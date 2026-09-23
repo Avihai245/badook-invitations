@@ -111,7 +111,7 @@ export function replyDietary(r: ResponseRecord): DietaryKey[] {
  */
 export function questionBreakdown(
   list: readonly ResponseRecord[],
-  q: CustomQuestion,
+  q: Pick<CustomQuestion, 'id' | 'type'> & { options?: readonly { value: string }[] },
 ): { value: string; count: number }[] | null {
   if (q.type === 'text') return null;
   const values = q.type === 'boolean' ? ['true', 'false'] : (q.options ?? []).map((o) => o.value);
@@ -147,6 +147,9 @@ export function matchesSearch(r: ResponseRecord, query: string): boolean {
 }
 
 // ─── CSV ──────────────────────────────────────────────────────────────────────────────────────────
+
+/** `noa-and-itay-rsvps.csv` */
+export const exportFileName = (slug: string) => `${slug}-rsvps.csv`;
 
 export interface CsvLabels {
   name: string;

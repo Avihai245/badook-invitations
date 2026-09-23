@@ -22,6 +22,7 @@ import { COUPLE_EVENTS } from '../templates/seed-copy';
 import type { TemplateEntry } from '../templates/registry';
 import { seedDocument } from '../templates/seed-document';
 import type { HostDb } from './host-db';
+import { NOTIFY_MODES } from '../lib/responses';
 
 export type ApiResult<T = unknown> = { status: number; body: T };
 const ok = <T>(body: T, status = 200): ApiResult<T> => ({ status, body });
@@ -256,6 +257,34 @@ export async function setArchived(
   if (!res) return fail(404, 'not_found');
   deps.revalidate(res.slug);
   return ok({ ok: true, ...res });
+}
+
+// ─── responses (§9B.3-G) ─────────────────────────────────────────────────────────────────────────
+
+/** DELETE a guest's reply (and its attendees) from the dashboard. */
+export async function deleteResponse(
+  userId: string,
+  id: string,
+  responseId: string,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  if (!(await deps.db.deleteResponse(id, userId, responseId))) return fail(404, 'not_found');
+  return ok({ ok: true });
+}
+
+const NotifySchema = z.strictObject({ mode: z.enum(NOTIFY_MODES) });
+
+/** How the host hears about replies: every reply, a daily digest, or not at all. */
+export async function setNotify(
+  userId: string,
+  id: string,
+  raw: unknown,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  const parsed = NotifySchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  if (!(await deps.db.setNotify(id, userId, parsed.data.mode))) return fail(404, 'not_found');
+  return ok({ ok: true, mode: parsed.data.mode });
 }
 
 // ─── uploads (§4 storage: signed upload URLs, MIME whitelist, size limits) ───────────────────────

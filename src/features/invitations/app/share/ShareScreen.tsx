@@ -1,6 +1,6 @@
 'use client';
 
-import { Copy, Download, ExternalLink, MessageCircle, PencilLine } from 'lucide-react';
+import { Copy, Download, ExternalLink, ListChecks, MessageCircle, PencilLine } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Card, Field, Input, Segmented, Textarea, useToast } from '@/components/app';
@@ -38,9 +38,12 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
           <h1 className="text-[26px] font-bold tracking-[-.01em]">{s.title}</h1>
           <p className="mt-1 text-muted">{s.subtitle}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="secondary" size="sm" icon={<PencilLine />} asChild>
             <Link href={`/app/invitations/${id}/edit`}>{s.edit}</Link>
+          </Button>
+          <Button variant="secondary" size="sm" icon={<ListChecks />} asChild>
+            <Link href={`/app/invitations/${id}/responses`}>{t.responses.title}</Link>
           </Button>
           <Button variant="secondary" size="sm" icon={<ExternalLink className="icon-dir" />} asChild>
             <a href={data.url} target="_blank" rel="noreferrer">

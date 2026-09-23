@@ -58,6 +58,9 @@ function deps(db: Partial<Record<keyof HostDb, unknown>> = {}) {
     duplicate: vi.fn(async () => ({ id: 'copy', slug: 'x-copy' })),
     setArchived: vi.fn(async () => ({ slug: 'noa-and-itay', status: 'archived', updatedAt: 'u' })),
     signedUpload: vi.fn(async (path: string) => ({ path, token: 'tok', url: `https://s/${path}?token=tok` })),
+    responses: vi.fn(async () => ({ notify: 'each', responses: [] })),
+    deleteResponse: vi.fn(async () => true),
+    setNotify: vi.fn(async () => true),
     ...db,
   } as unknown as MockDb;
   return {

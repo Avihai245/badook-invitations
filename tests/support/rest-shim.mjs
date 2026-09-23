@@ -34,6 +34,12 @@ const FUNCTIONS = new Set([
   'owner_invitation_version',
   'duplicate_invitation',
   'set_invitation_archived',
+  'owner_responses',
+  'owner_delete_response',
+  'set_invitation_notify',
+  'rsvp_notification_target',
+  'rsvp_digest_due',
+  'mark_rsvp_digest_sent',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';

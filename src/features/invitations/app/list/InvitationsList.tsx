@@ -1,6 +1,15 @@
 'use client';
 
-import { Archive, ArchiveRestore, Copy, MoreHorizontal, PencilLine, Plus, Share2 } from 'lucide-react';
+import {
+  Archive,
+  ArchiveRestore,
+  Copy,
+  ListChecks,
+  MoreHorizontal,
+  PencilLine,
+  Plus,
+  Share2,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -171,6 +180,15 @@ function InvitationCard({
             { label: t.list.menu.edit, icon: <PencilLine />, href },
             ...(item.status === 'published'
               ? [{ label: t.list.menu.share, icon: <Share2 />, href: `/app/invitations/${item.id}/share` }]
+              : []),
+            ...(item.status !== 'draft' || item.responses > 0
+              ? [
+                  {
+                    label: t.list.menu.responses,
+                    icon: <ListChecks />,
+                    href: `/app/invitations/${item.id}/responses`,
+                  },
+                ]
               : []),
             { label: t.list.menu.duplicate, icon: <Copy />, onSelect: onDuplicate },
             { type: 'separator' },

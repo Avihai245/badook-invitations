@@ -17,7 +17,7 @@ export async function hostApi<T = Record<string, unknown>>(
     method = 'GET',
     body,
     signal,
-  }: { method?: 'GET' | 'POST' | 'PATCH'; body?: unknown; signal?: AbortSignal } = {},
+  }: { method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'; body?: unknown; signal?: AbortSignal } = {},
 ): Promise<ApiResponse<T>> {
   try {
     const res = await fetch(url, {
