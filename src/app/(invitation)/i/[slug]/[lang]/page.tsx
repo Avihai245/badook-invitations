@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { InvitationDocument, Locale } from '@/features/invitations/contracts/types';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
-import { pageTitle } from '@/features/invitations/renderer/calendar-event';
+import { pageDescription, pageTitle } from '@/features/invitations/renderer/calendar-event';
 import {
   buildRenderContext,
   type RenderContext,
@@ -61,8 +61,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const ctx = context(invitation, locale);
   const { share } = invitation.doc;
   const title = pageTitle(ctx);
-  const description =
-    ctx.text(share.ogDescription) || [ctx.eventDateLong, ctx.hebrewDate].filter(Boolean).join(' · ');
+  const description = pageDescription(ctx);
   const url = `${ctx.publicBaseUrl}/i/${slug}?lang=${locale}`;
   // the document hash in the URL: link previews cache images by URL (a new one per publish)
   const image = {

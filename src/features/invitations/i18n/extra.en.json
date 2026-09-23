@@ -3,5 +3,6 @@
   "map.label": "Map: {name}",
   "rsvp.closed": "RSVPs are closed",
   "rsvp.alreadyReplied": "You already replied — edit",
-  "reveal.comingSoon": "The date is revealed here"
+  "reveal.comingSoon": "The date is revealed here",
+  "share.message": "Hi! 💌\n{title}\n{date}\nAll the details and RSVP at the link:\n{url}"
 }

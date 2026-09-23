@@ -18,6 +18,13 @@ export function pageTitle(ctx: RenderContext): string {
   return ctx.text(ctx.doc.share.ogTitle) || calendarTitle(ctx);
 }
 
+/** The link-preview description: the host's share description, else the date (+ the Hebrew date). */
+export function pageDescription(ctx: RenderContext): string {
+  return (
+    ctx.text(ctx.doc.share.ogDescription) || [ctx.eventDateLong, ctx.hebrewDate].filter(Boolean).join(' · ')
+  );
+}
+
 /** Calendar event of one venue — shared by the venue/RSVP calendar menus and /i/[slug]/event.ics. */
 export function venueCalendarEvent(ctx: RenderContext, venue: Venue): CalendarEvent {
   const { start, end } = eventRange(ctx.doc, venue);

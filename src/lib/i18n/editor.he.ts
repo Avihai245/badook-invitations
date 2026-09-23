@@ -509,6 +509,7 @@ export const editorHe = {
     copied: 'הקישור הועתק',
     open: 'פתיחת ההזמנה',
     toShare: 'לשיתוף בוואטסאפ',
+    moreSharing: 'QR והודעה מוכנה',
     published: 'ההזמנה פורסמה',
   },
   versionsDrawer: {

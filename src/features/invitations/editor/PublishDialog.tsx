@@ -7,8 +7,10 @@ import {
   ExternalLink,
   LoaderCircle,
   MessageCircle,
+  QrCode,
   TriangleAlert,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Dialog, Field, Input, cn, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
@@ -144,6 +146,9 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
               <a href={url} target="_blank" rel="noreferrer">
                 {p.open}
               </a>
+            </Button>
+            <Button variant="secondary" icon={<QrCode />} asChild>
+              <Link href={`/app/invitations/${meta.id}/share`}>{p.moreSharing}</Link>
             </Button>
             <Button variant="whatsapp" icon={<MessageCircle />} asChild>
               <a href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noreferrer">

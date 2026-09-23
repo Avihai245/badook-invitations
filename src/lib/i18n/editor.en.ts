@@ -514,6 +514,7 @@ export const editorEn: EditorDict = {
     copied: 'Link copied',
     open: 'Open the invitation',
     toShare: 'Share on WhatsApp',
+    moreSharing: 'QR and a ready message',
     published: 'Invitation published',
   },
   versionsDrawer: {

@@ -3,5 +3,6 @@
   "map.label": "מפה: {name}",
   "rsvp.closed": "מועד אישורי ההגעה הסתיים",
   "rsvp.alreadyReplied": "כבר עניתם — אפשר לעדכן",
-  "reveal.comingSoon": "התאריך יתגלה כאן"
+  "reveal.comingSoon": "התאריך יתגלה כאן",
+  "share.message": "היי! 💌\n{title}\n{date}\nכל הפרטים ואישור ההגעה בקישור:\n{url}"
 }

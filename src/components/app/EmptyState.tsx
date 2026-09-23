@@ -5,7 +5,7 @@ export type EmptyStateProps = {
   /** 120×120 illustration slot (an `<svg>` fills it). Decorative. */
   illustration?: ReactNode;
   title: ReactNode;
-  titleAs?: 'h2' | 'h3' | 'h4';
+  titleAs?: 'h1' | 'h2' | 'h3' | 'h4';
   /** One line, muted. */
   description?: ReactNode;
   /** CTA slot, e.g. `<Button>`. */
