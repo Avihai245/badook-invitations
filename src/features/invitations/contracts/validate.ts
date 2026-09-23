@@ -438,8 +438,9 @@ export function validateDocument(
   for (const [i, s] of doc.sections.entries()) {
     const base = `sections.${i}.data`;
     const severity = contentSeverity(s);
+    // A hidden empty section is simply unused — nothing to report.
     const emptyList = (key: string, field: FieldKey) =>
-      add({ path: `${base}.${key}`, code: 'empty_section', severity, field, sectionId: s.id });
+      s.enabled && add({ path: `${base}.${key}`, code: 'empty_section', severity, field, sectionId: s.id });
     switch (s.type) {
       case 'hero': {
         const m = s.data.media;

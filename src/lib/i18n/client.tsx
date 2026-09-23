@@ -1,7 +1,16 @@
 'use client';
 
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { dictFor, fmt, intlLocale, plural, uiDir, type AppDict, type PluralEntry, type UiLocale } from './app';
+import {
+  dictFor,
+  fmt,
+  intlLocale,
+  plural,
+  uiDir,
+  type AppDict,
+  type PluralEntry,
+  type UiLocale,
+} from './app';
 
 interface UiContextValue {
   locale: UiLocale;

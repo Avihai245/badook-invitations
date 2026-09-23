@@ -87,7 +87,10 @@ export function SignupForm() {
   const [state, action, pending] = useActionState<AuthState, FormData>(signUp, null);
   if (state?.sent) {
     return (
-      <AuthCard title={t.auth.checkEmailTitle} subtitle={fmt(t.auth.checkEmail, { email: state.email ?? '' })}>
+      <AuthCard
+        title={t.auth.checkEmailTitle}
+        subtitle={fmt(t.auth.checkEmail, { email: state.email ?? '' })}
+      >
         <Button asChild variant="secondary" fullWidth>
           <Link href="/login">{t.auth.toLogin}</Link>
         </Button>
@@ -112,7 +115,14 @@ export function SignupForm() {
           />
         </Field>
         <Field label={t.auth.password} required help={t.auth.passwordHint}>
-          <Input name="password" type="password" dir="ltr" autoComplete="new-password" minLength={8} required />
+          <Input
+            name="password"
+            type="password"
+            dir="ltr"
+            autoComplete="new-password"
+            minLength={8}
+            required
+          />
         </Field>
         <FormError error={state?.error} />
         <Button type="submit" size="lg" fullWidth loading={pending}>
@@ -155,7 +165,10 @@ export function ForgotPasswordForm() {
           <Button type="submit" size="lg" fullWidth loading={pending}>
             {t.auth.sendLink}
           </Button>
-          <Link href="/login" className="text-center text-[13px] text-muted underline-offset-2 hover:underline">
+          <Link
+            href="/login"
+            className="text-center text-[13px] text-muted underline-offset-2 hover:underline"
+          >
             {t.auth.toLogin}
           </Link>
         </form>
@@ -171,7 +184,14 @@ export function UpdatePasswordForm() {
     <AuthCard title={t.auth.updateTitle} subtitle={t.auth.updateSubtitle}>
       <form action={action} className="flex flex-col gap-4" noValidate>
         <Field label={t.auth.newPassword} required help={t.auth.passwordHint}>
-          <Input name="password" type="password" dir="ltr" autoComplete="new-password" minLength={8} required />
+          <Input
+            name="password"
+            type="password"
+            dir="ltr"
+            autoComplete="new-password"
+            minLength={8}
+            required
+          />
         </Field>
         <FormError error={state?.error} />
         <Button type="submit" size="lg" fullWidth loading={pending}>

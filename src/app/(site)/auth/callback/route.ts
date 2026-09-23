@@ -3,7 +3,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { serverEnv } from '@/lib/env';
 import { safeNext, sessionDb } from '@/lib/supabase/session';
 
-const OTP_TYPES: readonly EmailOtpType[] = ['signup', 'invite', 'magiclink', 'recovery', 'email_change', 'email'];
+const OTP_TYPES: readonly EmailOtpType[] = [
+  'signup',
+  'invite',
+  'magiclink',
+  'recovery',
+  'email_change',
+  'email',
+];
 
 /**
  * Landing URL of the Supabase Auth emails (sign-up confirmation, password recovery): exchanges the

@@ -19,7 +19,13 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, view
  * queries, dir and lang behave like on a phone), with every font pair of the template available —
  * the host can switch pairs. lang/dir/theme are set by the frame once the editor posts the document.
  */
-export default async function PreviewFrameLayout({ children, params }: { children: ReactNode; params: Params }) {
+export default async function PreviewFrameLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Params;
+}) {
   assertInvitationsEnabled();
   const entry = getTemplate((await params).template);
   if (!entry) notFound();

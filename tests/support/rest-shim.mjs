@@ -102,7 +102,8 @@ function verifyJwt(token) {
   const [head, body, sig] = String(token ?? '').split('.');
   if (!head || !body || !sig) return null;
   const expected = sign(`${head}.${body}`);
-  if (expected.length !== sig.length || !timingSafeEqual(Buffer.from(expected), Buffer.from(sig))) return null;
+  if (expected.length !== sig.length || !timingSafeEqual(Buffer.from(expected), Buffer.from(sig)))
+    return null;
   const claims = JSON.parse(Buffer.from(body, 'base64url').toString());
   return claims.exp * 1000 > Date.now() ? claims : null;
 }
@@ -165,7 +166,8 @@ function session(row) {
   };
 }
 
-const authError = (res, status, code, msg) => send(res, status, { code, error_code: code, msg, message: msg });
+const authError = (res, status, code, msg) =>
+  send(res, status, { code, error_code: code, msg, message: msg });
 
 async function userById(id) {
   return (await pool.query('select * from auth.users where id = $1', [id])).rows[0];
@@ -175,16 +177,26 @@ async function auth(req, res, path, query) {
   if (!ROLES[req.headers.apikey]) return authError(res, 401, 'no_api_key', 'Invalid API key');
   if (req.method === 'POST' && path === 'signup') {
     const { email, password, data } = await readBody(req);
-    const address = String(email ?? '').trim().toLowerCase();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(address)) return authError(res, 400, 'validation_failed', 'Invalid email');
-    if (String(password ?? '').length < 6) return authError(res, 422, 'weak_password', 'Password should be at least 6 characters');
+    const address = String(email ?? '')
+      .trim()
+      .toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(address))
+      return authError(res, 400, 'validation_failed', 'Invalid email');
+    if (String(password ?? '').length < 6)
+      return authError(res, 422, 'weak_password', 'Password should be at least 6 characters');
     const exists = (await pool.query('select 1 from auth.users where email = $1', [address])).rowCount;
     if (exists) return authError(res, 422, 'user_already_exists', 'User already registered');
     const row = (
       await pool.query(
         `insert into auth.users (id, aud, role, email, encrypted_password, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
          values ($1, 'authenticated', 'authenticated', $2, $3, $4, $5, now(), now()) returning *`,
-        [randomUUID(), address, hashPassword(password), { provider: 'email', providers: ['email'] }, data ?? {}],
+        [
+          randomUUID(),
+          address,
+          hashPassword(password),
+          { provider: 'email', providers: ['email'] },
+          data ?? {},
+        ],
       )
     ).rows[0];
     return send(res, 200, session(row));
@@ -192,7 +204,9 @@ async function auth(req, res, path, query) {
   if (req.method === 'POST' && path === 'token') {
     const body = await readBody(req);
     if (query.get('grant_type') === 'password') {
-      const address = String(body.email ?? '').trim().toLowerCase();
+      const address = String(body.email ?? '')
+        .trim()
+        .toLowerCase();
       const row = (await pool.query('select * from auth.users where email = $1', [address])).rows[0];
       if (!row || !checkPassword(String(body.password ?? ''), row.encrypted_password))
         return send(res, 400, {
@@ -206,7 +220,13 @@ async function auth(req, res, path, query) {
     }
     if (query.get('grant_type') === 'refresh_token') {
       const id = refreshTokens.get(body.refresh_token);
-      if (!id) return authError(res, 400, 'refresh_token_not_found', 'Invalid Refresh Token: Refresh Token Not Found');
+      if (!id)
+        return authError(
+          res,
+          400,
+          'refresh_token_not_found',
+          'Invalid Refresh Token: Refresh Token Not Found',
+        );
       refreshTokens.delete(body.refresh_token);
       return send(res, 200, session(await userById(id)));
     }
@@ -277,7 +297,11 @@ async function storage(req, res, rest, query) {
     if (bucket?.file_size_limit && file.length > Number(bucket.file_size_limit))
       return send(res, 413, { statusCode: '413', error: 'Payload too large' });
     if (bucket?.allowed_mime_types?.length && !bucket.allowed_mime_types.includes(contentType))
-      return send(res, 415, { statusCode: '415', error: 'invalid_mime_type', message: `mime type ${contentType} is not supported` });
+      return send(res, 415, {
+        statusCode: '415',
+        error: 'invalid_mime_type',
+        message: `mime type ${contentType} is not supported`,
+      });
     const target = storagePath(m[1], m[2]);
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, file);

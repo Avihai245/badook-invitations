@@ -8,7 +8,11 @@ import { useUi } from '@/lib/i18n/client';
 export function AppToasts({ children }: { children: ReactNode }) {
   const { t } = useUi();
   return (
-    <ToastProvider label={t.common.toastLabel} viewportLabel={t.common.toastViewport} closeLabel={t.common.close}>
+    <ToastProvider
+      label={t.common.toastLabel}
+      viewportLabel={t.common.toastViewport}
+      closeLabel={t.common.close}
+    >
       {children}
     </ToastProvider>
   );

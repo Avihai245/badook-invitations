@@ -294,6 +294,8 @@ export async function createUpload(
     ok: true,
     path: signed.path,
     token: signed.token,
+    /** PUT the file here (raw body, its content type) */
+    url: signed.url,
     ref: `upload:${signed.path}`,
     kind: limit.kind,
   });

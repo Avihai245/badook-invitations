@@ -7,6 +7,7 @@ export { Badge, Tag, type BadgeProps, type BadgeVariant } from './Badge';
 export { Bars, type BarsProps, type BarsRow } from './Bars';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button';
 export { Card, CardTitle, type CardPadding, type CardProps, type CardTitleProps } from './Card';
+export { Checkbox, type CheckboxProps } from './Checkbox';
 export {
   ColorSwatch,
   PaletteDots,

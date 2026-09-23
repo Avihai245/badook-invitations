@@ -17,7 +17,9 @@ export function fmt(template: string, vars: Record<string, string | number> = {}
   return template.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
 }
 
-export type PluralEntry = { one: string; other: string } & Partial<Record<'two' | 'many' | 'few' | 'zero', string>>;
+export type PluralEntry = { one: string; other: string } & Partial<
+  Record<'two' | 'many' | 'few' | 'zero', string>
+>;
 
 /** Picks the plural form with Intl.PluralRules (fallback `other`) and fills {n} plus `vars`. */
 export function plural(

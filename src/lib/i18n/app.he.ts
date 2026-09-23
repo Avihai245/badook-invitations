@@ -1,3 +1,5 @@
+import { editorHe } from './editor.he';
+
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
  * The invitation's own strings live in features/invitations/i18n; the editor language is independent of
@@ -5,6 +7,7 @@
  */
 export const he = {
   brand: 'Badook',
+  editor: editorHe,
   common: {
     close: 'סגירה',
     cancel: 'ביטול',
@@ -85,7 +88,12 @@ export const he = {
     corporate: 'אירוע חברה',
     other: 'אחר',
   },
-  status: { draft: 'טיוטה', published: 'פורסם', archived: 'בארכיון', unpublishedChanges: 'יש שינויים שלא פורסמו' },
+  status: {
+    draft: 'טיוטה',
+    published: 'פורסם',
+    archived: 'בארכיון',
+    unpublishedChanges: 'יש שינויים שלא פורסמו',
+  },
   list: {
     title: 'ההזמנות שלי',
     newInvitation: 'הזמנה חדשה',

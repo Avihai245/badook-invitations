@@ -68,7 +68,9 @@ export async function requestPasswordReset(_prev: AuthState, form: FormData): Pr
   const email = field(form, 'email').trim();
   if (!EMAIL_RE.test(email)) return { error: 'invalid_email', email };
   const db = await sessionDb();
-  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: callbackUrl('/auth/update-password') });
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: callbackUrl('/auth/update-password'),
+  });
   // Same answer whether or not the account exists (no account enumeration) — except rate limits.
   if (error && errorKey(error) === 'rate_limited') return { error: 'rate_limited', email };
   return { sent: true, email };

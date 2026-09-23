@@ -277,6 +277,8 @@ describe('structure and template references', () => {
         `required sections.${gi}.data.links.1.details`,
       ].sort(),
     );
+    faq.enabled = false; // a hidden empty section is just unused
+    expect(check(doc).issues.map((i) => i.code)).not.toContain('empty_section');
     const venues = doc.sections.find((s) => s.type === 'venues')!;
     if (venues.type !== 'venues') throw new Error();
     venues.data.items = Array.from({ length: 5 }, (_, i) => ({ ...venues.data.items[0]!, id: `v${i}` }));

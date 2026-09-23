@@ -53,7 +53,20 @@ export function usePreviewChannel(
       }
     };
     window.addEventListener('message', onMessage);
-    return () => window.removeEventListener('message', onMessage);
+    // The frame may have announced itself before this listener existed (hydration is slower than a
+    // cached frame): ask again, now and whenever the iframe (re)loads.
+    const ping = () =>
+      iframe.current?.contentWindow?.postMessage(
+        { type: 'ping', channel: PREVIEW_CHANNEL },
+        window.location.origin,
+      );
+    ping();
+    const el = iframe.current;
+    el?.addEventListener('load', ping);
+    return () => {
+      window.removeEventListener('message', onMessage);
+      el?.removeEventListener('load', ping);
+    };
   }, [iframe, sendDoc]);
 
   // (a reloaded iframe announces itself again with 'ready' and gets the current document)
@@ -64,7 +77,11 @@ export function usePreviewChannel(
   }, [doc, locale, debounceMs, sendDoc]);
 
   return {
-    highlight: useCallback((path: string | null, label?: string) => send({ type: 'highlight', path, label }), [send]),
+    highlight: useCallback(
+      (path: string | null, label?: string) => send({ type: 'highlight', path, label }),
+      [send],
+    ),
     replay: useCallback(() => send({ type: 'replay' }), [send]),
+    reveal: useCallback((path: string) => send({ type: 'reveal', path }), [send]),
   };
 }

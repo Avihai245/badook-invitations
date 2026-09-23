@@ -1,6 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react';
 import { dirOf, type InvitationDocument, type Locale, type TemplateManifest } from '../../contracts/types';
 import type { AssetBases } from '../../renderer/assets';
 import { buildRenderContext } from '../../renderer/context';
@@ -24,13 +32,19 @@ export function PreviewFrame({
   brand,
   bases,
   publicBaseUrl,
+  standalone = null,
 }: {
   template: TemplateManifest;
   brand: string;
   bases: AssetBases;
   publicBaseUrl: string;
+  /**
+   * "Open in a new tab": a saved draft (or published version) rendered full-page like the public
+   * invitation — cover included, the language switch as links — instead of waiting for the editor.
+   */
+  standalone?: { doc: InvitationDocument; locale: Locale; langHref: string | null } | null;
 }) {
-  const [state, setState] = useState<{ doc: InvitationDocument; locale: Locale } | null>(null);
+  const [state, setState] = useState<{ doc: InvitationDocument; locale: Locale } | null>(standalone);
   const [replay, setReplay] = useState(0);
   const highlight = useRef<{ path: string | null; label?: string }>({ path: null });
 
@@ -43,7 +57,10 @@ export function PreviewFrame({
     document.querySelector('.edit-chip')?.remove();
     const { path, label } = highlight.current;
     if (!path) return;
-    const found = closestRenderedPath(path, (p) => !!document.querySelector(`[data-edit-path="${CSS.escape(p)}"]`));
+    const found = closestRenderedPath(
+      path,
+      (p) => !!document.querySelector(`[data-edit-path="${CSS.escape(p)}"]`),
+    );
     const el = found ? document.querySelector<HTMLElement>(`[data-edit-path="${CSS.escape(found)}"]`) : null;
     if (!el) return;
     el.classList.add('edit-highlight');
@@ -61,17 +78,30 @@ export function PreviewFrame({
     }
     if (scroll) {
       const r = el.getBoundingClientRect();
-      if (r.top < 40 || r.bottom > window.innerHeight - 40) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      if (r.top < 40 || r.bottom > window.innerHeight - 40)
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
   }, []);
 
   // messages from the editor
   useEffect(() => {
+    if (standalone) return;
     const onMessage = (e: MessageEvent) => {
       if (e.origin !== window.location.origin || e.source !== window.parent) return;
       if (!isEnvelope<ParentToFrame>(e.data)) return;
       const msg = e.data;
-      if (msg.type === 'doc') setState({ doc: msg.doc, locale: msg.locale });
+      if (msg.type === 'ping') post({ type: 'ready' });
+      else if (msg.type === 'reveal') {
+        const found = closestRenderedPath(
+          msg.path,
+          (p) => !!document.querySelector(`[data-edit-path="${CSS.escape(p)}"]`),
+        );
+        const el = found
+          ? document.querySelector<HTMLElement>(`[data-edit-path="${CSS.escape(found)}"]`)
+          : null;
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        el?.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+      } else if (msg.type === 'doc') setState({ doc: msg.doc, locale: msg.locale });
       else if (msg.type === 'highlight') {
         highlight.current = { path: msg.path, label: msg.label };
         applyHighlight(true);
@@ -85,7 +115,7 @@ export function PreviewFrame({
     window.addEventListener('message', onMessage);
     post({ type: 'ready' });
     return () => window.removeEventListener('message', onMessage);
-  }, [post, applyHighlight]);
+  }, [post, applyHighlight, standalone]);
 
   // replay: live mode with the cover until the opening has played
   useEffect(() => {
@@ -103,6 +133,7 @@ export function PreviewFrame({
 
   // click an editable node → select it in the editor (links and buttons don't navigate or submit)
   useEffect(() => {
+    if (standalone) return;
     const onClick = (e: MouseEvent) => {
       if (replay) return;
       const target = e.target as Element | null;
@@ -118,7 +149,7 @@ export function PreviewFrame({
       document.removeEventListener('click', onClick, true);
       document.removeEventListener('submit', onSubmit, true);
     };
-  }, [post, replay]);
+  }, [post, replay, standalone]);
 
   const ctx = useMemo(
     () =>
@@ -135,7 +166,7 @@ export function PreviewFrame({
 
   // <html> carries lang/dir/theme exactly like the public page's root layout
   useLayoutEffect(() => {
-    if (!state) return;
+    if (!state || standalone) return;
     const root = document.documentElement;
     root.lang = state.locale;
     root.dir = dirOf(state.locale);
@@ -148,8 +179,54 @@ export function PreviewFrame({
       if (key.startsWith('--')) root.style.setProperty(key, String(value));
     }
     applyHighlight(false);
-  }, [state, template, replay, applyHighlight]);
+  }, [state, template, replay, applyHighlight, standalone]);
 
+  if (standalone)
+    return (
+      <StandalonePreview
+        {...standalone}
+        template={template}
+        brand={brand}
+        bases={bases}
+        publicBaseUrl={publicBaseUrl}
+      />
+    );
   if (!ctx) return null;
   return <InvitationBody key={replay} ctx={ctx} showCover={replay > 0} langSwitchHref={null} />;
+}
+
+function StandalonePreview({
+  doc,
+  locale,
+  langHref,
+  template,
+  brand,
+  bases,
+  publicBaseUrl,
+}: {
+  doc: InvitationDocument;
+  locale: Locale;
+  langHref: string | null;
+  template: TemplateManifest;
+  brand: string;
+  bases: AssetBases;
+  publicBaseUrl: string;
+}) {
+  const ctx = useMemo(
+    () => buildRenderContext(doc, template, locale, { mode: 'live', brand, bases, publicBaseUrl }),
+    [doc, template, locale, brand, bases, publicBaseUrl],
+  );
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.lang = locale;
+    root.dir = dirOf(locale);
+    root.dataset.theme = themeMode(template, doc);
+    delete root.dataset.opened;
+    root.classList.remove('no-js');
+    const vars = themeVars(template, doc, locale) as CSSProperties & Record<string, string>;
+    for (const [key, value] of Object.entries(vars)) {
+      if (key.startsWith('--')) root.style.setProperty(key, String(value));
+    }
+  }, [doc, template, locale]);
+  return <InvitationBody ctx={ctx} showCover langSwitchHref={langHref} />;
 }

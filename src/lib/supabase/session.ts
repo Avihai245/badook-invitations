@@ -13,7 +13,8 @@ import { serverEnv } from '../env';
  */
 export async function sessionDb(): Promise<SupabaseClient> {
   const { NEXT_PUBLIC_SUPABASE_URL: url, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: key } = serverEnv();
-  if (!url || !key) throw new Error('Supabase is not configured: set NEXT_PUBLIC_SUPABASE_URL and the publishable key');
+  if (!url || !key)
+    throw new Error('Supabase is not configured: set NEXT_PUBLIC_SUPABASE_URL and the publishable key');
   const store = await cookies();
   return createServerClient(url, key, {
     cookies: {

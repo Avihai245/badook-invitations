@@ -10,8 +10,12 @@ export type ParentToFrame =
   | { type: 'doc'; doc: InvitationDocument; locale: Locale }
   /** outline the node for this path (a field got focus), with a small label chip; null clears */
   | { type: 'highlight'; path: string | null; label?: string }
+  /** scroll the node for this path into view (a section was selected), without outlining it */
+  | { type: 'reveal'; path: string }
   /** play the cover opening again */
-  | { type: 'replay' };
+  | { type: 'replay' }
+  /** the editor (re)attached its listener: answer with 'ready' (a 'ready' sent before that was lost) */
+  | { type: 'ping' };
 
 export type FrameToParent =
   | { type: 'ready' }

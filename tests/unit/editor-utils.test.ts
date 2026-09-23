@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { validateDocument } from '@/features/invitations/contracts/validate';
 import { availableEntries, CATALOG, insertionIndex, newSection } from '@/features/invitations/editor/catalog';
 import { commit, createHistory, redo, replacePresent, undo } from '@/features/invitations/editor/history';
+import { addLocale, removeLocale } from '@/features/invitations/editor/locales';
 import {
   getAt,
   insertAt,
@@ -141,5 +142,46 @@ describe('section catalog', () => {
     if (faq.type !== 'faq') throw new Error();
     expect(Object.keys(faq.data.title)).toEqual(['en']);
     expect(Object.keys(faq.data.items[0]!.q)).toEqual(['en']);
+  });
+});
+
+describe('invitation languages (add / remove)', () => {
+  const { manifest, defaults } = requireTemplate('sahar-bordeaux');
+  const heOnly = () => removeLocale(structuredClone(FIXTURES['wedding-he-en']), 'en');
+
+  it('removes a language from every text and keeps the default valid', () => {
+    const doc = heOnly();
+    expect(doc.locales).toEqual(['he']);
+    expect(doc.defaultLocale).toBe('he');
+    expect(JSON.stringify(doc)).not.toMatch(/"en":/);
+    const en = removeLocale(structuredClone(FIXTURES['wedding-he-en']), 'he');
+    expect(en.defaultLocale).toBe('en');
+    expect(removeLocale(en, 'en')).toBe(en); // never the last one
+  });
+
+  it('adds a language: template copy for untouched texts, host content left to translate', () => {
+    const seeded = demoDocument('sahar-bordeaux', 'wedding', ['he'], 'he');
+    seeded.sections = seeded.sections.map((s) =>
+      s.type === 'text' && s.data.kind === 'story'
+        ? { ...s, data: { ...s.data, body: { he: 'הסיפור שלנו בקצרה' } } }
+        : s,
+    );
+    const doc = addLocale(seeded, 'en', manifest, defaults);
+    expect(doc.locales).toEqual(['he', 'en']);
+    const countdown = doc.sections.find((s) => s.type === 'countdown');
+    expect(countdown?.type === 'countdown' && countdown.data.title.en).toBeTruthy();
+    const story = doc.sections.find((s) => s.type === 'text' && s.data.kind === 'story');
+    expect(story?.type === 'text' && story.data.body.en).toBeUndefined(); // rewritten by the host
+    expect(doc.hosts.primary.en).toBeUndefined(); // names are the host's to translate
+    expect(doc.hosts.joiner).toEqual({ he: '&', en: '&' });
+    const { errors } = validateDocument(doc, manifest, { mode: 'publish', now: Date.parse('2026-01-01') });
+    expect(errors.some((e) => e.code === 'missing_translation' && e.path === 'hosts.primary.en')).toBe(true);
+    expect(addLocale(doc, 'en', manifest, defaults)).toBe(doc);
+  });
+
+  it('round-trips a bilingual fixture through remove + add without losing Hebrew', () => {
+    const doc = addLocale(heOnly(), 'en', manifest, defaults);
+    expect(doc.hosts.primary.he).toBe(FIXTURES['wedding-he-en'].hosts.primary.he);
+    expect(doc.locales).toEqual(['he', 'en']);
   });
 });

@@ -145,10 +145,10 @@ export const hostDb = {
       p_archived: archived,
     }),
 
-  async signedUpload(path: string): Promise<{ path: string; token: string }> {
+  async signedUpload(path: string): Promise<{ path: string; token: string; url: string }> {
     const { data, error } = await serviceDb().storage.from('invitation-media').createSignedUploadUrl(path);
     if (error || !data) throw new Error(`signed upload: ${error?.message ?? 'no data'}`);
-    return { path: data.path, token: data.token };
+    return { path: data.path, token: data.token, url: data.signedUrl };
   },
 };
 

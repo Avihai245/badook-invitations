@@ -31,6 +31,7 @@ import { useUi } from '@/lib/i18n/client';
 import type { EventType, L10n, Locale } from '../../contracts/types';
 import { CAPS } from '../../contracts/validate';
 import { requireTemplate } from '../../templates/registry';
+import { browserTimezone, DEFAULT_TIMEZONE, timezoneOptions } from '../../lib/timezones';
 import { COUPLE_EVENTS } from '../../templates/seed-copy';
 
 export interface WizardSeed {
@@ -55,7 +56,6 @@ const EVENT_ICONS: Record<EventType, LucideIcon> = {
   other: Sparkles,
 };
 
-const DEFAULT_TIMEZONE = 'Asia/Jerusalem';
 /** the create API keeps up to 40 characters of the parents' line */
 const PARENTS_MAX = 40;
 
@@ -98,24 +98,6 @@ function nameFields(type: EventType, f: AppDict['wizard']['fields']): NameField[
   }
 }
 
-function timezoneOptions(): { id: string; label: string }[] {
-  const ids = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : [];
-  const all = ids.includes(DEFAULT_TIMEZONE) ? ids : [DEFAULT_TIMEZONE, ...ids];
-  const now = new Date();
-  return all.map((id) => {
-    let offset = '';
-    try {
-      offset =
-        new Intl.DateTimeFormat('en', { timeZone: id, timeZoneName: 'shortOffset' })
-          .formatToParts(now)
-          .find((p) => p.type === 'timeZoneName')?.value ?? '';
-    } catch {
-      // unknown to this engine: listed without an offset
-    }
-    return { id, label: `${id.replace(/_/g, ' ')}${offset ? ` (${offset})` : ''}` };
-  });
-}
-
 /**
  * New-invitation wizard (§9B.3-C): a 560px dialog in 3 steps — event type → names, date and time →
  * languages (+ the names in the other language) — then POST /api/invitations and on to the editor.
@@ -138,7 +120,8 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
   const [age, setAge] = useState('');
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
-  const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
+  // §7.2: Asia/Jerusalem for Hebrew, otherwise the browser's zone.
+  const [timezone, setTimezone] = useState(() => (ui === 'he' ? DEFAULT_TIMEZONE : browserTimezone()));
   const [languages, setLanguages] = useState<Languages>(first);
   const [defaultLocale, setDefaultLocale] = useState<Locale>(first);
   const [attempted, setAttempted] = useState({ 2: false, 3: false });
@@ -161,7 +144,7 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
   const locales: Locale[] =
     languages === 'both' ? [defaultLocale, ...supported.filter((l) => l !== defaultLocale)] : [languages];
   const others = locales.filter((l) => l !== first);
-  const zones = useMemo(() => (step === 2 ? timezoneOptions() : []), [step]);
+  const zones = useMemo(() => (step === 2 ? timezoneOptions([timezone]) : []), [step, timezone]);
 
   const namesOf = (l: Locale) => names[l] ?? NO_NAMES;
   const setName = (l: Locale, key: NameKey, value: string) =>

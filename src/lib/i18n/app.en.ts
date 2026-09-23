@@ -1,8 +1,10 @@
 import type { AppDict } from './app.he';
+import { editorEn } from './editor.en';
 
 /** Host-app UI strings, English. Same shape as app.he.ts (checked by the type). */
 export const en: AppDict = {
   brand: 'Badook',
+  editor: editorEn,
   common: {
     close: 'Close',
     cancel: 'Cancel',
@@ -83,11 +85,19 @@ export const en: AppDict = {
     corporate: 'Company event',
     other: 'Other',
   },
-  status: { draft: 'Draft', published: 'Live', archived: 'Archived', unpublishedChanges: 'Unpublished changes' },
+  status: {
+    draft: 'Draft',
+    published: 'Live',
+    archived: 'Archived',
+    unpublishedChanges: 'Unpublished changes',
+  },
   list: {
     title: 'My invitations',
     newInvitation: 'New invitation',
-    stats: { one: '1 response · {attending} attending', other: '{responses} responses · {attending} attending' },
+    stats: {
+      one: '1 response · {attending} attending',
+      other: '{responses} responses · {attending} attending',
+    },
     noResponses: 'No responses yet',
     menu: {
       edit: 'Edit',

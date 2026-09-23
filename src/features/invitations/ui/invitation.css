@@ -1627,7 +1627,9 @@ footer.sec {
   border-radius: 4px;
   background: #2563eb;
   color: #fff;
-  font: 600 11px/1.6 system-ui, sans-serif;
+  font:
+    600 11px/1.6 system-ui,
+    sans-serif;
   white-space: nowrap;
   pointer-events: none;
 }

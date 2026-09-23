@@ -59,7 +59,7 @@ export function PreviewDialog({
       title={fmt(t.gallery.preview.title, { name })}
       description={manifest.description[ui] ?? manifest.description.en}
       closeLabel={t.common.close}
-      className="max-w-[920px]"
+      className="max-w-[920px]!"
       footer={
         <>
           <Button variant="ghost" asChild icon={<ExternalLink className="icon-dir" />}>
