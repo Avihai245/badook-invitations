@@ -61,17 +61,21 @@ export function seedSql(): string {
     );
   });
   if (only !== 'templates') {
+    // Non-login owner of the demo invitations. Supabase Auth reads these token columns as strings, so
+    // they must be '' rather than NULL (NULL there breaks user listing in the dashboard).
     lines.push(
-      `insert into auth.users (instance_id, id, aud, role, email, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)`,
+      `insert into auth.users (instance_id, id, aud, role, email, encrypted_password, confirmation_token, recovery_token,`,
+      `    email_change_token_new, email_change, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)`,
       `  values ('00000000-0000-0000-0000-000000000000', ${lit(DEMO_OWNER_ID)}, 'authenticated', 'authenticated', ${lit(DEMO_OWNER_EMAIL)},`,
-      `    '{"provider":"email","providers":["email"]}', '{"name":"Demo invitations"}', now(), now())`,
+      `    '', '', '', '', '', '{"provider":"email","providers":["email"]}', '{"name":"Demo invitations"}', now(), now())`,
       `  on conflict (id) do nothing;`,
     );
     for (const { slug, doc } of demoInvitations()) {
       const id = idFor(slug);
       lines.push(
+        `with d(doc) as (select ${json(doc)})`,
         `insert into public.invitations (id, owner_id, template_id, slug, status, event_type, draft, published, version, published_at)`,
-        `  values (${lit(id)}, ${lit(DEMO_OWNER_ID)}, ${lit(doc.templateId)}, ${lit(slug)}, 'published', ${lit(doc.eventType)}, ${json(doc)}, ${json(doc)}, 1, now())`,
+        `  select ${lit(id)}, ${lit(DEMO_OWNER_ID)}, ${lit(doc.templateId)}, ${lit(slug)}, 'published', ${lit(doc.eventType)}, d.doc, d.doc, 1, now() from d`,
         `  on conflict (slug) do update set template_id = excluded.template_id, event_type = excluded.event_type,`,
         `    draft = excluded.draft, published = excluded.published, status = 'published', published_at = now()`,
         `  where public.invitations.owner_id = ${lit(DEMO_OWNER_ID)};`,
