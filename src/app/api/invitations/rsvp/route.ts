@@ -1,3 +1,4 @@
+import { notifyReply } from '@/features/invitations/server/notify';
 import { getPublishedInvitation } from '@/features/invitations/server/published';
 import { MAX_BODY_BYTES, RATE_LIMIT, handleRsvp, type RsvpDeps } from '@/features/invitations/server/rsvp';
 import { serverEnv } from '@/lib/env';
@@ -5,6 +6,8 @@ import { invitationsEnabled } from '@/lib/feature';
 import { serviceDb } from '@/lib/supabase/server';
 
 const NO_STORE = { 'cache-control': 'no-store' };
+/** The longest a guest waits for the host's notification email to be handed to the provider. */
+const NOTIFY_WAIT_MS = 2500;
 
 /**
  * The guest's address, for the per-IP rate limit (stored only as a salted hash). CloudFront's own
@@ -54,7 +57,15 @@ export async function POST(request: Request) {
   if (declared > MAX_BODY_BYTES)
     return Response.json({ ok: false, code: 'invalid' }, { status: 413, headers: NO_STORE });
   try {
-    const { status, body } = await handleRsvp(await request.text(), clientIp(request), deps());
+    const { status, body, saved } = await handleRsvp(await request.text(), clientIp(request), deps());
+    // the host's email goes out before we answer (a serverless function may freeze right after the
+    // response), but a slow or failing mail provider never holds the guest up or fails the reply
+    if (saved) {
+      await Promise.race([
+        notifyReply(saved).catch((err: unknown) => console.error('RSVP notification failed', err)),
+        new Promise((resolve) => setTimeout(resolve, NOTIFY_WAIT_MS)),
+      ]);
+    }
     return Response.json(body, { status, headers: NO_STORE });
   } catch (err) {
     console.error('RSVP failed', err);

@@ -28,6 +28,11 @@ const ServerEnvSchema = z.object({
   INVITES_DEV_ROUTES: flag(false),
   INVITES_TURNSTILE_SITE_KEY: z.string().default(''),
   NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL: z.string().default(''),
+  // host notifications (P4): Resend API key + sender; without them emails are only logged
+  INVITES_EMAIL_API_KEY: z.string().default(''),
+  INVITES_EMAIL_FROM: z.string().default(''),
+  // bearer token of POST /api/cron/rsvp-digest (the daily summary); empty = the endpoint is off
+  INVITES_CRON_SECRET: z.string().default(''),
 });
 
 export type ServerEnv = z.infer<typeof ServerEnvSchema>;

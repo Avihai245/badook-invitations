@@ -80,9 +80,18 @@ describe('RSVP endpoint rules', () => {
       }),
       d,
     );
-    expect(r).toEqual({
+    expect(r).toMatchObject({
       status: 200,
       body: { ok: true, responseId: 'resp-1', editToken: expect.any(String) },
+    });
+    // what the host notification gets
+    expect(r.saved?.reply).toEqual({
+      name: 'Dana Levi',
+      attending: true,
+      adults: 2,
+      children: 1,
+      message: 'alert(1)Mazal tov!',
+      replaced: false,
     });
     const input = d.submit.mock.calls[0]![0];
     expect(input.response).toMatchObject({
@@ -112,6 +121,7 @@ describe('RSVP endpoint rules', () => {
     expect(r.body.ok).toBe(true);
     expect(d.loadInvitation).not.toHaveBeenCalled();
     expect(d.submit).not.toHaveBeenCalled();
+    expect(r.saved).toBeUndefined(); // and nobody gets an email about it
   });
 
   it('submitted < 3s after rendering → rejected; a client clock ahead of the server is not judged', async () => {

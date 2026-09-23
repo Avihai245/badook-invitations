@@ -271,6 +271,25 @@ export const en: AppDict = {
       kids_meal: "Kids' meal",
     },
   },
+  email: {
+    subjectYes: 'New RSVP: {name} · {guests}',
+    subjectNo: 'New reply: {name} · not attending',
+    subjectUpdated: 'Reply updated: {name} · {status}',
+    guests: { one: '1 guest', other: '{n} guests' },
+    attending: 'Attending',
+    declined: 'Not attending',
+    counts: '{adults} adults · {children} children',
+    message: 'Their message:',
+    open: 'See all RSVPs',
+    footerEach:
+      'You get this email because notifications for every reply are on — change it on the RSVP dashboard.',
+    digestSubject: {
+      one: 'Daily summary: 1 new reply · {title}',
+      other: 'Daily summary: {n} new replies · {title}',
+    },
+    digestIntro: 'Replies since the last summary:',
+    footerDigest: 'This is the daily RSVP summary — change it on the RSVP dashboard.',
+  },
   share: {
     metaTitle: 'Share · {name}',
     title: 'Your invitation is live 🎉',

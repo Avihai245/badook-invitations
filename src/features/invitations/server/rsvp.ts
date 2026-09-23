@@ -1,8 +1,15 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { RsvpSubmissionSchema } from '../contracts/schemas';
-import type { DietaryKey, RsvpConfig, RsvpResult, RsvpSubmission } from '../contracts/types';
+import type {
+  DietaryKey,
+  InvitationDocument,
+  RsvpConfig,
+  RsvpResult,
+  RsvpSubmission,
+} from '../contracts/types';
 import { t } from '../i18n/dictionary';
 import { endOfDayUtc } from '../lib/dates';
+import type { ReplySummary } from '../lib/notify-email';
 import { toE164 } from '../lib/phone';
 import type { PublishedInvitation } from './published';
 
@@ -60,6 +67,8 @@ export interface RsvpDeps {
 export interface RsvpOutcome {
   status: number;
   body: RsvpResult;
+  /** a reply really saved (not the honeypot's fake success): what the host notification needs */
+  saved?: { invitationId: string; doc: InvitationDocument; reply: ReplySummary };
 }
 
 export const sha256 = (s: string) => createHash('sha256').update(s).digest('hex');
@@ -275,6 +284,18 @@ export async function handleRsvp(raw: string, ip: string | null, deps: RsvpDeps)
       ok: true,
       responseId: saved.id,
       editToken: saved.replaced && sub.editToken ? sub.editToken : token,
+    },
+    saved: {
+      invitationId: invitation.id,
+      doc,
+      reply: {
+        name: response.primary_name,
+        attending: response.attending,
+        adults: response.adults_count,
+        children: response.children_count,
+        message: response.message,
+        replaced: saved.replaced,
+      },
     },
   };
 }

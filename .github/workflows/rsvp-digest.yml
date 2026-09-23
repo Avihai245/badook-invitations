@@ -1,0 +1,27 @@
+# The hosts' daily RSVP summary (invitations set to "daily summary" on the responses dashboard).
+# Repository secrets: INVITES_CRON_URL = the site (e.g. https://invites.example.com) and
+# INVITES_CRON_SECRET = the app's INVITES_CRON_SECRET. Without them the job does nothing.
+name: RSVP daily summary
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # 09:00 in Israel in summer, 08:00 in winter
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send the summaries
+        env:
+          URL: ${{ secrets.INVITES_CRON_URL }}
+          SECRET: ${{ secrets.INVITES_CRON_SECRET }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$SECRET" ]; then
+            echo "INVITES_CRON_URL / INVITES_CRON_SECRET are not set — nothing to do."
+            exit 0
+          fi
+          curl -fsS --max-time 120 -X POST -H "authorization: Bearer $SECRET" "${URL%/}/api/cron/rsvp-digest"
