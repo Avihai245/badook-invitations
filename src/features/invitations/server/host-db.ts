@@ -45,6 +45,8 @@ export interface OwnerInvitation {
   publishedAt: string | null;
   updatedAt: string;
   createdAt: string;
+  /** the save-the-date this invitation was created from (its page links here once published) */
+  sourceSlug: string | null;
 }
 
 export type SaveDraftResult =
@@ -93,6 +95,8 @@ export const hostDb = {
     eventType: EventType,
     slug: string,
     draft: InvitationDocument,
+    /** the owner's save-the-date this is the full invitation of */
+    sourceId?: string,
   ) =>
     rpc<{ id: string; slug: string }>('create_invitation', {
       p_owner_id: ownerId,
@@ -100,6 +104,7 @@ export const hostDb = {
       p_event_type: eventType,
       p_slug: slug,
       p_draft: draft,
+      ...(sourceId ? { p_source_id: sourceId } : {}),
     }),
 
   saveDraft: (id: string, ownerId: string, draft: InvitationDocument, expectedUpdatedAt: string) =>

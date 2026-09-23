@@ -11,7 +11,16 @@ export interface PublishedInvitation {
   slug: string;
   doc: InvitationDocument;
   entry: TemplateEntry;
+  /** a save-the-date's full invitation, once published (the page links to it) */
+  followUp: FollowUp | null;
 }
+
+export interface FollowUp {
+  slug: string;
+  locales: Locale[];
+}
+
+const isLocale = (v: unknown): v is Locale => (LOCALES as readonly unknown[]).includes(v);
 
 /**
  * The published document of `slug` through the public RPC (§4: never the draft or the owner), migrated
@@ -31,7 +40,12 @@ export const getPublishedInvitation = cache(async (slug: string): Promise<Publis
   }
   const entry = getTemplate(doc.templateId);
   if (!entry) return null;
-  return { id: (data as { id: string }).id, slug, doc, entry };
+  const raw = (data as { followUp?: { slug?: unknown; locales?: unknown } | null }).followUp;
+  const followUp =
+    raw && typeof raw.slug === 'string' && SLUG_RE.test(raw.slug)
+      ? { slug: raw.slug, locales: Array.isArray(raw.locales) ? raw.locales.filter(isLocale) : [] }
+      : null;
+  return { id: (data as { id: string }).id, slug, doc, entry, followUp };
 });
 
 /**

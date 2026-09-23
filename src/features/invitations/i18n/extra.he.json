@@ -14,5 +14,8 @@
   "reveal.button": "גילוי התאריך",
   "reveal.revealed": "התאריך נחשף",
   "gifts.copy": "העתקה",
-  "gifts.copied": "הועתק"
+  "gifts.copied": "הועתק",
+  "followUp.title": "ההזמנה כבר כאן",
+  "followUp.body": "כל הפרטים מחכים לכם בהזמנה המלאה.",
+  "followUp.cta": "לצפייה בהזמנה"
 }

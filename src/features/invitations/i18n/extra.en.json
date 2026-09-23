@@ -14,5 +14,8 @@
   "reveal.button": "Reveal the date",
   "reveal.revealed": "The date is revealed",
   "gifts.copy": "Copy",
-  "gifts.copied": "Copied"
+  "gifts.copied": "Copied",
+  "followUp.title": "The invitation is here",
+  "followUp.body": "All the details are waiting in the full invitation.",
+  "followUp.cta": "View the invitation"
 }

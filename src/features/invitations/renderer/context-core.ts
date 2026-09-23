@@ -53,6 +53,8 @@ export interface RenderContext {
   coverMedia: CoverMedia;
   /** the music track to play after the cover opens (null = none) */
   musicUrl: string | null;
+  /** a save-the-date's published full invitation — in this locale when it has it */
+  followUp: { href: string; lang: Locale | null } | null;
 }
 
 export interface RenderOptions {
@@ -65,6 +67,8 @@ export interface RenderOptions {
   /** QA/dev only: cover media and music instead of the template's (fixtures) */
   coverMedia?: CoverMedia;
   musicUrl?: string | null;
+  /** a save-the-date's full invitation, once published: the page links to it */
+  followUp?: { slug: string; locales: Locale[] } | null;
 }
 
 /**
@@ -110,5 +114,13 @@ export function createRenderContext(
     indexOf: (section) => indexById.get(section.id) ?? -1,
     coverMedia: options.coverMedia ?? coverMedia(template, options.bases),
     musicUrl: options.musicUrl !== undefined ? options.musicUrl : musicUrl(doc, template, options.bases),
+    followUp: options.followUp
+      ? {
+          href: options.followUp.locales.includes(locale)
+            ? `/i/${options.followUp.slug}?lang=${locale}`
+            : `/i/${options.followUp.slug}`,
+          lang: options.followUp.locales.includes(locale) ? locale : null,
+        }
+      : null,
   };
 }

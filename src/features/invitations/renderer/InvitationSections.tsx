@@ -1,4 +1,5 @@
 import { Fragment, type ComponentType } from 'react';
+import { FollowUpCard } from '../sections/follow-up/FollowUpCard';
 import { Decoration, type SectionViewProps } from '../sections/shared';
 import { SECTION_VIEWS } from '../sections/views';
 import type { RenderContext } from './context-core';
@@ -16,7 +17,12 @@ export function InvitationSections({ ctx }: { ctx: RenderContext }) {
         return (
           <Fragment key={section.id}>
             <View section={section} prev={enabled[k - 1]} ctx={ctx} />
-            {section.type === 'hero' ? <Decoration slot="afterHero" ctx={ctx} /> : null}
+            {section.type === 'hero' ? (
+              <>
+                <Decoration slot="afterHero" ctx={ctx} />
+                <FollowUpCard ctx={ctx} />
+              </>
+            ) : null}
           </Fragment>
         );
       })}

@@ -100,14 +100,16 @@ describe('anonymous', () => {
     ).rejects.toThrow(/permission denied/);
   });
 
-  it('get_published_invitation returns only id, slug, document and template', async () => {
+  it('get_published_invitation returns only id, slug, document, template and a follow-up link', async () => {
     const r = await as(
       c,
       'anon',
       null,
       async () => (await c.query(`select get_published_invitation('a-published') r`)).rows[0].r,
     );
-    expect(Object.keys(r).sort()).toEqual(['document', 'id', 'slug', 'template']);
+    expect(Object.keys(r).sort()).toEqual(['document', 'followUp', 'id', 'slug', 'template']);
+    // a save-the-date's full invitation: only its slug and languages (null here)
+    expect(r.followUp).toBeNull();
     expect(r.id).toBe(publishedId);
     expect(r.template.id).toBe('sahar-bordeaux');
     expect(JSON.stringify(r)).not.toContain(OWNER_A);

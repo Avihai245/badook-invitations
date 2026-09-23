@@ -122,12 +122,36 @@ export const en: AppDict = {
     followUp: {
       title: 'The full invitation',
       description:
-        'The names, date, languages, design and opening are copied from the save-the-date. The save-the-date and its link stay as they are.',
+        'The names, date, languages, design and opening are copied from the save-the-date. The save-the-date stays as it is, and once the new invitation is published it links to it.',
       typeLabel: 'Which event?',
       create: 'Create the invitation',
       creating: 'Preparing the full invitation…',
       error: 'We couldn’t create the invitation. Please try again.',
     },
+  },
+  home: {
+    soon: 'Coming soon: digital invitations with RSVPs — in Hebrew and English.',
+    title: 'Digital invitations your guests will love',
+    subtitle:
+      'Pick a design, add your details and send it on WhatsApp — with an animated opening, music and RSVPs in one place. In Hebrew and English.',
+    start: 'Create an invitation',
+    login: 'Sign in',
+    sample: 'See a sample invitation',
+    features: {
+      opening: {
+        title: 'Animated opening & music',
+        body: 'An envelope that opens with a tap, a song and a live Hebrew–English switch.',
+      },
+      rsvp: {
+        title: 'RSVPs in one place',
+        body: 'Who is coming, how many children, dietary needs — and an Excel export in one click.',
+      },
+      share: {
+        title: 'Send on WhatsApp',
+        body: 'A link with a beautiful preview, a ready message and a QR code.',
+      },
+    },
+    footer: 'Badook · digital invitations',
   },
   gallery: {
     title: 'Choose a design',

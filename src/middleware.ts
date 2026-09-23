@@ -7,7 +7,7 @@ import { NextResponse, type NextRequest } from 'next/server';
  * cacheable (responses to middleware rewrites are `private, no-store`).
  *
  * Host app: refreshes the Supabase session cookies (@supabase/ssr) and sends signed-out visitors of
- * /app/… to /login (and signed-in visitors of /login or /signup to their invitations).
+ * /app/… to /login (and signed-in visitors of the home page, /login or /signup to their invitations).
  */
 /**
  * Read at request time: a literal `process.env.NEXT_PUBLIC_*` is inlined by `next build`, which would
@@ -51,11 +51,12 @@ export async function middleware(request: NextRequest) {
   if (!user && pathname.startsWith('/app')) {
     return redirectTo(`/login?next=${encodeURIComponent(pathname + search)}`);
   }
-  if (user && (pathname === '/login' || pathname === '/signup')) return redirectTo('/app/invitations');
+  if (user && (pathname === '/' || pathname === '/login' || pathname === '/signup'))
+    return redirectTo('/app/invitations');
   return response;
 }
 
 export const config = {
   runtime: 'nodejs',
-  matcher: ['/dev/:path*', '/app/:path*', '/login', '/signup', '/auth/:path*'],
+  matcher: ['/', '/dev/:path*', '/app/:path*', '/login', '/signup', '/auth/:path*'],
 };

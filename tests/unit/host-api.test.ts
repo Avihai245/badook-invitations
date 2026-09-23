@@ -37,6 +37,7 @@ function invitation(
     publishedAt: null,
     updatedAt: '2026-09-23T09:00:00.000001+00:00',
     createdAt: '2026-09-23T08:00:00+00:00',
+    sourceSlug: null,
     ...over,
   };
 }
@@ -232,7 +233,8 @@ describe('save-the-date flow', () => {
     const r = await createFollowUp(USER, ID, { eventType: 'wedding' }, d);
     expect(r).toEqual({ status: 201, body: { ok: true, id: ID, slug: 'noa-and-itay' } });
     expect(d.db.get).toHaveBeenCalledWith(ID, USER);
-    const [owner, template, eventType, slug, draft] = d.db.create.mock.calls[0]!;
+    const [owner, template, eventType, slug, draft, source] = d.db.create.mock.calls[0]!;
+    expect(source).toBe(ID); // the save-the-date links to it once it is published
     expect([owner, template, eventType, slug]).toEqual([USER, 'sahar-bordeaux', 'wedding', 'noa-and-itay']);
     const doc = draft as InvitationDocument;
     expect(doc.eventType).toBe('wedding');
@@ -260,6 +262,29 @@ describe('save-the-date flow', () => {
       expect((await createFollowUp(USER, ID, body, d)).status).toBe(400);
       expect(d.db.create).not.toHaveBeenCalled();
     }
+  });
+});
+
+describe('a save-the-date’s full invitation', () => {
+  it('publishing or archiving it refreshes the save-the-date’s page too', async () => {
+    const d = deps({
+      get: vi.fn(async () =>
+        invitation({ sourceSlug: 'noa-and-itay-save-the-date' }, (doc) => {
+          for (const s of doc.sections)
+            if (s.type === 'venues')
+              for (const v of s.data.items) {
+                v.name = { he: 'אחוזה', en: 'Estate' };
+                v.address = { he: 'רחוב 1', en: '1 Street' };
+              }
+        }),
+      ),
+    });
+    const r = await publish(USER, ID, {}, d);
+    expect(r.status).toBe(200);
+    expect(d.revalidate).toHaveBeenCalledWith('noa-and-itay-save-the-date');
+    d.revalidate.mockClear();
+    await setArchived(USER, ID, { archived: true }, d);
+    expect(d.revalidate).toHaveBeenCalledWith('noa-and-itay-save-the-date');
   });
 });
 

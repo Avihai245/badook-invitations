@@ -30,6 +30,7 @@ export const dynamic = 'force-dynamic';
  *   live=0                 the language pill as a plain link (default: switches in place, like /i/…)
  *   gallery=carousel|grid  a gallery of the 5 test photos before the footer
  *   reveal=scratch|tap|spin  the reveal section's mechanic (added before the footer when missing)
+ *   followup=1             a published full invitation to link to (a save-the-date's, /i/noa-and-itay)
  */
 export default async function RenderPage({ params, searchParams }: { params: Params; searchParams: Search }) {
   assertDevRoutes();
@@ -109,6 +110,7 @@ export default async function RenderPage({ params, searchParams }: { params: Par
     now,
     coverMedia,
     musicUrl: one(sp.music) === 'fixture' ? '/dev/media/music.webm' : undefined,
+    followUp: one(sp.followup) === '1' ? { slug: 'noa-and-itay', locales: ['he', 'en'] } : null,
     publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
     bases: {
       ...assetBasesFromEnv({

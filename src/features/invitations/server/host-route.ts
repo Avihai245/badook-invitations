@@ -13,8 +13,13 @@ export const MAX_JSON_BYTES = 512 * 1024;
 
 const json = (status: number, body: unknown) => NextResponse.json(body, { status, headers: NO_STORE });
 
-/** Refreshes the cached public page of an invitation in every language path (/i/<slug>/<lang>). */
+/**
+ * Refreshes the cached public page of an invitation in every language. A page is cached under the
+ * path the guest asked for: /i/<slug> (?lang= is a rewrite to /i/<slug>/<lang>), or /i/<slug>/<lang>
+ * when that was requested directly.
+ */
 function revalidate(slug: string) {
+  revalidatePath(`/i/${slug}`);
   for (const lang of ['he', 'en', 'default']) revalidatePath(`/i/${slug}/${lang}`);
 }
 

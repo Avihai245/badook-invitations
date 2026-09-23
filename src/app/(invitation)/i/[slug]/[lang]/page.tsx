@@ -28,9 +28,10 @@ export async function generateStaticParams(): Promise<{ slug: string; lang: stri
   return [];
 }
 
-function renderOptions(): Omit<RenderOptions, 'mode'> {
+function renderOptions(invitation: PublishedInvitation): Omit<RenderOptions, 'mode'> {
   const env = serverEnv();
   return {
+    followUp: invitation.followUp,
     brand: env.INVITES_BRAND_NAME,
     publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
     icsViaRoute: true,
@@ -43,7 +44,7 @@ function renderOptions(): Omit<RenderOptions, 'mode'> {
 
 function context(invitation: PublishedInvitation, locale: Locale): RenderContext {
   return buildRenderContext(invitation.doc, invitation.entry.manifest, locale, {
-    ...renderOptions(),
+    ...renderOptions(invitation),
     mode: 'live',
   });
 }
@@ -101,10 +102,15 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   const next = otherLocale(invitation.doc, locale);
   // the pill's plain link keeps the cover skipped; with JS the language switches in place (LiveLocale)
   const link = (l: Locale) => `/i/${slug}?lang=${l}&open=1`;
-  const live = buildLivePayload(invitation.doc, invitation.entry.manifest, renderOptions(), (l) => ({
-    url: `/i/${slug}?lang=${l}`,
-    href: link(l),
-  }));
+  const live = buildLivePayload(
+    invitation.doc,
+    invitation.entry.manifest,
+    renderOptions(invitation),
+    (l) => ({
+      url: `/i/${slug}?lang=${l}`,
+      href: link(l),
+    }),
+  );
   return (
     <InvitationBody
       ctx={context(invitation, locale)}

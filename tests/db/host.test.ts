@@ -293,3 +293,99 @@ describe('duplicate / archive', () => {
     });
   });
 });
+
+describe('save-the-date → its full invitation (source_id)', () => {
+  const std = { ...(null as unknown as Record<string, unknown>) };
+  let stdId = '';
+
+  it('only the owner’s own save-the-date can be the source; the full invitation remembers it', async () => {
+    Object.assign(std, { ...doc, eventType: 'save_the_date' });
+    stdId = (
+      await commit<{ id: string }>('create_invitation', [
+        OWNER_A,
+        'sahar-bordeaux',
+        'save_the_date',
+        'fu-std',
+        std,
+      ])
+    ).id;
+    const wedding = await commit<{ id: string }>('create_invitation', [
+      OWNER_A,
+      'sahar-bordeaux',
+      'wedding',
+      'fu-wedding',
+      doc,
+    ]);
+    await expect(
+      call('create_invitation', [OWNER_A, 'sahar-bordeaux', 'wedding', 'fu-x', doc, wedding.id]),
+    ).rejects.toThrow(/source/);
+    await expect(
+      call('create_invitation', [OWNER_B, 'sahar-bordeaux', 'wedding', 'fu-y', doc, stdId]),
+    ).rejects.toThrow(/source/);
+    const full = await commit<{ id: string }>('create_invitation', [
+      OWNER_A,
+      'sahar-bordeaux',
+      'wedding',
+      'fu-full',
+      doc,
+      stdId,
+    ]);
+    expect(
+      (await call<{ sourceSlug: string | null }>('owner_invitation', [full.id, OWNER_A])).sourceSlug,
+    ).toBe('fu-std');
+    expect(
+      (await call<{ sourceSlug: string | null }>('owner_invitation', [stdId, OWNER_A])).sourceSlug,
+    ).toBeNull();
+  });
+
+  it('the public save-the-date links to its latest published full invitation — never a draft or an archived one', async () => {
+    const publicView = (slug: string) =>
+      as(
+        c,
+        'anon',
+        null,
+        async () => (await c.query(`select public.get_published_invitation($1) as r`, [slug])).rows[0].r,
+      );
+    await commit('publish_invitation', [stdId, OWNER_A]);
+    expect((await publicView('fu-std')).followUp).toBeNull(); // fu-full is still a draft
+
+    const full = (await c.query(`select id from invitations where slug = 'fu-full'`)).rows[0].id as string;
+    const second = (
+      await commit<{ id: string }>('create_invitation', [
+        OWNER_A,
+        'sahar-bordeaux',
+        'engagement',
+        'fu-second',
+        doc,
+        stdId,
+      ])
+    ).id;
+    await commit('publish_invitation', [full, OWNER_A]);
+    expect((await publicView('fu-std')).followUp).toEqual({ slug: 'fu-full', locales: doc.locales });
+    await commit('publish_invitation', [second, OWNER_A]);
+    expect((await publicView('fu-std')).followUp.slug).toBe('fu-second');
+    await commit('set_invitation_archived', [second, OWNER_A, true]);
+    expect((await publicView('fu-std')).followUp.slug).toBe('fu-full');
+    await commit('set_invitation_archived', [full, OWNER_A, true]);
+    expect((await publicView('fu-std')).followUp).toBeNull();
+    // a published invitation that isn't anyone's save-the-date has no follow-up
+    expect((await publicView('noa-and-itay')).followUp).toBeNull();
+  });
+
+  it('nobody can attach their invitation to someone else’s save-the-date (direct writes included)', async () => {
+    const hijack = (sql: string, params: unknown[]) =>
+      as(c, 'authenticated', OWNER_B, () => c.query(sql, params));
+    await expect(
+      hijack(
+        `insert into invitations (owner_id, template_id, slug, status, event_type, draft, published, source_id)
+         values ($1, 'sahar-bordeaux', 'fu-hijack', 'published', 'wedding', $2, $2, $3)`,
+        [OWNER_B, doc, stdId],
+      ),
+    ).rejects.toThrow(/source_id/);
+    const own = (await c.query(`select id from invitations where owner_id = $1 limit 1`, [OWNER_B])).rows[0]
+      .id;
+    await expect(hijack(`update invitations set source_id = $1 where id = $2`, [stdId, own])).rejects.toThrow(
+      /source_id/,
+    );
+  });
+});

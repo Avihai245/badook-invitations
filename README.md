@@ -38,6 +38,10 @@ Public routes:
 | `/i/<slug>/opengraph-image?lang=&v=`   | 1200×630 link-preview PNG (next/og on Node; `v` = document hash, linked from the page's `og:image`)     |
 | `POST /api/invitations/rsvp`           | Guest RSVP (`RsvpSubmission` → `RsvpResult`, §4)                                                        |
 
+A save-the-date links to its full invitation (created from it in the list) as soon as that one is
+published — and stops when it is archived. Publishing refreshes the cached pages right away (the
+invitation's own and its save-the-date's); otherwise they refresh within a minute.
+
 On a bilingual invitation the language pill switches in place (no reload, same place in the page,
 `?lang=` updated, music keeps playing); the other language is rendered in the browser from a payload
 the server prepares (`renderer/live/`).
@@ -47,6 +51,7 @@ Host app (sign-in required; Hebrew UI by default, English via the `עב | EN` to
 | Route                             | What                                                                                                                |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `/signup` · `/login`              | Email + password (Supabase Auth); `/auth/forgot`, `/auth/update-password`, `/auth/callback`                         |
+| `/`                               | Home: what Badook is, sign up / sign in, a sample invitation (signed-in hosts go to their invitations)              |
 | `/app/invitations`                | The host's invitations (duplicate, archive; a save-the-date → its full invitation)                                  |
 | `/app/invitations/new`            | Template gallery (muted preview videos) → live preview → 3-step wizard                                              |
 | `/app/invitations/<id>/edit`      | The editor (autosave, undo/redo, publish, versions)                                                                 |

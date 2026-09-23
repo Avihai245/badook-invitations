@@ -18,7 +18,7 @@ const NOW = Date.parse('2027-05-01T10:00:00Z');
 function invitation(mutate?: (doc: InvitationDocument) => void): PublishedInvitation {
   const doc = structuredClone(FIXTURES['wedding-he-en']);
   mutate?.(doc);
-  return { id: 'inv-1', slug: doc.share.slug, doc, entry: requireTemplate(doc.templateId) };
+  return { id: 'inv-1', slug: doc.share.slug, doc, entry: requireTemplate(doc.templateId), followUp: null };
 }
 
 type Overrides = {

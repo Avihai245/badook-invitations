@@ -248,17 +248,13 @@ test.describe('responses dashboard', () => {
 });
 
 test.describe('save-the-date', () => {
-  test('published without a venue; the date reveal and its calendar file; then the full invitation', async ({
+  test('published without a venue; the date reveal and its calendar file; the full invitation, linked once published', async ({
     page,
   }) => {
     test.setTimeout(90_000);
     const errors = collectErrors(page);
     await signUp(page);
-    const { id, slug } = await createInvitation(page, {
-      eventType: 'save_the_date',
-      locales: ['he', 'en'],
-      hosts: { primary: { he: 'נועה', en: 'Noa' }, secondary: { he: 'איתי', en: 'Itay' } },
-    });
+    const { id, slug } = await createInvitation(page, { eventType: 'save_the_date' });
     expect(slug).toMatch(/-save-the-date(-[0-9a-f]+)?$/);
     expect(await publishApi(page, id)).toMatchObject({ status: 200 });
 
@@ -286,11 +282,22 @@ test.describe('save-the-date', () => {
     await expect(dialog.getByRole('radio', { name: 'חתונה' })).toHaveAttribute('aria-checked', 'true');
     await dialog.getByRole('button', { name: 'יצירת ההזמנה' }).click();
     await page.waitForURL(/\/app\/invitations\/[0-9a-f-]{36}\/edit$/);
-    expect(page.url()).not.toContain(id);
+    const fullId = new URL(page.url()).pathname.split('/')[3]!;
+    expect(fullId).not.toBe(id);
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
     await expect(page.getByText('נועה & איתי · חתונה')).toBeVisible();
     await open(page, '/app/invitations');
     await expect(page.getByRole('heading', { level: 2, name: 'נועה & איתי' })).toHaveCount(2);
+
+    // once the full invitation is published, the save-the-date links to it (its cached page refreshed)
+    const fullSlug = await publishWithVenue(page, fullId);
+    await open(page, `/i/${slug}?lang=he&open=1`);
+    const link = page.getByRole('link', { name: 'לצפייה בהזמנה' });
+    await expect(link).toHaveAttribute('href', `/i/${fullSlug}?lang=he`);
+    await expect(page.getByRole('heading', { name: 'ההזמנה כבר כאן' })).toBeVisible();
+    await link.click();
+    await page.waitForURL(new RegExp(`/i/${fullSlug}\\?lang=he$`));
+    await expect(page.locator('#rsvp')).toHaveCount(1);
     expect(errors).toEqual([]);
   });
 });

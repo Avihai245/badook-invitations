@@ -176,10 +176,14 @@ export async function createFollowUp(
   const doc = followUpDocument(entry.manifest, entry.defaults, source.draft, eventType);
   // "noa-and-itay-save-the-date" → "noa-and-itay"; otherwise from the names (the RPC makes it unique)
   const slug = usableSlug(followUpSlug(source.slug)) ?? usableSlug(doc.share.slug) ?? randomSlug();
-  const created = await deps.db.create(userId, entry.manifest.id, eventType, slug, {
-    ...doc,
-    share: { ...doc.share, slug },
-  });
+  const created = await deps.db.create(
+    userId,
+    entry.manifest.id,
+    eventType,
+    slug,
+    { ...doc, share: { ...doc.share, slug } },
+    source.id,
+  );
   return ok({ ok: true, id: created.id, slug: created.slug }, 201);
 }
 
@@ -239,6 +243,8 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
   if (!published) return fail(404, 'not_found');
   deps.revalidate(published.slug);
   if (previousSlug && previousSlug !== published.slug) deps.revalidate(previousSlug);
+  // the save-the-date it was created from links here now (and follows a new slug)
+  if (inv.sourceSlug) deps.revalidate(inv.sourceSlug);
   return ok({ ok: true, ...published, warnings });
 }
 
@@ -295,6 +301,9 @@ export async function setArchived(
   const res = await deps.db.setArchived(id, userId, parsed.data.archived);
   if (!res) return fail(404, 'not_found');
   deps.revalidate(res.slug);
+  // a save-the-date links to its full invitation only while that one is published
+  const sourceSlug = (await deps.db.get(id, userId))?.sourceSlug;
+  if (sourceSlug) deps.revalidate(sourceSlug);
   return ok({ ok: true, ...res });
 }
 
