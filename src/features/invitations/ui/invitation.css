@@ -13,7 +13,8 @@
   --r-input: 10px;
   --col: 560px;
   --gutter: 24px;
-  --sec-pad: 88px;
+  /* each section's top and bottom padding — two of them separate neighbouring sections */
+  --sec-pad: 56px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --accent-08: color-mix(in srgb, var(--inv-accent) 8%, transparent);
   --accent-12: color-mix(in srgb, var(--inv-accent) 12%, transparent);
@@ -35,7 +36,7 @@
 }
 @media (min-width: 768px) {
   :root {
-    --sec-pad: 120px;
+    --sec-pad: 80px;
   }
 }
 @media (max-width: 359px) {
@@ -924,6 +925,11 @@ a {
   max-width: min(72%, 280px);
   height: auto;
 }
+/* an ornament that opens a section (the footer's) sits on the section's padding, not below it */
+.wrap > .illus:first-child,
+.wrap > .illus-img:first-child {
+  margin-top: 0;
+}
 .reveal {
   opacity: 0;
   transform: translateY(var(--reveal-distance, 40px));
@@ -1199,6 +1205,14 @@ a {
 }
 img.deco {
   opacity: 1;
+}
+/* The line-art stand-in (the template's art isn't produced yet): a soft band no wider than a phone
+   landscape, fading out at its sides — full-bleed on a desktop it would be a 360px-tall empty strip. */
+svg.deco {
+  width: min(100%, 720px);
+  margin-inline: auto;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
 }
 
 /* timeline — vertical by default; horizontal from 640px when the variant allows it (≤6 items) */

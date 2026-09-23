@@ -103,15 +103,16 @@ describe('translations (§12.5)', () => {
     expect(brief(edit.warnings)).toEqual(['missing_translation hosts.primary.en']);
   });
 
-  it('a disabled section never blocks publishing', () => {
+  it('a hidden section is never checked — not even as a warning', () => {
     const doc = wedding();
     const faq = doc.sections.find((s) => s.type === 'faq')!;
     if (faq.type !== 'faq') throw new Error();
     faq.enabled = false;
     delete faq.data.items[0]!.a.en;
-    const r = check(doc);
-    expect(r.errors).toEqual([]);
-    expect(r.warnings.map((w) => w.code)).toEqual(['missing_translation']);
+    expect(brief(check(doc).issues)).toEqual([]);
+    expect(brief(check(doc, 'edit').issues)).toEqual([]);
+    faq.enabled = true;
+    expect(brief(check(doc).errors)).toEqual([`missing_translation sections.8.data.items.0.a.en`]);
   });
 
   it('text empty in every language is "required" at the default language, not a missing translation', () => {
@@ -315,6 +316,80 @@ describe('structure and template references', () => {
   });
 });
 
+describe('switched off: what is off never shows, so nothing in it is checked', () => {
+  const sectionOf = <T extends InvitationDocument['sections'][number]['type']>(
+    doc: InvitationDocument,
+    type: T,
+  ) =>
+    doc.sections.find((s) => s.type === type) as Extract<InvitationDocument['sections'][number], { type: T }>;
+
+  it('a hidden gifts section with a half-filled Bit item (no label, no link) publishes cleanly', () => {
+    const doc = wedding();
+    const gifts = sectionOf(doc, 'gifts');
+    gifts.enabled = false;
+    gifts.data.links.push({ id: 'g9', kind: 'bit', label: { he: '', en: '' }, url: null, details: null });
+    expect(brief(check(doc).issues)).toEqual([]);
+    expect(brief(check(doc, 'edit').issues)).toEqual([]);
+    // shown again → the item has to be completed
+    gifts.enabled = true;
+    expect(brief(check(doc).errors)).toEqual([
+      'required sections.7.data.links.2.label.he',
+      'required sections.7.data.links.2.url',
+    ]);
+  });
+
+  it('no cover → its monogram, hint and seal color are not checked', () => {
+    const doc = wedding();
+    doc.cover.enabled = false;
+    doc.cover.monogram = { he: 'נועה ואיתי לוי', en: '' };
+    doc.cover.hint = { he: 'לחצו', en: '' };
+    doc.cover.sealColor = '#123456';
+    expect(brief(check(doc).issues)).toEqual([]);
+    doc.cover.enabled = true;
+    expect(
+      check(doc)
+        .errors.map((i) => i.code)
+        .sort(),
+    ).toEqual(['missing_translation', 'missing_translation', 'monogram_too_long', 'seal_color']);
+  });
+
+  it('RSVP options that are off: no dietary question → its note, no blessing field → its label', () => {
+    const doc = wedding();
+    const rsvp = sectionOf(doc, 'rsvp');
+    rsvp.data.dietary = { ...rsvp.data.dietary, enabled: false, note: { he: 'הערה', en: '' } };
+    rsvp.data.askMessage = false;
+    rsvp.data.messageLabel = { he: 'ברכה', en: '' };
+    expect(brief(check(doc).issues)).toEqual([]);
+    rsvp.data.dietary.enabled = true;
+    rsvp.data.askMessage = true;
+    expect(brief(check(doc).errors)).toEqual([
+      'missing_translation sections.9.data.dietary.note.en',
+      'missing_translation sections.9.data.messageLabel.en',
+    ]);
+  });
+
+  it("the parents' names only count when the footer shows them", () => {
+    const doc = wedding();
+    doc.hosts.parents = { he: 'מרים ודני לוי', en: '' };
+    sectionOf(doc, 'footer').data.showParents = false;
+    expect(brief(check(doc).issues)).toEqual([]);
+    sectionOf(doc, 'footer').data.showParents = true;
+    expect(brief(check(doc).errors)).toEqual(['missing_translation hosts.parents.en']);
+  });
+
+  it('music off (or the hero video playing its own sound) → the track is not checked', () => {
+    const doc = wedding();
+    doc.music = { ...doc.music, enabled: false, trackId: null, customUrl: 'template:no-such-track' };
+    expect(brief(check(doc).issues)).toEqual([]);
+    doc.music.enabled = true;
+    expect(brief(check(doc).errors)).toEqual(['asset_missing music.customUrl']);
+    const hero = sectionOf(doc, 'hero');
+    hero.data.media = { ...hero.data.media, kind: 'video', src: 'upload:u/i/hero.mp4', poster: null };
+    doc.music.videoSound = true;
+    expect(brief(check(doc).issues)).toEqual([]);
+  });
+});
+
 describe('warnings', () => {
   it('past event, past deadline, deadline after the event', () => {
     const doc = wedding();
@@ -326,6 +401,45 @@ describe('warnings', () => {
     doc.event.rsvpDeadline = '2025-12-01';
     expect(check(doc).warnings.map((w) => w.code)).toEqual(['event_past', 'deadline_past']);
     expect(check(doc).errors).toEqual([]);
+  });
+
+  it('the dates that clash travel with the warning (the message names them)', () => {
+    const doc = wedding();
+    doc.event.date = '2026-09-25';
+    doc.event.rsvpDeadline = '2026-09-30';
+    expect(check(doc).warnings).toEqual([
+      expect.objectContaining({
+        code: 'deadline_after_event',
+        params: { deadline: '2026-09-30', date: '2026-09-25' },
+      }),
+    ]);
+  });
+
+  it('a venue on another day than the event: fine next to one on the event day, flagged when alone', () => {
+    const doc = wedding();
+    const venues = doc.sections.find((s) => s.type === 'venues')!;
+    if (venues.type !== 'venues') throw new Error();
+    const first = venues.data.items[0]!;
+    first.date = '2027-06-20';
+    expect(check(doc).warnings).toEqual([
+      expect.objectContaining({
+        code: 'venue_date_differs',
+        path: 'sections.3.data.items.0.date',
+        sectionId: venues.id,
+        params: { venueDate: '2027-06-20', date: '2027-06-17' },
+      }),
+    ]);
+    // a two-day event: the henna on the event day, the wedding three days later
+    venues.data.items.unshift({ ...structuredClone(first), id: 'henna', date: null });
+    expect(check(doc).warnings).toEqual([]);
+    // the venue's date equal to the event's is no clash either
+    venues.data.items = [{ ...first, date: '2027-06-17' }];
+    expect(check(doc).warnings).toEqual([]);
+    // hidden venues show no date at all
+    first.date = '2027-06-20';
+    venues.data.items = [first];
+    venues.enabled = false;
+    expect(check(doc).warnings).toEqual([]);
   });
 
   it('low text contrast after a palette change (template defaults are never flagged)', () => {

@@ -1,8 +1,8 @@
 'use client';
 
-import { ArrowDown, ArrowUp, Copy, MoreHorizontal, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Copy, EyeOff, MoreHorizontal, Sparkles, Trash2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { Card, IconButton, Menu, Switch, useToast } from '@/components/app';
+import { Button, Card, IconButton, Menu, Switch, useToast } from '@/components/app';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { borrowedCopy } from '../templates/seed-document';
@@ -124,6 +124,15 @@ export function FormPanel({ className }: { className?: string }) {
   }
 
   const reviewTexts = section?.type === 'hero' && borrowedCopy(defaults, doc.eventType);
+  const setEnabled = (on: boolean) =>
+    section &&
+    apply(
+      (d) => ({
+        ...d,
+        sections: d.sections.map((s) => (s.id === section.id ? { ...s, enabled: on } : s)),
+      }),
+      null,
+    );
 
   return (
     <div ref={ref} className={className}>
@@ -139,21 +148,27 @@ export function FormPanel({ className }: { className?: string }) {
               <Switch
                 label={fmt(e.rail.toggle, { name: title })}
                 checked={section.enabled}
-                onCheckedChange={(on) =>
-                  apply(
-                    (d) => ({
-                      ...d,
-                      sections: d.sections.map((s) => (s.id === section.id ? { ...s, enabled: on } : s)),
-                    }),
-                    null,
-                  )
-                }
+                onCheckedChange={setEnabled}
               />
             </span>
           ) : null}
           {menu}
         </div>
       </div>
+      {section && !section.enabled ? (
+        // hidden: nothing below shows on the invitation or blocks publishing (validateDocument skips it)
+        <Card padding="sm" className="mt-4" data-testid="hidden-section-note">
+          <div className="flex items-start gap-3">
+            <EyeOff aria-hidden size={18} strokeWidth={1.75} className="mt-0.5 shrink-0 text-muted" />
+            <div className="flex-1">
+              <p className="text-[13px] text-muted">{e.hiddenSection.text}</p>
+              <Button size="sm" variant="secondary" className="mt-2.5" onClick={() => setEnabled(true)}>
+                {e.hiddenSection.show}
+              </Button>
+            </div>
+          </div>
+        </Card>
+      ) : null}
       {reviewTexts ? <ReviewTextsNote /> : null}
       <div key={key}>{body}</div>
       <Card padding="sm" tone="info" className="mt-4">

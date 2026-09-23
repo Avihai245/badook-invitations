@@ -137,6 +137,10 @@ export const editorHe = {
   tip: 'טיפ: לחיצה על כל טקסט בתצוגה המקדימה קופצת לשדה שלו.',
   reviewTexts:
     'לסוג האירוע הזה אין טקסטים מוכנים בעיצוב, אז התחלנו מטקסטים של אירוע דומה — כדאי לעבור עליהם.',
+  hiddenSection: {
+    text: 'הסקשן מוסתר: הוא לא מופיע בהזמנה, ומה שממולא בו לא נבדק — אפשר להשאיר בו טיוטה ולהציג אותו כשיהיה מוכן.',
+    show: 'הצגה בהזמנה',
+  },
   cards: {
     texts: 'טקסטים',
     background: 'רקע',
@@ -314,7 +318,8 @@ export const editorHe = {
       timeFormat: 'תצוגת שעות',
       timeFormats: { auto: 'לפי השפה', '24h': '24 שעות', '12h': '12 שעות (AM/PM)' },
       rsvpDeadline: 'תאריך אחרון לאישור הגעה',
-      noDeadline: 'בלי תאריך אחרון',
+      deadlineHelp: 'תאריך האירוע: {date} · ריק = בלי תאריך אחרון',
+      deadlineAfterEvent: 'מאוחר מתאריך האירוע ({date}). אם האירוע זז — משנים את התאריך ב"פרטי האירוע".',
     },
     cover: {
       enabled: 'מעטפת פתיחה',
@@ -447,9 +452,11 @@ export const editorHe = {
     locale_unsupported: 'העיצוב לא תומך ב{language}',
     default_locale: 'השפה שנפתחת קודם חייבת להיות אחת משפות ההזמנה',
     duplicate_locale: 'שפה מופיעה פעמיים',
-    event_past: 'תאריך האירוע כבר עבר',
-    deadline_past: 'התאריך האחרון לאישור הגעה כבר עבר',
-    deadline_after_event: 'התאריך האחרון לאישור הגעה אחרי האירוע',
+    event_past: 'תאריך האירוע ({date}) כבר עבר',
+    deadline_past: 'התאריך האחרון לאישור הגעה ({deadline}) כבר עבר',
+    deadline_after_event: 'התאריך האחרון לאישור הגעה ({deadline}) מאוחר מתאריך האירוע ({date})',
+    venue_date_differs:
+      'תאריך המקום ({venueDate}) שונה מתאריך האירוע ({date}) — בראש ההזמנה ובספירה לאחור מופיע תאריך האירוע',
     contrast_low: 'ניגודיות נמוכה ב"{field}" ({ratio}:1, מומלץ לפחות {min}:1)',
     empty_section: 'הסקשן "{field}" ריק ולא יוצג בהזמנה — הוסיפו פריט או הסתירו אותו',
   },
@@ -489,6 +496,7 @@ export const editorHe = {
     'venue.label': 'כותרת המקום',
     'venue.name': 'שם המקום',
     'venue.address': 'כתובת',
+    'venue.date': 'תאריך המקום',
     'timeline.items': 'שלבים',
     'timeline.label': 'מה קורה',
     'faq.items': 'שאלות',

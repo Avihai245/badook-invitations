@@ -10,6 +10,7 @@
 import { contrastRatio } from '../lib/contrast';
 import { cappedLength } from '../lib/l10n';
 import { visibleGlyphCount } from '../lib/text';
+import { isHttpsUrl } from '../lib/urls';
 import { parseVideoLink } from '../lib/video-links';
 import { InvitationDocumentSchema } from './schemas';
 import type { AssetRef, InvitationDocument, L10n, Locale, Palette, Section, TemplateManifest } from './types';
@@ -37,9 +38,10 @@ export type IssueCode =
   | 'locale_unsupported' // params.locale
   | 'default_locale'
   | 'duplicate_locale'
-  | 'event_past'
-  | 'deadline_past'
-  | 'deadline_after_event'
+  | 'event_past' // params.date
+  | 'deadline_past' // params.deadline
+  | 'deadline_after_event' // params.deadline, params.date
+  | 'venue_date_differs' // params.venueDate, params.date
   | 'contrast_low' // params.ratio, params.min
   | 'empty_section';
 
@@ -80,6 +82,7 @@ export type FieldKey =
   | 'venue.label'
   | 'venue.name'
   | 'venue.address'
+  | 'venue.date'
   | 'timeline.items'
   | 'timeline.label'
   | 'faq.items'
@@ -143,27 +146,39 @@ interface L10nField {
   field: FieldKey;
   cap?: number;
   section?: Section;
+  /** switched off — its section is hidden, or the option it belongs to is (the text never shows) */
+  unused?: boolean;
 }
 
 /** Every user-authored L10n of the document with its path, label key and length cap. */
 export function* l10nFields(doc: InvitationDocument): Generator<L10nField> {
+  const cover = !doc.cover.enabled;
+  // the parents' line only appears in a footer that shows it
+  const parents = !doc.sections.some((s) => s.type === 'footer' && s.enabled && s.data.showParents);
   yield { path: 'hosts.primary', value: doc.hosts.primary, field: 'hosts.primary', cap: CAPS.hostName };
   yield { path: 'hosts.secondary', value: doc.hosts.secondary, field: 'hosts.secondary', cap: CAPS.hostName };
   yield { path: 'hosts.joiner', value: doc.hosts.joiner, field: 'hosts.joiner' };
-  yield { path: 'hosts.parents', value: doc.hosts.parents, field: 'hosts.parents' };
-  yield { path: 'cover.monogram', value: doc.cover.monogram, field: 'cover.monogram' };
-  yield { path: 'cover.hint', value: doc.cover.hint, field: 'cover.hint' };
+  yield { path: 'hosts.parents', value: doc.hosts.parents, field: 'hosts.parents', unused: parents };
+  yield { path: 'cover.monogram', value: doc.cover.monogram, field: 'cover.monogram', unused: cover };
+  yield { path: 'cover.hint', value: doc.cover.hint, field: 'cover.hint', unused: cover };
   yield { path: 'share.ogTitle', value: doc.share.ogTitle, field: 'share.ogTitle' };
   yield { path: 'share.ogDescription', value: doc.share.ogDescription, field: 'share.ogDescription' };
 
   for (const [i, section] of doc.sections.entries()) {
     const base = `sections.${i}.data`;
-    const f = (key: string, value: L10n | null, field: FieldKey, cap?: number): L10nField => ({
+    const f = (
+      key: string,
+      value: L10n | null,
+      field: FieldKey,
+      cap?: number,
+      optionOff = false,
+    ): L10nField => ({
       path: `${base}.${key}`,
       value,
       field,
       cap,
       section,
+      unused: !section.enabled || optionOff,
     });
     switch (section.type) {
       case 'hero': {
@@ -228,13 +243,13 @@ export function* l10nFields(doc: InvitationDocument): Generator<L10nField> {
         const d = section.data;
         yield f('title', d.title, 'section.title', CAPS.title);
         yield f('subtitle', d.subtitle, 'section.subtitle', CAPS.subtitle);
-        yield f('dietary.note', d.dietary.note, 'rsvp.dietaryNote');
+        yield f('dietary.note', d.dietary.note, 'rsvp.dietaryNote', undefined, !d.dietary.enabled);
         for (const [k, q] of d.customQuestions.entries()) {
           yield f(`customQuestions.${k}.label`, q.label, 'rsvp.questionLabel');
           for (const [o, opt] of (q.options ?? []).entries())
             yield f(`customQuestions.${k}.options.${o}.label`, opt.label, 'rsvp.optionLabel');
         }
-        yield f('messageLabel', d.messageLabel, 'rsvp.messageLabel');
+        yield f('messageLabel', d.messageLabel, 'rsvp.messageLabel', undefined, !d.askMessage);
         yield f('successMessage', d.successMessage, 'rsvp.successMessage');
         yield f('declineMessage', d.declineMessage, 'rsvp.declineMessage');
         yield f('closedMessage', d.closedMessage, 'rsvp.closedMessage');
@@ -247,40 +262,42 @@ export function* l10nFields(doc: InvitationDocument): Generator<L10nField> {
   }
 }
 
-/** Every AssetRef in the document with its path. */
-function* assetRefs(
-  doc: InvitationDocument,
-): Generator<{ path: string; ref: AssetRef; field: FieldKey; section?: Section }> {
+/** Every AssetRef in the document with its path (`unused`: switched off — never loaded). */
+function* assetRefs(doc: InvitationDocument): Generator<{
+  path: string;
+  ref: AssetRef;
+  field: FieldKey;
+  section?: Section;
+  unused?: boolean;
+}> {
+  // the track plays unless the music is off, or the hero video's own sound replaces it
+  const heroVideo = doc.sections.some((s) => s.type === 'hero' && s.enabled && s.data.media.kind === 'video');
+  const trackOff = !doc.music.enabled || (doc.music.videoSound && heroVideo);
   if (doc.music.customUrl)
-    yield { path: 'music.customUrl', ref: doc.music.customUrl, field: 'music.customUrl' };
+    yield { path: 'music.customUrl', ref: doc.music.customUrl, field: 'music.customUrl', unused: trackOff };
   if (doc.share.ogImage) yield { path: 'share.ogImage', ref: doc.share.ogImage, field: 'share.ogImage' };
   for (const [i, section] of doc.sections.entries()) {
     const base = `sections.${i}.data`;
+    const unused = !section.enabled;
     if (section.type === 'hero') {
-      yield { path: `${base}.media.src`, ref: section.data.media.src, field: 'hero.media', section };
-      if (section.data.media.poster)
-        yield { path: `${base}.media.poster`, ref: section.data.media.poster, field: 'hero.media', section };
+      const { media } = section.data;
+      yield { path: `${base}.media.src`, ref: media.src, field: 'hero.media', section, unused };
+      if (media.poster)
+        yield { path: `${base}.media.poster`, ref: media.poster, field: 'hero.media', section, unused };
     } else if (section.type === 'text' && section.data.illustration) {
       yield {
         path: `${base}.illustration`,
         ref: section.data.illustration,
         field: 'text.illustration',
         section,
+        unused,
       };
     } else if (section.type === 'gallery') {
       for (const [k, img] of section.data.images.entries())
-        yield { path: `${base}.images.${k}.src`, ref: img.src, field: 'gallery.image', section };
+        yield { path: `${base}.images.${k}.src`, ref: img.src, field: 'gallery.image', section, unused };
     }
   }
 }
-
-const isHttpsUrl = (url: string) => {
-  try {
-    return new URL(url).protocol === 'https:';
-  } catch {
-    return false;
-  }
-};
 
 /** Today's date (YYYY-MM-DD) in the document's time zone. */
 function todayIn(timezone: string, now: number): string {
@@ -295,7 +312,11 @@ function todayIn(timezone: string, now: number): string {
 }
 
 export interface ValidateOptions {
-  /** 'publish': every rule on enabled content blocks; 'edit': translations/caps are warnings */
+  /**
+   * 'publish': every content rule blocks; 'edit': translations/caps are warnings. Either way, what is
+   * switched off (a hidden section, the cover, the music, an RSVP option…) is never checked — it
+   * doesn't show, so it can stay half-filled.
+   */
   mode: 'edit' | 'publish';
   /** ms epoch for the date warnings (tests) */
   now?: number;
@@ -320,9 +341,7 @@ export function validateDocument(
   }
   const doc = parsed.data as InvitationDocument;
   const add = (issue: Issue) => issues.push(issue);
-  // Content of a disabled section is never shown: its problems don't block publishing.
-  const contentSeverity = (section?: Section): IssueSeverity =>
-    mode === 'publish' && (!section || section.enabled) ? 'error' : 'warning';
+  const contentSeverity: IssueSeverity = mode === 'publish' ? 'error' : 'warning';
 
   // ── languages ──
   const seen = new Set<Locale>();
@@ -346,13 +365,13 @@ export function validateDocument(
 
   // ── translations & length caps ──
   for (const f of l10nFields(doc)) {
-    if (!f.value) continue;
+    if (!f.value || f.unused) continue;
     const value = f.value;
     // The link-preview title / description are optional overrides: a language without one gets the
     // automatic text (pageTitle / pageDescription), so a missing translation only warns.
     const optional = OPTIONAL_TEXTS.has(f.field);
     if (optional && doc.locales.every((l) => !(value[l] ?? '').trim())) continue;
-    const severity = optional ? 'warning' : contentSeverity(f.section);
+    const severity = optional ? 'warning' : contentSeverity;
     // Empty in every language → the text itself is missing ("required"), pointing at the default
     // language; otherwise each missing language is a missing translation.
     if (doc.locales.every((l) => !(value[l] ?? '').trim())) {
@@ -444,12 +463,12 @@ export function validateDocument(
     });
 
   for (const [i, s] of doc.sections.entries()) {
+    // a hidden section is simply unused: whatever is half-filled in it waits until it's switched on
+    if (!s.enabled) continue;
     const base = `sections.${i}.data`;
-    const severity = contentSeverity(s);
-    // An empty section isn't shown on the page, so it never blocks publishing — the host is told;
-    // a hidden one is simply unused.
+    const severity = contentSeverity;
+    // An empty section isn't shown on the page, so it never blocks publishing — the host is told.
     const emptyList = (key: string, field: FieldKey) =>
-      s.enabled &&
       add({ path: `${base}.${key}`, code: 'empty_section', severity: 'warning', field, sectionId: s.id });
     switch (s.type) {
       case 'hero': {
@@ -541,7 +560,8 @@ export function validateDocument(
       add({ path: `theme.palette.${key}`, code: 'palette_key', severity: 'error', field: 'theme.palette' });
   if (!template.fontPairs.some((p) => p.id === doc.theme.fontPairId))
     add({ path: 'theme.fontPairId', code: 'font_pair', severity: 'error', field: 'theme.fontPairId' });
-  const seal = doc.cover.sealColor;
+  // (no cover → no seal to color)
+  const seal = doc.cover.enabled ? doc.cover.sealColor : null;
   if (template.cover.overlay.recolor) {
     if (seal && !template.cover.sealColors.map((c) => c.toLowerCase()).includes(seal.toLowerCase()))
       add({ path: 'cover.sealColor', code: 'seal_color', severity: 'error', field: 'cover.sealColor' });
@@ -549,6 +569,7 @@ export function validateDocument(
     add({ path: 'cover.sealColor', code: 'seal_color', severity: 'error', field: 'cover.sealColor' });
   }
   for (const a of assetRefs(doc)) {
+    if (a.unused) continue;
     if (a.ref.startsWith('template:') && !(a.ref.slice(9) in template.assets))
       add({
         path: a.path,
@@ -559,18 +580,26 @@ export function validateDocument(
       });
   }
 
-  // ── warnings ──
+  // ── warnings ── (dates travel as params, so the message can say which ones clash)
   const today = todayIn(doc.timezone, now);
-  if (doc.event.date < today)
-    add({ path: 'event.date', code: 'event_past', severity: 'warning', field: 'event.date' });
+  const date = doc.event.date;
+  if (date < today)
+    add({
+      path: 'event.date',
+      code: 'event_past',
+      severity: 'warning',
+      field: 'event.date',
+      params: { date },
+    });
   const deadline = doc.event.rsvpDeadline;
   if (deadline && rsvps.some((s) => s.enabled)) {
-    if (deadline > doc.event.date)
+    if (deadline > date)
       add({
         path: 'event.rsvpDeadline',
         code: 'deadline_after_event',
         severity: 'warning',
         field: 'event.rsvpDeadline',
+        params: { deadline, date },
       });
     else if (deadline < today)
       add({
@@ -578,6 +607,23 @@ export function validateDocument(
         code: 'deadline_past',
         severity: 'warning',
         field: 'event.rsvpDeadline',
+        params: { deadline },
+      });
+  }
+  // Venues on other days are a multi-day event; but when none of them is on the event's date, one of
+  // the two is most likely a mistake — the top of the invitation and the countdown show the event date.
+  for (const [i, s] of doc.sections.entries()) {
+    if (s.type !== 'venues' || !s.enabled) continue;
+    const items = s.data.items;
+    const k = items.findIndex((v) => v.date && v.date !== date);
+    if (k >= 0 && items.every((v) => v.date && v.date !== date))
+      add({
+        path: `sections.${i}.data.items.${k}.date`,
+        code: 'venue_date_differs',
+        severity: 'warning',
+        field: 'venue.date',
+        sectionId: s.id,
+        params: { venueDate: items[k]!.date!, date },
       });
   }
   const overrides = doc.theme.palette ?? {};

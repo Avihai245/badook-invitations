@@ -32,6 +32,7 @@ import {
   L10nField,
   PanelCard,
   RangeField,
+  RsvpDeadlineField,
   SelectField,
   TimeField,
   hostsText,
@@ -638,12 +639,7 @@ function EventPanel() {
           fromValue={(v) => (v === null ? 'auto' : String(v))}
           toValue={(v) => (v === 'auto' ? null : v)}
         />
-        <DateField
-          path="event.rsvpDeadline"
-          label={f.event.rsvpDeadline}
-          help={f.event.noDeadline}
-          nullable
-        />
+        <RsvpDeadlineField />
       </PanelCard>
     </>
   );

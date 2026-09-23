@@ -24,6 +24,7 @@ import {
   L10nField,
   PanelCard,
   RangeField,
+  RsvpDeadlineField,
   SegmentedField,
   SelectField,
   SwitchRow,
@@ -564,12 +565,7 @@ function RsvpForm({ base, section }: { base: string; section: SectionOf<'rsvp'> 
       <PanelCard title={cards.texts}>
         <L10nField path={`${base}.title`} label={f.title} cap={CAPS.title} />
         <L10nField path={`${base}.subtitle`} label={f.subtitle} cap={CAPS.subtitle} nullable />
-        <DateField
-          path="event.rsvpDeadline"
-          label={f.event.rsvpDeadline}
-          help={f.event.noDeadline}
-          nullable
-        />
+        <RsvpDeadlineField />
       </PanelCard>
       <PanelCard title={cards.options}>
         <SelectField

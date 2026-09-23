@@ -49,12 +49,26 @@ const useHighlight = () => useContext(PreviewControlsContext).highlight;
 
 // ─── issues ────────────────────────────────────────────────────────────────────────────────────
 
-/** Human text of a validation issue ("חסר תרגום לאנגלית ב'שורת מיקום'"). */
-export function issueText(issue: Issue, e: EditorDict, fieldName?: string): string {
+/**
+ * Human text of a validation issue ("חסר תרגום לאנגלית ב'שורת מיקום'"). Date params (YYYY-MM-DD —
+ * which dates clash) are written by `date`, the UI language's formatter.
+ */
+export function issueText(
+  issue: Issue,
+  e: EditorDict,
+  fieldName?: string,
+  date?: (iso: string) => string,
+): string {
   const field = fieldName ?? (issue.field ? e.fieldLabels[issue.field] : '');
   const locale = issue.params?.locale as Locale | undefined;
+  const params = Object.fromEntries(
+    Object.entries(issue.params ?? {}).map(([k, v]) => [
+      k,
+      date && typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? date(v) : v,
+    ]),
+  );
   return fmt(e.issues[issue.code], {
-    ...issue.params,
+    ...params,
     field,
     language: locale ? e.languageIn[locale] : '',
   });
@@ -140,13 +154,13 @@ export function FieldFrame({
 
 function useIssueMessage(path: string, label: string, locale?: Locale): string | undefined {
   const { issues, showIssues } = useEditor();
-  const { t } = useUi();
+  const { t, date } = useUi();
   const found = issuesAt(issues.issues, path).filter(
     (i) => i.severity === 'error' && (showIssues || i.code === 'too_long' || i.code === 'monogram_too_long'),
   );
   const pick =
     (locale && found.find((i) => i.path === `${path}.${locale}` || i.params?.locale === locale)) ?? found[0];
-  return pick ? issueText(pick, t.editor, label) : undefined;
+  return pick ? issueText(pick, t.editor, label, (iso) => date(iso)) : undefined;
 }
 
 // ─── localized text ────────────────────────────────────────────────────────────────────────────
@@ -192,6 +206,9 @@ export function L10nField({
   const locales = doc.locales;
   const other = locales.find((l) => l !== locale && value?.[l]?.trim());
   const error = useIssueMessage(path, label, locale);
+  // in a hidden section nothing shows, so an empty language isn't flagged (as in validateDocument)
+  const hidden = /^sections\.(\d+)\./.exec(path);
+  const inHiddenSection = !!hidden && doc.sections[Number(hidden[1])]?.enabled === false;
 
   const change = (next: string) => {
     let v: L10n | null = { ...(value ?? {}), [locale]: next };
@@ -253,7 +270,7 @@ export function L10nField({
                 label: e.languageShort[l],
                 ariaLabel: e.languageFull[l],
                 lang: l,
-                missing: !(value?.[l] ?? '').trim() && (!nullable || !!value),
+                missing: !inHiddenSection && !(value?.[l] ?? '').trim() && (!nullable || !!value),
               }))}
             />
           ) : undefined
@@ -370,6 +387,32 @@ export function DateField({
         />
       </Field>
     </FieldFrame>
+  );
+}
+
+/**
+ * The RSVP deadline with the event's date beside it: the two are set in different panels, and a
+ * deadline later than the event is almost always an event date that wasn't moved along.
+ */
+export function RsvpDeadlineField() {
+  const { doc } = useEditor();
+  const { t, date } = useUi();
+  const ev = t.editor.f.event;
+  const eventDate = date(doc.event.date);
+  const after = doc.event.rsvpDeadline !== null && doc.event.rsvpDeadline > doc.event.date;
+  return (
+    <DateField
+      path="event.rsvpDeadline"
+      label={ev.rsvpDeadline}
+      help={
+        after ? (
+          <span className="text-warning">{fmt(ev.deadlineAfterEvent, { date: eventDate })}</span>
+        ) : (
+          fmt(ev.deadlineHelp, { date: eventDate })
+        )
+      }
+      nullable
+    />
   );
 }
 

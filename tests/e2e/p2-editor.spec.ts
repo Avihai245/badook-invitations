@@ -250,6 +250,72 @@ test.describe('hero background', () => {
   });
 });
 
+test.describe('switched off, and dates side by side', () => {
+  test.skip(({ viewport }) => (viewport?.width ?? 0) < 1024, 'the desktop editor');
+
+  test('a hidden section is never flagged; the RSVP deadline shows the event date', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await signUp(page);
+    const created = await page.evaluate(async () => {
+      const res = await fetch('/api/invitations', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          templateId: 'papercut-gold',
+          eventType: 'wedding',
+          locales: ['he', 'en'],
+          defaultLocale: 'he',
+          hosts: { primary: { he: 'נועה', en: 'Noa' }, secondary: { he: 'איתי', en: 'Itay' } },
+          date: '2027-06-17',
+          startTime: '19:30',
+          timezone: 'Asia/Jerusalem',
+        }),
+      });
+      return (await res.json()) as { id: string };
+    });
+    await open(page, `/app/invitations/${created.id}/edit`);
+
+    // gifts hidden, with a Bit item added and left empty: no "missing" dots, nothing to fix
+    await page.getByRole('button', { name: 'מתנות', exact: true }).click();
+    const shown = page.getByRole('switch', { name: 'הצגת מתנות' });
+    if (await shown.isChecked()) await shown.click();
+    const note = page.getByTestId('hidden-section-note');
+    await expect(note).toContainText('הסקשן מוסתר');
+    await page.getByRole('button', { name: 'הוספה', exact: true }).click();
+    const buttonText = page.locator('[data-field-path$=".label"]').last();
+    await expect(buttonText.getByRole('radio', { name: 'English' })).toBeVisible();
+    await expect(buttonText.locator('[title="חסר תרגום"]')).toHaveCount(0);
+    await saved(page);
+
+    // the deadline, set in the RSVP panel, next to the event's date (set elsewhere)
+    await page.getByRole('button', { name: 'אישור הגעה', exact: true }).click();
+    await expect(page.getByText('תאריך האירוע: 17 ביוני 2027')).toBeVisible();
+    await page.getByLabel('תאריך אחרון לאישור הגעה').fill('2027-06-20');
+    await expect(page.getByText('מאוחר מתאריך האירוע (17 ביוני 2027).', { exact: false })).toBeVisible();
+    await saved(page);
+
+    // publishing: nothing about the hidden gifts; the deadline warning names both dates
+    await page.getByRole('button', { name: 'פרסום', exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(
+      dialog.getByText('התאריך האחרון לאישור הגעה (20 ביוני 2027) מאוחר מתאריך האירוע (17 ביוני 2027)'),
+    ).toBeVisible();
+    await expect(dialog.getByText('מתנות')).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+
+    // shown again from the note: the item is now something to complete
+    await page.getByRole('button', { name: 'מתנות', exact: true }).click();
+    await note.getByRole('button', { name: 'הצגה בהזמנה' }).click();
+    await expect(note).toHaveCount(0);
+    await expect(shown).toBeChecked();
+    await expect(
+      page.locator('[data-field-path$=".label"]').last().locator('[title="חסר תרגום"]'),
+    ).toHaveCount(2);
+  });
+});
+
 test.describe('host editor on a phone', () => {
   test.skip(({ viewport }) => (viewport?.width ?? 0) >= 1024, 'mobile layout');
 

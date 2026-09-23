@@ -34,7 +34,7 @@ type PublishResponse =
  */
 export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: () => Promise<boolean> }) {
   const { doc, template, meta, setMeta, publicBaseUrl, select, setShowIssues } = useEditor();
-  const { t, locale: ui, plural } = useUi();
+  const { t, locale: ui, plural, date } = useUi();
   const { toast } = useToast();
   const e = t.editor;
   const p = e.publishDialog;
@@ -116,12 +116,13 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
 
   const blocked =
     listErrors.length > 0 || slugState === 'taken' || slugState === 'invalid' || slugState === 'checking';
+  const shownDate = (iso: string) => date(iso);
   const labelOf = (issue: Issue) => {
     if (issue.code === 'empty_section' && issue.sectionId) {
       const s = doc.sections.find((x) => x.id === issue.sectionId);
-      if (s) return issueText(issue, e, sectionName(s, e, ui));
+      if (s) return issueText(issue, e, sectionName(s, e, ui), shownDate);
     }
-    return issueText(issue, e);
+    return issueText(issue, e, undefined, shownDate);
   };
   const where = (issue: Issue) => {
     const target = issueTarget(issue, doc);

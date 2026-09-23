@@ -141,6 +141,10 @@ export const editorEn: EditorDict = {
   tip: 'Tip: click any text in the preview to jump to its field.',
   reviewTexts:
     'This design has no ready texts for this event type, so we started from a similar event’s — worth a quick read.',
+  hiddenSection: {
+    text: 'This section is hidden: it isn’t on the invitation and nothing in it is checked — keep a draft here and show it when it’s ready.',
+    show: 'Show on the invitation',
+  },
   cards: {
     texts: 'Texts',
     background: 'Background',
@@ -318,7 +322,9 @@ export const editorEn: EditorDict = {
       timeFormat: 'Time display',
       timeFormats: { auto: 'By language', '24h': '24-hour', '12h': '12-hour (AM/PM)' },
       rsvpDeadline: 'RSVP deadline',
-      noDeadline: 'No deadline',
+      deadlineHelp: 'Event date: {date} · empty = no deadline',
+      deadlineAfterEvent:
+        'Later than the event date ({date}). If the event moved, change its date in “Event details”.',
     },
     cover: {
       enabled: 'Opening envelope',
@@ -452,9 +458,11 @@ export const editorEn: EditorDict = {
     locale_unsupported: 'The design doesn’t support {language}',
     default_locale: 'The first language must be one of the invitation’s languages',
     duplicate_locale: 'A language appears twice',
-    event_past: 'The event date has passed',
-    deadline_past: 'The RSVP deadline has passed',
-    deadline_after_event: 'The RSVP deadline is after the event',
+    event_past: 'The event date ({date}) has passed',
+    deadline_past: 'The RSVP deadline ({deadline}) has passed',
+    deadline_after_event: 'The RSVP deadline ({deadline}) is after the event date ({date})',
+    venue_date_differs:
+      'The venue date ({venueDate}) differs from the event date ({date}) — the top of the invitation and the countdown show the event date',
     contrast_low: 'Low contrast in “{field}” ({ratio}:1, at least {min}:1 recommended)',
     empty_section: '“{field}” is empty and won’t be shown — add an item or hide it',
   },
@@ -494,6 +502,7 @@ export const editorEn: EditorDict = {
     'venue.label': 'Place title',
     'venue.name': 'Place name',
     'venue.address': 'Address',
+    'venue.date': 'Venue date',
     'timeline.items': 'Steps',
     'timeline.label': 'What happens',
     'faq.items': 'Questions',

@@ -30,13 +30,16 @@ export function SecHead({ title, sub, path }: { title: string; sub?: string | nu
   );
 }
 
-/** Line-art stand-ins for a missing panorama decoration (the reference's vineyard sketch for sahar-bordeaux). */
+/**
+ * Line-art stand-ins for a missing panorama decoration (the reference's vineyard sketch for
+ * sahar-bordeaux). Each viewBox hugs its drawing, so the band adds no empty space of its own.
+ */
 function PanoramaPlaceholder({ kind }: { kind: 'vineyard' | 'hills' }) {
   if (kind === 'vineyard') {
     return (
       <svg
         className="deco"
-        viewBox="0 0 800 200"
+        viewBox="0 62 800 124"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.2"
@@ -58,7 +61,7 @@ function PanoramaPlaceholder({ kind }: { kind: 'vineyard' | 'hills' }) {
   return (
     <svg
       className="deco"
-      viewBox="0 0 800 200"
+      viewBox="0 92 800 88"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.2"
