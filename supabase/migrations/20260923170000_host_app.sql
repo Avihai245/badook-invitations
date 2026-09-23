@@ -60,8 +60,9 @@ $$;
 
 -- ─── create ─────────────────────────────────────────────────────────────────────────────────────
 
--- New draft with the first free slug among p_slug, p_slug-2, p_slug-3, … Returns { id, slug }.
--- The document's share.slug and templateId always follow the row.
+-- New draft with the first free slug among p_slug, p_slug-2 … p_slug-9, then p_slug-<4 random hex>
+-- (popular name pairs keep coming). Returns { id, slug }. The document's share.slug and templateId
+-- always follow the row.
 create function public.create_invitation(
   p_owner_id uuid,
   p_template_id text,
@@ -86,10 +87,13 @@ begin
       return jsonb_build_object('id', v_id, 'slug', v_slug);
     exception when unique_violation then
       n := n + 1;
-      if n > 99 then
+      if n > 40 then
         raise;
       end if;
-      v_slug := rtrim(left(p_slug, 59 - length(n::text)), '-') || '-' || n;
+      v_slug := case
+        when n <= 9 then rtrim(left(p_slug, 58), '-') || '-' || n
+        else rtrim(left(p_slug, 55), '-') || '-' || substr(md5(random()::text || clock_timestamp()::text), 1, 4)
+      end;
     end;
   end loop;
 end $$;

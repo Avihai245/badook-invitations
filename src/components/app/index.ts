@@ -33,6 +33,7 @@ export {
   type TextareaProps,
 } from './Input';
 export { KpiCard, type KpiCardProps } from './KpiCard';
+export { Menu, type MenuItem, type MenuProps } from './Menu';
 export { L10nTabs, type L10nTabsOption, type L10nTabsProps } from './L10nTabs';
 export { PHONE_VIEWPORT, PhoneFrame, type PhoneFrameProps } from './PhoneFrame';
 export { rovingKeyDown } from './roving';

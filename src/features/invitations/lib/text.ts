@@ -89,3 +89,17 @@ export function suggestSlug(names: readonly string[]): string {
   if (slug.length < 3) slug = `invitation-${slug || 'new'}`;
   return slug;
 }
+
+/** "נועה & איתי" / "Dana": the hosts' names in one locale (host-app cards, titles). */
+export function hostsLine(
+  hosts: {
+    primary: Partial<Record<string, string>>;
+    secondary: Partial<Record<string, string>> | null;
+    joiner: Partial<Record<string, string>> | null;
+  },
+  locale: string,
+): string {
+  const primary = hosts.primary[locale]?.trim() ?? '';
+  const secondary = hosts.secondary?.[locale]?.trim();
+  return secondary ? `${primary} ${hosts.joiner?.[locale]?.trim() || '&'} ${secondary}` : primary;
+}

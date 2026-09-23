@@ -146,7 +146,7 @@ export const en: AppDict = {
       startTime: 'Time',
       endTime: 'End time',
       timezone: 'Time zone',
-      namesIn: 'Names in {language}',
+      namesIn: { he: 'Names in Hebrew', en: 'Names in English' },
     },
     languages: {
       he: 'עברית',
@@ -161,6 +161,7 @@ export const en: AppDict = {
       required: 'Required',
       date: 'Pick a date',
       time: 'Pick a time',
+      age: 'Age between 1 and 120',
       create: 'We couldn’t create the invitation. Please try again.',
     },
   },

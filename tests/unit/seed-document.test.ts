@@ -73,6 +73,27 @@ describe('seedDocument', () => {
     expect(doc.event.rsvpDeadline).toBe('2027-06-03');
   });
 
+  it('puts an initial on seals and the name on tickets for a single host', () => {
+    const single = { primary: { he: 'יונתן', en: 'Jonathan' } };
+    const base = {
+      locales: ['he', 'en'] as Locale[],
+      defaultLocale: 'he' as const,
+      date: '2027-06-17',
+      startTime: '19:00',
+      timezone: 'Asia/Jerusalem',
+    };
+    const atara = TEMPLATES.get('atara')!;
+    expect(
+      seedDocument(atara.manifest, atara.defaults, { ...base, eventType: 'bar_mitzvah', hosts: single }).cover
+        .monogram,
+    ).toEqual({ he: 'י', en: 'J' });
+    const rooftop = TEMPLATES.get('rooftop-dusk')!;
+    expect(
+      seedDocument(rooftop.manifest, rooftop.defaults, { ...base, eventType: 'birthday', hosts: single })
+        .cover.monogram,
+    ).toEqual({ he: 'יונתן', en: 'JONATHAN' });
+  });
+
   it('falls back to the closest event type and flags it', () => {
     const { defaults } = TEMPLATES.get('nitzan')!;
     const resolved = resolveEventDefaults(defaults, 'baby_shower');

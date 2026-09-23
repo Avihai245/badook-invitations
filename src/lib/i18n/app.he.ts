@@ -148,7 +148,7 @@ export const he = {
       startTime: 'שעה',
       endTime: 'שעת סיום',
       timezone: 'אזור זמן',
-      namesIn: 'שמות ב{language}',
+      namesIn: { he: 'השמות בעברית', en: 'השמות באנגלית' },
     },
     languages: {
       he: 'עברית',
@@ -163,6 +163,7 @@ export const he = {
       required: 'שדה חובה',
       date: 'בחרו תאריך',
       time: 'בחרו שעה',
+      age: 'גיל בין 1 ל־120',
       create: 'לא הצלחנו ליצור את ההזמנה. נסו שוב.',
     },
   },

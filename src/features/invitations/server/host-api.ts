@@ -1,0 +1,300 @@
+/**
+ * Host-app API logic (§4 routes: create, autosave, publish, restore, versions, slug, uploads, duplicate,
+ * archive) as plain functions over injected dependencies — the route files only parse the request,
+ * resolve the signed-in user and send the result. Tested in tests/unit/host-api.test.ts.
+ */
+import { randomBytes, randomUUID } from 'node:crypto';
+import { z } from 'zod';
+import {
+  EventTypeSchema,
+  HHmmSchema,
+  InvitationDocumentSchema,
+  ISODateSchema,
+  L10nSchema,
+  LocaleSchema,
+  SLUG_RE,
+  TimezoneSchema,
+} from '../contracts/schemas';
+import type { InvitationDocument, L10n, Locale } from '../contracts/types';
+import { validateDocument } from '../contracts/validate';
+import { graphemes } from '../lib/text';
+import { COUPLE_EVENTS } from '../templates/seed-copy';
+import type { TemplateEntry } from '../templates/registry';
+import { seedDocument } from '../templates/seed-document';
+import type { HostDb } from './host-db';
+
+export type ApiResult<T = unknown> = { status: number; body: T };
+const ok = <T>(body: T, status = 200): ApiResult<T> => ({ status, body });
+const fail = (status: number, code: string, extra: Record<string, unknown> = {}): ApiResult => ({
+  status,
+  body: { ok: false, code, ...extra },
+});
+
+export interface HostDeps {
+  db: HostDb;
+  template(id: string): TemplateEntry | undefined;
+  /** refreshes the cached public page /i/<slug> (all languages) */
+  revalidate(slug: string): void;
+  now(): number;
+}
+
+// ─── create (wizard) ─────────────────────────────────────────────────────────────────────────────
+
+export const CreateInvitationSchema = z.strictObject({
+  templateId: z.string().min(1),
+  eventType: EventTypeSchema,
+  locales: z.array(LocaleSchema).min(1).max(2),
+  defaultLocale: LocaleSchema,
+  hosts: z.strictObject({
+    primary: L10nSchema,
+    secondary: L10nSchema.nullable().optional(),
+    parents: L10nSchema.nullable().optional(),
+  }),
+  /** birthday: shown with the name on a ticket-style cover ("DANA 30") */
+  age: z.number().int().min(1).max(120).nullable().optional(),
+  /** chosen in the gallery's preview dialog */
+  paletteId: z.string().min(1).nullable().optional(),
+  fontPairId: z.string().min(1).nullable().optional(),
+  date: ISODateSchema,
+  startTime: HHmmSchema,
+  endTime: HHmmSchema.nullable().optional(),
+  timezone: TimezoneSchema,
+});
+export type CreateInvitationInput = z.infer<typeof CreateInvitationSchema>;
+
+const filled = (value: L10n | null | undefined, locales: readonly Locale[]) =>
+  !!value && locales.every((l) => !!value[l]?.trim());
+const trimmed = (value: L10n | null | undefined): L10n | null => {
+  if (!value) return null;
+  const out: L10n = {};
+  for (const [k, v] of Object.entries(value)) if (v?.trim()) out[k as Locale] = v.trim().slice(0, 40);
+  return Object.keys(out).length ? out : null;
+};
+
+export async function createInvitation(userId: string, raw: unknown, deps: HostDeps): Promise<ApiResult> {
+  const parsed = CreateInvitationSchema.safeParse(raw);
+  if (!parsed.success)
+    return fail(400, 'invalid', { issues: parsed.error.issues.map((i) => i.path.join('.')) });
+  const input = parsed.data;
+  const entry = deps.template(input.templateId);
+  if (!entry) return fail(400, 'invalid', { issues: ['templateId'] });
+  const { manifest, defaults } = entry;
+  const locales = [...new Set(input.locales)];
+  const bad: string[] = [];
+  if (!manifest.categories.includes(input.eventType)) bad.push('eventType');
+  if (!locales.every((l) => manifest.supportsLocales.includes(l))) bad.push('locales');
+  if (!locales.includes(input.defaultLocale)) bad.push('defaultLocale');
+  if (!filled(input.hosts.primary, locales)) bad.push('hosts.primary');
+  const couple = COUPLE_EVENTS.includes(input.eventType);
+  if (couple && !filled(input.hosts.secondary, locales)) bad.push('hosts.secondary');
+  const preset = input.paletteId ? manifest.palettePresets.find((p) => p.id === input.paletteId) : null;
+  if (input.paletteId && !preset) bad.push('paletteId');
+  if (input.fontPairId && !manifest.fontPairs.some((p) => p.id === input.fontPairId)) bad.push('fontPairId');
+  if (bad.length) return fail(400, 'invalid', { issues: bad });
+
+  const doc = seedDocument(manifest, defaults, {
+    eventType: input.eventType,
+    locales,
+    defaultLocale: input.defaultLocale,
+    hosts: {
+      primary: trimmed(input.hosts.primary)!,
+      secondary: couple ? trimmed(input.hosts.secondary) : null,
+      parents: trimmed(input.hosts.parents),
+    },
+    date: input.date,
+    startTime: input.startTime,
+    endTime: input.endTime ?? null,
+    timezone: input.timezone,
+  });
+  if (preset) {
+    const editable = new Set<string>(manifest.tokens.editablePaletteKeys);
+    doc.theme.palette = Object.fromEntries(Object.entries(preset.palette).filter(([k]) => editable.has(k)));
+  }
+  if (input.fontPairId) doc.theme.fontPairId = input.fontPairId;
+  // Birthday age on the cover: a seal that fits it shows "30"; a ticket shows "DANA 30" / "דנה 30".
+  const age = input.eventType === 'birthday' && input.age ? String(input.age) : null;
+  if (
+    age &&
+    manifest.cover.overlay.kind !== 'ticket_text' &&
+    age.length <= manifest.cover.overlay.text.maxGlyphs
+  ) {
+    doc.cover.monogram = Object.fromEntries(locales.map((l) => [l, age]));
+  } else if (age && manifest.cover.overlay.kind === 'ticket_text') {
+    const max = manifest.cover.overlay.text.maxGlyphs;
+    doc.cover.monogram = Object.fromEntries(
+      locales.map((l) => {
+        const suffix = ` ${age}`;
+        const name = graphemes((doc.hosts.primary[l] ?? '').toLocaleUpperCase(l))
+          .slice(0, Math.max(1, max - suffix.length))
+          .join('');
+        return [l, `${name.trim()}${suffix}`];
+      }),
+    );
+  }
+  // No usable name for a slug ('invitation-new': emoji, other scripts…) → a random one.
+  const slug =
+    SLUG_RE.test(doc.share.slug) && doc.share.slug !== 'invitation-new'
+      ? doc.share.slug
+      : `invite-${randomBytes(3).toString('hex')}`;
+  const created = await deps.db.create(userId, manifest.id, input.eventType, slug, {
+    ...doc,
+    share: { ...doc.share, slug },
+  });
+  return ok({ ok: true, id: created.id, slug: created.slug }, 201);
+}
+
+// ─── autosave ────────────────────────────────────────────────────────────────────────────────────
+
+export const SaveDraftSchema = z.strictObject({ draft: z.unknown(), updatedAt: z.string().min(1) });
+
+export async function saveDraft(
+  userId: string,
+  id: string,
+  raw: unknown,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  const parsed = SaveDraftSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const draft = InvitationDocumentSchema.safeParse(parsed.data.draft);
+  if (!draft.success)
+    return fail(422, 'invalid', { issues: draft.error.issues.slice(0, 20).map((i) => i.path.join('.')) });
+  const result = await deps.db.saveDraft(id, userId, draft.data as InvitationDocument, parsed.data.updatedAt);
+  if (!result) return fail(404, 'not_found');
+  if (!result.ok) return fail(409, 'conflict', { updatedAt: result.updatedAt, draft: result.draft });
+  return ok({ ok: true, updatedAt: result.updatedAt });
+}
+
+// ─── slug ────────────────────────────────────────────────────────────────────────────────────────
+
+export async function checkSlug(slug: string, id: string | null, deps: HostDeps): Promise<ApiResult> {
+  if (!SLUG_RE.test(slug)) return ok({ ok: true, valid: false, available: false });
+  return ok({ ok: true, valid: true, available: await deps.db.slugAvailable(slug, id) });
+}
+
+// ─── publish ─────────────────────────────────────────────────────────────────────────────────────
+
+export const PublishSchema = z.strictObject({ slug: z.string().optional() });
+
+export async function publish(userId: string, id: string, raw: unknown, deps: HostDeps): Promise<ApiResult> {
+  const parsed = PublishSchema.safeParse(raw ?? {});
+  if (!parsed.success) return fail(400, 'invalid');
+  const inv = await deps.db.get(id, userId);
+  if (!inv) return fail(404, 'not_found');
+  const entry = deps.template(inv.templateId);
+  if (!entry) return fail(500, 'template_missing');
+
+  const previousSlug = inv.status === 'published' ? inv.slug : null;
+  const slug = parsed.data.slug?.trim() || inv.slug;
+  const draft = { ...inv.draft, share: { ...inv.draft.share, slug } };
+  // Validate first, so a failed publish never leaves a half-applied slug change behind.
+  // (share.slug is checked here too — the schema's slug format rule.)
+  const { errors, warnings } = validateDocument(draft, entry.manifest, { mode: 'publish', now: deps.now() });
+  if (errors.length) return fail(422, 'invalid', { issues: errors, warnings });
+  if (slug !== inv.slug) {
+    const res = await deps.db.setSlug(id, userId, slug);
+    if (!res) return fail(404, 'not_found');
+    if (!res.ok) return fail(409, res.code === 'taken' ? 'slug_taken' : 'slug_invalid');
+  }
+  const published = await deps.db.publish(id, userId);
+  if (!published) return fail(404, 'not_found');
+  deps.revalidate(published.slug);
+  if (previousSlug && previousSlug !== published.slug) deps.revalidate(previousSlug);
+  return ok({ ok: true, ...published, warnings });
+}
+
+// ─── versions / restore ──────────────────────────────────────────────────────────────────────────
+
+export async function listVersions(userId: string, id: string, deps: HostDeps): Promise<ApiResult> {
+  const inv = await deps.db.get(id, userId);
+  if (!inv) return fail(404, 'not_found');
+  return ok({ ok: true, versions: await deps.db.versions(id, userId) });
+}
+
+export async function getVersion(
+  userId: string,
+  id: string,
+  version: number,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  if (!Number.isInteger(version) || version < 1) return fail(400, 'invalid');
+  const doc = await deps.db.version(id, userId, version);
+  return doc ? ok({ ok: true, version, document: doc }) : fail(404, 'not_found');
+}
+
+export async function restoreVersion(
+  userId: string,
+  id: string,
+  version: number,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  if (!Number.isInteger(version) || version < 1) return fail(400, 'invalid');
+  const restored = await deps.db.restore(id, userId, version);
+  if (!restored) return fail(404, 'not_found');
+  const inv = await deps.db.get(id, userId);
+  if (!inv) return fail(404, 'not_found');
+  return ok({ ok: true, draft: inv.draft, updatedAt: inv.updatedAt });
+}
+
+// ─── duplicate / archive ─────────────────────────────────────────────────────────────────────────
+
+export async function duplicate(userId: string, id: string, deps: HostDeps): Promise<ApiResult> {
+  const copy = await deps.db.duplicate(id, userId);
+  return copy ? ok({ ok: true, ...copy }, 201) : fail(404, 'not_found');
+}
+
+export const ArchiveSchema = z.strictObject({ archived: z.boolean() });
+
+export async function setArchived(
+  userId: string,
+  id: string,
+  raw: unknown,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  const parsed = ArchiveSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const res = await deps.db.setArchived(id, userId, parsed.data.archived);
+  if (!res) return fail(404, 'not_found');
+  deps.revalidate(res.slug);
+  return ok({ ok: true, ...res });
+}
+
+// ─── uploads (§4 storage: signed upload URLs, MIME whitelist, size limits) ───────────────────────
+
+export const UPLOAD_LIMITS: Record<string, { kind: 'image' | 'video' | 'audio'; ext: string; max: number }> =
+  {
+    'image/jpeg': { kind: 'image', ext: 'jpg', max: 8 * 1024 * 1024 },
+    'image/png': { kind: 'image', ext: 'png', max: 8 * 1024 * 1024 },
+    'image/webp': { kind: 'image', ext: 'webp', max: 8 * 1024 * 1024 },
+    'image/avif': { kind: 'image', ext: 'avif', max: 8 * 1024 * 1024 },
+    'video/mp4': { kind: 'video', ext: 'mp4', max: 15 * 1024 * 1024 },
+    'audio/mpeg': { kind: 'audio', ext: 'mp3', max: 10 * 1024 * 1024 },
+  };
+
+export const UploadSchema = z.strictObject({
+  contentType: z.string(),
+  size: z.number().int().positive(),
+});
+
+export async function createUpload(
+  userId: string,
+  id: string,
+  raw: unknown,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  const parsed = UploadSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const limit = UPLOAD_LIMITS[parsed.data.contentType];
+  if (!limit) return fail(415, 'unsupported_type');
+  if (parsed.data.size > limit.max) return fail(413, 'too_large', { max: limit.max });
+  const inv = await deps.db.get(id, userId);
+  if (!inv) return fail(404, 'not_found');
+  const path = `${userId}/${id}/${randomUUID()}.${limit.ext}`;
+  const signed = await deps.db.signedUpload(path);
+  return ok({
+    ok: true,
+    path: signed.path,
+    token: signed.token,
+    ref: `upload:${signed.path}`,
+    kind: limit.kind,
+  });
+}

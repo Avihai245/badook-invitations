@@ -84,6 +84,25 @@ describe('create_invitation', () => {
     expect(next.slug).toBe(`${'a'.repeat(58)}-2`);
   });
 
+  it('after -9 a popular slug gets a random 4-character suffix', async () => {
+    const slugs = await as(c, 'service_role', null, async () => {
+      const out: string[] = [];
+      for (let i = 0; i < 11; i++)
+        out.push(
+          (
+            await c.query(`select public.create_invitation($1, 'atara', 'bar_mitzvah', 'popular', $2) as r`, [
+              OWNER_B,
+              doc,
+            ])
+          ).rows[0].r.slug,
+        );
+      return out;
+    });
+    expect(slugs.slice(0, 9)).toEqual(['popular', ...[2, 3, 4, 5, 6, 7, 8, 9].map((n) => `popular-${n}`)]);
+    for (const s of slugs.slice(9)) expect(s).toMatch(/^popular-[0-9a-f]{4}$/);
+    expect(new Set(slugs).size).toBe(11);
+  });
+
   it('is not callable by anon or signed-in users directly', async () => {
     for (const role of ['anon', 'authenticated'] as const) {
       await expect(

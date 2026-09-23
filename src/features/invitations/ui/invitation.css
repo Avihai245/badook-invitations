@@ -1605,7 +1605,29 @@ footer.sec {
 [data-mode='editor'] [data-edit-path] {
   cursor: pointer;
 }
+[data-mode='editor'] [data-edit-path]:hover {
+  outline: 1px dashed rgba(37, 99, 235, 0.55);
+  outline-offset: 4px;
+}
 [data-mode='editor'] [data-edit-path].edit-highlight {
   outline: 2px solid #2563eb;
   outline-offset: 4px;
+}
+/* The editor preview re-renders on every edit: show everything at once (no scroll reveal). */
+[data-mode='editor'] .reveal {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition: none;
+}
+.edit-chip {
+  position: absolute;
+  z-index: 60;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: #2563eb;
+  color: #fff;
+  font: 600 11px/1.6 system-ui, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
 }

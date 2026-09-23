@@ -70,12 +70,14 @@ const addDays = (iso: ISODate, days: number): ISODate => {
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
 };
 
+/** Seals (≤ 5 glyphs) get initials — "נ&א" / "J"; wider overlays (tickets) get the name — "DANA". */
 function monogram(hosts: WizardInput['hosts'], locales: readonly Locale[], maxGlyphs: number): L10n {
   const out: L10n = {};
   for (const l of locales) {
     const a = firstGrapheme(hosts.primary[l] ?? '');
     const b = hosts.secondary ? firstGrapheme(hosts.secondary[l] ?? '') : '';
-    const text = a && b ? `${a}&${b}` : (hosts.primary[l] ?? '').trim().toLocaleUpperCase(l);
+    const name = (hosts.primary[l] ?? '').trim().toLocaleUpperCase(l);
+    const text = a && b ? `${a}&${b}` : maxGlyphs >= 6 ? name : a.toLocaleUpperCase(l);
     out[l] = [...new Intl.Segmenter(l, { granularity: 'grapheme' }).segment(text)]
       .map((s) => s.segment)
       .slice(0, Math.max(1, maxGlyphs))
