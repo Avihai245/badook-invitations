@@ -11,6 +11,8 @@
  * 3. Side-by-side PNGs: ours | live reference | provided screenshot (design-reference/screenshots).
  * 4. Desktop 1440×900 hero (HE/EN), cover, all 8 templates × he/en (demo) — checks for horizontal
  *    overflow and console errors.
+ * 5. P4 sections in every template × he/en: gallery (carousel in HE, grid in EN), a reveal (scratch /
+ *    tap / spin in turn) and gifts with account details; the seeded save-the-date demos (§10.3).
  * Runs locally or in CI only — never in the Amplify build (§1.1 rule 7).
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -29,7 +31,7 @@ const arg = (name: string, fallback: string) => {
 };
 const BASE = arg('base', 'http://127.0.0.1:3000');
 const OUT = resolve(arg('out', 'tests/.artifacts/qa'));
-const ONLY = arg('only', 'all'); // all | fixture | templates | sheets | legibility | stress
+const ONLY = arg('only', 'all'); // all | fixture | templates | sheets | legibility | stress | extras
 const NOW = '2026-09-23T10:00:00Z';
 // --tpl a,b limits the template loops (templates / sheets / legibility) to those ids
 const TPLS = arg('tpl', '')
@@ -486,6 +488,54 @@ async function heroLegibility(browser: Browser) {
   }
 }
 
+/** P4 sections (§2.2 sections 8–10, §10.3) in every template: element shots side by side per template. */
+async function extrasQA(browser: Browser) {
+  const reveals = ['scratch', 'tap', 'spin'] as const;
+  for (const [i, id] of TPLS.entries()) {
+    for (const locale of ['he', 'en'] as const) {
+      const { page, errors } = await newPage(browser);
+      const gallery = locale === 'he' ? 'carousel' : 'grid';
+      const reveal = reveals[i % reveals.length]!;
+      await page.goto(
+        `${BASE}/dev/invitations/render/${id}/${locale}/demo?open=1&now=${NOW}&gallery=${gallery}&reveal=${reveal}`,
+        { waitUntil: 'networkidle' },
+      );
+      await settle(page);
+      await hideFixed(page);
+      await checkPage(page, errors, `extras ${id} ${locale} (${gallery}, ${reveal})`);
+      const shots: string[] = [];
+      for (const [name, selector] of [
+        ['gallery', '.gallery'],
+        ['reveal', '.rv-card'],
+        ['gifts', '.card:has(.copy-btn)'],
+      ] as const) {
+        const el = page.locator(selector).first();
+        await el.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(name === 'gallery' ? 600 : 150);
+        const file = join(OUT, `extras-part-${id}-${locale}-${name}.png`);
+        await el.screenshot({ path: file });
+        shots.push(file);
+      }
+      sideBySide(shots, join(OUT, `extras-${id}-${locale}.png`));
+      await page.context().close();
+    }
+  }
+  // a new save-the-date as the wizard seeds it: hero → reveal → note → footer
+  for (const id of TPLS.filter((t) => ['sahar-bordeaux', 'caesarea-shore'].includes(t))) {
+    for (const locale of ['he', 'en'] as const) {
+      const { page, errors } = await newPage(browser, FRAME.w, FRAME.h, 1);
+      await page.goto(`${BASE}/dev/invitations/render/${id}/${locale}/demo-save_the_date?open=1&now=${NOW}`, {
+        waitUntil: 'networkidle',
+      });
+      await settle(page);
+      await hideFixed(page);
+      await checkPage(page, errors, `save-the-date ${id} ${locale}`);
+      await page.screenshot({ path: join(OUT, `std-${id}-${locale}.png`), fullPage: true });
+      await page.context().close();
+    }
+  }
+}
+
 async function main() {
   const browser = await chromium.launch();
   try {
@@ -494,6 +544,7 @@ async function main() {
     if (ONLY === 'all' || ONLY === 'sheets') await contactSheets(browser);
     if (ONLY === 'all' || ONLY === 'legibility') await heroLegibility(browser);
     if (ONLY === 'all' || ONLY === 'stress') await stressQA(browser);
+    if (ONLY === 'all' || ONLY === 'extras') await extrasQA(browser);
   } finally {
     await browser.close();
   }

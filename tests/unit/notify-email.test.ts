@@ -26,7 +26,7 @@ describe('reply email', () => {
     expect(e.html).toContain('מזל טוב &lt;script&gt;x&lt;/script&gt;');
     expect(e.html).not.toContain('<script>');
     expect(e.html).toContain('href="https://x.test/app/invitations/1/responses"');
-    expect(e.text).toContain('2 מבוגרים · 1 ילדים');
+    expect(e.text).toContain('2 מבוגרים · ילד אחד');
   });
 
   it('English decline and an updated reply', () => {
@@ -37,13 +37,13 @@ describe('reply email', () => {
         reply: { name: 'Avi', attending: false, adults: 0, children: 0, message: null },
       }).subject,
     ).toBe('New reply: Avi · not attending');
-    expect(
-      replyEmail({
-        ...base,
-        locale: 'en',
-        reply: { name: 'Avi', attending: true, adults: 1, children: 0, message: null, replaced: true },
-      }).subject,
-    ).toBe('Reply updated: Avi · 1 guest');
+    const updated = replyEmail({
+      ...base,
+      locale: 'en',
+      reply: { name: 'Avi', attending: true, adults: 1, children: 0, message: null, replaced: true },
+    });
+    expect(updated.subject).toBe('Reply updated: Avi · 1 guest');
+    expect(updated.text).toContain('1 adult · 0 children');
   });
 });
 

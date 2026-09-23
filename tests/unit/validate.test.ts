@@ -35,7 +35,7 @@ describe('fixtures, demos and wizard seeds', () => {
   );
 
   it.each(cases)(
-    'wizard seed %s · %s · %s: only the venue details are missing, then it is publishable',
+    'wizard seed %s · %s · %s: only the venue details are missing (a save-the-date has none), then it is publishable',
     (templateId, eventType, localeKey) => {
       const { manifest, defaults } = requireTemplate(templateId);
       const locales = localeKey.split('+') as Locale[];
@@ -55,6 +55,8 @@ describe('fixtures, demos and wizard seeds', () => {
         slug: 'wizard-seed',
       });
       const r = check(doc);
+      // §10.3: a save-the-date is the hero, the date reveal, a note and the footer — nothing to fill
+      if (eventType === 'save_the_date') return expect(brief(r.errors)).toEqual([]);
       expect(r.errors.length).toBeGreaterThan(0);
       expect(
         r.errors.every(

@@ -1,6 +1,7 @@
-// Host-app screens QA (P2/P3 Design QA gate, §11): screenshots of the list, gallery, preview, wizard,
-// editor, publish dialog and share screen in HE (RTL) and EN (LTR) at 1440×900, 1024×768 (editor,
-// compact rail) and 390×844, plus layout probes (no horizontal scroll, mirrored columns).
+// Host-app screens QA (P2–P4 Design QA gate, §11): screenshots of the list, gallery, preview, wizard,
+// editor, publish dialog, share screen, responses dashboard (+ a reply's drawer) and the save-the-date
+// follow-up dialog in HE (RTL) and EN (LTR) at 1440×900, 1024×768 (editor, compact rail) and 390×844,
+// plus layout probes (no horizontal scroll, mirrored columns, drawer from the inline-end).
 // Usage: BASE=http://127.0.0.1:3000 [QA_DATABASE_URL=postgres://…] node scripts/qa-host.mjs [he|en] [desktop|tablet|mobile]
 // Needs a running app on a local stack (tests/support/rest-shim.mjs) and its database (the venue that
 // publishing requires is filled in directly). Screenshots go to tests/.artifacts/qa/host/ (gitignored).
@@ -28,6 +29,17 @@ const T = {
     colors: 'צבעים',
     use: 'שימוש בעיצוב הזה',
     next: 'המשך',
+    more: 'אפשרויות נוספות',
+    followUp: 'יצירת ההזמנה המלאה',
+    guests: [
+      ['דנה', 'כהן'],
+      ['רון', 'לוי'],
+      ['מיכל', 'אברהם'],
+      ['יוסי', 'מזרחי'],
+      ['שירה', 'פרץ'],
+    ],
+    extra: ['יואב', 'אלה'],
+    message: 'מזל טוב! מחכים לחגוג איתכם 🎉',
   },
   en: {
     edit: 'Edit',
@@ -37,6 +49,17 @@ const T = {
     colors: 'Colors',
     use: 'Use this design',
     next: 'Continue',
+    more: 'More options',
+    followUp: 'Create the full invitation',
+    guests: [
+      ['Dana', 'Cohen'],
+      ['Ron', 'Levi'],
+      ['Michal', 'Abraham'],
+      ['Yossi', 'Mizrahi'],
+      ['Shira', 'Peretz'],
+    ],
+    extra: ['Yoav', 'Ella'],
+    message: 'Congratulations! Can’t wait to celebrate with you 🎉',
   },
 };
 
@@ -204,10 +227,112 @@ for (const lang of LANGS) {
       .evaluate((img) => img.complete && img.naturalWidth === 1200);
     check(tag, 'share: link preview image loads', preview);
 
+    // responses dashboard (P4): five replies, one of them a decline
+    const replies = t.guests.map(([first, last], i) =>
+      i === 2
+        ? { attending: false, contact: { fullName: `${first} ${last}`, phone: '054-111-2233', email: null } }
+        : {
+            attending: true,
+            message: i === 0 ? t.message : null,
+            adults: [[first, `050-123-45${60 + i}`], ...(i === 0 ? [[t.extra[0], null]] : [])].map(
+              ([firstName, phone]) => ({
+                firstName,
+                lastName: last,
+                phone,
+                email: null,
+                dietary: i === 1 ? ['vegetarian'] : i === 3 ? ['gluten_free'] : [],
+                dietaryNotes: null,
+              }),
+            ),
+            children:
+              i === 0
+                ? [{ fullName: `${t.extra[1]} ${last}`, age: 6, dietary: ['kids_meal'], dietaryNotes: null }]
+                : [],
+          },
+    );
+    for (const reply of replies) {
+      const res = await page.request.post(`${BASE}/api/invitations/rsvp`, {
+        data: {
+          invitationSlug: created.slug,
+          locale: lang,
+          hp: '',
+          renderedAt: Date.now() - 10_000,
+          answers: {},
+          message: null,
+          ...reply,
+        },
+      });
+      if (!res.ok()) check(tag, 'rsvp', false, `${res.status()} ${await res.text()}`);
+    }
+    await page.goto(`${BASE}/app/invitations/${created.id}/responses`, { waitUntil: 'networkidle' });
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    await settle(page, 1200);
+    await shot('40-responses');
+    await noOverflow(page, tag, 'responses');
+    const kpis = await page
+      .locator('#main dl')
+      .evaluateAll((els) =>
+        els.map((e) => ({ x: e.getBoundingClientRect().x, y: e.getBoundingClientRect().y })),
+      );
+    check(tag, 'responses: 4 KPI cards', kpis.length === 4, String(kpis.length));
+    const kpiRows = new Set(kpis.map((k) => Math.round(k.y))).size;
+    check(tag, 'responses: KPI rows', kpiRows === (vp.name === 'mobile' ? 2 : 1), String(kpiRows));
+    check(
+      tag,
+      'responses: first KPI at the inline-start',
+      lang === 'he' ? kpis[0].x > kpis[1].x : kpis[0].x < kpis[1].x,
+    );
+    await page.locator('#main table tbody tr').first().click();
+    const drawer = page.getByRole('dialog');
+    await drawer.waitFor();
+    await settle(page, 700);
+    await shot('41-responses-drawer');
+    const drawerBox = await drawer.boundingBox();
+    check(
+      tag,
+      'responses: drawer from the inline-end',
+      lang === 'he' ? drawerBox.x <= 1 : Math.abs(drawerBox.x + drawerBox.width - vp.width) <= 1,
+      `x=${Math.round(drawerBox.x)} w=${Math.round(drawerBox.width)}`,
+    );
+    await page.keyboard.press('Escape');
+
+    // save-the-date (P4): the list menu leads to the full invitation
+    const std = await page.evaluate(async (l) => {
+      const res = await fetch('/api/invitations', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          templateId: 'sahar-bordeaux',
+          eventType: 'save_the_date',
+          locales: [l],
+          defaultLocale: l,
+          hosts: { primary: { he: 'נועה', en: 'Noa' }, secondary: { he: 'איתי', en: 'Itay' } },
+          date: '2027-06-17',
+          startTime: '19:30',
+          timezone: 'Asia/Jerusalem',
+        }),
+      });
+      return res.json();
+    }, lang);
+    check(tag, 'save-the-date slug', /-save-the-date(-[0-9a-f]+)?$/.test(std.slug ?? ''), std.slug);
+
     await page.goto(`${BASE}/app/invitations`, { waitUntil: 'networkidle' });
     await settle(page);
     await shot('20-list');
     await noOverflow(page, tag, 'list');
+    await page.getByRole('button', { name: t.more }).first().click();
+    await settle(page, 300);
+    await shot('21-list-menu');
+    const followUp = page.getByRole('menuitem', { name: t.followUp });
+    check(tag, 'list: the save-the-date offers its full invitation', (await followUp.count()) === 1);
+    if (await followUp.count()) {
+      await followUp.click();
+      await page.getByRole('dialog').waitFor();
+      await settle(page, 400);
+      await shot('22-follow-up');
+      await noOverflow(page, tag, 'follow-up dialog');
+      await page.keyboard.press('Escape');
+    }
     for (const l of logs) results.push(`LOG   ${tag}  ${l}`);
     await context.close();
   }

@@ -44,6 +44,13 @@ export interface ResolvedDefaults {
   exact: boolean;
 }
 
+/**
+ * The seeded texts come from another event type (the editor asks the host to review them). A
+ * save-the-date has its own seed copy (`SEED_COPY.saveTheDate`) for what it shows.
+ */
+export const borrowedCopy = (defaults: TemplateDefaults, eventType: EventType): boolean =>
+  eventType !== 'save_the_date' && !resolveEventDefaults(defaults, eventType).exact;
+
 export function resolveEventDefaults(defaults: TemplateDefaults, eventType: EventType): ResolvedDefaults {
   const direct = defaults.defaults[eventType];
   if (direct) return { eventType, defaults: direct, exact: true };
@@ -97,7 +104,11 @@ export function seedDocument(
   input: WizardInput,
 ): InvitationDocument {
   const { locales } = input;
-  const { defaults: d } = resolveEventDefaults(templateDefaults, input.eventType);
+  const { defaults: d, exact } = resolveEventDefaults(templateDefaults, input.eventType);
+  // §10.3: a save-the-date shows the hero, the date reveal, a short note and the footer; the rest of
+  // the template's sections are there, switched off, for the host to add
+  const saveTheDate = input.eventType === 'save_the_date';
+  const std = SEED_COPY.saveTheDate;
   const variants = template.sectionDefaults.variants;
   const withVariant = <S extends Section>(s: S): S => {
     const v = variants[s.type];
@@ -112,7 +123,7 @@ export function seedDocument(
         {
           id: 'story',
           type: 'text',
-          enabled: true,
+          enabled: !saveTheDate,
           data: {
             kind: 'story',
             title: pick(d.story.title, locales),
@@ -127,7 +138,7 @@ export function seedDocument(
   const extras: Section[] = d.extraSections.map((x, i) => ({
     id: `${x.kind.replace(/_/g, '-')}${d.extraSections.findIndex((y) => y.kind === x.kind) === i ? '' : `-${i + 1}`}`,
     type: 'text',
-    enabled: true,
+    enabled: !saveTheDate,
     data: {
       kind: x.kind,
       title: pick(x.title, locales),
@@ -146,12 +157,13 @@ export function seedDocument(
         type: 'hero',
         enabled: true,
         data: {
-          eyebrow: pick(d.eyebrow, locales),
+          eyebrow: pick(saveTheDate && !exact ? std.eyebrow : d.eyebrow, locales),
           title:
             d.heroTitle.mode === 'hosts'
               ? { mode: 'hosts' }
               : { mode: 'custom', text: pick(d.heroTitle.text, locales) },
-          showDate: true,
+          // a save-the-date's date is the reveal's
+          showDate: !saveTheDate,
           locationLine: null,
           media: heroOption.media,
           overlayOpacity: template.hero.defaultOverlay,
@@ -168,6 +180,19 @@ export function seedDocument(
                 mechanic: 'scratch',
                 prompt: pick(SEED_COPY.revealPrompt.scratch, locales),
                 showCalendarButton: true,
+              },
+            },
+            {
+              id: 'note',
+              type: 'text',
+              enabled: true,
+              data: {
+                kind: 'custom',
+                title: null,
+                subtitle: null,
+                body: pick(std.note, locales),
+                illustration: null,
+                cta: null,
               },
             },
           ] satisfies Section[])
@@ -191,7 +216,7 @@ export function seedDocument(
       {
         id: 'venues',
         type: 'venues',
-        enabled: true,
+        enabled: !saveTheDate,
         data: {
           items: d.venueLabels.map((label, i) => ({
             id: `venue-${i + 1}`,
@@ -213,7 +238,7 @@ export function seedDocument(
       {
         id: 'timeline',
         type: 'timeline',
-        enabled: d.timeline.length > 0,
+        enabled: !saveTheDate && d.timeline.length > 0,
         data: {
           title: pick(SEED_COPY.timelineTitle(input.eventType), locales),
           showDate: true,
@@ -260,7 +285,7 @@ export function seedDocument(
       {
         id: 'rsvp',
         type: 'rsvp',
-        enabled: true,
+        enabled: !saveTheDate,
         data: {
           title: pick(d.rsvp.title, locales),
           subtitle: pickOrNull(d.rsvp.subtitle, locales),
@@ -292,7 +317,7 @@ export function seedDocument(
           showHosts: true,
           showDate: true,
           showParents: !!input.hosts.parents,
-          closingLine: pick(d.closingLine, locales),
+          closingLine: pick(saveTheDate && !exact ? std.closing : d.closingLine, locales),
           showCredit: true,
         },
       },
@@ -331,7 +356,7 @@ export function seedDocument(
       endTime,
       hebrewDate: locales.includes('he') ? 'day' : 'off',
       timeFormat: null,
-      rsvpDeadline: addDays(input.date, -14),
+      rsvpDeadline: saveTheDate ? null : addDays(input.date, -14),
     },
     theme: { fontPairId: template.fontPairs[0]!.id, palette: null },
     cover: {

@@ -99,15 +99,20 @@ export function demoDocument(
     slug: `demo-${templateId}`,
   });
   if (people.monogram) doc.cover.monogram = pick(people.monogram, locales);
-  doc.event.rsvpDeadline = '2027-06-01';
+  // a save-the-date keeps its §10.3 shape (hero → reveal → note → footer); the samples are filled in
+  // for when its other sections are switched on
+  const saveTheDate = type === 'save_the_date';
+  if (!saveTheDate) doc.event.rsvpDeadline = '2027-06-01';
 
   const sections: Section[] = doc.sections.map((s): Section => {
     switch (s.type) {
       case 'hero':
-        return {
-          ...s,
-          data: { ...s.data, locationLine: pick({ he: 'זכרון יעקב', en: "Zikhron Ya'akov" }, locales) },
-        };
+        return saveTheDate
+          ? s
+          : {
+              ...s,
+              data: { ...s.data, locationLine: pick({ he: 'זכרון יעקב', en: "Zikhron Ya'akov" }, locales) },
+            };
       case 'venues':
         return {
           ...s,
@@ -126,7 +131,7 @@ export function demoDocument(
       case 'faq':
         return {
           ...s,
-          enabled: true,
+          enabled: !saveTheDate,
           data: {
             ...s.data,
             items: [
@@ -146,7 +151,7 @@ export function demoDocument(
       case 'gifts':
         return {
           ...s,
-          enabled: true,
+          enabled: !saveTheDate,
           data: {
             ...s.data,
             links: [

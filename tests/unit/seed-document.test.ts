@@ -94,6 +94,35 @@ describe('seedDocument', () => {
     ).toEqual({ he: 'יונתן', en: 'JONATHAN' });
   });
 
+  it('a save-the-date is the hero, the date reveal, a note and the footer (§10.3)', () => {
+    const { manifest, defaults } = TEMPLATES.get('sahar-bordeaux')!;
+    const doc = seedDocument(manifest, defaults, {
+      eventType: 'save_the_date',
+      locales: ['he'],
+      defaultLocale: 'he',
+      hosts,
+      date: '2027-06-17',
+      startTime: '19:30',
+      timezone: 'Asia/Jerusalem',
+    });
+    expect(doc.sections.filter((s) => s.enabled).map((s) => s.type)).toEqual([
+      'hero',
+      'reveal',
+      'text',
+      'footer',
+    ]);
+    const hero = doc.sections[0]!;
+    expect(hero.type === 'hero' && hero.data).toMatchObject({
+      eyebrow: { he: 'אנחנו מתחתנים!' },
+      showDate: false,
+    });
+    const note = doc.sections.find((s) => s.id === 'note');
+    expect(note?.type === 'text' && note.data.body.he).toMatch(/הזמנה רשמית תישלח בהמשך\.$/);
+    // the rest is there to switch on
+    expect(doc.sections.find((s) => s.type === 'rsvp')?.enabled).toBe(false);
+    expect(doc.event.rsvpDeadline).toBeNull();
+  });
+
   it('falls back to the closest event type and flags it', () => {
     const { defaults } = TEMPLATES.get('nitzan')!;
     const resolved = resolveEventDefaults(defaults, 'baby_shower');

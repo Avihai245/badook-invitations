@@ -28,6 +28,9 @@ export const he = {
     english: 'English',
     both: 'שתיהן',
     toastLabel: 'התראה',
+    /** "3 מבוגרים" / "ילד אחד" (KPI, emails) */
+    adults: { one: 'מבוגר אחד', other: '{n} מבוגרים' },
+    children: { one: 'ילד אחד', other: '{n} ילדים' },
     toastViewport: 'התראות ({hotkey})',
   },
   shell: {
@@ -192,7 +195,7 @@ export const he = {
     export: 'ייצוא ל-Excel',
     kpi: {
       attending: 'מגיעים',
-      attendingSub: '{adults} מבוגרים · {children} ילדים',
+      attendingSub: '{adults} · {children}',
       responses: 'תשובות',
       responsesSub: '+{n} השבוע',
       declined: 'לא מגיעים',
@@ -288,7 +291,7 @@ export const he = {
     guests: { one: 'אורח אחד', other: '{n} אורחים' },
     attending: 'מגיעים',
     declined: 'לא מגיעים',
-    counts: '{adults} מבוגרים · {children} ילדים',
+    counts: '{adults} · {children}',
     message: 'ההודעה שצורפה:',
     open: 'לכל אישורי ההגעה',
     footerEach: 'קיבלתם את המייל כי ההתראות על כל תשובה פעילות — אפשר לשנות את זה בלוח אישורי ההגעה.',

@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 import { Card, IconButton, Menu, Switch, useToast } from '@/components/app';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
-import { resolveEventDefaults } from '../templates/seed-document';
+import { borrowedCopy } from '../templates/seed-document';
 import { LOCKED_TYPES } from './catalog';
 import { sectionName, useFocusRequest } from './fields/fields';
 import { GlobalPanel } from './panels/GlobalPanels';
@@ -123,7 +123,7 @@ export function FormPanel({ className }: { className?: string }) {
     return <div ref={ref} className={className} />;
   }
 
-  const reviewTexts = section?.type === 'hero' && !resolveEventDefaults(defaults, doc.eventType).exact;
+  const reviewTexts = section?.type === 'hero' && borrowedCopy(defaults, doc.eventType);
 
   return (
     <div ref={ref} className={className}>

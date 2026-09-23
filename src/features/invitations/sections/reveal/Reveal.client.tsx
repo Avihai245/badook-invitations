@@ -36,16 +36,24 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
  * Save-the-date reveal (§2.2 sections 9): `scratch` (scratch-off foil, auto-completes at 55% cleared),
  * `tap` (a seal that bursts) or `spin` (slot-machine digits settling on the date when it comes into
  * view). The date is in the page from the start (screen readers, no-JS); a button reveals it for
- * keyboard users. "Add to calendar" appears once revealed.
+ * keyboard users. "Add to calendar" appears once revealed, in the space the foil / seal covered (no
+ * empty gap before, no layout shift after).
  */
 export function Reveal({ mechanic, prompt, date, hebrewDate, iso, calendar, buttonLabel }: RevealProps) {
   const [revealed, setRevealed] = useState(false);
   const reveal = useCallback(() => setRevealed(true), []);
   const content = (
-    <div className="rv-date">
-      <p className="rv-long">{date}</p>
-      {hebrewDate ? <p className="rv-heb">{hebrewDate}</p> : null}
-    </div>
+    <>
+      <div className="rv-date">
+        <p className="rv-long">{date}</p>
+        {hebrewDate ? <p className="rv-heb">{hebrewDate}</p> : null}
+      </div>
+      {calendar ? (
+        <div className="rv-cal actions">
+          <CalendarMenu label={calendar.label} links={calendar.links} labels={calendar.labels} />
+        </div>
+      ) : null}
+    </>
   );
   return (
     <div className={`rv rv-${mechanic}`} data-revealed={revealed ? '' : undefined}>
@@ -62,11 +70,6 @@ export function Reveal({ mechanic, prompt, date, hebrewDate, iso, calendar, butt
           {content}
         </Spin>
       )}
-      {calendar ? (
-        <div className="rv-cal actions">
-          <CalendarMenu label={calendar.label} links={calendar.links} labels={calendar.labels} />
-        </div>
-      ) : null}
     </div>
   );
 }

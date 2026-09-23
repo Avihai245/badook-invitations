@@ -76,7 +76,13 @@ export function replyEmail(opts: {
     : r.attending
       ? fmt(e.subjectYes, { name: r.name, guests })
       : fmt(e.subjectNo, { name: r.name });
-  const counts = r.attending ? fmt(e.counts, { adults: r.adults, children: r.children }) : null;
+  const { common } = dictFor(locale);
+  const counts = r.attending
+    ? fmt(e.counts, {
+        adults: plural(locale, common.adults, r.adults),
+        children: plural(locale, common.children, r.children),
+      })
+    : null;
   const lines = [replyLine(locale, r), counts, r.message ? `${e.message}\n“${r.message}”` : null].filter(
     (l): l is string => !!l,
   );

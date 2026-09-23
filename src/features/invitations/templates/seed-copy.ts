@@ -25,6 +25,15 @@ export const SEED_COPY = {
     tap: { he: '(הקישו כדי לגלות)', en: '(tap to reveal)' },
     spin: { he: '(הקישו לסיבוב)', en: '(tap to spin)' },
   } satisfies Record<'scratch' | 'tap' | 'spin', L10n>,
+  /** A save-the-date (§10.3: hero → reveal → a short note → footer) in a template without its own copy. */
+  saveTheDate: {
+    eyebrow: { he: 'אנחנו מתחתנים!', en: 'We’re getting married!' },
+    note: {
+      he: 'פרק חדש עומד להתחיל, ואנחנו כל כך מתרגשים לחגוג אותו עם האנשים הכי חשובים לנו.\nהזמנה רשמית תישלח בהמשך.',
+      en: 'A new chapter is about to begin, and we can’t wait to celebrate it with the people who matter most to us.\nA formal invitation will follow.',
+    },
+    closing: { he: 'באהבה,', en: 'With love,' },
+  } satisfies Record<string, L10n>,
   joiner: { he: '&', en: '&' } satisfies L10n,
   /** Titles of text sections added in the editor when the template has no copy for that kind. */
   textTitles: {

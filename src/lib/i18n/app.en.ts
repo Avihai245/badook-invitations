@@ -25,6 +25,8 @@ export const en: AppDict = {
     english: 'English',
     both: 'Both',
     toastLabel: 'Notification',
+    adults: { one: '1 adult', other: '{n} adults' },
+    children: { one: '1 child', other: '{n} children' },
     toastViewport: 'Notifications ({hotkey})',
   },
   shell: {
@@ -192,7 +194,7 @@ export const en: AppDict = {
     export: 'Export to Excel',
     kpi: {
       attending: 'Attending',
-      attendingSub: '{adults} adults · {children} children',
+      attendingSub: '{adults} · {children}',
       responses: 'Replies',
       responsesSub: '+{n} this week',
       declined: 'Not attending',
@@ -288,7 +290,7 @@ export const en: AppDict = {
     guests: { one: '1 guest', other: '{n} guests' },
     attending: 'Attending',
     declined: 'Not attending',
-    counts: '{adults} adults · {children} children',
+    counts: '{adults} · {children}',
     message: 'Their message:',
     open: 'See all RSVPs',
     footerEach:

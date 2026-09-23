@@ -195,6 +195,8 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
   ];
 
   const exportHref = `/api/invitations/${data.id}/responses/export`;
+  // the dietary options someone chose (eight rows of mostly zeros say little)
+  const diet = dietaryCounts(list, data.dietary).filter((d) => d.count > 0);
   const breakdowns = data.questions.flatMap((q) => {
     const counts = questionBreakdown(list, q);
     return counts ? [{ q, counts }] : [];
@@ -263,8 +265,8 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
               label={r.kpi.attending}
               value={number(stats.attending)}
               sub={fmt(r.kpi.attendingSub, {
-                adults: number(stats.adults),
-                children: number(stats.children),
+                adults: plural(t.common.adults, stats.adults, { n: number(stats.adults) }),
+                children: plural(t.common.children, stats.children, { n: number(stats.children) }),
               })}
             />
             <KpiCard
@@ -287,13 +289,13 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
             />
           </div>
 
-          {data.dietary.length || breakdowns.length ? (
+          {diet.length || breakdowns.length ? (
             <div className="mt-4 grid gap-4 md:grid-cols-2">
-              {data.dietary.length ? (
+              {diet.length ? (
                 <Card padding="md">
                   <Bars
                     title={r.dietary}
-                    rows={dietaryCounts(list, data.dietary).map((d) => ({
+                    rows={diet.map((d) => ({
                       key: d.key,
                       label: dietLabel(d.key),
                       value: d.count,

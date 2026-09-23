@@ -57,6 +57,8 @@ export default defineConfig({
             INVITES_DEV_ROUTES: 'true',
             INVITES_PUBLIC_BASE_URL: baseURL,
             INVITES_IP_HASH_SALT: 'e2e-salt-0123456789abcdef0123456789',
+            // the daily RSVP summary endpoint (tests/e2e/p4-dashboard.spec.ts)
+            INVITES_CRON_SECRET: 'e2e-cron-secret-0123456789abcdef',
             NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${shimPort}`,
             NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'local-publishable',
             SUPABASE_SECRET_KEY: 'local-secret',
