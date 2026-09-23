@@ -106,6 +106,7 @@ export const en: AppDict = {
       duplicate: 'Duplicate',
       archive: 'Archive',
       unarchive: 'Restore from archive',
+      followUp: 'Create the full invitation',
     },
     duplicated: 'Copy created: {slug}',
     archived: 'Invitation archived',
@@ -116,6 +117,15 @@ export const en: AppDict = {
     emptyBody: 'Pick a design and you’ll have a moving invitation in minutes',
     emptyCta: 'Choose a design',
     archivedEmpty: 'No archived invitations',
+    followUp: {
+      title: 'The full invitation',
+      description:
+        'The names, date, languages, design and opening are copied from the save-the-date. The save-the-date and its link stay as they are.',
+      typeLabel: 'Which event?',
+      create: 'Create the invitation',
+      creating: 'Preparing the full invitation…',
+      error: 'We couldn’t create the invitation. Please try again.',
+    },
   },
   gallery: {
     title: 'Choose a design',

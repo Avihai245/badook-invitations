@@ -5,6 +5,7 @@ import {
   ArchiveRestore,
   Copy,
   ListChecks,
+  MailPlus,
   MoreHorizontal,
   PencilLine,
   Plus,
@@ -21,6 +22,7 @@ import { getTemplate } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
 import { posterColors } from '../poster';
 import { TemplatePoster } from '../TemplatePoster';
+import { FollowUpDialog, followUpTypes } from './FollowUpDialog';
 
 const BADGE: Record<InvitationSummary['status'], BadgeVariant> = {
   draft: 'draft',
@@ -35,6 +37,7 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
   const { toast } = useToast();
   const [showArchived, setShowArchived] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [followUp, setFollowUp] = useState<InvitationSummary | null>(null);
   const [, startTransition] = useTransition();
 
   const active = items.filter((i) => i.status !== 'archived');
@@ -88,6 +91,7 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
                 busy={busy === item.id}
                 onDuplicate={() => void duplicate(item.id)}
                 onArchive={(on) => void archive(item.id, on)}
+                onFollowUp={() => setFollowUp(item)}
               />
             </li>
           ))}
@@ -108,6 +112,7 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
           }
         />
       )}
+      {followUp ? <FollowUpDialog item={followUp} onClose={() => setFollowUp(null)} /> : null}
     </div>
   );
 }
@@ -117,11 +122,14 @@ function InvitationCard({
   busy,
   onDuplicate,
   onArchive,
+  onFollowUp,
 }: {
   item: InvitationSummary;
   busy: boolean;
   onDuplicate: () => void;
   onArchive: (archived: boolean) => void;
+  /** a save-the-date → its full invitation */
+  onFollowUp: () => void;
 }) {
   const { t, locale, date, number, plural } = useUi();
   const template = getTemplate(item.templateId)?.manifest;
@@ -189,6 +197,9 @@ function InvitationCard({
                     href: `/app/invitations/${item.id}/responses`,
                   },
                 ]
+              : []),
+            ...(item.eventType === 'save_the_date' && !archived && followUpTypes(item.templateId).length
+              ? [{ label: t.list.menu.followUp, icon: <MailPlus />, onSelect: onFollowUp }]
               : []),
             { label: t.list.menu.duplicate, icon: <Copy />, onSelect: onDuplicate },
             { type: 'separator' },

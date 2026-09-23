@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { cn, PaletteDots, Segmented } from '@/components/app';
 import type { UiLocale } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
@@ -12,6 +12,7 @@ import { posterColors } from '../poster';
 import { TemplatePoster } from '../TemplatePoster';
 import { CreateWizard, type WizardSeed } from './CreateWizard';
 import { PreviewDialog } from './PreviewDialog';
+import { usePreviewVideos } from './preview-videos';
 
 type Filter = 'all' | 'wedding' | 'barbat' | 'brit' | 'birthday' | 'baby_shower' | 'save_the_date';
 
@@ -25,12 +26,28 @@ const FILTERS: Record<Filter, readonly EventType[]> = {
   save_the_date: ['save_the_date'],
 };
 
+/** Dev/QA: the same fixture files on every card instead of the templates' own previews. */
+export interface DevPreviews {
+  image: string | null;
+  video: string;
+}
+
 /**
  * Template gallery (§7.1, §9B.3-B): filter chips by event type, 9:16 posters (the preview video plays
- * on hover when it exists), a preview dialog with a live phone, then the 3-step wizard.
+ * muted on hover, or on touch screens when the card is in view), a preview dialog with a live phone,
+ * then the 3-step wizard.
  */
-export function TemplateGallery({ bases, fontCss }: { bases: AssetBases; fontCss: string }) {
+export function TemplateGallery({
+  bases,
+  fontCss,
+  devPreviews = null,
+}: {
+  bases: AssetBases;
+  fontCss: string;
+  devPreviews?: DevPreviews | null;
+}) {
   const { t, locale } = useUi();
+  const videos = usePreviewVideos();
   const [filter, setFilter] = useState<Filter>('all');
   const [previewLocale, setPreviewLocale] = useState<Locale>(locale);
   const [preview, setPreview] = useState<string | null>(null);
@@ -41,11 +58,11 @@ export function TemplateGallery({ bases, fontCss }: { bases: AssetBases; fontCss
       [...TEMPLATES.values()].map(({ manifest }) => ({
         manifest,
         colors: posterColors(manifest),
-        image: templateFileUrl(manifest.id, manifest.previewImage, bases),
-        video: templateFileUrl(manifest.id, manifest.previewVideo, bases),
+        image: devPreviews ? devPreviews.image : templateFileUrl(manifest.id, manifest.previewImage, bases),
+        video: devPreviews ? devPreviews.video : templateFileUrl(manifest.id, manifest.previewVideo, bases),
         sample: manifest.cover.overlay.kind === 'ticket_text' ? '30' : locale === 'he' ? 'נ&א' : 'N&I',
       })),
-    [bases, locale],
+    [bases, locale, devPreviews],
   );
   const visible = templates.filter(
     ({ manifest }) => filter === 'all' || manifest.categories.some((c) => FILTERS[filter].includes(c)),
@@ -103,6 +120,7 @@ export function TemplateGallery({ bases, fontCss }: { bases: AssetBases; fontCss
                 image={image}
                 video={video}
                 sample={sample}
+                videos={videos}
                 onOpen={() => setPreview(manifest.id)}
               />
             </li>
@@ -141,6 +159,7 @@ function GalleryCard({
   image,
   video,
   sample,
+  videos,
   onOpen,
 }: {
   name: string;
@@ -150,22 +169,29 @@ function GalleryCard({
   image: string | null;
   video: string | null;
   sample: string;
+  videos: ReturnType<typeof usePreviewVideos>;
   onOpen: () => void;
 }) {
   const { t, fmt } = useUi();
   const ref = useRef<HTMLVideoElement>(null);
-  const play = (on: boolean) => {
-    const v = ref.current;
-    if (!v) return;
-    if (on) v.play().catch(() => {});
-    else v.pause();
-  };
+  const [playing, setPlaying] = useState(false);
+  // a preview that can't load (not produced yet, offline) leaves the poster
+  const [failed, setFailed] = useState(false);
+  const { register } = videos;
+  // a stable ref callback: a new one each render would unregister and register the video every time
+  const attach = useCallback(
+    (el: HTMLVideoElement | null) => {
+      ref.current = el;
+      return register(el);
+    },
+    [register],
+  );
   return (
     <button
       type="button"
       onClick={onOpen}
-      onMouseEnter={() => play(true)}
-      onMouseLeave={() => play(false)}
+      onMouseEnter={() => videos.hover(ref.current, true)}
+      onMouseLeave={() => videos.hover(ref.current, false)}
       aria-label={fmt(t.gallery.playPreview, { name })}
       className="group block w-full text-start"
     >
@@ -173,18 +199,29 @@ function GalleryCard({
         colors={colors}
         image={image}
         text={sample}
-        play
+        play={!playing}
         className="transition-[transform,box-shadow] duration-250 group-hover:-translate-y-1 group-hover:shadow-lg motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
       >
-        {video ? (
+        {video && !failed ? (
           <video
-            ref={ref}
+            ref={attach}
             src={video}
             muted
             playsInline
             loop
             preload="none"
-            className="absolute inset-0 size-full object-cover"
+            aria-hidden
+            data-playing={playing ? '' : undefined}
+            onPlaying={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
+            onError={() => {
+              setPlaying(false);
+              setFailed(true);
+            }}
+            className={cn(
+              'absolute inset-0 size-full object-cover transition-opacity duration-300 motion-reduce:transition-none',
+              playing ? 'opacity-100' : 'opacity-0',
+            )}
           />
         ) : null}
       </TemplatePoster>

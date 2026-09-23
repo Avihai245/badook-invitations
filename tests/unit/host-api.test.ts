@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { InvitationDocument } from '@/features/invitations/contracts/types';
 import {
   checkSlug,
+  createFollowUp,
   createInvitation,
   createUpload,
   publish,
@@ -211,6 +212,54 @@ describe('create (wizard)', () => {
       d,
     );
     expect(d.db.create.mock.calls[0]![3]).toMatch(/^invite-[0-9a-f]{6}$/);
+  });
+});
+
+describe('save-the-date flow', () => {
+  const saveTheDate = (over: Partial<OwnerInvitation> = {}) => {
+    const draft = structuredClone(FIXTURES['savethedate-he']);
+    return invitation({ slug: draft.share.slug, eventType: 'save_the_date', draft, ...over });
+  };
+
+  it('a new save-the-date leaves the plain slug to its full invitation', async () => {
+    const d = deps();
+    const r = await createInvitation(USER, wizard({ eventType: 'save_the_date' }), d);
+    expect(r.body).toMatchObject({ ok: true, slug: 'noa-and-itay-save-the-date' });
+  });
+
+  it('creates the full invitation: same template, the event type asked for, the plain slug', async () => {
+    const d = deps({ get: vi.fn(async () => saveTheDate()) });
+    const r = await createFollowUp(USER, ID, { eventType: 'wedding' }, d);
+    expect(r).toEqual({ status: 201, body: { ok: true, id: ID, slug: 'noa-and-itay' } });
+    expect(d.db.get).toHaveBeenCalledWith(ID, USER);
+    const [owner, template, eventType, slug, draft] = d.db.create.mock.calls[0]!;
+    expect([owner, template, eventType, slug]).toEqual([USER, 'sahar-bordeaux', 'wedding', 'noa-and-itay']);
+    const doc = draft as InvitationDocument;
+    expect(doc.eventType).toBe('wedding');
+    expect(doc.share.slug).toBe('noa-and-itay');
+    expect(doc.hosts.primary).toEqual({ he: 'נועה' });
+    expect(doc.sections.some((s) => s.type === 'rsvp' && s.enabled)).toBe(true);
+  });
+
+  it('a save-the-date slug without the suffix → one from the names (the database makes it unique)', async () => {
+    const d = deps({ get: vi.fn(async () => saveTheDate({ slug: 'noa-itay-2027' })) });
+    await createFollowUp(USER, ID, { eventType: 'engagement' }, d);
+    expect(d.db.create.mock.calls[0]![3]).toBe('noa-and-aiti'); // he-only names, transliterated
+  });
+
+  it('only for the owner’s save-the-date, to an event its template offers', async () => {
+    const missing = deps({ get: vi.fn(async () => null) });
+    expect((await createFollowUp(USER, ID, { eventType: 'wedding' }, missing)).status).toBe(404);
+    const wedding = deps();
+    expect(await createFollowUp(USER, ID, { eventType: 'wedding' }, wedding)).toEqual({
+      status: 409,
+      body: { ok: false, code: 'not_save_the_date' },
+    });
+    for (const body of [{ eventType: 'save_the_date' }, { eventType: 'birthday' }, { eventType: 'x' }, {}]) {
+      const d = deps({ get: vi.fn(async () => saveTheDate()) });
+      expect((await createFollowUp(USER, ID, body, d)).status).toBe(400);
+      expect(d.db.create).not.toHaveBeenCalled();
+    }
   });
 });
 

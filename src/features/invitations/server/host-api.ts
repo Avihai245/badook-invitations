@@ -18,6 +18,7 @@ import {
 import type { InvitationDocument, L10n, Locale } from '../contracts/types';
 import { validateDocument } from '../contracts/validate';
 import { graphemes } from '../lib/text';
+import { followUpDocument, followUpSlug, saveTheDateSlug } from '../templates/follow-up';
 import { COUPLE_EVENTS } from '../templates/seed-copy';
 import type { TemplateEntry } from '../templates/registry';
 import { seedDocument } from '../templates/seed-document';
@@ -133,11 +134,49 @@ export async function createInvitation(userId: string, raw: unknown, deps: HostD
     );
   }
   // No usable name for a slug ('invitation-new': emoji, other scripts…) → a random one.
-  const slug =
-    SLUG_RE.test(doc.share.slug) && doc.share.slug !== 'invitation-new'
-      ? doc.share.slug
-      : `invite-${randomBytes(3).toString('hex')}`;
+  const base = usableSlug(doc.share.slug) ?? randomSlug();
+  // a save-the-date leaves the plain slug to the full invitation that follows it
+  const slug = input.eventType === 'save_the_date' ? saveTheDateSlug(base) : base;
   const created = await deps.db.create(userId, manifest.id, input.eventType, slug, {
+    ...doc,
+    share: { ...doc.share, slug },
+  });
+  return ok({ ok: true, id: created.id, slug: created.slug }, 201);
+}
+
+const usableSlug = (slug: string | null) =>
+  slug && SLUG_RE.test(slug) && slug !== 'invitation-new' ? slug : null;
+const randomSlug = () => `invite-${randomBytes(3).toString('hex')}`;
+
+// ─── save-the-date → the full invitation ─────────────────────────────────────────────────────────
+
+export const FollowUpSchema = z.strictObject({ eventType: EventTypeSchema });
+
+/**
+ * POST /api/invitations/:id/follow-up — the full invitation for a save-the-date: a new draft in the
+ * same template for `eventType`, with the save-the-date's names, date, design and cover
+ * (`followUpDocument`). The save-the-date itself and its link stay as they are.
+ */
+export async function createFollowUp(
+  userId: string,
+  id: string,
+  raw: unknown,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  const parsed = FollowUpSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid', { issues: ['eventType'] });
+  const source = await deps.db.get(id, userId);
+  if (!source) return fail(404, 'not_found');
+  if (source.eventType !== 'save_the_date') return fail(409, 'not_save_the_date');
+  const entry = deps.template(source.templateId);
+  const { eventType } = parsed.data;
+  if (!entry) return fail(400, 'invalid', { issues: ['templateId'] });
+  if (eventType === 'save_the_date' || !entry.manifest.categories.includes(eventType))
+    return fail(400, 'invalid', { issues: ['eventType'] });
+  const doc = followUpDocument(entry.manifest, entry.defaults, source.draft, eventType);
+  // "noa-and-itay-save-the-date" → "noa-and-itay"; otherwise from the names (the RPC makes it unique)
+  const slug = usableSlug(followUpSlug(source.slug)) ?? usableSlug(doc.share.slug) ?? randomSlug();
+  const created = await deps.db.create(userId, entry.manifest.id, eventType, slug, {
     ...doc,
     share: { ...doc.share, slug },
   });

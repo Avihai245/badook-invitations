@@ -1,18 +1,5 @@
 'use client';
 
-import {
-  Baby,
-  Briefcase,
-  Cake,
-  CalendarHeart,
-  Flower2,
-  Gem,
-  Gift,
-  Heart,
-  ScrollText,
-  Sparkles,
-  type LucideIcon,
-} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
@@ -33,6 +20,7 @@ import { CAPS } from '../../contracts/validate';
 import { requireTemplate } from '../../templates/registry';
 import { browserTimezone, DEFAULT_TIMEZONE, timezoneOptions } from '../../lib/timezones';
 import { COUPLE_EVENTS } from '../../templates/seed-copy';
+import { EVENT_ICONS } from '../event-icons';
 
 export interface WizardSeed {
   templateId: string;
@@ -41,20 +29,6 @@ export interface WizardSeed {
   /** preselected from the gallery filter */
   eventType: EventType | null;
 }
-
-const EVENT_ICONS: Record<EventType, LucideIcon> = {
-  wedding: Heart,
-  engagement: Gem,
-  henna: Flower2,
-  bar_mitzvah: ScrollText,
-  bat_mitzvah: ScrollText,
-  brit: Baby,
-  birthday: Cake,
-  baby_shower: Gift,
-  save_the_date: CalendarHeart,
-  corporate: Briefcase,
-  other: Sparkles,
-};
 
 /** the create API keeps up to 40 characters of the parents' line */
 const PARENTS_MAX = 40;
