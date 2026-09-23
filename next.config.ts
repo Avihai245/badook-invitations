@@ -6,6 +6,20 @@ const FONT_FILES = [
   './node_modules/@fontsource/*/files/*-latin-400-normal.woff',
 ];
 
+/**
+ * The app's public address (INVITES_PUBLIC_BASE_URL — .env files are loaded before this one): on a
+ * custom domain behind Amplify's CDN, the host the proxy forwards can differ from the browser's
+ * Origin, and Server Actions (sign in, sign up, passwords) would be refused as cross-site.
+ */
+const publicHost = (() => {
+  try {
+    const url = process.env.INVITES_PUBLIC_BASE_URL;
+    return url ? new URL(url).host : null;
+  } catch {
+    return null;
+  }
+})();
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -13,6 +27,7 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   // Lets a second dev server run side by side (e.g. QA scripts) without clobbering `.next`.
   distDir: process.env.NEXT_DIST_DIR || '.next',
+  ...(publicHost ? { experimental: { serverActions: { allowedOrigins: [publicHost] } } } : {}),
   // Metadata (title, Open Graph) goes into <head> for every user agent instead of being streamed after
   // the shell, so link previews from any messenger (not only Next's bot list) see it.
   htmlLimitedBots: /.*/,

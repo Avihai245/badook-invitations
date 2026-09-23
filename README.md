@@ -187,3 +187,11 @@ environment variables are copied into `.env.production` during the build (every 
 reads starts with `NEXT_PUBLIC_`, `SUPABASE_` or `INVITES_`); all of them are documented in
 [`.env.example`](.env.example). Branches: `main` = production, `dev` = preview, each with its own
 variables. Heavy template media (videos, music) is served from Supabase Storage, not from the build.
+
+**Custom domain** (e.g. `https://invitations.badooks.com`): set `INVITES_PUBLIC_BASE_URL` to it in
+the Amplify console and redeploy — the variables are baked in at build time; share links, QR codes,
+link previews, calendar files, emails and sign-up confirmations all use it, and Server Actions
+accept it as an origin (`next.config.ts`). In Supabase → Authentication → URL Configuration, set the
+Site URL to it and add `<domain>/**` to the Redirect URLs. If the daily RSVP summary runs, update the
+`INVITES_CRON_URL` repository secret. The `*.amplifyapp.com` address keeps working (links already
+sent still open); sign-in sessions are per domain.
