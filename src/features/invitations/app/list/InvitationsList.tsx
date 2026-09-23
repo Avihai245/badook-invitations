@@ -129,8 +129,9 @@ function InvitationCard({
   const archived = item.status === 'archived';
 
   return (
-    <article className="group" aria-busy={busy || undefined}>
-      <Link href={href} tabIndex={-1} aria-hidden className="block">
+    // One column on phones: a row (small poster + details) instead of a full-width 9:16 poster.
+    <article className="group max-sm:flex max-sm:items-start max-sm:gap-4" aria-busy={busy || undefined}>
+      <Link href={href} tabIndex={-1} aria-hidden className="block max-sm:w-24 max-sm:shrink-0">
         <TemplatePoster
           colors={
             template ? posterColors(template, item.sealColor) : { background: '#EFEDEA', seal: '#D6D3D1' }
@@ -139,7 +140,7 @@ function InvitationCard({
           className="transition-[transform,box-shadow] duration-250 group-hover:-translate-y-1 group-hover:shadow-lg motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
         />
       </Link>
-      <div className="mt-2.5 flex items-start gap-2">
+      <div className="mt-2.5 flex items-start gap-2 max-sm:mt-1 max-sm:min-w-0 max-sm:flex-1">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h2 className="min-w-0 truncate text-[15px] font-bold">

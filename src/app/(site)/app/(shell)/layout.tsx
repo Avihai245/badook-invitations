@@ -19,11 +19,11 @@ export default async function ShellLayout({ children }: { children: ReactNode })
         {t.shell.skipToContent}
       </a>
       <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-6 px-6">
+        <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
           <Link href="/app/invitations" className="text-[18px] font-bold tracking-tight">
             {t.brand}
           </Link>
-          <nav aria-label={t.shell.account} className="flex items-center gap-1 text-[14px]">
+          <nav aria-label={t.shell.account} className="flex items-center gap-1 text-[14px] max-sm:hidden">
             <Link
               href="/app/invitations"
               className="rounded-btn px-3 py-1.5 font-semibold text-ink hover:bg-subtle"
@@ -39,8 +39,15 @@ export default async function ShellLayout({ children }: { children: ReactNode })
               </span>
             ) : null}
             <form action={signOut}>
-              <Button type="submit" variant="ghost" size="sm" icon={<LogOut className="icon-dir" />}>
-                {t.shell.signOut}
+              <Button
+                type="submit"
+                variant="ghost"
+                size="sm"
+                icon={<LogOut className="icon-dir" />}
+                aria-label={t.shell.signOut}
+                title={t.shell.signOut}
+              >
+                <span className="max-sm:sr-only">{t.shell.signOut}</span>
               </Button>
             </form>
           </div>

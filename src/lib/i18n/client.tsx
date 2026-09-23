@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import {
   dictFor,
   fmt,
@@ -30,6 +30,10 @@ const UiContext = createContext<UiContextValue | null>(null);
  * provider picks one by the locale the server resolved, so no strings travel in the RSC payload.
  */
 export function UiProvider({ locale, children }: { locale: UiLocale; children: ReactNode }) {
+  // <html data-hydrated> once React owns the page (end-to-end tests wait for it before typing).
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = '1';
+  }, []);
   const value = useMemo<UiContextValue>(() => {
     const intl = intlLocale(locale);
     return {

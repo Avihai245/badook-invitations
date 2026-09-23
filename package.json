@@ -24,7 +24,8 @@
     "qa:screens": "tsx scripts/qa-screens.ts",
     "qa:app-ui": "node scripts/qa-app-ui.mjs",
     "db:seed": "tsx scripts/seed.ts",
-    "test:db": "vitest run --config vitest.db.config.ts"
+    "test:db": "vitest run --config vitest.db.config.ts",
+    "qa:host": "node scripts/qa-host.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

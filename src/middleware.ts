@@ -9,6 +9,12 @@ import { NextResponse, type NextRequest } from 'next/server';
  * Host app: refreshes the Supabase session cookies (@supabase/ssr) and sends signed-out visitors of
  * /app/… to /login (and signed-in visitors of /login or /signup to their invitations).
  */
+/**
+ * Read at request time: a literal `process.env.NEXT_PUBLIC_*` is inlined by `next build`, which would
+ * freeze whatever the build machine had (e.g. .env.local) instead of the deployment's values.
+ */
+const runtimeEnv = (name: string): string | undefined => process.env[name] || undefined;
+
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   if (pathname.startsWith('/dev')) {
@@ -17,8 +23,8 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const url = runtimeEnv('NEXT_PUBLIC_SUPABASE_URL');
+  const key = runtimeEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY');
   if (!url || !key) return NextResponse.next();
 
   let response = NextResponse.next({ request });

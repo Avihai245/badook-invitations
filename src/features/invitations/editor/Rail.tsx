@@ -140,7 +140,7 @@ export function Rail({ onNavigate }: { onNavigate?: () => void }) {
               title={label}
               onClick={() => setRailTab(value)}
               className={cn(
-                'inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-btn text-[13px]',
+                'inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-btn text-[13px] lg:max-xl:h-9 lg:max-xl:flex-none',
                 on ? 'bg-subtle font-semibold text-ink' : 'text-muted hover:text-ink',
               )}
             >
@@ -261,7 +261,7 @@ function LockedRow({
         aria-label={t.editor.rail.locked}
         size={14}
         strokeWidth={1.75}
-        className="shrink-0 text-faint"
+        className={cn('shrink-0 text-faint', COMPACT_HIDE)}
       />
       <RowButton icon={icon} name={name} selected={selected} onClick={onSelect} flagged={flagged} />
     </RowShell>
