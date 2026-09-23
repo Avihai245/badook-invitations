@@ -88,7 +88,7 @@ describe('RSVP endpoint rules', () => {
     expect(input.response).toMatchObject({
       attending: true,
       primary_name: 'Dana Levi',
-      phone: '050-123-4567',
+      phone: '+972501234567', // stored in E.164
       adults_count: 2,
       children_count: 1,
       message: 'alert(1)Mazal tov!',

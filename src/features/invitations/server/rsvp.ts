@@ -3,6 +3,7 @@ import { RsvpSubmissionSchema } from '../contracts/schemas';
 import type { DietaryKey, RsvpConfig, RsvpResult, RsvpSubmission } from '../contracts/types';
 import { t } from '../i18n/dictionary';
 import { endOfDayUtc } from '../lib/dates';
+import { toE164 } from '../lib/phone';
 import type { PublishedInvitation } from './published';
 
 /**
@@ -85,6 +86,11 @@ const clean = (s: string | null | undefined): string | null => {
   const v = s == null ? '' : sanitize(s);
   return v === '' ? null : v;
 };
+/** Stored in E.164 when it parses (Israeli numbers without +972 included) — hosts call and export them. */
+const cleanPhone = (s: string | null | undefined): string | null => {
+  const v = clean(s);
+  return v === null ? null : toE164(v);
+};
 
 const PHONE_OK = (s: string) => /^\d{9,15}$/.test(s.replace(/\D/g, '')) && /^[\d\s()+.-]+$/.test(s);
 const EMAIL_OK = (s: string) => /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(s);
@@ -164,7 +170,7 @@ export function toRows(
         attending: false,
         locale: sub.locale,
         primary_name: sanitize(sub.contact.fullName),
-        phone: clean(sub.contact.phone),
+        phone: cleanPhone(sub.contact.phone),
         email: clean(sub.contact.email),
         adults_count: 0,
         children_count: 0,
@@ -183,7 +189,7 @@ export function toRows(
     last_name: i === 0 || details ? clean(a.lastName) : null,
     full_name: null,
     age: null,
-    phone: i === 0 ? clean(a.phone) : null,
+    phone: i === 0 ? cleanPhone(a.phone) : null,
     email: i === 0 ? clean(a.email) : null,
     dietary: a.dietary,
     dietary_notes: clean(a.dietaryNotes),

@@ -2,9 +2,11 @@ import 'server-only';
 import { serviceDb } from '@/lib/supabase/server';
 import { migrateDocument } from '../contracts/migrate';
 import type { EventType, InvitationDocument, L10n, Locale, Palette } from '../contracts/types';
+import type { NotifyMode, ResponseRecord } from '../lib/responses';
 
 /**
- * Typed access to the host-app database functions (supabase/migrations/*_host_app.sql). Always the
+ * Typed access to the host-app database functions (supabase/migrations/*_host_app.sql,
+ * *_responses.sql). Always the
  * service role + the verified user's id: every function checks ownership itself.
  */
 
@@ -144,6 +146,25 @@ export const hostDb = {
       p_owner_id: ownerId,
       p_archived: archived,
     }),
+
+  /** The dashboard's replies (newest first, with attendees) and the notification mode; null if not the owner's. */
+  responses: (id: string, ownerId: string) =>
+    isUuid(id)
+      ? rpc<{ notify: NotifyMode; responses: ResponseRecord[] } | null>('owner_responses', {
+          p_id: id,
+          p_owner_id: ownerId,
+        })
+      : Promise.resolve(null),
+
+  deleteResponse: (id: string, ownerId: string, responseId: string) =>
+    isUuid(id) && isUuid(responseId)
+      ? rpc<boolean>('owner_delete_response', { p_id: id, p_owner_id: ownerId, p_response_id: responseId })
+      : Promise.resolve(false),
+
+  setNotify: (id: string, ownerId: string, mode: NotifyMode) =>
+    isUuid(id)
+      ? rpc<boolean>('set_invitation_notify', { p_id: id, p_owner_id: ownerId, p_mode: mode })
+      : Promise.resolve(false),
 
   async signedUpload(path: string): Promise<{ path: string; token: string; url: string }> {
     const { data, error } = await serviceDb().storage.from('invitation-media').createSignedUploadUrl(path);
