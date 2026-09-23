@@ -1,0 +1,146 @@
+import type { CSSProperties } from 'react';
+import type { SectionOf } from '../../contracts/types';
+import { longestWordLength } from '../../lib/text';
+import { Icon } from '../../ui/Icon';
+import { editPath, type SectionViewProps } from '../shared';
+
+const CLOUDS: [number, number, number, number][] = [
+  [8, 12, 38, 9],
+  [52, 20, 44, 11],
+  [20, 32, 30, 7],
+];
+
+/**
+ * Sky + drifting clouds + hills — the reference's CSS/SVG stand-in for the hero video — plus, for
+ * pale skies, a scrim that keeps the white hero text legible.
+ */
+function HeroPlaceholder({ hills, scrim }: { hills: [string, string, string, string]; scrim: boolean }) {
+  return (
+    <>
+      {CLOUDS.map(([x, y, w, h], i) => (
+        <span
+          key={i}
+          className="cloud"
+          style={{
+            left: `${x}%`,
+            top: `${y}%`,
+            width: `${w}%`,
+            height: `${h}%`,
+            animationDuration: `${34 + i * 9}s`,
+            animationDirection: i % 2 ? 'reverse' : 'normal',
+          }}
+        />
+      ))}
+      <svg className="hills" viewBox="0 0 400 260" preserveAspectRatio="none">
+        <path d="M0 120 C80 70 160 90 230 110 S360 80 400 95 V260 H0Z" fill={hills[0]} opacity=".75" />
+        <path d="M0 170 C100 130 200 150 280 160 S370 140 400 150 V260 H0Z" fill={hills[1]} />
+        {Array.from({ length: 14 }, (_, i) => (
+          <path
+            key={i}
+            d={`M${i * 30} 260 L${150 + i * 8} 168`}
+            stroke={hills[2]}
+            strokeWidth="2"
+            opacity=".55"
+          />
+        ))}
+        <path d="M0 215 C120 190 260 205 400 195 V260 H0Z" fill={hills[3]} />
+      </svg>
+      {scrim ? <span className="scrim" /> : null}
+    </>
+  );
+}
+
+export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) {
+  const d = section.data;
+  const { doc } = ctx;
+  const path = editPath(ctx, section);
+  const src = ctx.asset(d.media.src);
+  const poster = ctx.asset(d.media.poster);
+  const focal = `${d.media.focalPoint.x * 100}% ${d.media.focalPoint.y * 100}%`;
+
+  let media;
+  if (d.media.kind === 'video' && src) {
+    media = (
+      <video
+        src={src}
+        poster={poster ?? undefined}
+        muted
+        playsInline
+        loop
+        autoPlay
+        preload="metadata"
+        style={{ objectPosition: focal }}
+      />
+    );
+  } else if (d.media.kind === 'video' && poster) {
+    media = <img src={poster} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
+  } else if (d.media.kind === 'image' && src) {
+    media = <img src={src} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
+  } else {
+    media = <HeroPlaceholder hills={ctx.art.hills} scrim={ctx.art.shade !== null} />;
+  }
+
+  const custom = d.title.mode === 'custom';
+  const joiner = ctx.text(doc.hosts.joiner) || '&';
+  const fit = (text: string) => ({ '--chars': longestWordLength(text, ctx.locale) }) as CSSProperties;
+  const primary = ctx.text(doc.hosts.primary);
+  const secondary = ctx.text(doc.hosts.secondary);
+  const customTitle = d.title.mode === 'custom' ? ctx.text(d.title.text) : '';
+  return (
+    <header className="hero" data-edit-path={path}>
+      <div className="hero-media" aria-hidden="true">
+        {media}
+      </div>
+      <div className="hero-overlay" style={{ '--ov': d.overlayOpacity } as CSSProperties} />
+      <div className="hero-inner hero-enter">
+        {d.eyebrow ? (
+          <p className="eyebrow" data-edit-path={path && `${path}.data.eyebrow`}>
+            {ctx.text(d.eyebrow)}
+          </p>
+        ) : (
+          <span />
+        )}
+        <h1 className={custom ? 'names custom' : 'names'} data-edit-path={path && `${path}.data.title`}>
+          {custom ? (
+            <span className="n" style={fit(customTitle)}>
+              {customTitle}
+            </span>
+          ) : (
+            <>
+              <span className="n" style={fit(primary)}>
+                <bdi>{primary}</bdi>
+              </span>
+              {doc.hosts.secondary ? (
+                <>
+                  <span className="j">{joiner}</span>
+                  <span className="n" style={fit(secondary)}>
+                    <bdi>{secondary}</bdi>
+                  </span>
+                </>
+              ) : null}
+            </>
+          )}
+        </h1>
+        <div className="rule" />
+        <p className="hero-date">
+          {d.showDate ? (
+            <>
+              {ctx.eventDateLong}
+              {ctx.hebrewDate ? <span className="hdate">{ctx.hebrewDate}</span> : null}
+            </>
+          ) : null}
+        </p>
+        {d.locationLine ? (
+          <p className="hero-loc" data-edit-path={path && `${path}.data.locationLine`}>
+            {ctx.text(d.locationLine)}
+          </p>
+        ) : (
+          <span />
+        )}
+      </div>
+      <span className="cue" aria-hidden="true">
+        <Icon name="chevron-down" size={28} strokeWidth={1.2} />
+      </span>
+    </header>
+  );
+}

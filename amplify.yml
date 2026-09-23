@@ -1,0 +1,28 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # Node 22 LTS (see .nvmrc). Amplify runs SSR compute on the same major version it builds with.
+        - nvm use 22 || nvm install 22
+        - node -v && npm -v
+        - npm ci --cache .npm --prefer-offline
+    build:
+      commands:
+        # Amplify console env vars are NOT visible to the SSR runtime by default:
+        # copy the ones the app needs into .env.production before building (MASTER_PROMPT §1.1 rule 3).
+        - env | grep -E '^(NEXT_PUBLIC_|SUPABASE_|INVITES_)' >> .env.production || true
+        # `npm run build` runs `prebuild` (template validation + font files) then `next build`.
+        # Tests (Vitest / Playwright) never run here — they run locally or in CI (§1.1 rule 7).
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      # node_modules is kept per §1.1 rule 2; note `npm ci` deletes it before installing,
+      # so the .npm download cache is what actually speeds up installs.
+      - node_modules/**/*
+      - .next/cache/**/*
+      - .npm/**/*

@@ -1,0 +1,150 @@
+/* Host app styles (§9B). The guest invitation never loads this file. */
+@import 'tailwindcss';
+@import './app-fonts.generated.css';
+
+/* §9B.1 tokens (fallback design system — this product has no prior one). */
+@theme {
+  --color-canvas: #fafaf9; /* page bg */
+  --color-surface: #ffffff;
+  --color-subtle: #f5f5f4;
+  --color-line: #e7e5e4; /* border */
+  --color-line-strong: #d6d3d1;
+  --color-ink: #1c1917; /* text */
+  --color-muted: #78716c;
+  --color-faint: #a8a29e;
+  --color-primary: #1c1917;
+  --color-primary-ink: #ffffff;
+  --color-primary-hover: #292524;
+  --color-focus: #2563eb;
+  --color-success: #15803d;
+  --color-success-bg: #f0fdf4;
+  --color-warning: #b45309;
+  --color-warning-bg: #fffbeb;
+  --color-danger: #b91c1c;
+  --color-danger-bg: #fef2f2;
+  --color-info-bg: #eff6ff;
+  --color-whatsapp: #25d366;
+  --color-row-hover: #fcfcfb;
+  --color-canvas-editor: #efedea; /* editor canvas behind the phone */
+
+  --radius-btn: 8px;
+  --radius-input: 10px;
+  --radius-card: 12px;
+  --radius-dialog: 16px;
+  --radius-poster: 24px;
+
+  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.06);
+  --shadow-md: 0 8px 24px rgba(28, 25, 23, 0.08);
+  --shadow-lg: 0 24px 48px rgba(28, 25, 23, 0.14);
+  --shadow-ring: 0 0 0 3px rgba(28, 25, 23, 0.08);
+
+  --font-sans: 'Heebo', 'Inter', system-ui, sans-serif;
+  --font-sans-en: 'Inter', 'Heebo', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  :lang(en) {
+    font-family: var(--font-sans-en);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Directional icons (arrows, send, external-link, undo/redo) mirror in RTL (§8). Resolved with
+   :dir(), so it follows the NEAREST [dir] ancestor — icons inside LTR islands of an RTL page
+   (dir="ltr" fields, the EN showcase under <html dir="rtl">) stay unmirrored. */
+@utility icon-dir {
+  &:dir(rtl) {
+    transform: scaleX(-1);
+  }
+}
+
+/* ── App UI primitives (src/components/app) ─────────────────────────────────────────────────── */
+
+/* Sets --app-slide-from to the inline-END edge: +100% in LTR (right), -100% in RTL (left).
+   Consumed by the drawer slide + toast swipe-out keyframes below. */
+@utility slide-from-end {
+  --app-slide-from: 100%;
+  &:dir(rtl) {
+    --app-slide-from: -100%;
+  }
+}
+
+/* Enter/exit motion for Drawer, Dialog, Toast and tooltips (Radix sets data-state). Components pair
+   every animate-app-* class with motion-reduce:animate-none. */
+@theme {
+  --animate-app-fade-in: app-fade-in 200ms ease-out;
+  --animate-app-fade-out: app-fade-out 200ms ease-in;
+  --animate-app-drawer-in: app-drawer-in 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-app-drawer-out: app-drawer-out 200ms ease-in;
+  --animate-app-dialog-in: app-dialog-in 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-app-dialog-out: app-dialog-out 150ms ease-in;
+  --animate-app-toast-in: app-toast-in 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-app-toast-out: app-fade-out 150ms ease-in;
+  --animate-app-toast-swipe-out: app-toast-swipe-out 150ms ease-out;
+
+  @keyframes app-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes app-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes app-drawer-in {
+    from {
+      transform: translateX(var(--app-slide-from, 100%));
+    }
+  }
+  @keyframes app-drawer-out {
+    to {
+      transform: translateX(var(--app-slide-from, 100%));
+    }
+  }
+  @keyframes app-dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+  @keyframes app-dialog-out {
+    to {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+  @keyframes app-toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  @keyframes app-toast-swipe-out {
+    from {
+      transform: translateX(var(--radix-toast-swipe-end-x, 0));
+    }
+    to {
+      opacity: 0;
+      transform: translateX(var(--app-slide-from, 100%));
+    }
+  }
+}

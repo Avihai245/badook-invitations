@@ -1,0 +1,13 @@
+# The build kit is imported as-is — never reformat it.
+docs/
+invitation-templates-pack/
+public/fonts/
+src/features/invitations/fonts/*.generated.*
+src/styles/*.generated.*
+.next*/
+tests/.artifacts/
+coverage/
+node_modules/
+package-lock.json
+test-results/
+playwright-report/

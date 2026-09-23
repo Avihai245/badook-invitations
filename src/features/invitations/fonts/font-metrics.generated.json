@@ -1,0 +1,125 @@
+{
+  "generatedBy": "scripts/measure-display-fonts.ts",
+  "emPerChar": {
+    "Allura": {
+      "latin": 0.443,
+      "hebrew": 0.447
+    },
+    "Amatic SC": {
+      "latin": 0.391,
+      "hebrew": 0.336
+    },
+    "Artifika": {
+      "latin": 0.604,
+      "hebrew": 0.447
+    },
+    "Assistant": {
+      "latin": 0.482,
+      "hebrew": 0.433
+    },
+    "Atma": {
+      "latin": 0.445,
+      "hebrew": 0.447
+    },
+    "Bellefair": {
+      "latin": 0.438,
+      "hebrew": 0.363
+    },
+    "Bodoni Moda": {
+      "latin": 0.542,
+      "hebrew": 0.447
+    },
+    "Bona Nova": {
+      "latin": 0.512,
+      "hebrew": 0.44
+    },
+    "Cinzel": {
+      "latin": 0.64,
+      "hebrew": 0.447
+    },
+    "Cinzel Decorative": {
+      "latin": 0.678,
+      "hebrew": 0.447
+    },
+    "Cormorant Garamond": {
+      "latin": 0.462,
+      "hebrew": 0.447
+    },
+    "David Libre": {
+      "latin": 0.48,
+      "hebrew": 0.495
+    },
+    "Frank Ruhl Libre": {
+      "latin": 0.506,
+      "hebrew": 0.422
+    },
+    "Fraunces": {
+      "latin": 0.557,
+      "hebrew": 0.447
+    },
+    "Great Vibes": {
+      "latin": 0.444,
+      "hebrew": 0.447
+    },
+    "Heebo": {
+      "latin": 0.515,
+      "hebrew": 0.478
+    },
+    "Inter": {
+      "latin": 0.545,
+      "hebrew": 0.447
+    },
+    "Italianno": {
+      "latin": 0.336,
+      "hebrew": 0.447
+    },
+    "Karantina": {
+      "latin": 0.324,
+      "hebrew": 0.296
+    },
+    "Lora": {
+      "latin": 0.538,
+      "hebrew": 0.447
+    },
+    "Marcellus": {
+      "latin": 0.518,
+      "hebrew": 0.447
+    },
+    "Noto Serif Hebrew": {
+      "latin": 0.565,
+      "hebrew": 0.447
+    },
+    "Pinyon Script": {
+      "latin": 0.456,
+      "hebrew": 0.447
+    },
+    "Playpen Sans Hebrew": {
+      "latin": 0.549,
+      "hebrew": 0.447
+    },
+    "Rubik": {
+      "latin": 0.538,
+      "hebrew": 0.471
+    },
+    "Secular One": {
+      "latin": 0.51,
+      "hebrew": 0.446
+    },
+    "Suez One": {
+      "latin": 0.524,
+      "hebrew": 0.435
+    },
+    "Syne": {
+      "latin": 0.522,
+      "hebrew": 0.447
+    },
+    "Unbounded": {
+      "latin": 0.711,
+      "hebrew": 0.447
+    },
+    "Varela Round": {
+      "latin": 0.524,
+      "hebrew": 0.472
+    }
+  }
+}

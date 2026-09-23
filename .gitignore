@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# next.js (NEXT_DIST_DIR may point at .next-<name>/ for parallel dev servers)
+.next/
+.next*/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# generated at build time (scripts/build-fonts.mjs) — never commit font binaries
+public/fonts/
+
+# env — only .env.example is committed; .env.production is written by amplify.yml during the build
+.env
+.env.*
+!.env.example
+
+# tests
+test-results/
+playwright-report/
+coverage/
+/tests/.artifacts/
+
+# misc
+.DS_Store
+*.log
