@@ -4,7 +4,7 @@ import weddingFixture from '@kit/fixtures/example-wedding-he-en.json';
 import { migrateDocument } from '../contracts/migrate';
 import type { EventType, InvitationDocument, L10n, Locale, Section } from '../contracts/types';
 import { requireTemplate } from './registry';
-import { COUPLE_EVENTS } from './seed-copy';
+import { demoPeople } from './demo-people';
 import { seedDocument } from './seed-document';
 
 /** The three §10 examples, read from docs/invitations/fixtures (never retyped). */
@@ -14,39 +14,6 @@ export const FIXTURES = {
   'savethedate-he': migrateDocument(saveTheDateFixture),
 } as const satisfies Record<string, InvitationDocument>;
 export type FixtureId = keyof typeof FIXTURES;
-
-interface DemoPeople {
-  primary: L10n;
-  secondary?: L10n;
-  parents?: L10n;
-  monogram?: L10n;
-}
-
-const PEOPLE: Partial<Record<EventType, DemoPeople>> = {
-  bar_mitzvah: {
-    primary: { he: 'יונתן', en: 'Jonathan' },
-    parents: { he: 'מיכל ודוד לוי', en: 'Michal & David Levi' },
-    monogram: { he: 'י', en: 'J' },
-  },
-  bat_mitzvah: {
-    primary: { he: 'תמר', en: 'Tamar' },
-    parents: { he: 'מיכל ודוד לוי', en: 'Michal & David Levi' },
-    monogram: { he: 'ת', en: 'T' },
-  },
-  brit: {
-    primary: { he: 'שירה ואורי', en: 'Shira & Ori' },
-    parents: { he: 'סבא וסבתא: רות ומשה כהן', en: 'Grandparents Ruth & Moshe Cohen' },
-    monogram: { he: 'ש&א', en: 'S&O' },
-  },
-  baby_shower: { primary: { he: 'מאיה', en: 'Maya' }, monogram: { he: 'מ', en: 'M' } },
-  birthday: { primary: { he: 'דנה', en: 'Dana' }, monogram: { he: 'דנה 30', en: 'DANA 30' } },
-  corporate: { primary: { he: 'צוות אקמה', en: 'Team Acme' }, monogram: { he: 'אקמה', en: 'ACME' } },
-};
-const COUPLE: DemoPeople = {
-  primary: { he: 'נועה', en: 'Noa' },
-  secondary: { he: 'איתי', en: 'Itay' },
-  parents: { he: 'מרים ודני לוי · רונית ואבי כהן', en: 'Miriam & Dani Levi · Ronit & Avi Cohen' },
-};
 
 const TIMES: Partial<Record<EventType, [string, string]>> = {
   brit: ['09:00', '12:00'],
@@ -85,7 +52,7 @@ export function demoDocument(
 ): InvitationDocument {
   const { manifest, defaults } = requireTemplate(templateId);
   const type = eventType ?? (Object.keys(defaults.defaults)[0] as EventType);
-  const people = COUPLE_EVENTS.includes(type) ? COUPLE : (PEOPLE[type] ?? COUPLE);
+  const people = demoPeople(type);
   const [startTime, endTime] = TIMES[type] ?? ['19:30', '01:00'];
   const doc = seedDocument(manifest, defaults, {
     eventType: type,

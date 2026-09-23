@@ -15,9 +15,9 @@ import {
 
 function AuthCard({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   return (
-    <div className="w-full max-w-[400px] rounded-dialog border border-line bg-surface p-8 shadow-md">
-      <h1 className="text-[22px] font-bold tracking-tight">{title}</h1>
-      <p className="mt-1.5 mb-6 text-[14px] text-muted">{subtitle}</p>
+    <div className="w-full max-w-[420px] rounded-[20px] border border-line/80 bg-surface/95 p-7 shadow-[0_24px_48px_-24px_rgba(60,35,15,0.25)] backdrop-blur sm:p-9">
+      <h1 className="font-display text-[30px] leading-tight font-bold tracking-[-0.01em]">{title}</h1>
+      <p className="mt-2 mb-7 text-[15px] text-pretty text-muted">{subtitle}</p>
       {children}
     </div>
   );

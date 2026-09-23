@@ -20,7 +20,6 @@ import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
 import { getTemplate } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
-import { posterColors } from '../poster';
 import { TemplatePoster } from '../TemplatePoster';
 import { FollowUpDialog, followUpTypes } from './FollowUpDialog';
 
@@ -63,7 +62,7 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
   return (
     <div className="mx-auto max-w-[1280px] px-6 pt-8 pb-16">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-[26px] font-bold tracking-tight">
+        <h1 className="font-display text-[32px] leading-tight font-bold tracking-[-0.01em]">
           {showArchived ? plural(t.list.showArchived, archived.length, { n: archived.length }) : t.list.title}
         </h1>
         <div className="flex items-center gap-2">
@@ -83,7 +82,7 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
       </div>
 
       {visible.length ? (
-        <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {visible.map((item) => (
             <li key={item.id}>
               <InvitationCard
@@ -135,7 +134,8 @@ function InvitationCard({
   const template = getTemplate(item.templateId)?.manifest;
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
-  const monogram = item.monogram?.[loc] ?? item.monogram?.[item.defaultLocale] ?? '';
+  const primary = item.hosts.primary[loc] ?? item.hosts.primary[item.defaultLocale] ?? '';
+  const secondary = item.hosts.secondary?.[loc] ?? item.hosts.secondary?.[item.defaultLocale] ?? null;
   const href = `/app/invitations/${item.id}/edit`;
   const stats = item.responses
     ? plural(t.list.stats, item.responses, {
@@ -149,13 +149,23 @@ function InvitationCard({
     // One column on phones: a row (small poster + details) instead of a full-width 9:16 poster.
     <article className="group max-sm:flex max-sm:items-start max-sm:gap-4" aria-busy={busy || undefined}>
       <Link href={href} tabIndex={-1} aria-hidden className="block max-sm:w-24 max-sm:shrink-0">
-        <TemplatePoster
-          colors={
-            template ? posterColors(template, item.sealColor) : { background: '#EFEDEA', seal: '#D6D3D1' }
-          }
-          text={monogram}
-          className="transition-[transform,box-shadow] duration-250 group-hover:-translate-y-1 group-hover:shadow-lg motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
-        />
+        {template ? (
+          // the invitation's own names and date on its design (the event type as the opening line)
+          <TemplatePoster
+            template={template}
+            locale={loc}
+            text={{
+              eyebrow: t.eventTypes[item.eventType],
+              primary: primary || name,
+              secondary,
+              date: date(item.date, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' }),
+            }}
+            joiner={item.hosts.joiner?.[loc] || '&'}
+            className="transition-[transform,box-shadow] duration-250 group-hover:-translate-y-1 group-hover:shadow-lg motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
+          />
+        ) : (
+          <div className="aspect-[9/16] rounded-poster bg-subtle" />
+        )}
       </Link>
       <div className="mt-2.5 flex items-start gap-2 max-sm:mt-1 max-sm:min-w-0 max-sm:flex-1">
         <div className="min-w-0 flex-1">

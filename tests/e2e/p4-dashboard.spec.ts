@@ -379,6 +379,8 @@ test.describe('template gallery', () => {
     page,
   }, testInfo) => {
     await signUp(page);
+    // the pointer would stay where sign-up's button was — right where a card appears in the gallery
+    await page.mouse.move(2, 2);
     await open(page, '/app/invitations/new?previews=fixture');
     const cards = page.locator('ul > li > button');
     const playing = page.locator('video[data-playing]');

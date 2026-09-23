@@ -26,6 +26,12 @@
   --color-whatsapp: #25d366;
   --color-row-hover: #fcfcfb;
   --color-canvas-editor: #efedea; /* editor canvas behind the phone */
+  /* brand accent (home, auth, highlights) — a warm gold that sits with every template */
+  --color-brand: #a0703f;
+  --color-brand-deep: #7a5230;
+  --color-brand-soft: #f6ede1;
+  --color-brand-line: #ead8c0;
+  --color-blush: #f8ebe4;
 
   --radius-btn: 8px;
   --radius-input: 10px;
@@ -40,6 +46,8 @@
 
   --font-sans: 'Heebo', 'Inter', system-ui, sans-serif;
   --font-sans-en: 'Inter', 'Heebo', system-ui, sans-serif;
+  /* headlines of the home and sign-in pages (font-display): a serif per script */
+  --font-display: 'Frank Ruhl Libre', 'Fraunces', Georgia, serif;
 }
 
 @layer base {
@@ -56,6 +64,8 @@
   }
   :lang(en) {
     font-family: var(--font-sans-en);
+    /* the font-display utility reads the variable: English headlines in Fraunces */
+    --font-display: 'Fraunces', 'Frank Ruhl Libre', Georgia, serif;
   }
   :focus-visible {
     outline: 2px solid var(--color-focus);

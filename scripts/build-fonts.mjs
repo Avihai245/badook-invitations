@@ -6,7 +6,7 @@
  * (§9A.2), and for each family copies the matching @fontsource woff2 files (hebrew / latin /
  * latin-ext subsets only) to public/fonts/<id>/<version>/, then writes:
  *   - src/features/invitations/fonts/font-faces.generated.json  (faces + unicode-range + size-adjust)
- *   - src/styles/app-fonts.generated.css                         (Heebo + Inter for the host app)
+ *   - src/styles/app-fonts.generated.css                         (the host app's Heebo, Inter + display fonts)
  * Font binaries are gitignored and regenerated on every build; the JSON/CSS are committed.
  * No request ever goes to Google Fonts (build or runtime).
  */
@@ -75,10 +75,12 @@ const ROLE_VARIANTS = {
   monogram: { hebrew: [[400, 'normal']], latin: [[400, 'normal']] },
 };
 
-/** Host app (§9B.1): Heebo (HE) / Inter (EN). */
+/** Host app (§9B.1): Heebo (HE) / Inter (EN); display headlines in Frank Ruhl Libre (HE) / Fraunces (EN). */
 const APP_FAMILIES = {
   Heebo: [400, 500, 600, 700].map((w) => [w, 'normal']),
   Inter: [400, 500, 600, 700].map((w) => [w, 'normal']),
+  'Frank Ruhl Libre': [500, 700].map((w) => [w, 'normal']),
+  Fraunces: [500, 600].map((w) => [w, 'normal']),
 };
 
 const familyId = (family) => family.toLowerCase().replace(/\s+/g, '-');

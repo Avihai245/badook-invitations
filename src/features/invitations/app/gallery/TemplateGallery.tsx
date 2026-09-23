@@ -8,8 +8,8 @@ import type { EventType, Locale } from '../../contracts/types';
 import type { AssetBases } from '../../renderer/assets';
 import { templateFileUrl } from '../../renderer/assets';
 import { TEMPLATES } from '../../templates/registry';
-import { posterColors } from '../poster';
-import { TemplatePoster } from '../TemplatePoster';
+import { posterSample, type PosterText } from '../poster';
+import { TemplatePoster, type PosterTemplate } from '../TemplatePoster';
 import { CreateWizard, type WizardSeed } from './CreateWizard';
 import { PreviewDialog } from './PreviewDialog';
 import { usePreviewVideos } from './preview-videos';
@@ -57,12 +57,12 @@ export function TemplateGallery({
     () =>
       [...TEMPLATES.values()].map(({ manifest }) => ({
         manifest,
-        colors: posterColors(manifest),
         image: devPreviews ? devPreviews.image : templateFileUrl(manifest.id, manifest.previewImage, bases),
         video: devPreviews ? devPreviews.video : templateFileUrl(manifest.id, manifest.previewVideo, bases),
-        sample: manifest.cover.overlay.kind === 'ticket_text' ? '30' : locale === 'he' ? 'נ&א' : 'N&I',
+        // the poster speaks the preview language (the switch above the gallery)
+        sample: posterSample(manifest.id, previewLocale),
       })),
-    [bases, locale, devPreviews],
+    [bases, previewLocale, devPreviews],
   );
   const visible = templates.filter(
     ({ manifest }) => filter === 'all' || manifest.categories.some((c) => FILTERS[filter].includes(c)),
@@ -79,7 +79,9 @@ export function TemplateGallery({
       <style dangerouslySetInnerHTML={{ __html: fontCss }} />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-[26px] font-bold tracking-tight">{t.gallery.title}</h1>
+          <h1 className="font-display text-[32px] leading-tight font-bold tracking-[-0.01em]">
+            {t.gallery.title}
+          </h1>
           <p className="mt-1 text-muted">{t.gallery.subtitle}</p>
         </div>
         <Segmented<Locale>
@@ -110,13 +112,14 @@ export function TemplateGallery({
       </div>
       {visible.length ? (
         <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
-          {visible.map(({ manifest, colors, image, video, sample }) => (
+          {visible.map(({ manifest, image, video, sample }) => (
             <li key={manifest.id}>
               <GalleryCard
                 name={manifest.name[locale as UiLocale] ?? manifest.name.en ?? manifest.id}
                 categories={manifest.categories.map((c) => t.eventTypes[c]).join(' · ')}
                 palette={manifest.tokens.palette}
-                colors={colors}
+                template={manifest}
+                locale={previewLocale}
                 image={image}
                 video={video}
                 sample={sample}
@@ -155,7 +158,8 @@ function GalleryCard({
   name,
   categories,
   palette,
-  colors,
+  template,
+  locale,
   image,
   video,
   sample,
@@ -165,10 +169,11 @@ function GalleryCard({
   name: string;
   categories: string;
   palette: { bg: string; accent: string; ink: string };
-  colors: ReturnType<typeof posterColors>;
+  template: PosterTemplate;
+  locale: Locale;
   image: string | null;
   video: string | null;
-  sample: string;
+  sample: PosterText;
   videos: ReturnType<typeof usePreviewVideos>;
   onOpen: () => void;
 }) {
@@ -196,9 +201,10 @@ function GalleryCard({
       className="group block w-full text-start"
     >
       <TemplatePoster
-        colors={colors}
-        image={image}
+        template={template}
+        locale={locale}
         text={sample}
+        image={image}
         play={!playing}
         className="transition-[transform,box-shadow] duration-250 group-hover:-translate-y-1 group-hover:shadow-lg motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
       >

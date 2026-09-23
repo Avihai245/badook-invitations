@@ -10,13 +10,29 @@ test('a visitor sees the pitch and the way in; a signed-in host goes to the invi
   await expect(
     page.getByRole('heading', { level: 1, name: 'הזמנות דיגיטליות שמרגשות את האורחים' }),
   ).toBeVisible();
-  await expect(page.getByRole('link', { name: 'יצירת הזמנה' })).toHaveAttribute('href', '/signup');
+  // the header, the first screen and the closing band all lead to signing up
+  const start = page.getByRole('main').getByRole('link', { name: 'יצירת הזמנה' });
+  await expect(start).toHaveCount(2);
+  for (const link of await start.all()) await expect(link).toHaveAttribute('href', '/signup');
   await expect(page.getByRole('link', { name: 'כניסה' })).toHaveAttribute('href', '/login');
+  // every design, as its invitation's first screen
+  await expect(page.getByRole('heading', { level: 2, name: 'עיצובים לכל אירוע' })).toBeVisible();
+  for (const name of [
+    'סהר בורדו',
+    'ניירת זהב',
+    'חוף קיסריה',
+    'רמון בשקיעה',
+    'עטרה',
+    'ניצן',
+    'גג בשקיעה',
+    'אחו הדבש',
+  ])
+    await expect(page.getByRole('main').getByText(name, { exact: true })).toBeVisible();
   const sample = page.getByRole('link', { name: 'לצפייה בהזמנה לדוגמה' });
   await expect(sample).toHaveAttribute('href', '/i/noa-and-itay?lang=he');
   expect((await page.request.get('/i/noa-and-itay?lang=he')).status()).toBe(200);
 
-  await page.getByRole('link', { name: 'יצירת הזמנה' }).click();
+  await start.first().click();
   await page.waitForURL(/\/signup$/);
   await page.fill(
     'input[name=email]',

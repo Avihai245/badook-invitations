@@ -1,5 +1,7 @@
-import type { TemplateManifest } from '../contracts/types';
+import type { Locale, TemplateManifest } from '../contracts/types';
 import { placeholderArt } from '../renderer/placeholders';
+import { demoPeople } from '../templates/demo-people';
+import { getTemplate } from '../templates/registry';
 
 /** Poster background + default seal per template, exactly as in design-reference/app.html (POSTER). */
 const REFERENCE: Record<string, [background: string, seal: string]> = {
@@ -34,4 +36,28 @@ export function posterColors(
 function fallback(template: Pick<TemplateManifest, 'id' | 'cover'>): [string, string] {
   const bg = placeholderArt(template.id).cover.bg;
   return [`linear-gradient(180deg, ${bg[0]}, ${bg[2]})`, template.cover.sealColors[0] ?? bg[1]];
+}
+
+/** The words on a poster: the event's opening line, the names, the date (all already localized). */
+export interface PosterText {
+  eyebrow: string | null;
+  primary: string;
+  secondary: string | null;
+  date: string | null;
+}
+
+/**
+ * A template's sample text in `locale` — what its demo invitation says (the first event type it is
+ * made for, its opening line, the demo people) — for the gallery and the home page.
+ */
+export function posterSample(templateId: string, locale: Locale): PosterText {
+  const entry = getTemplate(templateId);
+  const type = entry?.manifest.categories.find((c) => c !== 'save_the_date') ?? 'wedding';
+  const people = demoPeople(type);
+  return {
+    eyebrow: entry?.defaults.defaults[type]?.eyebrow[locale] ?? null,
+    primary: people.primary[locale] ?? '',
+    secondary: people.secondary?.[locale] ?? null,
+    date: '17.06.2027',
+  };
 }

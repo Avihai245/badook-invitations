@@ -1,7 +1,7 @@
 import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Button } from '@/components/app';
+import { BrandLogo, Button } from '@/components/app';
 import { getUi } from '@/lib/i18n/server';
 import { getSessionUser } from '@/lib/supabase/session';
 import { signOut } from '../../(auth)/actions';
@@ -20,8 +20,8 @@ export default async function ShellLayout({ children }: { children: ReactNode })
       </a>
       <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
-          <Link href="/app/invitations" className="text-[18px] font-bold tracking-tight">
-            {t.brand}
+          <Link href="/app/invitations" className="rounded-btn text-[18px]">
+            <BrandLogo label={t.brand} />
           </Link>
           <nav aria-label={t.shell.account} className="flex items-center gap-1 text-[14px] max-sm:hidden">
             <Link

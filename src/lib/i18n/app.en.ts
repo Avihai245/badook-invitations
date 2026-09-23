@@ -37,6 +37,8 @@ export const en: AppDict = {
     skipToContent: 'Skip to content',
   },
   auth: {
+    panelTitle: 'Invitations your guests will love',
+    panelBody: 'Design, music and RSVPs — all in one place, in Hebrew and English.',
     loginTitle: 'Sign in',
     loginSubtitle: 'Welcome back! Sign in to edit and share your invitations.',
     signupTitle: 'Create an account',
@@ -131,13 +133,39 @@ export const en: AppDict = {
   },
   home: {
     soon: 'Coming soon: digital invitations with RSVPs — in Hebrew and English.',
-    title: 'Digital invitations your guests will love',
+    badge: 'Digital invitations in Hebrew and English',
+    title: 'Digital invitations',
+    titleAccent: 'your guests will love',
     subtitle:
-      'Pick a design, add your details and send it on WhatsApp — with an animated opening, music and RSVPs in one place. In Hebrew and English.',
+      'Pick a design, add your details and send it on WhatsApp — with an animated opening, music and RSVPs in one place.',
     start: 'Create an invitation',
     login: 'Sign in',
     sample: 'See a sample invitation',
+    trust: ['Animated opening & music', 'RSVPs in one place', 'Send on WhatsApp'],
+    how: {
+      title: 'How it works',
+      steps: [
+        {
+          title: 'Pick a design',
+          body: 'Weddings, bar/bat mitzvahs, brits, birthdays and more — each with ready-made texts.',
+        },
+        {
+          title: 'Add your details',
+          body: 'Names, date, venue, your own song or video — and watch the invitation change as you type.',
+        },
+        {
+          title: 'Send it, get replies',
+          body: 'A WhatsApp link with a beautiful preview, and the RSVPs come straight to you.',
+        },
+      ],
+    },
+    designs: {
+      title: 'Designs for every occasion',
+      subtitle: 'Each comes with an animated opening, music and ready-made texts — all of it editable.',
+      cta: 'See all designs',
+    },
     features: {
+      title: 'Everything an invitation needs',
       opening: {
         title: 'Animated opening & music',
         body: 'An envelope that opens with a tap, a song and a live Hebrew–English switch.',
@@ -150,6 +178,22 @@ export const en: AppDict = {
         title: 'Send on WhatsApp',
         body: 'A link with a beautiful preview, a ready message and a QR code.',
       },
+      video: {
+        title: 'A photo or video background',
+        body: 'Upload your own photo or video, or paste a YouTube link.',
+      },
+      languages: {
+        title: 'Hebrew and English',
+        body: 'One invitation in two languages — guests switch between them with a tap.',
+      },
+      saveTheDate: {
+        title: 'Save the date',
+        body: 'Send a save-the-date first, then the full invitation.',
+      },
+    },
+    final: {
+      title: 'Ready to invite your guests?',
+      body: 'Your first invitation is ready in a few minutes.',
     },
     footer: 'Badook · digital invitations',
   },

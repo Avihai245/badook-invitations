@@ -71,7 +71,7 @@ Host app (sign-in required; Hebrew UI by default, English via the `עב | EN` to
 | Route                             | What                                                                                                                |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `/signup` · `/login`              | Email + password (Supabase Auth); `/auth/forgot`, `/auth/update-password`, `/auth/callback`                         |
-| `/`                               | Home: what Badook is, sign up / sign in, a sample invitation (signed-in hosts go to their invitations)              |
+| `/`                               | Home: what Badook is, how it works, every design as its invitation's first screen, sign up / sign in, a sample      |
 | `/app/invitations`                | The host's invitations (duplicate, archive; a save-the-date → its full invitation)                                  |
 | `/app/invitations/new`            | Template gallery (muted preview videos) → live preview → 3-step wizard                                              |
 | `/app/invitations/<id>/edit`      | The editor (autosave, undo/redo, publish, versions)                                                                 |

@@ -66,13 +66,17 @@ export function templateFontFamilies(template: TemplateManifest, pairId?: string
   return [...set];
 }
 
-/** @font-face rules for the given families (only what a page needs, inlined into <head>). */
-export function fontFaceCss(families: Iterable<string>): string {
+/**
+ * @font-face rules for the given families (only what a page needs, inlined into <head>); `weights`
+ * keeps only those weights (e.g. [400] for text that is never bold).
+ */
+export function fontFaceCss(families: Iterable<string>, weights?: readonly number[]): string {
   const rules: string[] = [];
   for (const family of families) {
     const entry = FAMILIES[family];
     if (!entry) continue;
     for (const f of entry.faces) {
+      if (weights && !weights.includes(f.weight)) continue;
       rules.push(
         `@font-face{font-family:'${family}';font-style:${f.style};font-weight:${f.weight};font-display:swap;` +
           `src:url(${f.url}) format('woff2');` +

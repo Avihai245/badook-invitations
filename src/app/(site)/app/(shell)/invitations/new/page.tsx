@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { TemplateGallery, type DevPreviews } from '@/features/invitations/app/gallery/TemplateGallery';
-import { fontFaceCss } from '@/features/invitations/fonts';
+import { GALLERY_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
-import { TEMPLATES } from '@/features/invitations/templates/registry';
 import { devRoutesEnabled } from '@/lib/dev-routes';
 import { serverEnv } from '@/lib/env';
 import { getUi } from '@/lib/i18n/server';
@@ -11,15 +10,6 @@ export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getUi();
   return { title: t.gallery.title };
 }
-
-/** Display fonts of every pair: the preview dialog renders the names in each of them. */
-const DISPLAY_FONT_CSS = fontFaceCss(
-  new Set(
-    [...TEMPLATES.values()].flatMap(({ manifest }) =>
-      manifest.fontPairs.flatMap((p) => [p.display.hebrew, p.display.latin]),
-    ),
-  ),
-);
 
 /**
  * Dev/QA (`?previews=fixture|missing`, dev routes only): every card gets the fixture poster + video of
@@ -47,7 +37,7 @@ export default async function NewInvitationPage({
         supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
         templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
       })}
-      fontCss={DISPLAY_FONT_CSS}
+      fontCss={GALLERY_FONT_CSS}
       devPreviews={devPreviews(previews)}
     />
   );
