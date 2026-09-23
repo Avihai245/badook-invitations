@@ -9,7 +9,24 @@ import { LiveLocale } from './live/LiveLocale.client';
 import type { LivePayload } from './live/payload';
 import { RevealObserver } from './RevealObserver.client';
 
-const LOCK = "document.body.classList.add('locked')";
+/**
+ * A tap on the cover before React has taken over (its scripts still loading on a slow connection)
+ * would be lost — and the music with it. This starts the music inside that very gesture (iOS allows
+ * audio only there, with a 1.5s fade) and leaves `data-pending-open` on <html> for CoverOverlay, which
+ * opens the cover once it is hydrated. It stands down as soon as the cover is (`data-cover-ready`).
+ */
+const EARLY_TAP =
+  '(function(){var r=document.documentElement;' +
+  "function off(){document.removeEventListener('click',on,true)}" +
+  'function on(e){if(r.dataset.coverReady)return off();var t=e.target;if(!t||!t.closest)return;' +
+  "var s=t.closest('.cover-skip');if(!s&&!t.closest('.cover-tap'))return;" +
+  "r.dataset.pendingOpen=s?'skip':'tap';off();" +
+  "var a=document.querySelector('audio.inv-music');if(!a||!a.paused)return;" +
+  'try{var v=Number(a.dataset.volume);if(!(v>=0&&v<=1))v=1;var p=a.play();if(p&&p.catch)p.catch(function(){});' +
+  'a.volume=0;var t0=Date.now(),i=setInterval(function(){var k=Math.min(1,(Date.now()-t0)/1500);' +
+  'a.volume=v*k;if(k>=1)clearInterval(i)},50)}catch(_){}}' +
+  "document.addEventListener('click',on,true)})()";
+const LOCK = "document.body.classList.add('locked');" + EARLY_TAP;
 const SKIP_OR_LOCK =
   "if(new URLSearchParams(location.search).get('open')==='1'){var d=document.documentElement.dataset;d.opened='1';d.coverSkipped='1'}else{" +
   LOCK +

@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
 import type { Locale } from '../contracts/types';
 import { Icon } from '../ui/Icon';
+import { withStartAt } from './assets';
 
 export interface MusicProps {
   src: string;
@@ -20,9 +21,11 @@ const FADE_MS = 1500;
  * reacts to <html data-opened>).
  *
  * Music (§2.2.1, §9): one <audio>, started by the cover's `invitation:open` event — dispatched inside
- * the tap handler, so iOS allows it — with a 1.5s fade-in; never autoplays otherwise (a skipped cover
- * leaves it paused, one tap on the button starts it). It pauses while the page is hidden and resumes
- * when the guest comes back. (iOS ignores `volume`: there the track starts at the device volume.)
+ * the tap handler, so iOS allows it — with a 1.5s fade-in; a tap on the cover before React has taken
+ * over starts it from InvitationBody's early-tap script instead. It never autoplays otherwise (a
+ * skipped cover leaves it paused, one tap on the button starts it); when a browser refuses to start
+ * it, the button pulses for that tap. It starts at the host's second (`#t=`), pauses while the page
+ * is hidden and resumes when the guest comes back. (iOS ignores `volume`: the device volume applies.)
  *
  * The language pill switches in place when the page provides `onSwitch` (the public page's
  * LiveLocale: no reload, same place in the invitation); otherwise — and before hydration — it is a
@@ -66,49 +69,90 @@ export function FloatingControls({
   );
 }
 
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
 function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicProps) {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
-  const fade = useRef(0);
+  /** the browser wouldn't start it by itself: the button asks for a tap */
+  const [blocked, setBlocked] = useState(false);
+  /** the file can't be played at all: no button */
+  const [failed, setFailed] = useState(false);
+  const fade = useRef({ raf: 0, timer: 0 });
   const resumeOnShow = useRef(false);
   const target = Math.min(1, Math.max(0, volume));
 
-  const play = useCallback(
-    (fadeIn: boolean) => {
-      const a = audio.current;
-      if (!a) return;
-      cancelAnimationFrame(fade.current);
-      if (a.readyState === 0 && startAtSec > 0) a.currentTime = startAtSec;
-      a.volume = fadeIn ? 0 : target;
-      // play() must be called synchronously inside the gesture (iOS / in-app browsers)
-      const started = a.play();
-      setPlaying(true);
-      started?.catch(() => setPlaying(false));
-      if (!fadeIn) return;
+  const stopFade = useCallback(() => {
+    cancelAnimationFrame(fade.current.raf);
+    window.clearTimeout(fade.current.timer);
+  }, []);
+
+  /** 0 → the host's volume over FADE_MS; the timer makes sure it gets there even without frames. */
+  const fadeIn = useCallback(
+    (a: HTMLAudioElement) => {
+      stopFade();
       const t0 = performance.now();
       const step = (now: number) => {
         // a frame's timestamp is when the frame began — it can be a little before t0
         const k = Math.min(1, Math.max(0, (now - t0) / FADE_MS));
         a.volume = target * k;
-        if (k < 1) fade.current = requestAnimationFrame(step);
+        if (k < 1) fade.current.raf = requestAnimationFrame(step);
       };
-      fade.current = requestAnimationFrame(step);
+      fade.current.raf = requestAnimationFrame(step);
+      fade.current.timer = window.setTimeout(() => {
+        cancelAnimationFrame(fade.current.raf);
+        a.volume = target;
+      }, FADE_MS + 250);
     },
-    [startAtSec, target],
+    [stopFade, target],
+  );
+
+  const play = useCallback(
+    (withFade: boolean) => {
+      const a = audio.current;
+      // already playing: started by the cover's early-tap script (InvitationBody) before React took over
+      if (!a || !a.paused) return;
+      // play() first and synchronously — it must stay inside the gesture (iOS, in-app browsers)
+      let started: Promise<void>;
+      try {
+        started = a.play() ?? Promise.resolve();
+      } catch (err) {
+        started = Promise.reject(err);
+      }
+      try {
+        a.volume = withFade ? 0 : target;
+        if (withFade) fadeIn(a);
+      } catch {
+        // volume is read-only on iOS (the device volume applies)
+      }
+      started.then(
+        () => setBlocked(false),
+        () => {
+          stopFade();
+          setBlocked(true);
+        },
+      );
+    },
+    [fadeIn, stopFade, target],
   );
 
   const pause = useCallback(() => {
-    cancelAnimationFrame(fade.current);
+    stopFade();
     audio.current?.pause();
-    setPlaying(false);
-  }, []);
+  }, [stopFade]);
 
-  // The cover's tap starts the music.
-  useEffect(() => {
+  // The cover's tap starts the music. Listening from the hydration commit on (a layout effect): a tap
+  // React replays right after hydrating must not come before the listener.
+  useIsoLayoutEffect(() => {
     const onOpen = () => play(true);
     window.addEventListener('invitation:open', onOpen);
     return () => window.removeEventListener('invitation:open', onOpen);
   }, [play]);
+
+  // Started before React took over (the early-tap script): the button shows it.
+  useEffect(() => {
+    if (audio.current && !audio.current.paused) setPlaying(true);
+  }, []);
 
   // Paused while the page is hidden (another app, locked phone), resumed when it comes back.
   useEffect(() => {
@@ -120,7 +164,7 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
         if (!a.paused) a.pause();
       } else if (resumeOnShow.current) {
         resumeOnShow.current = false;
-        void a.play().catch(() => setPlaying(false));
+        a.play()?.catch(() => setBlocked(true));
       }
     };
     document.addEventListener('visibilitychange', onVisibility);
@@ -129,25 +173,50 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
 
   useEffect(
     () => () => {
-      cancelAnimationFrame(fade.current);
+      stopFade();
       audio.current?.pause();
     },
-    [],
+    [stopFade],
   );
 
   return (
     <>
-      {/* preload="none": nothing downloads before the guest opens the invitation */}
-      <audio ref={audio} src={src} loop preload="none" onEnded={() => setPlaying(false)} />
-      <button
-        className="fab fab-music"
-        type="button"
-        aria-pressed={playing}
-        aria-label={playing ? pauseLabel : playLabel}
-        onClick={() => (playing ? pause() : play(false))}
-      >
-        <Icon name={playing ? 'volume-2' : 'volume-x'} size={20} />
-      </button>
+      {/* preload="none": nothing downloads before the guest opens the invitation. `#t=` = the host's
+          start second; class + data-volume are for the early-tap script. */}
+      <audio
+        ref={audio}
+        className="inv-music"
+        src={withStartAt(src, startAtSec)}
+        data-volume={target}
+        loop
+        preload="none"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onLoadedMetadata={(e) => {
+          // a browser that ignores the media fragment starts at 0: seek now that it can
+          const a = e.currentTarget;
+          if (startAtSec > 0 && a.currentTime < 1 && startAtSec < a.duration) {
+            try {
+              a.currentTime = startAtSec;
+            } catch {
+              // it plays from the start
+            }
+          }
+        }}
+        onError={() => setFailed(true)}
+      />
+      {failed ? null : (
+        <button
+          className="fab fab-music"
+          type="button"
+          data-blocked={blocked && !playing ? '' : undefined}
+          aria-pressed={playing}
+          aria-label={playing ? pauseLabel : playLabel}
+          onClick={() => (playing ? pause() : play(false))}
+        >
+          <Icon name={playing ? 'volume-2' : 'volume-x'} size={20} />
+        </button>
+      )}
     </>
   );
 }

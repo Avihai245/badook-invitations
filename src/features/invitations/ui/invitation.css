@@ -552,6 +552,26 @@ a {
   bottom: calc(16px + env(safe-area-inset-bottom));
   inset-inline-end: 16px;
 }
+/* the browser wouldn't start the music by itself: the button asks for the one tap it needs */
+.fab-music[data-blocked] {
+  border-color: var(--inv-accent);
+  animation: fab-call 1.8s var(--ease) infinite;
+}
+@keyframes fab-call {
+  0% {
+    box-shadow: 0 0 0 0 var(--accent-35);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fab-music[data-blocked] {
+    animation: none;
+    box-shadow: 0 0 0 3px var(--accent-35);
+  }
+}
 .fab-lang {
   top: calc(14px + env(safe-area-inset-top));
   inset-inline-end: 16px;

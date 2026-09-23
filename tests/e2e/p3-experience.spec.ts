@@ -72,6 +72,71 @@ test.describe('the opening', () => {
     await expect(page.locator('.cover')).toHaveCount(0, { timeout: 8000 });
   });
 
+  test('music: a host’s MP3 starts at their second and fades in to their volume', async ({ page }) => {
+    await open(page, `${SINK}?music=mp3&musicStart=5`);
+    const audio = page.locator('audio');
+    await expect(audio).toHaveAttribute('src', /\/music\.mp3#t=5$/);
+    await page.locator('.cover-tap').click();
+    await expect.poll(() => paused(page)).toBe(false);
+    expect(await audio.evaluate((a: HTMLAudioElement) => a.currentTime)).toBeGreaterThanOrEqual(5);
+    await expect
+      .poll(() => audio.evaluate((a: HTMLAudioElement) => a.volume), { timeout: 5000 })
+      .toBeCloseTo(0.6, 2);
+    await expect(page.locator('.fab-music')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('a tap on the cover before the scripts have loaded still opens it and starts the music', async ({
+    page,
+  }) => {
+    // slow connection: the cover (HTML) is on screen well before React takes over
+    await page.route('**/_next/static/**/*.js', async (route) => {
+      await new Promise((r) => setTimeout(r, 4000));
+      await route.continue();
+    });
+    await page.goto(`${SINK}?music=mp3&musicStart=5`, { waitUntil: 'commit' });
+    await page.locator('.cover-tap').click();
+    expect(await page.evaluate(() => document.documentElement.dataset.coverReady ?? null)).toBeNull();
+    // the music starts inside that tap (iOS allows it only there)…
+    await expect.poll(() => paused(page)).toBe(false);
+    // …and the cover opens as soon as React is ready — no second tap
+    await expect(page.locator('html')).toHaveAttribute('data-opened', '1', { timeout: 20_000 });
+    await expect(page.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
+    await expect(page.locator('.fab-music')).toHaveAttribute('aria-pressed', 'true');
+    expect(await page.locator('audio').evaluate((a: HTMLAudioElement) => a.currentTime)).toBeGreaterThan(5);
+  });
+
+  test('a browser that won’t start the music by itself: the button calls for the tap that plays it', async ({
+    page,
+  }) => {
+    // like iOS: audio starts only inside a tap (the task of a trusted click)
+    await page.addInitScript(() => {
+      let tapping = false;
+      window.addEventListener(
+        'click',
+        (e) => {
+          if (!e.isTrusted) return;
+          tapping = true;
+          window.setTimeout(() => (tapping = false));
+        },
+        true,
+      );
+      const play = HTMLMediaElement.prototype.play;
+      HTMLMediaElement.prototype.play = function () {
+        return tapping ? play.call(this) : Promise.reject(new DOMException('blocked', 'NotAllowedError'));
+      };
+    });
+    await open(page, `${SINK}?open=1&music=mp3&musicStart=5`);
+    // an opening outside a tap
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent('invitation:open')));
+    const music = page.locator('.fab-music');
+    await expect(music).toHaveAttribute('data-blocked', '');
+    await expect(music).toHaveAttribute('aria-pressed', 'false');
+    await music.click();
+    await expect.poll(() => paused(page)).toBe(false);
+    await expect(music).not.toHaveAttribute('data-blocked');
+    await expect(music).toHaveAttribute('aria-pressed', 'true');
+  });
+
   test('music: paused while the page is hidden, back when it returns; no autoplay on a skipped cover', async ({
     page,
   }) => {

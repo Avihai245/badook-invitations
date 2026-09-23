@@ -22,7 +22,7 @@ import type { EventType, InvitationDocument, Locale, Palette } from '../../contr
 import { contrastRatio } from '../../lib/contrast';
 import { visibleGlyphCount } from '../../lib/text';
 import { timezoneOptions } from '../../lib/timezones';
-import { templateFileUrl } from '../../renderer/assets';
+import { templateFileUrl, withStartAt } from '../../renderer/assets';
 import { COUPLE_EVENTS } from '../../templates/seed-copy';
 import { openPublishDialog } from '../events';
 import {
@@ -359,9 +359,13 @@ function MusicPanel() {
     if (playing === id) return stop();
     stop();
     const el = (audio.current ??= new Audio());
-    el.src = url;
-    el.volume = music.volume;
-    el.currentTime = music.startAtSec;
+    // the same start second as the invitation (a media fragment — see withStartAt)
+    el.src = withStartAt(url, music.startAtSec);
+    try {
+      el.volume = music.volume;
+    } catch {
+      // read-only on iOS
+    }
     void el.play().then(
       () => {
         setPlaying(id);
@@ -378,6 +382,7 @@ function MusicPanel() {
     <>
       <PanelCard>
         <BoolField path="music.enabled" label={m.enabled} help={m.enabledHelp} />
+        {music.enabled ? <p className="text-[12px] text-muted">{m.whereHelp}</p> : null}
       </PanelCard>
       {music.enabled ? (
         <>

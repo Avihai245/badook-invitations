@@ -340,6 +340,8 @@ export const editorEn: EditorDict = {
     music: {
       enabled: 'Background music',
       enabledHelp: 'Starts once a guest opens the invitation; it can always be muted.',
+      whereHelp:
+        'The music plays in the invitation itself, from the tap on the cover — not in the preview here. To listen: ▶ next to the track.',
       play: 'Play 10 seconds',
       stop: 'Stop',
       custom: 'Your own song',

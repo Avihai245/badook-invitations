@@ -54,3 +54,13 @@ export function resolveAsset(
   if (ref.startsWith('https://')) return ref;
   return null;
 }
+
+/**
+ * A track's URL that starts playing at `startAtSec` (a media fragment, `#t=`): every browser seeks
+ * there by itself once the file loads — no `currentTime` before the metadata is in (Safari ignores
+ * that), and the file stays one cache entry (the fragment never reaches the server).
+ */
+export function withStartAt(url: string, startAtSec: number): string {
+  const base = url.split('#')[0]!;
+  return startAtSec > 0 ? `${base}#t=${Math.round(startAtSec)}` : base;
+}

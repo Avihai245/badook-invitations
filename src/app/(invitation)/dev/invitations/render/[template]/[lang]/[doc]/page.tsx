@@ -26,7 +26,8 @@ export const dynamic = 'force-dynamic';
  *   tl=<variant>           force a timeline variant (vertical | horizontal-icons | flip-cards)
  *   cover=fixture          the video-first cover with the synthetic media of tests/fixtures/media
  *                          (cover=stall: a video that never loads → the cover must still open)
- *   music=fixture          the synthetic music track
+ *   music=fixture          the synthetic music track (music=mp3: a 12s MP3 with a new note every
+ *                          second; musicStart=<s> its start second, like a host's)
  *   live=0                 the language pill as a plain link (default: switches in place, like /i/…)
  *   gallery=carousel|grid  a gallery of the 5 test photos before the footer
  *   reveal=scratch|tap|spin  the reveal section's mechanic (added before the footer when missing)
@@ -101,7 +102,11 @@ export default async function RenderPage({ params, searchParams }: { params: Par
           overlay: entry.manifest.cover.overlay.image ? '/dev/media/seal-blank.png' : null,
         }
       : undefined;
-  const music = one(sp.music) === 'fixture' ? { ...doc.music, enabled: true } : doc.music;
+  const musicParam = one(sp.music);
+  const fixtureMusic = musicParam === 'fixture' || musicParam === 'mp3';
+  const music = fixtureMusic
+    ? { ...doc.music, enabled: true, startAtSec: Math.max(0, Number(one(sp.musicStart)) || 0) }
+    : doc.music;
 
   const env = serverEnv();
   const rendered = { ...doc, sections, music };
@@ -109,7 +114,7 @@ export default async function RenderPage({ params, searchParams }: { params: Par
     brand: env.INVITES_BRAND_NAME,
     now,
     coverMedia,
-    musicUrl: one(sp.music) === 'fixture' ? '/dev/media/music.webm' : undefined,
+    musicUrl: fixtureMusic ? `/dev/media/music.${musicParam === 'mp3' ? 'mp3' : 'webm'}` : undefined,
     followUp: one(sp.followup) === '1' ? { slug: 'noa-and-itay', locales: ['he', 'en'] } : null,
     publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
     bases: {

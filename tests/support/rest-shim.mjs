@@ -319,12 +319,30 @@ async function storage(req, res, rest, query) {
   if (m && (req.method === 'GET' || req.method === 'HEAD')) {
     try {
       const target = storagePath(m[1], decodeURIComponent(m[2]));
-      statSync(target);
-      res.writeHead(200, {
+      const { size } = statSync(target);
+      const headers = {
         'content-type': readFileSync(`${target}.type`, 'utf8'),
         'cache-control': 'public, max-age=3600',
+        'accept-ranges': 'bytes',
         ...CORS,
-      });
+      };
+      // byte ranges, like Supabase Storage (audio/video seek with them)
+      const range = /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range ?? ''));
+      if (range && (range[1] || range[2])) {
+        const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2]));
+        const end = range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+        if (start >= size || start > end) {
+          res.writeHead(416, { 'content-range': `bytes */${size}`, ...CORS });
+          return res.end();
+        }
+        res.writeHead(206, {
+          ...headers,
+          'content-range': `bytes ${start}-${end}/${size}`,
+          'content-length': end - start + 1,
+        });
+        return res.end(req.method === 'HEAD' ? undefined : readFileSync(target).subarray(start, end + 1));
+      }
+      res.writeHead(200, { ...headers, 'content-length': size });
       return res.end(req.method === 'HEAD' ? undefined : readFileSync(target));
     } catch {
       return send(res, 404, { statusCode: '404', error: 'not_found', message: 'Object not found' });

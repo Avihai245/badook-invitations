@@ -51,9 +51,11 @@ export function CoverOverlay(props: CoverOverlayProps) {
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
 
   useIsoLayoutEffect(() => {
+    const root = document.documentElement.dataset;
+    // from the hydration commit on, taps are ours: InvitationBody's early-tap script stands down
+    root.coverReady = '1';
     // ?open=1 on a cached page: normally already skipped before the first paint by InvitationBody's
     // inline script; the URL is re-checked here so the skip holds even if that state was lost.
-    const root = document.documentElement.dataset;
     if (
       root.coverSkipped ||
       (props.skipFromUrl && new URLSearchParams(window.location.search).get('open') === '1')
@@ -110,6 +112,28 @@ interface PhaseProps {
 /** Everything the gesture must start synchronously (iOS): the music listens to this event. */
 const announceOpen = () => window.dispatchEvent(new CustomEvent('invitation:open'));
 
+/**
+ * Opening happens once: `open` runs at most one time (a tap, the Skip button, or a tap that came
+ * before React took over — InvitationBody's early-tap script leaves `data-pending-open` for that).
+ */
+function useOpening(open: (skip: boolean) => void): (skip: boolean) => void {
+  const began = useRef(false);
+  const once = useCallback(
+    (skip: boolean) => {
+      if (began.current) return;
+      began.current = true;
+      delete document.documentElement.dataset.pendingOpen;
+      open(skip);
+    },
+    [open],
+  );
+  useEffect(() => {
+    const pending = document.documentElement.dataset.pendingOpen;
+    if (pending) once(pending === 'skip');
+  }, [once]);
+  return once;
+}
+
 // ─── video-first ──────────────────────────────────────────────────────────────────────────────
 
 function VideoCover({
@@ -149,8 +173,7 @@ function VideoCover({
     finish(CROSSFADE_MS);
   }, [finish]);
 
-  const open = (skip: boolean) => {
-    if (phase !== 'idle') return;
+  const open = useOpening((skip: boolean) => {
     announceOpen();
     const v = video.current;
     if (skip || !v || reducedMotion()) {
@@ -180,7 +203,7 @@ function VideoCover({
     if (started) started.catch(crossfade);
     // a video without a usable duration still ends: 'ended' covers it; this is the last resort
     later(crossfade, 15000);
-  };
+  });
 
   const cls = [
     'cover',
@@ -310,8 +333,7 @@ function CssCover({
   finish,
   later,
 }: CoverOverlayProps & PhaseProps) {
-  const open = (immediate: boolean) => {
-    if (phase !== 'idle') return;
+  const open = useOpening((immediate: boolean) => {
     announceOpen();
     if (immediate || reducedMotion()) {
       finish(immediate ? 700 : 300);
@@ -319,7 +341,7 @@ function CssCover({
     }
     setPhase('opening');
     later(() => finish(700), overlay.exit === 'fade' ? 700 : 1700);
-  };
+  });
 
   const cls = ['cover', phase !== 'idle' ? 'opening' : '', phase === 'gone' ? 'gone' : '']
     .filter(Boolean)
