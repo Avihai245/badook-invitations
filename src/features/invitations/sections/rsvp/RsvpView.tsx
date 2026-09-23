@@ -1,8 +1,7 @@
 import type { SectionOf } from '../../contracts/types';
 import { endOfDayUtc } from '../../lib/dates';
 import { Decoration, SecHead, editPath, iv, type SectionViewProps } from '../shared';
-import { icsHref, venueCalendarEvent } from '../../renderer/calendar-event';
-import { googleCalendarUrl, outlookCalendarUrl } from '../../lib/calendar';
+import { calendarLabels, calendarLinks, firstVenue } from '../../renderer/calendar-event';
 import { RsvpForm, type RsvpFormConfig } from './RsvpForm.client';
 
 export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) {
@@ -17,9 +16,6 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
     ctx.text(d.subtitle) ||
     (doc.event.rsvpDeadline ? ctx.t('rsvp.deadline', { date: ctx.tokens.deadline ?? '' }) : '');
 
-  const firstVenue = doc.sections.find((s) => s.type === 'venues')?.data;
-  const venue = firstVenue && 'items' in firstVenue ? firstVenue.items[0] : undefined;
-  const event = venue ? venueCalendarEvent(ctx, venue) : null;
   const config: RsvpFormConfig = {
     slug: doc.share.slug,
     locale: ctx.locale,
@@ -45,23 +41,12 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
     successMessage: ctx.text(d.successMessage),
     declineMessage: ctx.text(d.declineMessage),
     closedMessage: ctx.text(d.closedMessage),
-    calendar:
-      event && venue
-        ? {
-            label: ctx.t('venue.addToCalendar'),
-            labels: {
-              google: ctx.t('calendar.google'),
-              apple: ctx.t('calendar.apple'),
-              outlook: ctx.t('calendar.outlook'),
-            },
-            links: {
-              google: googleCalendarUrl(event),
-              outlook: outlookCalendarUrl(event),
-              ics: icsHref(ctx, venue),
-              icsFileName: `${doc.share.slug}-${venue.id}.ics`,
-            },
-          }
-        : null,
+    // the first venue's event — or, without venues, the event itself
+    calendar: {
+      label: ctx.t('venue.addToCalendar'),
+      labels: calendarLabels(ctx),
+      links: calendarLinks(ctx, firstVenue(ctx)),
+    },
     submitMode: ctx.mode === 'live' && ctx.icsViaRoute ? 'api' : 'simulate',
   };
 

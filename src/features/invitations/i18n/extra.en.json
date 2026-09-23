@@ -4,5 +4,15 @@
   "rsvp.closed": "RSVPs are closed",
   "rsvp.alreadyReplied": "You already replied — edit",
   "reveal.comingSoon": "The date is revealed here",
-  "share.message": "Hi! 💌\n{title}\n{date}\nAll the details and RSVP at the link:\n{url}"
+  "share.message": "Hi! 💌\n{title}\n{date}\nAll the details and RSVP at the link:\n{url}",
+  "gallery.label": "Photo gallery",
+  "gallery.open": "Enlarge photo {n} of {total}",
+  "gallery.close": "Close",
+  "gallery.prev": "Previous photo",
+  "gallery.next": "Next photo",
+  "gallery.counter": "{n} of {total}",
+  "reveal.button": "Reveal the date",
+  "reveal.revealed": "The date is revealed",
+  "gifts.copy": "Copy",
+  "gifts.copied": "Copied"
 }

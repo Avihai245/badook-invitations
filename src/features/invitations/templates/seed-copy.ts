@@ -19,7 +19,12 @@ export const SEED_COPY = {
   } satisfies L10n,
   galleryTitle: { he: 'גלריה', en: 'Gallery' } satisfies L10n,
   revealTitle: { he: 'שמרו את התאריך', en: 'Save the Date' } satisfies L10n,
-  revealPrompt: { he: '(גרדו כדי לגלות)', en: '(scratch to reveal)' } satisfies L10n,
+  /** The reveal's prompt per mechanic (the editor swaps an untouched one when the mechanic changes). */
+  revealPrompt: {
+    scratch: { he: '(גרדו כדי לגלות)', en: '(scratch to reveal)' },
+    tap: { he: '(הקישו כדי לגלות)', en: '(tap to reveal)' },
+    spin: { he: '(הקישו לסיבוב)', en: '(tap to spin)' },
+  } satisfies Record<'scratch' | 'tap' | 'spin', L10n>,
   joiner: { he: '&', en: '&' } satisfies L10n,
   /** Titles of text sections added in the editor when the template has no copy for that kind. */
   textTitles: {

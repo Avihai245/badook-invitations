@@ -6,8 +6,11 @@ import {
   Camera,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   CircleCheckBig,
   Clock,
+  Copy,
   Footprints,
   Gift,
   Heart,
@@ -21,12 +24,14 @@ import {
   ScrollText,
   Send,
   Smile,
+  Sparkles,
   Star,
   Users,
   UtensilsCrossed,
   Volume2,
   VolumeX,
   Wine,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 import type { TimelineIcon } from '../contracts/types';
@@ -40,8 +45,11 @@ const LUCIDE = {
   camera: Camera,
   check: Check,
   'chevron-down': ChevronDown,
+  'chevron-left': ChevronLeft,
+  'chevron-right': ChevronRight,
   'circle-check-big': CircleCheckBig,
   clock: Clock,
+  copy: Copy,
   footprints: Footprints,
   gift: Gift,
   heart: Heart,
@@ -55,18 +63,20 @@ const LUCIDE = {
   'scroll-text': ScrollText,
   send: Send,
   smile: Smile,
+  sparkles: Sparkles,
   star: Star,
   users: Users,
   'utensils-crossed': UtensilsCrossed,
   'volume-2': Volume2,
   'volume-x': VolumeX,
   wine: Wine,
+  x: X,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof LUCIDE | CustomIconName;
 
 /** Directional icons are mirrored in RTL (§8); pins, clocks, hearts… never are. */
-const DIRECTIONAL = new Set<IconName>(['navigation', 'send']);
+const DIRECTIONAL = new Set<IconName>(['navigation', 'send', 'chevron-left', 'chevron-right']);
 
 /** §9A.5 TimelineIcon → icon. */
 export const TIMELINE_ICON: Record<TimelineIcon, IconName> = {

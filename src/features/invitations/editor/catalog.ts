@@ -204,7 +204,7 @@ function genericSection(entry: CatalogEntry, doc: InvitationDocument, locales: r
         data: {
           title: pick(SEED_COPY.revealTitle, locales),
           mechanic: 'scratch',
-          prompt: pick(SEED_COPY.revealPrompt, locales),
+          prompt: pick(SEED_COPY.revealPrompt.scratch, locales),
           showCalendarButton: true,
         },
       };

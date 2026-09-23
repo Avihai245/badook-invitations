@@ -164,6 +164,19 @@ export function demoDocument(
                 url: 'https://payboxapp.page.link/EXAMPLE',
                 details: null,
               },
+              {
+                id: 'g3',
+                kind: 'bank_transfer',
+                label: pick({ he: 'העברה בנקאית', en: 'Bank transfer' }, locales),
+                url: null,
+                details: pick(
+                  {
+                    he: 'בנק הפועלים (12) · סניף 600 · חשבון 123456',
+                    en: 'Bank Hapoalim (12) · Branch 600 · Account 123456',
+                  },
+                  locales,
+                ),
+              },
             ],
           },
         };

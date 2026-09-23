@@ -1,25 +1,12 @@
 import { Fragment } from 'react';
-import type { SectionOf, Venue } from '../../contracts/types';
-import { googleCalendarUrl, outlookCalendarUrl } from '../../lib/calendar';
+import type { SectionOf } from '../../contracts/types';
 import { DAY_MONTH_YEAR, formatDate } from '../../lib/dates';
 import { googleMapsEmbedUrl, googleMapsUrl, hasLocation, wazeUrl } from '../../lib/maps';
-import { icsHref, venueCalendarEvent } from '../../renderer/calendar-event';
-import type { RenderContext } from '../../renderer/context';
+import { calendarLabels, calendarLinks } from '../../renderer/calendar-event';
 import { Icon } from '../../ui/Icon';
 import { Decoration, SecHead, editPath, iv, type SectionViewProps } from '../shared';
-import { CalendarMenu, type CalendarLinks } from './CalendarMenu.client';
+import { CalendarMenu } from './CalendarMenu.client';
 import { MapEmbed } from './MapEmbed.client';
-
-function calendarLinks(ctx: RenderContext, venue: Venue): CalendarLinks {
-  const event = venueCalendarEvent(ctx, venue);
-  const slug = ctx.doc.share.slug;
-  return {
-    google: googleCalendarUrl(event),
-    outlook: outlookCalendarUrl(event),
-    ics: icsHref(ctx, venue),
-    icsFileName: `${slug}-${venue.id}.ics`,
-  };
-}
 
 export function VenuesView({ section, ctx }: SectionViewProps<SectionOf<'venues'>>) {
   return (
@@ -86,11 +73,7 @@ export function VenuesView({ section, ctx }: SectionViewProps<SectionOf<'venues'
                     <CalendarMenu
                       label={ctx.t('venue.addToCalendar')}
                       links={calendarLinks(ctx, v)}
-                      labels={{
-                        google: ctx.t('calendar.google'),
-                        apple: ctx.t('calendar.apple'),
-                        outlook: ctx.t('calendar.outlook'),
-                      }}
+                      labels={calendarLabels(ctx)}
                     />
                   ) : null}
                 </div>

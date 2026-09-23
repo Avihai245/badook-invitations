@@ -7,6 +7,7 @@ type Params = Promise<{ file: string }>;
 
 const TYPES: Record<string, string> = {
   png: 'image/png',
+  jpg: 'image/jpeg',
   webm: 'video/webm',
   mp4: 'video/mp4',
   mp3: 'audio/mpeg',
@@ -16,8 +17,8 @@ const TYPES: Record<string, string> = {
 export const dynamic = 'force-dynamic';
 
 /**
- * Dev/QA only: the synthetic cover and music media of tests/fixtures/media (scripts/make-test-media.mjs),
- * used by `/dev/invitations/render/…?cover=fixture&music=fixture` to exercise the video-first cover.
+ * Dev/QA only: the synthetic media of tests/fixtures/media (scripts/make-test-media.mjs,
+ * make-gallery-media.mjs), used by `/dev/invitations/render/…?cover=fixture&music=fixture&gallery=…`.
  */
 export async function GET(_request: Request, { params }: { params: Params }) {
   if (!devRoutesEnabled()) return new NextResponse(null, { status: 404 });

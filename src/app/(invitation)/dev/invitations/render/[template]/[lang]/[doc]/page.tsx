@@ -5,6 +5,7 @@ import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { buildRenderContext, type RenderOptions } from '@/features/invitations/renderer/context';
 import { InvitationBody } from '@/features/invitations/renderer/InvitationBody';
 import { buildLivePayload } from '@/features/invitations/renderer/live/build';
+import { SEED_COPY } from '@/features/invitations/templates/seed-copy';
 import { assertDevRoutes } from '@/lib/dev-routes';
 import { serverEnv } from '@/lib/env';
 
@@ -27,6 +28,8 @@ export const dynamic = 'force-dynamic';
  *                          (cover=stall: a video that never loads → the cover must still open)
  *   music=fixture          the synthetic music track
  *   live=0                 the language pill as a plain link (default: switches in place, like /i/…)
+ *   gallery=carousel|grid  a gallery of the 5 test photos before the footer
+ *   reveal=scratch|tap|spin  the reveal section's mechanic (added before the footer when missing)
  */
 export default async function RenderPage({ params, searchParams }: { params: Params; searchParams: Search }) {
   assertDevRoutes();
@@ -36,10 +39,52 @@ export default async function RenderPage({ params, searchParams }: { params: Par
   const { doc, entry } = loaded;
 
   const tl = one(sp.tl);
-  const sections: Section[] =
+  let sections: Section[] =
     tl && TIMELINE_VARIANTS.includes(tl)
       ? doc.sections.map((s): Section => (s.type === 'timeline' ? { ...s, variant: tl } : s))
       : doc.sections;
+  const beforeFooter = (extra: Section) => {
+    const at = sections.findIndex((s) => s.type === 'footer');
+    sections = at < 0 ? [...sections, extra] : [...sections.slice(0, at), extra, ...sections.slice(at)];
+  };
+  const gallery = one(sp.gallery);
+  if (gallery === 'carousel' || gallery === 'grid') {
+    beforeFooter({
+      id: 'gallery-dev',
+      type: 'gallery',
+      enabled: true,
+      data: {
+        title: { he: 'רגעים', en: 'Moments' },
+        layout: gallery,
+        images: [1, 2, 3, 4, 5].map((n) => ({
+          id: `photo-${n}`,
+          src: `upload:gallery-${n}.jpg`,
+          alt: { he: `תמונה ${n}`, en: `Photo ${n}` },
+        })),
+      },
+    });
+  }
+  const mechanic = one(sp.reveal);
+  if (mechanic === 'scratch' || mechanic === 'tap' || mechanic === 'spin') {
+    if (sections.some((s) => s.type === 'reveal'))
+      sections = sections.map((s): Section =>
+        s.type === 'reveal'
+          ? { ...s, enabled: true, data: { ...s.data, mechanic, prompt: SEED_COPY.revealPrompt[mechanic] } }
+          : s,
+      );
+    else
+      beforeFooter({
+        id: 'reveal-dev',
+        type: 'reveal',
+        enabled: true,
+        data: {
+          title: { he: 'שמרו את התאריך', en: 'Save the Date' },
+          mechanic,
+          prompt: SEED_COPY.revealPrompt[mechanic],
+          showCalendarButton: true,
+        },
+      });
+  }
   const nowParam = one(sp.now);
   const now = nowParam && !Number.isNaN(Date.parse(nowParam)) ? Date.parse(nowParam) : undefined;
   const mode = one(sp.mode) === 'preview' ? 'preview' : 'live';
@@ -65,10 +110,14 @@ export default async function RenderPage({ params, searchParams }: { params: Par
     coverMedia,
     musicUrl: one(sp.music) === 'fixture' ? '/dev/media/music.webm' : undefined,
     publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
-    bases: assetBasesFromEnv({
-      supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
-      templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
-    }),
+    bases: {
+      ...assetBasesFromEnv({
+        supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
+        templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
+      }),
+      // the test photos are "uploads" served by /dev/media
+      ...(gallery ? { uploads: '/dev/media' } : {}),
+    },
   };
   const ctx = buildRenderContext(rendered, entry.manifest, lang, { ...options, mode });
 

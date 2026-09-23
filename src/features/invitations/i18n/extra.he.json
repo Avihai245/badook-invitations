@@ -4,5 +4,15 @@
   "rsvp.closed": "מועד אישורי ההגעה הסתיים",
   "rsvp.alreadyReplied": "כבר עניתם — אפשר לעדכן",
   "reveal.comingSoon": "התאריך יתגלה כאן",
-  "share.message": "היי! 💌\n{title}\n{date}\nכל הפרטים ואישור ההגעה בקישור:\n{url}"
+  "share.message": "היי! 💌\n{title}\n{date}\nכל הפרטים ואישור ההגעה בקישור:\n{url}",
+  "gallery.label": "גלריית תמונות",
+  "gallery.open": "הגדלת תמונה {n} מתוך {total}",
+  "gallery.close": "סגירה",
+  "gallery.prev": "התמונה הקודמת",
+  "gallery.next": "התמונה הבאה",
+  "gallery.counter": "{n} מתוך {total}",
+  "reveal.button": "גילוי התאריך",
+  "reveal.revealed": "התאריך נחשף",
+  "gifts.copy": "העתקה",
+  "gifts.copied": "הועתק"
 }

@@ -1,6 +1,7 @@
 import type { SectionOf } from '../../contracts/types';
 import { Icon } from '../../ui/Icon';
 import { editPath, type SectionViewProps } from '../shared';
+import { CopyButton } from './CopyButton.client';
 
 export function GiftsView({ section, ctx }: SectionViewProps<SectionOf<'gifts'>>) {
   const d = section.data;
@@ -35,7 +36,16 @@ export function GiftsView({ section, ctx }: SectionViewProps<SectionOf<'gifts'>>
                 ) : (
                   <div key={l.id} className="details" data-edit-path={path && `${path}.links.${i}`}>
                     <strong>{ctx.text(l.label)}</strong>
-                    {l.details ? <div>{ctx.text(l.details)}</div> : null}
+                    {l.details ? (
+                      <>
+                        <div>{ctx.text(l.details)}</div>
+                        <CopyButton
+                          text={ctx.text(l.details)}
+                          label={ctx.t('gifts.copy')}
+                          done={ctx.t('gifts.copied')}
+                        />
+                      </>
+                    ) : null}
                   </div>
                 ),
               )}

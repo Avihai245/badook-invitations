@@ -514,16 +514,32 @@ function GiftsForm({ base }: { base: string }) {
 // ─── reveal ────────────────────────────────────────────────────────────────────────────────────
 
 function RevealForm({ base, section }: { base: string; section: SectionOf<'reveal'> }) {
-  const { update } = useEditor();
+  const { apply } = useEditor();
   const { f, cards } = useText();
   const r = f.reveal;
+  type Mechanic = SectionOf<'reveal'>['data']['mechanic'];
+  // a prompt still at the old mechanic's wording ("scratch to reveal") follows the mechanic;
+  // one the host wrote stays
+  const setMechanic = (next: Mechanic) =>
+    apply((d) => {
+      const data = getAt(d, base) as SectionOf<'reveal'>['data'];
+      const from = SEED_COPY.revealPrompt[data.mechanic];
+      const to = SEED_COPY.revealPrompt[next];
+      const prompt = Object.fromEntries(
+        Object.entries(data.prompt).map(([l, v]) => [
+          l,
+          v === from[l as Locale] ? (to[l as Locale] ?? v) : v,
+        ]),
+      );
+      return setAt(d, base, { ...data, mechanic: next, prompt });
+    }, null);
   return (
     <PanelCard title={cards.texts}>
       <L10nField path={`${base}.title`} label={f.title} cap={CAPS.title} />
       <SegmentedField
         label={r.mechanic}
         value={section.data.mechanic}
-        onValueChange={(v) => update(`${base}.mechanic`, v, null)}
+        onValueChange={setMechanic}
         options={(['scratch', 'tap', 'spin'] as const).map((m) => ({ value: m, label: r.mechanics[m] }))}
       />
       <L10nField path={`${base}.prompt`} label={r.prompt} />
