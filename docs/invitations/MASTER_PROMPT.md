@@ -42,6 +42,18 @@ Config (env, with safe defaults): `INVITES_BRAND_NAME` (footer credit + OG), `IN
 
 Also report in Step 0: does the product have its own design system/component library (→ §9B rule), which font loading mechanism exists, and where static assets live (→ `public/templates/<id>/`).
 
+### 1.1 Deployment — AWS Amplify
+
+Deployment target: **AWS Amplify Hosting (Next.js SSR)**. Follow these rules in every phase:
+1. Use a Next.js version officially supported by Amplify Hosting SSR (check the current Amplify docs before choosing) and Node 20+.
+2. Add `amplify.yml` at the repo root: `npm ci` → `npm run build`, artifacts `baseDirectory: .next`, cache `node_modules` and `.next/cache`.
+3. Amplify console env vars are NOT available to SSR at runtime by default — in the build phase write the needed ones into `.env.production` (e.g. `env | grep -E '^(NEXT_PUBLIC_|SUPABASE_|INVITES_)' >> .env.production`). Document every required var in `.env.example`.
+4. No Edge runtime anywhere (no `runtime = 'edge'`): route handlers, OG image generation and middleware must run on Node. Verify the OG image (with Hebrew) works on Amplify.
+5. Publishing must refresh `/i/[slug]` on Amplify: use `revalidatePath` and verify it works there; if not, render the public page dynamically with short cache headers.
+6. Heavy template media (videos, music) must not ship in the build: serve it from Supabase Storage (public bucket, long cache headers). `public/templates/` keeps only placeholders.
+7. Branches: `main` = production, `dev` = preview, each with its own env vars. Playwright/visual tests run locally or in CI, never in the Amplify build.
+8. At the end of P1, deploy to Amplify and confirm the public page, RSVP submission and ICS download work in production.
+
 ---
 
 ## 2. Product definition (what we are building)
