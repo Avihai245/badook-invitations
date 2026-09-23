@@ -101,4 +101,16 @@ describe('video links', () => {
     );
     expect(videoStillUrl(parseVideoLink('https://vimeo.com/76979871')!)).toBeNull();
   });
+
+  it('subtitles are off unless the host turns them on; a start second for YouTube', () => {
+    const yt = parseVideoLink('https://youtu.be/dQw4w9WgXcQ')!;
+    const vimeo = parseVideoLink('https://vimeo.com/76979871')!;
+    const params = (url: string) => Object.fromEntries(new URL(url).searchParams);
+    expect(params(videoEmbedUrl(yt))).toMatchObject({ cc_load_policy: '0' });
+    expect(params(videoEmbedUrl(yt, undefined, { captions: true }))).toMatchObject({ cc_load_policy: '1' });
+    expect(params(videoEmbedUrl(vimeo))).toMatchObject({ texttrack: 'false' });
+    expect(params(videoEmbedUrl(vimeo, undefined, { captions: true }))).not.toHaveProperty('texttrack');
+    expect(params(videoEmbedUrl(yt, undefined, { start: 207 }))).toMatchObject({ start: '207' });
+    expect(params(videoEmbedUrl(yt))).not.toHaveProperty('start');
+  });
 });

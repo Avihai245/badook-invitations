@@ -167,6 +167,7 @@ export function seedDocument(
           locationLine: null,
           media: heroOption.media,
           overlayOpacity: template.hero.defaultOverlay,
+          captions: false,
         },
       },
       ...(input.eventType === 'save_the_date'

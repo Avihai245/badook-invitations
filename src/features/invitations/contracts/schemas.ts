@@ -154,6 +154,8 @@ export const HeroSectionSchema = section(
     locationLine: L10nSchema.nullable(),
     media: MediaSchema,
     overlayOpacity: z.number().min(0).max(0.7),
+    // added after v1 (see migrate.ts): a YouTube / Vimeo background's subtitles — hidden unless on
+    captions: z.boolean().default(false),
   }),
 );
 

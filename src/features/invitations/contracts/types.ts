@@ -115,6 +115,8 @@ export type Section =
         locationLine: L10n | null;
         media: Media;
         overlayOpacity: number; // 0..0.7
+        /** a YouTube / Vimeo background's own subtitles (burned-in text can't be hidden) */
+        captions: boolean;
       }
     >
   | Base<

@@ -178,6 +178,8 @@ export const editorEn: EditorDict = {
     showDateHelp: 'Gregorian + Hebrew',
     locationLine: 'Location line',
     overlay: 'Background dimming',
+    captions: 'Show subtitles',
+    captionsHelp: 'Off — YouTube or Vimeo subtitles stay hidden. Text burned into the video itself can’t be hidden.',
     heroOptions: 'Design backgrounds',
     target: 'Count down to',
     targets: { event: 'Start of the event', custom: 'Another moment' },

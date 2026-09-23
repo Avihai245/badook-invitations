@@ -55,7 +55,11 @@ export function canonicalVideoLink(v: VideoLink): string {
  * YouTube's `enablejsapi` (with the page's `origin`) and Vimeo's player API let the page turn the
  * sound on through postMessage — the host's "video sound" option.
  */
-export function videoEmbedUrl(v: VideoLink, origin?: string): string {
+export function videoEmbedUrl(
+  v: VideoLink,
+  origin?: string,
+  { captions = false, start }: { captions?: boolean; start?: number } = {},
+): string {
   if (v.provider === 'youtube') {
     const q = new URLSearchParams({
       autoplay: '1',
@@ -67,7 +71,11 @@ export function videoEmbedUrl(v: VideoLink, origin?: string): string {
       rel: '0',
       disablekb: '1',
       iv_load_policy: '3',
+      // subtitles: forced on, or off as far as the URL can say (HeroEmbed also unloads the module —
+      // a viewer whose YouTube account always shows them would otherwise still get them)
+      cc_load_policy: captions ? '1' : '0',
       enablejsapi: '1',
+      ...(start ? { start: String(Math.round(start)) } : {}),
       ...(origin ? { origin } : {}),
     });
     return `https://www.youtube-nocookie.com/embed/${v.id}?${q.toString()}`;
@@ -80,6 +88,7 @@ export function videoEmbedUrl(v: VideoLink, origin?: string): string {
     loop: '1',
     autopause: '0',
     dnt: '1',
+    ...(captions ? {} : { texttrack: 'false' }),
   });
   return `https://player.vimeo.com/video/${v.id}?${q.toString()}`;
 }

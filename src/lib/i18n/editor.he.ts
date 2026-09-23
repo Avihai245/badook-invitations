@@ -174,6 +174,8 @@ export const editorHe = {
     showDateHelp: 'לועזי + עברי',
     locationLine: 'שורת מיקום',
     overlay: 'הכהיית רקע',
+    captions: 'הצגת כתוביות',
+    captionsHelp: 'כבוי — הכתוביות של יוטיוב או Vimeo מוסתרות. טקסט שצרוב בתוך הסרטון עצמו לא ניתן להסתרה.',
     heroOptions: 'רקעים של העיצוב',
     target: 'סופרים עד',
     targets: { event: 'תחילת האירוע', custom: 'מועד אחר' },

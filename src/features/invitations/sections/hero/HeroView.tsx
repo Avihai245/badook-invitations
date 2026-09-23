@@ -69,7 +69,7 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
 
   let media = null;
   if (link) {
-    media = <HeroEmbed link={link} poster={poster} sound={sound} />;
+    media = <HeroEmbed link={link} poster={poster} sound={sound} captions={d.captions} />;
   } else if (d.media.kind === 'video' && src) {
     media = <HeroVideo src={src} poster={poster} focal={focal} sound={sound ? doc.music.volume : null} />;
   } else if (d.media.kind === 'video' && poster) {

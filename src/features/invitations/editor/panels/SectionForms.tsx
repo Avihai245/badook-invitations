@@ -17,6 +17,7 @@ import {
 import { CAPS, MAX_VENUES } from '../../contracts/validate';
 import { t as invitationText } from '../../i18n/dictionary';
 import { formatTime } from '../../lib/dates';
+import { parseVideoLink } from '../../lib/video-links';
 import { SEED_COPY } from '../../templates/seed-copy';
 import {
   BoolField,
@@ -120,6 +121,9 @@ function HeroForm({ base, section }: { base: string; section: SectionOf<'hero'> 
       </PanelCard>
       <PanelCard title={cards.background}>
         <HeroMediaField path={`${base}.media`} label={e.fieldLabels['hero.media']} />
+        {d.media.kind === 'video' && parseVideoLink(d.media.src) ? (
+          <BoolField path={`${base}.captions`} label={f.captions} help={f.captionsHelp} />
+        ) : null}
         <RangeField
           path={`${base}.overlayOpacity`}
           label={f.overlay}

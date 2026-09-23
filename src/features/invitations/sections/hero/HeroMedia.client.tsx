@@ -115,6 +115,42 @@ function playingFrom({ provider, data }: PlayerMessage): boolean | null {
   return null;
 }
 
+/** The `event` of a player message (YouTube posts JSON strings). */
+function eventOf(data: unknown): string | null {
+  let msg: unknown = data;
+  if (typeof msg === 'string') {
+    try {
+      msg = JSON.parse(msg);
+    } catch {
+      return null;
+    }
+  }
+  return msg && typeof msg === 'object' && typeof (msg as { event?: unknown }).event === 'string'
+    ? (msg as { event: string }).event
+    : null;
+}
+
+/** YouTube reported the video ended (state 0). */
+function endedFrom(data: unknown): boolean {
+  let msg: unknown = data;
+  if (typeof msg === 'string') {
+    try {
+      msg = JSON.parse(msg);
+    } catch {
+      return false;
+    }
+  }
+  const m = msg as { event?: string; info?: unknown } | null;
+  if (!m || typeof m !== 'object') return false;
+  const state =
+    m.event === 'onStateChange'
+      ? m.info
+      : m.event === 'infoDelivery'
+        ? (m.info as { playerState?: unknown } | undefined)?.playerState
+        : undefined;
+  return state === 0;
+}
+
 const PLAYER_ORIGIN = {
   youtube: 'https://www.youtube-nocookie.com',
   vimeo: 'https://player.vimeo.com',
@@ -125,16 +161,22 @@ const PLAYER_ORIGIN = {
  * scaled to cover the hero (a 16:9 frame, 9:16 for a Short), untouchable (taps go to the page). Until
  * it actually plays, the still stays on screen — also when a browser won't autoplay it — so there is
  * never a black box. With the "video sound" option the music button's `hero:sound` event turns its
- * sound on and off through the players' postMessage APIs (as far as the browser allows).
+ * sound on and off through the players' postMessage APIs (as far as the browser allows). Unless the
+ * host turned them on, the players' own subtitles stay off (text burned into the picture can't be).
  */
 export function HeroEmbed({
   link,
   poster,
   sound,
+  captions = false,
+  start,
 }: {
   link: VideoLink;
   poster: string | null;
   sound: boolean;
+  captions?: boolean;
+  /** YouTube: the second it starts from — and loops back to */
+  start?: number;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [origin, setOrigin] = useState<string | null>(null);
@@ -155,17 +197,32 @@ export function HeroEmbed({
     if (!origin) return;
     const target = PLAYER_ORIGIN[link.provider];
     const post = (message: unknown) => frame.current?.contentWindow?.postMessage(message, target);
-    const command = (func: string, value?: number | boolean) =>
+    const command = (func: string, value?: number | boolean | string) =>
       link.provider === 'youtube'
         ? post(JSON.stringify({ event: 'command', func, args: value === undefined ? [] : [value] }))
         : post({ method: func, value });
+    // YouTube loads its captions module with the player and again as a video starts: unload it then
+    const hideCaptions = () => {
+      if (captions) return;
+      if (link.provider === 'youtube') for (const name of ['captions', 'cc']) command('unloadModule', name);
+      else post({ method: 'disableTextTrack' });
+    };
     const onMessage = (e: MessageEvent) => {
       if (e.origin !== target || e.source !== frame.current?.contentWindow) return;
       const now = playingFrom({ provider: link.provider, data: e.data });
       if (now !== null) setPlaying(now);
+      if (now) hideCaptions();
+      if (link.provider === 'youtube' && start && endedFrom(e.data)) {
+        // a looping playlist restarts at 0: back to the host's second instead
+        command('seekTo', start);
+        command('playVideo');
+      }
+      if (link.provider === 'youtube' && eventOf(e.data) === 'onReady') hideCaptions();
       // Vimeo announces itself: then ask for the events that tell it plays
-      if (link.provider === 'vimeo' && typeof e.data === 'object' && e.data?.event === 'ready')
+      if (link.provider === 'vimeo' && typeof e.data === 'object' && e.data?.event === 'ready') {
         for (const value of ['play', 'pause', 'timeupdate']) post({ method: 'addEventListener', value });
+        hideCaptions();
+      }
     };
     const onLoad = () => {
       // YouTube starts sending state changes once the page says it listens
@@ -196,7 +253,7 @@ export function HeroEmbed({
       window.removeEventListener('hero:sound', onSound);
       stopTap();
     };
-  }, [origin, link, sound]);
+  }, [origin, link, sound, captions, start]);
 
   return (
     <div
@@ -221,7 +278,7 @@ export function HeroEmbed({
       {origin ? (
         <iframe
           ref={frame}
-          src={videoEmbedUrl(link, origin)}
+          src={videoEmbedUrl(link, origin, { captions, start })}
           title=""
           tabIndex={-1}
           allow="autoplay; encrypted-media; picture-in-picture"

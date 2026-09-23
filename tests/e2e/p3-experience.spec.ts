@@ -203,6 +203,7 @@ test.describe('hero video', () => {
       loop: '1',
       controls: '0',
       playsinline: '1',
+      cc_load_policy: '0', // subtitles off by default
     });
     // taps go to the page, and it only shows once it plays (the still until then)
     await expect(iframe).toHaveCSS('pointer-events', 'none');

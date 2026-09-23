@@ -247,6 +247,14 @@ test.describe('hero background', () => {
       /^https:\/\/www\.youtube-nocookie\.com\/embed\/dQw4w9WgXcQ\?/,
     );
     await expect(page.getByRole('button', { name: 'סרטון מיוטיוב או מ־Vimeo' }).first()).toBeVisible();
+
+    // its subtitles: hidden unless the host turns them on
+    const subtitles = page.getByRole('switch', { name: 'הצגת כתוביות' });
+    await expect(subtitles).not.toBeChecked();
+    await expect(frame.locator('.hero-embed iframe')).toHaveAttribute('src', /[?&]cc_load_policy=0(&|$)/);
+    await subtitles.click();
+    await expect(frame.locator('.hero-embed iframe')).toHaveAttribute('src', /[?&]cc_load_policy=1(&|$)/);
+    await saved(page);
   });
 });
 
