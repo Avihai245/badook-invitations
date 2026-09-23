@@ -15,6 +15,10 @@ export interface RsvpFormConfig {
   maxChildren: number;
   requirePhone: boolean;
   requireEmail: boolean;
+  /** the host's form options: an email field at all, one full-name field, the message */
+  askEmail: boolean;
+  nameFormat: 'split' | 'full';
+  askMessage: boolean;
   perAttendeeDetails: boolean;
   dietary: { enabled: boolean; options: DietaryKey[]; note: string | null };
   customQuestions: {
@@ -40,6 +44,7 @@ export interface RsvpFormConfig {
 interface Adult {
   firstName?: string;
   lastName?: string;
+  fullName?: string;
   phone?: string;
   email?: string;
   dietary?: DietaryKey[];
@@ -243,17 +248,21 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       adults.forEach((p, i) => {
         // without per-attendee details only the primary contact is asked for a name (§3)
         if (i === 0 || config.perAttendeeDetails) {
-          if (!p.firstName?.trim()) e[`a${i}.firstName`] = req;
-          if (!p.lastName?.trim()) e[`a${i}.lastName`] = req;
+          if (config.nameFormat === 'full') {
+            if (!p.fullName?.trim()) e[`a${i}.fullName`] = req;
+          } else {
+            if (!p.firstName?.trim()) e[`a${i}.firstName`] = req;
+            if (!p.lastName?.trim()) e[`a${i}.lastName`] = req;
+          }
         }
         if (needsNotes(p) && !p.dietaryNotes?.trim()) e[`a${i}.dietaryNotes`] = req;
       });
       const p0 = adults[0] ?? {};
       const phone = p0.phone?.trim() ?? '';
-      const email = p0.email?.trim() ?? '';
+      const email = config.askEmail ? (p0.email?.trim() ?? '') : '';
       if (phone ? !PHONE_OK(phone) : config.requirePhone)
         e['a0.phone'] = phone ? t(L, 'rsvp.error.phone') : req;
-      if (email ? !EMAIL_OK(email) : config.requireEmail)
+      if (config.askEmail && (email ? !EMAIL_OK(email) : config.requireEmail))
         e['a0.email'] = email ? t(L, 'rsvp.error.email') : req;
       if (config.perAttendeeDetails) {
         children.forEach((c, i) => {
@@ -267,9 +276,10 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       }
     } else {
       const phone = decline.phone?.trim() ?? '';
-      const email = decline.email?.trim() ?? '';
+      const email = config.askEmail ? (decline.email?.trim() ?? '') : '';
       if (!decline.fullName?.trim()) e['d.fullName'] = req;
-      if (!phone && !email) e['d.phone'] = t(L, 'rsvp.error.contact');
+      // a way to reach them: phone or email — just the phone when email isn't asked
+      if (!phone && !email) e['d.phone'] = config.askEmail ? t(L, 'rsvp.error.contact') : req;
       if (phone && !PHONE_OK(phone)) e['d.phone'] = t(L, 'rsvp.error.phone');
       if (email && !EMAIL_OK(email)) e['d.email'] = t(L, 'rsvp.error.email');
     }
@@ -293,7 +303,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       hp: hpRef.current?.value ?? '',
       renderedAt: renderedAt.current,
       answers: attending ? answered : {},
-      message: message.trim() || null,
+      message: config.askMessage ? message.trim() || null : null,
       ...(reply ? { editToken: reply.editToken } : {}),
     };
     const nullable = (v: string | undefined) => (v?.trim() ? v.trim() : null);
@@ -304,7 +314,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
         contact: {
           fullName: decline.fullName?.trim() ?? '',
           phone: nullable(decline.phone),
-          email: nullable(decline.email),
+          email: config.askEmail ? nullable(decline.email) : null,
         },
       };
     }
@@ -312,10 +322,11 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       ...base,
       attending: true,
       adults: adults.map((p, i) => ({
-        firstName: p.firstName?.trim() ?? '',
-        lastName: p.lastName?.trim() ?? '',
+        firstName: config.nameFormat === 'full' ? '' : (p.firstName?.trim() ?? ''),
+        lastName: config.nameFormat === 'full' ? '' : (p.lastName?.trim() ?? ''),
+        ...(config.nameFormat === 'full' ? { fullName: p.fullName?.trim() ?? '' } : {}),
         phone: i === 0 ? nullable(p.phone) : null,
-        email: i === 0 ? nullable(p.email) : null,
+        email: i === 0 && config.askEmail ? nullable(p.email) : null,
         dietary: p.dietary ?? [],
         dietaryNotes: nullable(p.dietaryNotes),
       })),
@@ -567,30 +578,43 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                     {t(L, 'rsvp.person', { n: i + 1 })}
                     {i === 0 ? <span className="tag">{t(L, 'rsvp.primaryContact')}</span> : null}
                   </h4>
-                  <div className="row2">
-                    {input(
-                      `a${i}.firstName`,
-                      t(L, 'rsvp.firstName'),
-                      p.firstName,
-                      (v) => updateAdult(i, { firstName: v }),
+                  {config.nameFormat === 'full' ? (
+                    input(
+                      `a${i}.fullName`,
+                      t(L, 'rsvp.fullName'),
+                      p.fullName,
+                      (v) => updateAdult(i, { fullName: v }),
                       {
                         required: true,
-                        autoComplete: i === 0 ? 'given-name' : 'off',
+                        autoComplete: i === 0 ? 'name' : 'off',
                       },
-                    )}
-                    {input(
-                      `a${i}.lastName`,
-                      t(L, 'rsvp.lastName'),
-                      p.lastName,
-                      (v) => updateAdult(i, { lastName: v }),
-                      {
-                        required: true,
-                        autoComplete: i === 0 ? 'family-name' : 'off',
-                      },
-                    )}
-                  </div>
-                  {i === 0 ? (
+                    )
+                  ) : (
                     <div className="row2">
+                      {input(
+                        `a${i}.firstName`,
+                        t(L, 'rsvp.firstName'),
+                        p.firstName,
+                        (v) => updateAdult(i, { firstName: v }),
+                        {
+                          required: true,
+                          autoComplete: i === 0 ? 'given-name' : 'off',
+                        },
+                      )}
+                      {input(
+                        `a${i}.lastName`,
+                        t(L, 'rsvp.lastName'),
+                        p.lastName,
+                        (v) => updateAdult(i, { lastName: v }),
+                        {
+                          required: true,
+                          autoComplete: i === 0 ? 'family-name' : 'off',
+                        },
+                      )}
+                    </div>
+                  )}
+                  {i === 0 ? (
+                    <div className={config.askEmail ? 'row2' : undefined}>
                       {input('a0.phone', t(L, 'rsvp.phone'), p.phone, (v) => updateAdult(0, { phone: v }), {
                         required: config.requirePhone,
                         type: 'tel',
@@ -599,14 +623,22 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                         placeholder: t(L, 'rsvp.phonePlaceholder'),
                         autoComplete: 'tel',
                       })}
-                      {input('a0.email', t(L, 'rsvp.email'), p.email, (v) => updateAdult(0, { email: v }), {
-                        required: config.requireEmail,
-                        type: 'email',
-                        ltr: true,
-                        inputMode: 'email',
-                        placeholder: 'name@example.com',
-                        autoComplete: 'email',
-                      })}
+                      {config.askEmail
+                        ? input(
+                            'a0.email',
+                            t(L, 'rsvp.email'),
+                            p.email,
+                            (v) => updateAdult(0, { email: v }),
+                            {
+                              required: config.requireEmail,
+                              type: 'email',
+                              ltr: true,
+                              inputMode: 'email',
+                              placeholder: 'name@example.com',
+                              autoComplete: 'email',
+                            },
+                          )
+                        : null}
                     </div>
                   ) : null}
                   {config.dietary.enabled ? (
@@ -752,13 +784,15 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
               autoComplete: 'name',
             },
           )}
-          <div className="row2">
+          <div className={config.askEmail ? 'row2' : undefined}>
             {input(
               'd.phone',
               t(L, 'rsvp.phone'),
               decline.phone,
               (v) => setDecline((d) => ({ ...d, phone: v })),
               {
+                // without an email field the phone is the only way to reach them
+                required: !config.askEmail,
                 type: 'tel',
                 ltr: true,
                 inputMode: 'tel',
@@ -766,36 +800,40 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                 autoComplete: 'tel',
               },
             )}
-            {input(
-              'd.email',
-              t(L, 'rsvp.email'),
-              decline.email,
-              (v) => setDecline((d) => ({ ...d, email: v })),
-              {
-                type: 'email',
-                ltr: true,
-                inputMode: 'email',
-                placeholder: 'name@example.com',
-                autoComplete: 'email',
-              },
-            )}
+            {config.askEmail
+              ? input(
+                  'd.email',
+                  t(L, 'rsvp.email'),
+                  decline.email,
+                  (v) => setDecline((d) => ({ ...d, email: v })),
+                  {
+                    type: 'email',
+                    ltr: true,
+                    inputMode: 'email',
+                    placeholder: 'name@example.com',
+                    autoComplete: 'email',
+                  },
+                )
+              : null}
           </div>
         </div>
       ) : null}
 
       {attending !== null ? (
         <>
-          <div className="grp field">
-            <label className="q" htmlFor={fid('message')}>
-              {config.messageLabel || t(L, 'rsvp.message')}
-            </label>
-            <textarea
-              id={fid('message')}
-              maxLength={500}
-              value={message}
-              onChange={(ev) => setMessage(ev.target.value)}
-            />
-          </div>
+          {config.askMessage ? (
+            <div className="grp field">
+              <label className="q" htmlFor={fid('message')}>
+                {config.messageLabel || t(L, 'rsvp.message')}
+              </label>
+              <textarea
+                id={fid('message')}
+                maxLength={500}
+                value={message}
+                onChange={(ev) => setMessage(ev.target.value)}
+              />
+            </div>
+          ) : null}
           <div className="grp">
             <button
               className="btn btn-primary"

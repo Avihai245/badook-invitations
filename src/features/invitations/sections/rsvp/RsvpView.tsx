@@ -23,7 +23,10 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
     maxAdults: d.maxAdults,
     maxChildren: d.askChildren ? d.maxChildren : 0,
     requirePhone: d.requirePhone,
-    requireEmail: d.requireEmail,
+    requireEmail: d.askEmail && d.requireEmail,
+    askEmail: d.askEmail,
+    nameFormat: d.nameFormat,
+    askMessage: d.askMessage,
     perAttendeeDetails: d.perAttendeeDetails,
     dietary: {
       enabled: d.dietary.enabled,

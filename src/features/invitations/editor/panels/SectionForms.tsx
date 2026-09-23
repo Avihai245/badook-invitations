@@ -588,8 +588,36 @@ function RsvpForm({ base, section }: { base: string; section: SectionOf<'rsvp'> 
           />
         ) : null}
         <BoolField path={`${base}.perAttendeeDetails`} label={r.perAttendee} help={r.perAttendeeHelp} />
+      </PanelCard>
+      <PanelCard title={cards.fields}>
+        <SegmentedField<'split' | 'full'>
+          path={`${base}.nameFormat`}
+          label={r.nameFormat}
+          value={d.nameFormat}
+          onValueChange={(v) => update(`${base}.nameFormat`, v, null)}
+          options={[
+            { value: 'split', label: r.nameSplit },
+            { value: 'full', label: r.nameFull },
+          ]}
+        />
         <BoolField path={`${base}.requirePhone`} label={r.requirePhone} />
-        <BoolField path={`${base}.requireEmail`} label={r.requireEmail} />
+        <SegmentedField<'off' | 'optional' | 'required'>
+          path={`${base}.askEmail`}
+          label={r.email}
+          value={!d.askEmail ? 'off' : d.requireEmail ? 'required' : 'optional'}
+          onValueChange={(v) =>
+            apply((doc) => {
+              const data = getAt(doc, base) as SectionOf<'rsvp'>['data'];
+              return setAt(doc, base, { ...data, askEmail: v !== 'off', requireEmail: v === 'required' });
+            }, null)
+          }
+          options={[
+            { value: 'off', label: r.emailOff },
+            { value: 'optional', label: r.emailOptional },
+            { value: 'required', label: r.emailRequired },
+          ]}
+        />
+        <BoolField path={`${base}.askMessage`} label={r.askMessage} help={r.askMessageHelp} />
       </PanelCard>
       <PanelCard title={cards.dietary}>
         <BoolField path={`${base}.dietary.enabled`} label={r.dietaryEnabled} />
@@ -686,7 +714,9 @@ function RsvpForm({ base, section }: { base: string; section: SectionOf<'rsvp'> 
         />
       </PanelCard>
       <PanelCard title={cards.messages}>
-        <L10nField path={`${base}.messageLabel`} label={r.messageLabel} help={r.messageHelp} nullable />
+        {d.askMessage ? (
+          <L10nField path={`${base}.messageLabel`} label={r.messageLabel} help={r.messageHelp} nullable />
+        ) : null}
         <L10nField path={`${base}.successMessage`} label={r.successMessage} multiline rows={2} />
         <L10nField path={`${base}.declineMessage`} label={r.declineMessage} multiline rows={2} />
         <L10nField path={`${base}.closedMessage`} label={r.closedMessage} multiline rows={2} />

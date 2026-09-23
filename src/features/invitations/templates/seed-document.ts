@@ -294,6 +294,9 @@ export function seedDocument(
           maxChildren: 4,
           requirePhone: true,
           requireEmail: false,
+          askEmail: true,
+          nameFormat: 'split',
+          askMessage: true,
           perAttendeeDetails: true,
           dietary: {
             enabled: d.rsvp.dietaryOptions.length > 0,

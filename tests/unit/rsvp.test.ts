@@ -246,6 +246,52 @@ describe('RSVP endpoint rules', () => {
     expect(rows[2]).toMatchObject({ kind: 'child', full_name: null, age: null });
   });
 
+  it('the host’s form options: one full-name field; email not asked (ignored); no message (dropped)', async () => {
+    const options = invitation((doc) =>
+      doc.sections.forEach((s) => {
+        if (s.type !== 'rsvp') return;
+        s.data.nameFormat = 'full';
+        s.data.askEmail = false;
+        s.data.requireEmail = true; // means nothing without the field
+        s.data.askMessage = false;
+      }),
+    );
+    const nameless = adult({ firstName: '', lastName: '', phone: '0501234567' });
+    expect((await call(yes({ adults: [nameless] }), deps(options))).body).toMatchObject({
+      ok: false,
+      fieldErrors: { 'a0.fullName': expect.any(String) },
+    });
+    const d = deps(options);
+    const r = await call(
+      yes({
+        message: 'Mazal tov!',
+        adults: [{ ...nameless, fullName: ' Dana Levi ', email: 'not-an-email' }],
+      }),
+      d,
+    );
+    expect(r.body.ok).toBe(true);
+    const input = d.submit.mock.calls[0]![0];
+    expect(input.response).toMatchObject({ primary_name: 'Dana Levi', email: null, message: null });
+    expect(input.attendees[0]).toMatchObject({
+      first_name: null,
+      last_name: null,
+      full_name: 'Dana Levi',
+      email: null,
+    });
+    // declining without an email field: the phone is the way to reach them
+    const decline = {
+      ...yes(),
+      attending: false,
+      adults: undefined,
+      children: undefined,
+      contact: { fullName: 'Dana', phone: null, email: 'dana@example.com' },
+    };
+    expect((await call(decline, deps(options))).body).toMatchObject({
+      ok: false,
+      fieldErrors: { 'd.phone': expect.any(String) },
+    });
+  });
+
   it('decline: full name + a phone or an email; no attendees', async () => {
     const decline = (contact: object) => ({
       ...yes(),

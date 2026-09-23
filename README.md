@@ -42,6 +42,11 @@ A save-the-date links to its full invitation (created from it in the list) as so
 published — and stops when it is archived. Publishing refreshes the cached pages right away (the
 invitation's own and its save-the-date's); otherwise they refresh within a minute.
 
+**RSVP form options** (editor → RSVP → "Form fields"): guests' names as first + last or one full-name
+line; email not asked / optional / required; the message field on or off (and phone required or
+not). The API applies the same rules — an email the form doesn't ask for is ignored, a message it
+doesn't ask for is dropped; a full name is stored as the attendee's `full_name`.
+
 **Hero video**: an uploaded video autoplays muted and looping (the `muted` attribute is set for iOS;
 a browser that holds it back, like iOS Low Power Mode, starts it on the first tap). The editor reads a
 still from the file while it uploads — the poster, and the link preview's picture. A YouTube or Vimeo

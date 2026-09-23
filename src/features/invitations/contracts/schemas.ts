@@ -103,6 +103,10 @@ export const RsvpConfigSchema = z.strictObject({
   maxChildren: z.number().int().min(0).max(10),
   requirePhone: z.boolean(),
   requireEmail: z.boolean(),
+  // added after v1 — filled in when a stored document doesn't have them (see migrate.ts)
+  askEmail: z.boolean().default(true),
+  nameFormat: z.enum(['split', 'full']).default('split'),
+  askMessage: z.boolean().default(true),
   perAttendeeDetails: z.boolean(),
   dietary: z.strictObject({
     enabled: z.boolean(),
@@ -478,6 +482,8 @@ export const RsvpSubmissionSchema = z.discriminatedUnion('attending', [
         z.strictObject({
           firstName: trimmed(40),
           lastName: trimmed(40),
+          // one field instead of first + last (rsvp.nameFormat 'full')
+          fullName: trimmed(80).optional(),
           phone: z.string().max(40).nullable(),
           email: z.string().max(254).nullable(),
           dietary: z.array(DietaryKeySchema),

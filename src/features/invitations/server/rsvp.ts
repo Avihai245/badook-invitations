@@ -123,17 +123,22 @@ export function validateAgainstConfig(sub: RsvpSubmission, config: RsvpConfig): 
     if (sub.children.length > (config.askChildren ? config.maxChildren : 0)) e.children = req;
     sub.adults.forEach((a, i) => {
       if (i === 0 || config.perAttendeeDetails) {
-        if (!clean(a.firstName)) e[`a${i}.firstName`] = req;
-        if (!clean(a.lastName)) e[`a${i}.lastName`] = req;
+        if (config.nameFormat === 'full') {
+          if (!clean(a.fullName)) e[`a${i}.fullName`] = req;
+        } else {
+          if (!clean(a.firstName)) e[`a${i}.firstName`] = req;
+          if (!clean(a.lastName)) e[`a${i}.lastName`] = req;
+        }
       }
       checkDiet(`a${i}`, a.dietary, a.dietaryNotes);
     });
     const p0 = sub.adults[0];
     const phone = clean(p0?.phone);
-    const email = clean(p0?.email);
+    // an invitation that doesn't ask for email ignores one
+    const email = config.askEmail ? clean(p0?.email) : null;
     if (phone ? !PHONE_OK(phone) : config.requirePhone)
       e['a0.phone'] = phone ? t(L, 'rsvp.error.phone') : req;
-    if (email ? !EMAIL_OK(email) : config.requireEmail)
+    if (config.askEmail && (email ? !EMAIL_OK(email) : config.requireEmail))
       e['a0.email'] = email ? t(L, 'rsvp.error.email') : req;
     sub.children.forEach((c, i) => {
       if (config.perAttendeeDetails && !clean(c.fullName)) e[`c${i}.fullName`] = req;
@@ -152,8 +157,9 @@ export function validateAgainstConfig(sub: RsvpSubmission, config: RsvpConfig): 
     const { fullName, phone, email } = sub.contact;
     if (!clean(fullName)) e['d.fullName'] = req;
     const p = clean(phone);
-    const m = clean(email);
-    if (!p && !m) e['d.phone'] = t(L, 'rsvp.error.contact');
+    const m = config.askEmail ? clean(email) : null;
+    // a way to reach them: phone or email — just the phone when email isn't asked
+    if (!p && !m) e['d.phone'] = config.askEmail ? t(L, 'rsvp.error.contact') : req;
     if (p && !PHONE_OK(p)) e['d.phone'] = t(L, 'rsvp.error.phone');
     if (m && !EMAIL_OK(m)) e['d.email'] = t(L, 'rsvp.error.email');
   }
@@ -172,7 +178,7 @@ export function toRows(
       .filter(([k]) => questionIds.has(k))
       .map(([k, v]) => [k, typeof v === 'string' ? sanitize(v) : v]),
   );
-  const message = clean(sub.message);
+  const message = config.askMessage ? clean(sub.message) : null;
   if (!sub.attending) {
     return {
       response: {
@@ -180,7 +186,7 @@ export function toRows(
         locale: sub.locale,
         primary_name: sanitize(sub.contact.fullName),
         phone: cleanPhone(sub.contact.phone),
-        email: clean(sub.contact.email),
+        email: config.askEmail ? clean(sub.contact.email) : null,
         adults_count: 0,
         children_count: 0,
         message,
@@ -191,15 +197,16 @@ export function toRows(
     };
   }
   const details = config.perAttendeeDetails;
+  const full = config.nameFormat === 'full';
   const adults: AttendeeRow[] = sub.adults.map((a, i) => ({
     kind: 'adult',
     position: i,
-    first_name: i === 0 || details ? clean(a.firstName) : null,
-    last_name: i === 0 || details ? clean(a.lastName) : null,
-    full_name: null,
+    first_name: (i === 0 || details) && !full ? clean(a.firstName) : null,
+    last_name: (i === 0 || details) && !full ? clean(a.lastName) : null,
+    full_name: (i === 0 || details) && full ? clean(a.fullName) : null,
     age: null,
     phone: i === 0 ? cleanPhone(a.phone) : null,
-    email: i === 0 ? clean(a.email) : null,
+    email: i === 0 && config.askEmail ? clean(a.email) : null,
     dietary: a.dietary,
     dietary_notes: clean(a.dietaryNotes),
   }));
@@ -220,7 +227,7 @@ export function toRows(
     response: {
       attending: true,
       locale: sub.locale,
-      primary_name: [p0.first_name, p0.last_name].filter(Boolean).join(' '),
+      primary_name: p0.full_name ?? [p0.first_name, p0.last_name].filter(Boolean).join(' '),
       phone: p0.phone,
       email: p0.email,
       adults_count: adults.length,

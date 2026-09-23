@@ -234,7 +234,10 @@ export interface RsvpConfig {
   maxAdults: number;
   maxChildren: number; // 1..10 / 0..10
   requirePhone: boolean;
-  requireEmail: boolean;
+  requireEmail: boolean; // only when askEmail
+  askEmail: boolean; // false → no email field at all
+  nameFormat: 'split' | 'full'; // first + last name, or one full-name field
+  askMessage: boolean; // the free-text message (messageLabel) — false → not asked
   perAttendeeDetails: boolean; // false → only counts + primary contact
   dietary: { enabled: boolean; options: DietaryKey[]; note: L10n | null };
   customQuestions: {
@@ -381,6 +384,7 @@ export type RsvpSubmission = {
       adults: {
         firstName: string;
         lastName: string;
+        fullName?: string; // instead of first + last when rsvp.nameFormat is 'full'
         phone: string | null;
         email: string | null;
         dietary: DietaryKey[];

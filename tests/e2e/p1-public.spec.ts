@@ -222,6 +222,49 @@ test.describe('RSVP', () => {
     expect(after).toEqual([{ id: rows[0]!.id, attendees: 1 }]);
   });
 
+  test('the host’s form options: one full-name field, no email, no message — stored that way', async ({
+    page,
+  }, testInfo) => {
+    await asGuest(page);
+    // a copy of noa-and-itay with those options under its own slug (a fresh page, never cached)
+    const slug = `options-${testInfo.project.name}-${randomUUID().slice(0, 6)}`;
+    await query(
+      `insert into invitations (owner_id, template_id, slug, status, event_type, draft, published, published_at)
+       select owner_id, template_id, $1, 'published', event_type, draft,
+         jsonb_set(jsonb_set(published, '{share,slug}', to_jsonb($1::text)), '{sections}', (
+           select jsonb_agg(case when s->>'type' = 'rsvp'
+             then jsonb_set(s, '{data}', (s->'data') || '{"nameFormat":"full","askEmail":false,"askMessage":false}')
+             else s end order by i)
+           from jsonb_array_elements(published->'sections') with ordinality as t(s, i))),
+         now()
+       from invitations where slug = 'noa-and-itay'`,
+      [slug],
+    );
+    const name = `דנה ${randomUUID().slice(0, 6)}`;
+    await open(page, `/i/${slug}?open=1`);
+    const form = page.locator('.form');
+    await form.locator('.opt').first().click();
+    await expect(form.locator('[id$="-a0.firstName"]')).toHaveCount(0);
+    await expect(form.locator('[id$="-a0.email"]')).toHaveCount(0);
+    await expect(form.locator('textarea')).toHaveCount(0);
+    await form.locator('button.btn-primary').click();
+    await expect(form.locator('[id$="-a0.fullName"]')).toHaveAttribute('aria-invalid', 'true');
+    await form.locator('[id$="-a0.fullName"]').fill(name);
+    await form.locator('[id$="-a0.phone"]').fill('050-123-4567');
+    await form.locator('button.btn-primary').click();
+    await expect(page.locator('.success[role="status"]')).toBeVisible({ timeout: 10_000 });
+    const rows = await query(
+      `select r.primary_name, r.email, r.message, a.first_name, a.last_name, a.full_name
+         from rsvp_responses r join invitations i on i.id = r.invitation_id
+         join rsvp_attendees a on a.response_id = r.id
+        where i.slug = $1`,
+      [slug],
+    );
+    expect(rows).toEqual([
+      { primary_name: name, email: null, message: null, first_name: null, last_name: null, full_name: name },
+    ]);
+  });
+
   test('decline needs a name and a phone or email, then stores a reply without attendees', async ({
     page,
   }, testInfo) => {
