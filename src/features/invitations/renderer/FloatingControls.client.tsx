@@ -87,7 +87,8 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
       if (!fadeIn) return;
       const t0 = performance.now();
       const step = (now: number) => {
-        const k = Math.min(1, (now - t0) / FADE_MS);
+        // a frame's timestamp is when the frame began — it can be a little before t0
+        const k = Math.min(1, Math.max(0, (now - t0) / FADE_MS));
         a.volume = target * k;
         if (k < 1) fade.current = requestAnimationFrame(step);
       };
