@@ -328,7 +328,12 @@ describe('publish / restore (service role)', () => {
     await as(c, 'service_role', null, async () => {
       expect((await c.query(`select publish_invitation($1, $2) r`, [draftId, OWNER_B])).rows[0].r).toBeNull();
       const r = (await c.query(`select publish_invitation($1, $2) r`, [draftId, OWNER_A])).rows[0].r;
-      expect(r).toEqual({ slug: 'a-draft', version: 1 });
+      expect(r).toEqual({
+        slug: 'a-draft',
+        version: 1,
+        publishedAt: expect.any(String),
+        updatedAt: expect.any(String),
+      });
       const inv = (
         await c.query('select status, published = draft same, published_at from invitations where id = $1', [
           draftId,

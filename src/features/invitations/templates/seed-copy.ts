@@ -21,6 +21,19 @@ export const SEED_COPY = {
   revealTitle: { he: 'שמרו את התאריך', en: 'Save the Date' } satisfies L10n,
   revealPrompt: { he: '(גרדו כדי לגלות)', en: '(scratch to reveal)' } satisfies L10n,
   joiner: { he: '&', en: '&' } satisfies L10n,
+  /** Titles of text sections added in the editor when the template has no copy for that kind. */
+  textTitles: {
+    story: { he: 'הסיפור שלנו', en: 'Our story' },
+    transport: { he: 'הסעות', en: 'Transportation' },
+    accommodation: { he: 'לינה', en: 'Accommodation' },
+    dress_code: { he: 'קוד לבוש', en: 'Dress code' },
+    menu: { he: 'תפריט', en: 'Menu' },
+    activities: { he: 'פעילויות', en: 'Activities' },
+    custom: { he: 'חשוב לדעת', en: 'Good to know' },
+  } satisfies Record<string, L10n>,
+  venueLabel: { he: 'האירוע', en: 'The Celebration' } satisfies L10n,
+  timelineSample: { label: { he: 'קבלת פנים', en: 'Welcome' } satisfies L10n },
+  faqSample: { he: 'יש חניה במקום?', en: 'Is there parking at the venue?' } satisfies L10n,
 } as const;
 
 /** Event types that naturally have two hosts joined by "&". */
