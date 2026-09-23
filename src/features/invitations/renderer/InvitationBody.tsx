@@ -12,8 +12,10 @@ import { RevealObserver } from './RevealObserver.client';
 /**
  * A tap on the cover before React has taken over (its scripts still loading on a slow connection)
  * would be lost — and the music with it. This starts the music inside that very gesture (iOS allows
- * audio only there, with a 1.5s fade) and leaves `data-pending-open` on <html> for CoverOverlay, which
- * opens the cover once it is hydrated. It stands down as soon as the cover is (`data-cover-ready`).
+ * audio only there, with a 1.5s fade): the track, or the hero video's sound (`data-sound`; <html
+ * data-video-sound="on"> says so — never an attribute on the video, which React is about to hydrate).
+ * It leaves `data-pending-open` on <html> for CoverOverlay, which opens the cover once it is hydrated,
+ * and stands down as soon as the cover is (`data-cover-ready`).
  */
 const EARLY_TAP =
   '(function(){var r=document.documentElement;' +
@@ -21,10 +23,12 @@ const EARLY_TAP =
   'function on(e){if(r.dataset.coverReady)return off();var t=e.target;if(!t||!t.closest)return;' +
   "var s=t.closest('.cover-skip');if(!s&&!t.closest('.cover-tap'))return;" +
   "r.dataset.pendingOpen=s?'skip':'tap';off();" +
-  "var a=document.querySelector('audio.inv-music');if(!a||!a.paused)return;" +
-  'try{var v=Number(a.dataset.volume);if(!(v>=0&&v<=1))v=1;var p=a.play();if(p&&p.catch)p.catch(function(){});' +
-  'a.volume=0;var t0=Date.now(),i=setInterval(function(){var k=Math.min(1,(Date.now()-t0)/1500);' +
-  'a.volume=v*k;if(k>=1)clearInterval(i)},50)}catch(_){}}' +
+  "var m=document.querySelector('audio.inv-music')||document.querySelector('.hero-media video[data-sound]');" +
+  "if(!m||(m.localName==='audio'?!m.paused:!m.muted&&!m.paused))return;" +
+  "try{var v=Number(m.dataset.volume);if(!(v>=0&&v<=1))v=1;if(m.localName==='video'){m.muted=false;r.dataset.videoSound='on'}" +
+  'var p=m.play();if(p&&p.catch)p.catch(function(){});' +
+  'm.volume=0;var t0=Date.now(),i=setInterval(function(){var k=Math.min(1,(Date.now()-t0)/1500);' +
+  'm.volume=v*k;if(k>=1)clearInterval(i)},50)}catch(_){}}' +
   "document.addEventListener('click',on,true)})()";
 const LOCK = "document.body.classList.add('locked');" + EARLY_TAP;
 const SKIP_OR_LOCK =
@@ -62,10 +66,14 @@ export function InvitationBody({
   const { doc, template } = ctx;
   const coverOn = showCover && doc.cover.enabled && ctx.mode === 'live';
   const nextLocale = doc.locales[(doc.locales.indexOf(ctx.locale) + 1) % doc.locales.length] as Locale;
+  // the host's "video sound" option: the hero video's own sound instead of the track (HeroMedia)
+  const hero = doc.sections.find((s) => s.type === 'hero');
+  const videoSound =
+    doc.music.enabled && doc.music.videoSound && hero?.type === 'hero' && hero.data.media.kind === 'video';
   const music: MusicProps | null =
-    ctx.mode === 'live' && ctx.musicUrl
+    ctx.mode === 'live' && (videoSound || ctx.musicUrl)
       ? {
-          src: ctx.musicUrl,
+          src: videoSound ? null : ctx.musicUrl,
           volume: doc.music.volume,
           startAtSec: doc.music.startAtSec,
           playLabel: ctx.t('music.play'),

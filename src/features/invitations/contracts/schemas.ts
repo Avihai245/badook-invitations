@@ -312,6 +312,8 @@ export const InvitationDocumentSchema = z.strictObject({
     customUrl: AssetRefSchema.nullable(),
     volume: unit,
     startAtSec: z.number().min(0),
+    // added after v1: filled in when a stored document doesn't have it (see migrate.ts)
+    videoSound: z.boolean().default(false),
   }),
   share: z.strictObject({
     slug: SlugSchema,

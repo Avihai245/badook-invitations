@@ -377,6 +377,10 @@ function MusicPanel() {
   const choose = (patch: Partial<InvitationDocument['music']>) =>
     apply((d) => ({ ...d, music: { ...d.music, ...patch } }), null);
   const custom = music.customUrl;
+  const hero = doc.sections.find((s) => s.type === 'hero');
+  const heroVideo = hero?.type === 'hero' && hero.data.media.kind === 'video';
+  // the hero video's own sound instead of a track (only while the hero is a video)
+  const videoSound = heroVideo && music.videoSound;
 
   return (
     <>
@@ -384,72 +388,93 @@ function MusicPanel() {
         <BoolField path="music.enabled" label={m.enabled} help={m.enabledHelp} />
         {music.enabled ? <p className="text-[12px] text-muted">{m.whereHelp}</p> : null}
       </PanelCard>
-      {music.enabled ? (
-        <>
-          <PanelCard title={e.cards.tracks}>
-            <div role="radiogroup" aria-label={e.cards.tracks} className="flex flex-col gap-2">
-              {template.music.tracks.map((track) => {
-                const on = !custom && music.trackId === track.id;
-                const url = templateFileUrl(template.id, track.url, bases);
-                return (
-                  <TrackRow
-                    key={track.id}
-                    title={track.title}
-                    subtitle={fmt(m.license, { license: track.license })}
-                    selected={on}
-                    onSelect={() => choose({ trackId: track.id, customUrl: null })}
-                    playing={playing === track.id}
-                    onPlay={url ? () => play(track.id, url) : undefined}
-                  />
-                );
-              })}
-              {custom ? (
-                <TrackRow
-                  title={m.custom}
-                  subtitle={e.upload.uploaded}
-                  selected
-                  onSelect={() => {}}
-                  playing={playing === 'custom'}
-                  onPlay={assetUrl(custom) ? () => play('custom', assetUrl(custom)!) : undefined}
-                  onRemove={() => choose({ customUrl: null, trackId: template.music.defaultTrackId })}
-                />
-              ) : null}
-            </div>
-            <div className="flex flex-col gap-2 border-t border-line pt-3.5">
-              <div className="text-[13px] font-semibold">{m.custom}</div>
-              <p className="text-[12px] text-muted">{m.customHelp}</p>
-              <Checkbox checked={rights} onCheckedChange={setRights} label={m.rights} />
-              <UploadTile
-                label={e.upload.audio}
-                accept={AUDIO_TYPES}
-                onFiles={async ([file]) => {
-                  if (!file) return;
-                  const res = await run(file);
-                  if (res?.kind === 'audio') choose({ customUrl: res.ref, trackId: null });
-                }}
-                progress={progress}
-                disabled={!rights}
-                className="h-12"
-              />
-              {!rights ? <p className="text-[12px] text-muted">{m.rightsRequired}</p> : null}
-              {error ? (
-                <p role="alert" className="text-[12px] text-danger">
-                  {error}
-                </p>
-              ) : null}
-            </div>
-          </PanelCard>
-          <PanelCard>
-            <RangeField
-              path="music.volume"
-              label={m.volume}
-              value={Math.round(music.volume * 100)}
-              min={0}
-              max={100}
-              step={5}
-              format={(v) => `${v}%`}
-              onChange={(v) => update('music.volume', v / 100, 'music.volume')}
+      {music.enabled && heroVideo ? (
+        <PanelCard>
+          <Field label={m.source}>
+            <Segmented<'track' | 'video'>
+              fullWidth
+              value={videoSound ? 'video' : 'track'}
+              onValueChange={(v) => {
+                stop();
+                choose({ videoSound: v === 'video' });
+              }}
+              options={[
+                { value: 'track', label: m.sourceTrack },
+                { value: 'video', label: m.sourceVideo },
+              ]}
             />
+          </Field>
+          {videoSound ? <p className="text-[12px] text-muted">{m.sourceVideoHelp}</p> : null}
+        </PanelCard>
+      ) : null}
+      {music.enabled && !videoSound ? (
+        <PanelCard title={e.cards.tracks}>
+          <div role="radiogroup" aria-label={e.cards.tracks} className="flex flex-col gap-2">
+            {template.music.tracks.map((track) => {
+              const on = !custom && music.trackId === track.id;
+              const url = templateFileUrl(template.id, track.url, bases);
+              return (
+                <TrackRow
+                  key={track.id}
+                  title={track.title}
+                  subtitle={fmt(m.license, { license: track.license })}
+                  selected={on}
+                  onSelect={() => choose({ trackId: track.id, customUrl: null })}
+                  playing={playing === track.id}
+                  onPlay={url ? () => play(track.id, url) : undefined}
+                />
+              );
+            })}
+            {custom ? (
+              <TrackRow
+                title={m.custom}
+                subtitle={e.upload.uploaded}
+                selected
+                onSelect={() => {}}
+                playing={playing === 'custom'}
+                onPlay={assetUrl(custom) ? () => play('custom', assetUrl(custom)!) : undefined}
+                onRemove={() => choose({ customUrl: null, trackId: template.music.defaultTrackId })}
+              />
+            ) : null}
+          </div>
+          <div className="flex flex-col gap-2 border-t border-line pt-3.5">
+            <div className="text-[13px] font-semibold">{m.custom}</div>
+            <p className="text-[12px] text-muted">{m.customHelp}</p>
+            <Checkbox checked={rights} onCheckedChange={setRights} label={m.rights} />
+            <UploadTile
+              label={e.upload.audio}
+              accept={AUDIO_TYPES}
+              onFiles={async ([file]) => {
+                if (!file) return;
+                const res = await run(file);
+                if (res?.kind === 'audio') choose({ customUrl: res.ref, trackId: null });
+              }}
+              progress={progress}
+              disabled={!rights}
+              className="h-12"
+            />
+            {!rights ? <p className="text-[12px] text-muted">{m.rightsRequired}</p> : null}
+            {error ? (
+              <p role="alert" className="text-[12px] text-danger">
+                {error}
+              </p>
+            ) : null}
+          </div>
+        </PanelCard>
+      ) : null}
+      {music.enabled ? (
+        <PanelCard>
+          <RangeField
+            path="music.volume"
+            label={m.volume}
+            value={Math.round(music.volume * 100)}
+            min={0}
+            max={100}
+            step={5}
+            format={(v) => `${v}%`}
+            onChange={(v) => update('music.volume', v / 100, 'music.volume')}
+          />
+          {videoSound ? null : (
             <Field label={m.startAt}>
               <Input
                 type="number"
@@ -465,8 +490,8 @@ function MusicPanel() {
                 className="w-28!"
               />
             </Field>
-          </PanelCard>
-        </>
+          )}
+        </PanelCard>
       ) : null}
     </>
   );

@@ -10,6 +10,7 @@
 import { contrastRatio } from '../lib/contrast';
 import { cappedLength } from '../lib/l10n';
 import { visibleGlyphCount } from '../lib/text';
+import { parseVideoLink } from '../lib/video-links';
 import { InvitationDocumentSchema } from './schemas';
 import type { AssetRef, InvitationDocument, L10n, Locale, Palette, Section, TemplateManifest } from './types';
 
@@ -454,10 +455,12 @@ export function validateDocument(
       case 'hero': {
         const m = s.data.media;
         const isUpload = m.src.startsWith('upload:');
+        // a YouTube / Vimeo link (HeroEmbed)
+        const isLink = m.kind === 'video' && parseVideoLink(m.src) !== null;
         const option = template.hero.options.some((o) =>
           m.kind === 'video' ? o.media.src === m.src : o.media.poster === m.src || o.media.src === m.src,
         );
-        if (!isUpload && !option)
+        if (!isUpload && !isLink && !option)
           add({
             path: `${base}.media.src`,
             code: 'hero_media',

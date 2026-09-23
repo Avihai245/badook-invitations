@@ -246,7 +246,7 @@ describe('structure and template references', () => {
     expect(codes).toContain('default_locale');
   });
 
-  it('hero media: one of the template hero options or an upload', () => {
+  it('hero media: one of the template hero options, an upload, or a YouTube / Vimeo video', () => {
     const doc = wedding();
     const hero = doc.sections[0]!;
     if (hero.type !== 'hero') throw new Error();
@@ -259,6 +259,18 @@ describe('structure and template references', () => {
       focalPoint: { x: 0.5, y: 0.5 },
     };
     expect(check(doc).errors).toEqual([]);
+    for (const src of ['https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://vimeo.com/76979871']) {
+      hero.data.media = { kind: 'video', src, poster: null, focalPoint: { x: 0.5, y: 0.5 } };
+      expect(check(doc).errors, src).toEqual([]);
+    }
+    // any other link isn't a background
+    hero.data.media = {
+      kind: 'video',
+      src: 'https://example.com/clip.mp4',
+      poster: null,
+      focalPoint: { x: 0.5, y: 0.5 },
+    };
+    expect(brief(check(doc).errors)).toEqual(['hero_media sections.0.data.media.src']);
   });
 
   it('template:<key> references must exist in the template assets', () => {

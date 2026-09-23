@@ -42,6 +42,14 @@ A save-the-date links to its full invitation (created from it in the list) as so
 published — and stops when it is archived. Publishing refreshes the cached pages right away (the
 invitation's own and its save-the-date's); otherwise they refresh within a minute.
 
+**Hero video**: an uploaded video autoplays muted and looping (the `muted` attribute is set for iOS;
+a browser that holds it back, like iOS Low Power Mode, starts it on the first tap). The editor reads a
+still from the file while it uploads — the poster, and the link preview's picture. A YouTube or Vimeo
+link plays as the background instead (muted, looping, no controls, untouchable; its still shows until
+it plays). With the music panel's "what plays → the background video's sound" the music button turns
+the video's own sound on (from the cover's tap) and off instead of a song — for a YouTube / Vimeo link
+as far as the browser allows.
+
 **Search engines** (§4): an invitation is hidden by default (`share.noindex`, the switch in the
 editor's "Link & sharing" panel). Its page then carries `robots` and `googlebot`
 `noindex, nofollow, noarchive, noimageindex` in the server-rendered `<head>` (for every crawler), and

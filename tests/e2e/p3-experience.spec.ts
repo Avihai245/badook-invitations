@@ -157,6 +157,59 @@ test.describe('the opening', () => {
   });
 });
 
+test.describe('hero video', () => {
+  test('an uploaded video autoplays muted (the attribute too, for iOS), over its still', async ({ page }) => {
+    await open(page, `${SINK}?open=1&hero=video`);
+    const video = page.locator('.hero-media video');
+    await expect(video).toHaveAttribute('muted', '');
+    await expect(video).toHaveAttribute('poster', '/dev/media/cover-poster.png');
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused && v.muted)).toBe(true);
+  });
+
+  test('“video sound”: the cover’s tap turns the video’s sound on; the button mutes it again', async ({
+    page,
+  }) => {
+    await open(page, `${SINK}?hero=video&videoSound=1`);
+    await expect(page.locator('audio')).toHaveCount(0);
+    const video = page.locator('.hero-media video');
+    await page.locator('.cover-tap').click();
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.muted && !v.paused)).toBe(true);
+    await expect
+      .poll(() => video.evaluate((v: HTMLVideoElement) => v.volume), { timeout: 5000 })
+      .toBeCloseTo(0.6, 2);
+    const music = page.locator('.fab-music');
+    await expect(music).toHaveAttribute('aria-pressed', 'true');
+    await music.click();
+    await expect(music).toHaveAttribute('aria-pressed', 'false');
+    // the picture keeps playing
+    expect(await video.evaluate((v: HTMLVideoElement) => v.muted && !v.paused)).toBe(true);
+    await music.click();
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(false);
+  });
+
+  test('a YouTube link: the muted, looping player without controls, over its still', async ({ page }) => {
+    await open(page, `${SINK}?open=1&hero=youtube`);
+    const embed = page.locator('.hero-embed');
+    await expect(embed.locator('img.hero-still')).toHaveAttribute(
+      'src',
+      /^https:\/\/i\.ytimg\.com\/vi\/dQw4w9WgXcQ\//,
+    );
+    const iframe = embed.locator('iframe');
+    const url = new URL((await iframe.getAttribute('src'))!);
+    expect(url.origin + url.pathname).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    expect(Object.fromEntries(url.searchParams)).toMatchObject({
+      autoplay: '1',
+      mute: '1',
+      loop: '1',
+      controls: '0',
+      playsinline: '1',
+    });
+    // taps go to the page, and it only shows once it plays (the still until then)
+    await expect(iframe).toHaveCSS('pointer-events', 'none');
+    await expect(iframe).toHaveCSS('opacity', '0');
+  });
+});
+
 test.describe('bilingual invitation', () => {
   test('the pill switches language in place: no reload, same place, ?lang=, RSVP kept', async ({ page }) => {
     const errors = collectErrors(page);

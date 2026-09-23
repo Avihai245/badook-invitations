@@ -78,6 +78,7 @@ export interface InvitationDocument {
     customUrl: AssetRef | null;
     volume: number;
     startAtSec: number;
+    videoSound: boolean; // the hero video's own sound instead of the track (when the hero is a video)
   };
   share: {
     slug: string;

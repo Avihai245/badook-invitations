@@ -346,6 +346,11 @@ export const editorHe = {
       rightsRequired: 'סמנו שיש לכם זכויות כדי להעלות',
       volume: 'עוצמה',
       startAt: 'להתחיל מהשנייה',
+      source: 'מה מתנגן',
+      sourceTrack: 'שיר',
+      sourceVideo: 'הסאונד של סרטון הרקע',
+      sourceVideoHelp:
+        'האורחים ישמעו את הסאונד של הסרטון מהרגע שהם פותחים את ההזמנה. בסרטון מיוטיוב או מ־Vimeo חלק מהדפדפנים לא מאפשרים סאונד — לסאונד בטוח העלו את הקובץ.',
       license: 'רישיון: {license}',
     },
     languages: {
@@ -404,6 +409,12 @@ export const editorHe = {
     focalTitle: 'מה חשוב בתמונה?',
     focalHelp: 'לחצו על החלק החשוב — הוא יישאר במסגרת בכל גודל מסך.',
     uploaded: 'הקובץ שלכם',
+    videoLink: 'סרטון מיוטיוב או מ־Vimeo',
+    videoLinkTitle: 'סרטון רקע מקישור',
+    videoLinkHelp:
+      'הדביקו קישור לסרטון ביוטיוב או ב־Vimeo. הוא יתנגן ברקע, בלי סאונד ובלולאה (סאונד — בלשונית המוזיקה).',
+    videoLinkLabel: 'קישור לסרטון',
+    videoLinkInvalid: 'זה לא נראה כמו קישור לסרטון ביוטיוב או ב־Vimeo',
     mb: '{n}MB',
   },
   issues: {

@@ -375,6 +375,7 @@ export function seedDocument(
       customUrl: null,
       volume: 0.6,
       startAtSec: 0,
+      videoSound: false,
     },
     share: {
       slug: input.slug ?? suggestSlug(names.filter(Boolean)),

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 
 // P2 done-when: "A new user creates, edits and publishes an invitation without touching code" —
@@ -174,6 +175,78 @@ test.describe('host: create → edit → publish', () => {
     await expect(main.getByRole('link', { name: 'נועה & איתי' })).toBeVisible();
     await expect(main.getByText('פורסם', { exact: true })).toBeVisible();
     expect(errors).toEqual([]);
+  });
+});
+
+test.describe('hero background', () => {
+  test.skip(({ viewport }) => (viewport?.width ?? 0) < 1024, 'the desktop editor');
+
+  test('an uploaded video gets a still as its poster; its sound can be the music; a YouTube link', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await signUp(page);
+    const created = await page.evaluate(async () => {
+      const res = await fetch('/api/invitations', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          templateId: 'papercut-gold',
+          eventType: 'wedding',
+          locales: ['he'],
+          defaultLocale: 'he',
+          hosts: { primary: { he: 'נועה' }, secondary: { he: 'איתי' } },
+          date: '2027-06-17',
+          startTime: '19:30',
+          timezone: 'Asia/Jerusalem',
+        }),
+      });
+      return (await res.json()) as { id: string };
+    });
+    await open(page, `/app/invitations/${created.id}/edit`);
+    const frame = page.frameLocator('iframe[title="תצוגה מקדימה של ההזמנה"]');
+
+    // a video (the test clip — Chrome reads it by its content): uploaded, with a still read from it
+    await page.locator('input[type=file][accept*="video/mp4"]').setInputFiles({
+      name: 'clip.mp4',
+      mimeType: 'video/mp4',
+      buffer: readFileSync('tests/fixtures/media/cover-open.webm'),
+    });
+    await page
+      .getByRole('dialog', { name: 'מה חשוב בתמונה?' })
+      .getByRole('button', { name: 'שמירה' })
+      .click();
+    await saved(page);
+    const video = frame.locator('.hero-media video');
+    await expect(video).toHaveAttribute('poster', /\/invitation-media\/.+\.jpg$/);
+    await expect(video).toHaveAttribute('muted', '');
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
+
+    // its sound instead of a song
+    await page.getByRole('tab', { name: 'עיצוב' }).click();
+    await page.getByRole('button', { name: 'מוזיקה' }).click();
+    await page.getByRole('radio', { name: 'הסאונד של סרטון הרקע' }).click();
+    await expect(page.getByText('האורחים ישמעו את הסאונד של הסרטון')).toBeVisible();
+    await expect(page.getByRole('radiogroup', { name: 'שירים' })).toHaveCount(0);
+    await saved(page);
+
+    // a YouTube link instead of the file
+    await page.getByRole('tab', { name: 'סקשנים' }).click();
+    await page.getByRole('button', { name: 'פתיחה (Hero)', exact: true }).click();
+    await page.getByRole('button', { name: 'סרטון מיוטיוב או מ־Vimeo' }).last().click();
+    const dialog = page.getByRole('dialog', { name: 'סרטון רקע מקישור' });
+    await dialog.getByRole('textbox', { name: 'קישור לסרטון' }).fill('https://example.com/clip.mp4');
+    await dialog.getByRole('button', { name: 'שמירה' }).click();
+    await expect(dialog.getByText('זה לא נראה כמו קישור לסרטון ביוטיוב או ב־Vimeo')).toBeVisible();
+    await dialog.getByRole('textbox', { name: 'קישור לסרטון' }).fill('https://youtu.be/dQw4w9WgXcQ?si=share');
+    await dialog.getByRole('button', { name: 'שמירה' }).click();
+    await saved(page);
+    await expect(frame.locator('.hero-embed iframe')).toHaveAttribute(
+      'src',
+      /^https:\/\/www\.youtube-nocookie\.com\/embed\/dQw4w9WgXcQ\?/,
+    );
+    await expect(page.getByRole('button', { name: 'סרטון מיוטיוב או מ־Vimeo' }).first()).toBeVisible();
   });
 });
 

@@ -350,6 +350,11 @@ export const editorEn: EditorDict = {
       rightsRequired: 'Confirm you have the rights to upload',
       volume: 'Volume',
       startAt: 'Start at second',
+      source: 'What plays',
+      sourceTrack: 'A song',
+      sourceVideo: 'The background video’s sound',
+      sourceVideoHelp:
+        'Guests hear the video’s own sound from the moment they open the invitation. Some browsers don’t allow sound from a YouTube or Vimeo video — upload the file for sound that always works.',
       license: 'License: {license}',
     },
     languages: {
@@ -409,6 +414,12 @@ export const editorEn: EditorDict = {
     focalTitle: 'What matters in the photo?',
     focalHelp: 'Click the important part — it stays in frame on every screen size.',
     uploaded: 'Your file',
+    videoLink: 'A YouTube or Vimeo video',
+    videoLinkTitle: 'Background video from a link',
+    videoLinkHelp:
+      'Paste a link to a video on YouTube or Vimeo. It plays in the background, muted and looping (sound: in the music tab).',
+    videoLinkLabel: 'Video link',
+    videoLinkInvalid: 'That doesn’t look like a YouTube or Vimeo video link',
     mb: '{n}MB',
   },
   issues: {

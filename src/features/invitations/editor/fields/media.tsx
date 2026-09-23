@@ -1,12 +1,13 @@
 'use client';
 
-import { Crosshair, ImageUp, Trash2, Upload } from 'lucide-react';
+import { Crosshair, ImageUp, Link2, Trash2, Upload } from 'lucide-react';
 import { useCallback, useId, useRef, useState, type ReactNode } from 'react';
-import { Button, Dialog, cn } from '@/components/app';
+import { Button, Dialog, Field, Input, cn } from '@/components/app';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import type { AssetRef, Media } from '../../contracts/types';
 import { hostApi } from '../../app/api';
+import { canonicalVideoLink, parseVideoLink, videoStillUrl, type VideoLink } from '../../lib/video-links';
 import { placeholderArt } from '../../renderer/placeholders';
 import { getAt } from '../paths';
 import { useEditor } from '../state/EditorProvider';
@@ -108,6 +109,63 @@ export function useUploader() {
     [upload, u],
   );
   return { run, progress, error };
+}
+
+/**
+ * A still of a video the host picked, read from the file itself (no upload needed): a frame a little
+ * in (the very first is often black), at most 1280px, as a JPEG — the hero's poster until the video
+ * plays and the link preview's picture. null when this browser can't decode the video.
+ */
+export async function captureVideoStill(file: File): Promise<File | null> {
+  const url = URL.createObjectURL(file);
+  const v = document.createElement('video');
+  const wait = (event: string, ms: number) =>
+    new Promise<void>((resolve, reject) => {
+      const timer = window.setTimeout(() => reject(new Error('timeout')), ms);
+      v.addEventListener(event, () => (window.clearTimeout(timer), resolve()), { once: true });
+      v.addEventListener('error', () => (window.clearTimeout(timer), reject(new Error('decode'))), {
+        once: true,
+      });
+    });
+  try {
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = 'auto';
+    v.src = url;
+    await wait('loadeddata', 10_000);
+    const seeked = wait('seeked', 5000);
+    v.currentTime = Math.min(0.5, (Number.isFinite(v.duration) ? v.duration : 1) / 4);
+    await seeked;
+    const scale = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(v.videoWidth * scale);
+    canvas.height = Math.round(v.videoHeight * scale);
+    const ctx = canvas.getContext('2d');
+    if (!ctx || !canvas.width || !canvas.height) return null;
+    ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/jpeg', 0.82));
+    return blob ? new File([blob], 'poster.jpg', { type: 'image/jpeg' }) : null;
+  } catch {
+    return null;
+  } finally {
+    v.removeAttribute('src');
+    v.load();
+    URL.revokeObjectURL(url);
+  }
+}
+
+/** Vimeo's still for a link (its oEmbed answers browsers directly); null when it can't be had. */
+async function vimeoStill(link: VideoLink): Promise<string | null> {
+  if (link.provider !== 'vimeo') return null;
+  try {
+    const q = new URLSearchParams({ url: canonicalVideoLink(link), width: '1280' });
+    const res = await fetch(`https://vimeo.com/api/oembed.json?${q.toString()}`);
+    const body = (await res.json()) as { thumbnail_url?: unknown };
+    const still = typeof body.thumbnail_url === 'string' ? body.thumbnail_url : null;
+    return still?.startsWith('https://') ? still : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -250,16 +308,37 @@ export function HeroMediaField({ path, label }: { path: string; label: string })
   const u = t.editor.upload;
   const media = getAt(doc, path) as Media;
   const { run, progress, error } = useUploader();
+  const uploadQuietly = useUpload();
   const [focal, setFocal] = useState(false);
+  const [linking, setLinking] = useState(false);
   const art = placeholderArt(template.id);
   const isUpload = !template.hero.options.some((o) => o.media.src === media.src);
+  const link = media.kind === 'video' ? parseVideoLink(media.src) : null;
 
   const onFiles = async ([file]: File[]) => {
     if (!file) return;
+    // a video's still is read from the file while it uploads
+    const still = file.type.startsWith('video/') ? captureVideoStill(file) : Promise.resolve(null);
     const res = await run(file);
     if (!res || res.kind === 'audio') return;
-    update(path, { kind: res.kind, src: res.ref, poster: null, focalPoint: { x: 0.5, y: 0.5 } }, null);
+    let poster: AssetRef | null = null;
+    if (res.kind === 'video') {
+      const frame = await still;
+      // no still (a codec this browser can't read, a failed upload) only means no poster
+      if (frame)
+        poster = await uploadQuietly(frame).then(
+          (r) => r.ref,
+          () => null,
+        );
+    }
+    update(path, { kind: res.kind, src: res.ref, poster, focalPoint: { x: 0.5, y: 0.5 } }, null);
     setFocal(true);
+  };
+
+  const onLink = async (v: VideoLink) => {
+    const poster = videoStillUrl(v) ?? (await vimeoStill(v));
+    update(path, { kind: 'video', src: canonicalVideoLink(v), poster, focalPoint: { x: 0.5, y: 0.5 } }, null);
+    setLinking(false);
   };
 
   return (
@@ -282,7 +361,17 @@ export function HeroMediaField({ path, label }: { path: string; label: string })
             />
           );
         })}
-        {isUpload ? (
+        {link ? (
+          // a YouTube / Vimeo video: its still; the player is always centered (no focal point)
+          <Thumb
+            selected
+            onClick={() => setLinking(true)}
+            url={assetUrl(media.poster)}
+            kind="image"
+            caption={link.provider === 'youtube' ? 'YouTube' : 'Vimeo'}
+            label={u.videoLink}
+          />
+        ) : isUpload ? (
           <Thumb
             selected
             onClick={() => setFocal(true)}
@@ -309,6 +398,22 @@ export function HeroMediaField({ path, label }: { path: string; label: string })
           className="aspect-[9/16]"
         />
       </div>
+      <Button
+        variant="secondary"
+        size="sm"
+        icon={<Link2 />}
+        className="mt-2 w-full"
+        onClick={() => setLinking(true)}
+      >
+        {u.videoLink}
+      </Button>
+      {linking ? (
+        <VideoLinkDialog
+          initial={link ? media.src : ''}
+          onSave={(v) => void onLink(v)}
+          onClose={() => setLinking(false)}
+        />
+      ) : null}
       {error ? (
         <p role="alert" className="mt-2 text-[12px] text-danger">
           {error}
@@ -324,6 +429,70 @@ export function HeroMediaField({ path, label }: { path: string; label: string })
         />
       ) : null}
     </FieldFrame>
+  );
+}
+
+/** Paste a YouTube or Vimeo address → the hero plays that video (muted, looping, no controls). */
+function VideoLinkDialog({
+  initial,
+  onSave,
+  onClose,
+}: {
+  initial: string;
+  onSave: (link: VideoLink) => void;
+  onClose: () => void;
+}) {
+  const { t } = useUi();
+  const u = t.editor.upload;
+  const [value, setValue] = useState(initial);
+  const [invalid, setInvalid] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const save = () => {
+    const link = parseVideoLink(value);
+    if (!link) return setInvalid(true);
+    setSaving(true);
+    onSave(link);
+  };
+  return (
+    <Dialog
+      open
+      onOpenChange={(o) => !o && onClose()}
+      title={u.videoLinkTitle}
+      description={u.videoLinkHelp}
+      closeLabel={t.common.close}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            {t.common.cancel}
+          </Button>
+          <Button onClick={save} disabled={saving || !value.trim()}>
+            {t.common.save}
+          </Button>
+        </>
+      }
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          save();
+        }}
+      >
+        <Field label={u.videoLinkLabel} error={invalid ? u.videoLinkInvalid : undefined}>
+          <Input
+            type="url"
+            inputMode="url"
+            dir="ltr"
+            autoFocus
+            placeholder="https://youtu.be/…"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              setInvalid(false);
+            }}
+          />
+        </Field>
+      </form>
+    </Dialog>
   );
 }
 

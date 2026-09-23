@@ -32,6 +32,8 @@ export const dynamic = 'force-dynamic';
  *   gallery=carousel|grid  a gallery of the 5 test photos before the footer
  *   reveal=scratch|tap|spin  the reveal section's mechanic (added before the footer when missing)
  *   followup=1             a published full invitation to link to (a save-the-date's, /i/noa-and-itay)
+ *   hero=video|youtube     the hero as an uploaded video (the test clip) or a YouTube link
+ *   videoSound=1           the hero video's sound instead of a track (the host's "video sound" option)
  */
 export default async function RenderPage({ params, searchParams }: { params: Params; searchParams: Search }) {
   assertDevRoutes();
@@ -87,6 +89,32 @@ export default async function RenderPage({ params, searchParams }: { params: Par
         },
       });
   }
+  const heroParam = one(sp.hero);
+  if (heroParam === 'video' || heroParam === 'youtube')
+    sections = sections.map((s): Section =>
+      s.type === 'hero'
+        ? {
+            ...s,
+            data: {
+              ...s.data,
+              media:
+                heroParam === 'video'
+                  ? {
+                      kind: 'video',
+                      src: 'upload:cover-open.webm',
+                      poster: 'upload:cover-poster.png',
+                      focalPoint: { x: 0.5, y: 0.5 },
+                    }
+                  : {
+                      kind: 'video',
+                      src: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                      poster: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+                      focalPoint: { x: 0.5, y: 0.5 },
+                    },
+            },
+          }
+        : s,
+    );
   const nowParam = one(sp.now);
   const now = nowParam && !Number.isNaN(Date.parse(nowParam)) ? Date.parse(nowParam) : undefined;
   const mode = one(sp.mode) === 'preview' ? 'preview' : 'live';
@@ -104,9 +132,16 @@ export default async function RenderPage({ params, searchParams }: { params: Par
       : undefined;
   const musicParam = one(sp.music);
   const fixtureMusic = musicParam === 'fixture' || musicParam === 'mp3';
-  const music = fixtureMusic
-    ? { ...doc.music, enabled: true, startAtSec: Math.max(0, Number(one(sp.musicStart)) || 0) }
-    : doc.music;
+  const videoSound = one(sp.videoSound) === '1';
+  const music =
+    fixtureMusic || videoSound
+      ? {
+          ...doc.music,
+          enabled: true,
+          startAtSec: Math.max(0, Number(one(sp.musicStart)) || 0),
+          videoSound,
+        }
+      : doc.music;
 
   const env = serverEnv();
   const rendered = { ...doc, sections, music };
@@ -122,8 +157,8 @@ export default async function RenderPage({ params, searchParams }: { params: Par
         supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
         templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
       }),
-      // the test photos are "uploads" served by /dev/media
-      ...(gallery ? { uploads: '/dev/media' } : {}),
+      // the test photos and clip are "uploads" served by /dev/media
+      ...(gallery || heroParam === 'video' ? { uploads: '/dev/media' } : {}),
     },
   };
   const ctx = buildRenderContext(rendered, entry.manifest, lang, { ...options, mode });

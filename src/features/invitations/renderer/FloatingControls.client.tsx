@@ -6,7 +6,8 @@ import { Icon } from '../ui/Icon';
 import { withStartAt } from './assets';
 
 export interface MusicProps {
-  src: string;
+  /** the track — or null: the hero video's own sound (the host's "video sound" option, HeroMedia) */
+  src: string | null;
   /** 0..1 */
   volume: number;
   startAtSec: number;
@@ -71,6 +72,18 @@ export function FloatingControls({
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
+/** The hero's uploaded video when it is the sound source (HeroVideo marks it `data-sound`). */
+const heroVideo = () => document.querySelector<HTMLVideoElement>('.hero-media video[data-sound]');
+/** <html data-video-sound="on">: its sound is on (HeroVideo leaves it unmuted when it (re)mounts). */
+const markVideoSound = (on: boolean) => {
+  if (on) document.documentElement.dataset.videoSound = 'on';
+  else delete document.documentElement.dataset.videoSound;
+};
+/** A YouTube / Vimeo hero as the sound source: HeroEmbed listens to `hero:sound`. */
+const heroEmbed = () => document.querySelector('.hero-embed[data-sound]');
+const embedSound = (on: boolean, volume: number) =>
+  window.dispatchEvent(new CustomEvent('hero:sound', { detail: { on, volume } }));
+
 function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicProps) {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -81,6 +94,7 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
   const fade = useRef({ raf: 0, timer: 0 });
   const resumeOnShow = useRef(false);
   const target = Math.min(1, Math.max(0, volume));
+  const videoSound = src === null;
 
   const stopFade = useCallback(() => {
     cancelAnimationFrame(fade.current.raf);
@@ -89,39 +103,43 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
 
   /** 0 → the host's volume over FADE_MS; the timer makes sure it gets there even without frames. */
   const fadeIn = useCallback(
-    (a: HTMLAudioElement) => {
+    (m: HTMLMediaElement) => {
       stopFade();
       const t0 = performance.now();
       const step = (now: number) => {
         // a frame's timestamp is when the frame began — it can be a little before t0
         const k = Math.min(1, Math.max(0, (now - t0) / FADE_MS));
-        a.volume = target * k;
+        m.volume = target * k;
         if (k < 1) fade.current.raf = requestAnimationFrame(step);
       };
       fade.current.raf = requestAnimationFrame(step);
       fade.current.timer = window.setTimeout(() => {
         cancelAnimationFrame(fade.current.raf);
-        a.volume = target;
+        m.volume = target;
       }, FADE_MS + 250);
     },
     [stopFade, target],
   );
 
-  const play = useCallback(
-    (withFade: boolean) => {
-      const a = audio.current;
-      // already playing: started by the cover's early-tap script (InvitationBody) before React took over
-      if (!a || !a.paused) return;
-      // play() first and synchronously — it must stay inside the gesture (iOS, in-app browsers)
+  /**
+   * Starts `m` (and, for the hero video, turns its sound on). play() comes first and synchronously —
+   * it must stay inside the gesture (iOS, in-app browsers) — then the volume, which can't stop it.
+   */
+  const start = useCallback(
+    (m: HTMLMediaElement, withFade: boolean, onRefused: () => void) => {
       let started: Promise<void>;
       try {
-        started = a.play() ?? Promise.resolve();
+        if (m instanceof HTMLVideoElement) {
+          m.muted = false;
+          markVideoSound(true);
+        }
+        started = m.paused ? (m.play() ?? Promise.resolve()) : Promise.resolve();
       } catch (err) {
         started = Promise.reject(err);
       }
       try {
-        a.volume = withFade ? 0 : target;
-        if (withFade) fadeIn(a);
+        m.volume = withFade ? 0 : target;
+        if (withFade) fadeIn(m);
       } catch {
         // volume is read-only on iOS (the device volume applies)
       }
@@ -129,6 +147,7 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
         () => setBlocked(false),
         () => {
           stopFade();
+          onRefused();
           setBlocked(true);
         },
       );
@@ -136,10 +155,43 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
     [fadeIn, stopFade, target],
   );
 
+  const play = useCallback(
+    (withFade: boolean) => {
+      if (!videoSound) {
+        const a = audio.current;
+        // already playing: started by the cover's early-tap script (InvitationBody) before React took over
+        if (a && a.paused) start(a, withFade, () => undefined);
+        return;
+      }
+      const v = heroVideo();
+      if (v) {
+        if (!v.muted && !v.paused) return;
+        setPlaying(true);
+        start(v, withFade, () => {
+          // sound refused: back to the muted picture, which may keep playing
+          v.muted = true;
+          markVideoSound(false);
+          setPlaying(false);
+          v.play()?.catch(() => undefined);
+        });
+      } else if (heroEmbed()) {
+        embedSound(true, target);
+        setPlaying(true);
+      }
+    },
+    [videoSound, start, target],
+  );
+
   const pause = useCallback(() => {
     stopFade();
-    audio.current?.pause();
-  }, [stopFade]);
+    if (!videoSound) return audio.current?.pause();
+    const v = heroVideo();
+    if (v) {
+      v.muted = true;
+      markVideoSound(false);
+    } else embedSound(false, target);
+    setPlaying(false);
+  }, [videoSound, stopFade, target]);
 
   // The cover's tap starts the music. Listening from the hydration commit on (a layout effect): a tap
   // React replays right after hydrating must not come before the listener.
@@ -149,13 +201,27 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
     return () => window.removeEventListener('invitation:open', onOpen);
   }, [play]);
 
-  // Started before React took over (the early-tap script): the button shows it.
+  // Started before React took over (the early-tap script): the button shows it. The hero video's
+  // sound can also change underneath (the video element re-created by the live language switch).
   useEffect(() => {
-    if (audio.current && !audio.current.paused) setPlaying(true);
-  }, []);
+    if (!videoSound) {
+      if (audio.current && !audio.current.paused) setPlaying(true);
+      return;
+    }
+    const v = heroVideo();
+    if (v && !v.muted) setPlaying(true);
+    const onVolume = (e: Event) => {
+      const el = e.target as HTMLVideoElement;
+      if (el.matches?.('.hero-media video[data-sound]')) setPlaying(!el.muted);
+    };
+    document.addEventListener('volumechange', onVolume, true);
+    return () => document.removeEventListener('volumechange', onVolume, true);
+  }, [videoSound]);
 
-  // Paused while the page is hidden (another app, locked phone), resumed when it comes back.
+  // The track pauses while the page is hidden (another app, locked phone) and resumes when it comes
+  // back. (The hero video is the browser's to pause in the background.)
   useEffect(() => {
+    if (videoSound) return;
     const onVisibility = () => {
       const a = audio.current;
       if (!a) return;
@@ -169,7 +235,7 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
     };
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, []);
+  }, [videoSound]);
 
   useEffect(
     () => () => {
@@ -183,28 +249,30 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
     <>
       {/* preload="none": nothing downloads before the guest opens the invitation. `#t=` = the host's
           start second; class + data-volume are for the early-tap script. */}
-      <audio
-        ref={audio}
-        className="inv-music"
-        src={withStartAt(src, startAtSec)}
-        data-volume={target}
-        loop
-        preload="none"
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onLoadedMetadata={(e) => {
-          // a browser that ignores the media fragment starts at 0: seek now that it can
-          const a = e.currentTarget;
-          if (startAtSec > 0 && a.currentTime < 1 && startAtSec < a.duration) {
-            try {
-              a.currentTime = startAtSec;
-            } catch {
-              // it plays from the start
+      {src !== null ? (
+        <audio
+          ref={audio}
+          className="inv-music"
+          src={withStartAt(src, startAtSec)}
+          data-volume={target}
+          loop
+          preload="none"
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onLoadedMetadata={(e) => {
+            // a browser that ignores the media fragment starts at 0: seek now that it can
+            const a = e.currentTarget;
+            if (startAtSec > 0 && a.currentTime < 1 && startAtSec < a.duration) {
+              try {
+                a.currentTime = startAtSec;
+              } catch {
+                // it plays from the start
+              }
             }
-          }
-        }}
-        onError={() => setFailed(true)}
-      />
+          }}
+          onError={() => setFailed(true)}
+        />
+      ) : null}
       {failed ? null : (
         <button
           className="fab fab-music"

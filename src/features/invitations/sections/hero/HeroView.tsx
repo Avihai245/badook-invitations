@@ -1,8 +1,10 @@
 import type { CSSProperties } from 'react';
 import type { AssetRef, SectionOf } from '../../contracts/types';
 import { longestWordLength } from '../../lib/text';
+import { parseVideoLink } from '../../lib/video-links';
 import { Icon } from '../../ui/Icon';
 import { editPath, type SectionViewProps } from '../shared';
+import { HeroEmbed, HeroVideo } from './HeroMedia.client';
 
 /** An upload or a link: resolves to a URL whether or not the file exists. */
 const unverified = (ref: AssetRef | null | undefined) => !!ref && !ref.startsWith('template:');
@@ -61,20 +63,15 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
   const poster = ctx.asset(d.media.poster);
   const focal = `${d.media.focalPoint.x * 100}% ${d.media.focalPoint.y * 100}%`;
 
+  // the host's "video sound" option: this video's sound instead of the track, on the live page
+  const sound = ctx.mode === 'live' && doc.music.enabled && doc.music.videoSound;
+  const link = d.media.kind === 'video' ? parseVideoLink(d.media.src) : null;
+
   let media = null;
-  if (d.media.kind === 'video' && src) {
-    media = (
-      <video
-        src={src}
-        poster={poster ?? undefined}
-        muted
-        playsInline
-        loop
-        autoPlay
-        preload="metadata"
-        style={{ objectPosition: focal }}
-      />
-    );
+  if (link) {
+    media = <HeroEmbed link={link} poster={poster} sound={sound} />;
+  } else if (d.media.kind === 'video' && src) {
+    media = <HeroVideo src={src} poster={poster} focal={focal} sound={sound ? doc.music.volume : null} />;
   } else if (d.media.kind === 'video' && poster) {
     media = <img src={poster} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
   } else if (d.media.kind === 'image' && src) {

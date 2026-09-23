@@ -8,7 +8,9 @@ type RawDocument = Record<string, unknown>;
 /**
  * `MIGRATIONS[n]` upgrades a document from schemaVersion n to n + 1.
  * Add an entry (and bump LATEST_SCHEMA_VERSION + the `schemaVersion` literal in §3) whenever the
- * document shape changes; never edit a published migration.
+ * document shape changes; never edit a published migration. A new field with a schema default
+ * (e.g. `music.videoSound`) needs none: parsing fills it in, and editors still open on the previous
+ * release keep saving.
  */
 const MIGRATIONS: Record<number, (doc: RawDocument) => RawDocument> = {};
 
