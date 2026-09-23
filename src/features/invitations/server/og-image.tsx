@@ -72,8 +72,10 @@ async function loadFonts(pair: FontPair, locale: Locale) {
     const names: string[] = [];
     for (const family of new Set([fontFor(pair, role, locale), fontFor(pair, role, other)])) {
       for (const subset of subsets) {
-        const faces = fontFaceFiles(family).filter((f) => f.subset === subset && f.style === 'normal');
-        const face = [...faces].sort((a, b) => Math.abs(a.weight - 400) - Math.abs(b.weight - 400))[0];
+        // the regular face (the one next.config traces into the server bundle)
+        const face = fontFaceFiles(family).find(
+          (f) => f.subset === subset && f.style === 'normal' && f.weight === 400,
+        );
         const data = face ? await readWoff(face.url) : null;
         if (!data) continue;
         const name = `${family} ${subset}`;

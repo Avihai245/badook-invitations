@@ -1,8 +1,9 @@
 import type { NextConfig } from 'next';
 
+// the regular face of each family's Hebrew and Latin subsets (~0.9MB) — what og-image.tsx loads
 const FONT_FILES = [
-  './node_modules/@fontsource/*/files/*-hebrew-*-normal.woff',
-  './node_modules/@fontsource/*/files/*-latin-*-normal.woff',
+  './node_modules/@fontsource/*/files/*-hebrew-400-normal.woff',
+  './node_modules/@fontsource/*/files/*-latin-400-normal.woff',
 ];
 
 const nextConfig: NextConfig = {

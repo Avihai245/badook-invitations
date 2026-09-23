@@ -1,11 +1,13 @@
-// Host-app screens QA (P2 Design QA gate, §11): screenshots of the list, gallery, preview, wizard,
-// editor and publish dialog in HE (RTL) and EN (LTR) at 1440×900, 1024×768 (editor, compact rail) and
-// 390×844, plus layout probes (no horizontal scroll, mirrored columns).
-// Usage: BASE=http://127.0.0.1:3000 node scripts/qa-host.mjs [he|en] [desktop|tablet|mobile]
-// Needs a running app on a local stack (tests/support/rest-shim.mjs). Screenshots go to
-// tests/.artifacts/qa/host/ (gitignored). Exits 1 when a probe fails. Never runs in the Amplify build.
+// Host-app screens QA (P2/P3 Design QA gate, §11): screenshots of the list, gallery, preview, wizard,
+// editor, publish dialog and share screen in HE (RTL) and EN (LTR) at 1440×900, 1024×768 (editor,
+// compact rail) and 390×844, plus layout probes (no horizontal scroll, mirrored columns).
+// Usage: BASE=http://127.0.0.1:3000 [QA_DATABASE_URL=postgres://…] node scripts/qa-host.mjs [he|en] [desktop|tablet|mobile]
+// Needs a running app on a local stack (tests/support/rest-shim.mjs) and its database (the venue that
+// publishing requires is filled in directly). Screenshots go to tests/.artifacts/qa/host/ (gitignored).
+// Exits 1 when a probe fails. Never runs in the Amplify build.
 import { mkdirSync } from 'node:fs';
 import { chromium } from '@playwright/test';
+import pg from 'pg';
 
 const OUT = 'tests/.artifacts/qa/host';
 mkdirSync(OUT, { recursive: true });
@@ -37,6 +39,24 @@ const T = {
     next: 'Continue',
   },
 };
+
+const db = new pg.Pool({
+  connectionString: process.env.QA_DATABASE_URL ?? 'postgres://postgres:postgres@127.0.0.1:5432/badook_dev',
+});
+/** The first venue's name and address in both languages (publishing requires them). */
+const fillVenue = (id) =>
+  db.query(
+    `update invitations set draft = jsonb_set(draft, '{sections}', (
+       select jsonb_agg(case when s->>'type' = 'venues'
+         then jsonb_set(jsonb_set(s, '{data,items,0,name}', $2::jsonb), '{data,items,0,address}', $3::jsonb)
+         else s end order by i)
+       from jsonb_array_elements(draft->'sections') with ordinality as t(s, i))) where id = $1`,
+    [
+      id,
+      JSON.stringify({ he: 'אחוזת הגפן', en: 'Ahuzat HaGefen' }),
+      JSON.stringify({ he: 'דרך הכרמים 12, זכרון יעקב', en: "12 Derech HaKramim, Zikhron Ya'akov" }),
+    ],
+  );
 
 const results = [];
 const check = (tag, name, ok, detail = '') =>
@@ -151,6 +171,39 @@ for (const lang of LANGS) {
       await page.keyboard.press('Escape');
     }
 
+    // share screen (P3)
+    await fillVenue(created.id);
+    const published = await page.evaluate(
+      async (id) =>
+        (
+          await fetch(`/api/invitations/${id}/publish`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: '{}',
+          })
+        ).status,
+      created.id,
+    );
+    check(tag, 'publish', published === 200, String(published));
+    await page.goto(`${BASE}/app/invitations/${created.id}/share`, { waitUntil: 'networkidle' });
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    await settle(page, 1200);
+    await shot('30-share');
+    await noOverflow(page, tag, 'share');
+    const linkBox = await page.locator('input[readonly]').boundingBox();
+    const qrBox = await page.locator('[role=img] svg').boundingBox();
+    if (vp.name === 'mobile') check(tag, 'share: one column', qrBox.y > linkBox.y + linkBox.height);
+    else
+      check(
+        tag,
+        'share: link card at the inline-start',
+        lang === 'he' ? linkBox.x > qrBox.x : linkBox.x < qrBox.x,
+      );
+    const preview = await page
+      .locator('img[width="1200"]')
+      .evaluate((img) => img.complete && img.naturalWidth === 1200);
+    check(tag, 'share: link preview image loads', preview);
+
     await page.goto(`${BASE}/app/invitations`, { waitUntil: 'networkidle' });
     await settle(page);
     await shot('20-list');
@@ -160,5 +213,6 @@ for (const lang of LANGS) {
   }
 }
 await browser.close();
+await db.end();
 console.log(results.join('\n'));
 process.exit(results.some((r) => r.startsWith('FAIL')) ? 1 : 0);
