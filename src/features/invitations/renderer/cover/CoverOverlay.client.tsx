@@ -13,6 +13,8 @@ export interface CoverOverlayProps {
   monogram: string;
   hint: string;
   skipLabel: string;
+  /** cached public page: `?open=1` in the URL skips the cover (see InvitationBody) */
+  skipFromUrl?: boolean;
 }
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
@@ -22,12 +24,33 @@ const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayout
  * and monogram effects lands in P3). Tap / Enter / Space opens it; the opened state lives on
  * <html data-opened> so the hero entrance and the floating controls react with CSS only.
  */
-export function CoverOverlay({ locale, style, overlay, monogram, hint, skipLabel }: CoverOverlayProps) {
+export function CoverOverlay({
+  locale,
+  style,
+  overlay,
+  monogram,
+  hint,
+  skipLabel,
+  skipFromUrl = false,
+}: CoverOverlayProps) {
   const [phase, setPhase] = useState<'idle' | 'opening' | 'gone' | 'removed'>('idle');
   const [showSkip, setShowSkip] = useState(false);
   const timers = useRef<number[]>([]);
 
   useIsoLayoutEffect(() => {
+    // ?open=1 on a cached page: normally already skipped before the first paint by InvitationBody's
+    // inline script; the URL is re-checked here so the skip holds even if that state was lost.
+    const root = document.documentElement.dataset;
+    if (
+      root.coverSkipped ||
+      (skipFromUrl && new URLSearchParams(window.location.search).get('open') === '1')
+    ) {
+      root.opened = '1';
+      root.coverSkipped = '1';
+      document.body.classList.remove('locked');
+      setPhase('removed');
+      return;
+    }
     document.body.classList.add('locked');
     const t = window.setTimeout(() => setShowSkip(true), 1000);
     return () => window.clearTimeout(t);

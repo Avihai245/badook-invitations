@@ -70,6 +70,9 @@ body {
   font-size: 19px;
   line-height: 1.6;
 }
+:root[data-cover-skipped] .cover {
+  display: none;
+}
 body.locked {
   overflow: hidden;
 }
@@ -1130,6 +1133,22 @@ img.deco {
   .flip-inner {
     transition: none;
   }
+}
+
+/* RSVP: "you already replied — edit" (§6.6) */
+.replied {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 0 18px;
+  font-family: var(--f-ui);
+  font-size: 14px;
+  color: var(--inv-ink-muted);
+}
+.replied svg {
+  color: var(--inv-accent-text);
+  flex: none;
 }
 
 /* cards: gifts */

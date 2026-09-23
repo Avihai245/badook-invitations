@@ -9,6 +9,8 @@ import { useEffect } from 'react';
  */
 export function RevealObserver() {
   useEffect(() => {
+    // the page is interactive from here on (tests wait for it before clicking controls)
+    document.documentElement.dataset.hydrated = '1';
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {

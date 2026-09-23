@@ -1,36 +1,13 @@
 import { Fragment } from 'react';
 import type { SectionOf, Venue } from '../../contracts/types';
-import { buildIcs, googleCalendarUrl, outlookCalendarUrl, type CalendarEvent } from '../../lib/calendar';
-import { DAY_MONTH_YEAR, eventRange, formatDate } from '../../lib/dates';
+import { googleCalendarUrl, outlookCalendarUrl } from '../../lib/calendar';
+import { DAY_MONTH_YEAR, formatDate } from '../../lib/dates';
 import { googleMapsUrl, hasLocation, wazeUrl } from '../../lib/maps';
+import { icsHref, venueCalendarEvent } from '../../renderer/calendar-event';
 import type { RenderContext } from '../../renderer/context';
 import { Icon } from '../../ui/Icon';
 import { Decoration, SecHead, editPath, iv, type SectionViewProps } from '../shared';
 import { CalendarMenu, type CalendarLinks } from './CalendarMenu.client';
-
-/** Event title for calendars: the hosts ("נועה & איתי") or the custom hero title. */
-export function calendarTitle(ctx: RenderContext): string {
-  const hero = ctx.doc.sections.find((s) => s.type === 'hero');
-  if (hero?.type === 'hero' && hero.data.title.mode === 'custom') return ctx.text(hero.data.title.text);
-  const { primary, secondary, joiner } = ctx.doc.hosts;
-  return [ctx.text(primary), secondary ? ctx.text(joiner) || '&' : '', ctx.text(secondary)]
-    .filter(Boolean)
-    .join(' ');
-}
-
-export function venueCalendarEvent(ctx: RenderContext, venue: Venue): CalendarEvent {
-  const { start, end } = eventRange(ctx.doc, venue);
-  const base = ctx.doc.share.slug;
-  return {
-    uid: `${base}-${venue.id}@${new URL(ctx.publicBaseUrl).host}`,
-    title: calendarTitle(ctx),
-    start,
-    end,
-    location: [ctx.text(venue.name), ctx.text(venue.address)].filter(Boolean).join(', '),
-    url: `${ctx.publicBaseUrl}/i/${base}`,
-    timezone: ctx.doc.timezone,
-  };
-}
 
 function calendarLinks(ctx: RenderContext, venue: Venue): CalendarLinks {
   const event = venueCalendarEvent(ctx, venue);
@@ -38,9 +15,7 @@ function calendarLinks(ctx: RenderContext, venue: Venue): CalendarLinks {
   return {
     google: googleCalendarUrl(event),
     outlook: outlookCalendarUrl(event),
-    ics: ctx.icsViaRoute
-      ? `/i/${slug}/event.ics?venue=${encodeURIComponent(venue.id)}`
-      : `data:text/calendar;charset=utf-8,${encodeURIComponent(buildIcs(event, new Date(ctx.now)))}`,
+    ics: icsHref(ctx, venue),
     icsFileName: `${slug}-${venue.id}.ics`,
   };
 }

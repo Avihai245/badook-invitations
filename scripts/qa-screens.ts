@@ -35,6 +35,12 @@ const TPLS = arg('tpl', '')
   ? TEMPLATE_IDS.filter((id) => arg('tpl', '').split(',').includes(id))
   : TEMPLATE_IDS;
 const REF_DIR = resolve('docs/invitations/design-reference');
+// --public: compare the published page /i/noa-and-itay (P1, needs the database) instead of the kitchen sink
+const PUBLIC = process.argv.includes('--public');
+const fixtureUrl = (locale: string) =>
+  PUBLIC
+    ? `${BASE}/i/noa-and-itay?lang=${locale}&open=1`
+    : `${BASE}/dev/invitations/render/sahar-bordeaux/${locale}/wedding-he-en?open=1&now=${NOW}`;
 const FRAME = { w: 390, h: 844, dpr: 2 };
 
 mkdirSync(OUT, { recursive: true });
@@ -149,10 +155,7 @@ async function fixtureQA(browser: Browser) {
   for (const locale of ['he', 'en'] as const) {
     // ours
     const ours = await newPage(browser);
-    await ours.page.goto(
-      `${BASE}/dev/invitations/render/sahar-bordeaux/${locale}/wedding-he-en?open=1&now=${NOW}`,
-      { waitUntil: 'networkidle' },
-    );
+    await ours.page.goto(fixtureUrl(locale), { waitUntil: 'networkidle' });
     await settle(ours.page);
     await ours.page.screenshot({ path: join(OUT, `ours-${locale}-top-with-controls.png`) });
     await driveRsvp(ours.page, true, locale);
@@ -235,10 +238,7 @@ async function fixtureQA(browser: Browser) {
   // desktop hero
   for (const locale of ['he', 'en'] as const) {
     const d = await newPage(browser, 1440, 900, 1);
-    await d.page.goto(
-      `${BASE}/dev/invitations/render/sahar-bordeaux/${locale}/wedding-he-en?open=1&now=${NOW}`,
-      { waitUntil: 'networkidle' },
-    );
+    await d.page.goto(fixtureUrl(locale), { waitUntil: 'networkidle' });
     await settle(d.page);
     await d.page.screenshot({ path: join(OUT, `ours-desktop-${locale}-top.png`) });
     await checkPage(d.page, d.errors, `desktop ${locale}`);

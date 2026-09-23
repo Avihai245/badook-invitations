@@ -1,11 +1,11 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
  * Runs on the Node.js runtime — no Edge anywhere (MASTER_PROMPT §1.1 rule 4).
- * P0: only tags /dev responses so the first Amplify deploy proves Node middleware works there.
- * P1 adds the Supabase session refresh for /app and the `?lang=` rewrite for /i/[slug].
+ * Tags /dev responses, proving Node middleware runs on the deployment. (The /i/<slug>?lang= mapping is a
+ * next.config rewrite: responses to middleware rewrites are not cacheable.)
  */
-export function middleware(_request: NextRequest) {
+export function middleware() {
   const response = NextResponse.next();
   response.headers.set('x-invites-middleware', 'nodejs');
   return response;

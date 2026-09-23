@@ -1,8 +1,8 @@
 import type { SectionOf } from '../../contracts/types';
 import { endOfDayUtc } from '../../lib/dates';
 import { Decoration, SecHead, editPath, iv, type SectionViewProps } from '../shared';
-import { venueCalendarEvent } from '../venues/VenuesView';
-import { buildIcs, googleCalendarUrl, outlookCalendarUrl } from '../../lib/calendar';
+import { icsHref, venueCalendarEvent } from '../../renderer/calendar-event';
+import { googleCalendarUrl, outlookCalendarUrl } from '../../lib/calendar';
 import { RsvpForm, type RsvpFormConfig } from './RsvpForm.client';
 
 export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) {
@@ -44,6 +44,7 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
     messageLabel: ctx.text(d.messageLabel),
     successMessage: ctx.text(d.successMessage),
     declineMessage: ctx.text(d.declineMessage),
+    closedMessage: ctx.text(d.closedMessage),
     calendar:
       event && venue
         ? {
@@ -56,9 +57,7 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
             links: {
               google: googleCalendarUrl(event),
               outlook: outlookCalendarUrl(event),
-              ics: ctx.icsViaRoute
-                ? `/i/${doc.share.slug}/event.ics?venue=${encodeURIComponent(venue.id)}`
-                : `data:text/calendar;charset=utf-8,${encodeURIComponent(buildIcs(event, new Date(ctx.now)))}`,
+              ics: icsHref(ctx, venue),
               icsFileName: `${doc.share.slug}-${venue.id}.ics`,
             },
           }

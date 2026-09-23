@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import type { DietaryKey, Locale } from '../../contracts/types';
+import type { DietaryKey, Locale, RsvpResult, RsvpSubmission } from '../../contracts/types';
 import { t } from '../../i18n/dictionary';
 import { Icon } from '../../ui/Icon';
 import { CalendarMenu, type CalendarLinks } from '../venues/CalendarMenu.client';
@@ -27,6 +27,7 @@ export interface RsvpFormConfig {
   messageLabel: string;
   successMessage: string;
   declineMessage: string;
+  closedMessage: string;
   calendar: {
     label: string;
     links: CalendarLinks;
@@ -51,6 +52,35 @@ interface Child {
   dietaryNotes?: string;
 }
 type Errors = Record<string, string>;
+
+/** What the browser keeps after a reply (§6.6): `rsvp:<slug>` → the edit token (+ the answers, to prefill an edit). */
+interface StoredReply {
+  responseId: string;
+  editToken: string;
+  draft?: Pick<RsvpSubmission, 'answers' | 'message'> &
+    ({ attending: true; adults: Adult[]; children: Child[] } | { attending: false; contact: Contact });
+}
+type Contact = { fullName?: string; phone?: string; email?: string };
+const storageKey = (slug: string) => `rsvp:${slug}`;
+function readReply(slug: string): StoredReply | null {
+  try {
+    const raw = window.localStorage.getItem(storageKey(slug));
+    const v = raw ? (JSON.parse(raw) as StoredReply) : null;
+    return v && typeof v.editToken === 'string' ? v : null;
+  } catch {
+    return null;
+  }
+}
+function writeReply(slug: string, reply: StoredReply) {
+  try {
+    window.localStorage.setItem(storageKey(slug), JSON.stringify(reply));
+  } catch {
+    // private mode / storage full: editing later just creates a new reply
+  }
+}
+
+const PHONE_OK = (s: string) => /^\d{9,15}$/.test(s.replace(/\D/g, ''));
+const EMAIL_OK = (s: string) => /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(s);
 
 const ALLERGIES: DietaryKey[] = ['nut_allergy', 'other_allergy'];
 const needsNotes = (p: { dietary?: DietaryKey[] }) => (p.dietary ?? []).some((k) => ALLERGIES.includes(k));
@@ -95,14 +125,35 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
   const stash = useRef<{ adults: Adult[]; children: Child[] }>({ adults: [], children: [] });
   const [answers, setAnswers] = useState<Record<string, string | boolean>>({});
   const [message, setMessage] = useState('');
-  const [decline, setDecline] = useState<{ fullName?: string; phone?: string; email?: string }>({});
+  const [decline, setDecline] = useState<Contact>({});
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [focusFirstError, setFocusFirstError] = useState(0);
+  const [closed, setClosed] = useState(false);
+  const [reply, setReply] = useState<StoredReply | null>(null);
+  const hpRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     renderedAt.current = Date.now();
-  }, []);
+    if (config.submitMode === 'api') setReply(readReply(config.slug));
+  }, [config.submitMode, config.slug]);
+
+  /** "You already replied — edit": refill the form from the stored answers; the next send replaces the reply. */
+  const editStoredReply = () => {
+    const d = reply?.draft;
+    if (!d) return;
+    setAnswers(d.answers ?? {});
+    setMessage(d.message ?? '');
+    setErrors({});
+    if (d.attending) {
+      setAttending(true);
+      setAdults(d.adults.length ? d.adults : [{}]);
+      setChildren(d.children);
+    } else {
+      setAttending(false);
+      setDecline(d.contact);
+    }
+  };
 
   useEffect(() => {
     if (!focusFirstError) return;
@@ -160,32 +211,91 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     const req = t(L, 'rsvp.error.required');
     if (attending) {
       adults.forEach((p, i) => {
-        if (!p.firstName?.trim()) e[`a${i}.firstName`] = req;
-        if (!p.lastName?.trim()) e[`a${i}.lastName`] = req;
+        // without per-attendee details only the primary contact is asked for a name (§3)
+        if (i === 0 || config.perAttendeeDetails) {
+          if (!p.firstName?.trim()) e[`a${i}.firstName`] = req;
+          if (!p.lastName?.trim()) e[`a${i}.lastName`] = req;
+        }
         if (needsNotes(p) && !p.dietaryNotes?.trim()) e[`a${i}.dietaryNotes`] = req;
       });
       const p0 = adults[0] ?? {};
-      const digits = (p0.phone ?? '').replace(/\D/g, '');
-      if (config.requirePhone && !/^\d{9,15}$/.test(digits))
-        e['a0.phone'] = p0.phone ? t(L, 'rsvp.error.phone') : req;
-      if (!config.requirePhone && p0.phone && !/^\d{9,15}$/.test(digits))
-        e['a0.phone'] = t(L, 'rsvp.error.phone');
-      if (config.requireEmail && !/^\S+@\S+\.\S+$/.test(p0.email ?? '')) {
-        e['a0.email'] = p0.email ? t(L, 'rsvp.error.email') : req;
+      const phone = p0.phone?.trim() ?? '';
+      const email = p0.email?.trim() ?? '';
+      if (phone ? !PHONE_OK(phone) : config.requirePhone)
+        e['a0.phone'] = phone ? t(L, 'rsvp.error.phone') : req;
+      if (email ? !EMAIL_OK(email) : config.requireEmail)
+        e['a0.email'] = email ? t(L, 'rsvp.error.email') : req;
+      if (config.perAttendeeDetails) {
+        children.forEach((c, i) => {
+          if (!c.fullName?.trim()) e[`c${i}.fullName`] = req;
+          if (needsNotes(c) && !c.dietaryNotes?.trim()) e[`c${i}.dietaryNotes`] = req;
+        });
       }
-      children.forEach((c, i) => {
-        if (!c.fullName?.trim()) e[`c${i}.fullName`] = req;
-        if (needsNotes(c) && !c.dietaryNotes?.trim()) e[`c${i}.dietaryNotes`] = req;
-      });
       for (const q of config.customQuestions) {
-        const v = answers[q.id];
+        const v = answerOf(q);
         if (q.required && (v === undefined || v === '' || v === false)) e[`q.${q.id}`] = req;
       }
     } else {
+      const phone = decline.phone?.trim() ?? '';
+      const email = decline.email?.trim() ?? '';
       if (!decline.fullName?.trim()) e['d.fullName'] = req;
-      if (!decline.phone?.trim() && !decline.email?.trim()) e['d.phone'] = t(L, 'rsvp.error.contact');
+      if (!phone && !email) e['d.phone'] = t(L, 'rsvp.error.contact');
+      if (phone && !PHONE_OK(phone)) e['d.phone'] = t(L, 'rsvp.error.phone');
+      if (email && !EMAIL_OK(email)) e['d.email'] = t(L, 'rsvp.error.email');
     }
     return e;
+  }
+
+  /** A select shows its first option until changed — that option is the answer. */
+  const answerOf = (q: RsvpFormConfig['customQuestions'][number]) =>
+    answers[q.id] ?? (q.type === 'select' ? q.options?.[0]?.value : undefined);
+
+  function payload(): RsvpSubmission {
+    const answered = Object.fromEntries(
+      config.customQuestions.flatMap((q) => {
+        const v = answerOf(q);
+        return v === undefined ? [] : [[q.id, v]];
+      }),
+    );
+    const base = {
+      invitationSlug: config.slug,
+      locale: L,
+      hp: hpRef.current?.value ?? '',
+      renderedAt: renderedAt.current,
+      answers: attending ? answered : {},
+      message: message.trim() || null,
+      ...(reply ? { editToken: reply.editToken } : {}),
+    };
+    const nullable = (v: string | undefined) => (v?.trim() ? v.trim() : null);
+    if (!attending) {
+      return {
+        ...base,
+        attending: false,
+        contact: {
+          fullName: decline.fullName?.trim() ?? '',
+          phone: nullable(decline.phone),
+          email: nullable(decline.email),
+        },
+      };
+    }
+    return {
+      ...base,
+      attending: true,
+      adults: adults.map((p, i) => ({
+        firstName: p.firstName?.trim() ?? '',
+        lastName: p.lastName?.trim() ?? '',
+        phone: i === 0 ? nullable(p.phone) : null,
+        email: i === 0 ? nullable(p.email) : null,
+        dietary: p.dietary ?? [],
+        dietaryNotes: nullable(p.dietaryNotes),
+      })),
+      children: children.map((c) => ({
+        fullName: c.fullName?.trim() ?? '',
+        age: c.age ?? 0,
+        dietary: c.dietary ?? [],
+        dietaryNotes: nullable(c.dietaryNotes),
+      })),
+    };
   }
 
   async function submit() {
@@ -201,7 +311,44 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       setStatus('sent');
       return;
     }
-    // P1: POST /api/invitations/rsvp with the shared RsvpSubmission schema.
+    // the server rejects replies sent less than 3s after the form appeared (§4)
+    const wait = 3100 - (Date.now() - renderedAt.current);
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+    const body = payload();
+    let result: RsvpResult | null = null;
+    try {
+      const res = await fetch('/api/invitations/rsvp', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      result = (await res.json().catch(() => null)) as RsvpResult | null;
+    } catch {
+      result = null;
+    }
+    if (result?.ok) {
+      const { hp: _hp, renderedAt: _r, invitationSlug: _s, locale: _l, editToken: _t, ...rest } = body;
+      const draft = (
+        rest.attending ? { ...rest, adults, children } : { ...rest, contact: decline }
+      ) as StoredReply['draft'];
+      const stored = { responseId: result.responseId, editToken: result.editToken, draft };
+      writeReply(config.slug, stored);
+      setReply(stored);
+      setStatus('sent');
+      return;
+    }
+    if (result && !result.ok && result.code === 'closed') {
+      setClosed(true);
+      setStatus('idle');
+      return;
+    }
+    if (result && !result.ok && result.fieldErrors) {
+      setErrors(result.fieldErrors);
+      setStatus('idle');
+      setFocusFirstError((n) => n + 1);
+      return;
+    }
+    // network error / rate limited / server error: keep everything typed (§6.5)
     setStatus('error');
   }
 
@@ -321,8 +468,22 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     </div>
   );
 
+  if (closed) return <p className="closed">{config.closedMessage}</p>;
+
   return (
     <div ref={formRef}>
+      {reply && status !== 'sending' ? (
+        <p className="replied" role="status">
+          <Icon name="check" size={16} strokeWidth={2} />
+          {reply.draft ? (
+            <button type="button" className="linkbtn" onClick={editStoredReply}>
+              {t(L, 'rsvp.alreadyReplied')}
+            </button>
+          ) : (
+            t(L, 'rsvp.alreadyReplied')
+          )}
+        </p>
+      ) : null}
       <p className="q" id={fid('att')}>
         {t(L, 'rsvp.willAttend')} <span className="req">*</span>
       </p>
@@ -525,7 +686,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                   {q.type === 'select' ? (
                     <select
                       id={fid(`q.${q.id}`)}
-                      value={String(answers[q.id] ?? q.options?.[0]?.value ?? '')}
+                      value={String(answerOf(q) ?? '')}
                       onChange={(ev) => setAnswers((a) => ({ ...a, [q.id]: ev.target.value }))}
                     >
                       {q.options?.map((o) => (
@@ -639,6 +800,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
             autoComplete="off"
             aria-hidden="true"
             defaultValue=""
+            ref={hpRef}
           />
         </>
       ) : null}

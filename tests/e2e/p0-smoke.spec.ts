@@ -9,6 +9,12 @@ const NOW = '2026-09-23T10:00:00Z';
 const render = (id: string, locale: string, doc = 'demo', query = 'open=1') =>
   `/dev/invitations/render/${id}/${locale}/${doc}?${query}&now=${NOW}`;
 
+/** Navigates and waits until React has hydrated — before that, controls are plain HTML. */
+async function open(page: Page, url: string) {
+  await page.goto(url);
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+}
+
 /** Console errors + uncaught exceptions (hydration mismatches are console errors). */
 function collectErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -41,7 +47,7 @@ test.describe('invitation renders', () => {
 
 test('cover opens and unlocks scrolling', async ({ page }) => {
   const errors = collectErrors(page);
-  await page.goto(render('sahar-bordeaux', 'he', 'wedding-he-en', 'x=1'));
+  await open(page, render('sahar-bordeaux', 'he', 'wedding-he-en', 'x=1'));
   const cover = page.locator('.cover > button[aria-label]');
   await expect(cover).toBeVisible();
   await expect(page.locator('body')).toHaveClass(/locked/);
@@ -53,7 +59,7 @@ test('cover opens and unlocks scrolling', async ({ page }) => {
 });
 
 test('RSVP form validates, then submits (simulated in the kitchen sink)', async ({ page }) => {
-  await page.goto(render('sahar-bordeaux', 'en', 'wedding-he-en'));
+  await open(page, render('sahar-bordeaux', 'en', 'wedding-he-en'));
   const form = page.locator('.form');
   await form.locator('.opt').first().click();
   await form.locator('button.btn-primary').click();
@@ -66,7 +72,7 @@ test('RSVP form validates, then submits (simulated in the kitchen sink)', async 
 });
 
 test('flip-card timeline flips on tap and from the keyboard', async ({ page }) => {
-  await page.goto(render('sahar-bordeaux', 'en', 'demo', 'open=1&tl=flip-cards'));
+  await open(page, render('sahar-bordeaux', 'en', 'demo', 'open=1&tl=flip-cards'));
   const cards = page.locator('.flip');
   await cards.first().click();
   await expect(cards.first()).toHaveAttribute('aria-pressed', 'true');

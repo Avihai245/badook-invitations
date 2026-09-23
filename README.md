@@ -9,7 +9,7 @@ design reference (look & feel source of truth) is in
 [`docs/invitations/design-reference/`](docs/invitations/design-reference/). The 8 templates live in
 [`invitation-templates-pack/`](invitation-templates-pack/) and are imported as-is.
 
-**Status:** P0 (design foundation) — see the build order in §11 of the spec.
+**Status:** P1 (contracts, database, public page, RSVP) — see the build order in §11 of the spec.
 
 ## Stack
 
@@ -22,8 +22,40 @@ Hosting (SSR) — see §1.1 of the spec.
 ```bash
 nvm use            # Node 22 (.nvmrc); Node ≥ 20 is required
 npm ci
-cp .env.example .env.local   # fill in what you need; P0 runs without Supabase
+cp .env.example .env.local   # Supabase URL + keys, INVITES_IP_HASH_SALT (see the file)
 npm run dev        # http://localhost:3000
+```
+
+Public routes:
+
+| Route                                  | What                                                                                                    |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `/i/<slug>`                            | Published invitation (ISR, 60 s). `?lang=he\|en` (default: the invitation's), `?open=1` skips the cover |
+| `/i/<slug>/event.ics?venue=<id>&lang=` | Calendar file for one venue                                                                             |
+| `POST /api/invitations/rsvp`           | Guest RSVP (`RsvpSubmission` → `RsvpResult`, §4)                                                        |
+
+### Database
+
+Migrations are in [`supabase/migrations/`](supabase/migrations/) (tables, RLS, RPCs, storage buckets —
+MASTER_PROMPT §4). Apply them with the Supabase CLI (`supabase db push`) or the SQL editor, then seed:
+
+```bash
+npm run db:seed > seed.sql          # 8 templates + the 3 examples + a demo per template/event type
+psql "$DATABASE_URL" -f seed.sql     # idempotent — safe to re-run after template changes
+```
+
+Demo invitations: `/i/noa-and-itay`, `/i/mayas-baby-shower`, `/i/noa-and-itay-save-the-date`,
+`/i/demo-<template>` (and `demo-atara-bat-mitzvah`).
+
+**Without Supabase** (local Postgres 16): `tests/db/supabase-shim.sql` provides the Supabase roles and
+`auth.uid()`, and `tests/support/rest-shim.mjs` answers `supabase-js` RPC calls from a local database —
+this is how the database and end-to-end tests run:
+
+```bash
+npx tsx tests/support/reset-local-db.ts badook_local      # shim + migrations + seed
+DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/badook_local node tests/support/rest-shim.mjs
+# .env.local: NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+#             NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=local-publishable  SUPABASE_SECRET_KEY=local-secret
 ```
 
 Dev-only pages (always on under `next dev`; in builds only with `INVITES_DEV_ROUTES=true`):
@@ -36,16 +68,18 @@ Dev-only pages (always on under `next dev`; in builds only with `INVITES_DEV_ROU
 
 ## Scripts
 
-| Command                                 |                                                                                                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev` / `build` / `start`       | Next.js (build first validates the templates and generates the fonts)                                                                             |
-| `npm run lint` · `typecheck` · `format` | ESLint · `tsc --noEmit` · Prettier                                                                                                                |
-| `npm test`                              | Unit tests (Vitest)                                                                                                                               |
-| `npm run qa:screens -- --base <url>`    | Design QA gate: pixel diff against the design reference, all templates × he/en, hero legibility, stress strings. Writes to `tests/.artifacts/qa/` |
-| `npm run qa:app-ui`                     | Host-app UI QA: RTL/LTR, focus and layout probes + screenshots of `/dev/app-ui` (`BASE=<url>`)                                                    |
-| `npm run test:e2e`                      | Playwright tests                                                                                                                                  |
-| `npm run fonts`                         | Regenerate the self-hosted `@font-face` files and index                                                                                           |
-| `npm run templates:validate`            | Validate the template pack and fixtures against the contracts                                                                                     |
+| Command                                 |                                                                                                                                                                |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev` / `build` / `start`       | Next.js (build first validates the templates and generates the fonts)                                                                                          |
+| `npm run lint` · `typecheck` · `format` | ESLint · `tsc --noEmit` · Prettier                                                                                                                             |
+| `npm test`                              | Unit tests (Vitest)                                                                                                                                            |
+| `npm run test:db`                       | Migration, RLS and RPC tests on a fresh local Postgres database (`TEST_DATABASE_URL`, default `postgres://postgres:postgres@127.0.0.1:5432/postgres`)          |
+| `npm run db:seed`                       | Seed SQL to stdout (see Database)                                                                                                                              |
+| `npm run qa:screens -- --base <url>`    | Design QA gate: pixel diff against the design reference, all templates × he/en, hero legibility, stress strings. Writes to `tests/.artifacts/qa/`              |
+| `npm run qa:app-ui`                     | Host-app UI QA: RTL/LTR, focus and layout probes + screenshots of `/dev/app-ui` (`BASE=<url>`)                                                                 |
+| `npm run test:e2e`                      | Playwright tests; starts its own local stack (fresh database + REST shim + `next start`) — run `npm run build` first. `PW_BASE_URL=<url>` targets a deployment |
+| `npm run fonts`                         | Regenerate the self-hosted `@font-face` files and index                                                                                                        |
+| `npm run templates:validate`            | Validate the template pack and fixtures against the contracts                                                                                                  |
 
 Visual and Playwright tests run locally or in CI — never in the Amplify build.
 
@@ -54,18 +88,24 @@ Visual and Playwright tests run locally or in CI — never in the Amplify build.
 ```
 src/
   app/(site)/            host app (Hebrew RTL root layout, Tailwind) + /dev pages
-  app/(invitation)/      guest invitation routes (own root layout, no Tailwind)
+  app/(invitation)/      guest invitation routes: /i/[slug], .ics (own root layout, no Tailwind)
+  app/api/invitations/   RSVP endpoint
   components/app/        host-app UI primitives (§9B.2)
   features/invitations/
+    server/              published-invitation loader, RSVP rules (server only)
     contracts/           §3 types, Zod schemas, document migrations
     templates/           registry of the 8 pack templates, document seeding, demos/fixtures
     renderer/            the one renderer (public page, preview, editor frame, kitchen sink)
     sections/            one view per section type + the section registry
     ui/                  invitation CSS (ported from the design reference) and icons
     fonts/ i18n/ lib/    self-hosted fonts, dictionaries, dates/Hebrew calendar/contrast/… utilities
-  lib/                   env parsing, dev-route gate
-scripts/                 template validation, font generation, design QA
+  lib/                   env parsing, feature flag, dev-route gate; supabase/ = server-side clients
+supabase/migrations/     SQL (§4)
+scripts/                 template validation, font generation, seed, design QA
 tests/unit/              Vitest
+tests/db/                database tests + the Supabase shim
+tests/e2e/               Playwright
+tests/support/           local stack: database reset, REST shim
 ```
 
 ## Deployment (AWS Amplify)

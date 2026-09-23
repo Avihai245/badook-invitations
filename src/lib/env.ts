@@ -11,9 +11,13 @@ const flag = (fallback: boolean) =>
 
 /**
  * Server-side configuration (every name matches amplify.yml's `^(NEXT_PUBLIC_|SUPABASE_|INVITES_)`).
- * Documented in .env.example. Supabase keys join in P1.
+ * Documented in .env.example.
  */
 const ServerEnvSchema = z.object({
+  NEXT_PUBLIC_SUPABASE_URL: z.string().default(''),
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().default(''),
+  SUPABASE_SECRET_KEY: z.string().default(''),
+  INVITES_IP_HASH_SALT: z.string().default(''),
   INVITES_PUBLIC_BASE_URL: z
     .url()
     .default('http://localhost:3000')

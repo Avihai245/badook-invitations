@@ -1,0 +1,63 @@
+import { getPublishedInvitation } from '@/features/invitations/server/published';
+import { MAX_BODY_BYTES, RATE_LIMIT, handleRsvp, type RsvpDeps } from '@/features/invitations/server/rsvp';
+import { serverEnv } from '@/lib/env';
+import { invitationsEnabled } from '@/lib/feature';
+import { serviceDb } from '@/lib/supabase/server';
+
+const NO_STORE = { 'cache-control': 'no-store' };
+
+/**
+ * The guest's address, for the per-IP rate limit (stored only as a salted hash). CloudFront's own
+ * CloudFront-Viewer-Address ("ip:port") when present; otherwise the first X-Forwarded-For hop. That one
+ * can be set by the client — which only lets an attacker dodge the limit, whereas trusting a proxy hop
+ * could put every guest into one bucket. Re-check on the first Amplify deploy.
+ */
+function clientIp(request: Request): string | null {
+  const viewer = request.headers.get('cloudfront-viewer-address');
+  if (viewer) return viewer.replace(/:\d+$/, '').replace(/^\[|\]$/g, '');
+  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  return forwarded || request.headers.get('x-real-ip') || null;
+}
+
+const deps = (): RsvpDeps => ({
+  loadInvitation: getPublishedInvitation,
+  rateHit: async (invitationId, ipHash) => {
+    const { data, error } = await serviceDb().rpc('rsvp_rate_hit', {
+      p_invitation_id: invitationId,
+      p_ip_hash: ipHash,
+      p_limit: RATE_LIMIT.count,
+      p_window_seconds: RATE_LIMIT.windowSeconds,
+    });
+    if (error) throw new Error(`rsvp_rate_hit failed: ${error.message}`);
+    return data === true;
+  },
+  submit: async ({ invitationId, response, attendees, existingTokenHash, newTokenHash }) => {
+    const { data, error } = await serviceDb().rpc('submit_rsvp', {
+      p_invitation_id: invitationId,
+      p_response: response,
+      p_attendees: attendees,
+      p_existing_token_hash: existingTokenHash,
+      p_new_token_hash: newTokenHash,
+    });
+    if (error || !data) throw new Error(`submit_rsvp failed: ${error?.message ?? 'no result'}`);
+    return data as { id: string; replaced: boolean };
+  },
+  now: Date.now,
+  ipHashSalt: serverEnv().INVITES_IP_HASH_SALT,
+});
+
+/** Guest RSVP (§4): validated with the shared schema + the invitation's rules; written in one transaction. */
+export async function POST(request: Request) {
+  if (!invitationsEnabled())
+    return Response.json({ ok: false, code: 'not_found' }, { status: 404, headers: NO_STORE });
+  const declared = Number(request.headers.get('content-length') ?? 0);
+  if (declared > MAX_BODY_BYTES)
+    return Response.json({ ok: false, code: 'invalid' }, { status: 413, headers: NO_STORE });
+  try {
+    const { status, body } = await handleRsvp(await request.text(), clientIp(request), deps());
+    return Response.json(body, { status, headers: NO_STORE });
+  } catch (err) {
+    console.error('RSVP failed', err);
+    return Response.json({ error: 'server_error' }, { status: 500, headers: NO_STORE });
+  }
+}
