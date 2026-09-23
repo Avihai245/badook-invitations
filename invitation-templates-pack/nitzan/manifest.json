@@ -1,0 +1,236 @@
+{
+  "id": "nitzan",
+  "version": 2,
+  "name": {
+    "he": "ניצן",
+    "en": "Nitzan"
+  },
+  "description": {
+    "he": "חיתול מוסלין עטוף בסרט סאטן ותגית עץ, עץ זית צעיר בחצר מוארת וזרעי שן־ארי מרחפים. לברית, לבריתה ולבייבי שאוור — רך ומלא אור.",
+    "en": "A muslin swaddle wrapped in satin ribbon with a wooden tag, a young olive tree in a sunlit courtyard and drifting dandelion seeds. For brit, simchat bat and baby showers — soft and full of light."
+  },
+  "categories": [
+    "brit",
+    "baby_shower"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/nitzan/preview.webp",
+  "previewVideo": "/templates/nitzan/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F7F8F3",
+      "surface": "#ECEFE3",
+      "ink": "#2E382C",
+      "inkMuted": "#5F6A58",
+      "accent": "#5F7555",
+      "accentInk": "#FFFFFF",
+      "line": "#D5DBC8",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink",
+      "surface"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "sage",
+      "name": {
+        "he": "מרווה",
+        "en": "Sage"
+      },
+      "palette": {
+        "accent": "#5F7555",
+        "surface": "#ECEFE3"
+      }
+    },
+    {
+      "id": "sky",
+      "name": {
+        "he": "תכלת",
+        "en": "Sky"
+      },
+      "palette": {
+        "accent": "#4F7390",
+        "surface": "#E8EEF3"
+      }
+    },
+    {
+      "id": "blush",
+      "name": {
+        "he": "ורוד פודרה",
+        "en": "Blush"
+      },
+      "palette": {
+        "accent": "#965C5C",
+        "surface": "#F5E9E7"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "soft",
+      "display": {
+        "latin": "Fraunces",
+        "hebrew": "Varela Round"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "Assistant"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "playful",
+      "display": {
+        "latin": "Atma",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "swaddle",
+    "renderer": "video",
+    "poster": "/templates/nitzan/cover-poster.webp",
+    "posterDesktop": "/templates/nitzan/cover-poster-desktop.webp",
+    "openVideo": "/templates/nitzan/cover-open.mp4",
+    "openVideoDesktop": "/templates/nitzan/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "tag",
+      "image": "/templates/nitzan/wood-tag-blank.png",
+      "recolor": false,
+      "size": 0.24,
+      "offset": {
+        "x": 0,
+        "y": 0.08
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#4A3524",
+        "effect": "deboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Fraunces",
+      "hebrew": "Varela Round"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "עץ זית צעיר",
+          "en": "Young olive tree"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.45
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#1C2418",
+    "defaultOverlay": 0.25
+  },
+  "music": {
+    "defaultTrackId": "nitzan-theme",
+    "tracks": [
+      {
+        "id": "nitzan-theme",
+        "title": "First Light (music box & piano)",
+        "url": "/templates/nitzan/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/nitzan/hero.mp4",
+    "hero-poster": "/templates/nitzan/hero-poster.webp",
+    "hero-desktop": "/templates/nitzan/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/nitzan/hero-desktop-poster.webp",
+    "olive-sprig": "/templates/nitzan/olive-sprig.webp",
+    "sparrows": "/templates/nitzan/sparrows.webp",
+    "dandelion": "/templates/nitzan/dandelion.webp",
+    "booties": "/templates/nitzan/booties.webp",
+    "pomegranate-small": "/templates/nitzan/pomegranate-small.webp",
+    "cradle": "/templates/nitzan/cradle.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": "template:olive-sprig",
+    "afterTimeline": "template:dandelion",
+    "beforeRsvp": "template:sparrows",
+    "footer": "template:booties"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

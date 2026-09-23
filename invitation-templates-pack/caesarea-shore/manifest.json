@@ -1,0 +1,241 @@
+{
+  "id": "caesarea-shore",
+  "version": 2,
+  "name": {
+    "he": "חוף קיסריה",
+    "en": "Caesarea Shore"
+  },
+  "description": {
+    "he": "מעטפת פשתן בגוון חול עם חותם שעווה טורקיז, קשתות אמת המים בשעת הזהב וגלים רכים. ים־תיכוני, אוורירי ואלגנטי.",
+    "en": "A sand-linen envelope with a teal wax seal, ancient aqueduct arches at golden hour and soft rolling waves. Mediterranean, airy and elegant."
+  },
+  "categories": [
+    "wedding",
+    "engagement",
+    "save_the_date"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/caesarea-shore/preview.webp",
+  "previewVideo": "/templates/caesarea-shore/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F7F2EA",
+      "surface": "#EEE5D6",
+      "ink": "#173F4A",
+      "inkMuted": "#4F6B73",
+      "accent": "#1E5A67",
+      "accentInk": "#FFFFFF",
+      "line": "#D7CAB5",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink",
+      "bg"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "teal",
+      "name": {
+        "he": "טורקיז",
+        "en": "Teal"
+      },
+      "palette": {
+        "accent": "#1E5A67",
+        "ink": "#173F4A"
+      }
+    },
+    {
+      "id": "coral-clay",
+      "name": {
+        "he": "חמר ואלמוג",
+        "en": "Coral clay"
+      },
+      "palette": {
+        "accent": "#9E4E40",
+        "ink": "#3F2420"
+      }
+    },
+    {
+      "id": "deep-sea",
+      "name": {
+        "he": "ים עמוק",
+        "en": "Deep sea"
+      },
+      "palette": {
+        "accent": "#1F3552",
+        "ink": "#15243A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "coastal-script",
+      "display": {
+        "latin": "Italianno",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "coastal-modern",
+      "display": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Bona Nova"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Bona Nova"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/caesarea-shore/cover-poster.webp",
+    "posterDesktop": "/templates/caesarea-shore/cover-poster-desktop.webp",
+    "openVideo": "/templates/caesarea-shore/cover-open.mp4",
+    "openVideoDesktop": "/templates/caesarea-shore/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/caesarea-shore/seal-blank.png",
+      "recolor": true,
+      "size": 0.32,
+      "offset": {
+        "x": 0,
+        "y": 0.0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#1E5A67",
+      "#C0674F",
+      "#1F3552",
+      "#CFC6B6"
+    ],
+    "monogramFont": {
+      "latin": "Italianno",
+      "hebrew": "Frank Ruhl Libre"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "קשתות בשעת הזהב",
+          "en": "Arches at golden hour"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.45
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0B2229",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "caesarea-shore-theme",
+    "tracks": [
+      {
+        "id": "caesarea-shore-theme",
+        "title": "Sea Breeze (guitar & strings)",
+        "url": "/templates/caesarea-shore/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/caesarea-shore/hero.mp4",
+    "hero-poster": "/templates/caesarea-shore/hero-poster.webp",
+    "hero-desktop": "/templates/caesarea-shore/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/caesarea-shore/hero-desktop-poster.webp",
+    "shells": "/templates/caesarea-shore/shells.webp",
+    "arches-panorama": "/templates/caesarea-shore/arches-panorama.webp",
+    "sea-lavender": "/templates/caesarea-shore/sea-lavender.webp",
+    "lantern-sand": "/templates/caesarea-shore/lantern-sand.webp",
+    "footprints": "/templates/caesarea-shore/footprints.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": "template:arches-panorama",
+    "afterTimeline": "template:footprints",
+    "beforeRsvp": "template:shells",
+    "footer": "template:sea-lavender"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

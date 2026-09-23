@@ -1,0 +1,269 @@
+{
+  "id": "atara",
+  "version": 2,
+  "name": {
+    "he": "עטרה",
+    "en": "Atara"
+  },
+  "description": {
+    "he": "שקית טלית מקטיפה רקומה בחוטי כסף שנפתחת אל ספר תורה באור חלון. לבר ולבת מצווה — מכובד, מרגש ונקי.",
+    "en": "An embroidered velvet tallit bag that opens onto a Torah scroll in soft window light. For bar & bat mitzvah — dignified, moving and clean."
+  },
+  "categories": [
+    "bar_mitzvah",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/atara/preview.webp",
+  "previewVideo": "/templates/atara/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F5F7FA",
+      "surface": "#E8EDF4",
+      "ink": "#14233F",
+      "inkMuted": "#4E5B73",
+      "accent": "#1F3A68",
+      "accentInk": "#FFFFFF",
+      "line": "#C8D2E2",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "line"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "bar-navy",
+      "name": {
+        "he": "בר מצווה — כחול וכסף",
+        "en": "Bar mitzvah — navy & silver"
+      },
+      "palette": {
+        "bg": "#F5F7FA",
+        "surface": "#E8EDF4",
+        "ink": "#14233F",
+        "inkMuted": "#4E5B73",
+        "accent": "#1F3A68",
+        "line": "#C8D2E2"
+      }
+    },
+    {
+      "id": "bat-rose",
+      "name": {
+        "he": "בת מצווה — סגול ורד",
+        "en": "Bat mitzvah — plum & rose"
+      },
+      "palette": {
+        "bg": "#FBF6F6",
+        "surface": "#F4E8EA",
+        "ink": "#45202D",
+        "inkMuted": "#7A5A64",
+        "accent": "#8E4A5E",
+        "line": "#E5CED4"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "stately",
+      "display": {
+        "latin": "Cinzel",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "gentle",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "pouch",
+    "renderer": "video",
+    "poster": "/templates/atara/cover-poster.webp",
+    "posterDesktop": "/templates/atara/cover-poster-desktop.webp",
+    "openVideo": "/templates/atara/cover-open.mp4",
+    "openVideoDesktop": "/templates/atara/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/atara/patch-blank.png",
+      "recolor": true,
+      "size": 0.28,
+      "offset": {
+        "x": 0,
+        "y": -0.04
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#A7B0BC",
+      "#B89A5B",
+      "#8E4A5E"
+    ],
+    "monogramFont": {
+      "latin": "Cinzel",
+      "hebrew": "Suez One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "ספר תורה באור חלון",
+          "en": "Torah in window light"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.45
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      },
+      {
+        "id": "bloom",
+        "name": {
+          "he": "קשת אבן ובוגנוויליה",
+          "en": "Stone arch & bougainvillea"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero-bloom",
+          "poster": "template:hero-bloom-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.45
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-bloom-desktop",
+          "poster": "template:hero-bloom-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0A1428",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "atara-theme",
+    "tracks": [
+      {
+        "id": "atara-theme",
+        "title": "Coming of Age (cello & piano)",
+        "url": "/templates/atara/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/atara/hero.mp4",
+    "hero-poster": "/templates/atara/hero-poster.webp",
+    "hero-desktop": "/templates/atara/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/atara/hero-desktop-poster.webp",
+    "tallit-stripes": "/templates/atara/tallit-stripes.webp",
+    "torah-crown": "/templates/atara/torah-crown.webp",
+    "pomegranates": "/templates/atara/pomegranates.webp",
+    "stone-arch": "/templates/atara/stone-arch.webp",
+    "tefillin-bag-outline": "/templates/atara/tefillin-bag-outline.webp",
+    "flowers-spray": "/templates/atara/flowers-spray.webp",
+    "hero-bloom": "/templates/atara/hero-bloom.mp4",
+    "hero-bloom-poster": "/templates/atara/hero-bloom-poster.webp",
+    "hero-bloom-desktop": "/templates/atara/hero-bloom-desktop.mp4",
+    "hero-bloom-desktop-poster": "/templates/atara/hero-bloom-desktop-poster.webp"
+  },
+  "decorations": {
+    "afterHero": "template:tallit-stripes",
+    "betweenVenues": "template:stone-arch",
+    "afterTimeline": null,
+    "beforeRsvp": "template:pomegranates",
+    "footer": "template:torah-crown"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

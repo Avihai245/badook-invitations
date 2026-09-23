@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "templateId": "sahar-bordeaux",
+  "eventType": "save_the_date",
+  "locales": [
+    "he"
+  ],
+  "defaultLocale": "he",
+  "timezone": "Asia/Jerusalem",
+  "hosts": {
+    "primary": {
+      "he": "נועה"
+    },
+    "secondary": {
+      "he": "איתי"
+    },
+    "joiner": {
+      "he": "&"
+    },
+    "parents": null
+  },
+  "event": {
+    "date": "2027-06-17",
+    "startTime": "19:30",
+    "endTime": "01:00",
+    "hebrewDate": "day",
+    "timeFormat": null,
+    "rsvpDeadline": null
+  },
+  "theme": {
+    "fontPairId": "classic-script",
+    "palette": null
+  },
+  "cover": {
+    "enabled": true,
+    "monogram": {
+      "he": "נ&א"
+    },
+    "sealColor": "#731F2E",
+    "hint": {
+      "he": "לחצו לפתיחה"
+    }
+  },
+  "music": {
+    "enabled": true,
+    "trackId": "sahar-bordeaux-theme",
+    "customUrl": null,
+    "volume": 0.6,
+    "startAtSec": 0
+  },
+  "share": {
+    "slug": "noa-and-itay-save-the-date",
+    "ogTitle": {
+      "he": "שמרו את התאריך — נועה ואיתי"
+    },
+    "ogDescription": {
+      "he": "הזמנה רשמית תישלח בהמשך"
+    },
+    "ogImage": null,
+    "noindex": true
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "enabled": true,
+      "data": {
+        "eyebrow": {
+          "he": "אנחנו מתחתנים!"
+        },
+        "title": {
+          "mode": "hosts"
+        },
+        "showDate": false,
+        "locationLine": null,
+        "media": {
+          "kind": "image",
+          "src": "template:hero-poster",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "overlayOpacity": 0.3
+      }
+    },
+    {
+      "id": "reveal",
+      "type": "reveal",
+      "enabled": true,
+      "data": {
+        "title": {
+          "he": "שמרו את התאריך"
+        },
+        "mechanic": "scratch",
+        "prompt": {
+          "he": "(גרדו כדי לגלות)"
+        },
+        "showCalendarButton": true
+      }
+    },
+    {
+      "id": "note",
+      "type": "text",
+      "enabled": true,
+      "data": {
+        "kind": "custom",
+        "title": null,
+        "subtitle": null,
+        "body": {
+          "he": "פרק חדש עומד להתחיל, ואנחנו כל כך מתרגשים לחגוג אותו עם האנשים הכי חשובים לנו.\nהזמנה רשמית תישלח בהמשך."
+        },
+        "illustration": null,
+        "cta": null
+      }
+    },
+    {
+      "id": "footer",
+      "type": "footer",
+      "enabled": true,
+      "data": {
+        "showHosts": true,
+        "showDate": true,
+        "showParents": false,
+        "closingLine": {
+          "he": "באהבה,"
+        },
+        "showCredit": true
+      }
+    }
+  ]
+}

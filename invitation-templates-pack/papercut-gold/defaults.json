@@ -1,0 +1,144 @@
+{
+  "templateId": "papercut-gold",
+  "defaults": {
+    "wedding": {
+      "coverHint": {
+        "he": "לחצו לפתיחת השער",
+        "en": "Tap to open the gate"
+      },
+      "eyebrow": {
+        "he": "בשעה טובה ומוצלחת",
+        "en": "Together with their families"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "עוד מעט…",
+          "en": "Almost there"
+        },
+        "subtitle": {
+          "he": "עד שנעמוד תחת החופה",
+          "en": "Until we stand under the chuppah"
+        },
+        "afterEvent": {
+          "he": "מזל טוב! תודה שהייתם איתנו",
+          "en": "Mazal tov! Thank you for being with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "קול ששון וקול שמחה",
+          "en": "Voices of joy and gladness"
+        },
+        "body": {
+          "he": "באהבה גדולה ובהודיה, אנו שמחים להזמינכם\nלחגוג איתנו את נישואינו ב־{date}.",
+          "en": "With great love and gratitude, we invite you\nto celebrate our marriage on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "האירוע",
+          "en": "The Celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "18:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:30",
+          "label": {
+            "he": "חופה וקידושין",
+            "en": "Chuppah"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחה חגיגית",
+            "en": "Festive dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "ערב אלגנטי",
+            "en": "Evening elegant"
+          },
+          "body": {
+            "he": "נשמח לראותכם בלבוש ערב חגיגי.",
+            "en": "We'd love to see you in elegant evening attire."
+          },
+          "illustration": "template:lantern"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן ולכלה",
+          "en": "A blessing for the couple"
+        },
+        "successMessage": {
+          "he": "תודה רבה! נתראה בשמחות",
+          "en": "Thank you! See you at the celebration"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון — נחגוג יחד בהזדמנות אחרת",
+          "en": "Thank you for letting us know — we'll celebrate together another time"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "בברכה ובאהבה",
+        "en": "With love and blessings"
+      }
+    }
+  }
+}

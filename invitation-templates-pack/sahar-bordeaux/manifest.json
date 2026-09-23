@@ -1,0 +1,241 @@
+{
+  "id": "sahar-bordeaux",
+  "version": 2,
+  "name": {
+    "he": "סהר בורדו",
+    "en": "Sahar Bordeaux"
+  },
+  "description": {
+    "he": "מעטפת שנהב עם חותם שעווה בורדו, שקיעה בצבעי מים מעל כרמים ואיורי דיו בגוון ספיה. קלאסי, חם ורומנטי.",
+    "en": "Ivory envelope with a bordeaux wax seal, a watercolour sunset over vineyards and sepia ink-and-wash drawings. Classic, warm and romantic."
+  },
+  "categories": [
+    "wedding",
+    "engagement",
+    "save_the_date"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/sahar-bordeaux/preview.webp",
+  "previewVideo": "/templates/sahar-bordeaux/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FBF8F4",
+      "surface": "#FAF2EF",
+      "ink": "#59141F",
+      "inkMuted": "#8A5A62",
+      "accent": "#731F2E",
+      "accentInk": "#FFFFFF",
+      "line": "#D9C3C6",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink",
+      "bg"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "bordeaux",
+      "name": {
+        "he": "בורדו",
+        "en": "Bordeaux"
+      },
+      "palette": {
+        "accent": "#731F2E",
+        "ink": "#59141F"
+      }
+    },
+    {
+      "id": "midnight",
+      "name": {
+        "he": "כחול לילה",
+        "en": "Midnight"
+      },
+      "palette": {
+        "accent": "#1F3A5F",
+        "ink": "#16263D"
+      }
+    },
+    {
+      "id": "olive",
+      "name": {
+        "he": "זית",
+        "en": "Olive"
+      },
+      "palette": {
+        "accent": "#4E5A2E",
+        "ink": "#2F361C"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "classic-script",
+      "display": {
+        "latin": "Pinyon Script",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "modern-serif",
+      "display": {
+        "latin": "Bodoni Moda",
+        "hebrew": "Noto Serif Hebrew"
+      },
+      "heading": {
+        "latin": "Bodoni Moda",
+        "hebrew": "Noto Serif Hebrew"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/sahar-bordeaux/cover-poster.webp",
+    "posterDesktop": "/templates/sahar-bordeaux/cover-poster-desktop.webp",
+    "openVideo": "/templates/sahar-bordeaux/cover-open.mp4",
+    "openVideoDesktop": "/templates/sahar-bordeaux/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/sahar-bordeaux/seal-blank.png",
+      "recolor": true,
+      "size": 0.34,
+      "offset": {
+        "x": 0,
+        "y": 0.0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#731F2E",
+      "#1F3A5F",
+      "#B08D57",
+      "#2F4F3A"
+    ],
+    "monogramFont": {
+      "latin": "Pinyon Script",
+      "hebrew": "Bellefair"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שקיעה בכרם",
+          "en": "Vineyard sunset"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.45
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#1A0A0D",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "sahar-bordeaux-theme",
+    "tracks": [
+      {
+        "id": "sahar-bordeaux-theme",
+        "title": "Strings at Dusk",
+        "url": "/templates/sahar-bordeaux/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/sahar-bordeaux/hero.mp4",
+    "hero-poster": "/templates/sahar-bordeaux/hero-poster.webp",
+    "hero-desktop": "/templates/sahar-bordeaux/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/sahar-bordeaux/hero-desktop-poster.webp",
+    "rings-vine": "/templates/sahar-bordeaux/rings-vine.webp",
+    "bicycle": "/templates/sahar-bordeaux/bicycle.webp",
+    "harvest-table": "/templates/sahar-bordeaux/harvest-table.webp",
+    "vineyard-panorama": "/templates/sahar-bordeaux/vineyard-panorama.webp",
+    "grapes": "/templates/sahar-bordeaux/grapes.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": "template:vineyard-panorama",
+    "afterTimeline": "template:harvest-table",
+    "beforeRsvp": "template:grapes",
+    "footer": "template:rings-vine"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "templateId": "honey-meadow",
+  "eventType": "baby_shower",
+  "locales": [
+    "en"
+  ],
+  "defaultLocale": "en",
+  "timezone": "Europe/London",
+  "hosts": {
+    "primary": {
+      "en": "Maya"
+    },
+    "secondary": null,
+    "joiner": null,
+    "parents": null
+  },
+  "event": {
+    "date": "2027-03-14",
+    "startTime": "11:00",
+    "endTime": "14:00",
+    "hebrewDate": "off",
+    "timeFormat": "12h",
+    "rsvpDeadline": "2027-03-01"
+  },
+  "theme": {
+    "fontPairId": "playful-serif",
+    "palette": null
+  },
+  "cover": {
+    "enabled": true,
+    "monogram": {
+      "en": "M"
+    },
+    "sealColor": "#E0A526",
+    "hint": {
+      "en": "Tap to open"
+    }
+  },
+  "music": {
+    "enabled": true,
+    "trackId": "honey-meadow-theme",
+    "customUrl": null,
+    "volume": 0.5,
+    "startAtSec": 0
+  },
+  "share": {
+    "slug": "mayas-baby-shower",
+    "ogTitle": {
+      "en": "Maya's Baby Shower"
+    },
+    "ogDescription": {
+      "en": "Sunday, 14 March 2027 · The Orchard Room"
+    },
+    "ogImage": null,
+    "noindex": true
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "enabled": true,
+      "data": {
+        "eyebrow": {
+          "en": "Boy or girl — we can't wait to meet you!"
+        },
+        "title": {
+          "mode": "custom",
+          "text": {
+            "en": "Maya's Baby Shower"
+          }
+        },
+        "showDate": true,
+        "locationLine": null,
+        "media": {
+          "kind": "video",
+          "src": "upload:hero-watercolor.mp4",
+          "poster": "upload:hero-watercolor.jpg",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.35
+          }
+        },
+        "overlayOpacity": 0.2
+      }
+    },
+    {
+      "id": "countdown",
+      "type": "countdown",
+      "enabled": true,
+      "data": {
+        "title": {
+          "en": "Due Date Countdown"
+        },
+        "subtitle": null,
+        "target": {
+          "date": "2027-04-20",
+          "time": "00:00"
+        },
+        "afterEvent": {
+          "en": "Baby is here! 💛"
+        }
+      }
+    },
+    {
+      "id": "venues",
+      "type": "venues",
+      "enabled": true,
+      "data": {
+        "items": [
+          {
+            "id": "venue-main",
+            "label": {
+              "en": "The Venue"
+            },
+            "name": {
+              "en": "The Orchard Room"
+            },
+            "address": {
+              "en": "42 Willow Lane, Brighton BN1 1AA"
+            },
+            "geo": null,
+            "mapsQuery": "42 Willow Lane Brighton",
+            "date": null,
+            "startTime": "11:00",
+            "endTime": "14:00",
+            "showMap": false,
+            "buttons": {
+              "maps": true,
+              "waze": false,
+              "calendar": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "book-note",
+      "type": "text",
+      "enabled": true,
+      "data": {
+        "kind": "custom",
+        "title": {
+          "en": "Books for Baby"
+        },
+        "subtitle": null,
+        "body": {
+          "en": "Instead of a card, please bring your favourite children's book with a little note inside."
+        },
+        "illustration": "template:daisy-bunch",
+        "cta": null
+      }
+    },
+    {
+      "id": "gifts",
+      "type": "gifts",
+      "enabled": true,
+      "data": {
+        "title": {
+          "en": "Gifts"
+        },
+        "body": {
+          "en": "Your presence is the greatest gift we could ask for. If you'd like to spoil Baby, we've put together a small wish list."
+        },
+        "links": [
+          {
+            "id": "g1",
+            "kind": "registry",
+            "label": {
+              "en": "Gift Registry"
+            },
+            "url": "https://example.com/registry/maya",
+            "details": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "rsvp",
+      "type": "rsvp",
+      "enabled": true,
+      "data": {
+        "title": {
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "en": "Please let us know if you can make it."
+        },
+        "askChildren": true,
+        "maxAdults": 3,
+        "maxChildren": 3,
+        "requirePhone": true,
+        "requireEmail": true,
+        "perAttendeeDetails": true,
+        "dietary": {
+          "enabled": true,
+          "options": [
+            "none",
+            "gluten_free",
+            "dairy_free",
+            "vegan",
+            "vegetarian",
+            "pescatarian",
+            "nut_allergy",
+            "other_allergy"
+          ],
+          "note": null
+        },
+        "customQuestions": [],
+        "messageLabel": {
+          "en": "Message for Maya"
+        },
+        "successMessage": {
+          "en": "Thank you! We can't wait to celebrate with you."
+        },
+        "declineMessage": {
+          "en": "Thanks for letting us know — you'll be missed!"
+        },
+        "closedMessage": {
+          "en": "RSVPs are now closed. Please contact Maya directly."
+        }
+      }
+    },
+    {
+      "id": "footer",
+      "type": "footer",
+      "enabled": true,
+      "data": {
+        "showHosts": false,
+        "showDate": true,
+        "showParents": false,
+        "closingLine": {
+          "en": "With love, Maya & Tom"
+        },
+        "showCredit": true
+      }
+    }
+  ]
+}

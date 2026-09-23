@@ -1,0 +1,184 @@
+{
+  "templateId": "ramon-dusk",
+  "defaults": {
+    "wedding": {
+      "coverHint": {
+        "he": "לחצו כדי להתיר את החבל",
+        "en": "Tap to untie"
+      },
+      "eyebrow": {
+        "he": "מתחת לשמי המדבר",
+        "en": "Under the desert sky"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "עוד כמה לילות…",
+          "en": "A few more nights…"
+        },
+        "subtitle": {
+          "he": "עד שנתחתן במדבר",
+          "en": "Until our desert wedding"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו מתחת לכוכבים",
+          "en": "Thank you for celebrating with us under the stars"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "מקום של שקט ואור",
+          "en": "A place of stillness and light"
+        },
+        "body": {
+          "he": "ב־{date} נתחתן בלב המדבר,\nבין סלעים, רוח וכוכבים.\nבואו לחגוג איתנו.",
+          "en": "On {date} we'll be married in the heart of the desert,\namong rocks, wind and stars.\nCome celebrate with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "במדבר",
+          "en": "In the Desert"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:30",
+          "label": {
+            "he": "קבלת פנים בשקיעה",
+            "en": "Sunset welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "18:30",
+          "label": {
+            "he": "חופה",
+            "en": "Chuppah"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "19:15",
+          "label": {
+            "he": "ארוחה סביב המדורה",
+            "en": "Fireside dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "23:30",
+          "label": {
+            "he": "כוכבים ומדורה",
+            "en": "Stars & bonfire"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "transport",
+          "title": {
+            "he": "הסעות",
+            "en": "Shuttles"
+          },
+          "subtitle": {
+            "he": "יוצאות ב־15:00",
+            "en": "Departing at 15:00"
+          },
+          "body": {
+            "he": "הסעות יוצאות מתל אביב ומבאר שבע. סמנו בטופס אם תצטרפו.",
+            "en": "Shuttles depart from Tel Aviv and Be'er Sheva. Let us know in the RSVP form."
+          },
+          "illustration": null
+        },
+        {
+          "kind": "accommodation",
+          "title": {
+            "he": "לינה",
+            "en": "Stay the Night"
+          },
+          "subtitle": {
+            "he": "מחירים מיוחדים לאורחים",
+            "en": "Special guest rates"
+          },
+          "body": {
+            "he": "שמרנו חדרים ואוהלי גלמפינג באזור. פרטים והזמנה בקישור.",
+            "en": "We've reserved rooms and glamping tents nearby. Details and booking at the link."
+          },
+          "illustration": "template:lanterns"
+        },
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "בוהו־שיק",
+            "en": "Boho chic"
+          },
+          "body": {
+            "he": "צבעי אדמה, בדים נושמים ונעליים שמתאימות לחול. בלילה מתקרר — הביאו שכבה.",
+            "en": "Earth tones, breathable fabrics and sand-friendly shoes. Nights get cool — bring a layer."
+          },
+          "illustration": "template:pampas"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "Message for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה במדבר ✨",
+          "en": "Thank you! See you in the desert ✨"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם, נתגעגע!",
+          "en": "Thanks for letting us know — we'll miss you!"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "נתראה במדבר",
+        "en": "See you in the desert"
+      }
+    }
+  }
+}

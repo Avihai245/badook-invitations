@@ -1,0 +1,142 @@
+{
+  "templateId": "honey-meadow",
+  "defaults": {
+    "baby_shower": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בן או בת? מחכים להכיר!",
+        "en": "Boy or girl — we can't wait to meet you!"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "בייבי שאוור ל{primary}",
+          "en": "{primary}'s Baby Shower"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנחגוג יחד",
+          "en": "Until we celebrate together"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו! 💛",
+          "en": "Thank you for celebrating with us! 💛"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "מתוק כמו דבש",
+          "en": "Sweet as honey"
+        },
+        "body": {
+          "he": "משהו מתוק בדרך!\nבואו לחגוג איתנו ב־{date} — עם עוגות, משחקים והרבה אהבה.",
+          "en": "Something sweet is on the way!\nJoin us on {date} for cake, games and lots of love."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המקום",
+          "en": "The Venue"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "11:00",
+          "label": {
+            "he": "קבלת פנים ובראנץ'",
+            "en": "Welcome brunch"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "12:00",
+          "label": {
+            "he": "משחקים והפתעות",
+            "en": "Games & surprises"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "12:45",
+          "label": {
+            "he": "פתיחת מתנות",
+            "en": "Gift opening"
+          },
+          "icon": "gift"
+        },
+        {
+          "time": "13:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "ספר במקום כרטיס",
+            "en": "A book instead of a card"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "במקום כרטיס ברכה, הביאו את ספר הילדים האהוב עליכם עם הקדשה קטנה.",
+            "en": "Instead of a card, bring your favourite children's book with a little note inside."
+          },
+          "illustration": "template:daisy-bunch"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה להורים לעתיד",
+          "en": "A note for the parents-to-be"
+        },
+        "successMessage": {
+          "he": "תודה! מחכים לראותכם 💛",
+          "en": "Thank you! Can't wait to see you 💛"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נתגעגע!",
+          "en": "Thanks for letting us know — you'll be missed!"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      }
+    }
+  }
+}

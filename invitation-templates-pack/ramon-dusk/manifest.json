@@ -1,0 +1,236 @@
+{
+  "id": "ramon-dusk",
+  "version": 2,
+  "name": {
+    "he": "רמון בשקיעה",
+    "en": "Ramon at Dusk"
+  },
+  "description": {
+    "he": "מעטפת קראפט קשורה בחבל יוטה עם פמפס מיובש ותגית נייר, מכתש בגווני טרקוטה וכוכבים ראשונים. בוהו מדברי, חם ומודרני.",
+    "en": "A kraft envelope tied with jute, dried pampas and a paper tag; a terracotta crater under the first stars. Desert boho, warm and modern."
+  },
+  "categories": [
+    "wedding",
+    "engagement",
+    "henna"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/ramon-dusk/preview.webp",
+  "previewVideo": "/templates/ramon-dusk/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F6EFE6",
+      "surface": "#EEE0CF",
+      "ink": "#3D291F",
+      "inkMuted": "#6E5546",
+      "accent": "#A04C27",
+      "accentInk": "#FFFFFF",
+      "line": "#DDC6B0",
+      "heroText": "#FFF8F0"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink",
+      "bg"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "terracotta",
+      "name": {
+        "he": "טרקוטה",
+        "en": "Terracotta"
+      },
+      "palette": {
+        "accent": "#A04C27"
+      }
+    },
+    {
+      "id": "sage",
+      "name": {
+        "he": "מרווה",
+        "en": "Sage"
+      },
+      "palette": {
+        "accent": "#5E6E4F",
+        "ink": "#2E3526"
+      }
+    },
+    {
+      "id": "night",
+      "name": {
+        "he": "לילה במדבר",
+        "en": "Desert night"
+      },
+      "palette": {
+        "accent": "#3E3A5C",
+        "ink": "#23203A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "boho",
+      "display": {
+        "latin": "Allura",
+        "hebrew": "Amatic SC"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "soft-serif",
+      "display": {
+        "latin": "Fraunces",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/ramon-dusk/cover-poster.webp",
+    "posterDesktop": "/templates/ramon-dusk/cover-poster-desktop.webp",
+    "openVideo": "/templates/ramon-dusk/cover-open.mp4",
+    "openVideoDesktop": "/templates/ramon-dusk/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "tag",
+      "image": "/templates/ramon-dusk/tag-blank.png",
+      "recolor": false,
+      "size": 0.26,
+      "offset": {
+        "x": 0,
+        "y": 0.06
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#3D291F",
+        "effect": "print",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Allura",
+      "hebrew": "Amatic SC"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "המכתש בשקיעה",
+          "en": "Crater at dusk"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.55
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFF8F0",
+    "overlayColor": "#24130B",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "ramon-dusk-theme",
+    "tracks": [
+      {
+        "id": "ramon-dusk-theme",
+        "title": "Desert Bloom (oud & guitar)",
+        "url": "/templates/ramon-dusk/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/ramon-dusk/hero.mp4",
+    "hero-poster": "/templates/ramon-dusk/hero-poster.webp",
+    "hero-desktop": "/templates/ramon-dusk/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/ramon-dusk/hero-desktop-poster.webp",
+    "pampas": "/templates/ramon-dusk/pampas.webp",
+    "acacia": "/templates/ramon-dusk/acacia.webp",
+    "ibex": "/templates/ramon-dusk/ibex.webp",
+    "lanterns": "/templates/ramon-dusk/lanterns.webp",
+    "stars-band": "/templates/ramon-dusk/stars-band.webp",
+    "crater-panorama": "/templates/ramon-dusk/crater-panorama.webp"
+  },
+  "decorations": {
+    "afterHero": "template:stars-band",
+    "betweenVenues": "template:crater-panorama",
+    "afterTimeline": "template:lanterns",
+    "beforeRsvp": "template:pampas",
+    "footer": "template:ibex"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

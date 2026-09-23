@@ -1,0 +1,239 @@
+{
+  "id": "papercut-gold",
+  "version": 2,
+  "name": {
+    "he": "ניירת זהב",
+    "en": "Golden Papercut"
+  },
+  "description": {
+    "he": "שער נייר חתוך בעבודת יד בהשראת כתובות עתיקות — רימונים, גפנים ויונים מעל רדיד זהב. מסורתי, מוזהב ומלא הוד.",
+    "en": "A hand-cut paper gate inspired by antique ketubot — pomegranates, vines and doves over gold foil. Traditional, gilded and majestic."
+  },
+  "categories": [
+    "wedding",
+    "engagement"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/papercut-gold/preview.webp",
+  "previewVideo": "/templates/papercut-gold/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FBF7EE",
+      "surface": "#F3EAD6",
+      "ink": "#3A2A18",
+      "inkMuted": "#6F5C45",
+      "accent": "#8C6A1F",
+      "accentInk": "#FFFFFF",
+      "line": "#E2D3AE",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink",
+      "bg"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב עתיק",
+        "en": "Antique gold"
+      },
+      "palette": {
+        "accent": "#8C6A1F"
+      }
+    },
+    {
+      "id": "pomegranate",
+      "name": {
+        "he": "רימון",
+        "en": "Pomegranate"
+      },
+      "palette": {
+        "accent": "#8E2A33",
+        "ink": "#3B1418"
+      }
+    },
+    {
+      "id": "olive",
+      "name": {
+        "he": "זית",
+        "en": "Olive"
+      },
+      "palette": {
+        "accent": "#5B6630",
+        "ink": "#2C3117"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "regal",
+      "display": {
+        "latin": "Cinzel Decorative",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "script",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "David Libre"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "David Libre"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "video",
+    "poster": "/templates/papercut-gold/cover-poster.webp",
+    "posterDesktop": "/templates/papercut-gold/cover-poster-desktop.webp",
+    "openVideo": "/templates/papercut-gold/cover-open.mp4",
+    "openVideoDesktop": "/templates/papercut-gold/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/papercut-gold/medallion-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0.0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#3A2A18",
+        "effect": "foil",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#B08D57",
+      "#A7ADB5",
+      "#8E2A33"
+    ],
+    "monogramFont": {
+      "latin": "Cinzel Decorative",
+      "hebrew": "Bellefair"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "חצר אבן ועץ זית",
+          "en": "Stone courtyard & olive tree"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#1E150A",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "papercut-gold-theme",
+    "tracks": [
+      {
+        "id": "papercut-gold-theme",
+        "title": "Golden Gate (violin & harp)",
+        "url": "/templates/papercut-gold/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/papercut-gold/hero.mp4",
+    "hero-poster": "/templates/papercut-gold/hero-poster.webp",
+    "hero-desktop": "/templates/papercut-gold/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/papercut-gold/hero-desktop-poster.webp",
+    "pomegranate-branch": "/templates/papercut-gold/pomegranate-branch.webp",
+    "papercut-band": "/templates/papercut-gold/papercut-band.webp",
+    "doves": "/templates/papercut-gold/doves.webp",
+    "chuppah": "/templates/papercut-gold/chuppah.webp",
+    "olive-sprig": "/templates/papercut-gold/olive-sprig.webp",
+    "lantern": "/templates/papercut-gold/lantern.webp"
+  },
+  "decorations": {
+    "afterHero": "template:papercut-band",
+    "betweenVenues": "template:pomegranate-branch",
+    "afterTimeline": "template:doves",
+    "beforeRsvp": "template:lantern",
+    "footer": "template:chuppah"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

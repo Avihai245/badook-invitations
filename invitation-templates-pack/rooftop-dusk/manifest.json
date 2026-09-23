@@ -1,0 +1,236 @@
+{
+  "id": "rooftop-dusk",
+  "version": 2,
+  "name": {
+    "he": "גג בשקיעה",
+    "en": "Rooftop at Dusk"
+  },
+  "description": {
+    "he": "כרטיס כניסה וינטג' שנתלש, גגות לבנים בשקיעה, שרשראות אורות ונוף לים. לימי הולדת, מסיבות אירוסין ואירועי חברה — לילי, צבעוני ומלא אנרגיה.",
+    "en": "A vintage admit-one ticket that tears open, white rooftops at dusk, string lights and a sea view. For birthdays, engagement parties and company events — nocturnal, colourful and full of energy."
+  },
+  "categories": [
+    "birthday",
+    "engagement",
+    "corporate"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/rooftop-dusk/preview.webp",
+  "previewVideo": "/templates/rooftop-dusk/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#1C1A2E",
+      "surface": "#262340",
+      "ink": "#F6EFE6",
+      "inkMuted": "#BDB5CC",
+      "accent": "#FF8A5B",
+      "accentInk": "#1C1A2E",
+      "line": "#3B3758",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 20,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "coral",
+      "name": {
+        "he": "קורל",
+        "en": "Coral"
+      },
+      "palette": {
+        "accent": "#FF8A5B",
+        "accentInk": "#1C1A2E"
+      }
+    },
+    {
+      "id": "neon-teal",
+      "name": {
+        "he": "טורקיז ניאון",
+        "en": "Neon teal"
+      },
+      "palette": {
+        "accent": "#3FD0C9",
+        "accentInk": "#1C1A2E"
+      }
+    },
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב",
+        "en": "Gold"
+      },
+      "palette": {
+        "accent": "#E9C46A",
+        "accentInk": "#1C1A2E"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "poster",
+      "display": {
+        "latin": "Unbounded",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Syne",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "bold",
+      "display": {
+        "latin": "Syne",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Syne",
+        "hebrew": "Secular One"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "video",
+    "poster": "/templates/rooftop-dusk/cover-poster.webp",
+    "posterDesktop": "/templates/rooftop-dusk/cover-poster-desktop.webp",
+    "openVideo": "/templates/rooftop-dusk/cover-open.mp4",
+    "openVideoDesktop": "/templates/rooftop-dusk/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0.0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#2A1E1A",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Unbounded",
+      "hebrew": "Karantina"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "גגות העיר בשקיעה",
+          "en": "City rooftops at dusk"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.45
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0E0C1A",
+    "defaultOverlay": 0.4
+  },
+  "music": {
+    "defaultTrackId": "rooftop-dusk-theme",
+    "tracks": [
+      {
+        "id": "rooftop-dusk-theme",
+        "title": "Golden Hour Groove (nu-disco)",
+        "url": "/templates/rooftop-dusk/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 60,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/rooftop-dusk/hero.mp4",
+    "hero-poster": "/templates/rooftop-dusk/hero-poster.webp",
+    "hero-desktop": "/templates/rooftop-dusk/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/rooftop-dusk/hero-desktop-poster.webp",
+    "string-lights": "/templates/rooftop-dusk/string-lights.webp",
+    "cocktails": "/templates/rooftop-dusk/cocktails.webp",
+    "vinyl": "/templates/rooftop-dusk/vinyl.webp",
+    "disco-ball": "/templates/rooftop-dusk/disco-ball.webp",
+    "palms": "/templates/rooftop-dusk/palms.webp",
+    "confetti": "/templates/rooftop-dusk/confetti.webp"
+  },
+  "decorations": {
+    "afterHero": "template:string-lights",
+    "betweenVenues": "template:palms",
+    "afterTimeline": "template:vinyl",
+    "beforeRsvp": "template:cocktails",
+    "footer": "template:disco-ball"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

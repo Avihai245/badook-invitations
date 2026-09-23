@@ -1,0 +1,152 @@
+{
+  "templateId": "caesarea-shore",
+  "defaults": {
+    "wedding": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "על שפת הים, אנחנו אומרים כן",
+        "en": "By the sea, we say yes"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנתחתן מול הים",
+          "en": "Until we marry by the sea"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו על החוף ♥",
+          "en": "Thank you for celebrating with us by the sea ♥"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "בין הגלים",
+          "en": "Between the waves"
+        },
+        "body": {
+          "he": "ב־{date}, כשהשמש תשקע אל הים,\nנתחתן — ונשמח שתהיו שם איתנו.",
+          "en": "On {date}, as the sun sets into the sea,\nwe will be married — and we'd love for you to be there."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "על החוף",
+          "en": "On the Shore"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "18:00",
+          "label": {
+            "he": "קבלת פנים על החוף",
+            "en": "Welcome on the beach"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:00",
+          "label": {
+            "he": "חופה בשקיעה",
+            "en": "Sunset chuppah"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "23:30",
+          "label": {
+            "he": "מסיבה על החול",
+            "en": "Party on the sand"
+          },
+          "icon": "party"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "בהיר וקיצי",
+            "en": "Light & summery"
+          },
+          "body": {
+            "he": "האירוע על החול — מומלץ נעליים שטוחות ושכבה קלה לרוח של הערב.",
+            "en": "We'll be on the sand — flat shoes and a light layer for the evening breeze are recommended."
+          },
+          "illustration": "template:footprints"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "Message for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה על החוף ♥",
+          "en": "Thank you! See you on the shore ♥"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם, נתגעגע!",
+          "en": "Thanks for letting us know — we'll miss you!"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "נתראה על החוף",
+        "en": "See you on the shore"
+      }
+    }
+  }
+}

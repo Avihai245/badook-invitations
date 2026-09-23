@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 1,
+  "templateId": "sahar-bordeaux",
+  "eventType": "wedding",
+  "locales": [
+    "he",
+    "en"
+  ],
+  "defaultLocale": "he",
+  "timezone": "Asia/Jerusalem",
+  "hosts": {
+    "primary": {
+      "he": "נועה",
+      "en": "Noa"
+    },
+    "secondary": {
+      "he": "איתי",
+      "en": "Itay"
+    },
+    "joiner": {
+      "he": "&",
+      "en": "&"
+    },
+    "parents": {
+      "he": "מרים ודני לוי · רונית ואבי כהן",
+      "en": "Miriam & Dani Levi · Ronit & Avi Cohen"
+    }
+  },
+  "event": {
+    "date": "2027-06-17",
+    "startTime": "19:30",
+    "endTime": "01:00",
+    "hebrewDate": "day",
+    "timeFormat": null,
+    "rsvpDeadline": "2027-06-01"
+  },
+  "theme": {
+    "fontPairId": "classic-script",
+    "palette": {
+      "accent": "#731F2E"
+    }
+  },
+  "cover": {
+    "enabled": true,
+    "monogram": {
+      "he": "נ&א",
+      "en": "N&I"
+    },
+    "sealColor": "#731F2E",
+    "hint": {
+      "he": "לחצו לפתיחת ההזמנה",
+      "en": "Tap to open"
+    }
+  },
+  "music": {
+    "enabled": true,
+    "trackId": "sahar-bordeaux-theme",
+    "customUrl": null,
+    "volume": 0.6,
+    "startAtSec": 0
+  },
+  "share": {
+    "slug": "noa-and-itay",
+    "ogTitle": {
+      "he": "נועה ואיתי מתחתנים",
+      "en": "Noa & Itay are getting married"
+    },
+    "ogDescription": {
+      "he": "יום חמישי, 17 ביוני 2027 · זכרון יעקב",
+      "en": "Thursday, 17 June 2027 · Zikhron Ya'akov"
+    },
+    "ogImage": null,
+    "noindex": true
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "enabled": true,
+      "data": {
+        "eyebrow": {
+          "he": "אנחנו מתחתנים",
+          "en": "We're getting married"
+        },
+        "title": {
+          "mode": "hosts"
+        },
+        "showDate": true,
+        "locationLine": {
+          "he": "זכרון יעקב",
+          "en": "Zikhron Ya'akov"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.4
+          }
+        },
+        "overlayOpacity": 0.35
+      }
+    },
+    {
+      "id": "countdown",
+      "type": "countdown",
+      "enabled": true,
+      "data": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד היום הגדול שלנו",
+          "en": "Until our big day"
+        },
+        "target": "event",
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו ♥",
+          "en": "Thank you for celebrating with us ♥"
+        }
+      }
+    },
+    {
+      "id": "story",
+      "type": "text",
+      "enabled": true,
+      "data": {
+        "kind": "story",
+        "title": {
+          "he": "יחד, מתחת לגפנים",
+          "en": "Together, beneath the vines"
+        },
+        "subtitle": null,
+        "body": {
+          "he": "אחרי שבע שנים, שני כלבים ואינספור שקיעות בכרמל —\nהגיע הזמן להגיד \"כן\".\nנשמח שתהיו חלק מהרגע הזה.",
+          "en": "Seven years, two dogs and countless Carmel sunsets later —\nit's time to say \"yes\".\nWe would love for you to be part of this moment."
+        },
+        "illustration": "template:rings-vine",
+        "cta": null
+      }
+    },
+    {
+      "id": "venues",
+      "type": "venues",
+      "enabled": true,
+      "data": {
+        "items": [
+          {
+            "id": "venue-main",
+            "label": {
+              "he": "האירוע",
+              "en": "The Celebration"
+            },
+            "name": {
+              "he": "אחוזת הגפן",
+              "en": "Ahuzat HaGefen"
+            },
+            "address": {
+              "he": "דרך הכרמים 12, זכרון יעקב",
+              "en": "12 Derech HaKramim, Zikhron Ya'akov"
+            },
+            "geo": {
+              "lat": 32.5707,
+              "lng": 34.9536
+            },
+            "mapsQuery": "Ahuzat HaGefen Zikhron Yaakov",
+            "date": null,
+            "startTime": "19:30",
+            "endTime": "01:00",
+            "showMap": true,
+            "buttons": {
+              "maps": true,
+              "waze": true,
+              "calendar": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "timeline",
+      "type": "timeline",
+      "enabled": true,
+      "data": {
+        "title": {
+          "he": "סדר הערב",
+          "en": "Timeline of the evening"
+        },
+        "showDate": true,
+        "revealMode": "none",
+        "items": [
+          {
+            "id": "t1",
+            "time": "19:30",
+            "label": {
+              "he": "קבלת פנים",
+              "en": "Welcome"
+            },
+            "icon": "glass"
+          },
+          {
+            "id": "t2",
+            "time": "20:30",
+            "label": {
+              "he": "חופה וקידושין",
+              "en": "Chuppah"
+            },
+            "icon": "chuppah"
+          },
+          {
+            "id": "t3",
+            "time": "21:15",
+            "label": {
+              "he": "ארוחת ערב",
+              "en": "Dinner"
+            },
+            "icon": "dinner"
+          },
+          {
+            "id": "t4",
+            "time": "22:00",
+            "label": {
+              "he": "ריקודים",
+              "en": "Dancing"
+            },
+            "icon": "music"
+          },
+          {
+            "id": "t5",
+            "time": "00:00",
+            "label": {
+              "he": "מסיבת אפטר",
+              "en": "After Party"
+            },
+            "icon": "party"
+          }
+        ]
+      }
+    },
+    {
+      "id": "transport",
+      "type": "text",
+      "enabled": true,
+      "data": {
+        "kind": "transport",
+        "title": {
+          "he": "הסעות",
+          "en": "Transportation"
+        },
+        "subtitle": {
+          "he": "יוצאות בשעה 18:15",
+          "en": "Departing at 18:15"
+        },
+        "body": {
+          "he": "יציאה מתל אביב — חניון רידינג.\nיציאה מירושלים — חניון בנייני האומה.\nחזרה בשעה 00:30. נא לסמן בטופס האישור אם תצטרפו.",
+          "en": "From Tel Aviv — Reading parking lot.\nFrom Jerusalem — Binyanei HaUma parking.\nReturn shuttles at 00:30. Please indicate in the RSVP form if you'll join."
+        },
+        "illustration": null,
+        "cta": null
+      }
+    },
+    {
+      "id": "dress-code",
+      "type": "text",
+      "enabled": true,
+      "data": {
+        "kind": "dress_code",
+        "title": {
+          "he": "קוד לבוש",
+          "en": "Dress Code"
+        },
+        "subtitle": {
+          "he": "חגיגי־קיצי",
+          "en": "Summer festive"
+        },
+        "body": {
+          "he": "האירוע בחוץ, על הדשא — מומלץ להימנע מעקבי סטילטו.",
+          "en": "The celebration is outdoors on the lawn — we suggest skipping stiletto heels."
+        },
+        "illustration": null,
+        "cta": null
+      }
+    },
+    {
+      "id": "gifts",
+      "type": "gifts",
+      "enabled": true,
+      "data": {
+        "title": {
+          "he": "מתנות",
+          "en": "Gifts"
+        },
+        "body": {
+          "he": "הנוכחות שלכם היא המתנה הגדולה ביותר. למי שרוצה — אפשר גם כאן:",
+          "en": "Your presence is the greatest gift. If you wish, you can also give here:"
+        },
+        "links": [
+          {
+            "id": "g1",
+            "kind": "bit",
+            "label": {
+              "he": "העברה בביט",
+              "en": "Send via Bit"
+            },
+            "url": "https://www.bitpay.co.il/app/me/EXAMPLE",
+            "details": null
+          },
+          {
+            "id": "g2",
+            "kind": "paybox",
+            "label": {
+              "he": "העברה בפייבוקס",
+              "en": "Send via PayBox"
+            },
+            "url": "https://payboxapp.page.link/EXAMPLE",
+            "details": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "faq",
+      "type": "faq",
+      "enabled": true,
+      "data": {
+        "title": {
+          "he": "שאלות נפוצות",
+          "en": "FAQ"
+        },
+        "items": [
+          {
+            "id": "q1",
+            "q": {
+              "he": "יש חניה במקום?",
+              "en": "Is there parking at the venue?"
+            },
+            "a": {
+              "he": "כן, חניה חינם בשטח האחוזה.",
+              "en": "Yes, free parking on the estate grounds."
+            }
+          },
+          {
+            "id": "q2",
+            "q": {
+              "he": "האוכל כשר?",
+              "en": "Is the food kosher?"
+            },
+            "a": {
+              "he": "כן, כשר בהשגחת הרבנות. אפשר לבקש כשר למהדרין בטופס.",
+              "en": "Yes, rabbinate-certified kosher. Mehadrin meals can be requested in the form."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rsvp",
+      "type": "rsvp",
+      "enabled": true,
+      "data": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו",
+          "en": "Please let us know if you can make it"
+        },
+        "askChildren": true,
+        "maxAdults": 4,
+        "maxChildren": 4,
+        "requirePhone": true,
+        "requireEmail": false,
+        "perAttendeeDetails": true,
+        "dietary": {
+          "enabled": true,
+          "options": [
+            "none",
+            "kosher_mehadrin",
+            "vegetarian",
+            "vegan",
+            "gluten_free",
+            "nut_allergy",
+            "other_allergy",
+            "kids_meal"
+          ],
+          "note": {
+            "he": "כל האוכל באירוע כשר. אם אתם צריכים כשר למהדרין — סמנו זאת.",
+            "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+          }
+        },
+        "customQuestions": [
+          {
+            "id": "shuttle",
+            "type": "select",
+            "required": false,
+            "label": {
+              "he": "מצטרפים להסעה?",
+              "en": "Joining a shuttle?"
+            },
+            "options": [
+              {
+                "value": "none",
+                "label": {
+                  "he": "לא צריך",
+                  "en": "No thanks"
+                }
+              },
+              {
+                "value": "tlv",
+                "label": {
+                  "he": "מתל אביב",
+                  "en": "From Tel Aviv"
+                }
+              },
+              {
+                "value": "jlm",
+                "label": {
+                  "he": "מירושלים",
+                  "en": "From Jerusalem"
+                }
+              }
+            ]
+          }
+        ],
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "Message for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! קיבלנו את האישור שלכם ♥",
+          "en": "Thank you! Your RSVP has been received ♥"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם, נתגעגע!",
+          "en": "Thanks for letting us know — we'll miss you!"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        }
+      }
+    },
+    {
+      "id": "footer",
+      "type": "footer",
+      "enabled": true,
+      "data": {
+        "showHosts": true,
+        "showDate": true,
+        "showParents": true,
+        "closingLine": {
+          "he": "מחכים לראותכם",
+          "en": "Can't wait to see you"
+        },
+        "showCredit": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "templateId": "rooftop-dusk",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו כדי לתלוש",
+        "en": "Tap to tear"
+      },
+      "eyebrow": {
+        "he": "יאללה, חוגגים!",
+        "en": "Let's celebrate!"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "יום ההולדת של {primary}",
+          "en": "{primary}'s Birthday"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור התחילה",
+          "en": "The countdown is on"
+        },
+        "subtitle": {
+          "he": "עד שהמסיבה מתחילה",
+          "en": "Until the party starts"
+        },
+        "afterEvent": {
+          "he": "איזה לילה! תודה שבאתם",
+          "en": "What a night! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד שנה, עוד מסיבה",
+          "en": "One more year, one big party"
+        },
+        "body": {
+          "he": "ב־{date} עולים לגג,\nמרימים כוסית מול השקיעה\nורוקדים עד שהעיר נרדמת.",
+          "en": "On {date} we're heading up to the rooftop —\ndrinks at sunset\nand dancing until the city falls asleep."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The Party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:00",
+          "label": {
+            "he": "קוקטייל שקיעה",
+            "en": "Sunset cocktails"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "די־ג'יי",
+            "en": "DJ set"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "Toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "רחבה",
+            "en": "Dance floor"
+          },
+          "icon": "party"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "נצנוץ מבורך",
+            "en": "Glitter encouraged"
+          },
+          "body": {
+            "he": "מה שגורם לכם להרגיש הכי טוב — עם נצנוץ קטן.",
+            "en": "Whatever makes you feel your best — with a little sparkle."
+          },
+          "illustration": "template:disco-ball"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים?",
+          "en": "You in?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה על הגג 🥂",
+          "en": "Amazing! See you on the rooftop 🥂"
+        },
+        "declineMessage": {
+          "he": "חבל! נרים כוסית לכבודכם",
+          "en": "Too bad! We'll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על הגג",
+        "en": "See you on the rooftop"
+      }
+    }
+  }
+}

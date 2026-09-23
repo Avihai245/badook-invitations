@@ -1,0 +1,240 @@
+{
+  "id": "honey-meadow",
+  "version": 2,
+  "name": {
+    "he": "אחו הדבש",
+    "en": "Honey Meadow"
+  },
+  "description": {
+    "he": "מעטפת קראפט עם חותם שעוות דבורים משושה, אחו חמניות בצבעי מים עם בלון פורח ודבורה חמודה. לבייבי שאוור ולימי הולדת לילדים — מתוק ושמח.",
+    "en": "A kraft envelope with a hexagonal beeswax seal, a watercolour sunflower meadow with a hot-air balloon and a friendly bee. For baby showers and kids' birthdays — sweet and joyful."
+  },
+  "categories": [
+    "baby_shower",
+    "birthday",
+    "brit"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/honey-meadow/preview.webp",
+  "previewVideo": "/templates/honey-meadow/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FFFEF2",
+      "surface": "#FFF8DC",
+      "ink": "#292119",
+      "inkMuted": "#62573F",
+      "accent": "#E8B93C",
+      "accentInk": "#292119",
+      "line": "#EADFB8",
+      "heroText": "#FFFDF5"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "surface"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "honey",
+      "name": {
+        "he": "דבש",
+        "en": "Honey"
+      },
+      "palette": {
+        "accent": "#E8B93C",
+        "surface": "#FFF8DC"
+      }
+    },
+    {
+      "id": "mint",
+      "name": {
+        "he": "מנטה",
+        "en": "Mint"
+      },
+      "palette": {
+        "accent": "#8CC7A1",
+        "surface": "#EEF8F0"
+      }
+    },
+    {
+      "id": "peach",
+      "name": {
+        "he": "אפרסק",
+        "en": "Peach"
+      },
+      "palette": {
+        "accent": "#F2A07B",
+        "surface": "#FFF1E8"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "playful-serif",
+      "display": {
+        "latin": "Atma",
+        "hebrew": "Amatic SC"
+      },
+      "heading": {
+        "latin": "Artifika",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "rounded",
+      "display": {
+        "latin": "Fraunces",
+        "hebrew": "Varela Round"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "Varela Round"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/honey-meadow/cover-poster.webp",
+    "posterDesktop": "/templates/honey-meadow/cover-poster-desktop.webp",
+    "openVideo": "/templates/honey-meadow/cover-open.mp4",
+    "openVideoDesktop": "/templates/honey-meadow/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/honey-meadow/seal-hex-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0.0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#E0A526",
+      "#C98A3A",
+      "#8CC7A1"
+    ],
+    "monogramFont": {
+      "latin": "Atma",
+      "hebrew": "Amatic SC"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "אחו חמניות",
+          "en": "Sunflower meadow"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.4
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFDF5",
+    "overlayColor": "#2A2110",
+    "defaultOverlay": 0.2
+  },
+  "music": {
+    "defaultTrackId": "honey-meadow-theme",
+    "tracks": [
+      {
+        "id": "honey-meadow-theme",
+        "title": "Buzzing Lullaby (ukulele & glockenspiel)",
+        "url": "/templates/honey-meadow/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/honey-meadow/hero.mp4",
+    "hero-poster": "/templates/honey-meadow/hero-poster.webp",
+    "hero-desktop": "/templates/honey-meadow/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/honey-meadow/hero-desktop-poster.webp",
+    "daisy-bunch": "/templates/honey-meadow/daisy-bunch.webp",
+    "bee-sunflower": "/templates/honey-meadow/bee-sunflower.webp",
+    "sunflowers": "/templates/honey-meadow/sunflowers.webp",
+    "balloon": "/templates/honey-meadow/balloon.webp",
+    "honeycomb-band": "/templates/honey-meadow/honeycomb-band.webp",
+    "clouds": "/templates/honey-meadow/clouds.webp"
+  },
+  "decorations": {
+    "afterHero": "template:honeycomb-band",
+    "betweenVenues": "template:sunflowers",
+    "afterTimeline": "template:balloon",
+    "beforeRsvp": "template:clouds",
+    "footer": "template:bee-sunflower"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}
