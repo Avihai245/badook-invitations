@@ -2,12 +2,13 @@ import { Fragment } from 'react';
 import type { SectionOf, Venue } from '../../contracts/types';
 import { googleCalendarUrl, outlookCalendarUrl } from '../../lib/calendar';
 import { DAY_MONTH_YEAR, formatDate } from '../../lib/dates';
-import { googleMapsUrl, hasLocation, wazeUrl } from '../../lib/maps';
+import { googleMapsEmbedUrl, googleMapsUrl, hasLocation, wazeUrl } from '../../lib/maps';
 import { icsHref, venueCalendarEvent } from '../../renderer/calendar-event';
 import type { RenderContext } from '../../renderer/context';
 import { Icon } from '../../ui/Icon';
 import { Decoration, SecHead, editPath, iv, type SectionViewProps } from '../shared';
 import { CalendarMenu, type CalendarLinks } from './CalendarMenu.client';
+import { MapEmbed } from './MapEmbed.client';
 
 function calendarLinks(ctx: RenderContext, venue: Venue): CalendarLinks {
   const event = venueCalendarEvent(ctx, venue);
@@ -51,17 +52,12 @@ export function VenuesView({ section, ctx }: SectionViewProps<SectionOf<'venues'
                   <Icon name="clock" size={18} /> <span className="ltr">{ctx.time(v.startTime)}</span>
                 </p>
                 {v.showMap && located ? (
-                  <div
-                    className="map reveal"
+                  <MapEmbed
+                    // the editor and previews keep the placeholder (an iframe would swallow clicks)
+                    src={ctx.mode === 'live' ? googleMapsEmbedUrl(mapsTarget, ctx.locale) : null}
+                    label={ctx.t('map.label', { name: ctx.text(v.name) })}
                     style={iv(4)}
-                    role="img"
-                    aria-label={ctx.t('map.label', { name: ctx.text(v.name) })}
-                  >
-                    <span className="pin">
-                      <Icon name="map-pin" size={40} strokeWidth={1.6} />
-                    </span>
-                    <span className="chip">Google Maps</span>
-                  </div>
+                  />
                 ) : null}
                 <div className="actions reveal" style={iv(5)}>
                   {v.buttons.maps ? (

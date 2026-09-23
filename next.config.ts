@@ -1,5 +1,10 @@
 import type { NextConfig } from 'next';
 
+const FONT_FILES = [
+  './node_modules/@fontsource/*/files/*-hebrew-*-normal.woff',
+  './node_modules/@fontsource/*/files/*-latin-*-normal.woff',
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -10,6 +15,12 @@ const nextConfig: NextConfig = {
   // Metadata (title, Open Graph) goes into <head> for every user agent instead of being streamed after
   // the shell, so link previews from any messenger (not only Next's bot list) see it.
   htmlLimitedBots: /.*/,
+  // The OG image renderer (satori) reads fonts from disk — the .woff next to each @fontsource .woff2 —
+  // so they must ship with those routes (the paths are computed at runtime, invisible to tracing).
+  outputFileTracingIncludes: {
+    '/i/[slug]/opengraph-image': FONT_FILES,
+    '/dev/invitations/og/[template]/[lang]/[doc]': FONT_FILES,
+  },
   // /i/<slug>?lang=en → /i/<slug>/en (no ?lang → /i/<slug>/default): the public invitation is a
   // cacheable path (ISR + CDN) instead of depending on the query. Done here rather than in middleware —
   // responses to middleware rewrites are sent as `private, no-store`, which disables ISR and the CDN.

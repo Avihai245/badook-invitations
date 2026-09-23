@@ -34,6 +34,7 @@
     "@hebcal/core": "^6.9.3",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.1",
+    "bidi-js": "^1.1.0",
     "clsx": "^2.1.1",
     "libphonenumber-js": "^1.13.13",
     "lucide-react": "^1.47.0",

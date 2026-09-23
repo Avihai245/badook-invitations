@@ -10,6 +10,7 @@ import {
 } from '@/features/invitations/renderer/context';
 import { InvitationBody } from '@/features/invitations/renderer/InvitationBody';
 import { buildLivePayload } from '@/features/invitations/renderer/live/build';
+import { OG_SIZE, ogVersion } from '@/features/invitations/server/og-image';
 import {
   getPublishedInvitation,
   resolveLocale,
@@ -63,6 +64,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const description =
     ctx.text(share.ogDescription) || [ctx.eventDateLong, ctx.hebrewDate].filter(Boolean).join(' · ');
   const url = `${ctx.publicBaseUrl}/i/${slug}?lang=${locale}`;
+  // the document hash in the URL: link previews cache images by URL (a new one per publish)
+  const image = {
+    url: `${ctx.publicBaseUrl}/i/${slug}/opengraph-image?lang=${locale}&v=${ogVersion(invitation.doc)}`,
+    ...OG_SIZE,
+    alt: title,
+  };
   return {
     title,
     description,
@@ -74,7 +81,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
         invitation.doc.locales.map((l) => [l, `${ctx.publicBaseUrl}/i/${slug}?lang=${l}`]),
       ),
     },
-    openGraph: { title, description, url, type: 'website', locale: locale === 'he' ? 'he_IL' : 'en_GB' },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'website',
+      locale: locale === 'he' ? 'he_IL' : 'en_GB',
+      images: [image],
+    },
+    twitter: { card: 'summary_large_image', title, description, images: [image.url] },
   };
 }
 

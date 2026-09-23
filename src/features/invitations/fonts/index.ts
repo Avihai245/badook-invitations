@@ -108,6 +108,11 @@ export function displayFontPreloads(pair: FontPair, locale: Locale): string[] {
   return face ? [face.url] : [];
 }
 
+/** A family's font files (woff2 URLs under /fonts, as served to browsers). */
+export function fontFaceFiles(family: string): readonly FontFace[] {
+  return FAMILIES[family]?.faces ?? [];
+}
+
 export function hasFamily(family: string): boolean {
   return family in FAMILIES;
 }
