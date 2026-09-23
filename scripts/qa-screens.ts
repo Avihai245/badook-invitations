@@ -20,6 +20,7 @@ import { chromium, type Browser, type Page } from '@playwright/test';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import { fontFaceCss } from '../src/features/invitations/fonts';
+import { FIXTURES } from '../src/features/invitations/templates/demo';
 import { TEMPLATE_IDS } from '../src/features/invitations/templates/registry';
 
 const arg = (name: string, fallback: string) => {
@@ -419,62 +420,68 @@ async function heroLegibility(browser: Browser) {
     { tag: 'mobile', w: FRAME.w, h: FRAME.h },
     { tag: 'desktop', w: 1440, h: 900 },
   ];
-  for (const id of TPLS) {
-    for (const locale of ['he', 'en'] as const) {
-      for (const v of views) {
-        const { page } = await newPage(browser, v.w, v.h, 1);
-        await page.goto(`${BASE}/dev/invitations/render/${id}/${locale}/demo?open=1&now=${NOW}`, {
-          waitUntil: 'networkidle',
-        });
-        await settle(page);
-        const lines = await page.evaluate(() => {
-          const out: { large: boolean; color: string; x: number; y: number; w: number; h: number }[] = [];
-          const els = document.querySelectorAll<HTMLElement>(
-            '.hero .eyebrow, .hero .names .n, .hero .names .j, .hero .hero-date, .hero .hero-loc',
-          );
-          for (let i = 0; i < els.length; i++) {
-            const el = els[i]!;
-            const range = document.createRange();
-            range.selectNodeContents(el);
-            const rects = range.getClientRects();
-            for (let k = 0; k < rects.length; k++) {
-              const r = rects[k]!;
-              if (r.width < 4 || r.height < 4) continue;
-              out.push({
-                large: el.classList.contains('n'),
-                color: getComputedStyle(el).color,
-                x: r.x,
-                y: r.y,
-                w: r.width,
-                h: r.height,
-              });
-            }
+  // Every template's demo (placeholder art) plus the kit fixtures, which bring their own hero media —
+  // including uploads that don't exist, so the missing-media fallback is measured too.
+  const cases = [
+    ...TPLS.flatMap((id) => (['he', 'en'] as const).map((locale) => ({ id, locale, doc: 'demo' }))),
+    ...Object.entries(FIXTURES).flatMap(([doc, d]) =>
+      TPLS.includes(d.templateId) ? d.locales.map((locale) => ({ id: d.templateId, locale, doc })) : [],
+    ),
+  ];
+  for (const { id, locale, doc } of cases) {
+    for (const v of views) {
+      const { page } = await newPage(browser, v.w, v.h, 1);
+      await page.goto(`${BASE}/dev/invitations/render/${id}/${locale}/${doc}?open=1&now=${NOW}`, {
+        waitUntil: 'networkidle',
+      });
+      await settle(page);
+      const lines = await page.evaluate(() => {
+        const out: { large: boolean; color: string; x: number; y: number; w: number; h: number }[] = [];
+        const els = document.querySelectorAll<HTMLElement>(
+          '.hero .eyebrow, .hero .names .n, .hero .names .j, .hero .hero-date, .hero .hero-loc',
+        );
+        for (let i = 0; i < els.length; i++) {
+          const el = els[i]!;
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          const rects = range.getClientRects();
+          for (let k = 0; k < rects.length; k++) {
+            const r = rects[k]!;
+            if (r.width < 4 || r.height < 4) continue;
+            out.push({
+              large: el.classList.contains('n'),
+              color: getComputedStyle(el).color,
+              x: r.x,
+              y: r.y,
+              w: r.width,
+              h: r.height,
+            });
           }
-          return out;
-        });
-        // 1) text fill transparent → the backdrop as a reader sees it (overlay + text shadow halo)
-        const shadow = await page.addStyleTag({
-          content:
-            '.hero-inner *{color:transparent!important;-webkit-text-fill-color:transparent!important}.hero .rule,.cue,.fab{visibility:hidden!important}',
-        });
-        await page.waitForTimeout(50);
-        const withShadow = contrastBehind(PNG.sync.read(await page.screenshot()), lines);
-        // 2) text + shadow hidden → bare backdrop (conservative)
-        await shadow.evaluate((el) => (el as Element).remove());
-        await page.addStyleTag({ content: '.hero-inner,.cue,.fab{visibility:hidden!important}' });
-        await page.waitForTimeout(50);
-        const bare = contrastBehind(PNG.sync.read(await page.screenshot()), lines);
-        const small = withShadow.small;
-        const large = withShadow.large;
-        report.legibility.push({
-          name: `${id} ${locale} ${v.tag}`,
-          small,
-          large,
-          bareSmall: bare.small,
-          bareLarge: bare.large,
-        });
-        await page.context().close();
-      }
+        }
+        return out;
+      });
+      // 1) text fill transparent → the backdrop as a reader sees it (overlay + text shadow halo)
+      const shadow = await page.addStyleTag({
+        content:
+          '.hero-inner *{color:transparent!important;-webkit-text-fill-color:transparent!important}.hero .rule,.cue,.fab{visibility:hidden!important}',
+      });
+      await page.waitForTimeout(50);
+      const withShadow = contrastBehind(PNG.sync.read(await page.screenshot()), lines);
+      // 2) text + shadow hidden → bare backdrop (conservative)
+      await shadow.evaluate((el) => (el as Element).remove());
+      await page.addStyleTag({ content: '.hero-inner,.cue,.fab{visibility:hidden!important}' });
+      await page.waitForTimeout(50);
+      const bare = contrastBehind(PNG.sync.read(await page.screenshot()), lines);
+      const small = withShadow.small;
+      const large = withShadow.large;
+      report.legibility.push({
+        name: `${doc === 'demo' ? id : `${id}/${doc}`} ${locale} ${v.tag}`,
+        small,
+        large,
+        bareSmall: bare.small,
+        bareLarge: bare.large,
+      });
+      await page.context().close();
     }
   }
 }

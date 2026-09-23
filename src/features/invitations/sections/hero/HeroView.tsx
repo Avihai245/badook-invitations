@@ -1,8 +1,11 @@
 import type { CSSProperties } from 'react';
-import type { SectionOf } from '../../contracts/types';
+import type { AssetRef, SectionOf } from '../../contracts/types';
 import { longestWordLength } from '../../lib/text';
 import { Icon } from '../../ui/Icon';
 import { editPath, type SectionViewProps } from '../shared';
+
+/** An upload or a link: resolves to a URL whether or not the file exists. */
+const unverified = (ref: AssetRef | null | undefined) => !!ref && !ref.startsWith('template:');
 
 const CLOUDS: [number, number, number, number][] = [
   [8, 12, 38, 9],
@@ -58,7 +61,7 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
   const poster = ctx.asset(d.media.poster);
   const focal = `${d.media.focalPoint.x * 100}% ${d.media.focalPoint.y * 100}%`;
 
-  let media;
+  let media = null;
   if (d.media.kind === 'video' && src) {
     media = (
       <video
@@ -76,9 +79,12 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
     media = <img src={poster} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
   } else if (d.media.kind === 'image' && src) {
     media = <img src={src} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
-  } else {
-    media = <HeroPlaceholder hills={ctx.art.hills} scrim={ctx.art.shade !== null} />;
   }
+  // Template media only resolves once the file is in the bucket (media-manifest.json), but an uploaded
+  // or linked file can be missing (the kit fixtures point at uploads that don't exist; a host may
+  // delete one). Draw the placeholder art under those: a file that fails to load leaves the element
+  // transparent, so the art and its scrim show through instead of a bare sky (§5 missing media).
+  const placeholder = !media || unverified(d.media.src) || unverified(d.media.poster);
 
   const custom = d.title.mode === 'custom';
   const joiner = ctx.text(doc.hosts.joiner) || '&';
@@ -89,6 +95,7 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
   return (
     <header className="hero" data-edit-path={path}>
       <div className="hero-media" aria-hidden="true">
+        {placeholder ? <HeroPlaceholder hills={ctx.art.hills} scrim={ctx.art.shade !== null} /> : null}
         {media}
       </div>
       <div className="hero-overlay" style={{ '--ov': d.overlayOpacity } as CSSProperties} />

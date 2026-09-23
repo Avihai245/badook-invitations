@@ -46,7 +46,7 @@ export default async function RenderPage({ params, searchParams }: { params: Par
     now,
     publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
     bases: assetBasesFromEnv({
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
       templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
     }),
   });

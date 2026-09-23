@@ -85,6 +85,17 @@ test.describe('public invitations', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 
+  test('an uploaded hero file that may be missing keeps the placeholder art under it', async ({ page }) => {
+    // The baby shower fixture points at uploads (upload:hero-watercolor.*) that aren't in the bucket:
+    // the video stays transparent when they fail, so the art and its scrim must be drawn beneath it.
+    await open(page, '/i/mayas-baby-shower?open=1');
+    const media = page.locator('.hero-media');
+    await expect(media.locator('video')).toHaveAttribute('src', /\/invitation-media\/hero-watercolor\.mp4$/);
+    await expect(media.locator('svg.hills')).toHaveCount(1);
+    await expect(media.locator('.scrim')).toHaveCount(1);
+    expect(await media.evaluate((m) => m.lastElementChild?.localName)).toBe('video');
+  });
+
   test('the cover opens; ?open=1 skips it before the first paint; the language pill keeps it skipped', async ({
     page,
   }) => {
