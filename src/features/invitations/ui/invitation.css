@@ -362,6 +362,167 @@ a {
   }
 }
 
+/* ============ 3b. VIDEO-FIRST COVER (§2.2.1) ============ */
+.cover-video {
+  background: #000;
+  transition: opacity 0.6s var(--ease);
+  --short: min(100vw, 100svh);
+}
+.cover-video::after {
+  display: none;
+}
+.cv-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.cv-media picture {
+  display: contents;
+}
+.cv-poster,
+.cv-video,
+.cv-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* the first frame of the video is the poster: show the video only once it really plays */
+.cv-video {
+  opacity: 0;
+}
+.cover-video.playing .cv-video {
+  opacity: 1;
+}
+.cv-backdrop {
+  display: none;
+}
+/* landscape without desktop art: the 9:16 media centered over a blurred, scaled copy of itself */
+@media (min-width: 1024px) and (min-aspect-ratio: 1/1) {
+  .cover-video:not([data-desktop]) .cv-backdrop {
+    display: block;
+    filter: blur(28px) saturate(1.1);
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+  .cover-video:not([data-desktop]) .cv-poster,
+  .cover-video:not([data-desktop]) .cv-video {
+    left: 50%;
+    right: auto;
+    width: auto;
+    height: 100svh;
+    aspect-ratio: 9 / 16;
+    transform: translateX(-50%);
+    box-shadow: 0 0 80px rgba(0, 0, 0, 0.35);
+  }
+}
+/* the editable overlay, centered on the viewport (template size/offset are fractions of its short side) */
+.cv-overlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--short) * var(--ov-size) * var(--ov-aspect));
+  aspect-ratio: var(--ov-aspect);
+  transform: translate(calc(-50% + var(--short) * var(--ov-x)), calc(-50% + var(--short) * var(--ov-y)));
+  z-index: 2;
+}
+.cv-overlay .half {
+  position: absolute;
+  inset: 0;
+  transition:
+    transform 0.45s var(--ease),
+    opacity 0.45s var(--ease);
+}
+.cv-overlay .half.l {
+  clip-path: inset(0 50% 0 0);
+}
+.cv-overlay .half.r {
+  clip-path: inset(0 0 0 50%);
+}
+.ov-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  animation: pulse-flat 2.4s ease-in-out infinite;
+}
+.ov-art > svg,
+.ov-art > img,
+.ov-tint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.ov-png {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+.ov-png.multiply {
+  mix-blend-mode: multiply;
+}
+.ov-tint {
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+.monogram {
+  overflow: visible;
+}
+.cover-video .cover-hint {
+  color: var(--cover-hint, rgba(255, 255, 255, 0.85));
+}
+.cover-video .cover-skip {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.25);
+}
+/* opening: the overlay exits inside the video's static first holdMs */
+.cover-video.opening .ov-art {
+  animation: none;
+}
+.cover-video.opening .cover-hint {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.cover-video.opening .cv-overlay .half.l {
+  transform: translate(-18px, 34px) rotate(-12deg);
+  opacity: 0;
+}
+.cover-video.opening .cv-overlay .half.r {
+  transform: translate(18px, 34px) rotate(12deg);
+  opacity: 0;
+}
+.cover-video.opening[data-exit='lift'] .cv-overlay .half {
+  transform: translateY(-24px) scale(1.08);
+  opacity: 0;
+  transition:
+    transform 0.4s var(--ease),
+    opacity 0.4s var(--ease);
+}
+.cover-video.opening[data-exit='fade'] .cv-overlay .half {
+  transform: none;
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+.cover-video.opening[data-exit='none'] .cv-overlay .half {
+  transform: none;
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ov-art {
+    animation: none;
+  }
+  .cover-video,
+  .cv-overlay .half {
+    transition: opacity 0.3s linear;
+  }
+}
+
 /* ============ 4. FLOATING CONTROLS ============ */
 .fab {
   position: fixed;

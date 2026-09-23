@@ -13,6 +13,7 @@ import { DAY_MONTH_YEAR, formatDate, formatEventDate, formatTime } from '../lib/
 import { formatHebrewDate } from '../lib/hebrew-date';
 import { interpolate, localize, type TokenValues } from '../lib/l10n';
 import { resolveAsset, type AssetBases } from './assets';
+import { coverMedia, musicUrl, type CoverMedia } from './cover/media';
 import { placeholderArt, type PlaceholderArt } from './placeholders';
 
 export type RenderMode = 'live' | 'preview' | 'editor';
@@ -47,6 +48,10 @@ export interface RenderContext {
   asset(ref: AssetRef | null | undefined): string | null;
   /** index of a section in doc.sections — used for data-edit-path */
   indexOf(section: Section): number;
+  /** the cover's media files (null = not produced: CSS fallback) */
+  coverMedia: CoverMedia;
+  /** the music track to play after the cover opens (null = none) */
+  musicUrl: string | null;
 }
 
 export interface RenderOptions {
@@ -56,6 +61,9 @@ export interface RenderOptions {
   bases: AssetBases;
   publicBaseUrl: string;
   icsViaRoute?: boolean;
+  /** QA/dev only: cover media and music instead of the template's (fixtures) */
+  coverMedia?: CoverMedia;
+  musicUrl?: string | null;
 }
 
 export function buildRenderContext(
@@ -96,5 +104,7 @@ export function buildRenderContext(
     time: (hhmm) => formatTime(hhmm, locale, doc.event.timeFormat),
     asset: (ref) => resolveAsset(ref, template, options.bases),
     indexOf: (section) => indexById.get(section.id) ?? -1,
+    coverMedia: options.coverMedia ?? coverMedia(template, options.bases),
+    musicUrl: options.musicUrl !== undefined ? options.musicUrl : musicUrl(doc, template, options.bases),
   };
 }

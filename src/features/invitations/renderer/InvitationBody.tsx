@@ -56,8 +56,17 @@ export function InvitationBody({
               overlay={{
                 kind: template.cover.overlay.kind,
                 exit: template.cover.overlay.exit,
-                textColor: template.cover.overlay.text.color,
+                recolor: template.cover.overlay.recolor,
+                size: template.cover.overlay.size,
+                offset: template.cover.overlay.offset,
+                text: template.cover.overlay.text,
               }}
+              sealColor={
+                template.cover.overlay.recolor
+                  ? (doc.cover.sealColor ?? template.cover.sealColors[0] ?? null)
+                  : null
+              }
+              media={ctx.coverMedia}
               monogram={ctx.text(doc.cover.monogram)}
               hint={ctx.text(doc.cover.hint) || ctx.t('cover.hint')}
               skipLabel={ctx.t('cover.skip')}
@@ -74,7 +83,15 @@ export function InvitationBody({
               : null
           }
           music={
-            doc.music.enabled ? { playLabel: ctx.t('music.play'), pauseLabel: ctx.t('music.pause') } : null
+            ctx.mode === 'live' && ctx.musicUrl
+              ? {
+                  src: ctx.musicUrl,
+                  volume: doc.music.volume,
+                  startAtSec: doc.music.startAtSec,
+                  playLabel: ctx.t('music.play'),
+                  pauseLabel: ctx.t('music.pause'),
+                }
+              : null
           }
         />
         <main>

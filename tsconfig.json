@@ -25,6 +25,13 @@
       "@pack/*": ["./invitation-templates-pack/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next-env.d.ts", ".next-main/types/**/*.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    ".next-main/types/**/*.ts",
+    ".next-dev/types/**/*.ts"
+  ],
   "exclude": ["node_modules", ".next", "test-results", "playwright-report"]
 }
