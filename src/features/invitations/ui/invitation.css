@@ -906,6 +906,18 @@ a {
     animation: none;
   }
 }
+/* Live language switch (LiveLocale): the other locale's nodes appear in place — the hero's entrance
+   has played already, and what is on screen shows at once (lower sections still reveal on scroll). */
+:root[data-locale-switched] .hero-enter > *,
+:root[data-locale-switched] .hero-enter > .rule {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  animation: none;
+}
+.inv[data-instant] .reveal {
+  transition: none !important;
+}
 
 /* countdown */
 .cd {

@@ -1,9 +1,8 @@
 import type { Venue } from '../contracts/types';
 import { buildIcs, type CalendarEvent } from '../lib/calendar';
 import { eventRange } from '../lib/dates';
-import type { RenderContext } from './context';
+import type { RenderContext } from './context-core';
 
-/** Calendar event of one venue — shared by the venue/RSVP calendar menus and /i/[slug]/event.ics. */
 /** Event title for calendars: the hosts ("נועה & איתי") or the custom hero title. */
 export function calendarTitle(ctx: RenderContext): string {
   const hero = ctx.doc.sections.find((s) => s.type === 'hero');
@@ -14,6 +13,12 @@ export function calendarTitle(ctx: RenderContext): string {
     .join(' ');
 }
 
+/** The invitation page's title (and link-preview title): the host's share title, else the calendar title. */
+export function pageTitle(ctx: RenderContext): string {
+  return ctx.text(ctx.doc.share.ogTitle) || calendarTitle(ctx);
+}
+
+/** Calendar event of one venue — shared by the venue/RSVP calendar menus and /i/[slug]/event.ics. */
 export function venueCalendarEvent(ctx: RenderContext, venue: Venue): CalendarEvent {
   const { start, end } = eventRange(ctx.doc, venue);
   const base = ctx.doc.share.slug;

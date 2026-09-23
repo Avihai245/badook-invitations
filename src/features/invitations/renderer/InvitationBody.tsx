@@ -1,11 +1,12 @@
-import { Fragment, Suspense, type ComponentType } from 'react';
+import { Suspense } from 'react';
 import type { Locale } from '../contracts/types';
-import { SECTIONS } from '../sections/registry';
-import { Decoration, type SectionViewProps } from '../sections/shared';
-import type { RenderContext } from './context';
+import type { RenderContext } from './context-core';
 import { CoverOverlay } from './cover/CoverOverlay.client';
 import { FitNames } from './FitNames.client';
-import { FloatingControls } from './FloatingControls.client';
+import { FloatingControls, type MusicProps } from './FloatingControls.client';
+import { InvitationSections } from './InvitationSections';
+import { LiveLocale } from './live/LiveLocale.client';
+import type { LivePayload } from './live/payload';
 import { RevealObserver } from './RevealObserver.client';
 
 const LOCK = "document.body.classList.add('locked')";
@@ -23,6 +24,7 @@ export function InvitationBody({
   showCover,
   skipCoverFromUrl = false,
   langSwitchHref,
+  live = null,
 }: {
   ctx: RenderContext;
   /** false with `?open=1`, in the editor/preview frame and for OG screenshots */
@@ -34,11 +36,25 @@ export function InvitationBody({
   skipCoverFromUrl?: boolean;
   /** URL of the same invitation in the next locale (null when there is only one locale) */
   langSwitchHref: string | null;
+  /**
+   * Bilingual public page: the language pill switches in place (LiveLocale) instead of following
+   * `langSwitchHref`.
+   */
+  live?: LivePayload | null;
 }) {
   const { doc, template } = ctx;
-  const enabled = doc.sections.filter((s) => s.enabled);
   const coverOn = showCover && doc.cover.enabled && ctx.mode === 'live';
   const nextLocale = doc.locales[(doc.locales.indexOf(ctx.locale) + 1) % doc.locales.length] as Locale;
+  const music: MusicProps | null =
+    ctx.mode === 'live' && ctx.musicUrl
+      ? {
+          src: ctx.musicUrl,
+          volume: doc.music.volume,
+          startAtSec: doc.music.startAtSec,
+          playLabel: ctx.t('music.play'),
+          pauseLabel: ctx.t('music.pause'),
+        }
+      : null;
 
   // The Suspense boundary contains any suspension while hydrating (a client chunk still loading on a
   // slow first visit): without it React replays the root with a stale hydration cursor and regenerates
@@ -76,35 +92,23 @@ export function InvitationBody({
         ) : (
           <script dangerouslySetInnerHTML={{ __html: "document.documentElement.dataset.opened='1'" }} />
         )}
-        <FloatingControls
-          langSwitch={
-            doc.locales.length > 1 && langSwitchHref
-              ? { href: langSwitchHref, label: ctx.t('locale.switch'), targetLocale: nextLocale }
-              : null
-          }
-          music={
-            ctx.mode === 'live' && ctx.musicUrl
-              ? {
-                  src: ctx.musicUrl,
-                  volume: doc.music.volume,
-                  startAtSec: doc.music.startAtSec,
-                  playLabel: ctx.t('music.play'),
-                  pauseLabel: ctx.t('music.pause'),
-                }
-              : null
-          }
-        />
-        <main>
-          {enabled.map((section, k) => {
-            const View = SECTIONS[section.type].view as ComponentType<SectionViewProps>;
-            return (
-              <Fragment key={section.id}>
-                <View section={section} prev={enabled[k - 1]} ctx={ctx} />
-                {section.type === 'hero' ? <Decoration slot="afterHero" ctx={ctx} /> : null}
-              </Fragment>
-            );
-          })}
-        </main>
+        {live && doc.locales.length > 1 ? (
+          <LiveLocale initial={ctx.locale} payload={live} music={music}>
+            <InvitationSections ctx={ctx} />
+          </LiveLocale>
+        ) : (
+          <>
+            <FloatingControls
+              langSwitch={
+                doc.locales.length > 1 && langSwitchHref
+                  ? { href: langSwitchHref, label: ctx.t('locale.switch'), targetLocale: nextLocale }
+                  : null
+              }
+              music={music}
+            />
+            <InvitationSections ctx={ctx} />
+          </>
+        )}
         <RevealObserver />
         <FitNames />
       </div>

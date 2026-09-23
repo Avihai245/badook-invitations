@@ -71,6 +71,22 @@ function readReply(slug: string): StoredReply | null {
     return null;
   }
 }
+/**
+ * What the guest has typed, kept in memory per invitation: the live language switch renders the form
+ * again in the other locale, and nothing typed (or the "thank you" screen) may be lost on the way.
+ */
+interface Draft {
+  attending: boolean | null;
+  adults: Adult[];
+  children: Child[];
+  stash: { adults: Adult[]; children: Child[] };
+  answers: Record<string, string | boolean>;
+  message: string;
+  decline: Contact;
+  sent: boolean;
+}
+const drafts = new Map<string, Draft>();
+
 function writeReply(slug: string, reply: StoredReply) {
   try {
     window.localStorage.setItem(storageKey(slug), JSON.stringify(reply));
@@ -118,16 +134,17 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
   const fid = (path: string) => `${uid}-${path}`;
   const renderedAt = useRef(0);
   const formRef = useRef<HTMLDivElement>(null);
-  const [attending, setAttending] = useState<boolean | null>(null);
-  const [adults, setAdults] = useState<Adult[]>([{}]);
-  const [children, setChildren] = useState<Child[]>([]);
+  const [kept] = useState(() => drafts.get(config.slug));
+  const [attending, setAttending] = useState<boolean | null>(kept?.attending ?? null);
+  const [adults, setAdults] = useState<Adult[]>(kept?.adults ?? [{}]);
+  const [children, setChildren] = useState<Child[]>(kept?.children ?? []);
   // Removed attendee cards are stashed so decreasing then increasing keeps what was typed (§6.2).
-  const stash = useRef<{ adults: Adult[]; children: Child[] }>({ adults: [], children: [] });
-  const [answers, setAnswers] = useState<Record<string, string | boolean>>({});
-  const [message, setMessage] = useState('');
-  const [decline, setDecline] = useState<Contact>({});
+  const stash = useRef<{ adults: Adult[]; children: Child[] }>(kept?.stash ?? { adults: [], children: [] });
+  const [answers, setAnswers] = useState<Record<string, string | boolean>>(kept?.answers ?? {});
+  const [message, setMessage] = useState(kept?.message ?? '');
+  const [decline, setDecline] = useState<Contact>(kept?.decline ?? {});
   const [errors, setErrors] = useState<Errors>({});
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(kept?.sent ? 'sent' : 'idle');
   const [focusFirstError, setFocusFirstError] = useState(0);
   const [closed, setClosed] = useState(false);
   const [reply, setReply] = useState<StoredReply | null>(null);
@@ -137,6 +154,19 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     renderedAt.current = Date.now();
     if (config.submitMode === 'api') setReply(readReply(config.slug));
   }, [config.submitMode, config.slug]);
+
+  useEffect(() => {
+    drafts.set(config.slug, {
+      attending,
+      adults,
+      children,
+      stash: stash.current,
+      answers,
+      message,
+      decline,
+      sent: status === 'sent',
+    });
+  }, [config.slug, attending, adults, children, answers, message, decline, status]);
 
   /** "You already replied — edit": refill the form from the stored answers; the next send replaces the reply. */
   const editStoredReply = () => {

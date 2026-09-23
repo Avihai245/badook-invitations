@@ -2,9 +2,14 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { InvitationDocument, Locale } from '@/features/invitations/contracts/types';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
-import { calendarTitle } from '@/features/invitations/renderer/calendar-event';
-import { buildRenderContext, type RenderContext } from '@/features/invitations/renderer/context';
+import { pageTitle } from '@/features/invitations/renderer/calendar-event';
+import {
+  buildRenderContext,
+  type RenderContext,
+  type RenderOptions,
+} from '@/features/invitations/renderer/context';
 import { InvitationBody } from '@/features/invitations/renderer/InvitationBody';
+import { buildLivePayload } from '@/features/invitations/renderer/live/build';
 import {
   getPublishedInvitation,
   resolveLocale,
@@ -22,10 +27,9 @@ export async function generateStaticParams(): Promise<{ slug: string; lang: stri
   return [];
 }
 
-function context(invitation: PublishedInvitation, locale: Locale): RenderContext {
+function renderOptions(): Omit<RenderOptions, 'mode'> {
   const env = serverEnv();
-  return buildRenderContext(invitation.doc, invitation.entry.manifest, locale, {
-    mode: 'live',
+  return {
     brand: env.INVITES_BRAND_NAME,
     publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
     icsViaRoute: true,
@@ -33,6 +37,13 @@ function context(invitation: PublishedInvitation, locale: Locale): RenderContext
       supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
       templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
     }),
+  };
+}
+
+function context(invitation: PublishedInvitation, locale: Locale): RenderContext {
+  return buildRenderContext(invitation.doc, invitation.entry.manifest, locale, {
+    ...renderOptions(),
+    mode: 'live',
   });
 }
 
@@ -48,7 +59,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!invitation || !locale) return {};
   const ctx = context(invitation, locale);
   const { share } = invitation.doc;
-  const title = ctx.text(share.ogTitle) || calendarTitle(ctx);
+  const title = pageTitle(ctx);
   const description =
     ctx.text(share.ogDescription) || [ctx.eventDateLong, ctx.hebrewDate].filter(Boolean).join(' · ');
   const url = `${ctx.publicBaseUrl}/i/${slug}?lang=${locale}`;
@@ -74,13 +85,19 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   const locale = invitation && resolveLocale(invitation.doc, lang);
   if (!invitation || !locale) notFound();
   const next = otherLocale(invitation.doc, locale);
+  // the pill's plain link keeps the cover skipped; with JS the language switches in place (LiveLocale)
+  const link = (l: Locale) => `/i/${slug}?lang=${l}&open=1`;
+  const live = buildLivePayload(invitation.doc, invitation.entry.manifest, renderOptions(), (l) => ({
+    url: `/i/${slug}?lang=${l}`,
+    href: link(l),
+  }));
   return (
     <InvitationBody
       ctx={context(invitation, locale)}
       showCover
       skipCoverFromUrl
-      // keeps the cover skipped when switching language (P3 swaps texts in place without a reload)
-      langSwitchHref={next ? `/i/${slug}?lang=${next}&open=1` : null}
+      langSwitchHref={next ? link(next) : null}
+      live={live}
     />
   );
 }

@@ -24,8 +24,9 @@ const FADE_MS = 1500;
  * leaves it paused, one tap on the button starts it). It pauses while the page is hidden and resumes
  * when the guest comes back. (iOS ignores `volume`: there the track starts at the device volume.)
  *
- * The language pill switches in place when the page provides `onSwitch` (no reload, same scroll
- * position); otherwise it is a plain link to the other language.
+ * The language pill switches in place when the page provides `onSwitch` (the public page's
+ * LiveLocale: no reload, same place in the invitation); otherwise — and before hydration — it is a
+ * plain link to the other language. `onIntent` (hover, press, focus) lets the page fetch ahead.
  */
 export function FloatingControls({
   langSwitch,
@@ -36,6 +37,7 @@ export function FloatingControls({
     label: string;
     targetLocale: Locale;
     onSwitch?: (locale: Locale) => void;
+    onIntent?: () => void;
   } | null;
   music: MusicProps | null;
 }) {
@@ -46,6 +48,9 @@ export function FloatingControls({
           className="fab fab-lang"
           href={langSwitch.href}
           hrefLang={langSwitch.targetLocale}
+          onPointerEnter={langSwitch.onIntent}
+          onPointerDown={langSwitch.onIntent}
+          onFocus={langSwitch.onIntent}
           onClick={(e: MouseEvent<HTMLAnchorElement>) => {
             if (!langSwitch.onSwitch || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
             e.preventDefault();

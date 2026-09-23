@@ -13,17 +13,8 @@ import {
   VenuesSectionSchema,
 } from '../contracts/schemas';
 import type { SectionOf, SectionType } from '../contracts/types';
-import { CountdownView } from './countdown/CountdownView';
-import { FaqView } from './faq/FaqView';
-import { FooterView } from './footer/FooterView';
-import { GiftsView } from './gifts/GiftsView';
-import { HeroView } from './hero/HeroView';
-import { GalleryView, RevealView } from './later/LaterViews';
-import { RsvpView } from './rsvp/RsvpView';
 import type { SectionViewProps } from './shared';
-import { TextView } from './text/TextView';
-import { TimelineView } from './timeline/TimelineView';
-import { VenuesView } from './venues/VenuesView';
+import { SECTION_VIEWS as V } from './views';
 
 /**
  * Section registry (§5): one entry per section type. Adding a section type means adding an entry
@@ -41,30 +32,30 @@ export interface SectionDefinition<T extends SectionType> {
 type Registry = { [T in SectionType]: SectionDefinition<T> };
 
 export const SECTIONS: Registry = {
-  hero: { type: 'hero', schema: HeroSectionSchema, view: HeroView, variants: [] },
-  countdown: { type: 'countdown', schema: CountdownSectionSchema, view: CountdownView, variants: ['boxes'] },
-  text: { type: 'text', schema: TextSectionSchema, view: TextView, variants: [] },
-  venues: { type: 'venues', schema: VenuesSectionSchema, view: VenuesView, variants: ['stacked-with-map'] },
+  hero: { type: 'hero', schema: HeroSectionSchema, view: V.hero, variants: [] },
+  countdown: { type: 'countdown', schema: CountdownSectionSchema, view: V.countdown, variants: ['boxes'] },
+  text: { type: 'text', schema: TextSectionSchema, view: V.text, variants: [] },
+  venues: { type: 'venues', schema: VenuesSectionSchema, view: V.venues, variants: ['stacked-with-map'] },
   timeline: {
     type: 'timeline',
     schema: TimelineSectionSchema,
-    view: TimelineView,
+    view: V.timeline,
     variants: ['horizontal-icons', 'vertical', 'flip-cards'],
   },
-  faq: { type: 'faq', schema: FaqSectionSchema, view: FaqView, variants: [] },
+  faq: { type: 'faq', schema: FaqSectionSchema, view: V.faq, variants: [] },
   gallery: {
     type: 'gallery',
     schema: GallerySectionSchema,
-    view: GalleryView,
+    view: V.gallery,
     variants: ['carousel', 'grid'],
   },
-  gifts: { type: 'gifts', schema: GiftsSectionSchema, view: GiftsView, variants: [] },
+  gifts: { type: 'gifts', schema: GiftsSectionSchema, view: V.gifts, variants: [] },
   reveal: {
     type: 'reveal',
     schema: RevealSectionSchema,
-    view: RevealView,
+    view: V.reveal,
     variants: ['scratch', 'tap', 'spin'],
   },
-  rsvp: { type: 'rsvp', schema: RsvpSectionSchema, view: RsvpView, variants: [] },
-  footer: { type: 'footer', schema: FooterSectionSchema, view: FooterView, variants: [] },
+  rsvp: { type: 'rsvp', schema: RsvpSectionSchema, view: V.rsvp, variants: [] },
+  footer: { type: 'footer', schema: FooterSectionSchema, view: V.footer, variants: [] },
 };

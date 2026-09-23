@@ -2,8 +2,9 @@ import { notFound } from 'next/navigation';
 import type { Locale, Section } from '@/features/invitations/contracts/types';
 import { isLocale, loadDevDocument } from '@/features/invitations/dev/load-dev-document';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
-import { buildRenderContext } from '@/features/invitations/renderer/context';
+import { buildRenderContext, type RenderOptions } from '@/features/invitations/renderer/context';
 import { InvitationBody } from '@/features/invitations/renderer/InvitationBody';
+import { buildLivePayload } from '@/features/invitations/renderer/live/build';
 import { assertDevRoutes } from '@/lib/dev-routes';
 import { serverEnv } from '@/lib/env';
 
@@ -25,6 +26,7 @@ export const dynamic = 'force-dynamic';
  *   cover=fixture          the video-first cover with the synthetic media of tests/fixtures/media
  *                          (cover=stall: a video that never loads → the cover must still open)
  *   music=fixture          the synthetic music track
+ *   live=0                 the language pill as a plain link (default: switches in place, like /i/…)
  */
 export default async function RenderPage({ params, searchParams }: { params: Params; searchParams: Search }) {
   assertDevRoutes();
@@ -56,8 +58,8 @@ export default async function RenderPage({ params, searchParams }: { params: Par
   const music = one(sp.music) === 'fixture' ? { ...doc.music, enabled: true } : doc.music;
 
   const env = serverEnv();
-  const ctx = buildRenderContext({ ...doc, sections, music }, entry.manifest, lang, {
-    mode,
+  const rendered = { ...doc, sections, music };
+  const options: Omit<RenderOptions, 'mode'> = {
     brand: env.INVITES_BRAND_NAME,
     now,
     coverMedia,
@@ -67,13 +69,21 @@ export default async function RenderPage({ params, searchParams }: { params: Par
       supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
       templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
     }),
-  });
+  };
+  const ctx = buildRenderContext(rendered, entry.manifest, lang, { ...options, mode });
 
   const next = doc.locales[(doc.locales.indexOf(lang) + 1) % doc.locales.length] as Locale;
   const query = new URLSearchParams(
     Object.entries(sp).flatMap(([k, v]) => (typeof v === 'string' ? [[k, v]] : [])),
   ).toString();
-  const langSwitchHref = `/dev/invitations/render/${template}/${next}/${docKey}${query ? `?${query}` : ''}`;
+  const path = (l: Locale) => `/dev/invitations/render/${template}/${l}/${docKey}`;
+  const href = (l: Locale) => `${path(l)}${query ? `?${query}` : ''}`;
+  const live =
+    mode === 'live' && one(sp.live) !== '0'
+      ? buildLivePayload(rendered, entry.manifest, options, (l) => ({ url: path(l), href: href(l) }))
+      : null;
 
-  return <InvitationBody ctx={ctx} showCover={one(sp.open) !== '1'} langSwitchHref={langSwitchHref} />;
+  return (
+    <InvitationBody ctx={ctx} showCover={one(sp.open) !== '1'} langSwitchHref={href(next)} live={live} />
+  );
 }
