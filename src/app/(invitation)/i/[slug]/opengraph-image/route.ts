@@ -39,5 +39,7 @@ export async function GET(request: Request, { params }: { params: Params }) {
   );
   return invitationOgImage(ctx, {
     'cache-control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+    // a hidden invitation's names and date stay out of image search too
+    ...(invitation.doc.share.noindex ? { 'x-robots-tag': 'noindex' } : {}),
   });
 }

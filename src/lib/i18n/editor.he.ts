@@ -367,6 +367,10 @@ export const editorHe = {
       ogImageHelp: 'ריק = תמונה שנוצרת מההזמנה',
       noindex: 'להסתיר ממנועי חיפוש',
       noindexHelp: 'מומלץ: רק מי שקיבל את הקישור יגיע להזמנה.',
+      notLive: 'ההזמנה עוד לא פורסמה — הקישור יתחיל לעבוד אחרי הפרסום.',
+      publishNow: 'פרסום עכשיו',
+      open: 'פתיחת ההזמנה',
+      pendingChanges: 'יש שינויים שעוד לא פורסמו — הקישור מציג את הגרסה הקודמת.',
     },
   },
   list: {
@@ -425,7 +429,7 @@ export const editorHe = {
     deadline_past: 'התאריך האחרון לאישור הגעה כבר עבר',
     deadline_after_event: 'התאריך האחרון לאישור הגעה אחרי האירוע',
     contrast_low: 'ניגודיות נמוכה ב"{field}" ({ratio}:1, מומלץ לפחות {min}:1)',
-    empty_section: 'הסקשן "{field}" ריק — הוסיפו פריט או הסתירו אותו',
+    empty_section: 'הסקשן "{field}" ריק ולא יוצג בהזמנה — הוסיפו פריט או הסתירו אותו',
   },
   fieldLabels: {
     'hosts.primary': 'שם',

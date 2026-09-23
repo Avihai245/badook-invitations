@@ -131,6 +131,9 @@ export const CAPS = {
 } as const;
 
 export const MAX_VENUES = 4;
+
+/** Texts with an automatic fallback per language (see `pageTitle` / `pageDescription`). */
+const OPTIONAL_TEXTS = new Set<FieldKey>(['share.ogTitle', 'share.ogDescription']);
 const MIN_TEXT_CONTRAST = 4.5;
 
 interface L10nField {
@@ -344,7 +347,11 @@ export function validateDocument(
   for (const f of l10nFields(doc)) {
     if (!f.value) continue;
     const value = f.value;
-    const severity = contentSeverity(f.section);
+    // The link-preview title / description are optional overrides: a language without one gets the
+    // automatic text (pageTitle / pageDescription), so a missing translation only warns.
+    const optional = OPTIONAL_TEXTS.has(f.field);
+    if (optional && doc.locales.every((l) => !(value[l] ?? '').trim())) continue;
+    const severity = optional ? 'warning' : contentSeverity(f.section);
     // Empty in every language → the text itself is missing ("required"), pointing at the default
     // language; otherwise each missing language is a missing translation.
     if (doc.locales.every((l) => !(value[l] ?? '').trim())) {
@@ -438,9 +445,11 @@ export function validateDocument(
   for (const [i, s] of doc.sections.entries()) {
     const base = `sections.${i}.data`;
     const severity = contentSeverity(s);
-    // A hidden empty section is simply unused — nothing to report.
+    // An empty section isn't shown on the page, so it never blocks publishing — the host is told;
+    // a hidden one is simply unused.
     const emptyList = (key: string, field: FieldKey) =>
-      s.enabled && add({ path: `${base}.${key}`, code: 'empty_section', severity, field, sectionId: s.id });
+      s.enabled &&
+      add({ path: `${base}.${key}`, code: 'empty_section', severity: 'warning', field, sectionId: s.id });
     switch (s.type) {
       case 'hero': {
         const m = s.data.media;

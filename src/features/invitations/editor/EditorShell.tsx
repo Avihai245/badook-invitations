@@ -9,6 +9,7 @@ import { useUi } from '@/lib/i18n/client';
 import type { InvitationDocument } from '../contracts/types';
 import { loginUrl } from '../app/api';
 import { Canvas, type Device } from './Canvas';
+import { OPEN_PUBLISH_EVENT } from './events';
 import { PreviewControlsProvider } from './fields/fields';
 import { FormPanel } from './FormPanel';
 import { usePreviewChannel } from './preview/usePreviewChannel';
@@ -90,6 +91,13 @@ export function EditorShell({
   const [sheet, setSheet] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [versions, setVersions] = useState(false);
+
+  // e.g. the share panel's "publish" button
+  useEffect(() => {
+    const open = () => setPublishing(true);
+    window.addEventListener(OPEN_PUBLISH_EVENT, open);
+    return () => window.removeEventListener(OPEN_PUBLISH_EVENT, open);
+  }, []);
 
   // Undo/redo from the keyboard (the document history, also inside text fields).
   useEffect(() => {

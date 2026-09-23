@@ -42,6 +42,13 @@ A save-the-date links to its full invitation (created from it in the list) as so
 published — and stops when it is archived. Publishing refreshes the cached pages right away (the
 invitation's own and its save-the-date's); otherwise they refresh within a minute.
 
+**Search engines** (§4): an invitation is hidden by default (`share.noindex`, the switch in the
+editor's "Link & sharing" panel). Its page then carries `robots` and `googlebot`
+`noindex, nofollow, noarchive, noimageindex` in the server-rendered `<head>` (for every crawler), and
+its link-preview image and calendar file send `X-Robots-Tag`. `/robots.txt` leaves `/i/` open on
+purpose: a crawler has to fetch a page to see its `noindex`. A link that is unknown, not published
+yet or archived shows a "not available" page (404) in both languages.
+
 On a bilingual invitation the language pill switches in place (no reload, same place in the page,
 `?lang=` updated, music keeps playing); the other language is rendered in the browser from a payload
 the server prepares (`renderer/live/`).

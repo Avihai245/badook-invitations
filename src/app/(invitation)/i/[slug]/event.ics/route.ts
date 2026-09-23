@@ -46,6 +46,7 @@ export async function GET(request: Request, { params }: { params: Params }) {
       'content-type': 'text/calendar; charset=utf-8',
       'content-disposition': `attachment; filename="${file}"`,
       'cache-control': 'public, max-age=300, s-maxage=300',
+      'x-robots-tag': 'noindex, nofollow',
     },
   });
 }

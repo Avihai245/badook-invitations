@@ -8,6 +8,8 @@ export type TimelineVariant = 'horizontal-icons' | 'vertical' | 'flip-cards';
 
 export function TimelineView({ section, ctx }: SectionViewProps<SectionOf<'timeline'>>) {
   const d = section.data;
+  // an empty schedule isn't shown (the editor warns)
+  if (!d.items.length) return null;
   const path = editPath(ctx, section, 'data');
   const variant = (section.variant ??
     ctx.template.sectionDefaults.variants.timeline ??

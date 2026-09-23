@@ -372,6 +372,10 @@ export const editorEn: EditorDict = {
       ogImageHelp: 'Empty = an image generated from the invitation',
       noindex: 'Hide from search engines',
       noindexHelp: 'Recommended: only people with the link will find the invitation.',
+      notLive: 'Not published yet — the link starts working once you publish.',
+      publishNow: 'Publish now',
+      open: 'Open the invitation',
+      pendingChanges: 'There are unpublished changes — the link shows the previous version.',
     },
   },
   list: {
@@ -430,7 +434,7 @@ export const editorEn: EditorDict = {
     deadline_past: 'The RSVP deadline has passed',
     deadline_after_event: 'The RSVP deadline is after the event',
     contrast_low: 'Low contrast in “{field}” ({ratio}:1, at least {min}:1 recommended)',
-    empty_section: '“{field}” is empty — add an item or hide it',
+    empty_section: '“{field}” is empty and won’t be shown — add an item or hide it',
   },
   fieldLabels: {
     'hosts.primary': 'Name',

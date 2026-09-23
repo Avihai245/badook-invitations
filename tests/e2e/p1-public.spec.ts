@@ -80,9 +80,46 @@ test.describe('public invitations', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'he');
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
     expect((await request.get('/i/no-such-invitation')).status()).toBe(404);
+    // a guest on such a link gets a page that says so, in both languages (the link's first)
+    expect((await page.goto('/i/no-such-invitation?lang=en'))?.status()).toBe(404);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(
+      page.getByRole('heading', { name: 'This invitation isn’t available right now' }),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'ההזמנה לא זמינה כרגע' })).toBeVisible();
+    await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute('content', /noindex/);
     // an English-only invitation asked for Hebrew falls back to English
     await page.goto('/i/mayas-baby-shower?lang=he');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('a hidden invitation is hidden from search engines the way crawlers see it', async ({ request }) => {
+    // robots.txt lets crawlers fetch the invitation — otherwise they could never read its noindex
+    const robotsTxt = await (await request.get('/robots.txt')).text();
+    expect(robotsTxt).toMatch(/^User-Agent: \*$/m);
+    expect(robotsTxt).toMatch(/^Allow: \/$/m);
+    expect(robotsTxt).toMatch(/^Disallow: \/api\/$/m);
+    expect(robotsTxt).not.toMatch(/^Disallow: \/i\//m);
+    // the server-rendered <head> (no JavaScript), for Googlebot and Bingbot alike
+    for (const ua of [
+      'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+      'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
+    ]) {
+      for (const path of ['/i/noa-and-itay', '/i/noa-and-itay?lang=en']) {
+        const res = await request.get(path, { headers: { 'user-agent': ua } });
+        expect(res.status()).toBe(200);
+        const head = (await res.text()).split('</head>')[0];
+        expect(head).toContain('<meta name="robots" content="noindex, nofollow, noarchive, noimageindex"/>');
+        expect(head).toContain(
+          '<meta name="googlebot" content="noindex, nofollow, noarchive, noimageindex"/>',
+        );
+      }
+    }
+    // its link-preview image and calendar file too
+    const og = await request.get('/i/noa-and-itay/opengraph-image?lang=he');
+    expect(og.headers()['x-robots-tag']).toBe('noindex');
+    const ics = await request.get('/i/noa-and-itay/event.ics?venue=venue-main');
+    expect(ics.headers()['x-robots-tag']).toBe('noindex, nofollow');
   });
 
   test('an uploaded hero file that may be missing keeps the placeholder art under it', async ({ page }) => {

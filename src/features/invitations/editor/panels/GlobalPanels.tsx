@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Copy, Pause, Play, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { Check, Copy, ExternalLink, Pause, Play, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Badge,
@@ -24,6 +24,7 @@ import { visibleGlyphCount } from '../../lib/text';
 import { timezoneOptions } from '../../lib/timezones';
 import { templateFileUrl } from '../../renderer/assets';
 import { COUPLE_EVENTS } from '../../templates/seed-copy';
+import { openPublishDialog } from '../events';
 import {
   BoolField,
   DateField,
@@ -739,6 +740,31 @@ function SharePanel() {
             </Button>
           </div>
         </Field>
+        {meta.status === 'published' ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 font-semibold text-ink underline-offset-2 hover:underline"
+            >
+              <ExternalLink aria-hidden className="size-3.5" />
+              {s.open}
+            </a>
+            {meta.unpublishedChanges ? <span className="text-warning">{s.pendingChanges}</span> : null}
+          </div>
+        ) : (
+          // the link is only live once published (guests would get "not available yet")
+          <div
+            role="status"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+          >
+            <span>{s.notLive}</span>
+            <Button size="sm" onClick={openPublishDialog}>
+              {s.publishNow}
+            </Button>
+          </div>
+        )}
       </PanelCard>
       <PanelCard title={e.cards.card}>
         <L10nField path="share.ogTitle" label={s.ogTitle} help={s.ogTitleHelp} cap={60} nullable />

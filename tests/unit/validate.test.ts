@@ -124,10 +124,19 @@ describe('translations (§12.5)', () => {
 
   it('null optional texts are fine; a present optional text must be complete', () => {
     const doc = wedding();
-    doc.share.ogTitle = null;
+    doc.hosts.parents = null;
     expect(check(doc).errors).toEqual([]);
+    doc.hosts.parents = { he: 'מרים ודני' };
+    expect(brief(check(doc).errors)).toEqual(['missing_translation hosts.parents.en']);
+  });
+
+  it('the link-preview title and description only warn: a language without them gets the automatic text', () => {
+    const doc = wedding();
     doc.share.ogTitle = { he: 'כותרת' };
-    expect(brief(check(doc).errors)).toEqual(['missing_translation share.ogTitle.en']);
+    doc.share.ogDescription = {};
+    const r = check(doc);
+    expect(r.errors).toEqual([]);
+    expect(brief(r.warnings)).toEqual(['missing_translation share.ogTitle.en']);
   });
 });
 
@@ -273,12 +282,10 @@ describe('structure and template references', () => {
     const fi = doc.sections.indexOf(faq);
     const gi = doc.sections.indexOf(gifts);
     expect(brief(check(doc).errors).sort()).toEqual(
-      [
-        `empty_section sections.${fi}.data.items`,
-        `required sections.${gi}.data.links.0.url`,
-        `required sections.${gi}.data.links.1.details`,
-      ].sort(),
+      [`required sections.${gi}.data.links.0.url`, `required sections.${gi}.data.links.1.details`].sort(),
     );
+    // an empty section isn't shown, so it only warns
+    expect(brief(check(doc).warnings)).toContain(`empty_section sections.${fi}.data.items`);
     faq.enabled = false; // a hidden empty section is just unused
     expect(check(doc).issues.map((i) => i.code)).not.toContain('empty_section');
     const venues = doc.sections.find((s) => s.type === 'venues')!;

@@ -49,6 +49,19 @@ function context(invitation: PublishedInvitation, locale: Locale): RenderContext
   });
 }
 
+/**
+ * A hidden invitation (`share.noindex`, the default): not indexed, links not followed, no cached copy,
+ * no image search — in <head> for every crawler (htmlLimitedBots), which is why robots.txt must let
+ * them fetch /i/ (app/robots.ts). The OG image and the calendar file say the same in X-Robots-Tag.
+ */
+const HIDDEN_ROBOTS = {
+  index: false,
+  follow: false,
+  noarchive: true,
+  noimageindex: true,
+  googleBot: { index: false, follow: false, noarchive: true, noimageindex: true },
+} satisfies Metadata['robots'];
+
 const otherLocale = (doc: InvitationDocument, locale: Locale): Locale | null =>
   doc.locales.length > 1
     ? (doc.locales[(doc.locales.indexOf(locale) + 1) % doc.locales.length] ?? null)
@@ -58,7 +71,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug, lang } = await params;
   const invitation = await getPublishedInvitation(slug);
   const locale = invitation && resolveLocale(invitation.doc, lang);
-  if (!invitation || !locale) return {};
+  // not-found.tsx: nothing to show on this link (yet)
+  if (!invitation || !locale)
+    return {
+      title: lang === 'en' ? 'Invitation not available' : 'ההזמנה לא זמינה',
+      robots: { index: false, follow: false },
+    };
   const ctx = context(invitation, locale);
   const { share } = invitation.doc;
   const title = pageTitle(ctx);
@@ -73,8 +91,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     title,
     description,
-    // §4: noindex unless the host turned it off
-    robots: share.noindex ? { index: false, follow: false } : undefined,
+    // §4: hidden from search engines unless the host turned it off — see HIDDEN_ROBOTS
+    robots: share.noindex ? HIDDEN_ROBOTS : undefined,
     alternates: {
       canonical: url,
       languages: Object.fromEntries(

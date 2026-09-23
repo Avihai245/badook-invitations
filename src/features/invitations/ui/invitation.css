@@ -2230,3 +2230,121 @@ footer.sec {
   white-space: nowrap;
   pointer-events: none;
 }
+
+/* ============ 8. MISSING INVITATION (not-found of /i/<slug>) ============
+   No template here: fixed paper tokens, the page's own two fonts (MissingInvitation.tsx). */
+:root.inv-missing {
+  --inv-bg: #f6f1e9;
+  --inv-ink: #2b2521;
+  --inv-ink-muted: #72675d;
+  --inv-accent: #a8834f;
+  --f-body: 'Assistant', system-ui, sans-serif;
+  --f-display: 'Frank Ruhl Libre', Georgia, serif;
+}
+.missing {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 48px 20px;
+  position: relative;
+  z-index: 2; /* above the paper grain */
+  background:
+    radial-gradient(120% 70% at 50% 0%, #fffaf2 0%, transparent 60%),
+    radial-gradient(90% 60% at 50% 100%, #efe5d6 0%, transparent 70%);
+}
+.missing-card {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 28px 36px;
+  background: #fffdf9;
+  border: 1px solid #e9dfd0;
+  border-radius: 22px;
+  box-shadow:
+    0 1px 2px rgb(72 48 20 / 0.05),
+    0 18px 48px -18px rgb(72 48 20 / 0.28);
+}
+.missing-art {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 20px;
+  fill: none;
+  stroke: var(--inv-accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.missing-art .missing-seal {
+  fill: #b5523b;
+  stroke: none;
+}
+.missing-he {
+  order: 1;
+}
+.missing-rule {
+  order: 2;
+}
+.missing-en {
+  order: 3;
+}
+:root[lang='en'] .missing-en {
+  order: 1;
+}
+:root[lang='en'] .missing-he {
+  order: 3;
+}
+.missing h1 {
+  font-family: var(--f-display);
+  font-weight: 500;
+  color: var(--inv-ink);
+  font-size: 25px;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.missing-en h1 {
+  font-size: 22px;
+}
+.missing p {
+  margin-top: 10px;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--inv-ink-muted);
+  text-wrap: pretty;
+}
+.missing-en p {
+  font-size: 15px;
+}
+.missing-rule {
+  direction: ltr; /* the lines fade outwards whatever the page direction */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 22px 0;
+  color: var(--inv-accent);
+  font-size: 12px;
+  line-height: 1;
+}
+.missing-rule span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e2d5c1);
+}
+.missing-rule span:last-child {
+  background: linear-gradient(to left, transparent, #e2d5c1);
+}
+.missing-brand {
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #a39584;
+}

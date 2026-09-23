@@ -82,6 +82,7 @@ test.describe('host: create → edit → publish', () => {
 
     // editor
     await page.waitForURL(/\/app\/invitations\/[0-9a-f-]{36}\/edit$/, { timeout: 30_000 });
+    const editorUrl = page.url();
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
     await expect(page.getByRole('heading', { level: 2, name: 'פתיחה (Hero)' })).toBeVisible();
     const frame = page.frameLocator('iframe[title="תצוגה מקדימה של ההזמנה"]');
@@ -109,8 +110,23 @@ test.describe('host: create → edit → publish', () => {
     await page.getByRole('textbox', { name: 'כתובת', exact: true }).fill('דרך הכרמים 12, זכרון יעקב');
     await saved(page);
 
-    // publish
-    await page.getByRole('button', { name: 'פרסום', exact: true }).click();
+    // not published yet: the share panel says the link isn't live, and a guest opening it gets the
+    // friendly "not available" page (a 404, cached like any page — publishing must refresh it)
+    await page.getByRole('tab', { name: 'הגדרות' }).click();
+    await page.getByRole('button', { name: 'קישור ושיתוף' }).click();
+    await expect(page.getByText('ההזמנה עוד לא פורסמה — הקישור יתחיל לעבוד אחרי הפרסום.')).toBeVisible();
+    const draftPath = new URL(await page.getByRole('textbox', { name: 'כתובת ההזמנה' }).inputValue())
+      .pathname;
+    const guest = await page.context().newPage();
+    expect((await guest.goto(draftPath))?.status()).toBe(404);
+    await expect(guest.getByRole('heading', { name: 'ההזמנה לא זמינה כרגע' })).toBeVisible();
+    await expect(
+      guest.getByRole('heading', { name: 'This invitation isn’t available right now' }),
+    ).toBeVisible();
+    await guest.close();
+
+    // publish, from the share panel
+    await page.getByRole('button', { name: 'פרסום עכשיו' }).click();
     dialog = page.getByRole('dialog');
     await expect(dialog.getByText('הכל מוכן לפרסום')).toBeVisible();
     await dialog.getByRole('button', { name: 'פרסום', exact: true }).click();
@@ -119,13 +135,38 @@ test.describe('host: create → edit → publish', () => {
     expect(url).toMatch(/\/i\/noa-and-[a-z0-9-]+$/); // transliterated from the Hebrew names
     await dialog.getByRole('button', { name: 'סגירה' }).click();
     await expect(page.getByText('פורסם', { exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'פתיחת ההזמנה' })).toHaveAttribute('href', url);
 
-    // the public page shows the published invitation
+    // the public page shows the published invitation (the cached "not available" page is gone)
     const slug = new URL(url).pathname.split('/').pop()!;
+    expect(`/i/${slug}`).toBe(draftPath);
     const res = await open(page, `/i/${slug}?open=1`);
     expect(res?.status()).toBe(200);
     await expect(page.locator('.eyebrow')).toHaveText('מתחתנים בכרם!');
     await expect(page.getByText('אחוזת הגפן')).toBeVisible();
+    // hidden from search engines by default (§4)…
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      'content',
+      'noindex, nofollow, noarchive, noimageindex',
+    );
+
+    // …until the host switches it off and publishes again (the cached page is refreshed)
+    await open(page, editorUrl);
+    await page.getByRole('tab', { name: 'הגדרות' }).click();
+    await page.getByRole('button', { name: 'קישור ושיתוף' }).click();
+    const hide = page.getByRole('switch', { name: 'להסתיר ממנועי חיפוש' });
+    await expect(hide).toHaveAttribute('aria-checked', 'true');
+    await hide.click();
+    await expect(hide).toHaveAttribute('aria-checked', 'false');
+    await saved(page);
+    await page.getByRole('button', { name: 'פרסום השינויים' }).click();
+    dialog = page.getByRole('dialog');
+    await dialog.getByRole('button', { name: 'פרסום', exact: true }).click();
+    await expect(dialog.getByRole('heading', { name: 'ההזמנה באוויר!' })).toBeVisible({ timeout: 20_000 });
+    await dialog.getByRole('button', { name: 'סגירה' }).click();
+    await open(page, `/i/${slug}?open=1`);
+    await expect(page.locator('.eyebrow')).toHaveText('מתחתנים בכרם!');
+    await expect(page.locator('meta[name="robots"], meta[name="googlebot"]')).toHaveCount(0);
 
     // back in the list: the card is published
     await open(page, '/app/invitations');
