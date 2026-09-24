@@ -12,9 +12,17 @@ import { UiLanguageToggle } from '../UiLanguageToggle';
 /** The designs on the side panel: [back, front]. */
 const PANEL = ['caesarea-shore', 'sahar-bordeaux'] as const;
 
+/** The policies, in small print under the form. */
+const LEGAL = [
+  ['/privacy', 'privacy'],
+  ['/terms', 'terms'],
+  ['/cookies', 'cookies'],
+  ['/accessibility', 'accessibility'],
+] as const;
+
 /**
  * Sign in / sign up / password pages: the form on the warm canvas and, on wide screens, a panel of
- * invitations (their first screens, TemplatePoster) with what Badook is.
+ * invitations (their first screens, TemplatePoster) with what Badook is; the policies in small print.
  */
 export default async function AuthLayout({ children }: { children: ReactNode }) {
   assertInvitationsEnabled();
@@ -37,9 +45,21 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
           </Link>
           <UiLanguageToggle />
         </header>
-        <main className="flex flex-1 items-start justify-center px-4 pt-[6vh] pb-16 sm:pt-[10vh]">
+        <main className="flex flex-1 items-start justify-center px-4 pt-[6vh] pb-10 sm:pt-[10vh]">
           {children}
         </main>
+        <footer className="px-5 pb-6 sm:px-8">
+          <nav
+            aria-label={t.site.footer.legal}
+            className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-muted"
+          >
+            {LEGAL.map(([href, key]) => (
+              <Link key={href} href={href} className="underline-offset-2 hover:text-ink hover:underline">
+                {t.site.footer[key]}
+              </Link>
+            ))}
+          </nav>
+        </footer>
       </div>
       <aside
         aria-hidden

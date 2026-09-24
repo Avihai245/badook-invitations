@@ -3,7 +3,7 @@
 import { CheckCircle2, CircleAlert, Coins, CreditCard, History, ShieldCheck, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AreaHelp, Badge, Button, Card, Dialog, Hint, KpiCard, useToast } from '@/components/app';
 import { PlanCards } from '@/features/site/PlanCards';
 import { useUi } from '@/lib/i18n/client';
@@ -23,9 +23,18 @@ const post = async (url: string, body: unknown) => {
 /**
  * /app/billing: the plan in force and what it allows, the plans side by side (upgrade, switch, cancel),
  * message packs, and the history. Coming back from the payment page it says how the payment ended —
- * and while the provider's notice is still on its way, it checks again by itself.
+ * and while the provider's notice is still on its way, it checks again by itself. `start`: the plan
+ * chosen on the home page (?plan=), on to its payment page right away.
  */
-export function BillingScreen({ data, status }: { data: BillingPageData; status: string | null }) {
+export function BillingScreen({
+  data,
+  status,
+  start = null,
+}: {
+  data: BillingPageData;
+  status: string | null;
+  start?: 'pro' | 'business' | null;
+}) {
   const { t, locale, fmt, number, date } = useUi();
   const b = t.billing;
   const router = useRouter();
@@ -70,6 +79,18 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
       variant: 'danger',
     });
   };
+
+  // once: the address drops ?plan= first, so coming back from the payment page doesn't start again
+  const started = useRef(false);
+  useEffect(() => {
+    if (!start || started.current) return;
+    started.current = true;
+    window.history.replaceState(null, '', '/app/billing');
+    if (off) return;
+    if (a.effective === start && a.planStatus !== 'canceled') toast({ title: b.errors.already });
+    else void buy(start);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
+  }, []);
 
   const cancel = async () => {
     setBusy('cancel');

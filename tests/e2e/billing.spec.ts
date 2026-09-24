@@ -165,7 +165,9 @@ test('the account: details, and deleting it deletes everything', async ({ page }
   await expect(confirm).toBeDisabled();
   await dialog.getByRole('checkbox').click();
   await confirm.click();
-  await page.waitForURL((url) => url.pathname === '/');
+  // on the sign-in page, which says so
+  await page.waitForURL(/\/login\?deleted=1$/);
+  await expect(page.getByTestId('auth-notice')).toContainText('החשבון נמחק');
   // signed out, and the account is gone
   await page.goto('/app/invitations');
   await page.waitForURL(/\/login/);

@@ -53,7 +53,10 @@ export function AccountScreen({ data }: { data: AccountScreenData }) {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ confirm: true }),
     }).catch(() => null);
-    if (res?.ok) return window.location.assign('/?deleted=1');
+    const body = (await res?.json().catch(() => null)) as { chargeStopped?: boolean } | null;
+    // the sign-in page confirms it (and says so when the monthly charge is left to support)
+    if (res?.ok)
+      return window.location.assign(`/login?deleted=${body?.chargeStopped === false ? 'charge' : '1'}`);
     setDeleting(false);
     toast({ title: a.error, variant: 'danger' });
   };

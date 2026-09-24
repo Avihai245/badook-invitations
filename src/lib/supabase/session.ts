@@ -6,6 +6,8 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { serverEnv } from '../env';
 
+export { safeNext } from './auth-paths';
+
 /**
  * Supabase client bound to the visitor's session cookies (@supabase/ssr) — used for Auth only: who is
  * signed in, sign in/up/out, password reset. Data access goes through the service-role functions with
@@ -42,10 +44,4 @@ export async function requireUser(next: string): Promise<User> {
   const user = await getSessionUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(next)}`);
   return user;
-}
-
-/** Relative in-app paths only — never an open redirect to another origin. */
-export function safeNext(next: unknown, fallback = '/app/invitations'): string {
-  const value = typeof next === 'string' ? next : '';
-  return /^\/(?![/\\])[^\s]*$/.test(value) ? value : fallback;
 }
