@@ -90,10 +90,14 @@ Host app (sign-in required; Hebrew UI by default, English via the `עב | EN` to
 **Email notifications** (P4): a host gets an email per reply or a daily summary (their choice on the
 responses screen), sent through [Resend](https://resend.com) when `INVITES_EMAIL_API_KEY` and
 `INVITES_EMAIL_FROM` (a sender on a verified domain) are set — otherwise the emails are only logged.
-The daily summary is `POST /api/cron/rsvp-digest` with `Authorization: Bearer <INVITES_CRON_SECRET>`,
-called every morning by [`.github/workflows/rsvp-digest.yml`](.github/workflows/rsvp-digest.yml) —
-set the repository secrets `INVITES_CRON_URL` (the site) and `INVITES_CRON_SECRET` (the same value as
-the app's). Without a secret the endpoint is off (404) and the workflow does nothing.
+The daily summary is part of the daily run (with the purge the privacy policy promises, the billing
+checks and the templates sync), and the WhatsApp queue is looked at every couple of minutes: the app
+runs both by itself on its own traffic (`src/features/jobs` — a host's page, a guest's reply, WhatsApp's
+status notices; the database lets one server run each turn). A scheduler can call them too, also when
+nobody is on the site: `POST /api/cron/rsvp-digest` and `/api/cron/whatsapp` with
+`Authorization: Bearer <INVITES_CRON_SECRET>` — [`.github/workflows/`](.github/workflows) does, given the
+repository secrets `INVITES_CRON_URL` (the site) and `INVITES_CRON_SECRET` (the same value as the app's).
+Without a secret those endpoints are off (404) and the workflows do nothing.
 
 **Supabase Auth settings** (dashboard → Authentication → URL Configuration): Site URL = the deployed
 URL (`INVITES_PUBLIC_BASE_URL`), and add `<site>/auth/callback` to the Redirect URLs — sign-up
@@ -199,8 +203,8 @@ variables. Heavy template media (videos, music) is served from Supabase Storage,
 the Amplify console and redeploy — the variables are baked in at build time; share links, QR codes,
 link previews, calendar files, emails and sign-up confirmations all use it, and Server Actions
 accept it as an origin (`next.config.ts`). In Supabase → Authentication → URL Configuration, set the
-Site URL to it and add `<domain>/**` to the Redirect URLs. If the daily RSVP summary runs, update the
-`INVITES_CRON_URL` repository secret. The `*.amplifyapp.com` address keeps working (links already
+Site URL to it and add `<domain>/**` to the Redirect URLs. If the scheduled workflows are set up, update
+the `INVITES_CRON_URL` repository secret. The `*.amplifyapp.com` address keeps working (links already
 sent still open); sign-in sessions are per domain.
 
 **Database changes** go in `supabase/migrations/` and are applied to the production project before

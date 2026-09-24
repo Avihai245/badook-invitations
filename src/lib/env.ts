@@ -31,8 +31,10 @@ const ServerEnvSchema = z.object({
   // host notifications (P4): Resend API key + sender; without them emails are only logged
   INVITES_EMAIL_API_KEY: z.string().default(''),
   INVITES_EMAIL_FROM: z.string().default(''),
-  // bearer token of POST /api/cron/rsvp-digest (the daily summary); empty = the endpoint is off
+  // bearer token of POST /api/cron/* (a scheduler's calls); empty = those endpoints are off
   INVITES_CRON_SECRET: z.string().default(''),
+  // the app runs its recurring jobs by itself on its own traffic (features/jobs); off: only a scheduler
+  INVITES_JOBS_FALLBACK: flag(true),
   // comma-separated emails with the top plan and the admin tools (the platform's owners)
   INVITES_ADMIN_EMAILS: z
     .string()

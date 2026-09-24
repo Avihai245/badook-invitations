@@ -76,6 +76,8 @@ const FUNCTIONS = new Set([
   'seed_upsert',
   'billing_pending_checkouts',
   'account_note_limit',
+  'app_job_claim',
+  'app_job_done',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';

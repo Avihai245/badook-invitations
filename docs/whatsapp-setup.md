@@ -82,7 +82,9 @@ Footer: `Sent with Badook`. Button: `Invitation & RSVP` → `https://invitations
 
 ## 5. שליחה ברקע (הודעות שנשארו בתור)
 
-כשמשתמש שולח, הדף שולח את ההודעות בקבוצות ומראה התקדמות. אם הדף נסגר באמצע, או כשהודעה ממתינה לניסיון חוזר (מגבלת קצב של Meta), ה-workflow `.github/workflows/whatsapp-queue.yml` רץ כל 10 דקות ושולח את מה שנשאר. הוא צריך שני Secrets ב-GitHub (Settings → Secrets and variables → Actions), אותם Secrets שכבר משמשים לסיכום היומי:
+כשמשתמש שולח, הדף שולח את ההודעות בקבוצות ומראה התקדמות. אם הדף נסגר באמצע, או כשהודעה ממתינה לניסיון חוזר (מגבלת קצב של Meta), המערכת עצמה שולחת את מה שנשאר: בכל כמה דקות שיש בהן פעילות באתר (משתמש מחובר, תשובת מוזמן, עדכון סטטוס מ-Meta) היא בודקת את התור (`src/features/jobs`). אין צורך בהגדרה נוספת.
+
+אפשר להוסיף גם תזמון חיצוני שרץ כל 10 דקות גם כשאין פעילות: ה-workflow `.github/workflows/whatsapp-queue.yml`. הוא צריך שני Secrets ב-GitHub (Settings → Secrets and variables → Actions), אותם Secrets שמשמשים לריצה היומית:
 
 - `INVITES_CRON_URL`: הכתובת הציבורית, למשל `https://invitations.badooks.com`
 - `INVITES_CRON_SECRET`: אותו ערך כמו `INVITES_CRON_SECRET` ב-Amplify
