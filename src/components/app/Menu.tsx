@@ -49,7 +49,7 @@ export function Menu({ trigger, items, align = 'end', dir: dirProp, className }:
           sideOffset={6}
           collisionPadding={8}
           className={cn(
-            'z-50 min-w-[190px] rounded-card border border-line bg-surface p-1 text-ink shadow-lg',
+            'z-[70] min-w-[190px] rounded-card border border-line bg-surface p-1 text-ink shadow-lg',
             'motion-safe:data-[state=open]:animate-app-fade-in',
             className,
           )}

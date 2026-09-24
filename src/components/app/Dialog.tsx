@@ -54,7 +54,7 @@ export function Dialog({
         <RadixDialog.Overlay
           dir={dir}
           className={cn(
-            'fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[rgba(28,25,23,0.4)] p-4 sm:p-6',
+            'fixed inset-0 z-[66] grid place-items-center overflow-y-auto bg-[rgba(28,25,23,0.4)] p-4 sm:p-6',
             // motion-safe: a data-state selector would out-specify motion-reduce:animate-none.
             'motion-safe:data-[state=open]:animate-app-fade-in motion-safe:data-[state=closed]:animate-app-fade-out',
           )}

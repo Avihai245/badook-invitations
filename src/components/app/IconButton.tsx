@@ -87,7 +87,7 @@ function WithTooltip({
             sideOffset={6}
             dir={dir}
             className={cn(
-              'z-[60] rounded-md bg-ink px-2 py-1 text-[12px] font-medium text-white shadow-md select-none',
+              'z-[80] rounded-md bg-ink px-2 py-1 text-[12px] font-medium text-white shadow-md select-none',
               'motion-safe:animate-app-fade-in motion-safe:data-[state=closed]:animate-app-fade-out',
             )}
           >

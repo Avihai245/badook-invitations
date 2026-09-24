@@ -30,9 +30,17 @@ const UiContext = createContext<UiContextValue | null>(null);
  * provider picks one by the locale the server resolved, so no strings travel in the RSC payload.
  */
 export function UiProvider({ locale, children }: { locale: UiLocale; children: ReactNode }) {
-  // <html data-hydrated> once React owns the page (end-to-end tests wait for it before typing).
+  // <html data-hydrated> once React owns the page and every part streamed in behind a loading
+  // skeleton has taken its place — until then React keeps such a part in a hidden <div id="S:…">, a
+  // second copy of it (end-to-end tests wait for this before looking and typing).
   useEffect(() => {
-    document.documentElement.dataset.hydrated = '1';
+    let frame = 0;
+    const settle = () => {
+      if (document.querySelector('div[hidden][id^="S:"]')) frame = requestAnimationFrame(settle);
+      else document.documentElement.dataset.hydrated = '1';
+    };
+    settle();
+    return () => cancelAnimationFrame(frame);
   }, []);
   const value = useMemo<UiContextValue>(() => {
     const intl = intlLocale(locale);

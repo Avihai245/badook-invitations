@@ -311,7 +311,7 @@ function SectionsSheet({
         <RadixDialog.Overlay className="fixed inset-0 z-40 bg-[rgba(28,25,23,0.4)] motion-safe:data-[state=open]:animate-app-fade-in lg:hidden" />
         <RadixDialog.Content
           dir={dir}
-          className="fixed inset-x-0 bottom-0 z-50 flex max-h-[80dvh] flex-col rounded-t-dialog bg-surface shadow-lg outline-none lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-[60] flex max-h-[80dvh] flex-col rounded-t-dialog bg-surface shadow-lg outline-none lg:hidden"
         >
           <div className="flex items-center justify-between border-b border-line px-4 py-2">
             <RadixDialog.Title className="text-[15px] font-bold">{t.editor.sectionsSheet}</RadixDialog.Title>

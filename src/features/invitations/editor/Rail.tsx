@@ -527,7 +527,7 @@ function AddSection({ onAdded }: { onAdded?: () => void }) {
           collisionPadding={12}
           dir={dir}
           aria-label={e.rail.addSectionTitle}
-          className="z-50 w-[min(560px,calc(100vw-24px))] rounded-dialog border border-line bg-surface p-3 shadow-lg motion-safe:data-[state=open]:animate-app-fade-in"
+          className="z-[70] w-[min(560px,calc(100vw-24px))] rounded-dialog border border-line bg-surface p-3 shadow-lg motion-safe:data-[state=open]:animate-app-fade-in"
         >
           <p className="px-1 pb-2 text-[13px] font-bold text-muted">{e.rail.addSectionTitle}</p>
           <div className="grid max-h-[60vh] grid-cols-1 gap-1 overflow-auto sm:grid-cols-2">
