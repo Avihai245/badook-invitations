@@ -138,7 +138,8 @@ test.describe('responses dashboard', () => {
     await expect(page.getByRole('heading', { name: 'עוד אין תשובות' })).toBeVisible();
     const exportEmpty = page.getByRole('button', { name: 'ייצוא ל-Excel' });
     await expect(exportEmpty).toBeDisabled();
-    await page.locator('[data-disabled-hint]').hover();
+    // (in #main: right after hydration the streamed copy of the page can still be in the document)
+    await page.locator('#main [data-disabled-hint]').hover();
     await expect(page.getByRole('tooltip')).toContainText('עוד אין תשובות לייצוא');
 
     await rsvp(
