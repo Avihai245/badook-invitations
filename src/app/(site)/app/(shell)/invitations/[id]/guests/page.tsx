@@ -6,6 +6,7 @@ import { hostDb } from '@/features/invitations/server/host-db';
 import { loadGuestsPage } from '@/features/invitations/server/guests';
 import { fmt } from '@/lib/i18n/app';
 import { getUi } from '@/lib/i18n/server';
+import { requestBaseUrl } from '@/lib/request-url';
 import { getSessionUser, requireUser } from '@/lib/supabase/session';
 
 type Params = Promise<{ id: string }>;
@@ -35,7 +36,7 @@ export default async function GuestsPage({
   const [{ id }, query] = await Promise.all([params, searchParams]);
   const user = await requireUser(`/app/invitations/${id}/guests`);
   const { locale } = await getUi();
-  const data = await loadGuestsPage(id, user, locale);
+  const data = await loadGuestsPage(id, user, locale, await requestBaseUrl());
   if (!data) notFound();
   const open = query.import ? 'import' : query.send ? 'send' : null;
   // the invitation's header and tabs come from the workspace layout ([id]/layout.tsx)

@@ -5,6 +5,7 @@ import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { getTemplate } from '@/features/invitations/templates/registry';
 import { serverEnv } from '@/lib/env';
+import { requestBaseUrl } from '@/lib/request-url';
 import { getSessionUser } from '@/lib/supabase/session';
 
 type Params = Promise<{ template: string }>;
@@ -49,7 +50,7 @@ export default async function PreviewFramePage({
         supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
         templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
       })}
-      publicBaseUrl={env.INVITES_PUBLIC_BASE_URL}
+      publicBaseUrl={await requestBaseUrl()}
       standalone={standalone}
     />
   );

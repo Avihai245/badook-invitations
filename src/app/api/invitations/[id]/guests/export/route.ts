@@ -2,9 +2,9 @@ import { csvCell } from '@/features/invitations/lib/guest-import';
 import { displayPhone, guestState } from '@/features/invitations/lib/guest-status';
 import { guestsDb } from '@/features/invitations/server/guests';
 import { hostDb, isUuid } from '@/features/invitations/server/host-db';
-import { serverEnv } from '@/lib/env';
 import { invitationsEnabled } from '@/lib/feature';
 import { getUi } from '@/lib/i18n/server';
+import { requestBaseUrl } from '@/lib/request-url';
 import { getSessionUser } from '@/lib/supabase/session';
 
 type Params = { params: Promise<{ id: string }> };
@@ -29,7 +29,8 @@ export async function GET(_request: Request, { params }: Params) {
   if (!inv || !guests) return new Response('Not found', { status: 404, headers: NO_STORE });
   const g = t.guests;
   const c = g.csv;
-  const base = serverEnv().INVITES_PUBLIC_BASE_URL;
+  // the address the host is on: the personal links in the file open where they signed in
+  const base = await requestBaseUrl();
   const header = [
     c.name,
     c.phone,

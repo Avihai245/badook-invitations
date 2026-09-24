@@ -298,6 +298,8 @@ export async function loadGuestsPage(
   id: string,
   user: { id: string; email?: string | null },
   uiLocale: Locale,
+  /** the address the host is on (requestBaseUrl()) — the personal links are built on it */
+  publicBaseUrl?: string,
 ): Promise<GuestsPageData | null> {
   if (!isUuid(id)) return null;
   const [inv, guests, account] = await Promise.all([
@@ -322,7 +324,7 @@ export async function loadGuestsPage(
     dateLine: formatEventDate(doc, locale),
     eventType: inv.eventType,
     locale: doc.defaultLocale,
-    publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
+    publicBaseUrl: publicBaseUrl ?? env.INVITES_PUBLIC_BASE_URL,
     guests,
     greeting: greeting || null,
     plan: account.effective,

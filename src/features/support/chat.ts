@@ -31,12 +31,13 @@ export type ChatRequest = z.infer<typeof ChatSchema>;
 export const CHAT_LIMIT = { count: 30, windowSeconds: 3600 };
 const MAX_TOTAL_CHARS = 16_000;
 
-export function knowledgeContext(): KnowledgeContext {
+/** `site`: the address the host is on (requestBaseUrl()); the configured one when absent. */
+export function knowledgeContext(site?: string): KnowledgeContext {
   const env = serverEnv();
   const prices = planPrices();
   return {
     brand: env.INVITES_BRAND_NAME,
-    site: env.INVITES_PUBLIC_BASE_URL,
+    site: site ?? env.INVITES_PUBLIC_BASE_URL,
     prices: { pro: prices.pro, business: prices.business },
     messagePrice: messagePriceIls(env.INVITES_WHATSAPP_PRICE_USD, env.INVITES_USD_TO_ILS),
     packs: CREDIT_PACKS.map((count) => ({
@@ -242,7 +243,7 @@ export function textFromEvents(
 /** POST /api/support/chat. */
 export async function supportChat(
   raw: unknown,
-  { userId, ip }: { userId: string | null; ip: string | null },
+  { userId, ip, site }: { userId: string | null; ip: string | null; site?: string },
   fetchImpl: typeof fetch = fetch,
 ): Promise<ChatResult> {
   const parsed = ChatSchema.safeParse(raw);
@@ -257,7 +258,7 @@ export async function supportChat(
     return { status: 429, json: { ok: false, code: 'rate' } };
 
   const env = serverEnv();
-  const k = knowledgeContext();
+  const k = knowledgeContext(site);
   const question = messages.at(-1)!.content;
   // not set up, or past the site's daily ceiling: the guide answers
   if (

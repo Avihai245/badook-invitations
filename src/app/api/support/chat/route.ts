@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supportChat } from '@/features/support/chat';
 import { clientIp } from '@/lib/client-ip';
+import { requestBaseUrl } from '@/lib/request-url';
 import { getSessionUser } from '@/lib/supabase/session';
 
 const NO_STORE = { 'cache-control': 'no-store' };
@@ -15,7 +16,9 @@ export async function POST(request: Request) {
     const user = await getSessionUser().catch(() => null);
     if (!user)
       return NextResponse.json({ ok: false, code: 'unauthorized' }, { status: 401, headers: NO_STORE });
-    const result = await supportChat(body, { userId: user.id, ip: clientIp(request) });
+    // links in the answers point to the address the host is on
+    const site = await requestBaseUrl();
+    const result = await supportChat(body, { userId: user.id, ip: clientIp(request), site });
     if ('stream' in result)
       return new Response(result.stream, {
         headers: {
