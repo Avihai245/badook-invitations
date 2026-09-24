@@ -69,7 +69,12 @@ export function templateMessage(m: Claimed, doc: InvitationDocument): TemplateMe
     guestName: m.guestName ?? '',
     hosts: hostsLine(doc.hosts, docLocale),
     event: EVENT_PHRASE[locale][doc.eventType],
-    date: formatDate(doc.event.date, locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+    date: formatDate(doc.event.date, locale, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }),
     linkSuffix: m.guestToken ? `${m.slug}?g=${m.guestToken}` : m.slug,
     ref: m.id,
   };
@@ -100,7 +105,10 @@ export async function processQueue(
           await rpc('whatsapp_result', { p_message_id: m.id, p_wa_id: outcome.id, p_error: null });
           result.sent++;
         } else if (outcome.retryable) {
-          const again = await rpc<boolean>('whatsapp_requeue', { p_message_id: m.id, p_error: outcome.error });
+          const again = await rpc<boolean>('whatsapp_requeue', {
+            p_message_id: m.id,
+            p_error: outcome.error,
+          });
           if (again) result.retried++;
           else result.failed++;
         } else {

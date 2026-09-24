@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { HintProvider, ToastProvider } from '@/components/app';
+import { AskAssistant } from '@/features/support/AskAssistant.client';
 import { useUi } from '@/lib/i18n/client';
 
 /** Toasts and button hints for the host app (/app/…), labelled in the UI language. */
@@ -13,7 +14,7 @@ export function AppToasts({ children }: { children: ReactNode }) {
       viewportLabel={t.common.toastViewport}
       closeLabel={t.common.close}
     >
-      <HintProvider>{children}</HintProvider>
+      <HintProvider areaFooter={<AskAssistant />}>{children}</HintProvider>
     </ToastProvider>
   );
 }

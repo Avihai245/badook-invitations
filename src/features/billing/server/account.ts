@@ -115,6 +115,7 @@ export async function entitlementsFor(user: Pick<User, 'id' | 'email'>): Promise
     activeInvitations: account.limits.activeInvitations,
     used: account.activeInvitations,
     premiumTemplates: account.limits.premiumTemplates,
+    removeBranding: account.limits.removeBranding,
   };
 }
 

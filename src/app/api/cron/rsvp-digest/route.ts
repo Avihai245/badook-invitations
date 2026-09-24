@@ -31,7 +31,9 @@ export async function POST(request: Request) {
     const { data: purged, error } = await serviceDb().rpc('purge_expired');
     if (error) console.error('purge_expired failed', error.message);
     // and tells support about paid plans whose monthly renewal never arrived
-    const overdue = await reportOverdue().catch((err) => (console.error('billing_overdue failed', err), null));
+    const overdue = await reportOverdue().catch(
+      (err) => (console.error('billing_overdue failed', err), null),
+    );
     return Response.json({ ...digests, purged: purged ?? null, overdue }, { headers: NO_STORE });
   } catch (err) {
     console.error('RSVP digest failed', err);

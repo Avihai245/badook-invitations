@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { loadAccount } from '@/features/billing/server/account';
 import { Editor } from '@/features/invitations/editor/Editor';
 import { fontFaceCss, templateFontFamilies } from '@/features/invitations/fonts';
 import { hostsLine } from '@/features/invitations/lib/text';
@@ -29,7 +30,7 @@ export default async function EditInvitationPage({ params }: { params: Params })
   const entry = getTemplate(inv.templateId);
   if (!entry) notFound();
   const env = serverEnv();
-  const uiLocale = await getUiLocale();
+  const [uiLocale, account] = await Promise.all([getUiLocale(), loadAccount(user)]);
   const unpublishedChanges =
     inv.status === 'published' && JSON.stringify(inv.draft) !== JSON.stringify(inv.published);
   return (
@@ -54,6 +55,10 @@ export default async function EditInvitationPage({ params }: { params: Params })
         })}
         publicBaseUrl={env.INVITES_PUBLIC_BASE_URL}
         uiLocale={uiLocale}
+        features={{
+          removeBranding: account.limits.removeBranding,
+          premiumTemplates: account.limits.premiumTemplates,
+        }}
       />
     </>
   );

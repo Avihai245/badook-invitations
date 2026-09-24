@@ -15,7 +15,9 @@ const at = (days: number) => new Date(NOW + days * DAY).toISOString();
 describe('the plan in force', () => {
   it('free is free; admins always get the top plan', () => {
     expect(effectivePlan({ plan: 'free', planStatus: 'active', planRenewsAt: null }, NOW)).toBe('free');
-    expect(effectivePlan({ plan: 'free', planStatus: 'active', planRenewsAt: null }, NOW, true)).toBe('business');
+    expect(effectivePlan({ plan: 'free', planStatus: 'active', planRenewsAt: null }, NOW, true)).toBe(
+      'business',
+    );
   });
 
   it('a canceled plan lasts until the end of the paid period', () => {
@@ -25,10 +27,17 @@ describe('the plan in force', () => {
   });
 
   it('a renewal that never came keeps the plan for the grace period only', () => {
-    expect(effectivePlan({ plan: 'business', planStatus: 'active', planRenewsAt: at(20) }, NOW)).toBe('business');
-    expect(effectivePlan({ plan: 'business', planStatus: 'past_due', planRenewsAt: at(-3) }, NOW)).toBe('business');
+    expect(effectivePlan({ plan: 'business', planStatus: 'active', planRenewsAt: at(20) }, NOW)).toBe(
+      'business',
+    );
+    expect(effectivePlan({ plan: 'business', planStatus: 'past_due', planRenewsAt: at(-3) }, NOW)).toBe(
+      'business',
+    );
     expect(
-      effectivePlan({ plan: 'business', planStatus: 'active', planRenewsAt: at(-RENEWAL_GRACE_DAYS - 1) }, NOW),
+      effectivePlan(
+        { plan: 'business', planStatus: 'active', planRenewsAt: at(-RENEWAL_GRACE_DAYS - 1) },
+        NOW,
+      ),
     ).toBe('free');
   });
 });

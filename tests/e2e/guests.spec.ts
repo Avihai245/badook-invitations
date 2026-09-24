@@ -129,7 +129,9 @@ test.describe('guest list', () => {
     await expect(page.getByRole('heading', { name: 'עוד אין מוזמנים' })).toBeVisible();
     // (in #main: right after hydration the streamed copy of the page can still be in the document)
     await page.locator('#main').getByTestId('area-help').click();
-    await expect(page.getByRole('dialog').getByText(/^מעלים קובץ Excel או CSV עם עמודות שם וטלפון/)).toBeVisible();
+    await expect(
+      page.getByRole('dialog').getByText(/^מעלים קובץ Excel או CSV עם עמודות שם וטלפון/),
+    ).toBeVisible();
     await page.keyboard.press('Escape');
 
     // an Excel file: Hebrew titles, one row without a name, one duplicate phone

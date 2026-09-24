@@ -46,11 +46,14 @@ const ServerEnvSchema = z.object({
 
   // ── support assistant (AI chat): Anthropic API; without a key it answers from the built-in guide ──
   ANTHROPIC_API_KEY: z.string().default(''),
-  INVITES_AI_MODEL: z.string().trim().min(1).default('claude-opus-5-5'),
+  // the model's id (Anthropic's models page); without it, too, the guide answers
+  INVITES_AI_MODEL: z.string().trim().default(''),
   INVITES_AI_API_BASE: z
     .url()
     .default('https://api.anthropic.com')
     .transform((u) => u.replace(/\/+$/, '')),
+  // questions a day for the whole site (a cost ceiling); past it the assistant answers from the guide
+  INVITES_AI_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(2000),
 
   // ── WhatsApp Business Platform (Cloud API) — the system's official number ──
   INVITES_WHATSAPP_TOKEN: z.string().default(''),

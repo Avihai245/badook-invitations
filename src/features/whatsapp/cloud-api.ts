@@ -34,7 +34,12 @@ export function cloudApiConfigured(): boolean {
 /** Meta caps a text parameter at 1024 characters and rejects newlines and tabs in it. */
 const param = (text: string) => ({
   type: 'text',
-  text: text.replace(/[\n\t]+/g, ' ').replace(/ {4,}/g, '   ').trim().slice(0, 1000) || '-',
+  text:
+    text
+      .replace(/[\n\t]+/g, ' ')
+      .replace(/ {4,}/g, '   ')
+      .trim()
+      .slice(0, 1000) || '-',
 });
 
 export async function sendTemplate(m: TemplateMessage, fetchImpl: typeof fetch = fetch): Promise<SendResult> {
@@ -76,7 +81,8 @@ export async function sendTemplate(m: TemplateMessage, fetchImpl: typeof fetch =
   const id = json?.messages?.[0]?.id;
   if (res.ok && id) return { ok: true, id };
   const e = json?.error;
-  const error = [e?.code, e?.error_data?.details ?? e?.message].filter(Boolean).join(' · ') || `HTTP ${res.status}`;
+  const error =
+    [e?.code, e?.error_data?.details ?? e?.message].filter(Boolean).join(' · ') || `HTTP ${res.status}`;
   // throughput / rate limits and Meta's own hiccups: try again later; the rest won't get better
   const retryable = res.status >= 500 || res.status === 429 || e?.code === 130429 || e?.code === 131056;
   return { ok: false, error, retryable };
@@ -120,7 +126,9 @@ export function statusesOf(payload: unknown): StatusUpdate[] {
         out.push({
           id: st.id,
           status: st.status as StatusUpdate['status'],
-          error: e ? [e.code, e.error_data?.details ?? e.message ?? e.title].filter(Boolean).join(' · ') : null,
+          error: e
+            ? [e.code, e.error_data?.details ?? e.message ?? e.title].filter(Boolean).join(' · ')
+            : null,
         });
       }
     }

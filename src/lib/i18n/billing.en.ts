@@ -103,6 +103,9 @@ export const billingEn: typeof billingHe = {
       'Your plan allows {limit} active invitations at a time. Archive an old one, or upgrade to create more.',
     premiumTitle: 'A premium design',
     premiumBody: 'This design is included in Pro and Business. Keep editing, and publish after upgrading.',
+    brandingTitle: 'The credit at the bottom',
+    brandingBody:
+      'Removing “Made with Badook” is part of Pro and Business. Turn the credit back on in the closing section, or upgrade.',
     guestsBody: 'Your plan allows up to {max} guests per invitation. Upgrade to add more.',
     cta: 'See plans',
     later: 'Not now',

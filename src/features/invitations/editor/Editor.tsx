@@ -4,7 +4,7 @@ import type { InvitationDocument, Locale } from '../contracts/types';
 import type { AssetBases } from '../renderer/assets';
 import { requireTemplate } from '../templates/registry';
 import { EditorShell } from './EditorShell';
-import { EditorProvider, type InvitationMeta } from './state/EditorProvider';
+import { EditorProvider, type EditorFeatures, type InvitationMeta } from './state/EditorProvider';
 
 /** The editor page's client root: the template comes from the (client-side) registry. */
 export function Editor({
@@ -15,6 +15,7 @@ export function Editor({
   bases,
   publicBaseUrl,
   uiLocale,
+  features,
 }: {
   draft: InvitationDocument;
   meta: InvitationMeta;
@@ -23,6 +24,7 @@ export function Editor({
   bases: AssetBases;
   publicBaseUrl: string;
   uiLocale: Locale;
+  features?: EditorFeatures;
 }) {
   const { manifest, defaults } = requireTemplate(templateId);
   return (
@@ -34,6 +36,7 @@ export function Editor({
       bases={bases}
       publicBaseUrl={publicBaseUrl}
       initialLocale={uiLocale}
+      features={features}
     >
       <EditorShell initialDoc={draft} initialUpdatedAt={updatedAt} />
     </EditorProvider>

@@ -40,14 +40,25 @@ export async function sendInvitations(userId: string, id: string, raw: unknown):
   const needed = parsed.data.guestIds.length;
   if (account.admin && account.credits < needed)
     await accountDb.creditsAdd(userId, needed - account.credits, 'admin', `whatsapp:${id}`);
-  const queued = await whatsappDb.queue(id, userId, parsed.data.guestIds, serverEnv().INVITES_WHATSAPP_PRICE_USD);
+  const queued = await whatsappDb.queue(
+    id,
+    userId,
+    parsed.data.guestIds,
+    serverEnv().INVITES_WHATSAPP_PRICE_USD,
+  );
   if (!queued) return fail(409, 'not_published');
   if (!queued.ok)
     return queued.code === 'credits'
       ? fail(402, 'credits', { needed: queued.needed, balance: queued.balance })
       : fail(422, 'nobody');
   const first = await processQueue(id, FIRST_BATCH);
-  return ok({ ok: true, queued: queued.queued, balance: queued.balance, ...first, pending: await whatsappDb.pending(id) });
+  return ok({
+    ok: true,
+    queued: queued.queued,
+    balance: queued.balance,
+    ...first,
+    pending: await whatsappDb.pending(id),
+  });
 }
 
 /** POST /api/invitations/:id/whatsapp/process — the next batch of this invitation's queue. */

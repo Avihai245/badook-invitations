@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BrandLogo } from '@/components/app';
 import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';
+import { SupportButton } from '@/features/support/SupportChat.client';
 import { getUi } from '@/lib/i18n/server';
 import { getSessionUser } from '@/lib/supabase/session';
 import { UiLanguageToggle } from '../../UiLanguageToggle';
@@ -26,6 +27,7 @@ export default async function ShellLayout({ children }: { children: ReactNode })
           <ShellLinks />
           <div className="ms-auto flex items-center gap-2 sm:gap-3">
             <UiLanguageToggle />
+            <SupportButton />
             <AccessibilityMenu placement="header" />
             <UserMenu email={user?.email ?? null} />
           </div>

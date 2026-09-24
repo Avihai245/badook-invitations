@@ -302,7 +302,12 @@ export async function loadGuestsPage(
       lang,
       hosts: hostsLine(doc.hosts, docLang),
       event: EVENT_PHRASE[lang][doc.eventType],
-      date: formatDate(doc.event.date, lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+      date: formatDate(doc.event.date, lang, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
     },
   };
 }

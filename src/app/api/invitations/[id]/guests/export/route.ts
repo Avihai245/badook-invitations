@@ -21,12 +21,28 @@ export async function GET(_request: Request, { params }: Params) {
   if (!user) return new Response('Unauthorized', { status: 401, headers: NO_STORE });
   const { id } = await params;
   if (!isUuid(id)) return new Response('Not found', { status: 404, headers: NO_STORE });
-  const [inv, guests, { t }] = await Promise.all([hostDb.get(id, user.id), guestsDb.list(id, user.id), getUi()]);
+  const [inv, guests, { t }] = await Promise.all([
+    hostDb.get(id, user.id),
+    guestsDb.list(id, user.id),
+    getUi(),
+  ]);
   if (!inv || !guests) return new Response('Not found', { status: 404, headers: NO_STORE });
   const g = t.guests;
   const c = g.csv;
   const base = serverEnv().INVITES_PUBLIC_BASE_URL;
-  const header = [c.name, c.phone, c.email, c.party, c.group, c.status, c.opened, c.reply, c.adults, c.children, c.link];
+  const header = [
+    c.name,
+    c.phone,
+    c.email,
+    c.party,
+    c.group,
+    c.status,
+    c.opened,
+    c.reply,
+    c.adults,
+    c.children,
+    c.link,
+  ];
   const rows = guests.map((x) => {
     const state = guestState(x);
     return [

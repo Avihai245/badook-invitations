@@ -306,7 +306,8 @@ async function auth(req, res, path, query) {
   // ── admin (service role): what the server does with auth.admin.* ──
   const admin = /^admin\/users\/([0-9a-f-]{36})$/.exec(path);
   if (admin) {
-    if (ROLES[req.headers.apikey] !== 'service_role') return authError(res, 403, 'not_admin', 'User not allowed');
+    if (ROLES[req.headers.apikey] !== 'service_role')
+      return authError(res, 403, 'not_admin', 'User not allowed');
     if (req.method === 'DELETE') {
       const deleted = await pool.query('delete from auth.users where id = $1', [admin[1]]);
       return deleted.rowCount ? send(res, 200, {}) : authError(res, 404, 'user_not_found', 'User not found');
@@ -383,7 +384,9 @@ async function storage(req, res, rest, query) {
     const { prefix = '' } = await readBody(req);
     let names = [];
     try {
-      names = readdirSync(storagePath(m[1], prefix), { withFileTypes: true }).filter((d) => !d.name.endsWith('.type'));
+      names = readdirSync(storagePath(m[1], prefix), { withFileTypes: true }).filter(
+        (d) => !d.name.endsWith('.type'),
+      );
     } catch {
       names = [];
     }
@@ -391,7 +394,11 @@ async function storage(req, res, rest, query) {
     return send(
       res,
       200,
-      names.map((d) => ({ name: d.name, id: d.isDirectory() ? null : randomUUID(), metadata: d.isDirectory() ? null : {} })),
+      names.map((d) => ({
+        name: d.name,
+        id: d.isDirectory() ? null : randomUUID(),
+        metadata: d.isDirectory() ? null : {},
+      })),
     );
   }
   m = /^object\/([a-z0-9-]+)$/.exec(rest);

@@ -12,7 +12,12 @@
 import { createHash } from 'node:crypto';
 import { InvitationDocumentSchema } from '../src/features/invitations/contracts/schemas';
 import type { EventType, InvitationDocument } from '../src/features/invitations/contracts/types';
-import { FIXTURES, SAMPLES, demoDocument, videoSampleDocument } from '../src/features/invitations/templates/demo';
+import {
+  FIXTURES,
+  SAMPLES,
+  demoDocument,
+  videoSampleDocument,
+} from '../src/features/invitations/templates/demo';
 import { TEMPLATES } from '../src/features/invitations/templates/registry';
 
 export const DEMO_OWNER_ID = '00000000-0000-4000-8000-00000000d3e0';

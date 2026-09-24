@@ -8,6 +8,8 @@ const config = [
   {
     ignores: [
       '.next*/**',
+      // local agent worktrees (other checkouts of this repository)
+      '.claude/**',
       'out/**',
       'coverage/**',
       'tests/.artifacts/**',

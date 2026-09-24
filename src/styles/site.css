@@ -196,6 +196,81 @@
   transform: rotate(45deg);
 }
 
+/* ── the support assistant (SupportChat.client.tsx) ─────────────────────────────────────────── */
+.support-launcher {
+  animation:
+    support-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.8s both,
+    support-glow 2.4s ease-in-out 1.6s 3;
+}
+@keyframes support-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
+}
+@keyframes support-glow {
+  50% {
+    box-shadow:
+      0 14px 34px -10px rgba(122, 82, 48, 0.75),
+      0 0 0 10px rgba(160, 112, 63, 0.14);
+  }
+}
+.support-panel {
+  transform-origin: bottom right;
+  animation: support-open 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.support-panel:dir(rtl) {
+  transform-origin: bottom left;
+}
+@keyframes support-open {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+}
+.support-rise {
+  animation: support-rise 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes support-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.support-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-brand);
+  opacity: 0.35;
+  animation: support-dot 1.1s ease-in-out infinite;
+}
+@keyframes support-dot {
+  40% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+.support-orb {
+  animation: support-orb 9s ease-in-out infinite alternate;
+}
+@keyframes support-orb {
+  to {
+    transform: translate(-18px, 22px) scale(1.25);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .support-launcher,
+  .support-panel,
+  .support-rise,
+  .support-orb {
+    animation: none !important;
+  }
+  .support-dot {
+    animation-duration: 2.4s;
+  }
+}
+
 /* ── the accessibility menu's modes (AccessibilityMenu.client.tsx) ──────────────────────────── */
 html[data-a11y-text='1'] body {
   zoom: 1.15;

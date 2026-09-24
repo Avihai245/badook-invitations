@@ -12,7 +12,9 @@ const baseURL = process.env.PW_BASE_URL || `http://127.0.0.1:${port}`;
 const admin = new URL(
   process.env.TEST_DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5432/postgres',
 );
-const e2eDatabase = Object.assign(new URL(admin), { pathname: '/badook_e2e' }).toString();
+// PW_DB_NAME: another database name, to run two local stacks side by side (with other PW_*PORTs)
+const dbName = process.env.PW_DB_NAME || 'badook_e2e';
+const e2eDatabase = Object.assign(new URL(admin), { pathname: `/${dbName}` }).toString();
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -44,18 +46,22 @@ export default defineConfig({
     ? undefined
     : [
         {
-          command: 'npx tsx tests/support/reset-local-db.ts badook_e2e && node tests/support/rest-shim.mjs',
+          command: `npx tsx tests/support/reset-local-db.ts ${dbName} && node tests/support/rest-shim.mjs`,
           port: shimPort,
           reuseExistingServer: false,
           env: { DATABASE_URL: e2eDatabase, REST_SHIM_PORT: String(shimPort) },
           timeout: 120_000,
         },
         {
-          // the WhatsApp Cloud API stand-in (tests/e2e/guests.spec.ts)
+          // the WhatsApp Cloud API and Anthropic API stand-ins (tests/e2e/guests.spec.ts, support.spec.ts)
           command: 'node tests/support/mock-whatsapp.mjs',
           url: `http://127.0.0.1:${whatsappPort}/health`,
           reuseExistingServer: false,
-          env: { MOCK_WHATSAPP_PORT: String(whatsappPort), MOCK_WHATSAPP_TOKEN: 'e2e-whatsapp-token' },
+          env: {
+            MOCK_WHATSAPP_PORT: String(whatsappPort),
+            MOCK_WHATSAPP_TOKEN: 'e2e-whatsapp-token',
+            MOCK_AI_KEY: 'e2e-anthropic-key',
+          },
           timeout: 30_000,
         },
         {
@@ -80,6 +86,10 @@ export default defineConfig({
             INVITES_ADMIN_EMAILS: 'wa-admin-mobile@example.com,wa-admin-desktop@example.com',
             // billing through our own test payment page instead of PayPlus (tests/e2e/billing.spec.ts)
             INVITES_BILLING_TEST_MODE: 'true',
+            // the support assistant: the Anthropic API stand-in above (tests/e2e/support.spec.ts)
+            ANTHROPIC_API_KEY: 'e2e-anthropic-key',
+            INVITES_AI_MODEL: 'e2e-model',
+            INVITES_AI_API_BASE: `http://127.0.0.1:${whatsappPort}`,
           },
           timeout: 120_000,
         },

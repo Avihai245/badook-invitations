@@ -4,7 +4,8 @@ import type { LegalContext, LegalDoc } from './types';
  * The cookie policy: every cookie and browser-storage key the site sets (all essential or remembering a
  * choice the visitor made), and the external content that loads only with consent. Kept in sync with
  * the code: `cookie_consent` (CookieConsent.client.tsx), `ui_lang` (lib/i18n), the Supabase session,
- * `badook:a11y` (a11y.ts), `rsvp:<slug>` (RsvpForm) and `badook:guest:<slug>` (guest.client.tsx).
+ * `badook:a11y` (a11y.ts), `badook:support` (SupportChat.client.tsx), `rsvp:<slug>` (RsvpForm) and
+ * `badook:guest:<slug>` (guest.client.tsx).
  */
 export function cookiesDoc(c: LegalContext): LegalDoc {
   if (c.locale === 'en') {
@@ -36,6 +37,7 @@ export function cookiesDoc(c: LegalContext): LegalDoc {
             {
               list: [
                 '“badook:a11y”: your accessibility-menu settings.',
+                '“badook:support” (for the visit only): your conversation with the support assistant, so it stays when you move between pages; it is erased when you close the tab.',
                 '“rsvp:<invitation>”: on an invitation page, a guest’s own reply, so they can edit it later from the same device.',
                 '“badook:guest:<invitation>” (for the visit only): who opened a personal invitation link, to greet them and fill in the form.',
               ],
@@ -88,6 +90,7 @@ export function cookiesDoc(c: LegalContext): LegalDoc {
           {
             list: [
               '״badook:a11y״: ההגדרות שבחרתם בתפריט הנגישות.',
+              '״badook:support״ (לביקור הנוכחי בלבד): השיחה שלכם עם עוזר התמיכה, כדי שתישאר כשעוברים בין עמודים; היא נמחקת כשסוגרים את הלשונית.',
               '״rsvp:<ההזמנה>״: בעמוד הזמנה, התשובה של האורח עצמו, כדי שיוכל לערוך אותה אחר כך מאותו מכשיר.',
               '״badook:guest:<ההזמנה>״ (לביקור הנוכחי בלבד): מי נכנס מקישור אישי, כדי לברך אותו בשמו ולמלא את הטופס.',
             ],

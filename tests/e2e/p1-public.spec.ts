@@ -11,7 +11,9 @@ const LOCAL = !process.env.PW_BASE_URL;
 const admin = new URL(
   process.env.TEST_DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5432/postgres',
 );
-const DB_URL = Object.assign(new URL(admin), { pathname: '/badook_e2e' }).toString();
+const DB_URL = Object.assign(new URL(admin), {
+  pathname: `/${process.env.PW_DB_NAME || 'badook_e2e'}`,
+}).toString();
 
 async function query<T = Record<string, unknown>>(sql: string, params: unknown[] = []): Promise<T[]> {
   const c = new Client({ connectionString: DB_URL });

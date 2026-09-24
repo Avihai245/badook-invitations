@@ -39,6 +39,8 @@ export interface Entitlements {
   /** active now (not archived; a save-the-date's full invitation doesn't count) */
   used: number;
   premiumTemplates: boolean;
+  /** the "made with" credit may be turned off */
+  removeBranding: boolean;
 }
 
 export interface HostDeps {
@@ -258,8 +260,12 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
   // (share.slug is checked here too — the schema's slug format rule.)
   const { errors, warnings } = validateDocument(draft, entry.manifest, { mode: 'publish', now: deps.now() });
   if (errors.length) return fail(422, 'invalid', { issues: errors, warnings });
-  if (isPremiumTemplate(entry.manifest) && deps.entitlements && !(await deps.entitlements()).premiumTemplates)
-    return fail(402, 'premium_template');
+  if (deps.entitlements) {
+    const e = await deps.entitlements();
+    if (isPremiumTemplate(entry.manifest) && !e.premiumTemplates) return fail(402, 'premium_template');
+    const creditOff = draft.sections.some((s) => s.type === 'footer' && s.enabled && !s.data.showCredit);
+    if (creditOff && !e.removeBranding) return fail(402, 'branding');
+  }
   if (slug !== inv.slug) {
     const res = await deps.db.setSlug(id, userId, slug);
     if (!res) return fail(404, 'not_found');

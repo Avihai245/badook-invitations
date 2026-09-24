@@ -8,6 +8,7 @@ import {
   Eye,
   History,
   LoaderCircle,
+  MessageCircleQuestion,
   Monitor,
   MoreHorizontal,
   Redo2,
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge, Button, IconButton, Menu, Segmented, cn } from '@/components/app';
+import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import type { Locale } from '../contracts/types';
 import type { Device } from './Canvas';
@@ -122,6 +124,14 @@ export function Topbar({
           <Redo2 className="icon-dir" />
         </IconButton>
         <div className="hidden items-center gap-2 md:flex">
+          <IconButton
+            label={t.support.open}
+            tooltip
+            onClick={() => openSupport()}
+            data-testid="support-button"
+          >
+            <MessageCircleQuestion />
+          </IconButton>
           <IconButton label={e.versions} tooltip onClick={onVersions}>
             <History />
           </IconButton>
@@ -139,6 +149,7 @@ export function Topbar({
             items={[
               { label: e.preview, icon: <Eye />, onSelect: onPreview },
               { label: e.versions, icon: <History />, onSelect: onVersions },
+              { label: t.support.open, icon: <MessageCircleQuestion />, onSelect: () => openSupport() },
             ]}
           />
         </div>

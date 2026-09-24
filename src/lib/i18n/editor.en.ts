@@ -309,6 +309,8 @@ export const editorEn: EditorDict = {
       showParents: 'Parents’ names',
       closingLine: 'Closing line',
       showCredit: 'Badook credit',
+      creditPaid: 'Removing the credit is part of the Pro and Business plans.',
+      creditUpgrade: 'See plans',
     },
     hosts: {
       primary: 'Name',

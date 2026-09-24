@@ -250,7 +250,12 @@ test.describe('responses dashboard', () => {
     };
     expect(await first.json()).toEqual({ sent: 1, failed: 0, purged, overdue: 0 });
     // nothing new since → nothing sent
-    expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({ sent: 0, failed: 0, purged, overdue: 0 });
+    expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
+      sent: 0,
+      failed: 0,
+      purged,
+      overdue: 0,
+    });
   });
 });
 

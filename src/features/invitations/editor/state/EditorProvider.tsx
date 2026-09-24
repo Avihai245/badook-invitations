@@ -62,12 +62,22 @@ function reducer(h: History<InvitationDocument>, a: Action): History<InvitationD
   }
 }
 
+/** What the host's plan allows in the editor (features/billing/plans.ts). */
+export interface EditorFeatures {
+  /** the "made with" credit at the bottom can be turned off */
+  removeBranding: boolean;
+  /** premium designs can be published */
+  premiumTemplates: boolean;
+}
+const ALL_FEATURES: EditorFeatures = { removeBranding: true, premiumTemplates: true };
+
 export interface EditorContextValue {
   doc: InvitationDocument;
   template: TemplateManifest;
   defaults: TemplateDefaults;
   bases: AssetBases;
   publicBaseUrl: string;
+  features: EditorFeatures;
   meta: InvitationMeta;
   setMeta: (update: Partial<InvitationMeta>) => void;
   /** language being edited — also the preview language */
@@ -121,6 +131,7 @@ export function EditorProvider({
   bases,
   publicBaseUrl,
   initialLocale,
+  features = ALL_FEATURES,
   children,
 }: {
   initialDoc: InvitationDocument;
@@ -130,6 +141,7 @@ export function EditorProvider({
   bases: AssetBases;
   publicBaseUrl: string;
   initialLocale: Locale;
+  features?: EditorFeatures;
   children: ReactNode;
 }) {
   const [history, dispatch] = useReducer(reducer, initialDoc, createHistory);
@@ -166,6 +178,7 @@ export function EditorProvider({
       defaults,
       bases,
       publicBaseUrl,
+      features,
       meta,
       setMeta: (update) => setMetaState((m) => ({ ...m, ...update })),
       locale: activeLocale,
@@ -193,6 +206,7 @@ export function EditorProvider({
       defaults,
       bases,
       publicBaseUrl,
+      features,
       meta,
       activeLocale,
       selection,

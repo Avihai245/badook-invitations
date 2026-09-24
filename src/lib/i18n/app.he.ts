@@ -3,6 +3,7 @@ import { accountHe } from './account.he';
 import { billingHe } from './billing.he';
 import { guestsHe } from './guests.he';
 import { siteHe } from './site.he';
+import { supportHe } from './support.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -13,6 +14,7 @@ export const he = {
   brand: 'Badook',
   guests: guestsHe,
   site: siteHe,
+  support: supportHe,
   billing: billingHe,
   accountPage: accountHe,
   editor: editorHe,
@@ -52,7 +54,8 @@ export const he = {
       newInvitation: 'הזמנה חדשה',
       billing: 'חבילה וחיובים',
       account: 'החשבון שלי',
-      help: 'עזרה',
+      assistant: 'שאלו את העוזר',
+      contact: 'יצירת קשר',
     },
     userMenu: 'תפריט החשבון',
     uiLanguage: 'שפת הממשק',

@@ -1,9 +1,10 @@
 'use client';
 
-import { CircleUserRound, CreditCard, LayoutGrid, LogOut, Mail } from 'lucide-react';
+import { CircleUserRound, CreditCard, LayoutGrid, LogOut, Mail, MessageCircleQuestion } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn, IconButton, Menu } from '@/components/app';
+import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import { signOut } from '../../(auth)/actions';
 
@@ -70,7 +71,8 @@ export function UserMenu({ email }: { email: string | null }) {
         { label: t.shell.nav.account, icon: <CircleUserRound />, href: '/app/account' },
         { label: t.shell.nav.billing, icon: <CreditCard />, href: '/app/billing' },
         { label: t.shell.nav.invitations, icon: <LayoutGrid />, href: '/app/invitations' },
-        { label: t.shell.nav.help, icon: <Mail />, href: '/contact' },
+        { label: t.shell.nav.assistant, icon: <MessageCircleQuestion />, onSelect: () => openSupport() },
+        { label: t.shell.nav.contact, icon: <Mail />, href: '/contact' },
         { type: 'separator' as const },
         { label: t.shell.signOut, icon: <LogOut className="icon-dir" />, onSelect: () => void signOut() },
       ]}

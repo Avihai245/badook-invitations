@@ -3,6 +3,7 @@ import { accountEn } from './account.en';
 import { billingEn } from './billing.en';
 import { guestsEn } from './guests.en';
 import { siteEn } from './site.en';
+import { supportEn } from './support.en';
 import { editorEn } from './editor.en';
 
 /** Host-app UI strings, English. Same shape as app.he.ts (checked by the type). */
@@ -10,6 +11,7 @@ export const en: AppDict = {
   brand: 'Badook',
   guests: guestsEn,
   site: siteEn,
+  support: supportEn,
   billing: billingEn,
   accountPage: accountEn,
   editor: editorEn,
@@ -47,7 +49,8 @@ export const en: AppDict = {
       newInvitation: 'New invitation',
       billing: 'Plan & billing',
       account: 'My account',
-      help: 'Help',
+      assistant: 'Ask the assistant',
+      contact: 'Contact us',
     },
     userMenu: 'Account menu',
     uiLanguage: 'Interface language',

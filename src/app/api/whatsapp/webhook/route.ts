@@ -23,7 +23,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const raw = await request.text();
-  if (!validSignature(raw, request.headers.get('x-hub-signature-256'), serverEnv().INVITES_WHATSAPP_APP_SECRET))
+  if (
+    !validSignature(raw, request.headers.get('x-hub-signature-256'), serverEnv().INVITES_WHATSAPP_APP_SECRET)
+  )
     return new Response('Invalid signature', { status: 401, headers: NO_STORE });
   let payload: unknown;
   try {

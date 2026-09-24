@@ -751,14 +751,31 @@ function RsvpForm({ base, section }: { base: string; section: SectionOf<'rsvp'> 
 
 function FooterForm({ base }: { base: string }) {
   const { f, cards } = useText();
+  const { doc, features } = useEditor();
   const ft = f.footer;
+  // turning the credit off is part of the paid plans (it can always be turned back on)
+  const locked = !features.removeBranding && !!getAt(doc, `${base}.showCredit`);
   return (
     <PanelCard title={cards.display}>
       <BoolField path={`${base}.showHosts`} label={ft.showHosts} />
       <BoolField path={`${base}.showDate`} label={ft.showDate} />
       <BoolField path={`${base}.showParents`} label={ft.showParents} help={f.hosts.parentsHelp} />
       <L10nField path={`${base}.closingLine`} label={ft.closingLine} nullable />
-      <BoolField path={`${base}.showCredit`} label={ft.showCredit} />
+      <BoolField
+        path={`${base}.showCredit`}
+        label={ft.showCredit}
+        disabled={locked}
+        help={
+          locked ? (
+            <>
+              {ft.creditPaid}{' '}
+              <a href="/app/billing" className="font-semibold underline">
+                {ft.creditUpgrade}
+              </a>
+            </>
+          ) : undefined
+        }
+      />
     </PanelCard>
   );
 }

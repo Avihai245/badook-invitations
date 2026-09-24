@@ -21,13 +21,19 @@ const message = {
 };
 
 const answer = (status: number, body: unknown) =>
-  vi.fn(async () => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } }));
+  vi.fn(
+    async () =>
+      new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } }),
+  );
 
 describe('WhatsApp Cloud API client', () => {
   it('sends the fixed template: the guest, hosts, event and date, and the personal link on the button', async () => {
     const { sendTemplate } = await import('@/features/whatsapp/cloud-api');
     const fetchImpl = answer(200, { messages: [{ id: 'wamid.X' }] });
-    expect(await sendTemplate(message, fetchImpl as unknown as typeof fetch)).toEqual({ ok: true, id: 'wamid.X' });
+    expect(await sendTemplate(message, fetchImpl as unknown as typeof fetch)).toEqual({
+      ok: true,
+      id: 'wamid.X',
+    });
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('https://wa.test/v26.0/1234567890/messages');
     expect((init.headers as Record<string, string>).authorization).toBe('Bearer test-token');
@@ -64,9 +70,16 @@ describe('WhatsApp Cloud API client', () => {
       retryable: true,
     });
     const down = answer(503, {});
-    expect(await sendTemplate(message, down as unknown as typeof fetch)).toMatchObject({ ok: false, retryable: true });
+    expect(await sendTemplate(message, down as unknown as typeof fetch)).toMatchObject({
+      ok: false,
+      retryable: true,
+    });
     const invalid = answer(400, {
-      error: { code: 131026, message: 'Message undeliverable', error_data: { details: 'not a WhatsApp user' } },
+      error: {
+        code: 131026,
+        message: 'Message undeliverable',
+        error_data: { details: 'not a WhatsApp user' },
+      },
     });
     expect(await sendTemplate(message, invalid as unknown as typeof fetch)).toEqual({
       ok: false,
@@ -106,7 +119,11 @@ describe('WhatsApp Cloud API client', () => {
               value: {
                 statuses: [
                   { id: 'wamid.A', status: 'delivered' },
-                  { id: 'wamid.B', status: 'failed', errors: [{ code: 131026, title: 'Message undeliverable' }] },
+                  {
+                    id: 'wamid.B',
+                    status: 'failed',
+                    errors: [{ code: 131026, title: 'Message undeliverable' }],
+                  },
                   { id: 'wamid.C', status: 'deleted' },
                   { status: 'read' },
                 ],

@@ -9,7 +9,7 @@ const e2eDb = () => {
   const admin = new URL(
     process.env.TEST_DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5432/postgres',
   );
-  return Object.assign(new URL(admin), { pathname: '/badook_e2e' }).toString();
+  return Object.assign(new URL(admin), { pathname: `/${process.env.PW_DB_NAME || 'badook_e2e'}` }).toString();
 };
 
 test('cookie consent: asked once, necessary only by default, changeable from the footer', async ({

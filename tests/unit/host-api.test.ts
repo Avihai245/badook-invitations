@@ -428,8 +428,20 @@ describe('slug, restore, archive', () => {
 
 describe('the plan’s limits', () => {
   const limits = (
-    over: Partial<{ activeInvitations: number | null; used: number; premiumTemplates: boolean }> = {},
-  ) => vi.fn(async () => ({ activeInvitations: 1, used: 0, premiumTemplates: false, ...over }));
+    over: Partial<{
+      activeInvitations: number | null;
+      used: number;
+      premiumTemplates: boolean;
+      removeBranding: boolean;
+    }> = {},
+  ) =>
+    vi.fn(async () => ({
+      activeInvitations: 1 as number | null,
+      used: 0,
+      premiumTemplates: false,
+      removeBranding: false,
+      ...over,
+    }));
 
   it('a new invitation needs room in the plan (free: one active at a time)', async () => {
     const full = { ...deps(), entitlements: limits({ used: 1 }) };
@@ -477,5 +489,21 @@ describe('the plan’s limits', () => {
     expect(free.db.publish).not.toHaveBeenCalled();
     const pro = { ...free, entitlements: limits({ premiumTemplates: true }) };
     expect((await publish(USER, ID, {}, pro)).status).toBe(200);
+  });
+
+  it('the "made with" credit comes off only on a plan that includes it', async () => {
+    const noCredit = () =>
+      invitation({}, (doc) => {
+        for (const s of doc.sections) if (s.type === 'footer') s.data.showCredit = false;
+      });
+    const free = {
+      ...deps({ get: vi.fn(async () => noCredit()) }),
+      entitlements: limits({ removeBranding: false }),
+    };
+    expect(await publish(USER, ID, {}, free)).toEqual({ status: 402, body: { ok: false, code: 'branding' } });
+    const pro = { ...free, entitlements: limits({ removeBranding: true }) };
+    expect((await publish(USER, ID, {}, pro)).status).toBe(200);
+    const withCredit = { ...deps(), entitlements: limits({ removeBranding: false }) };
+    expect((await publish(USER, ID, {}, withCredit)).status).toBe(200);
   });
 });

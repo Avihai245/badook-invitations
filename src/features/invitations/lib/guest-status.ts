@@ -17,15 +17,7 @@ export interface GuestLike {
 }
 
 export type GuestState =
-  | 'attending'
-  | 'declined'
-  | 'opened'
-  | 'read'
-  | 'delivered'
-  | 'sent'
-  | 'queued'
-  | 'failed'
-  | 'none';
+  'attending' | 'declined' | 'opened' | 'read' | 'delivered' | 'sent' | 'queued' | 'failed' | 'none';
 
 export function guestState(g: GuestLike): GuestState {
   if (g.response) return g.response.attending ? 'attending' : 'declined';
@@ -37,7 +29,15 @@ export function guestState(g: GuestLike): GuestState {
 export const wasSent = (g: GuestLike) =>
   !!g.response || !!g.openedAt || ['sent', 'delivered', 'read'].includes(g.sendStatus);
 
-export const GUEST_FILTERS = ['all', 'notSent', 'sent', 'opened', 'attending', 'declined', 'noReply'] as const;
+export const GUEST_FILTERS = [
+  'all',
+  'notSent',
+  'sent',
+  'opened',
+  'attending',
+  'declined',
+  'noReply',
+] as const;
 export type GuestFilter = (typeof GUEST_FILTERS)[number];
 
 export function matchesGuestFilter(g: GuestLike, filter: GuestFilter): boolean {

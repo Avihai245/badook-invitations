@@ -304,6 +304,8 @@ export const editorHe = {
       showParents: 'שמות ההורים',
       closingLine: 'שורת סיום',
       showCredit: 'קרדיט Badook',
+      creditPaid: 'הסרת הקרדיט כלולה בחבילות Pro ו־Business.',
+      creditUpgrade: 'לחבילות',
     },
     hosts: {
       primary: 'שם',

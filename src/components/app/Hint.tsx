@@ -2,16 +2,27 @@
 
 import { CircleHelp } from 'lucide-react';
 import { Popover, Tooltip } from 'radix-ui';
-import type { ReactElement, ReactNode } from 'react';
+import { createContext, useContext, type ReactElement, type ReactNode } from 'react';
 import { useDir } from './direction';
 import { cn } from './utils';
 
+/** What every <AreaHelp> card ends with (the host app: a way to ask the support assistant). */
+const AreaFooter = createContext<ReactNode>(null);
+
 /** Wrap a group of hinted buttons (the host app mounts one for all its pages). */
-export function HintProvider({ children }: { children: ReactNode }) {
+export function HintProvider({
+  children,
+  areaFooter = null,
+}: {
+  children: ReactNode;
+  areaFooter?: ReactNode;
+}) {
   return (
-    <Tooltip.Provider delayDuration={250} skipDelayDuration={200}>
-      {children}
-    </Tooltip.Provider>
+    <AreaFooter.Provider value={areaFooter}>
+      <Tooltip.Provider delayDuration={250} skipDelayDuration={200}>
+        {children}
+      </Tooltip.Provider>
+    </AreaFooter.Provider>
   );
 }
 
@@ -72,6 +83,7 @@ export function AreaHelp({
   className?: string;
 }) {
   const dir = useDir();
+  const footer = useContext(AreaFooter);
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
@@ -94,10 +106,11 @@ export function AreaHelp({
           align="end"
           sideOffset={8}
           collisionPadding={12}
-          className="z-[70] w-[min(360px,calc(100vw-24px))] rounded-[14px] border border-line bg-surface p-4 shadow-lg outline-none data-[state=open]:animate-app-dialog-in motion-reduce:animate-none"
+          // fits the room on screen: the list scrolls, the title and the footer stay in view
+          className="z-[70] flex max-h-[min(70dvh,var(--radix-popover-content-available-height))] w-[min(360px,calc(100vw-24px))] flex-col rounded-[14px] border border-line bg-surface p-4 shadow-lg outline-none data-[state=open]:animate-app-dialog-in motion-reduce:animate-none"
         >
-          <p className="text-[14px] font-bold">{title}</p>
-          <ul className="mt-3 flex max-h-[60vh] flex-col gap-3 overflow-y-auto">
+          <p className="shrink-0 text-[14px] font-bold">{title}</p>
+          <ul className="mt-3 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain">
             {items.map((item, i) => (
               <li key={i} className="flex items-start gap-3">
                 {item.icon ? (
@@ -115,6 +128,7 @@ export function AreaHelp({
               </li>
             ))}
           </ul>
+          {footer ? <div className="mt-3 shrink-0 border-t border-line pt-3">{footer}</div> : null}
           <Popover.Arrow className="fill-surface" width={12} height={6} />
         </Popover.Content>
       </Popover.Portal>
