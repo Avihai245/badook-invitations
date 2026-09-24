@@ -13,6 +13,7 @@ export const billingEn: typeof billingHe = {
     past_due: 'The last charge didn’t go through. Try again or update your payment method by {date}.',
     admin: 'Admin account: everything is open',
   },
+  usageTitle: 'Your usage',
   usage: {
     invitations: 'Active invitations',
     of: '{used} of {limit}',
@@ -27,6 +28,7 @@ export const billingEn: typeof billingHe = {
     business: 'Upgrade to Business',
     switchPro: 'Switch to Pro',
     switchBusiness: 'Switch to Business',
+    retry: 'Pay again',
   },
   toFree: 'Move to Free',
   cancel: {
@@ -58,6 +60,8 @@ export const billingEn: typeof billingHe = {
     payments: 'Payments',
     credits: 'Credit movements',
     none: 'No payments yet.',
+    noCredits: 'No credit movements yet.',
+    renewal: 'Monthly renewal',
     date: 'Date',
     item: 'Item',
     amount: 'Amount',
@@ -90,6 +94,17 @@ export const billingEn: typeof billingHe = {
       'Opens a secure payment page. The plan starts right after payment and renews every month until you cancel.',
     cancel: 'Stops the monthly charges. The plan stays until the end of the paid period.',
     buy: 'Buys a one-time pack of credits for sending on WhatsApp from the official number.',
+    toFree:
+      'Stops the monthly charges, like canceling: the paid plan stays until the end of the period you paid for, then the account moves to the free plan. Published invitations keep working.',
+    retry:
+      'Pays for the plan again, with another card if you like. The new payment replaces the monthly charge that failed.',
+    usage:
+      'The cards under your plan: how many invitations are active out of what the plan allows (archiving one frees a place), how many guests each invitation’s list can have, and how many credits are left for sending on WhatsApp (one message = one credit).',
+    history:
+      'Payments: every purchase and monthly charge, with its amount and status. Credit movements: credits added (purchases, the plan’s monthly credits) and used (messages you sent, refunds for messages that weren’t sent).',
+  },
+  disabled: {
+    off: 'These buttons work once online payment is enabled. Until then, write to us to upgrade or buy credits.',
   },
   test: {
     title: 'Test payment page',
@@ -99,6 +114,7 @@ export const billingEn: typeof billingHe = {
   },
   upgrade: {
     planLimitTitle: 'You’ve reached your plan’s invitations',
+    guestsTitle: 'You’ve reached your plan’s guest limit',
     planLimitBody:
       'Your plan allows {limit} active invitations at a time. Archive an old one, or upgrade to create more.',
     premiumTitle: 'A premium design',

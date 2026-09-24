@@ -7,6 +7,7 @@ import type { ApiResult } from '@/features/invitations/server/host-api';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { serviceDb } from '@/lib/supabase/server';
 import { accountDb, loadAccount } from './account';
+import { alertSupport } from './alert';
 import { cancelRecurring } from './payplus';
 
 const ok = <T>(body: T, status = 200): ApiResult<T> => ({ status, body });
@@ -56,17 +57,28 @@ async function removeFolder(prefix: string, depth = 0): Promise<number> {
  * POST /api/account/delete — { confirm: true }: closes the account for good. The monthly charge
  * stops, uploaded files are deleted, and deleting the user removes everything else it owns (the
  * database cascades: invitations, guests, replies, credits, payments' records keep no card data).
- * Published invitations stop answering at once.
+ * Published invitations stop answering at once. When PayPlus refuses to stop the monthly charge,
+ * support is alerted to stop it by hand and the answer says so (`chargeStopped: false`) — the
+ * account screen tells the host.
  */
 export async function deleteAccount(user: Pick<User, 'id' | 'email'>, raw: unknown): Promise<ApiResult> {
   if (!z.strictObject({ confirm: z.literal(true) }).safeParse(raw).success) return fail(400, 'invalid');
   const account = await loadAccount(user);
+  let chargeStopped = true;
   if (
     account.billingProvider === 'payplus' &&
     account.billingSubscriptionId &&
     account.planStatus !== 'canceled'
-  )
-    await cancelRecurring(account.billingSubscriptionId);
+  ) {
+    chargeStopped = await cancelRecurring(account.billingSubscriptionId);
+    if (!chargeStopped)
+      await alertSupport('Stop a monthly charge by hand (the account was deleted)', {
+        userId: user.id,
+        email: user.email,
+        plan: account.plan,
+        subscription: account.billingSubscriptionId,
+      });
+  }
   const invitations = (await hostDb.list(user.id)) ?? [];
   await removeFolder(user.id);
   const { error } = await serviceDb().auth.admin.deleteUser(user.id);
@@ -76,5 +88,5 @@ export async function deleteAccount(user: Pick<User, 'id' | 'email'>, raw: unkno
     revalidatePath(`/i/${inv.slug}`);
     for (const lang of ['he', 'en', 'default']) revalidatePath(`/i/${inv.slug}/${lang}`);
   }
-  return ok({ ok: true });
+  return ok({ ok: true, chargeStopped });
 }

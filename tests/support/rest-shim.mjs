@@ -4,7 +4,7 @@
 //   · Auth  /auth/v1 — email + password sign-up (auto-confirmed), password / refresh-token grants,
 //     GET/PUT /user, logout, recover; HS256 access tokens; users live in auth.users; "Continue with
 //     Google" through a stand-in account chooser (authorize → code → the PKCE grant); /settings;
-//     admin: create users, one-time sign-in links (generate_link → POST /verify), get / delete;
+//     admin: create users, one-time sign-in links (generate_link → POST /verify), get / update / delete;
 //   · Storage /storage/v1 — signed upload URLs (service role), uploads, public reads; files on disk,
 //     bucket size/MIME limits from storage.buckets.
 //
@@ -74,6 +74,8 @@ const FUNCTIONS = new Set([
   'partner_account',
   'app_meta_get',
   'seed_upsert',
+  'billing_pending_checkouts',
+  'account_note_limit',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
@@ -400,7 +402,7 @@ async function auth(req, res, path, query) {
         return authError(res, 422, 'weak_password', 'Password should be at least 6 characters');
       await pool.query(
         `update auth.users set encrypted_password = coalesce($2, encrypted_password),
-           raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || coalesce($3, '{}'), updated_at = now() where id = $1`,
+           raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || coalesce($3::jsonb, '{}'), updated_at = now() where id = $1`,
         [claims.sub, password === undefined ? null : hashPassword(password), data ?? null],
       );
     }
@@ -475,6 +477,34 @@ async function auth(req, res, path, query) {
     if (req.method === 'GET') {
       const row = await userById(admin[1]);
       return row ? send(res, 200, userJson(row)) : authError(res, 404, 'user_not_found', 'User not found');
+    }
+    // updateUserById: a new email (confirmed at once, like email_confirm: true) and metadata
+    if (req.method === 'PUT') {
+      const body = await readBody(req);
+      const row = await userById(admin[1]);
+      if (!row) return authError(res, 404, 'user_not_found', 'User not found');
+      const email = body.email === undefined ? row.email : String(body.email).trim().toLowerCase();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
+        return authError(res, 400, 'validation_failed', 'Invalid email');
+      if (
+        email !== row.email &&
+        (await pool.query('select 1 from auth.users where email = $1', [email])).rowCount
+      )
+        return authError(
+          res,
+          422,
+          'email_exists',
+          'A user with this email address has already been registered',
+        );
+      const updated = (
+        await pool.query(
+          `update auth.users set email = $2, raw_app_meta_data = coalesce(raw_app_meta_data, '{}') || $3,
+             raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || $4, updated_at = now()
+           where id = $1 returning *`,
+          [row.id, email, body.app_metadata ?? {}, body.user_metadata ?? {}],
+        )
+      ).rows[0];
+      return send(res, 200, userJson(updated));
     }
   }
   if (req.method === 'POST' && path === 'logout') return send(res, 204);

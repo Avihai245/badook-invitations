@@ -72,7 +72,7 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
   page,
 }) => {
   test.setTimeout(150_000);
-  await signUp(page);
+  const email = await signUp(page);
   // free: one active invitation
   expect((await create(page)).status).toBe(201);
   expect(await create(page)).toEqual({ status: 402, body: { ok: false, code: 'plan_limit', limit: 1 } });
@@ -94,6 +94,15 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
   await expect(current).toContainText('חינם');
   await expect(kpi(page, 'הזמנות פעילות')).toContainText('1 מתוך 1');
   await expect(kpi(page, 'קרדיטים לוואטסאפ')).toContainText('0');
+  // nothing yet, in words that fit each list
+  await expect(page.getByText('עוד אין תשלומים.')).toBeVisible();
+  await expect(page.getByText('עוד אין תנועות קרדיטים.')).toBeVisible();
+  // the "?" explains every part of the screen
+  await page.locator('#main').getByTestId('area-help').click();
+  const help = page.getByRole('dialog');
+  for (const label of ['מעבר לחינם', 'השימוש בחבילה', 'היסטוריה'])
+    await expect(help.getByText(label, { exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
 
   // Pro: the payment page, then back with the plan and its monthly credits
   await pay(page, page.getByRole('button', { name: 'שדרוג ל־Pro' }), 'תשלום (בדיקה)');
@@ -128,6 +137,8 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
   });
   await page.reload();
   await expect(kpi(page, 'קרדיטים לוואטסאפ')).toContainText('200');
+  // the monthly charge is in the payments too
+  await expect(page.getByTestId('payments')).toContainText('חידוש חודשי');
 
   // canceling: no more charges, the plan stays until the paid period ends
   await current.getByRole('button', { name: 'ביטול המנוי' }).click();
@@ -136,6 +147,25 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
   await expect(current).toContainText('בוטלה: פעילה עד');
   await expect(current).toContainText('Pro');
   expect((await api(page, '/api/billing/cancel', {})).status).toBe(409);
+
+  if (!LOCAL) return;
+  // a plan whose renewal never came, past the grace period: free again — and Pro can be bought again
+  const client = new pg.Client({ connectionString: e2eDb() });
+  await client.connect();
+  try {
+    await client.query(
+      `update accounts set plan_status = 'active', plan_renews_at = now() - interval '20 days'
+       where user_id = (select id from auth.users where email = $1)`,
+      [email],
+    );
+  } finally {
+    await client.end();
+  }
+  await page.reload();
+  await expect(current).toContainText('חינם');
+  await pay(page, page.getByRole('button', { name: 'שדרוג ל־Pro' }), 'תשלום (בדיקה)');
+  await expect(page.getByTestId('billing-returned')).toContainText('התשלום התקבל');
+  await expect(current).toContainText('Pro');
 });
 
 test('the account: details, and deleting it deletes everything', async ({ page }) => {
@@ -165,7 +195,9 @@ test('the account: details, and deleting it deletes everything', async ({ page }
   await expect(confirm).toBeDisabled();
   await dialog.getByRole('checkbox').click();
   await confirm.click();
-  await page.waitForURL((url) => url.pathname === '/');
+  // on the sign-in page, which says so
+  await page.waitForURL(/\/login\?deleted=1$/);
+  await expect(page.getByTestId('auth-notice')).toContainText('החשבון נמחק');
   // signed out, and the account is gone
   await page.goto('/app/invitations');
   await page.waitForURL(/\/login/);

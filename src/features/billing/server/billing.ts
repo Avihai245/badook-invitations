@@ -2,9 +2,9 @@ import 'server-only';
 import type { User } from '@supabase/supabase-js';
 import { z } from 'zod';
 import type { ApiResult } from '@/features/invitations/server/host-api';
-import { sendEmail } from '@/features/invitations/server/email';
 import { serverEnv } from '@/lib/env';
 import type { UiLocale } from '@/lib/i18n/app';
+import { requestBaseUrl } from '@/lib/request-url';
 import { serviceDb } from '@/lib/supabase/server';
 import {
   CREDIT_PACKS,
@@ -17,6 +17,7 @@ import {
   type Product,
 } from '../plans';
 import { accountDb, loadAccount, planPrices, type AccountView, type BillingPatch } from './account';
+import { alertSupport } from './alert';
 import {
   cancelRecurring,
   confirmPayment,
@@ -24,6 +25,7 @@ import {
   payplusConfigured,
   readTransaction,
   validCallbackHash,
+  type PayplusTransaction,
 } from './payplus';
 
 /**
@@ -57,6 +59,15 @@ export interface Checkout {
   completedAt: string | null;
 }
 
+/** A monthly charge of a plan, paid or failed (billing_events). */
+export interface Renewal {
+  /** null for renewals recorded before products were kept */
+  product: Product | null;
+  amount: number | null;
+  status: 'paid' | 'failed';
+  at: string;
+}
+
 export const checkoutDb = {
   create: (userId: string, product: Product, amount: number, provider: string) =>
     rpc<string>('checkout_create', {
@@ -87,8 +98,16 @@ export const checkoutDb = {
   history: (userId: string) =>
     rpc<{
       checkouts: Checkout[];
+      renewals: Renewal[];
       credits: { delta: number; reason: string; at: string }[];
     }>('billing_history', { p_user_id: userId }),
+  /** purchases still waiting for the provider's notice */
+  pending: (provider: string, minMinutes: number, maxDays: number) =>
+    rpc<Checkout[]>('billing_pending_checkouts', {
+      p_provider: provider,
+      p_min_minutes: minMinutes,
+      p_max_days: maxDays,
+    }),
 };
 
 export type BillingMode = 'payplus' | 'test' | 'off';
@@ -135,12 +154,16 @@ export async function startCheckout(
   const mode = billingMode();
   if (mode === 'off') return fail(503, 'not_configured');
   const account = await loadAccount(user);
-  if (isPlan(product) && account.plan === product && account.planStatus !== 'canceled' && !account.admin)
+  // the plan in force decides: a plan that lapsed can be bought again, and so can one whose monthly
+  // charge failed (a new payment replaces it) or that was canceled
+  const running = account.planStatus === 'active' || account.planStatus === 'trialing';
+  if (isPlan(product) && account.effective === product && running && !account.admin)
     return fail(409, 'already');
   const amount = productPrice(product);
   if (!(amount > 0)) return fail(503, 'not_configured');
   const id = await checkoutDb.create(user.id, product, amount, mode);
-  const base = serverEnv().INVITES_PUBLIC_BASE_URL;
+  // back to the address the host is on (their session is there)
+  const base = await requestBaseUrl();
   if (mode === 'test') return ok({ ok: true, url: `${base}/app/billing/test-checkout?id=${id}` });
 
   const t =
@@ -205,27 +228,104 @@ async function settle(
   return done;
 }
 
-async function alertSupport(subject: string, details: Record<string, unknown>) {
-  const env = serverEnv();
-  console.error(`[billing] ${subject}`, details);
-  if (!env.INVITES_SUPPORT_EMAIL) return;
-  const text = Object.entries(details)
-    .map(([k, v]) => `${k}: ${String(v)}`)
-    .join('\n');
-  await sendEmail({
-    to: env.INVITES_SUPPORT_EMAIL,
-    subject: `[${env.INVITES_BRAND_NAME} billing] ${subject}`,
-    text,
-    html: `<pre>${text.replace(/</g, '&lt;')}</pre>`,
-  });
+// ─── the provider's callback ─────────────────────────────────────────────────────────────────────
+
+export type FirstPayment =
+  | { outcome: 'paid'; transaction: PayplusTransaction }
+  | { outcome: 'failed' }
+  | { outcome: 'pending' }
+  | { outcome: 'amount_mismatch'; paid: number | null };
+
+/**
+ * How a purchase's first payment ended. PayPlus's own answer for the page request we opened decides
+ * (`confirmed`, PaymentPages/ipn); a signed notice that says paid for that very page request, with the
+ * right amount, counts too (the answer can lag behind the notice, or keep its fields elsewhere).
+ * Nothing is marked failed while anything says it was paid: it stays pending until a later notice, the
+ * billing page or the daily check settles it. `notice` null: no notice, just asking PayPlus again.
+ */
+export function decideFirstPayment(
+  checkout: Pick<Checkout, 'amount' | 'providerRef'>,
+  confirmed: PayplusTransaction,
+  notice: PayplusTransaction | null,
+  signed: boolean,
+): FirstPayment {
+  const price = Number(checkout.amount);
+  const amountOk = (tx: PayplusTransaction) => tx.amount === null || Math.abs(tx.amount - price) < 0.01;
+  if (confirmed.paid)
+    return amountOk(confirmed)
+      ? { outcome: 'paid', transaction: confirmed }
+      : { outcome: 'amount_mismatch', paid: confirmed.amount };
+  const vouched =
+    notice?.paid &&
+    signed &&
+    notice.amount !== null &&
+    (!notice.pageRequestUid || notice.pageRequestUid === checkout.providerRef);
+  if (vouched)
+    return amountOk(notice)
+      ? { outcome: 'paid', transaction: notice }
+      : { outcome: 'amount_mismatch', paid: notice.amount };
+  if (!notice || notice.paid) return { outcome: 'pending' };
+  return { outcome: 'failed' };
 }
 
-// ─── the provider's callback ─────────────────────────────────────────────────────────────────────
+/** Settles a PayPlus purchase from what PayPlus says about it now (decideFirstPayment). */
+async function reconcileCheckout(
+  checkout: Checkout,
+  notice: { tx: PayplusTransaction; signed: boolean; payload: unknown } | null,
+): Promise<FirstPayment['outcome']> {
+  const confirmed = await confirmPayment(checkout.providerRef!);
+  const decision = decideFirstPayment(checkout, confirmed, notice?.tx ?? null, notice?.signed ?? false);
+  const payload = notice?.payload ?? { confirmedWithPayplus: confirmed };
+  switch (decision.outcome) {
+    case 'amount_mismatch':
+      await alertSupport('Paid amount differs from the price', {
+        checkout: checkout.id,
+        paid: decision.paid,
+        price: checkout.amount,
+      });
+      break;
+    case 'pending':
+      // a notice said paid, and PayPlus doesn't confirm it (yet): kept pending, and a person looks
+      if (notice?.tx.paid)
+        await alertSupport('A payment PayPlus has not confirmed (kept pending)', {
+          checkout: checkout.id,
+          userId: checkout.userId,
+          product: checkout.product,
+          amount: checkout.amount,
+          pageRequest: checkout.providerRef,
+          transaction: notice.tx.transactionUid,
+          signed: notice.signed,
+        });
+      break;
+    case 'failed':
+      if (checkout.status === 'pending')
+        await settle(checkout, 'failed', {
+          // the transaction's id (a repeat of this notice is applied once); without one, apart from
+          // the paid event's fallback id — a failed purchase can still turn out paid
+          eventId: `payplus:${notice?.tx.transactionUid ?? `failed:${checkout.id}`}`,
+          subscriptionId: null,
+          customerId: null,
+          payload,
+        });
+      break;
+    case 'paid': {
+      const tx = decision.transaction;
+      await settle(checkout, 'paid', {
+        eventId: `payplus:${tx.transactionUid ?? notice?.tx.transactionUid ?? checkout.id}`,
+        subscriptionId: tx.recurringUid ?? notice?.tx.recurringUid ?? null,
+        customerId: tx.customerUid ?? notice?.tx.customerUid ?? null,
+        payload,
+      });
+      break;
+    }
+  }
+  return decision.outcome;
+}
 
 /**
  * POST /api/billing/payplus/callback — a first payment (matched to our purchase by `more_info` and
- * confirmed with PayPlus against the page request we stored) or a monthly renewal (matched by the
- * subscription; its signature must be valid).
+ * confirmed with PayPlus against the page request we stored; a purchase not settled as paid yet takes
+ * a later notice too) or a monthly renewal (matched by the subscription; its signature must be valid).
  */
 export async function payplusCallback(
   raw: string,
@@ -240,29 +340,15 @@ export async function payplusCallback(
   const tx = readTransaction(payload);
   const signed = validCallbackHash(raw, hash);
   const checkoutId = tx.moreInfo && /^[0-9a-f-]{36}$/i.test(tx.moreInfo) ? tx.moreInfo : null;
+  const checkout = checkoutId ? await checkoutDb.get(checkoutId, null) : null;
 
-  const checkout = checkoutId && !tx.renewal ? await checkoutDb.get(checkoutId, null) : null;
-  if (checkout && checkout.status === 'pending') {
+  if (checkout && (checkout.status === 'pending' || (checkout.status === 'failed' && tx.paid))) {
     if (checkout.provider !== 'payplus' || !checkout.providerRef) return { status: 404, body: 'unknown' };
-    // PayPlus says, for the page request we opened, how it ended — not the callback's word
-    const confirmed = await confirmPayment(checkout.providerRef);
-    const amountOk = confirmed.amount === null || Math.abs(confirmed.amount - checkout.amount) < 0.01;
-    if (confirmed.paid && !amountOk) {
-      await alertSupport('Paid amount differs from the price', {
-        checkout: checkout.id,
-        paid: confirmed.amount,
-        price: checkout.amount,
-      });
-      return { status: 200, body: 'amount mismatch' };
-    }
-    await settle(checkout, confirmed.paid ? 'paid' : 'failed', {
-      eventId: `payplus:${confirmed.transactionUid ?? tx.transactionUid ?? checkout.id}`,
-      subscriptionId: confirmed.recurringUid ?? tx.recurringUid,
-      customerId: confirmed.customerUid ?? tx.customerUid,
-      payload,
-    });
-    return { status: 200, body: 'ok' };
+    const outcome = await reconcileCheckout(checkout, { tx, signed, payload });
+    if (!tx.renewal) return { status: 200, body: outcome.replace('_', ' ') };
   }
+  // a message pack is paid once: nothing about it renews anything
+  if (checkout && !isPlan(checkout.product)) return { status: 200, body: 'ok' };
 
   // a monthly charge of an existing plan (or a repeated notice of one already applied: the event id
   // is the transaction's, so it is applied once)
@@ -274,11 +360,22 @@ export async function payplusCallback(
     return { status: 401, body: 'bad signature' };
   }
   if ((!tx.recurringUid && !tx.customerUid) || !tx.transactionUid) return { status: 200, body: 'ignored' };
-  await applyRenewal('payplus', tx.recurringUid, tx.customerUid, tx.paid, tx.transactionUid, payload);
+  await applyRenewal(
+    'payplus',
+    tx.recurringUid,
+    tx.customerUid,
+    tx.paid,
+    tx.transactionUid,
+    payload,
+    tx.amount,
+  );
   return { status: 200, body: 'ok' };
 }
 
-/** A renewal of the plan paid through this subscription: another month and its credits, or past due. */
+/**
+ * A renewal of the plan paid through this subscription: another month and its credits, or past due.
+ * Recorded with the plan and the amount charged (the price now when the notice doesn't say).
+ */
 export async function applyRenewal(
   provider: string,
   subscriptionId: string | null,
@@ -286,6 +383,7 @@ export async function applyRenewal(
   paid: boolean,
   transactionId: string | null,
   payload: unknown,
+  amount: number | null = null,
 ): Promise<boolean> {
   const userId = await accountDb.byBilling(provider, subscriptionId, customerId);
   if (!userId) {
@@ -312,6 +410,8 @@ export async function applyRenewal(
       : { planStatus: 'past_due' },
     credits: paid ? PLAN_LIMITS[account.plan].monthlyCredits : 0,
     payload,
+    product: account.plan,
+    amount: amount ?? planPrices()[account.plan],
   });
 }
 
@@ -393,18 +493,31 @@ export interface BillingPageData {
   returned: Checkout | null;
 }
 
+/**
+ * The billing screen's data. Back from a successful payment whose notice hasn't come (or couldn't be
+ * confirmed), PayPlus is asked directly — the screen looks again every few seconds while it waits.
+ */
 export async function loadBillingPage(
   user: Pick<User, 'id' | 'email'>,
   checkoutId: string | null,
+  status: string | null = null,
 ): Promise<BillingPageData> {
   const env = serverEnv();
-  const [account, history, returned] = await Promise.all([
-    loadAccount(user),
-    checkoutDb.history(user.id),
-    checkoutId && /^[0-9a-f-]{36}$/i.test(checkoutId)
-      ? checkoutDb.get(checkoutId, user.id)
-      : Promise.resolve(null),
-  ]);
+  const id = checkoutId && /^[0-9a-f-]{36}$/i.test(checkoutId) ? checkoutId : null;
+  let returned = id ? await checkoutDb.get(id, user.id) : null;
+  if (
+    returned?.status === 'pending' &&
+    status === 'success' &&
+    returned.provider === 'payplus' &&
+    returned.providerRef
+  ) {
+    const outcome = await reconcileCheckout(returned, null).catch((err) => {
+      console.error('[billing] confirming a returned payment', err);
+      return 'pending' as const;
+    });
+    if (outcome !== 'pending') returned = await checkoutDb.get(returned.id, user.id);
+  }
+  const [account, history] = await Promise.all([loadAccount(user), checkoutDb.history(user.id)]);
   const { billingSubscriptionId: _hidden, ...visible } = account;
   return {
     account: visible,
@@ -421,8 +534,35 @@ export async function loadBillingPage(
   };
 }
 
-/** For the daily job: paid plans whose renewal never arrived, to check in the provider's dashboard. */
+/**
+ * PayPlus purchases still pending after 15 minutes (up to a week back) are asked about again: a
+ * notice that was lost, came before PayPlus could confirm it, or never came. Those paid are settled,
+ * and support hears about them. Abandoned payment pages simply stay pending.
+ */
+async function reconcilePending(): Promise<number> {
+  const settled: string[] = [];
+  for (const checkout of await checkoutDb.pending('payplus', 15, 7)) {
+    const outcome = await reconcileCheckout(checkout, null).catch((err) => {
+      console.error('[billing] pending checkout', checkout.id, err);
+      return 'pending' as const;
+    });
+    if (outcome === 'paid') settled.push(checkout.id);
+  }
+  if (settled.length)
+    await alertSupport(`${settled.length} payments settled without their PayPlus notice`, {
+      checkouts: settled.join(', '),
+    });
+  return settled.length;
+}
+
+/**
+ * For the daily job: settles PayPlus purchases whose notice never came (reconcilePending), and tells
+ * support about paid plans whose renewal never arrived, to check in the provider's dashboard. Returns
+ * how many plans are overdue.
+ */
 export async function reportOverdue(): Promise<number> {
+  if (billingMode() === 'payplus')
+    await reconcilePending().catch((err) => console.error('[billing] pending checkouts', err));
   const overdue = await rpc<{ userId: string; email: string; plan: string; renewsAt: string }[]>(
     'billing_overdue',
     { p_days: 3 },

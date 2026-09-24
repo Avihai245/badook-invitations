@@ -15,6 +15,7 @@ type AccountJson = {
   activeInvitations: number;
   createdAt: string;
   email?: string;
+  userManaged?: boolean;
 };
 
 const view = (a: AccountJson, email: string): PartnerUser => ({
@@ -25,10 +26,15 @@ const view = (a: AccountJson, email: string): PartnerUser => ({
   plan: a.plan,
   activeInvitations: a.activeInvitations,
   createdAt: a.createdAt,
+  userManaged: a.userManaged === true,
 });
 
-/** The partner API's dependencies on Supabase (Auth admin + the service-role functions). */
-export function partnerDeps(): PartnerDeps {
+/**
+ * The partner API's dependencies on Supabase (Auth admin + the service-role functions). `site`: the
+ * public address the links point to (requestBaseUrl — INVITES_PUBLIC_BASE_URL unless that is unset
+ * or still Amplify's default address).
+ */
+export function partnerDeps(site: string): PartnerDeps {
   const db = serviceDb();
   const env = serverEnv();
   const rpc = async <T>(fn: string, args: Record<string, unknown>): Promise<T> => {
@@ -42,24 +48,30 @@ export function partnerDeps(): PartnerDeps {
     return data.user.email;
   };
   return {
-    site: env.INVITES_PUBLIC_BASE_URL,
+    site,
     findUserByEmail: (email) => rpc<string | null>('user_id_by_email', { p_email: email }),
     async createUser({ email, fullName, phone }) {
       const { data, error } = await db.auth.admin.createUser({
         email,
         email_confirm: true,
+        // the partner may claim only users it created (account_link_partner)
+        app_metadata: { provisioned_by: PARTNER_SOURCE },
         user_metadata: { full_name: fullName, name: fullName, ...(phone ? { phone } : {}) },
       });
-      if (data.user) return data.user.id;
-      // created in the meantime by another request
+      if (data.user) return { id: data.user.id, created: true };
+      // created in the meantime — by another request of the partner, or by its owner signing up
       const existing =
         error?.code === 'email_exists'
           ? await rpc<string | null>('user_id_by_email', { p_email: email })
           : null;
-      if (existing) return existing;
+      if (existing) return { id: existing, created: false };
       throw new Error(`createUser: ${error?.message ?? 'no user'}`);
     },
-    async link(userId, { externalId, fullName, phone }, claim) {
+    async deleteUser(userId) {
+      const { error } = await db.auth.admin.deleteUser(userId);
+      if (error) throw new Error(`deleteUser: ${error.message}`);
+    },
+    async link(userId, { externalId, fullName, phone }) {
       let account: AccountJson | null;
       try {
         account = await rpc<AccountJson | null>('account_link_partner', {
@@ -68,7 +80,7 @@ export function partnerDeps(): PartnerDeps {
           p_external_id: externalId,
           p_full_name: fullName,
           p_phone: phone,
-          p_claim: claim,
+          p_claim: true,
         });
       } catch (err) {
         // accounts_partner_external: this partner id already belongs to another user
@@ -84,6 +96,12 @@ export function partnerDeps(): PartnerDeps {
         p_external_id: externalId ?? null,
       });
       return account ? view(account, account.email ?? (await emailOf(account.userId))) : null;
+    },
+    async updateEmail(userId, email) {
+      const { error } = await db.auth.admin.updateUserById(userId, { email, email_confirm: true });
+      if (!error) return true;
+      if (error.code === 'email_exists') return false;
+      throw new Error(`updateUserById: ${error.message}`);
     },
     async loginToken(email) {
       const { data, error } = await db.auth.admin.generateLink({ type: 'magiclink', email });

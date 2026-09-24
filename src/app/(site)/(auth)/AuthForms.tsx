@@ -1,11 +1,14 @@
 'use client';
 
+import { CircleCheck } from 'lucide-react';
 import Link from 'next/link';
-import { useActionState, type ReactNode } from 'react';
+import { Fragment, useActionState, type ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Button, Field, Input } from '@/components/app';
+import type { AppDict } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import {
+  continueWithLink,
   requestPasswordReset,
   signIn,
   signInWithGoogle,
@@ -14,6 +17,8 @@ import {
   type AuthErrorKey,
   type AuthState,
 } from './actions';
+
+export type AuthNoticeKey = keyof AppDict['accountPage']['auth']['notices'];
 
 /** Google's "G" (its sign-in branding asks for the standard mark on a light button). */
 function GoogleMark() {
@@ -49,6 +54,16 @@ function GoogleSubmit() {
   );
 }
 
+/** A form's submit button that shows it is working (forms posting to a server action). */
+function PendingSubmit({ children }: { children: ReactNode }) {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" size="lg" fullWidth loading={pending}>
+      {children}
+    </Button>
+  );
+}
+
 /** "Continue with Google", then a divider before the email form. */
 function GoogleSignIn({ next }: { next: string }) {
   const { t } = useUi();
@@ -79,9 +94,70 @@ function AuthCard({ title, subtitle, children }: { title: string; subtitle: stri
 
 function FormError({ error }: { error?: AuthErrorKey }) {
   const { t } = useUi();
+  const message = !error
+    ? null
+    : error in t.auth.errors
+      ? t.auth.errors[error as keyof typeof t.auth.errors]
+      : t.accountPage.auth.errors[error as keyof typeof t.accountPage.auth.errors];
   return (
     <p role="alert" aria-live="polite" className="min-h-5 text-[13px] text-danger">
-      {error ? t.auth.errors[error] : null}
+      {message}
+    </p>
+  );
+}
+
+/** Good news on arrival (the email is confirmed, the account was deleted). */
+function Notice({ notice }: { notice: AuthNoticeKey }) {
+  const { t } = useUi();
+  const a = t.accountPage.auth;
+  return (
+    <p
+      role="status"
+      data-testid="auth-notice"
+      className="mb-5 flex items-start gap-2 rounded-card border border-[#bbf7d0] bg-success-bg px-3.5 py-3 text-[13.5px] text-success"
+    >
+      <CircleCheck aria-hidden className="mt-0.5 size-4 shrink-0" />
+      <span>
+        {a.notices[notice]}
+        {notice === 'deleted_charge' ? (
+          <>
+            {' '}
+            <Link href="/contact?topic=billing" className="font-semibold underline underline-offset-2">
+              {a.contact}
+            </Link>
+          </>
+        ) : null}
+      </span>
+    </p>
+  );
+}
+
+/** A sentence with links in place of its {placeholders}. */
+function Linked({ text, links }: { text: string; links: Record<string, ReactNode> }) {
+  return (
+    <>
+      {text.split(/(\{\w+\})/).map((part, i) => (
+        <Fragment key={i}>{(/^\{\w+\}$/.test(part) && links[part.slice(1, -1)]) || part}</Fragment>
+      ))}
+    </>
+  );
+}
+
+/** "By signing up you agree to the Terms and the Privacy Policy", under the sign-up button. */
+function TermsLine() {
+  const { t } = useUi();
+  const a = t.accountPage.auth;
+  const link = (href: string, label: string) => (
+    <Link href={href} className="font-medium text-ink underline underline-offset-2">
+      {label}
+    </Link>
+  );
+  return (
+    <p className="text-center text-[12.5px] text-pretty text-muted" data-testid="signup-terms">
+      <Linked
+        text={a.terms}
+        links={{ terms: link('/terms', a.termsLink), privacy: link('/privacy', a.privacyLink) }}
+      />
     </p>
   );
 }
@@ -89,10 +165,12 @@ function FormError({ error }: { error?: AuthErrorKey }) {
 export function LoginForm({
   next,
   initialError,
+  notice,
   google = false,
 }: {
   next: string;
   initialError?: AuthErrorKey;
+  notice?: AuthNoticeKey;
   google?: boolean;
 }) {
   const { t } = useUi();
@@ -102,6 +180,7 @@ export function LoginForm({
   );
   return (
     <AuthCard title={t.auth.loginTitle} subtitle={t.auth.loginSubtitle}>
+      {notice ? <Notice notice={notice} /> : null}
       {google ? <GoogleSignIn next={next} /> : null}
       <form action={action} className="flex flex-col gap-4" noValidate>
         <input type="hidden" name="next" value={next} />
@@ -145,9 +224,10 @@ export function LoginForm({
   );
 }
 
-export function SignupForm({ google = false }: { google?: boolean }) {
+export function SignupForm({ next, google = false }: { next: string; google?: boolean }) {
   const { t, fmt } = useUi();
   const [state, action, pending] = useActionState<AuthState, FormData>(signUp, null);
+  const toLogin = next === '/app/invitations' ? '/login' : `/login?next=${encodeURIComponent(next)}`;
   if (state?.sent) {
     return (
       <AuthCard
@@ -155,15 +235,16 @@ export function SignupForm({ google = false }: { google?: boolean }) {
         subtitle={fmt(t.auth.checkEmail, { email: state.email ?? '' })}
       >
         <Button asChild variant="secondary" fullWidth>
-          <Link href="/login">{t.auth.toLogin}</Link>
+          <Link href={toLogin}>{t.auth.toLogin}</Link>
         </Button>
       </AuthCard>
     );
   }
   return (
     <AuthCard title={t.auth.signupTitle} subtitle={t.auth.signupSubtitle}>
-      {google ? <GoogleSignIn next="/app/invitations" /> : null}
+      {google ? <GoogleSignIn next={next} /> : null}
       <form action={action} className="flex flex-col gap-4" noValidate>
+        <input type="hidden" name="next" value={next} />
         <Field label={t.auth.name}>
           <Input name="name" autoComplete="name" maxLength={80} />
         </Field>
@@ -192,10 +273,11 @@ export function SignupForm({ google = false }: { google?: boolean }) {
         <Button type="submit" size="lg" fullWidth loading={pending}>
           {t.auth.signup}
         </Button>
+        <TermsLine />
       </form>
       <p className="mt-6 text-center text-[13px] text-muted">
         {t.auth.haveAccount}{' '}
-        <Link href="/login" className="font-semibold text-ink underline-offset-2 hover:underline">
+        <Link href={toLogin} className="font-semibold text-ink underline-offset-2 hover:underline">
           {t.auth.toLogin}
         </Link>
       </p>
@@ -203,9 +285,12 @@ export function SignupForm({ google = false }: { google?: boolean }) {
   );
 }
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ initialError }: { initialError?: AuthErrorKey }) {
   const { t } = useUi();
-  const [state, action, pending] = useActionState<AuthState, FormData>(requestPasswordReset, null);
+  const [state, action, pending] = useActionState<AuthState, FormData>(
+    requestPasswordReset,
+    initialError ? { error: initialError } : null,
+  );
   return (
     <AuthCard title={t.auth.forgotTitle} subtitle={state?.sent ? t.auth.linkSent : t.auth.forgotSubtitle}>
       {state?.sent ? (
@@ -261,6 +346,25 @@ export function UpdatePasswordForm() {
         <Button type="submit" size="lg" fullWidth loading={pending}>
           {t.auth.updatePassword}
         </Button>
+      </form>
+    </AuthCard>
+  );
+}
+
+/**
+ * A one-time sign-in link from Badook Events lands here: nothing is used until the visitor clicks —
+ * mail scanners and link previews only open pages (actions.ts: continueWithLink).
+ */
+export function ContinueForm({ tokenHash, next }: { tokenHash: string; next: string }) {
+  const { t } = useUi();
+  const c = t.accountPage.auth.continue;
+  return (
+    <AuthCard title={c.title} subtitle={c.subtitle}>
+      <form action={continueWithLink} className="flex flex-col gap-3">
+        <input type="hidden" name="token_hash" value={tokenHash} />
+        <input type="hidden" name="next" value={next} />
+        <PendingSubmit>{c.button}</PendingSubmit>
+        <p className="text-center text-[12.5px] text-muted">{c.note}</p>
       </form>
     </AuthCard>
   );

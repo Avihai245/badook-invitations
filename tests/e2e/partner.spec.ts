@@ -1,8 +1,10 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 
 // The partner API (Badook Events → here): opening a user with name, email and phone, the one-time
-// sign-in link it returns (used once), updating the same user, looking users up, and what it refuses:
-// no key, a wrong key, and an account someone opened by themselves.
+// sign-in link it returns (a page with a "Continue" button: opening it — as a mail scanner would —
+// uses nothing; the click signs in, once), updating the same user, a new email, looking users up, and
+// what it refuses: no key, a wrong key, an account someone opened by themselves, and links for a user
+// who has taken over their own sign-in.
 
 const LOCAL = !process.env.PW_BASE_URL;
 /** Same value as INVITES_PARTNER_API_KEY in playwright.config.ts. */
@@ -11,6 +13,13 @@ const auth = { authorization: `Bearer ${KEY}` };
 
 const provision = (request: APIRequestContext, data: Record<string, unknown>, headers = auth) =>
   request.post('/api/partner/v1/users', { data, headers });
+
+/** Opens a sign-in link and clicks "Continue". */
+async function continueWith(page: Page, loginUrl: string) {
+  await page.goto(loginUrl);
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+  await page.getByRole('button', { name: 'המשך ל־Badook' }).click();
+}
 
 test.describe('the partner API', () => {
   test.skip(!LOCAL, 'the key is the local stack’s');
@@ -40,11 +49,21 @@ test.describe('the partner API', () => {
     expect(body).toMatchObject({
       ok: true,
       created: true,
-      user: { email, fullName: 'שירן אברהם', phone: '+972527654321', plan: 'free', activeInvitations: 0 },
+      user: {
+        email,
+        fullName: 'שירן אברהם',
+        phone: '+972527654321',
+        plan: 'free',
+        activeInvitations: 0,
+        userManaged: false,
+      },
     });
+    expect(body.loginUrl).toContain('/auth/continue?token_hash=');
 
-    // the link signs them in, into their invitations; the account shows what the partner sent
-    await page.goto(body.loginUrl);
+    // a mail scanner or a link preview opens the link: nothing is used
+    expect((await request.get(body.loginUrl)).status()).toBe(200);
+    // the click signs them in, into their invitations; the account shows what the partner sent
+    await continueWith(page, body.loginUrl);
     await page.waitForURL(/\/app\/invitations$/);
     await page.goto('/app/account');
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
@@ -54,8 +73,11 @@ test.describe('the partner API', () => {
 
     // the same link a second time: no
     await page.context().clearCookies();
-    await page.goto(body.loginUrl);
-    await page.waitForURL(/\/login\?error=link_invalid/);
+    await continueWith(page, body.loginUrl);
+    await page.waitForURL(/\/login\?error=link_expired/);
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'הקישור פג תוקף או שכבר השתמשו בו' }),
+    ).toBeVisible();
 
     // the same person again: updated, same user; a fresh link by the partner's id
     const again = await provision(request, { email, fullName: 'שירן א.' });
@@ -69,13 +91,40 @@ test.describe('the partner API', () => {
       headers: auth,
     });
     expect(link.status()).toBe(200);
-    await page.goto(((await link.json()) as { loginUrl: string }).loginUrl);
+    await continueWith(page, ((await link.json()) as { loginUrl: string }).loginUrl);
     await page.waitForURL(/\/app\/billing$/);
 
-    const found = await request.get(`/api/partner/v1/users?externalId=${encodeURIComponent(externalId)}`, {
+    // the email changed in Badook Events: the same user, found by the new one
+    const newEmail = `partner-new-${tag}@example.com`;
+    const changed = await request.patch('/api/partner/v1/users', {
+      data: { externalId, email: newEmail },
       headers: auth,
     });
-    expect(await found.json()).toMatchObject({ ok: true, user: { userId: body.user.userId, email } });
+    expect(await changed.json()).toMatchObject({
+      ok: true,
+      user: { userId: body.user.userId, email: newEmail },
+    });
+    const found = await request.get(`/api/partner/v1/users?email=${encodeURIComponent(newEmail)}`, {
+      headers: auth,
+    });
+    expect(await found.json()).toMatchObject({
+      ok: true,
+      user: { userId: body.user.userId, email: newEmail },
+    });
+
+    // once they choose a password of their own, the partner hands out no more links
+    await page.goto('/auth/update-password');
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    await page.fill('input[name=password]', 'my-own-password');
+    await page.click('form:has(input[name=password]) button[type=submit]');
+    await page.waitForURL(/\/app\/invitations$/);
+    const refused = await request.post('/api/partner/v1/login-links', {
+      data: { externalId },
+      headers: auth,
+    });
+    expect(refused.status()).toBe(409);
+    expect(await refused.json()).toMatchObject({ ok: false, code: 'user_managed' });
+    expect((await provision(request, { email: newEmail, fullName: 'X' })).status()).toBe(409);
   });
 
   test('an account opened by its owner stays theirs', async ({ page, request }, testInfo) => {
@@ -94,5 +143,25 @@ test.describe('the partner API', () => {
         await request.get(`/api/partner/v1/users?email=${encodeURIComponent(email)}`, { headers: auth })
       ).status(),
     ).toBe(404);
+    // and a partner id that is already another user's leaves nothing behind: the retry works
+    const tag = `${testInfo.project.name}-${Date.now()}`;
+    const first = await provision(request, {
+      email: `a-${tag}@example.com`,
+      fullName: 'A',
+      externalId: `be-x-${tag}`,
+    });
+    expect(first.status()).toBe(201);
+    const clash = await provision(request, {
+      email: `b-${tag}@example.com`,
+      fullName: 'B',
+      externalId: `be-x-${tag}`,
+    });
+    expect(await clash.json()).toEqual({ ok: false, code: 'external_id_taken' });
+    const retry = await provision(request, {
+      email: `b-${tag}@example.com`,
+      fullName: 'B',
+      externalId: `be-y-${tag}`,
+    });
+    expect(retry.status()).toBe(201);
   });
 });

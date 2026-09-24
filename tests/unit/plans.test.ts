@@ -6,6 +6,7 @@ import {
   packPriceIls,
   PLAN_LIMITS,
   RENEWAL_GRACE_DAYS,
+  VAT_RATE,
 } from '@/features/billing/plans';
 
 const NOW = Date.parse('2026-09-24T10:00:00Z');
@@ -43,10 +44,18 @@ describe('the plan in force', () => {
 });
 
 describe('prices', () => {
-  it('a message costs Meta’s rate in shekels, rounded up to the agora; packs multiply it', () => {
-    expect(messagePriceIls(0.0353, 3.7)).toBe(0.14);
-    expect(packPriceIls(100, 0.0353, 3.7)).toBe(14);
-    expect(packPriceIls(1000, 0.0353, 3.7)).toBe(140);
+  it('a message costs Meta’s rate in shekels plus VAT, rounded up to the agora; packs multiply it', () => {
+    // 0.0353 × 3.7 × 1.18 = 0.1541… → 0.16 (net of VAT 0.1356, above Meta's 0.1306)
+    expect(VAT_RATE).toBe(0.18);
+    expect(messagePriceIls(0.0353, 3.7)).toBe(0.16);
+    expect(messagePriceIls(0.0353, 3.7) / (1 + VAT_RATE)).toBeGreaterThanOrEqual(0.0353 * 3.7);
+    expect(packPriceIls(100, 0.0353, 3.7)).toBe(16);
+    expect(packPriceIls(1000, 0.0353, 3.7)).toBe(160);
+    // an exact agora stays as it is; anything above goes up to the next one
+    expect(messagePriceIls(0.5, 1)).toBe(0.59);
+    expect(messagePriceIls(0.05, 2.5)).toBe(0.15);
+    // the configuration still moves it
+    expect(messagePriceIls(0.04, 3.6)).toBe(0.17);
   });
 
   it('products: plans and message packs', () => {

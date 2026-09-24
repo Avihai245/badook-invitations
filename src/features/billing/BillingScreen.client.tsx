@@ -1,9 +1,19 @@
 'use client';
 
-import { CheckCircle2, CircleAlert, Coins, CreditCard, History, ShieldCheck, XCircle } from 'lucide-react';
+import {
+  CheckCircle2,
+  CircleAlert,
+  CircleArrowDown,
+  Coins,
+  CreditCard,
+  Gauge,
+  History,
+  ShieldCheck,
+  XCircle,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AreaHelp, Badge, Button, Card, Dialog, Hint, KpiCard, useToast } from '@/components/app';
 import { PlanCards } from '@/features/site/PlanCards';
 import { useUi } from '@/lib/i18n/client';
@@ -23,9 +33,18 @@ const post = async (url: string, body: unknown) => {
 /**
  * /app/billing: the plan in force and what it allows, the plans side by side (upgrade, switch, cancel),
  * message packs, and the history. Coming back from the payment page it says how the payment ended —
- * and while the provider's notice is still on its way, it checks again by itself.
+ * and while the provider's notice is still on its way, it checks again by itself. `start`: the plan
+ * chosen on the home page (?plan=), on to its payment page right away.
  */
-export function BillingScreen({ data, status }: { data: BillingPageData; status: string | null }) {
+export function BillingScreen({
+  data,
+  status,
+  start = null,
+}: {
+  data: BillingPageData;
+  status: string | null;
+  start?: 'pro' | 'business' | null;
+}) {
   const { t, locale, fmt, number, date } = useUi();
   const b = t.billing;
   const router = useRouter();
@@ -45,13 +64,21 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
     ? date(a.planRenewsAt, { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
 
-  // back from the payment page while its notice hasn't arrived yet: look again in a moment
+  // back from the payment page while its notice hasn't arrived yet: look again in a moment (each
+  // look asks PayPlus too: every few seconds for a minute, then every 15 seconds)
   const pending = data.returned?.status === 'pending' && status === 'success';
   useEffect(() => {
     if (!pending) return;
-    const timer = window.setInterval(() => router.refresh(), 2500);
+    const since = Date.now();
+    let tick = 0;
+    const timer = window.setInterval(() => {
+      tick += 1;
+      if (Date.now() - since < 60_000 || tick % 6 === 0) router.refresh();
+    }, 2500);
     return () => window.clearInterval(timer);
   }, [pending, router]);
+  // a monthly charge that failed (the plan still in its grace days): its own card offers to pay again
+  const pastDue = a.planStatus === 'past_due' && a.effective !== 'free' && !a.admin;
 
   const buy = async (product: Product) => {
     setBusy(product);
@@ -70,6 +97,19 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
       variant: 'danger',
     });
   };
+
+  // once: the address drops ?plan= first, so coming back from the payment page doesn't start again
+  const started = useRef(false);
+  useEffect(() => {
+    if (!start || started.current) return;
+    started.current = true;
+    window.history.replaceState(null, '', '/app/billing');
+    if (off) return;
+    if (a.effective === start && (a.planStatus === 'active' || a.planStatus === 'trialing'))
+      toast({ title: b.errors.already });
+    else void buy(start);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
+  }, []);
 
   const cancel = async () => {
     setBusy('cancel');
@@ -94,20 +134,22 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
   const planAction = (plan: PlanId) => {
     if (plan === 'free')
       return a.plan !== 'free' && a.planStatus !== 'canceled' ? (
-        <Hint text={b.help.cancel}>
+        <Hint text={b.help.toFree}>
           <Button fullWidth variant="secondary" onClick={() => setConfirmCancel(true)}>
             {b.toFree}
           </Button>
         </Hint>
       ) : null;
-    const label =
-      a.plan === 'free' || a.planStatus === 'canceled'
+    const retry = pastDue && plan === a.effective;
+    const label = retry
+      ? b.choose.retry
+      : a.effective === 'free' || a.planStatus === 'canceled'
         ? b.choose[plan]
         : plan === 'pro'
           ? b.choose.switchPro
           : b.choose.switchBusiness;
     return (
-      <Hint text={b.help.choose}>
+      <Hint text={retry ? b.help.retry : b.help.choose}>
         <Button
           fullWidth
           variant={plan === 'pro' ? 'primary' : 'secondary'}
@@ -120,6 +162,26 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
       </Hint>
     );
   };
+
+  // purchases and monthly renewals, newest first
+  const payments = [
+    ...data.history.checkouts.map((c) => ({
+      key: c.id,
+      label: b.products[c.product],
+      renewal: false,
+      amount: Number(c.amount) as number | null,
+      status: c.status,
+      at: c.completedAt ?? c.createdAt,
+    })),
+    ...data.history.renewals.map((r, i) => ({
+      key: `renewal-${i}`,
+      label: r.product ? b.products[r.product] : b.history.renewal,
+      renewal: !!r.product,
+      amount: r.amount === null ? null : Number(r.amount),
+      status: r.status,
+      at: r.at,
+    })),
+  ].sort((x, y) => Date.parse(y.at) - Date.parse(x.at));
 
   // how the payment the visitor came back from ended: our record decides, not the address they came to
   const returned: keyof typeof b.returned | null =
@@ -146,8 +208,11 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
           title={t.common.helpTitle}
           items={[
             { icon: <CreditCard />, label: b.choose.pro, text: b.help.choose },
+            { icon: <CircleArrowDown />, label: b.toFree, text: b.help.toFree },
             { icon: <XCircle />, label: b.cancel.button, text: b.help.cancel },
             { icon: <Coins />, label: b.packs.buy, text: b.help.buy },
+            { icon: <Gauge />, label: b.usageTitle, text: b.help.usage },
+            { icon: <History />, label: b.history.title, text: b.help.history },
           ]}
         />
       </div>
@@ -225,14 +290,25 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
 
       <h2 className="mt-10 text-[20px] font-bold">{b.plans}</h2>
       <div className="mt-4">
-        <PlanCards t={t} locale={locale} prices={data.prices} current={a.effective} action={planAction} />
+        <PlanCards
+          t={t}
+          locale={locale}
+          prices={data.prices}
+          current={pastDue ? undefined : a.effective}
+          action={planAction}
+        />
       </div>
-      {!off ? (
+      {off ? (
+        // why the buttons are off
+        <p className="mt-3 text-[13px] text-muted" data-testid="billing-disabled">
+          {b.disabled.off}
+        </p>
+      ) : (
         <p className="mt-3 flex items-center gap-2 text-[13px] text-muted">
           <ShieldCheck aria-hidden className="size-4 text-success" />
           {b.secure} {t.site.plans.vat}
         </p>
-      ) : null}
+      )}
 
       <section id="credits" className="mt-12 scroll-mt-20">
         <h2 className="text-[20px] font-bold">{b.packs.title}</h2>
@@ -264,6 +340,7 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
             </li>
           ))}
         </ul>
+        {off ? <p className="mt-3 text-[13px] text-muted">{b.disabled.off}</p> : null}
       </section>
 
       <section className="mt-12">
@@ -274,26 +351,23 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
         <div className="mt-4 grid gap-5 lg:grid-cols-2">
           <Card className="overflow-hidden">
             <p className="border-b border-line px-4 py-3 text-[14px] font-semibold">{b.history.payments}</p>
-            {data.history.checkouts.length ? (
+            {payments.length ? (
               <ul className="divide-y divide-line text-[14px]" data-testid="payments">
-                {data.history.checkouts.map((c) => (
-                  <li key={c.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                {payments.map((p) => (
+                  <li key={p.key} className="flex items-center justify-between gap-3 px-4 py-3">
                     <div className="min-w-0">
-                      <p className="truncate font-medium">{b.products[c.product]}</p>
+                      <p className="truncate font-medium">{p.label}</p>
                       <p className="text-[12px] text-muted">
-                        {date(c.completedAt ?? c.createdAt, {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
+                        {p.renewal ? `${b.history.renewal} · ` : ''}
+                        {date(p.at, { day: 'numeric', month: 'short', year: 'numeric' })}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <span className="tabular-nums">{money(Number(c.amount), 2)}</span>
+                      {p.amount !== null ? <span className="tabular-nums">{money(p.amount, 2)}</span> : null}
                       <Badge
-                        variant={c.status === 'paid' ? 'live' : c.status === 'failed' ? 'danger' : 'neutral'}
+                        variant={p.status === 'paid' ? 'live' : p.status === 'failed' ? 'danger' : 'neutral'}
                       >
-                        {b.history.statuses[c.status]}
+                        {b.history.statuses[p.status]}
                       </Badge>
                     </div>
                   </li>
@@ -329,7 +403,7 @@ export function BillingScreen({ data, status }: { data: BillingPageData; status:
                 ))}
               </ul>
             ) : (
-              <p className="px-4 py-6 text-[14px] text-muted">{b.history.none}</p>
+              <p className="px-4 py-6 text-[14px] text-muted">{b.history.noCredits}</p>
             )}
           </Card>
         </div>

@@ -411,35 +411,62 @@ describe('support chat and partners', () => {
 
   it('finds users by email (any case); the partner claims only users it created, and sees only its own', async () => {
     const P = 'partner:badook-events';
+    // users the partner created (Auth app_metadata.provisioned_by); one of them set a password before
+    // the partner linked it
+    const MADE = '99999999-9999-4999-8999-999999999991';
+    const MADE_WITH_PASSWORD = '99999999-9999-4999-8999-999999999992';
+    await c.query(
+      `insert into auth.users (id, email, encrypted_password, raw_app_meta_data, raw_user_meta_data) values
+         ($1, 'made@example.com', '', $3, '{"full_name":"Made"}'),
+         ($2, 'made2@example.com', 'scrypt:x:y', $3, '{}')`,
+      [MADE, MADE_WITH_PASSWORD, { provider: 'email', providers: ['email'], provisioned_by: P }],
+    );
     expect(await call('user_id_by_email', [' b@EXAMPLE.com '])).toBe(OWNER_B);
     expect(await call('user_id_by_email', ['nobody@example.com'])).toBeNull();
-    // an account opened some other way stays as it is
+    // an account opened some other way stays as it is — claiming or not (its owner signed up at the
+    // same moment the partner tried to create it)
     expect(await call('account_link_partner', [OWNER_B, P, 'be-7', 'Someone', null, false])).toBeNull();
-    // a user the partner has just created becomes the partner's
+    expect(await call('account_link_partner', [OWNER_B, P, 'be-7', 'Someone', null, true])).toBeNull();
+    expect(await call('account_link_partner', [MADE_WITH_PASSWORD, P, null, 'X', null, true])).toBeNull();
+    // a user the partner created becomes the partner's
     const linked = await commit('account_link_partner', [
-      OWNER_A,
+      MADE,
       P,
       'be-42',
       'Dana Partner',
       '+972500000000',
       true,
     ]);
-    expect(linked).toMatchObject({ source: P, fullName: 'Dana Partner', phone: '+972500000000' });
+    expect(linked).toMatchObject({
+      source: P,
+      fullName: 'Dana Partner',
+      phone: '+972500000000',
+      userManaged: false,
+    });
     // already the partner's: updated (what isn't sent stays)
-    expect(await call('account_link_partner', [OWNER_A, P, null, 'Dana P.', null, false])).toMatchObject({
+    expect(await call('account_link_partner', [MADE, P, null, 'Dana P.', null, false])).toMatchObject({
       fullName: 'Dana P.',
       phone: '+972500000000',
     });
     // another partner can't claim it
-    expect(await call('account_link_partner', [OWNER_A, 'partner:other', null, 'X', null, true])).toBeNull();
+    expect(await call('account_link_partner', [MADE, 'partner:other', null, 'X', null, true])).toBeNull();
     // found by our id or by the partner's id, with the email; never someone else's user
     expect(await call('partner_account', [P, null, 'be-42'])).toMatchObject({
-      userId: OWNER_A,
-      email: 'a@example.com',
+      userId: MADE,
+      email: 'made@example.com',
+      userManaged: false,
     });
-    expect(await call('partner_account', [P, OWNER_A, null])).toMatchObject({ userId: OWNER_A });
+    expect(await call('partner_account', [P, MADE, null])).toMatchObject({ userId: MADE });
     expect(await call('partner_account', [P, OWNER_B, null])).toBeNull();
-    expect(await call('partner_account', ['partner:other', OWNER_A, null])).toBeNull();
+    expect(await call('partner_account', ['partner:other', MADE, null])).toBeNull();
+    // the user takes over their own sign-in (Google, or a password): the partner sees it
+    await c.query(`update auth.users set raw_app_meta_data = raw_app_meta_data || $2 where id = $1`, [
+      MADE,
+      { providers: ['email', 'google'] },
+    ]);
+    expect(await call('partner_account', [P, MADE, null])).toMatchObject({ userManaged: true });
+    expect(await call('user_self_managed', [MADE_WITH_PASSWORD])).toBe(true);
+    expect(await call('user_self_managed', [OWNER_B])).toBe(false);
   });
 
   it('none of it is reachable with the public keys', async () => {
