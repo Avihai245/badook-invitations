@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
+import { stubExternalMedia } from '../support/external';
 import { Client } from 'pg';
 import { demoInvitations } from '../../scripts/seed';
 
@@ -26,6 +27,8 @@ async function query<T = Record<string, unknown>>(sql: string, params: unknown[]
 }
 
 function collectErrors(page: Page): string[] {
+  // YouTube stills and players (the video sample) come from outside: answered locally
+  void stubExternalMedia(page);
   const errors: string[] = [];
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push(m.text());

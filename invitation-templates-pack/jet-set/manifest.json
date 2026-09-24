@@ -83,15 +83,15 @@
       "id": "boarding",
       "display": {
         "latin": "Space Mono",
-        "hebrew": "Cousine"
+        "hebrew": "Rubik"
       },
       "heading": {
         "latin": "Space Mono",
-        "hebrew": "Cousine"
+        "hebrew": "Rubik"
       },
       "body": {
         "latin": "Space Mono",
-        "hebrew": "Cousine"
+        "hebrew": "Rubik"
       },
       "ui": {
         "latin": "Inter",
@@ -145,7 +145,7 @@
     "sealColors": [],
     "monogramFont": {
       "latin": "Space Mono",
-      "hebrew": "Cousine"
+      "hebrew": "Rubik"
     }
   },
   "hero": {

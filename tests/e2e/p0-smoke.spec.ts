@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { stubExternalMedia } from '../support/external';
 import { TEMPLATE_IDS } from '../../src/features/invitations/templates/registry';
 
 // P0 smoke: the kitchen sink renders every template × locale cleanly (run against a production build
@@ -17,6 +18,8 @@ async function open(page: Page, url: string) {
 
 /** Console errors + uncaught exceptions (hydration mismatches are console errors). */
 function collectErrors(page: Page): string[] {
+  // YouTube stills and players (the video sample) come from outside: answered locally
+  void stubExternalMedia(page);
   const errors: string[] = [];
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push(m.text());
