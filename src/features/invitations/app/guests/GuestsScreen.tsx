@@ -38,10 +38,11 @@ import {
   Input,
   KpiCard,
   Menu,
+  PageTitle,
   Segmented,
-  useToast,
   type BadgeVariant,
   type DataTableColumn,
+  useToast,
 } from '@/components/app';
 import { UpgradeDialog, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
 import { dictFor, fmt as format } from '@/lib/i18n/app';
@@ -403,7 +404,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
         <div className="flex items-start justify-between gap-3">
           <div className="max-w-2xl min-w-0">
             <div className="flex items-center gap-1">
-              <h1 className="text-[22px] font-bold tracking-[-.01em]">{g.title}</h1>
+              <PageTitle size="section">{g.title}</PageTitle>
               <AreaHelp label={t.common.helpLabel} title={h.title} items={helpItems} />
             </div>
             <p className="mt-1 text-[14px] text-muted">{g.subtitle}</p>

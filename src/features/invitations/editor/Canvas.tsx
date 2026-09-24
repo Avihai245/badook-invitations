@@ -2,7 +2,7 @@
 
 import { ExternalLink, Eye, Play } from 'lucide-react';
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { Button, PhoneFrame, cn } from '@/components/app';
+import { Button, Hint, PhoneFrame, cn } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { useEditor } from './state/EditorProvider';
 
@@ -97,12 +97,16 @@ export function Canvas({
         </div>
       )}
       <div className="flex gap-2">
-        <Button variant="secondary" size="sm" icon={<Play />} onClick={onReplay}>
-          {c.replay}
-        </Button>
-        <Button variant="ghost" size="sm" icon={<ExternalLink className="icon-dir" />} onClick={onOpenTab}>
-          {c.openTab}
-        </Button>
+        <Hint text={c.replayHint}>
+          <Button variant="secondary" size="sm" icon={<Play />} onClick={onReplay}>
+            {c.replay}
+          </Button>
+        </Hint>
+        <Hint text={c.openTabHint}>
+          <Button variant="ghost" size="sm" icon={<ExternalLink className="icon-dir" />} onClick={onOpenTab}>
+            {c.openTab}
+          </Button>
+        </Hint>
       </div>
     </div>
   );

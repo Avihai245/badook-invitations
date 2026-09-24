@@ -27,7 +27,12 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   // Lets a second dev server run side by side (e.g. QA scripts) without clobbering `.next`.
   distDir: process.env.NEXT_DIST_DIR || '.next',
-  ...(publicHost ? { experimental: { serverActions: { allowedOrigins: [publicHost] } } } : {}),
+  experimental: {
+    // an address that matches no page at all gets the site's own 404 (app/global-not-found.tsx), not
+    // Next's plain English one — the app has several root layouts, so there is no single not-found
+    globalNotFound: true,
+    ...(publicHost ? { serverActions: { allowedOrigins: [publicHost] } } : {}),
+  },
   // Metadata (title, Open Graph) goes into <head> for every user agent instead of being streamed after
   // the shell, so link previews from any messenger (not only Next's bot list) see it.
   htmlLimitedBots: /.*/,

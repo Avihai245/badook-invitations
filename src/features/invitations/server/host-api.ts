@@ -23,6 +23,9 @@ import { followUpDocument, followUpSlug, saveTheDateSlug } from '../templates/fo
 import { COUPLE_EVENTS } from '../templates/seed-copy';
 import type { TemplateEntry } from '../templates/registry';
 import { seedDocument } from '../templates/seed-document';
+import { isPremiumTemplate } from '../templates/tier';
+
+export { isPremiumTemplate };
 import type { HostDb } from './host-db';
 import { NOTIFY_MODES } from '../lib/responses';
 
@@ -53,9 +56,6 @@ export interface HostDeps {
   /** the host's plan limits (absent: nothing is limited) */
   entitlements?(): Promise<Entitlements>;
 }
-
-/** A premium design (the gallery marks them): publishing one needs a paid plan. */
-export const isPremiumTemplate = (manifest: object) => (manifest as { tier?: unknown }).tier === 'premium';
 
 /** 402 when the plan has no room for one more active invitation. */
 async function noRoom(deps: HostDeps): Promise<ApiResult | null> {

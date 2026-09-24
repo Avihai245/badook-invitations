@@ -1,11 +1,11 @@
 'use client';
 
-import { Crown } from 'lucide-react';
+import { Crown, LayoutGrid } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { cn, PaletteDots, Segmented } from '@/components/app';
+import { cn, PageHeader, PaletteDots, Segmented } from '@/components/app';
 import type { UiLocale } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
-import type { EventType, Locale } from '../../contracts/types';
+import { EVENT_TYPES, type EventType, type Locale, type TemplateManifest } from '../../contracts/types';
 import type { AssetBases } from '../../renderer/assets';
 import { templateFileUrl } from '../../renderer/assets';
 import { TEMPLATES } from '../../templates/registry';
@@ -14,19 +14,27 @@ import { TemplatePoster, type PosterTemplate } from '../TemplatePoster';
 import { CreateWizard, type WizardSeed } from './CreateWizard';
 import { PreviewDialog } from './PreviewDialog';
 import { usePreviewVideos } from './preview-videos';
+import { EVENT_ICONS } from '../event-icons';
 import { HelpFor } from '../HelpFor';
 
-type Filter = 'all' | 'wedding' | 'barbat' | 'brit' | 'birthday' | 'baby_shower' | 'save_the_date';
+type Filter = EventType | 'all';
 
-const FILTERS: Record<Filter, readonly EventType[]> = {
-  all: [],
-  wedding: ['wedding'],
-  barbat: ['bar_mitzvah', 'bat_mitzvah'],
-  brit: ['brit'],
-  birthday: ['birthday'],
-  baby_shower: ['baby_shower'],
-  save_the_date: ['save_the_date'],
-};
+/**
+ * The gallery's event-type chips: every type at least one design is made for, in the contract's
+ * order (EVENT_TYPES), with how many designs each has. A design shows under each of its types.
+ */
+export function eventTypeFilters(
+  manifests: readonly Pick<TemplateManifest, 'categories'>[],
+): { type: EventType; count: number }[] {
+  return EVENT_TYPES.map((type) => ({
+    type,
+    count: manifests.filter((m) => m.categories.includes(type)).length,
+  })).filter((f) => f.count > 0);
+}
+
+/** The designs a chip shows. */
+export const matchesFilter = (manifest: Pick<TemplateManifest, 'categories'>, filter: Filter) =>
+  filter === 'all' || manifest.categories.includes(filter);
 
 /** Dev/QA: the same fixture files on every card instead of the templates' own previews. */
 export interface DevPreviews {
@@ -48,7 +56,7 @@ export function TemplateGallery({
   fontCss: string;
   devPreviews?: DevPreviews | null;
 }) {
-  const { t, locale } = useUi();
+  const { t, locale, plural, number } = useUi();
   const videos = usePreviewVideos();
   const [filter, setFilter] = useState<Filter>('all');
   const [previewLocale, setPreviewLocale] = useState<Locale>(locale);
@@ -66,55 +74,75 @@ export function TemplateGallery({
       })),
     [bases, previewLocale, devPreviews],
   );
-  const visible = templates.filter(
-    ({ manifest }) => filter === 'all' || manifest.categories.some((c) => FILTERS[filter].includes(c)),
+  const visible = templates.filter(({ manifest }) => matchesFilter(manifest, filter));
+  const chips = useMemo(
+    () => [
+      { type: 'all' as const, count: templates.length },
+      ...eventTypeFilters(templates.map((x) => x.manifest)),
+    ],
+    [templates],
   );
-  const chipLabel = (f: Filter) =>
-    f === 'all'
-      ? t.gallery.all
-      : f === 'barbat'
-        ? t.gallery.barBat
-        : t.eventTypes[f as Exclude<Filter, 'all' | 'barbat'>];
 
   return (
-    <div className="mx-auto max-w-[1200px] px-6 pt-8 pb-16">
+    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
       <style dangerouslySetInnerHTML={{ __html: fontCss }} />
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-1">
-            <h1 className="font-display text-[32px] leading-tight font-bold tracking-[-0.01em]">
-              {t.gallery.title}
-            </h1>
-            <HelpFor area="gallery" />
-          </div>
-          <p className="mt-1 text-muted">{t.gallery.subtitle}</p>
-        </div>
-        <Segmented<Locale>
-          label={t.gallery.previewLanguage}
-          value={previewLocale}
-          onValueChange={setPreviewLocale}
-          options={[
-            { value: 'he', label: t.common.hebrew },
-            { value: 'en', label: t.common.english },
-          ]}
-        />
+      <PageHeader
+        title={t.gallery.title}
+        help={<HelpFor area="gallery" />}
+        description={t.gallery.subtitle}
+        actions={
+          <Segmented<Locale>
+            label={t.gallery.previewLanguage}
+            value={previewLocale}
+            onValueChange={setPreviewLocale}
+            options={[
+              { value: 'he', label: t.common.hebrew },
+              { value: 'en', label: t.common.english },
+            ]}
+          />
+        }
+      />
+      {/* phones: one row that scrolls sideways; wider screens: the chips wrap */}
+      <div
+        role="group"
+        aria-label={t.gallery.filterLabel}
+        className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
+      >
+        {chips.map(({ type, count }) => {
+          const Icon = type === 'all' ? LayoutGrid : EVENT_ICONS[type];
+          const on = filter === type;
+          return (
+            <button
+              key={type}
+              type="button"
+              aria-pressed={on}
+              data-filter={type}
+              onClick={() => setFilter(type)}
+              className={cn(
+                'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border ps-3 pe-2 text-[13px] font-medium whitespace-nowrap transition-colors duration-150 motion-reduce:transition-none',
+                on
+                  ? 'border-ink bg-ink text-white shadow-sm'
+                  : 'border-line bg-surface text-ink hover:border-line-strong hover:bg-subtle',
+              )}
+            >
+              <Icon aria-hidden className={cn('size-4 shrink-0', on ? 'text-white/85' : 'text-brand')} />
+              {type === 'all' ? t.gallery.all : t.eventTypes[type]}
+              <span
+                aria-hidden
+                className={cn(
+                  'min-w-5 rounded-full px-1.5 text-center text-[11px] leading-5 font-semibold tabular-nums',
+                  on ? 'bg-white/20 text-white' : 'bg-subtle text-muted',
+                )}
+              >
+                {number(count)}
+              </span>
+            </button>
+          );
+        })}
       </div>
-      <div role="group" aria-label={t.gallery.filterLabel} className="mt-5 flex flex-wrap gap-2">
-        {(Object.keys(FILTERS) as Filter[]).map((f) => (
-          <button
-            key={f}
-            type="button"
-            aria-pressed={filter === f}
-            onClick={() => setFilter(f)}
-            className={cn(
-              'h-[34px] rounded-full border px-3.5 text-[13px] font-medium transition-colors',
-              filter === f ? 'border-ink bg-ink text-white' : 'border-line bg-surface hover:bg-subtle',
-            )}
-          >
-            {chipLabel(f)}
-          </button>
-        ))}
-      </div>
+      <p aria-live="polite" className="sr-only">
+        {plural(t.gallery.results, visible.length, { n: number(visible.length) })}
+      </p>
       {visible.length ? (
         <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map(({ manifest, image, video, sample }) => (
@@ -149,8 +177,11 @@ export function TemplateGallery({
             setWizard({
               templateId: preview,
               ...choice,
+              // the type the gallery was filtered by, when this design is made for it
               eventType:
-                FILTERS[filter].find((e) => TEMPLATES.get(preview)?.manifest.categories.includes(e)) ?? null,
+                filter !== 'all' && TEMPLATES.get(preview)?.manifest.categories.includes(filter)
+                  ? filter
+                  : null,
             });
           }}
         />

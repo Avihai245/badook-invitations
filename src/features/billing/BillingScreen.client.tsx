@@ -14,7 +14,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { AreaHelp, Badge, Button, Card, Dialog, Hint, KpiCard, useToast } from '@/components/app';
+import { AreaHelp, Badge, Button, Card, Dialog, Hint, KpiCard, PageTitle, useToast } from '@/components/app';
 import { PlanCards } from '@/features/site/PlanCards';
 import { useUi } from '@/lib/i18n/client';
 import type { PlanId, Product } from './plans';
@@ -202,7 +202,7 @@ export function BillingScreen({
   return (
     <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 sm:px-6">
       <div className="flex items-center gap-1">
-        <h1 className="text-[26px] font-bold tracking-[-.01em]">{b.title}</h1>
+        <PageTitle>{b.title}</PageTitle>
         <AreaHelp
           label={t.common.helpLabel}
           title={t.common.helpTitle}

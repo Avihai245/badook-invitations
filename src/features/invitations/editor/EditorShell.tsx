@@ -99,6 +99,15 @@ export function EditorShell({
     return () => window.removeEventListener(OPEN_PUBLISH_EVENT, open);
   }, []);
 
+  // `?publish=1` (the list's and the workspace's "publish" buttons): open with the publish window, once
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('publish') !== '1') return;
+    setPublishing(true);
+    url.searchParams.delete('publish');
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  }, []);
+
   // Undo/redo from the keyboard (the document history, also inside text fields).
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {

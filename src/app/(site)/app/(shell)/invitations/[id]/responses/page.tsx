@@ -13,7 +13,7 @@ type Params = Promise<{ id: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const [{ id }, { t, locale }, user] = await Promise.all([params, getUi(), getSessionUser()]);
   const inv = user ? await hostDb.get(id, user.id) : null;
-  if (!inv) return { title: t.responses.title };
+  if (!inv) return { title: t.errorPages.notFound.metaTitle };
   const l = inv.draft.locales.includes(locale) ? locale : inv.draft.defaultLocale;
   return {
     title: fmt(t.responses.metaTitle, { name: hostsLine(inv.draft.hosts, l) || t.eventTypes[inv.eventType] }),

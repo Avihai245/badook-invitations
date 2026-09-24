@@ -359,7 +359,8 @@ test.describe('share screen', () => {
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(url);
 
     await message.fill(`מחכים לכם!\n${url}`);
-    const whatsapp = page.getByRole('link', { name: 'שליחה בוואטסאפ' });
+    // (exact: the invitation's "guests & WhatsApp sending" tab says it too)
+    const whatsapp = page.getByRole('link', { name: 'שליחה בוואטסאפ', exact: true });
     await expect(whatsapp).toHaveAttribute(
       'href',
       `https://wa.me/?text=${encodeURIComponent(`מחכים לכם!\n${url}`)}`,

@@ -22,6 +22,7 @@ import { requireTemplate } from '../../templates/registry';
 import { browserTimezone, DEFAULT_TIMEZONE, timezoneOptions } from '../../lib/timezones';
 import { COUPLE_EVENTS } from '../../templates/seed-copy';
 import { EVENT_ICONS } from '../event-icons';
+import { HelpFor } from '../HelpFor';
 
 export interface WizardSeed {
   templateId: string;
@@ -259,6 +260,7 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
           </span>
         }
         closeLabel={creating ? undefined : t.common.close}
+        help={creating ? undefined : <HelpFor area="wizard" inDialog />}
         footer={
           creating ? null : (
             <>

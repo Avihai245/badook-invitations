@@ -13,7 +13,7 @@ export type EmptyStateProps = {
   className?: string;
 };
 
-/** Centered empty state (§9B.2): 120px illustration + title (16px/700) + one line + CTA. */
+/** Centered empty state (§9B.2): 120px illustration + title (18px/700) + one line + CTA. */
 export function EmptyState({
   illustration,
   title,
@@ -29,9 +29,9 @@ export function EmptyState({
           {illustration}
         </div>
       )}
-      <Title className="text-[16px] font-bold text-balance">{title}</Title>
+      <Title className="text-[18px] leading-snug font-bold text-balance">{title}</Title>
       {description != null && (
-        <p className="mt-1 max-w-[46ch] text-[14px] text-muted text-balance">{description}</p>
+        <p className="mt-1.5 max-w-[46ch] text-[14.5px] text-balance text-muted">{description}</p>
       )}
       {action != null && <div className="mt-5 flex flex-wrap justify-center gap-2">{action}</div>}
     </div>

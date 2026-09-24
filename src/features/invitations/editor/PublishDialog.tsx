@@ -12,11 +12,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Dialog, Field, Input, cn, useToast } from '@/components/app';
+import { Button, Dialog, Field, Hint, Input, cn, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { SLUG_RE } from '../contracts/schemas';
 import { validateDocument, type Issue } from '../contracts/validate';
 import { hostApi } from '../app/api';
+import { HelpFor } from '../app/HelpFor';
 import { posterColors } from '../app/poster';
 import { formatEventDate } from '../lib/dates';
 import { hostsText, issueText, sectionName } from './fields/fields';
@@ -120,6 +121,12 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
 
   const blocked =
     listErrors.length > 0 || slugState === 'taken' || slugState === 'invalid' || slugState === 'checking';
+  // why "publish" can't be pressed yet (its hint while disabled)
+  const blockedReason = listErrors.length
+    ? p.blocked
+    : slugState === 'checking'
+      ? p.blockedChecking
+      : p.blockedSlug;
   const shownDate = (iso: string) => date(iso);
   const labelOf = (issue: Issue) => {
     if (issue.code === 'empty_section' && issue.sectionId) {
@@ -145,6 +152,7 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
         title={p.doneTitle}
         description={p.doneBody}
         closeLabel={t.common.close}
+        help={<HelpFor area="publish" inDialog />}
         footer={
           <>
             <Button variant="secondary" icon={<ExternalLink className="icon-dir" />} asChild>
@@ -192,14 +200,21 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
       onOpenChange={(o) => !o && phase !== 'publishing' && onClose()}
       title={meta.status === 'published' ? p.titleUpdate : p.title}
       closeLabel={phase === 'publishing' ? undefined : t.common.close}
+      help={phase === 'publishing' ? undefined : <HelpFor area="publish" inDialog />}
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={phase === 'publishing'}>
             {t.common.cancel}
           </Button>
-          <Button onClick={() => void publish()} disabled={blocked} loading={phase === 'publishing'}>
-            {phase === 'publishing' ? p.publishing : p.publish}
-          </Button>
+          <Hint text={p.publish} disabledText={blockedReason}>
+            <Button
+              onClick={() => void publish()}
+              disabled={blocked && phase !== 'publishing'}
+              loading={phase === 'publishing'}
+            >
+              {phase === 'publishing' ? p.publishing : p.publish}
+            </Button>
+          </Hint>
         </>
       }
     >

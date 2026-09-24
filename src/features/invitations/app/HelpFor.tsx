@@ -2,11 +2,18 @@
 
 import {
   Archive,
+  ArchiveRestore,
   ArrowLeft,
   BadgeCheck,
   Bell,
+  CalendarClock,
+  CalendarDays,
+  CaseSensitive,
   ChartColumn,
   Check,
+  CircleAlert,
+  CircleCheck,
+  Clock,
   Copy,
   CreditCard,
   Crown,
@@ -14,33 +21,53 @@ import {
   Ellipsis,
   ExternalLink,
   Eye,
+  FileSpreadsheet,
+  Globe,
   GripVertical,
+  Hash,
   History,
+  Image,
   KeyRound,
   Languages,
+  LayoutDashboard,
+  Link2,
   ListChecks,
   ListFilter,
+  ListOrdered,
+  Mail,
   MailPlus,
   MessageCircle,
   MessageCircleQuestion,
   MessageSquareText,
   MousePointerClick,
+  Music,
   Palette,
+  PanelBottom,
   PanelRightOpen,
   PencilLine,
+  Play,
   Plus,
   QrCode,
+  RotateCcw,
   Save,
+  ScanEye,
   Search,
   Send,
   Settings2,
+  SlidersHorizontal,
   Smartphone,
+  Sparkles,
+  Stamp,
+  Tags,
   ToggleRight,
   Trash2,
+  TriangleAlert,
+  Type,
   Undo2,
+  Upload,
   Users,
+  Volume2,
   WandSparkles,
-  CircleAlert,
   type LucideIcon,
 } from 'lucide-react';
 import { AreaHelp } from '@/components/app';
@@ -53,14 +80,27 @@ export type HelpArea = keyof Help;
 const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
   list: {
     newInvitation: Plus,
-    card: PencilLine,
+    card: MousePointerClick,
+    quick: Users,
+    nextStep: Sparkles,
+    countdown: CalendarClock,
     menu: Ellipsis,
     guests: Users,
     responses: ListChecks,
     duplicate: Copy,
     archive: Archive,
+    archiveView: ArchiveRestore,
     followUp: MailPlus,
     status: BadgeCheck,
+  },
+  overview: {
+    tabs: LayoutDashboard,
+    stats: ChartColumn,
+    import: FileSpreadsheet,
+    send: MessageCircle,
+    steps: ListOrdered,
+    link: Link2,
+    publish: Send,
   },
   gallery: {
     filter: ListFilter,
@@ -70,15 +110,36 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     demo: ExternalLink,
     use: WandSparkles,
   },
+  preview: {
+    phone: Smartphone,
+    language: Languages,
+    palettes: Palette,
+    fonts: CaseSensitive,
+    demo: ExternalLink,
+    use: WandSparkles,
+  },
+  wizard: {
+    eventType: Sparkles,
+    names: PencilLine,
+    date: CalendarDays,
+    timezone: Globe,
+    languages: Languages,
+    steps: ListOrdered,
+    create: Check,
+  },
   editor: {
     back: ArrowLeft,
     save: Check,
     undo: Undo2,
     device: Smartphone,
     language: Languages,
+    replay: Play,
+    openTab: ExternalLink,
     versions: History,
     preview: Eye,
     publish: Send,
+    premium: Crown,
+    mobileTabs: PanelBottom,
     assistant: MessageCircleQuestion,
   },
   rail: {
@@ -91,11 +152,51 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     design: Palette,
     settings: Settings2,
   },
+  designPalette: {
+    presets: Palette,
+    swatch: SlidersHorizontal,
+    hex: Hash,
+    contrast: ScanEye,
+    reset: RotateCcw,
+  },
+  designFonts: { pairs: CaseSensitive, more: Plus, live: Eye },
+  designCover: { enabled: Mail, monogram: Type, seal: Stamp, hint: MousePointerClick, replay: Play },
+  designMusic: {
+    enabled: Music,
+    tracks: Play,
+    custom: Upload,
+    videoSound: Image,
+    volume: Volume2,
+    startAt: Clock,
+  },
+  settingsEvent: {
+    type: Sparkles,
+    names: PencilLine,
+    joiner: Type,
+    parents: Users,
+    date: CalendarDays,
+    timezone: Globe,
+    hebrewDate: CalendarClock,
+    timeFormat: Clock,
+    deadline: ListChecks,
+  },
+  settingsLanguages: { add: Plus, remove: Trash2, default: Languages, tabs: Tags },
+  settingsShare: { address: Link2, publishNow: Send, card: MessageSquareText, image: Image, noindex: Eye },
+  publish: {
+    slug: Link2,
+    errors: CircleAlert,
+    warnings: TriangleAlert,
+    card: MessageCircle,
+    publish: Send,
+    after: CircleCheck,
+  },
+  versions: { version: History, live: BadgeCheck, view: ExternalLink, restore: RotateCcw, undo: Undo2 },
   responses: {
     kpis: Users,
     notify: Bell,
     export: Download,
     search: Search,
+    chips: Tags,
     row: PanelRightOpen,
     charts: ChartColumn,
   },
@@ -104,6 +205,7 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     copyLink: Copy,
     message: MessageSquareText,
     whatsapp: MessageCircle,
+    copyMessage: Copy,
     guests: Users,
     qr: QrCode,
     preview: Smartphone,
@@ -111,8 +213,20 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
   account: { save: Save, password: KeyRound, plan: CreditCard, delete: Trash2 },
 };
 
-/** The "?" of an area: what each of its buttons does (lib/i18n/help.*.ts), with the button's icon. */
-export function HelpFor({ area, className }: { area: HelpArea; className?: string }) {
+/**
+ * The "?" of an area: what each of its buttons does (lib/i18n/help.*.ts), with the button's icon.
+ * `inDialog`: inside a modal dialog the card doesn't end with "ask the assistant" (the chat would
+ * open behind the dialog).
+ */
+export function HelpFor({
+  area,
+  inDialog = false,
+  className,
+}: {
+  area: HelpArea;
+  inDialog?: boolean;
+  className?: string;
+}) {
   const { t } = useUi();
   const help = t.help[area];
   const icons = ICONS[area] as Record<string, LucideIcon>;
@@ -122,5 +236,13 @@ export function HelpFor({ area, className }: { area: HelpArea; className?: strin
       return { icon: Icon ? <Icon /> : undefined, label: item.label, text: item.text };
     },
   );
-  return <AreaHelp label={t.common.helpLabel} title={help.title} items={items} className={className} />;
+  return (
+    <AreaHelp
+      label={t.common.helpLabel}
+      title={help.title}
+      items={items}
+      footer={!inDialog}
+      className={className}
+    />
+  );
 }

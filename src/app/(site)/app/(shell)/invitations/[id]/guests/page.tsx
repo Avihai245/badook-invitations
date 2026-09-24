@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { InvitationNav } from '@/features/invitations/app/InvitationNav';
 import { GuestsScreen } from '@/features/invitations/app/guests/GuestsScreen';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { hostDb } from '@/features/invitations/server/host-db';
@@ -39,16 +38,6 @@ export default async function GuestsPage({
   const data = await loadGuestsPage(id, user, locale);
   if (!data) notFound();
   const open = query.import ? 'import' : query.send ? 'send' : null;
-  return (
-    <>
-      <InvitationNav
-        id={data.id}
-        title={data.title}
-        dateLine={data.dateLine}
-        published={data.published}
-        current="guests"
-      />
-      <GuestsScreen data={data} open={open} />
-    </>
-  );
+  // the invitation's header and tabs come from the workspace layout ([id]/layout.tsx)
+  return <GuestsScreen data={data} open={open} />;
 }

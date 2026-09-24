@@ -5,12 +5,14 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Badge, cn } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
+import { useInWorkspace } from './workspace/context';
 
 export type InvitationTab = 'guests' | 'responses' | 'share';
 
 /**
  * The header of an invitation's pages: back to all invitations, its title and date, whether it is
- * live, and tabs to its editor, guest list, RSVPs and share screen.
+ * live, and tabs to its editor, guest list, RSVPs and share screen. Inside the invitation's workspace
+ * (app/(shell)/invitations/[id]/layout.tsx) its header and tabs take this place: nothing is drawn.
  */
 export function InvitationNav({
   id,
@@ -28,7 +30,9 @@ export function InvitationNav({
   actions?: ReactNode;
 }) {
   const { t } = useUi();
+  const inWorkspace = useInWorkspace();
   const n = t.shell.invitationNav;
+  if (inWorkspace) return null;
   const tabs = [
     { key: 'edit', href: `/app/invitations/${id}/edit`, label: n.edit, icon: <PencilLine /> },
     { key: 'guests', href: `/app/invitations/${id}/guests`, label: n.guests, icon: <Users /> },

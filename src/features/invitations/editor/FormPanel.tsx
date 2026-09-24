@@ -11,7 +11,19 @@ import { sectionName, useFocusRequest } from './fields/fields';
 import { GlobalPanel } from './panels/GlobalPanels';
 import { ReviewTextsNote, SectionForm } from './panels/SectionForms';
 import { insertAt, moveAt, uniqueId } from './paths';
-import { useEditor } from './state/EditorProvider';
+import { useEditor, type PanelId } from './state/EditorProvider';
+import { HelpFor, type HelpArea } from '../app/HelpFor';
+
+/** Each design and settings panel's "?" (what each of its controls does). */
+const PANEL_HELP: Record<PanelId, HelpArea> = {
+  palette: 'designPalette',
+  fonts: 'designFonts',
+  cover: 'designCover',
+  music: 'designMusic',
+  event: 'settingsEvent',
+  languages: 'settingsLanguages',
+  share: 'settingsShare',
+};
 
 /** The form panel (§9B.3-D): title + helper line, then the cards of the selected section or panel. */
 export function FormPanel({ className }: { className?: string }) {
@@ -138,7 +150,10 @@ export function FormPanel({ className }: { className?: string }) {
     <div ref={ref} className={className}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-[18px] font-bold">{title}</h2>
+          <div className="flex items-center gap-1">
+            <h2 className="text-[18px] font-bold">{title}</h2>
+            {selection.kind === 'panel' ? <HelpFor area={PANEL_HELP[selection.panel]} /> : null}
+          </div>
           <p className="mt-0.5 text-[13px] text-muted">{sub}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">

@@ -1,37 +1,30 @@
-import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { BrandLogo } from '@/components/app';
 import { getUi } from '@/lib/i18n/server';
 import { getSessionUser } from '@/lib/supabase/session';
-import { UiLanguageToggle } from '../../UiLanguageToggle';
-import { ShellLinks, UserMenu } from './ShellNav.client';
+import { AppSidebar, MobileTabBar } from './ShellNav.client';
 
-/** Host-app chrome for the list, gallery, responses and share pages (the editor is full-screen). */
+/**
+ * The host app's frame for the list, gallery, an invitation's pages, billing and the account (the
+ * editor is full-screen): from 1024px a sidebar on the start side and the page beside it; below that
+ * a compact top bar and a bottom tab bar (the page keeps room for it).
+ */
 export default async function ShellLayout({ children }: { children: ReactNode }) {
   const [{ t }, user] = await Promise.all([getUi(), getSessionUser()]);
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[264px_minmax(0,1fr)]">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-3 focus:z-50 focus:rounded-btn focus:bg-surface focus:px-3 focus:py-2 focus:shadow-md"
+        className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-3 focus:z-50 focus:rounded-btn focus:bg-surface focus:px-3 focus:py-2 focus:shadow-md"
       >
         {t.shell.skipToContent}
       </a>
-      <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
-          <Link href="/app/invitations" className="rounded-btn text-[18px]">
-            <BrandLogo label={t.brand} />
-          </Link>
-          <ShellLinks />
-          <div className="ms-auto flex items-center gap-2 sm:gap-3">
-            <UiLanguageToggle />
-            <UserMenu email={user?.email ?? null} />
-          </div>
-        </div>
-      </header>
-      <main id="main" className="flex-1">
+      <AppSidebar email={user?.email ?? null} />
+      {/* room for the floating buttons: the tab bar (phones) and the assistant (bottom corner), and on
+          RTL wide screens the accessibility button on the left edge (content starts past it) */}
+      <main id="main" className="min-w-0 pb-[calc(88px+env(safe-area-inset-bottom))] lg:pb-24 lg:rtl:pl-12">
         {children}
       </main>
+      <MobileTabBar />
     </div>
   );
 }

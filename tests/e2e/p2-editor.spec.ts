@@ -85,7 +85,7 @@ test.describe('host: create → edit → publish', () => {
     await page.waitForURL(/\/app\/invitations\/[0-9a-f-]{36}\/edit$/, { timeout: 30_000 });
     const editorUrl = page.url();
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
-    await expect(page.getByRole('heading', { level: 2, name: 'פתיחה (Hero)' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'המסך הראשי' })).toBeVisible();
     const frame = page.frameLocator('iframe[title="תצוגה מקדימה של ההזמנה"]');
     await expect(frame.locator('h1.names')).toContainText('נועה', { timeout: 30_000 });
 
@@ -233,7 +233,7 @@ test.describe('hero background', () => {
 
     // a YouTube link instead of the file
     await page.getByRole('tab', { name: 'סקשנים' }).click();
-    await page.getByRole('button', { name: 'פתיחה (Hero)', exact: true }).click();
+    await page.getByRole('button', { name: 'המסך הראשי', exact: true }).click();
     await page.getByRole('button', { name: 'סרטון מיוטיוב או מ־Vimeo' }).last().click();
     const dialog = page.getByRole('dialog', { name: 'סרטון רקע מקישור' });
     await dialog.getByRole('textbox', { name: 'קישור לסרטון' }).fill('https://example.com/clip.mp4');
@@ -350,7 +350,7 @@ test.describe('host editor on a phone', () => {
     await open(page, `/app/invitations/${created.id}/edit`);
     const tabs = page.getByRole('navigation', { name: 'מצב העורך' });
     await expect(tabs).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'פתיחה (Hero)' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'המסך הראשי' })).toBeVisible();
     await tabs.getByRole('button', { name: 'תצוגה' }).click();
     await expect(page.locator('iframe[title="תצוגה מקדימה של ההזמנה"]')).toBeVisible();
     await tabs.getByRole('button', { name: 'עריכה' }).click();
@@ -362,5 +362,65 @@ test.describe('host editor on a phone', () => {
     // no horizontal scroll at 390px
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
+  });
+});
+
+test.describe('from the list to publishing, a premium design, a wrong address', () => {
+  test('the next step opens the publish window; a premium design says early it needs a paid plan; a bad id is a branded 404', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await signUp(page);
+    // a premium design on the free plan (editing is fine, publishing needs Pro or Business)
+    const created = await page.evaluate(async () => {
+      const res = await fetch('/api/invitations', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          templateId: 'jet-set',
+          eventType: 'wedding',
+          locales: ['he'],
+          defaultLocale: 'he',
+          hosts: { primary: { he: 'שירה' }, secondary: { he: 'עומר' } },
+          date: '2027-05-20',
+          startTime: '19:30',
+          timezone: 'Asia/Jerusalem',
+        }),
+      });
+      return (await res.json()) as { id: string };
+    });
+
+    // the list's next step: straight to the editor with its publish window open
+    await open(page, '/app/invitations');
+    const main = page.locator('#main');
+    await main.getByRole('link', { name: 'הצעד הבא: לפרסם' }).click();
+    await page.waitForURL(new RegExp(`/app/invitations/${created.id}/edit$`));
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    const dialog = page.getByRole('dialog', { name: 'פרסום ההזמנה' });
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+
+    // the premium tag in the bar, and what it means
+    await page.getByTestId('premium-notice').click();
+    const note = page.getByRole('dialog').filter({ hasText: 'עיצוב פרימיום' });
+    await expect(note).toContainText('כדי לפרסם אותה צריך חבילת Pro או Business');
+    await expect(note.getByRole('link', { name: /לחבילות/ })).toHaveAttribute('href', '/app/billing');
+    await page.keyboard.press('Escape');
+
+    // an id that isn't one of the host's invitations: the site's own 404, in Hebrew, with a way back
+    // (these routes stream behind their loading skeletons, so the status line can't change to 404)
+    for (const path of [
+      '/app/invitations/00000000-0000-4000-8000-000000000000/edit',
+      '/app/invitations/00000000-0000-4000-8000-000000000000/responses',
+      '/app/invitations/not-an-invitation',
+    ]) {
+      await open(page, path);
+      await expect(page.getByRole('heading', { level: 1, name: 'לא מצאנו את העמוד הזה' })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'לכל ההזמנות שלי' })).toBeVisible();
+    }
+    await page.getByRole('link', { name: 'לכל ההזמנות שלי' }).click();
+    await page.waitForURL(/\/app\/invitations$/);
   });
 });

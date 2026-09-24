@@ -151,3 +151,20 @@ test('the site skips to its content from the keyboard', async ({ page }) => {
   await expect(skip).toBeFocused();
   await expect(skip).toHaveAttribute('href', '#main');
 });
+
+test('an address that matches no page: the site’s own 404, in the visitor’s language', async ({
+  page,
+  context,
+}) => {
+  const res = await page.goto('/no-such-page/at-all');
+  expect(res?.status()).toBe(404);
+  await expect(page.getByRole('heading', { level: 1, name: 'לא מצאנו את העמוד הזה' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'לדף הבית' })).toHaveAttribute('href', '/');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page).toHaveTitle(/העמוד לא נמצא/);
+  await context.addCookies([{ name: 'ui_lang', value: 'en', url: page.url() }]);
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).not.toHaveText('לא מצאנו את העמוד הזה');
+});

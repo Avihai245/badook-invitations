@@ -162,7 +162,7 @@ test.describe('guest list', () => {
     // the personal greeting: switched on in the opening section, the preview shows a sample name
     await open(page, `/app/invitations/${id}/edit`);
     if (testInfo.project.name === 'desktop')
-      await page.getByRole('button', { name: 'פתיחה (Hero)', exact: true }).click();
+      await page.getByRole('button', { name: 'המסך הראשי', exact: true }).click();
     await page.getByRole('switch', { name: 'ברכה אישית עם שם המוזמן' }).click();
     const frame = page.frameLocator('iframe[title="תצוגה מקדימה של ההזמנה"]');
     if (testInfo.project.name === 'desktop')
