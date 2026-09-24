@@ -128,9 +128,18 @@ test.describe('responses dashboard', () => {
   }, testInfo) => {
     test.setTimeout(120_000);
     const errors = collectErrors(page);
+    const desktop = testInfo.project.name === 'desktop';
     await signUp(page);
     const { id } = await createInvitation(page);
     const slug = await publishWithVenue(page, id);
+
+    // no replies yet: nothing to export, and the button says why
+    await open(page, `/app/invitations/${id}/responses`);
+    await expect(page.getByRole('heading', { name: 'עוד אין תשובות' })).toBeVisible();
+    const exportEmpty = page.getByRole('button', { name: 'ייצוא ל-Excel' });
+    await expect(exportEmpty).toBeDisabled();
+    await page.locator('[data-disabled-hint]').hover();
+    await expect(page.getByRole('tooltip')).toContainText('עוד אין תשובות לייצוא');
 
     await rsvp(
       page,
@@ -168,9 +177,13 @@ test.describe('responses dashboard', () => {
     await expect(kpi(page, 'לא מגיעים').locator('dd').first()).toHaveText('1');
     await expect(kpi(page, 'לא מגיעים')).toContainText('33% מהתשובות');
 
-    const table = page.getByRole('table', { name: 'התשובות לאישור ההגעה' });
-    const rows = table.locator('tbody tr');
+    // a table on a computer; on a phone, a card per reply
+    const rows = desktop
+      ? page.getByRole('table', { name: 'התשובות לאישור ההגעה' }).locator('tbody tr')
+      : page.getByRole('list', { name: 'התשובות לאישור ההגעה' }).getByRole('listitem');
     await expect(rows).toHaveCount(3);
+    // each reply is a named button (keyboards and screen readers)
+    await expect(page.getByRole('button', { name: 'פרטי התשובה של רון לוי' })).toBeVisible();
     await page.getByRole('searchbox', { name: 'חיפוש לפי שם, טלפון או אימייל' }).fill('לוי');
     await expect(rows).toHaveCount(1);
     await expect(rows.first()).toContainText('רון לוי');
@@ -183,6 +196,16 @@ test.describe('responses dashboard', () => {
     await expect(rows).toHaveCount(1);
     await page.getByRole('radio', { name: 'הכל' }).click();
     await expect(rows).toHaveCount(3);
+
+    // the Filter menu's choices show as removable chips, with how many replies are shown
+    await page.getByRole('button', { name: /^סינון/ }).click();
+    await page.getByRole('menuitem', { name: 'עם הודעה' }).click();
+    await expect(rows).toHaveCount(1);
+    const active = page.getByTestId('active-filters');
+    await expect(active).toContainText('מוצגות 1 מתוך 3');
+    await active.getByRole('button', { name: 'הסרת הסינון: עם הודעה' }).click();
+    await expect(rows).toHaveCount(3);
+    await expect(active).toHaveCount(0);
 
     // a reply's details
     await rows.filter({ hasText: 'דנה כהן' }).click();
@@ -221,7 +244,6 @@ test.describe('responses dashboard', () => {
     expect(lines.slice(1).join('\n')).not.toContain('דנה כהן');
 
     // notification setting: saved and kept after a reload
-    const desktop = testInfo.project.name === 'desktop';
     const mode = desktop ? 'סיכום יומי' : 'כבויות';
     await page.getByRole('button', { name: 'התראות במייל: על כל תשובה' }).click();
     await page.getByRole('menuitem', { name: mode }).click();
