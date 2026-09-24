@@ -440,7 +440,8 @@ export const editorEn: EditorDict = {
     videoLink: 'A YouTube or Vimeo video',
     videoLinkTitle: 'Background video from a link',
     videoLinkHelp:
-      'Paste a link to a video on YouTube or Vimeo. It plays in the background, muted and looping (sound: in the music tab).',
+      'Paste a link to a video on YouTube or Vimeo. It plays in the background, muted and looping (sound: in the music tab). A link with a time (e.g. ?t=207, or YouTube’s “Share” at a moment) starts there.',
+    videoLinkStart: 'Starts at {time}',
     videoLinkLabel: 'Video link',
     videoLinkInvalid: 'That doesn’t look like a YouTube or Vimeo video link',
     mb: '{n}MB',

@@ -6,6 +6,8 @@ export interface OutgoingEmail {
   subject: string;
   html: string;
   text: string;
+  /** where replies go (the contact form: the visitor's address) */
+  replyTo?: string;
 }
 
 /**
@@ -31,6 +33,7 @@ export async function sendEmail(email: OutgoingEmail): Promise<boolean> {
         subject: email.subject,
         html: email.html,
         text: email.text,
+        ...(email.replyTo ? { reply_to: email.replyTo } : {}),
       }),
       signal: AbortSignal.timeout(8000),
     });

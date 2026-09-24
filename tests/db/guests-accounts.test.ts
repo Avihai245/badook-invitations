@@ -363,6 +363,52 @@ describe('support chat and partners', () => {
     expect(hits).toEqual([true, true, true, false]);
   });
 
+  it('stores contact-form messages; only the service role can', async () => {
+    const id = await commit<string>('contact_submit', [
+      'דנה',
+      'dana@example.com',
+      '',
+      'support',
+      'שלום',
+      'he',
+      null,
+    ]);
+    expect(id).toMatch(/^[0-9a-f-]{36}$/);
+    const row = (await c.query('select name, phone, topic from contact_messages where id = $1', [id]))
+      .rows[0];
+    expect(row).toEqual({ name: 'דנה', phone: null, topic: 'support' });
+    await expect(
+      commit('contact_submit', ['x', 'x@example.com', '', 'spam', 'x', 'he', null]),
+    ).rejects.toThrow();
+    await expect(
+      as(c, 'anon', null, () =>
+        c.query(`select public.contact_submit('a','a@b.co','','other','m','he',null)`),
+      ),
+    ).rejects.toThrow(/permission denied/);
+  });
+
+  it('purge_expired forgets what the privacy policy says it forgets', async () => {
+    await c.query(
+      `insert into support_rate_events (key_hash, created_at) values ('old', now() - interval '2 days')`,
+    );
+    await c.query(
+      `insert into contact_messages (name, email, topic, message, created_at)
+       values ('old', 'old@example.com', 'other', 'm', now() - interval '3 years')`,
+    );
+    await c.query(`update rsvp_responses set ip_hash = 'h', created_at = now() - interval '40 days'
+                   where id = (select id from rsvp_responses limit 1)`);
+    const purged = await commit<Record<string, number>>('purge_expired', []);
+    expect(purged.supportRate).toBeGreaterThanOrEqual(1);
+    expect(purged.contact).toBe(1);
+    expect(purged.ipHashes).toBe(1);
+    expect(
+      (
+        await c.query(`select count(*)::int n from rsvp_responses where ip_hash is not null
+                           and created_at < now() - interval '30 days'`)
+      ).rows[0].n,
+    ).toBe(0);
+  });
+
   it('finds users by email (any case) and links them to the partner', async () => {
     expect(await call('user_id_by_email', [' b@EXAMPLE.com '])).toBe(OWNER_B);
     expect(await call('user_id_by_email', ['nobody@example.com'])).toBeNull();

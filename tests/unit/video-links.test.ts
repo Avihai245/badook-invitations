@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   canonicalVideoLink,
+  formatStartTime,
+  parseStartTime,
   parseVideoLink,
   videoEmbedUrl,
   videoStillUrl,
@@ -10,7 +12,6 @@ describe('video links', () => {
   it('reads every common YouTube address', () => {
     for (const url of [
       'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      'youtube.com/watch?v=dQw4w9WgXcQ&t=42s',
       'https://m.youtube.com/watch?feature=share&v=dQw4w9WgXcQ',
       'https://youtu.be/dQw4w9WgXcQ?si=abc',
       'https://www.youtube.com/embed/dQw4w9WgXcQ',
@@ -23,6 +24,58 @@ describe('video links', () => {
       id: 'dQw4w9WgXcQ',
       vertical: true,
     });
+  });
+
+  it('keeps the moment a link starts at (t=207 · 3m27s · #t= · start=)', () => {
+    for (const url of [
+      'https://youtu.be/5GvcO2lufGU?t=207',
+      'https://youtu.be/5GvcO2lufGU?si=x&t=207s',
+      'https://www.youtube.com/watch?v=5GvcO2lufGU&t=3m27s',
+      'https://www.youtube.com/watch?v=5GvcO2lufGU#t=3m27s',
+      'https://www.youtube.com/embed/5GvcO2lufGU?start=207',
+    ])
+      expect(parseVideoLink(url), url).toEqual({
+        provider: 'youtube',
+        id: '5GvcO2lufGU',
+        vertical: false,
+        start: 207,
+      });
+    expect(parseVideoLink('https://vimeo.com/76979871#t=1m5s')).toEqual({
+      provider: 'vimeo',
+      id: '76979871',
+      hash: null,
+      start: 65,
+    });
+    // not a time, or zero: no start
+    for (const url of [
+      'https://youtu.be/5GvcO2lufGU?t=abc',
+      'https://youtu.be/5GvcO2lufGU?t=0',
+      'https://youtu.be/5GvcO2lufGU?t=99999999',
+    ])
+      expect(parseVideoLink(url), url).toEqual({ provider: 'youtube', id: '5GvcO2lufGU', vertical: false });
+    expect(parseStartTime('1:02:03')).toBe(3723);
+    expect(parseStartTime('3:27')).toBe(207);
+    expect(parseStartTime('1h')).toBe(3600);
+    expect(parseStartTime('')).toBeNull();
+    expect(formatStartTime(207)).toBe('3:27');
+    expect(formatStartTime(3723)).toBe('1:02:03');
+    expect(formatStartTime(5)).toBe('0:05');
+  });
+
+  it('stores the start time with the link and embeds from it', () => {
+    const v = parseVideoLink('https://youtu.be/5GvcO2lufGU?t=207')!;
+    expect(canonicalVideoLink(v)).toBe('https://www.youtube.com/watch?v=5GvcO2lufGU&t=207');
+    expect(parseVideoLink(canonicalVideoLink(v))).toEqual(v);
+    const short = parseVideoLink('https://youtube.com/shorts/dQw4w9WgXcQ?t=5')!;
+    expect(canonicalVideoLink(short)).toBe('https://www.youtube.com/shorts/dQw4w9WgXcQ?t=5');
+    expect(parseVideoLink(canonicalVideoLink(short))).toEqual(short);
+    const vimeo = parseVideoLink('https://vimeo.com/76979871/8272103f6e#t=65s')!;
+    expect(canonicalVideoLink(vimeo)).toBe('https://vimeo.com/76979871/8272103f6e#t=65s');
+    expect(parseVideoLink(canonicalVideoLink(vimeo))).toEqual(vimeo);
+    expect(new URL(videoEmbedUrl(v, 'https://x.test', { start: v.start })).searchParams.get('start')).toBe(
+      '207',
+    );
+    expect(videoEmbedUrl(vimeo, undefined, { start: vimeo.start })).toMatch(/#t=65s$/);
   });
 
   it('reads Vimeo addresses, with the private-link hash', () => {

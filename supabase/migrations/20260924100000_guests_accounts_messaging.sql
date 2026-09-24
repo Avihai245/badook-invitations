@@ -127,6 +127,23 @@ create table public.support_rate_events (
 );
 create index on public.support_rate_events (key_hash, created_at desc);
 
+-- ─── contact form ───────────────────────────────────────────────────────────────────────────────
+
+-- Messages from the site's contact form (also emailed to support when email is set up). Kept up to two
+-- years (purge_expired).
+create table public.contact_messages (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name text not null check (char_length(name) between 1 and 120),
+  email text not null check (char_length(email) between 3 and 254),
+  phone text check (char_length(phone) <= 40),
+  topic text not null check (topic in ('support', 'billing', 'privacy', 'accessibility', 'business', 'other')),
+  message text not null check (char_length(message) between 1 and 5000),
+  locale text not null default 'he' check (locale in ('he', 'en')),
+  user_id uuid references auth.users (id) on delete set null
+);
+create index on public.contact_messages (created_at desc);
+
 -- ─── row level security: service role only ──────────────────────────────────────────────────────
 
 alter table public.accounts enable row level security;
@@ -135,8 +152,9 @@ alter table public.billing_events enable row level security;
 alter table public.invitation_guests enable row level security;
 alter table public.whatsapp_messages enable row level security;
 alter table public.support_rate_events enable row level security;
+alter table public.contact_messages enable row level security;
 revoke all on public.accounts, public.credit_ledger, public.billing_events, public.invitation_guests,
-  public.whatsapp_messages, public.support_rate_events from anon, authenticated;
+  public.whatsapp_messages, public.support_rate_events, public.contact_messages from anon, authenticated;
 
 -- ─── account functions ──────────────────────────────────────────────────────────────────────────
 
@@ -743,6 +761,38 @@ begin
   return n <= p_limit;
 end $$;
 
+-- A contact-form message; returns its id.
+create function public.contact_submit(
+  p_name text, p_email text, p_phone text, p_topic text, p_message text, p_locale text, p_user_id uuid
+) returns uuid
+language sql security definer set search_path = '' as $$
+  insert into public.contact_messages (name, email, phone, topic, message, locale, user_id)
+  values (p_name, p_email, nullif(p_phone, ''), p_topic, p_message, p_locale, p_user_id)
+  returning id
+$$;
+
+-- What the privacy policy promises about keeping data (run daily with the RSVP summary): rate-limit
+-- rows after a day, a reply's hashed IP after 30 days, contact messages after two years.
+create function public.purge_expired() returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  a int;
+  b int;
+  c int;
+  d int;
+begin
+  delete from public.rsvp_rate_events where created_at < now() - interval '1 day';
+  get diagnostics a = row_count;
+  delete from public.support_rate_events where created_at < now() - interval '1 day';
+  get diagnostics b = row_count;
+  update public.rsvp_responses set ip_hash = null
+  where ip_hash is not null and created_at < now() - interval '30 days';
+  get diagnostics c = row_count;
+  delete from public.contact_messages where created_at < now() - interval '2 years';
+  get diagnostics d = row_count;
+  return jsonb_build_object('rsvpRate', a, 'supportRate', b, 'ipHashes', c, 'contact', d);
+end $$;
+
 -- ─── partner provisioning ───────────────────────────────────────────────────────────────────────
 
 -- The user with this email (the partner API finds before it creates). null when there is none.
@@ -797,6 +847,8 @@ begin
     'public.whatsapp_requeue(uuid, text)',
     'public.whatsapp_pending(uuid)',
     'public.support_rate_hit(text, int, int)',
+    'public.contact_submit(text, text, text, text, text, text, uuid)',
+    'public.purge_expired()',
     'public.user_id_by_email(text)',
     'public.account_link_partner(uuid, text, text, text, text)'
   ] loop

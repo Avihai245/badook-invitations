@@ -241,9 +241,16 @@ test.describe('responses dashboard', () => {
     expect((await cron('Bearer wrong-secret')).status()).toBe(401);
     const first = await cron(`Bearer ${CRON_SECRET}`);
     expect(first.status()).toBe(200);
-    expect(await first.json()).toEqual({ sent: 1, failed: 0 });
+    // the same daily call also purges data past its keeping time (the privacy policy)
+    const purged = {
+      rsvpRate: expect.any(Number),
+      supportRate: expect.any(Number),
+      ipHashes: expect.any(Number),
+      contact: expect.any(Number),
+    };
+    expect(await first.json()).toEqual({ sent: 1, failed: 0, purged });
     // nothing new since → nothing sent
-    expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({ sent: 0, failed: 0 });
+    expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({ sent: 0, failed: 0, purged });
   });
 });
 

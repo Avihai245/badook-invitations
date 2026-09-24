@@ -59,6 +59,8 @@ const FUNCTIONS = new Set([
   'whatsapp_requeue',
   'whatsapp_pending',
   'support_rate_hit',
+  'contact_submit',
+  'purge_expired',
   'user_id_by_email',
   'account_link_partner',
 ]);

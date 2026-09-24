@@ -1,5 +1,6 @@
 import { editorHe } from './editor.he';
 import { guestsHe } from './guests.he';
+import { siteHe } from './site.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -9,6 +10,7 @@ import { guestsHe } from './guests.he';
 export const he = {
   brand: 'Badook',
   guests: guestsHe,
+  site: siteHe,
   editor: editorHe,
   common: {
     close: 'סגירה',

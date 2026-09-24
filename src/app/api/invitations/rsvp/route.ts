@@ -2,6 +2,7 @@ import { guestsDb } from '@/features/invitations/server/guests';
 import { notifyReply } from '@/features/invitations/server/notify';
 import { getPublishedInvitation } from '@/features/invitations/server/published';
 import { MAX_BODY_BYTES, RATE_LIMIT, handleRsvp, type RsvpDeps } from '@/features/invitations/server/rsvp';
+import { clientIp } from '@/lib/client-ip';
 import { serverEnv } from '@/lib/env';
 import { invitationsEnabled } from '@/lib/feature';
 import { serviceDb } from '@/lib/supabase/server';
@@ -9,19 +10,6 @@ import { serviceDb } from '@/lib/supabase/server';
 const NO_STORE = { 'cache-control': 'no-store' };
 /** The longest a guest waits for the host's notification email to be handed to the provider. */
 const NOTIFY_WAIT_MS = 2500;
-
-/**
- * The guest's address, for the per-IP rate limit (stored only as a salted hash). CloudFront's own
- * CloudFront-Viewer-Address ("ip:port") when present; otherwise the first X-Forwarded-For hop. That one
- * can be set by the client — which only lets an attacker dodge the limit, whereas trusting a proxy hop
- * could put every guest into one bucket. Re-check on the first Amplify deploy.
- */
-function clientIp(request: Request): string | null {
-  const viewer = request.headers.get('cloudfront-viewer-address');
-  if (viewer) return viewer.replace(/:\d+$/, '').replace(/^\[|\]$/g, '');
-  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  return forwarded || request.headers.get('x-real-ip') || null;
-}
 
 const deps = (): RsvpDeps => ({
   loadInvitation: getPublishedInvitation,

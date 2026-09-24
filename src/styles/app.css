@@ -1,6 +1,7 @@
 /* Host app styles (§9B). The guest invitation never loads this file. */
 @import 'tailwindcss';
 @import './app-fonts.generated.css';
+@import './site.css';
 
 /* §9B.1 tokens (fallback design system — this product has no prior one). */
 @theme {

@@ -175,7 +175,7 @@ export function HeroEmbed({
   poster: string | null;
   sound: boolean;
   captions?: boolean;
-  /** YouTube: the second it starts from — and loops back to */
+  /** the second it starts from (the host's link had ?t=…); YouTube also loops back to it */
   start?: number;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);

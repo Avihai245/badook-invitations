@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { DEMO_OWNER_ID } from '../../scripts/seed';
+import { DEMO_OWNER_ID, demoInvitations } from '../../scripts/seed';
+import { TEMPLATES } from '../../src/features/invitations/templates/registry';
 import { as, createTestDatabase } from './harness';
 
 // §4 contract + §12.10 RLS tests, on a fresh database (shim → migrations → seed).
@@ -58,12 +59,16 @@ afterAll(async () => {
 });
 
 describe('seed', () => {
-  it('has the 8 templates and 12 published invitations with versions', async () => {
-    expect((await c.query('select count(*)::int n from invitation_templates')).rows[0].n).toBe(8);
+  it('has every template and every sample invitation, published with a version', async () => {
+    expect((await c.query('select count(*)::int n from invitation_templates')).rows[0].n).toBe(
+      TEMPLATES.size,
+    );
     const rows = (
-      await c.query(`select status, version from invitations where owner_id = $1`, [DEMO_OWNER_ID])
+      await c.query(`select slug, status, version from invitations where owner_id = $1`, [DEMO_OWNER_ID])
     ).rows;
-    expect(rows).toHaveLength(12);
+    expect(rows).toHaveLength(demoInvitations().length);
+    // the home page's two samples: without and with a background video
+    expect(rows.map((r) => r.slug)).toEqual(expect.arrayContaining(['noa-and-itay', 'noa-and-itay-video']));
     expect(rows.every((r) => r.status === 'published' && r.version === 1)).toBe(true);
   });
 });

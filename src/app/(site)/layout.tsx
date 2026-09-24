@@ -3,6 +3,9 @@ import type { ReactNode } from 'react';
 import { uiDir } from '@/lib/i18n/app';
 import { UiProvider } from '@/lib/i18n/client';
 import { getUiLocale } from '@/lib/i18n/server';
+import { A11Y_BOOT } from '@/features/site/a11y';
+import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';
+import { CookieConsent } from '@/features/site/CookieConsent.client';
 import '@/styles/app.css';
 
 export const metadata: Metadata = {
@@ -19,9 +22,17 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const locale = await getUiLocale();
   return (
-    <html lang={locale} dir={uiDir(locale)}>
+    <html lang={locale} dir={uiDir(locale)} suppressHydrationWarning>
+      <head>
+        {/* the accessibility menu's settings, before the first paint */}
+        <script dangerouslySetInnerHTML={{ __html: A11Y_BOOT }} />
+      </head>
       <body>
-        <UiProvider locale={locale}>{children}</UiProvider>
+        <UiProvider locale={locale}>
+          {children}
+          <AccessibilityMenu />
+          <CookieConsent />
+        </UiProvider>
       </body>
     </html>
   );

@@ -7,7 +7,13 @@ import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import type { AssetRef, Media } from '../../contracts/types';
 import { hostApi } from '../../app/api';
-import { canonicalVideoLink, parseVideoLink, videoStillUrl, type VideoLink } from '../../lib/video-links';
+import {
+  canonicalVideoLink,
+  formatStartTime,
+  parseVideoLink,
+  videoStillUrl,
+  type VideoLink,
+} from '../../lib/video-links';
 import { placeholderArt } from '../../renderer/placeholders';
 import { getAt } from '../paths';
 import { useEditor } from '../state/EditorProvider';
@@ -304,7 +310,7 @@ function Thumb({
  */
 export function HeroMediaField({ path, label }: { path: string; label: string }) {
   const { doc, template, update, assetUrl, locale } = useEditor();
-  const { t } = useUi();
+  const { t, fmt } = useUi();
   const u = t.editor.upload;
   const media = getAt(doc, path) as Media;
   const { run, progress, error } = useUploader();
@@ -407,6 +413,11 @@ export function HeroMediaField({ path, label }: { path: string; label: string })
       >
         {u.videoLink}
       </Button>
+      {link?.start ? (
+        <p className="mt-1.5 text-[12px] text-muted" data-testid="video-start">
+          {fmt(u.videoLinkStart, { time: formatStartTime(link.start) })}
+        </p>
+      ) : null}
       {linking ? (
         <VideoLinkDialog
           initial={link ? media.src : ''}
@@ -442,10 +453,11 @@ function VideoLinkDialog({
   onSave: (link: VideoLink) => void;
   onClose: () => void;
 }) {
-  const { t } = useUi();
+  const { t, fmt } = useUi();
   const u = t.editor.upload;
   const [value, setValue] = useState(initial);
   const [invalid, setInvalid] = useState(false);
+  const pasted = parseVideoLink(value);
   const [saving, setSaving] = useState(false);
   const save = () => {
     const link = parseVideoLink(value);
@@ -477,7 +489,11 @@ function VideoLinkDialog({
           save();
         }}
       >
-        <Field label={u.videoLinkLabel} error={invalid ? u.videoLinkInvalid : undefined}>
+        <Field
+          label={u.videoLinkLabel}
+          error={invalid ? u.videoLinkInvalid : undefined}
+          help={pasted?.start ? fmt(u.videoLinkStart, { time: formatStartTime(pasted.start) }) : undefined}
+        >
           <Input
             type="url"
             inputMode="url"

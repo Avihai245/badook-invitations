@@ -15,6 +15,33 @@ export const FIXTURES = {
 } as const satisfies Record<string, InvitationDocument>;
 export type FixtureId = keyof typeof FIXTURES;
 
+/**
+ * The site's sample invitations (the home page shows them in a phone): the wedding example as it is,
+ * and the same one with a YouTube video behind its opening screen — how a background video looks.
+ */
+export const SAMPLES = {
+  classic: 'noa-and-itay',
+  video: 'noa-and-itay-video',
+} as const;
+export const SAMPLE_VIDEO_LINK = 'https://www.youtube.com/watch?v=5GvcO2lufGU&t=207';
+
+export function videoSampleDocument(): InvitationDocument {
+  const doc = structuredClone(FIXTURES['wedding-he-en']);
+  doc.share.slug = SAMPLES.video;
+  for (const section of doc.sections) {
+    if (section.type !== 'hero') continue;
+    section.data.media = {
+      kind: 'video',
+      src: SAMPLE_VIDEO_LINK,
+      poster: 'https://i.ytimg.com/vi/5GvcO2lufGU/hqdefault.jpg',
+      focalPoint: { x: 0.5, y: 0.5 },
+    };
+    // a darker veil: the names stay readable over any frame of the video
+    section.data.overlayOpacity = 0.45;
+  }
+  return doc;
+}
+
 const TIMES: Partial<Record<EventType, [string, string]>> = {
   brit: ['09:00', '12:00'],
   baby_shower: ['11:00', '14:00'],
