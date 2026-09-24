@@ -3,6 +3,7 @@ import { serviceDb } from '@/lib/supabase/server';
 import { migrateDocument } from '../contracts/migrate';
 import type { EventType, InvitationDocument, L10n, Locale, Palette } from '../contracts/types';
 import type { NotifyMode, ResponseRecord } from '../lib/responses';
+import { syncSeedOnce } from './seed-sync';
 
 /**
  * Typed access to the host-app database functions (supabase/migrations/*_host_app.sql,
@@ -72,7 +73,7 @@ export const isUuid = (value: string) => UUID_RE.test(value);
 
 async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
   const { data, error } = await serviceDb().rpc(fn, args);
-  if (error) throw new Error(`${fn}: ${error.message}`);
+  if (error) throw Object.assign(new Error(`${fn}: ${error.message}`), { code: error.code });
   return data as T;
 }
 
@@ -100,15 +101,23 @@ export const hostDb = {
     draft: InvitationDocument,
     /** the owner's save-the-date this is the full invitation of */
     sourceId?: string,
-  ) =>
-    rpc<{ id: string; slug: string }>('create_invitation', {
-      p_owner_id: ownerId,
-      p_template_id: templateId,
-      p_event_type: eventType,
-      p_slug: slug,
-      p_draft: draft,
-      ...(sourceId ? { p_source_id: sourceId } : {}),
-    }),
+  ) => {
+    const create = () =>
+      rpc<{ id: string; slug: string }>('create_invitation', {
+        p_owner_id: ownerId,
+        p_template_id: templateId,
+        p_event_type: eventType,
+        p_slug: slug,
+        p_draft: draft,
+        ...(sourceId ? { p_source_id: sourceId } : {}),
+      });
+    return create().catch(async (err: { code?: string }) => {
+      // a template this deployment brought that the database doesn't have yet: sync, then once more
+      if (err.code !== '23503') throw err;
+      await syncSeedOnce('create with an unknown template');
+      return create();
+    });
+  },
 
   saveDraft: (id: string, ownerId: string, draft: InvitationDocument, expectedUpdatedAt: string) =>
     rpc<SaveDraftResult>('save_invitation_draft', {

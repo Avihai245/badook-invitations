@@ -72,6 +72,8 @@ const FUNCTIONS = new Set([
   'user_id_by_email',
   'account_link_partner',
   'partner_account',
+  'app_meta_get',
+  'seed_upsert',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';

@@ -6,13 +6,20 @@ open it on their phones and RSVP.
 
 The full product spec is [`docs/invitations/MASTER_PROMPT.md`](docs/invitations/MASTER_PROMPT.md); the
 design reference (look & feel source of truth) is in
-[`docs/invitations/design-reference/`](docs/invitations/design-reference/). The 8 templates live in
+[`docs/invitations/design-reference/`](docs/invitations/design-reference/). The 28 templates live in
 [`invitation-templates-pack/`](invitation-templates-pack/) and are imported as-is.
 
 **Status:** P4 — all phases of the build order (§11 of the spec) are in: design foundation, contracts
 and rendering, the editor, the experience (video-first cover, music, live language switch, maps,
 link preview, share screen) and the dashboard & extras (responses dashboard, CSV export, email
-notifications, gallery, gifts, date reveal, the save-the-date flow, template preview videos).
+notifications, gallery, gifts, date reveal, the save-the-date flow, template preview videos). On top:
+the public site (home, policies, cookie consent, accessibility menu, contact), guest lists with
+personal links, WhatsApp sending from the official number, three plans with PayPlus, the AI support
+assistant, sign in with Google, and the partner API for Badook Events.
+
+Setting up the outside services (each guide says what goes where):
+[WhatsApp](docs/whatsapp-setup.md) · [payments (PayPlus)](docs/billing-setup.md) ·
+[sign in with Google](docs/google-sign-in.md) · [Badook Events partner API](docs/partner-api.md).
 
 ## Stack
 
@@ -184,7 +191,7 @@ tests/support/           local stack: database reset, REST shim
 
 `amplify.yml` builds with Node 22 (`npm ci` → `npm run build`, artifacts `.next`). Amplify console
 environment variables are copied into `.env.production` during the build (every variable the app
-reads starts with `NEXT_PUBLIC_`, `SUPABASE_` or `INVITES_`); all of them are documented in
+reads starts with `NEXT_PUBLIC_`, `SUPABASE_` or `INVITES_`, plus `ANTHROPIC_API_KEY`); all of them are documented in
 [`.env.example`](.env.example). Branches: `main` = production, `dev` = preview, each with its own
 variables. Heavy template media (videos, music) is served from Supabase Storage, not from the build.
 
@@ -195,3 +202,9 @@ accept it as an origin (`next.config.ts`). In Supabase → Authentication → UR
 Site URL to it and add `<domain>/**` to the Redirect URLs. If the daily RSVP summary runs, update the
 `INVITES_CRON_URL` repository secret. The `*.amplifyapp.com` address keeps working (links already
 sent still open); sign-in sessions are per domain.
+
+**Database changes** go in `supabase/migrations/` and are applied to the production project before
+the code that needs them is deployed. **Templates and demo invitations** need no manual step: at
+startup (`src/instrumentation.ts`) the server compares a fingerprint of them with the one stored in
+the database and, when a deploy changed them, writes the rows (`features/invitations/server/seed-sync.ts`).
+`npm run db:seed` still prints the same data as SQL for a fresh database.

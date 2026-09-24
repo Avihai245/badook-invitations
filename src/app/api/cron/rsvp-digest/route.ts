@@ -4,6 +4,7 @@ import { sendDigests } from '@/features/invitations/server/notify';
 import { serverEnv } from '@/lib/env';
 import { invitationsEnabled } from '@/lib/feature';
 import { serviceDb } from '@/lib/supabase/server';
+import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 
@@ -16,7 +17,7 @@ const sameSecret = (given: string, expected: string) => {
 /**
  * POST /api/cron/rsvp-digest with `Authorization: Bearer <INVITES_CRON_SECRET>` — the daily RSVP
  * summary for invitations set to "daily summary" (called by .github/workflows/rsvp-digest.yml), and
- * the daily purge of data past its keeping time (purge_expired).
+ * the daily purge of data past its keeping time (purge_expired), and the templates and demos sync.
  * Off (404) without a secret.
  */
 export async function POST(request: Request) {
@@ -34,7 +35,9 @@ export async function POST(request: Request) {
     const overdue = await reportOverdue().catch(
       (err) => (console.error('billing_overdue failed', err), null),
     );
-    return Response.json({ ...digests, purged: purged ?? null, overdue }, { headers: NO_STORE });
+    // and that the templates and demos match this deployment (a no-op when they do)
+    const seed = await syncSeedOnce('daily');
+    return Response.json({ ...digests, purged: purged ?? null, overdue, seed }, { headers: NO_STORE });
   } catch (err) {
     console.error('RSVP digest failed', err);
     return Response.json({ error: 'server_error' }, { status: 500, headers: NO_STORE });

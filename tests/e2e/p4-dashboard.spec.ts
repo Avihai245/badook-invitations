@@ -248,13 +248,15 @@ test.describe('responses dashboard', () => {
       ipHashes: expect.any(Number),
       contact: expect.any(Number),
     };
-    expect(await first.json()).toEqual({ sent: 1, failed: 0, purged, overdue: 0 });
+    // …and checks the templates and demos match the code (a fresh seed does)
+    expect(await first.json()).toEqual({ sent: 1, failed: 0, purged, overdue: 0, seed: 'current' });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
       sent: 0,
       failed: 0,
       purged,
       overdue: 0,
+      seed: 'current',
     });
   });
 });
