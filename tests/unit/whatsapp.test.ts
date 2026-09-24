@@ -86,14 +86,44 @@ describe('WhatsApp Cloud API client', () => {
       error: '131026 · not a WhatsApp user',
       retryable: false,
     });
-    const offline = vi.fn(async () => {
-      throw new Error('ECONNRESET');
+    // Meta's other "slow down" answers wait too
+    for (const code of [80007, 131048, 131056]) {
+      const slow = answer(400, { error: { code, message: 'Rate limit' } });
+      expect(await sendTemplate(message, slow as unknown as typeof fetch)).toMatchObject({ retryable: true });
+    }
+  });
+
+  it('a request that may have reached Meta is never tried again; one that never connected is', async () => {
+    const { sendTemplate } = await import('@/features/whatsapp/cloud-api');
+    const refused = vi.fn(async () => {
+      throw new TypeError('fetch failed', {
+        cause: Object.assign(new Error('refused'), { code: 'ECONNREFUSED' }),
+      });
     });
-    expect(await sendTemplate(message, offline as unknown as typeof fetch)).toEqual({
+    expect(await sendTemplate(message, refused as unknown as typeof fetch)).toEqual({
       ok: false,
-      error: 'ECONNRESET',
+      error: 'ECONNREFUSED',
       retryable: true,
     });
+    const reset = vi.fn(async () => {
+      throw new TypeError('fetch failed', {
+        cause: Object.assign(new Error('reset'), { code: 'ECONNRESET' }),
+      });
+    });
+    const slow = vi.fn(async () => {
+      throw new DOMException('The operation was aborted due to timeout', 'TimeoutError');
+    });
+    for (const fetchImpl of [reset, slow])
+      expect(await sendTemplate(message, fetchImpl as unknown as typeof fetch)).toEqual({
+        ok: false,
+        error: 'timeout',
+        retryable: false,
+      });
+  });
+
+  it('waits before a retry: a minute, then five', async () => {
+    const { retryWait } = await import('@/features/whatsapp/sender');
+    expect([1, 2, 3].map(retryWait)).toEqual([60, 300, 300]);
   });
 
   it('checks the webhook signature (hex HMAC-SHA256 of the raw body)', async () => {
@@ -106,6 +136,42 @@ describe('WhatsApp Cloud API client', () => {
     expect(validSignature(raw, null, 'app-secret')).toBe(false);
     expect(validSignature(raw, 'sha256=zz', 'app-secret')).toBe(false);
     expect(validSignature(raw, sig, '')).toBe(false);
+    // the right length but not hex: refused, never a crash (the webhook would answer 500)
+    expect(validSignature(raw, `sha256=${'z'.repeat(64)}`, 'app-secret')).toBe(false);
+    expect(validSignature(raw, `sha256=${'é'.repeat(64)}`, 'app-secret')).toBe(false);
+    expect(validSignature(raw, sig.toUpperCase().replace('SHA256=', 'sha256='), 'app-secret')).toBe(true);
+  });
+
+  it('reads what guests write to the number; STOP-like words are a request to stop', async () => {
+    const { inboundOf } = await import('@/features/whatsapp/cloud-api');
+    const { isStopRequest } = await import('@/features/whatsapp/opt-out');
+    const payload = {
+      entry: [
+        {
+          changes: [
+            {
+              value: {
+                messages: [
+                  { from: '972501234567', type: 'text', text: { body: 'STOP' } },
+                  { from: '972501234568', type: 'button', button: { text: 'Stop promotions', payload: 'x' } },
+                  { from: 'not-a-number', type: 'text', text: { body: 'stop' } },
+                  { from: '972501234569', type: 'image', image: { id: '1' } },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    };
+    expect(inboundOf(payload)).toEqual([
+      { from: '+972501234567', text: 'STOP' },
+      { from: '+972501234568', text: 'Stop promotions' },
+    ]);
+    expect(inboundOf(null)).toEqual([]);
+    for (const text of ['STOP', 'stop!', 'Unsubscribe', 'הסר', 'הסרה', 'הסירו אותי', 'עצור', 'בטל', 'הפסק.'])
+      expect(isStopRequest(text), text).toBe(true);
+    for (const text of ['', 'תודה רבה!', 'we will stop by', 'אנחנו מגיעים, בטל את ההודעה הקודמת'])
+      expect(isStopRequest(text), text).toBe(false);
   });
 
   it('reads message statuses from a webhook delivery, ignoring anything else', async () => {

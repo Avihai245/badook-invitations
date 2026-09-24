@@ -37,6 +37,8 @@ export interface ImportPreview {
   header: boolean;
   /** data rows read (empty rows skipped) */
   rows: number;
+  /** rows past MAX_IMPORT_ROWS, not read */
+  truncated: number;
 }
 
 export const MAX_IMPORT_ROWS = 5000;
@@ -50,8 +52,8 @@ const SYNONYMS: Record<ColumnKey, readonly string[]> = {
     'שם המוזמן',
     'שם האורח',
     'שם המוזמנים',
+    'שמות המוזמנים',
     'מוזמן',
-    'מוזמנים',
     'אורח',
     'שם איש קשר',
     'name',
@@ -99,26 +101,47 @@ const SYNONYMS: Record<ColumnKey, readonly string[]> = {
     'mail',
     'email address',
   ],
+  // only titles that clearly count people: a bare "מספר" is usually the row's number
   partySize: [
     'כמות',
     'מספר מוזמנים',
     'כמות מוזמנים',
+    'מס מוזמנים',
     'מספר אורחים',
     'כמות אורחים',
-    'כמה',
-    'מספר',
+    'מס אורחים',
+    'מספר נפשות',
+    'נפשות',
+    'כמה מוזמנים',
     'party size',
-    'party',
-    'guests',
-    'count',
+    'number of guests',
+    'no of guests',
+    'guest count',
+    'guests count',
+    'headcount',
     'quantity',
     'qty',
-    'number of guests',
     'pax',
-    'size',
   ],
   group: ['קבוצה', 'צד', 'קטגוריה', 'שייכות', 'קרבה', 'group', 'side', 'category', 'tag', 'label'],
 };
+
+/** Titles that are the names in one list and a head count in another: the column's cells decide. */
+const NAMES_OR_COUNT = ['מוזמנים', 'אורחים', 'guests'];
+
+/** One of `words` as whole words of a title — in any script (`\b` only knows Latin letters). */
+const words = (list: string) => new RegExp(`(?<![\\p{L}\\p{N}])(?:${list})(?![\\p{L}\\p{N}])`, 'u');
+/** Exports with numbered or compound columns: "Phone 1 - Value", "E-mail 1 - Value", "טלפון 2", "מייל 1". */
+const LOOSE: readonly [ColumnKey, RegExp][] = [
+  ['phone', words('phone|mobile|cell|telephone|whatsapp|טלפון|נייד|פלאפון|סלולרי|סלולארי|וואטסאפ|ווטסאפ')],
+  ['email', words('e ?mail|מייל|אימייל|דואל')],
+  ['firstName', words('given name|first name|שם פרטי')],
+  ['lastName', words('family name|last name|שם משפחה')],
+];
+/** "Phone 1 - Type", "E-mail 1 - Label": what kind of number it is, not the number. */
+const NOT_A_VALUE = words('type|label|סוג');
+/** Of several phone columns, the mobile one (WhatsApp reaches mobiles). */
+const MOBILE = words('mobile|cell|cellphone|whatsapp|נייד|סלולרי|סלולארי|פלאפון|וואטסאפ|ווטסאפ');
 
 /** "שם מלא:" / " Full_Name " / 'דוא"ל' → comparable text. */
 function normalizeTitle(value: Cell): string {
@@ -133,17 +156,15 @@ function normalizeTitle(value: Cell): string {
   );
 }
 
-function titleKey(value: Cell): ColumnKey | null {
-  const t = normalizeTitle(value);
-  if (!t) return null;
+function exactKey(title: string): ColumnKey | null {
   for (const key of Object.keys(SYNONYMS) as ColumnKey[])
-    if (SYNONYMS[key].some((s) => normalizeTitle(s) === t)) return key;
-  // exports with numbered columns: "Phone 1 - Value", "E-mail 1 - Value", "טלפון 2"
-  if (/\b(phone|mobile|טלפון|נייד)\b/.test(t)) return 'phone';
-  if (/\b(e ?mail|מייל)\b/.test(t)) return 'email';
-  if (/\b(given name)\b/.test(t)) return 'firstName';
-  if (/\b(family name)\b/.test(t)) return 'lastName';
+    if (SYNONYMS[key].some((s) => normalizeTitle(s) === title)) return key;
   return null;
+}
+
+function looseKey(title: string): ColumnKey | null {
+  if (NOT_A_VALUE.test(title)) return null;
+  return LOOSE.find(([, re]) => re.test(title))?.[0] ?? null;
 }
 
 const cellText = (value: Cell): string => {
@@ -168,24 +189,59 @@ export function normalizeGuestPhone(value: Cell): string | null {
   return null;
 }
 
+/**
+ * Whether the system's WhatsApp can reach this number: an Israeli number only as a mobile (+9725…) —
+ * a landline never has WhatsApp; other countries' numbers are taken as they are. The database's
+ * whatsapp_capable() says the same when it queues messages.
+ */
+export function whatsappCapable(e164: string | null): boolean {
+  if (!e164) return false;
+  return !e164.startsWith('+972') || /^\+9725\d{8}$/.test(e164);
+}
+
 const looksLikePhone = (v: Cell) =>
   normalizeGuestPhone(v) !== null && /\d{7,}/.test(cellText(v).replace(/\D/g, ''));
 const looksLikeEmail = (v: Cell) => EMAIL_RE.test(cellText(v));
 const looksLikeCount = (v: Cell) => /^\d{1,2}$/.test(cellText(v)) && Number(cellText(v)) > 0;
+const hasLetters = (v: Cell) => /\p{L}/u.test(cellText(v));
 
-/** Columns by their titles (first row), or null when the first row isn't titles. */
-function mappingFromTitles(row: readonly Cell[]): ColumnMapping | null {
+/** Of a column's filled cells (in the first 50 rows), the share that pass `test`. */
+function share(rows: readonly (readonly Cell[])[], i: number, test: (v: Cell) => boolean): number {
+  const filled = rows.slice(0, 50).filter((r) => cellText(r[i]));
+  return filled.length ? filled.filter((r) => test(r[i])).length / filled.length : 0;
+}
+
+/** Columns by their titles (the first row), or null when it isn't titles. `data`: the rows under it. */
+function mappingFromTitles(row: readonly Cell[], data: readonly (readonly Cell[])[]): ColumnMapping | null {
+  const titles = row.map(normalizeTitle);
   const mapping: ColumnMapping = {};
-  row.forEach((cell, i) => {
-    const key = titleKey(cell);
-    if (key && mapping[key] === undefined) mapping[key] = i;
+  const taken = (i: number) => Object.values(mapping).includes(i);
+  const take = (key: ColumnKey, i: number) => {
+    if (mapping[key] === undefined && !taken(i)) mapping[key] = i;
+  };
+  const exact = titles.map((t) => (t ? exactKey(t) : null));
+  // a mobile column before any other phone column, then the other exact titles, then numbered ones
+  exact.forEach((key, i) => {
+    if (key === 'phone' && MOBILE.test(titles[i]!)) take('phone', i);
   });
-  const recognized = Object.keys(mapping).length;
-  if (!recognized) return null;
+  exact.forEach((key, i) => {
+    if (key) take(key, i);
+  });
+  titles.forEach((t, i) => {
+    const key = t && !taken(i) ? looseKey(t) : null;
+    if (key) take(key, i);
+  });
+  titles.forEach((t, i) => {
+    if (NAMES_OR_COUNT.includes(t)) take(share(data, i, looksLikeCount) >= 0.8 ? 'partySize' : 'name', i);
+  });
+  if (!Object.keys(mapping).length) return null;
   if (mapping.name === undefined && mapping.firstName === undefined && mapping.lastName === undefined) {
-    // titles without a name column: the first unrecognized text column holds the names
-    const free = row.findIndex((cell, i) => cellText(cell) && !Object.values(mapping).includes(i));
-    if (free >= 0) mapping.name = free;
+    // titles without a name column: the first other column that holds text (titled or not)
+    const width = Math.max(row.length, ...data.slice(0, 50).map((r) => r.length));
+    const free = Array.from({ length: width }, (_, i) => i).find(
+      (i) => !taken(i) && share(data, i, hasLetters) >= 0.6,
+    );
+    if (free !== undefined) mapping.name = free;
   }
   return mapping;
 }
@@ -193,18 +249,12 @@ function mappingFromTitles(row: readonly Cell[]): ColumnMapping | null {
 /** Without titles: phones, emails and small numbers by their look; the first other column = names. */
 function mappingFromContent(rows: readonly (readonly Cell[])[]): ColumnMapping {
   const width = Math.max(0, ...rows.map((r) => r.length));
-  const sample = rows.slice(0, 50);
-  const share = (i: number, test: (v: Cell) => boolean) => {
-    const filled = sample.filter((r) => cellText(r[i]));
-    return filled.length ? filled.filter((r) => test(r[i])).length / filled.length : 0;
-  };
   const mapping: ColumnMapping = {};
   for (let i = 0; i < width; i++) {
-    if (mapping.phone === undefined && share(i, looksLikePhone) >= 0.6) mapping.phone = i;
-    else if (mapping.email === undefined && share(i, looksLikeEmail) >= 0.6) mapping.email = i;
-    else if (mapping.partySize === undefined && share(i, looksLikeCount) >= 0.8) mapping.partySize = i;
-    else if (mapping.name === undefined && share(i, (v) => /\p{L}/u.test(cellText(v))) >= 0.6)
-      mapping.name = i;
+    if (mapping.phone === undefined && share(rows, i, looksLikePhone) >= 0.6) mapping.phone = i;
+    else if (mapping.email === undefined && share(rows, i, looksLikeEmail) >= 0.6) mapping.email = i;
+    else if (mapping.partySize === undefined && share(rows, i, looksLikeCount) >= 0.8) mapping.partySize = i;
+    else if (mapping.name === undefined && share(rows, i, hasLetters) >= 0.6) mapping.name = i;
   }
   return mapping;
 }
@@ -214,10 +264,14 @@ export function readGuestRows(sheet: readonly (readonly Cell[])[]): ImportPrevie
   const rows = sheet
     .map((r, i) => ({ cells: r, line: i + 1 }))
     .filter((r) => r.cells.some((c) => cellText(c)));
-  if (!rows.length) return { guests: [], issues: [], mapping: {}, header: false, rows: 0 };
-  const titles = mappingFromTitles(rows[0]!.cells);
+  if (!rows.length) return { guests: [], issues: [], mapping: {}, header: false, rows: 0, truncated: 0 };
+  const titles = mappingFromTitles(
+    rows[0]!.cells,
+    rows.slice(1).map((r) => r.cells),
+  );
   const header = titles !== null;
-  const data = (header ? rows.slice(1) : rows).slice(0, MAX_IMPORT_ROWS);
+  const all = header ? rows.slice(1) : rows;
+  const data = all.slice(0, MAX_IMPORT_ROWS);
   const mapping = titles ?? mappingFromContent(data.map((r) => r.cells));
   const at = (cells: readonly Cell[], key: ColumnKey) =>
     mapping[key] === undefined ? '' : cellText(cells[mapping[key]!]);
@@ -260,7 +314,25 @@ export function readGuestRows(sheet: readonly (readonly Cell[])[]): ImportPrevie
     const group = at(cells, 'group').slice(0, 60) || null;
     guests.push({ name, phone, email, partySize, group });
   }
-  return { guests, issues, mapping, header, rows: data.length };
+  return { guests, issues, mapping, header, rows: data.length, truncated: all.length - data.length };
+}
+
+const OLE2 = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1];
+/** Excel's old binary format (.xls, an OLE2 file) — only .xlsx and CSV can be read. */
+export const isLegacyExcel = (bytes: Uint8Array) => OLE2.every((b, i) => bytes[i] === b);
+
+/**
+ * A CSV file's text: UTF-8 (Excel's "CSV UTF-8", with its BOM), UTF-16 with a BOM, or else
+ * Windows-1255 — what Excel's plain "CSV" writes on a Hebrew Windows.
+ */
+export function decodeCsv(bytes: Uint8Array): string {
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) return new TextDecoder('utf-16le').decode(bytes);
+  if (bytes[0] === 0xfe && bytes[1] === 0xff) return new TextDecoder('utf-16be').decode(bytes);
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes).replace(/^\uFEFF/, '');
+  } catch {
+    return new TextDecoder('windows-1255').decode(bytes);
+  }
 }
 
 /** CSV text → rows: quotes ("a, b" and "" inside), CRLF, a BOM, and , ; or tab — whichever the first line uses. */

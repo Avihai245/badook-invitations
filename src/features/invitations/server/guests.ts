@@ -36,6 +36,10 @@ export interface GuestRecord {
   lastOpenedAt: string | null;
   openCount: number;
   createdAt: string;
+  /** asked the system's WhatsApp number to stop: never sent to again */
+  optedOut: boolean;
+  /** a WhatsApp message waiting for its next try (Meta asked us to slow down) */
+  retryAt: string | null;
   response: { id: string; attending: boolean; adults: number; children: number; updatedAt: string } | null;
 }
 
@@ -55,6 +59,12 @@ export const guestsDb = {
       p_rows: rows,
       p_max: max,
     }),
+  add: (id: string, ownerId: string, guest: CleanGuest & { token: string }, max: number) =>
+    rpc<
+      | { ok: true; guest: GuestRecord }
+      | { ok: false; code: 'duplicate_phone'; guest?: { id: string; name: string } }
+      | null
+    >('add_guest', { p_id: id, p_owner_id: ownerId, p_guest: guest, p_max: max }),
   update: (id: string, ownerId: string, guestId: string, g: CleanGuest) =>
     rpc<{ ok: true; guest: GuestRecord } | { ok: false; code: 'duplicate_phone' } | null>('update_guest', {
       p_id: id,
@@ -100,6 +110,7 @@ const GuestInputSchema = z.strictObject({
 export const ImportGuestsSchema = z.strictObject({
   guests: z.array(GuestInputSchema).min(1).max(MAX_IMPORT_ROWS),
 });
+const AddGuestSchema = z.strictObject({ guest: GuestInputSchema });
 const IdsSchema = z.strictObject({ ids: z.array(z.string().refine(isUuid)).min(1).max(MAX_IMPORT_ROWS) });
 const MarkSchema = z.strictObject({
   ids: z.array(z.string().refine(isUuid)).min(1).max(MAX_IMPORT_ROWS),
@@ -136,9 +147,21 @@ export async function listGuests(userId: string, id: string): Promise<ApiResult>
   return ok({ ok: true, guests });
 }
 
+const guestLimit = (err: unknown) => err instanceof Error && /guest_limit/.test(err.message);
+
 /**
- * Adds guests (a spreadsheet, or one typed by hand): rows re-validated here; a phone already on the
- * list updates that guest; the plan's list size is enforced.
+ * POST /api/invitations/:id/guests — a spreadsheet's rows ({ guests }), or one guest typed by hand
+ * ({ guest }).
+ */
+export function saveGuests(userId: string, id: string, raw: unknown): Promise<ApiResult> {
+  return raw && typeof raw === 'object' && 'guest' in raw
+    ? addGuest(userId, id, raw)
+    : importGuests(userId, id, raw);
+}
+
+/**
+ * Adds a spreadsheet's guests: rows re-validated here; a guest already on the list (by phone, or by
+ * name when there is no phone) is updated; the plan's list size is enforced.
  */
 export async function importGuests(userId: string, id: string, raw: unknown): Promise<ApiResult> {
   if (!isUuid(id)) return fail(404, 'not_found');
@@ -160,8 +183,30 @@ export async function importGuests(userId: string, id: string, raw: unknown): Pr
     if (!result) return fail(404, 'not_found');
     return ok({ ok: true, ...result });
   } catch (err) {
-    if (err instanceof Error && /guest_limit/.test(err.message))
-      return fail(402, 'guest_limit', { max, plan: account.effective });
+    if (guestLimit(err)) return fail(402, 'guest_limit', { max, plan: account.effective });
+    throw err;
+  }
+}
+
+/**
+ * Adds one guest typed by hand. A phone already on the list is a conflict (409 duplicate_phone, with
+ * that guest's name) — never an update of someone else; the plan's list size is enforced.
+ */
+export async function addGuest(userId: string, id: string, raw: unknown): Promise<ApiResult> {
+  if (!isUuid(id)) return fail(404, 'not_found');
+  const parsed = AddGuestSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const c = clean(parsed.data.guest);
+  if ('error' in c) return fail(422, c.error);
+  const account = await accountOf(userId);
+  const max = account.limits.guestsPerInvitation;
+  try {
+    const result = await guestsDb.add(id, userId, { ...c, token: newGuestToken() }, max);
+    if (!result) return fail(404, 'not_found');
+    if (!result.ok) return fail(409, result.code, result.guest ? { guest: result.guest } : {});
+    return ok(result);
+  } catch (err) {
+    if (guestLimit(err)) return fail(402, 'guest_limit', { max, plan: account.effective });
     throw err;
   }
 }

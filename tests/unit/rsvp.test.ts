@@ -325,6 +325,49 @@ describe('RSVP endpoint rules', () => {
     const fresh = await call(yes({ editToken: token }));
     expect(fresh.body.ok && fresh.body.editToken).not.toBe(token);
   });
+
+  it("a personal link's reply is found by its guest: the browser's edit token (maybe another guest's) is not sent", async () => {
+    const token = 'x'.repeat(43);
+    const guestToken = 'AbCdEfGhIjKlMnOp';
+    const d = {
+      ...deps(invitation(), {
+        submit: vi.fn<RsvpDeps['submit']>(async () => ({ id: 'resp-2', replaced: true })),
+      }),
+      guestId: vi.fn<NonNullable<RsvpDeps['guestId']>>(async () => 'guest-b'),
+    };
+    const r = await call(yes({ editToken: token, guestToken }), d);
+    expect(d.guestId).toHaveBeenCalledWith('inv-1', guestToken);
+    const input = d.submit.mock.calls[0]![0];
+    expect(input.response.guest_id).toBe('guest-b');
+    expect(input.existingTokenHash).toBeNull();
+    // the guest's reply now has the new token — the one that comes back
+    expect(r.body.ok && r.body.editToken).not.toBe(token);
+    expect(input.newTokenHash).toBe(sha256(r.body.ok ? r.body.editToken : ''));
+  });
+
+  it("the site's sample invitations: checked like any other, answered like any other, nothing stored", async () => {
+    const d = { ...deps(), isDemo: vi.fn<NonNullable<RsvpDeps['isDemo']>>(async () => true) };
+    const r = await call(yes(), d);
+    expect(r).toEqual({
+      status: 200,
+      body: { ok: true, responseId: expect.any(String), editToken: expect.any(String), demo: true },
+    });
+    expect(r.saved).toBeUndefined();
+    expect(d.isDemo).toHaveBeenCalledWith('inv-1');
+    expect(d.submit).not.toHaveBeenCalled();
+    expect(d.rateHit).not.toHaveBeenCalled();
+    // the same rules still apply
+    const invalid = await call(yes({ adults: [adult({ firstName: '' })] }), d);
+    expect(invalid.body).toMatchObject({ ok: false, fieldErrors: { 'a0.firstName': expect.any(String) } });
+    // any other invitation is stored
+    const real = { ...deps(), isDemo: vi.fn<NonNullable<RsvpDeps['isDemo']>>(async () => false) };
+    expect((await call(yes(), real)).body).toEqual({
+      ok: true,
+      responseId: 'resp-1',
+      editToken: expect.any(String),
+    });
+    expect(real.submit).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('sanitize', () => {

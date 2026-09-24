@@ -63,7 +63,7 @@ describe('the support assistant', () => {
     expect(prompt).toContain(`₪${k.messagePrice} להודעה`);
     expect(prompt).toContain('https://invitations.example.com/contact');
     for (const topic of [
-      'ייבוא מאקסל',
+      'העלאת רשימה מאקסל',
       'שליחה בוואטסאפ',
       'אישורי הגעה',
       'ביטול המנוי',

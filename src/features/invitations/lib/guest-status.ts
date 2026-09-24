@@ -1,3 +1,5 @@
+import { formatPhone } from './phone';
+
 /**
  * Where each guest stands, from their record: the reply wins, then having opened the personal link,
  * then the delivery of the invitation (WhatsApp statuses or marked as sent by the host).
@@ -103,12 +105,7 @@ export function guestStats(list: readonly GuestLike[]): GuestStats {
   return stats;
 }
 
-/** 050-123-4567 for Israeli numbers, +44 20… style otherwise (display only). */
+/** 050-123-4567 / 03-123-4567 for Israeli numbers, +44 20… style otherwise (display only). */
 export function displayPhone(e164: string | null): string {
-  if (!e164) return '';
-  if (e164.startsWith('+972') && e164.length === 13) {
-    const n = `0${e164.slice(4)}`;
-    return `${n.slice(0, 3)}-${n.slice(3, 6)}-${n.slice(6)}`;
-  }
-  return e164;
+  return e164 ? formatPhone(e164) : '';
 }

@@ -72,6 +72,7 @@ export default defineConfig({
             INVITES_DEV_ROUTES: 'true',
             INVITES_PUBLIC_BASE_URL: baseURL,
             INVITES_IP_HASH_SALT: 'e2e-salt-0123456789abcdef0123456789',
+            INVITES_DEMO_RSVP: 'store', // p1-public.spec.ts reads RSVPs to the seeded sample invitations
             // the daily RSVP summary endpoint (tests/e2e/p4-dashboard.spec.ts)
             INVITES_CRON_SECRET: 'e2e-cron-secret-0123456789abcdef',
             // the tests drive the WhatsApp queue and the daily run themselves (features/jobs)

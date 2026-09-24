@@ -1,16 +1,20 @@
 'use client';
 
-import { AlertTriangle, CheckCircle2, Download, FileSpreadsheet, Upload } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Download, FileSpreadsheet, Info, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState, type DragEvent } from 'react';
 import { Button, Dialog, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
-import { displayPhone } from '../../lib/guest-status';
+import { guestPhone } from '../../lib/guest-list';
 import { hostApi, loginUrl } from '../api';
 import {
   csvCell,
+  decodeCsv,
+  isLegacyExcel,
+  MAX_IMPORT_ROWS,
   parseCsv,
   readGuestRows,
+  whatsappCapable,
   type Cell,
   type ColumnKey,
   type ImportPreview,
@@ -20,13 +24,23 @@ import {
 const BATCH = 1000;
 const SHOWN_ISSUES = 8;
 
-/** A spreadsheet file → its first sheet's rows (xlsx via read-excel-file, CSV parsed here). */
+/**
+ * A spreadsheet file → its first sheet's rows: .xlsx via read-excel-file, CSV decoded here (UTF-8 or
+ * Excel's Hebrew Windows-1255). The old binary .xls can't be read — the host is told how to re-save it.
+ */
 async function readSheet(file: File): Promise<Cell[][]> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  if (isLegacyExcel(bytes)) throw new Error('old_excel');
   const name = file.name.toLowerCase();
-  if (name.endsWith('.csv') || file.type === 'text/csv') return parseCsv(await file.text());
-  if (name.endsWith('.xls')) throw new Error('old_excel');
+  const zip = bytes[0] === 0x50 && bytes[1] === 0x4b;
+  if (!zip && (/\.(csv|txt|tsv)$/.test(name) || file.type === 'text/csv')) return parseCsv(decodeCsv(bytes));
   const { readSheet: read } = await import('read-excel-file/universal');
-  return (await read(file)) as Cell[][];
+  try {
+    return (await read(file)) as Cell[][];
+  } catch (err) {
+    if ((err as { code?: unknown } | null)?.code === 'XLS_FILE_NOT_SUPPORTED') throw new Error('old_excel');
+    throw err;
+  }
 }
 
 /** The sample file (CSV with a BOM, so Excel opens the Hebrew right). */
@@ -42,7 +56,8 @@ export function downloadSample(rows: string[][], fileName: string) {
 
 /**
  * Import guests from Excel or CSV: pick or drop a file → the columns found, the rows it can't use
- * and a sample of the guests → import (in batches). A phone already on the list updates that guest.
+ * (and any past the 5,000-row limit), landlines WhatsApp can't reach, and a sample of the guests →
+ * import (in batches). A guest already on the list (by phone, or by name without one) is updated.
  */
 export function ImportDialog({
   id,
@@ -55,7 +70,7 @@ export function ImportDialog({
   onClose: () => void;
   onImported: (message: string) => void;
 }) {
-  const { t, fmt, number } = useUi();
+  const { t, fmt, plural, number } = useUi();
   const g = t.guests;
   const im = g.import;
   const { toast } = useToast();
@@ -105,7 +120,7 @@ export function ImportDialog({
       if (res.status === 402) {
         setLimit(res.body?.max ?? maxGuests);
         setState('idle');
-        if (added + updated) onImported(fmt(im.done, { added, updated }));
+        if (added + updated) onImported(summary(added, updated));
         return;
       }
       if (!res.ok || !res.body) {
@@ -117,8 +132,16 @@ export function ImportDialog({
       updated += res.body.updated;
     }
     setState('idle');
-    onImported(fmt(im.done, { added: number(added), updated: number(updated) }));
+    onImported(summary(added, updated));
   };
+
+  const summary = (added: number, updated: number) =>
+    fmt(preview?.truncated ? im.doneTruncated : im.done, {
+      added: number(added),
+      updated: number(updated),
+      n: number(preview?.truncated ?? 0),
+      max: number(MAX_IMPORT_ROWS),
+    });
 
   const mappingLabels = preview
     ? (Object.entries(preview.mapping) as [ColumnKey, number][])
@@ -126,6 +149,7 @@ export function ImportDialog({
         .map(([key]) => im.columns[key])
     : [];
   const count = preview?.guests.length ?? 0;
+  const landlines = preview?.guests.filter((x) => x.phone && !whatsappCapable(x.phone)).length ?? 0;
 
   return (
     <Dialog
@@ -141,7 +165,7 @@ export function ImportDialog({
             {t.common.cancel}
           </Button>
           <Button onClick={() => void submit()} disabled={!count || state !== 'idle' || limit !== null}>
-            {state === 'importing' ? im.importing : fmt(im.confirm, { n: number(count) })}
+            {state === 'importing' ? im.importing : plural(im.confirm, count, { n: number(count) })}
           </Button>
         </>
       }
@@ -174,7 +198,7 @@ export function ImportDialog({
           <input
             ref={input}
             type="file"
-            accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
             className="sr-only"
             data-testid="guest-file"
             onChange={(e) => {
@@ -202,7 +226,7 @@ export function ImportDialog({
           <div className="flex flex-col gap-3" data-testid="import-preview">
             <p className="flex items-center gap-2 text-[15px] font-bold">
               <CheckCircle2 aria-hidden className="size-5 text-success" />
-              {fmt(im.found, { n: number(count) })}
+              {plural(im.found, count, { n: number(count) })}
             </p>
             <div className="flex flex-wrap items-center gap-1.5 text-[12px]">
               <span className="text-muted">{preview.header ? im.mapping : im.noHeader}:</span>
@@ -221,7 +245,7 @@ export function ImportDialog({
                         <bdi>{guest.name}</bdi>
                       </td>
                       <td className="px-3 py-2 text-muted" dir="ltr">
-                        {displayPhone(guest.phone) || '—'}
+                        {guestPhone(guest.phone) || '—'}
                       </td>
                       <td className="px-3 py-2 text-muted max-sm:hidden" dir="ltr">
                         {guest.email ?? ''}
@@ -239,7 +263,7 @@ export function ImportDialog({
           <div className="rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px]">
             <p className="flex items-center gap-2 font-semibold text-warning">
               <AlertTriangle aria-hidden className="size-4" />
-              {fmt(im.issues, { n: number(preview.issues.length) })}
+              {plural(im.issues, preview.issues.length, { n: number(preview.issues.length) })}
             </p>
             <ul className="mt-1.5 flex flex-col gap-0.5 text-ink">
               {preview.issues.slice(0, SHOWN_ISSUES).map((issue) => (
@@ -255,10 +279,27 @@ export function ImportDialog({
                 </li>
               ))}
               {preview.issues.length > SHOWN_ISSUES ? (
-                <li className="text-muted">{fmt(im.more, { n: preview.issues.length - SHOWN_ISSUES })}</li>
+                <li className="text-muted">{plural(im.more, preview.issues.length - SHOWN_ISSUES)}</li>
               ) : null}
             </ul>
           </div>
+        ) : null}
+
+        {preview?.truncated ? (
+          <p
+            role="status"
+            className="flex items-start gap-2 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+          >
+            <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" />
+            {fmt(im.truncated, { n: number(preview.truncated), max: number(MAX_IMPORT_ROWS) })}
+          </p>
+        ) : null}
+
+        {landlines ? (
+          <p className="flex items-start gap-2 rounded-card bg-info-bg px-3 py-2.5 text-[13px] text-ink">
+            <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-muted" />
+            {plural(im.landlines, landlines, { n: number(landlines) })}
+          </p>
         ) : null}
 
         {limit !== null ? (

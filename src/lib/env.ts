@@ -18,6 +18,8 @@ const ServerEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().default(''),
   SUPABASE_SECRET_KEY: z.string().default(''),
   INVITES_IP_HASH_SALT: z.string().default(''),
+  // replies to the site's sample invitations: checked, not kept; 'store' keeps them (end-to-end tests)
+  INVITES_DEMO_RSVP: z.string().trim().toLowerCase().default(''),
   INVITES_PUBLIC_BASE_URL: z
     .url()
     .default('http://localhost:3000')

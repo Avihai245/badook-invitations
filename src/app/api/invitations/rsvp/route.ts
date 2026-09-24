@@ -1,7 +1,9 @@
+import { after } from 'next/server';
 import { guestsDb } from '@/features/invitations/server/guests';
 import { notifyReply } from '@/features/invitations/server/notify';
 import { getPublishedInvitation } from '@/features/invitations/server/published';
 import { MAX_BODY_BYTES, RATE_LIMIT, handleRsvp, type RsvpDeps } from '@/features/invitations/server/rsvp';
+import { tick } from '@/features/jobs/jobs';
 import { clientIp } from '@/lib/client-ip';
 import { serverEnv } from '@/lib/env';
 import { invitationsEnabled } from '@/lib/feature';
@@ -37,6 +39,15 @@ const deps = (): RsvpDeps => ({
   now: Date.now,
   ipHashSalt: serverEnv().INVITES_IP_HASH_SALT,
   guestId: (invitationId, token) => guestsDb.byToken(invitationId, token),
+  // the site's sample invitations keep no replies — unless INVITES_DEMO_RSVP=store (e2e tests)
+  isDemo:
+    serverEnv().INVITES_DEMO_RSVP === 'store'
+      ? undefined
+      : async (invitationId) => {
+          const { data, error } = await serviceDb().rpc('invitation_is_demo', { p_id: invitationId });
+          if (error) throw new Error(`invitation_is_demo failed: ${error.message}`);
+          return data === true;
+        },
 });
 
 /** Guest RSVP (§4): validated with the shared schema + the invitation's rules; written in one transaction. */
@@ -55,6 +66,8 @@ export async function POST(request: Request) {
         notifyReply(saved).catch((err: unknown) => console.error('RSVP notification failed', err)),
         new Promise((resolve) => setTimeout(resolve, NOTIFY_WAIT_MS)),
       ]);
+      // guests' replies keep the app's recurring jobs going too (features/jobs)
+      after(() => tick());
     }
     return Response.json(body, { status, headers: NO_STORE });
   } catch (err) {

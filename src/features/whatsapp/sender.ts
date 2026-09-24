@@ -8,9 +8,11 @@ import { serviceDb } from '@/lib/supabase/server';
 import { sendTemplate, type SendResult, type TemplateMessage } from './cloud-api';
 
 /**
- * Sends the queued WhatsApp invitations (supabase/migrations/*_guests_accounts_messaging.sql): claims a
- * batch, calls the Cloud API a few at a time, and records each answer — a failure refunds its
- * credit, a temporary one (rate limit, timeout) goes back to the queue (3 tries).
+ * Sends the queued WhatsApp invitations (supabase/migrations/*_guests_accounts_messaging.sql and
+ * *_guests_whatsapp_fixes.sql): claims a batch of due messages, calls the Cloud API a few at a time,
+ * and records each answer — a failure refunds its credit; a temporary one (Meta's rate limits) goes
+ * back to the queue and waits before its next try (3 tries); one that may have reached Meta (a
+ * timeout) is never sent twice.
  */
 
 async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
@@ -53,6 +55,8 @@ interface Claimed {
   id: string;
   invitationId: string;
   toPhone: string;
+  /** this try's number (1 = the first) */
+  attempts?: number;
   guestName: string | null;
   guestToken: string | null;
   slug: string;
@@ -87,6 +91,11 @@ export interface ProcessResult {
 }
 
 const CONCURRENCY = 5;
+/** How long a message waits after its first and second failed try (Meta asked us to slow down). */
+export const RETRY_WAIT_SECONDS = [60, 300];
+
+export const retryWait = (attempts: number) =>
+  RETRY_WAIT_SECONDS[Math.min(Math.max(attempts, 1), RETRY_WAIT_SECONDS.length) - 1]!;
 
 /** Sends up to `limit` queued messages (one invitation's, or any when null). */
 export async function processQueue(
@@ -108,6 +117,7 @@ export async function processQueue(
           const again = await rpc<boolean>('whatsapp_requeue', {
             p_message_id: m.id,
             p_error: outcome.error,
+            p_wait_seconds: retryWait(m.attempts ?? 1),
           });
           if (again) result.retried++;
           else result.failed++;
@@ -121,15 +131,35 @@ export async function processQueue(
   return result;
 }
 
+/** Guests a send left out, never charged: no WhatsApp (a landline), asked us to stop, already have it. */
+export interface Skipped {
+  landline: number;
+  optedOut: number;
+  received: number;
+}
+
 export const whatsappDb = {
-  queue: (id: string, ownerId: string, guestIds: string[], priceUsd: number) =>
+  queue: (id: string, ownerId: string, guestIds: string[], priceUsd: number, resend: boolean) =>
     rpc<
-      | { ok: true; queued: number; balance: number }
-      | { ok: false; code: 'credits'; needed: number; balance: number }
-      | { ok: false; code: 'nobody' }
+      | ({ skipped?: Skipped } & (
+          | { ok: true; queued: number; balance: number }
+          | { ok: false; code: 'credits'; needed: number; balance: number }
+          | { ok: false; code: 'nobody' }
+        ))
       | null
-    >('whatsapp_queue', { p_id: id, p_owner_id: ownerId, p_guest_ids: guestIds, p_price_usd: priceUsd }),
+    >('whatsapp_queue', {
+      p_id: id,
+      p_owner_id: ownerId,
+      p_guest_ids: guestIds,
+      p_price_usd: priceUsd,
+      p_resend: resend,
+    }),
+  /** messages the page can still send now (due, or being sent) */
   pending: (id: string) => rpc<number>('whatsapp_pending', { p_id: id }),
+  /** messages waiting for their next try — the scheduled job sends them */
+  waiting: (id: string) => rpc<{ count: number; nextAt: string | null }>('whatsapp_waiting', { p_id: id }),
   status: (waId: string, status: string, error: string | null) =>
     rpc<boolean>('whatsapp_status', { p_wa_id: waId, p_status: status, p_error: error }),
+  optOut: (phone: string, source: 'reply' | 'meta') =>
+    rpc<boolean>('whatsapp_opt_out', { p_phone: phone, p_source: source }),
 };
