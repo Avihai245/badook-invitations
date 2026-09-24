@@ -2,14 +2,15 @@
 //   · REST  POST /rest/v1/rpc/<fn> — the API key picks the database role exactly like Supabase maps its
 //     keys (publishable → anon, secret → service_role), so grants and RLS are enforced by Postgres;
 //   · Auth  /auth/v1 — email + password sign-up (auto-confirmed), password / refresh-token grants,
-//     GET/PUT /user, logout, recover; HS256 access tokens; users live in auth.users;
+//     GET/PUT /user, logout, recover; HS256 access tokens; users live in auth.users; "Continue with
+//     Google" through a stand-in account chooser (authorize → code → the PKCE grant); /settings;
 //   · Storage /storage/v1 — signed upload URLs (service role), uploads, public reads; files on disk,
 //     bucket size/MIME limits from storage.buckets.
 //
 //   DATABASE_URL=postgres://… REST_SHIM_PORT=54321 node tests/support/rest-shim.mjs
 //   app env: NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 //            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=local-publishable  SUPABASE_SECRET_KEY=local-secret
-import { createHmac, randomBytes, randomUUID, scryptSync, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, randomUUID, scryptSync, timingSafeEqual } from 'node:crypto';
 import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, join, normalize } from 'node:path';
@@ -228,8 +229,94 @@ async function userById(id) {
   return (await pool.query('select * from auth.users where id = $1', [id])).rows[0];
 }
 
+// ── "Continue with Google": the browser comes to /authorize, picks an account on a stand-in page,
+// and goes back to the app with a one-time code, which the app trades for a session (PKCE). ──
+const oauthCodes = new Map(); // code → { userId, challenge }
+const html = (res, body) => {
+  res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+  res.end(body);
+};
+const escapeHtml = (v) => String(v).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+function redirectBack(res, target, params) {
+  const url = new URL(target);
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+  res.writeHead(303, { location: url.toString() });
+  res.end();
+}
+
+async function oauth(req, res, path, query) {
+  const target = query.get('redirect_to') ?? '';
+  if (!/^https?:\/\//.test(target)) return authError(res, 400, 'validation_failed', 'redirect_to');
+  if (path === 'authorize') {
+    if (query.get('provider') !== 'google') return authError(res, 400, 'validation_failed', 'provider');
+    const keep = ['redirect_to', 'code_challenge', 'code_challenge_method']
+      .map((k) => `<input type="hidden" name="${k}" value="${escapeHtml(query.get(k) ?? '')}">`)
+      .join('');
+    return html(
+      res,
+      `<!doctype html><html lang="en"><head><title>Google (test)</title></head><body>
+<h1>Sign in with Google (test)</h1>
+<form action="/auth/v1/authorize/google_account" method="get">${keep}
+<label>Email <input name="email" type="email" required></label>
+<label>Name <input name="name"></label>
+<button type="submit">Continue</button>
+<button type="submit" name="cancel" value="1" formnovalidate>Cancel</button>
+</form></body></html>`,
+    );
+  }
+  // the account was chosen (or the visitor canceled)
+  if (query.get('cancel'))
+    return redirectBack(res, target, { error: 'access_denied', error_description: 'The user canceled' });
+  const email = String(query.get('email') ?? '')
+    .trim()
+    .toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return authError(res, 400, 'validation_failed', 'email');
+  const name = String(query.get('name') ?? '').trim() || email.split('@')[0];
+  let row = (await pool.query('select * from auth.users where email = $1', [email])).rows[0];
+  if (row) {
+    // Supabase links a verified Google identity to the account with the same email
+    const providers = [...new Set([...(row.raw_app_meta_data?.providers ?? ['email']), 'google'])];
+    row = (
+      await pool.query(
+        `update auth.users set raw_app_meta_data = coalesce(raw_app_meta_data, '{}') || $2, updated_at = now()
+         where id = $1 returning *`,
+        [row.id, { providers }],
+      )
+    ).rows[0];
+  } else {
+    row = (
+      await pool.query(
+        `insert into auth.users (id, aud, role, email, encrypted_password, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+         values ($1, 'authenticated', 'authenticated', $2, null, $3, $4, now(), now()) returning *`,
+        [
+          randomUUID(),
+          email,
+          { provider: 'google', providers: ['google'] },
+          { full_name: name, name, email, email_verified: true },
+        ],
+      )
+    ).rows[0];
+  }
+  const code = randomUUID();
+  oauthCodes.set(code, {
+    userId: row.id,
+    challenge: query.get('code_challenge') ?? '',
+    method: query.get('code_challenge_method') ?? 'plain',
+  });
+  return redirectBack(res, target, { code });
+}
+
 async function auth(req, res, path, query) {
+  if (req.method === 'GET' && (path === 'authorize' || path === 'authorize/google_account'))
+    return oauth(req, res, path, query);
   if (!ROLES[req.headers.apikey]) return authError(res, 401, 'no_api_key', 'Invalid API key');
+  if (req.method === 'GET' && path === 'settings')
+    return send(res, 200, {
+      external: { email: true, google: process.env.SHIM_GOOGLE !== 'off' },
+      disable_signup: false,
+      mailer_autoconfirm: true,
+    });
   if (req.method === 'POST' && path === 'signup') {
     const { email, password, data } = await readBody(req);
     const address = String(email ?? '')
@@ -284,6 +371,18 @@ async function auth(req, res, path, query) {
         );
       refreshTokens.delete(body.refresh_token);
       return send(res, 200, session(await userById(id)));
+    }
+    if (query.get('grant_type') === 'pkce') {
+      const entry = oauthCodes.get(body.auth_code);
+      oauthCodes.delete(body.auth_code);
+      const verifier = String(body.code_verifier ?? '');
+      const expected =
+        entry?.method?.toLowerCase() === 's256'
+          ? createHash('sha256').update(verifier).digest('base64url')
+          : verifier;
+      if (!entry || !verifier || expected !== entry.challenge)
+        return authError(res, 400, 'flow_state_not_found', 'invalid flow state, no valid flow state found');
+      return send(res, 200, session(await userById(entry.userId)));
     }
     return authError(res, 400, 'unsupported_grant_type', 'Unsupported grant type');
   }

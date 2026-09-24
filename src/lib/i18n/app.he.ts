@@ -99,6 +99,8 @@ export const he = {
     updatePassword: 'שמירת הסיסמה',
     checkEmailTitle: 'בדקו את תיבת המייל',
     checkEmail: 'שלחנו קישור לאישור החשבון אל {email}. לחצו עליו כדי להתחיל.',
+    google: 'המשך עם Google',
+    orEmail: 'או עם אימייל',
     errors: {
       invalid_credentials: 'האימייל או הסיסמה לא נכונים.',
       email_not_confirmed: 'עוד לא אישרתם את האימייל — חפשו את הקישור ששלחנו.',
@@ -107,6 +109,7 @@ export const he = {
       invalid_email: 'כתובת האימייל לא תקינה.',
       rate_limited: 'יותר מדי ניסיונות. נסו שוב בעוד כמה דקות.',
       link_invalid: 'הקישור לא תקף או שפג תוקפו. בקשו קישור חדש.',
+      oauth_failed: 'הכניסה עם Google לא הושלמה. נסו שוב, או היכנסו עם מייל וסיסמה.',
       session_missing: 'כדי לבחור סיסמה חדשה פתחו את הקישור מהמייל.',
       generic: 'משהו השתבש. נסו שוב בעוד רגע.',
     },

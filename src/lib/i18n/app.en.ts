@@ -94,6 +94,8 @@ export const en: AppDict = {
     updatePassword: 'Save password',
     checkEmailTitle: 'Check your inbox',
     checkEmail: 'We sent a confirmation link to {email}. Click it to get started.',
+    google: 'Continue with Google',
+    orEmail: 'or with email',
     errors: {
       invalid_credentials: 'Wrong email or password.',
       email_not_confirmed: 'You haven’t confirmed your email yet — look for the link we sent.',
@@ -102,6 +104,8 @@ export const en: AppDict = {
       invalid_email: 'That email address isn’t valid.',
       rate_limited: 'Too many attempts. Please try again in a few minutes.',
       link_invalid: 'This link is invalid or has expired. Request a new one.',
+      oauth_failed:
+        'Signing in with Google didn’t finish. Try again, or sign in with your email and password.',
       session_missing: 'To choose a new password, open the link from the email.',
       generic: 'Something went wrong. Please try again in a moment.',
     },

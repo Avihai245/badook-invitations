@@ -13,12 +13,15 @@ const OTP_TYPES: readonly EmailOtpType[] = [
 ];
 
 /**
- * Landing URL of the Supabase Auth emails (sign-up confirmation, password recovery): exchanges the
- * PKCE `code` — or verifies a `token_hash` from a customized email template — for a session cookie,
- * then continues to `next` (an in-app path).
+ * Landing URL of the Supabase Auth emails (sign-up confirmation, password recovery) and of "Continue
+ * with Google": exchanges the PKCE `code` — or verifies a `token_hash` from a customized email
+ * template — for a session cookie, then continues to `next` (an in-app path). A sign-in with Google
+ * that was canceled or refused comes back with `error`.
  */
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
+  const base = serverEnv().INVITES_PUBLIC_BASE_URL || request.nextUrl.origin;
+  if (params.get('error')) return NextResponse.redirect(new URL('/login?error=oauth_failed', base));
   const next = safeNext(params.get('next'));
   const code = params.get('code');
   const tokenHash = params.get('token_hash');
@@ -30,6 +33,5 @@ export async function GET(request: NextRequest) {
   } else if (tokenHash && type && OTP_TYPES.includes(type)) {
     ok = !(await db.auth.verifyOtp({ type, token_hash: tokenHash })).error;
   }
-  const base = serverEnv().INVITES_PUBLIC_BASE_URL || request.nextUrl.origin;
   return NextResponse.redirect(new URL(ok ? next : '/login?error=link_invalid', base));
 }

@@ -2,16 +2,70 @@
 
 import Link from 'next/link';
 import { useActionState, type ReactNode } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Button, Field, Input } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import {
   requestPasswordReset,
   signIn,
+  signInWithGoogle,
   signUp,
   updatePassword,
   type AuthErrorKey,
   type AuthState,
 } from './actions';
+
+/** Google's "G" (its sign-in branding asks for the standard mark on a light button). */
+function GoogleMark() {
+  return (
+    <svg aria-hidden viewBox="0 0 48 48" width="18" height="18">
+      <path
+        fill="#FFC107"
+        d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"
+      />
+      <path
+        fill="#FF3D00"
+        d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+      />
+      <path
+        fill="#4CAF50"
+        d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2A11.9 11.9 0 0 1 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"
+      />
+      <path
+        fill="#1976D2"
+        d="M43.6 20.1H42V20H24v8h11.3a12 12 0 0 1-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"
+      />
+    </svg>
+  );
+}
+
+function GoogleSubmit() {
+  const { t } = useUi();
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" variant="secondary" size="lg" fullWidth loading={pending} icon={<GoogleMark />}>
+      {t.auth.google}
+    </Button>
+  );
+}
+
+/** "Continue with Google", then a divider before the email form. */
+function GoogleSignIn({ next }: { next: string }) {
+  const { t } = useUi();
+  return (
+    <>
+      <form action={signInWithGoogle}>
+        <input type="hidden" name="next" value={next} />
+        <GoogleSubmit />
+      </form>
+      <div className="my-5 flex items-center gap-3 text-[12.5px] text-muted" aria-hidden>
+        <span className="h-px flex-1 bg-line" />
+        {t.auth.orEmail}
+        <span className="h-px flex-1 bg-line" />
+      </div>
+    </>
+  );
+}
 
 function AuthCard({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   return (
@@ -32,7 +86,15 @@ function FormError({ error }: { error?: AuthErrorKey }) {
   );
 }
 
-export function LoginForm({ next, initialError }: { next: string; initialError?: AuthErrorKey }) {
+export function LoginForm({
+  next,
+  initialError,
+  google = false,
+}: {
+  next: string;
+  initialError?: AuthErrorKey;
+  google?: boolean;
+}) {
   const { t } = useUi();
   const [state, action, pending] = useActionState<AuthState, FormData>(
     signIn,
@@ -40,6 +102,7 @@ export function LoginForm({ next, initialError }: { next: string; initialError?:
   );
   return (
     <AuthCard title={t.auth.loginTitle} subtitle={t.auth.loginSubtitle}>
+      {google ? <GoogleSignIn next={next} /> : null}
       <form action={action} className="flex flex-col gap-4" noValidate>
         <input type="hidden" name="next" value={next} />
         <Field label={t.auth.email} required>
@@ -82,7 +145,7 @@ export function LoginForm({ next, initialError }: { next: string; initialError?:
   );
 }
 
-export function SignupForm() {
+export function SignupForm({ google = false }: { google?: boolean }) {
   const { t, fmt } = useUi();
   const [state, action, pending] = useActionState<AuthState, FormData>(signUp, null);
   if (state?.sent) {
@@ -99,6 +162,7 @@ export function SignupForm() {
   }
   return (
     <AuthCard title={t.auth.signupTitle} subtitle={t.auth.signupSubtitle}>
+      {google ? <GoogleSignIn next="/app/invitations" /> : null}
       <form action={action} className="flex flex-col gap-4" noValidate>
         <Field label={t.auth.name}>
           <Input name="name" autoComplete="name" maxLength={80} />

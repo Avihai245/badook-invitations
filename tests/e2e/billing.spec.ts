@@ -18,7 +18,7 @@ async function signUp(page: Page) {
   await page.goto('/signup');
   await page.fill('input[name=email]', email);
   await page.fill('input[name=password]', 'a-good-password');
-  await page.click('button[type=submit]');
+  await page.click('form:has(input[name=password]) button[type=submit]');
   await page.waitForURL(/\/app\/invitations$/);
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   return email;
@@ -171,7 +171,7 @@ test('the account: details, and deleting it deletes everything', async ({ page }
   await page.waitForURL(/\/login/);
   await page.fill('input[name=email]', email);
   await page.fill('input[name=password]', 'a-good-password');
-  await page.click('button[type=submit]');
+  await page.click('form:has(input[name=password]) button[type=submit]');
   await expect(page.getByText('האימייל או הסיסמה לא נכונים')).toBeVisible();
   if (!LOCAL) return;
   const client = new pg.Client({ connectionString: e2eDb() });

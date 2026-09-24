@@ -295,7 +295,7 @@ test.describe('share screen', () => {
       `share-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`,
     );
     await page.fill('input[name=password]', 'a-good-password');
-    await page.click('button[type=submit]');
+    await page.click('form:has(input[name=password]) button[type=submit]');
     await page.waitForURL(/\/app\/invitations$/);
     const { id } = await page.evaluate(async () => {
       const res = await fetch('/api/invitations', {

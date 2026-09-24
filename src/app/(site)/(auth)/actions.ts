@@ -64,6 +64,26 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
   return { sent: true, email };
 }
 
+/**
+ * "Continue with Google": Supabase sends the visitor to Google and back to /auth/callback with a code
+ * (PKCE — the verifier waits in a cookie). A Google account with the email of an existing account
+ * signs into that account.
+ */
+export async function signInWithGoogle(form: FormData): Promise<void> {
+  const next = safeNext(form.get('next'));
+  const db = await sessionDb();
+  const { data, error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: callbackUrl(next),
+      skipBrowserRedirect: true,
+      queryParams: { prompt: 'select_account' },
+    },
+  });
+  if (error || !data?.url) redirect('/login?error=oauth_failed');
+  redirect(data.url);
+}
+
 export async function requestPasswordReset(_prev: AuthState, form: FormData): Promise<AuthState> {
   const email = field(form, 'email').trim();
   if (!EMAIL_RE.test(email)) return { error: 'invalid_email', email };
