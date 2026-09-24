@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { DEMO_OWNER_ID } from '../../scripts/seed';
@@ -247,7 +247,9 @@ describe('replies and guests', () => {
     expect(await call('invitation_is_demo', [demo.id])).toBe(true);
     expect(await call('invitation_is_demo', [inv])).toBe(false);
     // the owner id in the migration is the seed's
-    const sql = readFileSync('supabase/migrations/20260924140000_guests_whatsapp_fixes.sql', 'utf8');
+    // (found by name: the file is renamed to the version production records when it's applied)
+    const file = readdirSync('supabase/migrations').find((f) => f.endsWith('_guests_whatsapp_fixes.sql'))!;
+    const sql = readFileSync(`supabase/migrations/${file}`, 'utf8');
     expect(sql).toContain(`'${DEMO_OWNER_ID}'::uuid`);
   });
 });
