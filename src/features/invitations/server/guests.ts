@@ -50,8 +50,11 @@ async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
 }
 
 export const guestsDb = {
+  // an address that isn't an invitation id (/app/invitations/whatever) is simply not the owner's
   list: (id: string, ownerId: string) =>
-    rpc<GuestRecord[] | null>('owner_guests', { p_id: id, p_owner_id: ownerId }),
+    isUuid(id)
+      ? rpc<GuestRecord[] | null>('owner_guests', { p_id: id, p_owner_id: ownerId })
+      : Promise.resolve(null),
   import: (id: string, ownerId: string, rows: unknown[], max: number) =>
     rpc<{ added: number; updated: number; total: number } | null>('import_guests', {
       p_id: id,
