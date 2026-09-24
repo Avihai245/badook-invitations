@@ -74,6 +74,10 @@ const FUNCTIONS = new Set([
   'partner_account',
   'app_meta_get',
   'seed_upsert',
+  'add_guest',
+  'invitation_is_demo',
+  'whatsapp_opt_out',
+  'whatsapp_waiting',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
