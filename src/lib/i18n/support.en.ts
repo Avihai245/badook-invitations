@@ -1,6 +1,6 @@
 import type { supportHe } from './support.he';
 
-/** The support assistant (the chat on every page) — English. */
+/** The support assistant (the chat in the signed-in app) — English. */
 export const supportEn: typeof supportHe = {
   open: 'Help: ask the assistant',
   launcher: 'Need help?',

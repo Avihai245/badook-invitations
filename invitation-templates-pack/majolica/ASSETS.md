@@ -10,7 +10,7 @@ Look: Hand-painted ceramic tiles, lemons with glossy leaves, bright seaside midd
 
 Until these files exist the invitation shows its scene (`src/features/invitations/renderer/scenes/majolica.tsx`) — keep the media in the same palette and composition (calm centre for the names).
 
-Put files in `public/templates/majolica/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `majolica/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

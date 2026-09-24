@@ -27,7 +27,7 @@ export interface PlaceholderArt {
   /**
    * Pale skies only: a color multiplied over the sky, clouds and hills below the light at the top
    * (see placeholderScrim), deepening them in their own hue so white hero text stays legible.
-   * Checked by `qa-screens --only legibility`. null = none (sahar-bordeaux = the reference as is).
+   * Checked by `qa-screens --only legibility`. null = none.
    */
   shade: string | null;
   cloud: string;
@@ -63,7 +63,8 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
       'radial-gradient(38% 20% at 70% 60%,rgba(255,240,210,.95),rgba(255,226,190,0) 70%),' +
       'radial-gradient(90% 50% at 50% 100%,rgba(90,40,55,.55),transparent 70%),' +
       'linear-gradient(180deg,#F8DCC4 0%,#F5C4A6 26%,#EFA995 46%,#D28A8C 62%,#9A5C6B 79%,#5E2F40 100%)',
-    shade: null,
+    // the reference's pale sunset, deepened in its own rose under the text so it reads (WCAG AA)
+    shade: '#A87070',
     cloud: 'rgba(255,246,238,.45)',
     hills: ['#8E5563', '#6E3A48', '#5A2C3A', '#4E2332'],
     cover: {

@@ -4,7 +4,7 @@
 
 Cover: `ticket` · overlay `ticket_text` · exit `fade` · categories: birthday, engagement, corporate
 
-Put files in `public/templates/rooftop-dusk/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `rooftop-dusk/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

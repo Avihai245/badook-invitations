@@ -84,7 +84,7 @@ ${knowledgeBase(k)}
 export const screenNote = (screen: string) =>
   `The user is on this screen of the app: ${screen}. Prefer answers that fit it, unless they ask about something else.`;
 
-/** The rate limit key: never the address itself, only a salted hash. */
+/** The rate limit key (`u:<user>`, `ip:<address>` or `global`): never the address itself, only a salted hash. */
 function rateKey(who: string): string {
   return createHash('sha256').update(`${serverEnv().INVITES_IP_HASH_SALT}:chat:${who}`).digest('hex');
 }
@@ -102,13 +102,25 @@ async function rateHit(key: string, limit: number, windowSeconds: number): Promi
 export type ChatResult =
   { status: number; json: { ok: false; code: string } } | { status: 200; stream: ReadableStream<Uint8Array> };
 
-/** Words of a question (Hebrew/English), for the manual search without the API. */
+/** Words that say nothing about the subject (how, what, can I…) — never a reason to pick a line. */
+const STOP = new Set(
+  (
+    'מה איך את של על עם אני זה זו זאת אפשר יש אין לא כן מי או גם רק כל אם הוא היא אנחנו אתם שלי שלנו לי לנו ' +
+    'אותו אותה למה מתי איפה כמה האם בבקשה תודה רוצה רוצים צריך צריכה צריכים עושים לעשות אצלי שם פה ' +
+    'how what the a an to do does did i is are be can could my in on of for with it you me and or where when why ' +
+    'please want need there this that'
+  ).split(' '),
+);
+/** Hebrew prefixes (ו/ה/ב/ל/מ/ש/כ) off a longer word, so "ההזמנה" meets "הזמנה". */
+const stem = (w: string) => w.replace(/^[והבלמשכ](?=\p{L}{3,})/u, '');
+
+/** The meaningful words of a text (Hebrew/English), for the manual search without the API. */
 const words = (text: string) =>
   text
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\s]/gu, ' ')
     .split(/\s+/)
-    .filter((w) => w.length > 1);
+    .filter((w) => w.length > 1 && !STOP.has(w) && !STOP.has(stem(w)));
 
 /** Without an API key: the part of the manual that shares most words with the question. */
 export function manualAnswer(question: string, k: KnowledgeContext, locale: 'he' | 'en'): string {
@@ -119,17 +131,26 @@ export function manualAnswer(question: string, k: KnowledgeContext, locale: 'he'
       const [title = '', ...lines] = part.split('\n');
       return { title: title.replace(/^## /, ''), lines: lines.filter((l) => l.trim()) };
     });
-  const q = new Set(words(question).map((w) => w.replace(/^[והבלמשכ](?=\p{L}{3,})/u, '')));
+  const q = new Set(words(question).map(stem));
+  const hits = (text: string) =>
+    new Set(
+      words(text)
+        .map(stem)
+        .filter((w) => q.has(w)),
+    ).size;
   let best: { title: string; line: string; score: number } | null = null;
-  for (const part of parts)
+  for (const part of parts) {
+    // a word from the section's title counts too, a little less than one in the line
+    const inTitle = hits(part.title) * 0.5;
     for (const line of part.lines) {
-      const score = words(line).filter(
-        (w) => q.has(w) || q.has(w.replace(/^[והבלמשכ](?=\p{L}{3,})/u, '')),
-      ).length;
+      const score = hits(line) + inTitle;
       if (score > (best?.score ?? 0)) best = { title: part.title, line, score };
     }
+  }
   const contact = `${k.site}/contact`;
-  if (!best || best.score < 1)
+  // one meaningful word in common is enough only for a one- or two-word question
+  const needed = q.size <= 2 ? 1 : 2;
+  if (!best || best.score < needed)
     return locale === 'en'
       ? `I couldn't find that in the guide. You can ask the team through the contact form: ${contact}`
       : `לא מצאתי את זה במדריך. אפשר לשאול את הצוות בטופס יצירת הקשר: ${contact}`;
@@ -148,21 +169,32 @@ const textStream = (text: string) =>
     },
   });
 
-/** Anthropic's server-sent events → the answer's text, as it comes. */
+/**
+ * Anthropic's server-sent events → the answer's text, as it comes. An answer that stops early — the
+ * length limit, or the connection or the API failing midway — ends with `onCut()`'s note, so it never
+ * just trails off.
+ */
 export function textFromEvents(
   body: ReadableStream<Uint8Array>,
   onError: () => string,
+  onCut: () => string = () => '',
 ): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
   let buffer = '';
   let sent = false;
+  let finished = false;
+  let cut = false;
   const reader = body.getReader();
   return new ReadableStream<Uint8Array>({
     async pull(controller) {
       for (;;) {
-        const { value, done } = await reader.read().catch(() => ({ value: undefined, done: true as const }));
+        const { value, done } = await reader.read().catch(() => {
+          cut = true;
+          return { value: undefined, done: true as const };
+        });
         if (done) {
           if (!sent) controller.enqueue(encoder.encode(onError()));
+          else if (cut || !finished) controller.enqueue(encoder.encode(onCut()));
           controller.close();
           return;
         }
@@ -178,10 +210,18 @@ export function textFromEvents(
             .join('');
           if (!data) continue;
           try {
-            const json = JSON.parse(data) as { type?: string; delta?: { type?: string; text?: string } };
+            const json = JSON.parse(data) as {
+              type?: string;
+              delta?: { type?: string; text?: string; stop_reason?: string };
+            };
             if (json.type === 'content_block_delta' && json.delta?.type === 'text_delta' && json.delta.text)
               out += json.delta.text;
-            if (json.type === 'error') out += sent || out ? '' : onError();
+            if (json.type === 'message_delta' && json.delta?.stop_reason === 'max_tokens') cut = true;
+            if (json.type === 'message_stop') finished = true;
+            if (json.type === 'error') {
+              if (sent || out) cut = true;
+              else out += onError();
+            }
           } catch {
             // a partial or unknown event
           }
@@ -212,7 +252,8 @@ export async function supportChat(
   if (messages.reduce((n, m) => n + m.content.length, 0) > MAX_TOTAL_CHARS)
     return { status: 413, json: { ok: false, code: 'too_long' } };
 
-  if (!(await rateHit(rateKey(userId ?? ip ?? 'unknown'), CHAT_LIMIT.count, CHAT_LIMIT.windowSeconds)))
+  const who = userId ? `u:${userId}` : `ip:${ip ?? 'unknown'}`;
+  if (!(await rateHit(rateKey(who), CHAT_LIMIT.count, CHAT_LIMIT.windowSeconds)))
     return { status: 429, json: { ok: false, code: 'rate' } };
 
   const env = serverEnv();
@@ -222,7 +263,7 @@ export async function supportChat(
   if (
     !env.ANTHROPIC_API_KEY ||
     !env.INVITES_AI_MODEL ||
-    !(await rateHit(rateKey('all'), env.INVITES_AI_DAILY_LIMIT, 24 * 3600))
+    !(await rateHit(rateKey('global'), env.INVITES_AI_DAILY_LIMIT, 24 * 3600))
   )
     return { status: 200, stream: textStream(manualAnswer(question, k, locale)) };
 
@@ -264,5 +305,9 @@ export async function supportChat(
     );
     return { status: 200, stream: textStream(fallback()) };
   }
-  return { status: 200, stream: textFromEvents(res.body, fallback) };
+  const cutNote = () =>
+    locale === 'en'
+      ? '\n\n(The answer was cut short — ask me to go on, or ask a shorter question.)'
+      : '\n\n(התשובה נקטעה — בקשו ממני להמשיך, או שאלו שאלה קצרה יותר.)';
+  return { status: 200, stream: textFromEvents(res.body, fallback, cutNote) };
 }

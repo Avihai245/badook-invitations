@@ -2471,6 +2471,21 @@ footer.sec {
   opacity: 0.8;
   letter-spacing: var(--track);
 }
+.f-legal {
+  font-family: var(--f-ui);
+  font-size: 11.5px;
+  color: var(--inv-ink-muted);
+  margin-top: 40px;
+  opacity: 0.75;
+}
+.credit + .f-legal {
+  margin-top: 8px;
+}
+.f-legal a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 
 /* editor hooks (§5): outlined node when a field is focused in the editor */
 [data-mode='editor'] [data-edit-path] {

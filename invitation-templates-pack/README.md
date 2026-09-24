@@ -2,7 +2,7 @@
 
 28 templates: the 8 originals, then 20 whose placeholder art is a drawn scene (`src/features/invitations/renderer/scenes`) — the hero, the gallery poster and the cover's card draw it until the template's media exist. Each folder: `manifest.json` (TemplateManifest v2), `defaults.json` (TemplateDefaults — HE+EN seed copy per event type), `ASSETS.md` (checklist of media files to produce).
 
-Install: copy each folder to `public/templates/<id>/` (JSON files may instead live in `src/templates/<id>/` — follow the build prompt). Media files are produced with `invitation-templates-kit-he.md`; until they exist, the app renders placeholders.
+Install: the manifests and defaults are read from this folder by the app (src/features/invitations/templates/registry.ts). Media files are produced with `invitation-templates-kit-he.md` and uploaded to the Supabase Storage bucket `template-media` (docs/template-media.md); until they exist, the app renders its own art.
 
 `tier` (optional, `standard` by default): `premium` designs carry a "Premium" badge in the gallery. Font pairs: a template's own pairs come first in the editor; the font library (`src/features/invitations/fonts/library.json`, ids `lib-…`, reserved) adds pairs any template can use.
 

@@ -10,7 +10,7 @@ Look: 1920s art deco: brushed gold on onyx black, geometric lines, champagne gla
 
 Until these files exist the invitation shows its scene (`src/features/invitations/renderer/scenes/deco-gatsby.tsx`) — keep the media in the same palette and composition (calm centre for the names).
 
-Put files in `public/templates/deco-gatsby/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `deco-gatsby/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

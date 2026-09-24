@@ -102,7 +102,14 @@ test.describe('the opening', () => {
     await expect(page.locator('html')).toHaveAttribute('data-opened', '1', { timeout: 20_000 });
     await expect(page.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
     await expect(page.locator('.fab-music')).toHaveAttribute('aria-pressed', 'true');
-    expect(await page.locator('audio').evaluate((a: HTMLAudioElement) => a.currentTime)).toBeGreaterThan(5);
+    // it began at the host's second — the 12s track loops, so on a slow machine it may have wrapped
+    // around by now: what it played shows where it started
+    const starts = await page
+      .locator('audio')
+      .evaluate((a: HTMLAudioElement) =>
+        Array.from({ length: a.played.length }, (_, i) => a.played.start(i)),
+      );
+    expect(starts.some((s) => s >= 4.9)).toBe(true);
   });
 
   test('a browser that won’t start the music by itself: the button calls for the tap that plays it', async ({
@@ -347,7 +354,8 @@ test.describe('share screen', () => {
     await expect(message).toHaveValue(new RegExp(`^היי! 💌\\nנועה & איתי\\n.*2027\\n.*\\n${url}$`));
 
     await page.getByRole('button', { name: 'העתקה', exact: true }).click();
-    await expect(page.getByText('הקישור הועתק')).toBeVisible();
+    // exact: the toast's screen-reader announcement ("התראה הקישור הועתק") is on the page for a moment too
+    await expect(page.getByText('הקישור הועתק', { exact: true })).toBeVisible();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(url);
 
     await message.fill(`מחכים לכם!\n${url}`);

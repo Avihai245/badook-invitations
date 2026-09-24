@@ -10,7 +10,7 @@ Look: Real neon signs in the dark, a soft halo, reflections on a glossy floor, l
 
 Until these files exist the invitation shows its scene (`src/features/invitations/renderer/scenes/neon-night.tsx`) — keep the media in the same palette and composition (calm centre for the names).
 
-Put files in `public/templates/neon-night/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `neon-night/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

@@ -4,7 +4,7 @@
 
 Cover: `pouch` · overlay `medallion` · exit `lift` · categories: bar_mitzvah, bat_mitzvah
 
-Put files in `public/templates/atara/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `atara/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

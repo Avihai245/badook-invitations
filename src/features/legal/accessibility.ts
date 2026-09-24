@@ -36,13 +36,13 @@ export function accessibilityDoc(c: LegalContext): LegalDoc {
           body: [
             {
               list: [
-                'Every part can be used with a keyboard alone, with a visible focus indicator; a “skip to content” link opens each app page.',
+                'Every part can be used with a keyboard alone, with a visible focus indicator; the site’s pages and the app’s main screens open with a “skip to content” link.',
                 'Semantic structure (headings, lists, landmarks, tables) and accessible names for buttons and fields, for screen readers such as NVDA, JAWS and VoiceOver.',
                 'Contrast between text and background meets level AA; information is never given by colour alone.',
                 'Text can be enlarged up to 200% without losing content; pages adapt to phones and tablets.',
                 'Form fields have labels, errors are described in words and announced, and the first error receives the focus.',
                 'Moving content can be stopped: the home page’s background video has a pause button, and animations stop for visitors whose device asks for reduced motion.',
-                'An accessibility menu (the button at the side of every page): larger text, high contrast, highlighted links, a readable font, line spacing, stopping animations and a large cursor.',
+                'An accessibility menu (the round button floating on the left of every page of the site and the app): larger text, high contrast, highlighted links, a readable font, line spacing, stopping animations and a large cursor.',
                 'Each area of the app has a “?” button that explains what every button there does.',
                 'Invitations: the opening animation can be skipped, music starts only after the guest taps and can be turned off, and the RSVP form is fully keyboard- and screen-reader-accessible.',
               ],
@@ -105,13 +105,13 @@ export function accessibilityDoc(c: LegalContext): LegalDoc {
         body: [
           {
             list: [
-              'כל חלק באתר אפשר להפעיל עם מקלדת בלבד, עם סימון פוקוס בולט; בכל עמוד במערכת יש קישור ״דילוג לתוכן״.',
+              'כל חלק באתר אפשר להפעיל עם מקלדת בלבד, עם סימון פוקוס בולט; עמודי האתר והמסכים הראשיים במערכת נפתחים בקישור ״דילוג לתוכן״.',
               'מבנה סמנטי (כותרות, רשימות, אזורים וטבלאות) ושמות נגישים לכפתורים ולשדות, לתוכנות קוראות מסך כמו NVDA, JAWS ו־VoiceOver.',
               'הניגודיות בין הטקסט לרקע עומדת ברמה AA, ומידע אף פעם לא מועבר רק באמצעות צבע.',
               'אפשר להגדיל את הטקסט עד 200% בלי לאבד תוכן, והעמודים מתאימים את עצמם לטלפונים ולטאבלטים.',
               'לשדות בטפסים יש תוויות, שגיאות מתוארות במילים ומוקראות, והפוקוס עובר לשגיאה הראשונה.',
               'אפשר לעצור תוכן בתנועה: לסרטון הרקע בעמוד הבית יש כפתור עצירה, והאנימציות נעצרות אצל מי שהמכשיר שלו מבקש תנועה מופחתת.',
-              'תפריט נגישות (הכפתור בצד כל עמוד): הגדלת טקסט, ניגודיות גבוהה, הדגשת קישורים, גופן קריא, ריווח שורות, עצירת אנימציות וסמן גדול.',
+              'תפריט נגישות (הכפתור העגול שצף בצד שמאל של כל עמוד באתר ובמערכת): הגדלת טקסט, ניגודיות גבוהה, הדגשת קישורים, גופן קריא, ריווח שורות, עצירת אנימציות וסמן גדול.',
               'לכל אזור במערכת יש כפתור ״?״ שמסביר מה כל כפתור בו עושה.',
               'בהזמנות: אפשר לדלג על אנימציית הפתיחה, המוזיקה מתחילה רק אחרי לחיצה של האורח ואפשר לכבות אותה, וטופס אישור ההגעה נגיש במלואו במקלדת ובקורא מסך.',
             ],

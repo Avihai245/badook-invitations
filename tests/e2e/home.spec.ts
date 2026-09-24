@@ -78,11 +78,11 @@ test('the sample invitation in a phone: without and with the YouTube video; exte
   const sample = page.locator('#sample');
   await sample.scrollIntoViewIfNeeded();
   const phone = sample.locator('iframe');
-  await expect(phone).toHaveAttribute('src', '/i/noa-and-itay?lang=he');
+  await expect(phone).toHaveAttribute('src', '/i/noa-and-itay-classic?lang=he');
   await expect(phone).toHaveAttribute('title', 'הזמנה לדוגמה בטלפון · בלי סרטון');
   // exactly a phone's screen, whatever the visitor's screen
   expect(await phone.evaluate((el) => [el.clientWidth, el.clientHeight])).toEqual([390, 844]);
-  expect((await page.request.get('/i/noa-and-itay?lang=he')).status()).toBe(200);
+  expect((await page.request.get('/i/noa-and-itay-classic?lang=he')).status()).toBe(200);
 
   // with a video: the same invitation, playing the video from 3:27
   await sample.getByRole('radio', { name: 'עם סרטון ברקע' }).click();

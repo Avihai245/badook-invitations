@@ -4,7 +4,7 @@
 
 Cover: `envelope_seal` · overlay `tag` · exit `lift` · categories: wedding, engagement, henna
 
-Put files in `public/templates/ramon-dusk/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `ramon-dusk/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

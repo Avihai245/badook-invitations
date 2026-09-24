@@ -111,7 +111,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
                 'Account information: as long as the account is open.',
                 'Invitations, guest lists and RSVPs: until the host deletes them, or deletes the account. Hosts can delete a guest, a reply or a whole invitation at any time.',
                 'After an account is deleted its information is erased within 30 days, and from backups within 90 days.',
-                'Payment and invoice records: seven years, as tax law requires.',
+                'Payment and invoice records: kept by our payment provider (PayPlus) for seven years, as tax law requires; the copies in our own system are erased with the account.',
                 'Hashed IP addresses used against abuse: up to 30 days.',
                 'Messages sent through the contact form: up to two years.',
               ],
@@ -133,7 +133,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           id: 'cookies',
           heading: '9. Cookies',
           body: [
-            'We use essential cookies to run the site. External content on the site’s own pages (videos from YouTube in its privacy-enhanced mode, Vimeo, Google Maps) loads by default, and you can turn it off at any time. The cookie policy has the details, and the “Cookie settings” link at the bottom of every page changes your choice.',
+            'We use essential cookies to run the site. External content on the site’s own pages (videos from YouTube in its privacy-enhanced mode, Vimeo, Google Maps) loads by default, and you can turn it off at any time. The cookie policy has the details, and the “Cookie settings” link at the bottom of the site’s pages changes your choice.',
           ],
         },
         {
@@ -270,7 +270,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'פרטי החשבון: כל עוד החשבון פתוח.',
               'הזמנות, רשימות מוזמנים ואישורי הגעה: עד שהמארח מוחק אותם או את החשבון. אפשר למחוק מוזמן, תשובה או הזמנה שלמה בכל רגע.',
               'אחרי מחיקת חשבון, המידע שלו נמחק תוך 30 יום, ומהגיבויים תוך 90 יום.',
-              'רישומי תשלומים וחשבוניות: שבע שנים, כפי שדיני המס מחייבים.',
+              'רישומי תשלומים וחשבוניות: נשמרים אצל ספק התשלומים שלנו (PayPlus) שבע שנים, כפי שדיני המס מחייבים; העותקים במערכת שלנו נמחקים עם החשבון.',
               'גיבובי כתובות IP לחסימת שימוש לרעה: עד 30 יום.',
               'הודעות מטופס יצירת הקשר: עד שנתיים.',
             ],
@@ -292,7 +292,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
         id: 'cookies',
         heading: '9. עוגיות',
         body: [
-          'אנחנו משתמשים בעוגיות חיוניות להפעלת האתר. תוכן חיצוני בעמודי האתר עצמו (סרטונים מ־YouTube במצב הפרטיות המוגברת שלו, Vimeo ומפות Google) נטען כברירת מחדל, ואפשר לכבות אותו בכל רגע. כל הפרטים במדיניות העוגיות, ובקישור ״הגדרות עוגיות״ בתחתית כל עמוד אפשר לשנות את הבחירה.',
+          'אנחנו משתמשים בעוגיות חיוניות להפעלת האתר. תוכן חיצוני בעמודי האתר עצמו (סרטונים מ־YouTube במצב הפרטיות המוגברת שלו, Vimeo ומפות Google) נטען כברירת מחדל, ואפשר לכבות אותו בכל רגע. כל הפרטים במדיניות העוגיות, ובקישור ״הגדרות עוגיות״ בתחתית עמודי האתר אפשר לשנות את הבחירה.',
         ],
       },
       {

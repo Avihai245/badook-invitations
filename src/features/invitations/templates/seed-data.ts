@@ -10,7 +10,7 @@
 import { createHash } from 'node:crypto';
 import { InvitationDocumentSchema } from '../contracts/schemas';
 import type { EventType, InvitationDocument, TemplateManifest } from '../contracts/types';
-import { FIXTURES, SAMPLES, demoDocument, videoSampleDocument } from './demo';
+import { FIXTURES, SAMPLES, demoDocument, classicSampleDocument, videoSampleDocument } from './demo';
 import { TEMPLATES } from './registry';
 
 export const DEMO_OWNER_ID = '00000000-0000-4000-8000-00000000d3e0';
@@ -42,6 +42,7 @@ export function demoInvitations(): { slug: string; doc: InvitationDocument }[] {
   const out: { slug: string; doc: InvitationDocument }[] = [];
   for (const doc of Object.values(FIXTURES)) out.push({ slug: doc.share.slug, doc: structuredClone(doc) });
   // the home page's second sample: the wedding example with a YouTube video behind the opening
+  out.push({ slug: SAMPLES.classic, doc: classicSampleDocument() });
   out.push({ slug: SAMPLES.video, doc: videoSampleDocument() });
   for (const { manifest, defaults } of TEMPLATES.values()) {
     (Object.keys(defaults.defaults) as EventType[]).forEach((type, i) => {

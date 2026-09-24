@@ -56,7 +56,7 @@ export function cookiesDoc(c: LegalContext): LegalDoc {
           id: 'choice',
           heading: '4. Changing your choice',
           body: [
-            'The “Cookie settings” link at the bottom of every page reopens the notice. You can also delete or block cookies in your browser’s settings; blocking essential cookies will stop signing in from working.',
+            'The “Cookie settings” link at the bottom of the site’s pages reopens the notice. You can also delete or block cookies in your browser’s settings; blocking essential cookies will stop signing in from working.',
           ],
         },
       ],
@@ -109,7 +109,7 @@ export function cookiesDoc(c: LegalContext): LegalDoc {
         id: 'choice',
         heading: '4. שינוי הבחירה',
         body: [
-          'הקישור ״הגדרות עוגיות״ בתחתית כל עמוד פותח שוב את ההודעה. אפשר גם למחוק או לחסום עוגיות בהגדרות הדפדפן; חסימת העוגיות החיוניות תמנע התחברות למערכת.',
+          'הקישור ״הגדרות עוגיות״ בתחתית עמודי האתר פותח שוב את ההודעה. אפשר גם למחוק או לחסום עוגיות בהגדרות הדפדפן; חסימת העוגיות החיוניות תמנע התחברות למערכת.',
         ],
       },
     ],

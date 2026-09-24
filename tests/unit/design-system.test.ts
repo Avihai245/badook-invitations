@@ -72,8 +72,11 @@ describe('placeholder art', () => {
     expect(hasPlaceholderArt(id)).toBe(true);
   });
 
-  it('sahar-bordeaux (the design reference) gets no scrim', () => {
-    expect(placeholderScrim(placeholderArt('sahar-bordeaux'))).toBe('none');
+  it('sahar-bordeaux (the design reference’s pale sunset) is deepened under the text too', () => {
+    // its hero text measured 2.2–2.9:1 on the reference's sky; the scrim brings it past WCAG AA
+    expect(placeholderScrim(placeholderArt('sahar-bordeaux'))).toBe(
+      'linear-gradient(180deg,#FFFFFF 4%,#A87070 24%,#A87070 100%)',
+    );
   });
 
   it('pale skies get a multiply scrim in their shade, untouched at the top', () => {

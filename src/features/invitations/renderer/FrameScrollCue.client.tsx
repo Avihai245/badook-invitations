@@ -3,18 +3,15 @@
 import { useEffect, useState } from 'react';
 import { Icon } from '../ui/Icon';
 
-/** Marks <html data-framed> before the first paint when the invitation is shown inside another page. */
-export const FRAMED_BOOT =
-  "try{if(window.self!==window.top)document.documentElement.setAttribute('data-framed','')}catch(e){document.documentElement.setAttribute('data-framed','')}";
-
 /** Less than this left to scroll: the end of the invitation, no arrow. */
 const END_PX = 48;
 
 /**
- * The invitation inside a phone frame (the site's sample, the gallery's preview, the editor): a phone
- * shows no scrollbar (invitation.css hides it under <html data-framed>), so this floating arrow says
- * there is more below — and scrolls about a screen down. It stays away while the cover is closed and
- * while the hero's own arrow is on screen, and goes once the end is reached.
+ * The invitation inside a phone frame (the site's sample, the gallery's preview, the editor — <html
+ * data-framed>, set by FRAMED_BOOT in ./framed.ts): a phone shows no scrollbar (invitation.css hides
+ * it), so this floating arrow says there is more below — and scrolls about a screen down. It stays
+ * away while the cover is closed and while the hero's own arrow is on screen, and goes once the end
+ * is reached.
  */
 export function FrameScrollCue() {
   const [framed, setFramed] = useState(false);

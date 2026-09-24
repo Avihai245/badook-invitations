@@ -4,7 +4,7 @@
 
 Cover: `gatefold` · overlay `medallion` · exit `lift` · categories: wedding, engagement
 
-Put files in `public/templates/papercut-gold/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `papercut-gold/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

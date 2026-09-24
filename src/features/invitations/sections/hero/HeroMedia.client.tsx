@@ -43,12 +43,15 @@ export function HeroVideo({
   poster,
   focal,
   sound,
+  calm = false,
 }: {
   src: string;
   poster: string | null;
   focal: string;
   /** the host's volume when its sound is the music (0..1), else null */
   sound: number | null;
+  /** the live page: a guest who prefers less motion gets the first frame (the editor shows it playing) */
+  calm?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
@@ -64,9 +67,15 @@ export function HeroVideo({
         v.volume = sound;
       }
     } else v.muted = true;
+    // a guest who prefers less motion gets the first frame — unless the video is the soundtrack
+    if (calm && sound === null && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay');
+      v.pause();
+      return;
+    }
     kick(v);
     return onFirstTap(() => kick(v));
-  }, [src, sound]);
+  }, [src, sound, calm]);
   return (
     <video
       ref={ref}
@@ -170,6 +179,7 @@ export function HeroEmbed({
   sound,
   captions = false,
   start,
+  calm = false,
 }: {
   link: VideoLink;
   poster: string | null;
@@ -177,6 +187,8 @@ export function HeroEmbed({
   captions?: boolean;
   /** the second it starts from (the host's link had ?t=…); YouTube also loops back to it */
   start?: number;
+  /** the live page: a guest who prefers less motion gets the still (the editor shows it playing) */
+  calm?: boolean;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [origin, setOrigin] = useState<string | null>(null);
@@ -190,8 +202,14 @@ export function HeroEmbed({
   const nextStill = () => setStillAt((i) => i + 1);
   const vertical = link.provider === 'youtube' && link.vertical;
 
-  // the player's API needs this page's origin: only known in the browser (the iframe is client-only)
-  useEffect(() => setOrigin(window.location.origin), []);
+  // the player's API needs this page's origin: only known in the browser (the iframe is client-only).
+  // No player — the still stays — for a guest who prefers less motion (unless the video is the
+  // soundtrack), or inside the site's sample when its visitor turned external content off (?external=0).
+  useEffect(() => {
+    const external = new URLSearchParams(window.location.search).get('external') !== '0';
+    const still = calm && !sound && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (external && !still) setOrigin(window.location.origin);
+  }, [sound, calm]);
 
   useEffect(() => {
     if (!origin) return;

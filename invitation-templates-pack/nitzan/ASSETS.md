@@ -4,7 +4,7 @@
 
 Cover: `swaddle` · overlay `tag` · exit `lift` · categories: brit, baby_shower
 
-Put files in `public/templates/nitzan/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `nitzan/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

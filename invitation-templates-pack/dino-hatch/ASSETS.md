@@ -10,7 +10,7 @@ Look: Chunky, colourful dinosaur illustration, a smoking volcano, ferns — chee
 
 Until these files exist the invitation shows its scene (`src/features/invitations/renderer/scenes/dino-hatch.tsx`) — keep the media in the same palette and composition (calm centre for the names).
 
-Put files in `public/templates/dino-hatch/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `dino-hatch/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

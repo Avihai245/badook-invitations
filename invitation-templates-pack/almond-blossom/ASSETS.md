@@ -10,7 +10,7 @@ Look: An almond tree blooming at Tu BiShvat: dark branches, white-pink flowers, 
 
 Until these files exist the invitation shows its scene (`src/features/invitations/renderer/scenes/almond-blossom.tsx`) — keep the media in the same palette and composition (calm centre for the names).
 
-Put files in `public/templates/almond-blossom/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `almond-blossom/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

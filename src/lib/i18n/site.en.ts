@@ -37,7 +37,7 @@ export const siteEn: typeof siteHe = {
     open: 'Open full screen',
     points: {
       classic: [
-        'An envelope that opens with a tap, and a song that starts with it',
+        'An envelope that opens with a tap, and a song of your choice that starts with it',
         'Venue, schedule, directions in Waze and Google Maps, add to calendar',
         'RSVP in a few seconds, straight into your list',
       ],

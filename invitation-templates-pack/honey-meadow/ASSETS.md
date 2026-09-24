@@ -4,7 +4,7 @@
 
 Cover: `envelope_seal` · overlay `wax_seal` · exit `crack` · categories: baby_shower, birthday, brit
 
-Put files in `public/templates/honey-meadow/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `honey-meadow/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

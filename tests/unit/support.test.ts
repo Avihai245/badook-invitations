@@ -84,6 +84,9 @@ describe('the support assistant', () => {
     expect(manualAnswer('qwertyuiop zxcvbnm', k, 'en')).toBe(
       "I couldn't find that in the guide. You can ask the team through the contact form: https://invitations.example.com/contact",
     );
+    // words like "what" or "how" alone never pick a line
+    expect(manualAnswer('מה איך אפשר?', k, 'he')).toMatch(/^לא מצאתי את זה במדריך/);
+    expect(manualAnswer('how can I do what?', k, 'en')).toMatch(/^I couldn't find that/);
   });
 
   it('reads the streamed answer, whatever the pieces', async () => {
@@ -114,11 +117,55 @@ describe('the support assistant', () => {
     ).toBe('חלק');
   });
 
+  it('an answer that stops early says so', async () => {
+    const { textFromEvents } = await import('@/features/support/chat');
+    const cut = () => ' [cut]';
+    // the length limit
+    expect(
+      await read(
+        textFromEvents(
+          sse([
+            delta('ארוך'),
+            { type: 'message_delta', delta: { stop_reason: 'max_tokens' } },
+            { type: 'message_stop' },
+          ]),
+          () => 'F',
+          cut,
+        ),
+      ),
+    ).toBe('ארוך [cut]');
+    // the stream ends without the API saying it's done, or the API fails midway
+    expect(await read(textFromEvents(sse([delta('חצי')]), () => 'F', cut))).toBe('חצי [cut]');
+    expect(
+      await read(
+        textFromEvents(
+          sse([delta('חלק'), { type: 'error', error: { type: 'overloaded_error' } }]),
+          () => 'F',
+          cut,
+        ),
+      ),
+    ).toBe('חלק [cut]');
+    // a complete answer has no note
+    expect(
+      await read(
+        textFromEvents(
+          sse([
+            delta('שלם'),
+            { type: 'message_delta', delta: { stop_reason: 'end_turn' } },
+            { type: 'message_stop' },
+          ]),
+          () => 'F',
+          cut,
+        ),
+      ),
+    ).toBe('שלם');
+  });
+
   it('asks the API with the cached rules, the screen, and only the conversation', async () => {
     const { supportChat } = await import('@/features/support/chat');
     const fetchImpl = vi.fn(
       async () =>
-        new Response(sse([delta('תשובה')]), {
+        new Response(sse([delta('תשובה'), { type: 'message_stop' }]), {
           status: 200,
           headers: { 'content-type': 'text/event-stream' },
         }),

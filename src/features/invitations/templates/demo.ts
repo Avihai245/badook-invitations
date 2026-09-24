@@ -17,14 +17,31 @@ export const FIXTURES = {
 export type FixtureId = keyof typeof FIXTURES;
 
 /**
- * The site's sample invitations (the home page shows them in a phone): the wedding example as it is,
- * and the same one with a YouTube video behind its opening screen — how a background video looks.
+ * The site's sample invitations (the home page shows them in a phone): the wedding example with a
+ * still picture behind its opening screen, and the same one with a YouTube video there — how a
+ * background video looks. (The kit's own fixture, noa-and-itay, stays as it is for the tests.)
  */
 export const SAMPLES = {
-  classic: 'noa-and-itay',
+  classic: 'noa-and-itay-classic',
   video: 'noa-and-itay-video',
 } as const;
 export const SAMPLE_VIDEO_LINK = 'https://www.youtube.com/watch?v=5GvcO2lufGU&t=207';
+
+/** The "without a video" sample: a still behind the names, whatever media the template gets later. */
+export function classicSampleDocument(): InvitationDocument {
+  const doc = structuredClone(FIXTURES['wedding-he-en']);
+  doc.share.slug = SAMPLES.classic;
+  for (const section of doc.sections) {
+    if (section.type !== 'hero') continue;
+    section.data.media = {
+      kind: 'image',
+      src: 'template:hero-poster',
+      poster: null,
+      focalPoint: section.data.media.focalPoint,
+    };
+  }
+  return doc;
+}
 
 export function videoSampleDocument(): InvitationDocument {
   const doc = structuredClone(FIXTURES['wedding-he-en']);

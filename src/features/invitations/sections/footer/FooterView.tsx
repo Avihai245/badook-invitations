@@ -51,6 +51,16 @@ export function FooterView({ section, ctx }: SectionViewProps<SectionOf<'footer'
           </p>
         ) : null}
         {d.showCredit ? <p className="credit">{ctx.t('footer.madeWith', { brand: ctx.brand })}</p> : null}
+        {/* guests reach the accessibility statement and the privacy policy from every invitation */}
+        <p className="f-legal">
+          <a href="/accessibility" target="_blank" rel="noopener">
+            {ctx.t('footer.accessibility')}
+          </a>
+          <span aria-hidden="true"> · </span>
+          <a href="/privacy" target="_blank" rel="noopener">
+            {ctx.t('footer.privacy')}
+          </a>
+        </p>
       </div>
     </footer>
   );

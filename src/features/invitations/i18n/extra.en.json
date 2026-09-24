@@ -1,4 +1,6 @@
 {
+  "footer.accessibility": "Accessibility statement",
+  "footer.privacy": "Privacy",
   "timeline.tapToReveal": "(tap to reveal)",
   "map.label": "Map: {name}",
   "rsvp.closed": "RSVPs are closed",

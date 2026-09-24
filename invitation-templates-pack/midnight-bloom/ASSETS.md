@@ -10,7 +10,7 @@ Look: 17th-century Dutch still life: saturated flowers on deep black, warm side 
 
 Until these files exist the invitation shows its scene (`src/features/invitations/renderer/scenes/midnight-bloom.tsx`) — keep the media in the same palette and composition (calm centre for the names).
 
-Put files in `public/templates/midnight-bloom/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `midnight-bloom/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

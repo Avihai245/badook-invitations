@@ -10,7 +10,7 @@ Look: A 1960s-inspired still: martini, olives, candles, black-and-white checks, 
 
 Until these files exist the invitation shows its scene (`src/features/invitations/renderer/scenes/martini-olive.tsx`) — keep the media in the same palette and composition (calm centre for the names).
 
-Put files in `public/templates/martini-olive/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `martini-olive/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

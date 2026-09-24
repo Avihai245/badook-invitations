@@ -1,4 +1,4 @@
-/** The support assistant (the chat on every page) — Hebrew. */
+/** The support assistant (the chat in the signed-in app) — Hebrew. */
 export const supportHe = {
   open: 'עזרה: שאלו את העוזר',
   launcher: 'צריכים עזרה?',

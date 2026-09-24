@@ -6,7 +6,21 @@
   inset: 0;
   overflow: hidden;
   container-type: size;
-  background: #1a130e;
+  /* under the still and the video: warm, slowly moving light — what shows when YouTube can't load */
+  background:
+    radial-gradient(38% 45% at 22% 30%, rgba(214, 145, 92, 0.55), transparent 70%),
+    radial-gradient(34% 40% at 78% 64%, rgba(178, 76, 99, 0.45), transparent 70%),
+    radial-gradient(30% 36% at 55% 18%, rgba(243, 201, 160, 0.35), transparent 70%), #1a130e;
+  background-size: 140% 140%;
+  animation: site-aurora 18s ease-in-out infinite alternate;
+}
+@keyframes site-aurora {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
 }
 .site-video .site-video-still {
   position: absolute;
@@ -333,8 +347,10 @@ html[data-a11y-links] a {
   outline: 2px solid #b45309;
   outline-offset: 2px;
 }
+/* a readable font for the interface — not for what shows a font on purpose (design posters, font
+   pickers, the scenes' invitations), which set theirs inline, nor for what is inside them */
 html[data-a11y-readable] body,
-html[data-a11y-readable] body * {
+html[data-a11y-readable] body *:not([style*='font-family'], [style*='font-family'] *) {
   font-family: Arial, 'Heebo', Helvetica, sans-serif !important;
 }
 html[data-a11y-spacing] body * {
@@ -367,6 +383,7 @@ html[data-a11y-cursor] * {
   .site-glow,
   .site-title-accent,
   .site-scroll-cue,
+  .site-video,
   .site-video .site-video-still {
     animation: none !important;
     transition: none !important;

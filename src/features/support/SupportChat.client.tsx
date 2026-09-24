@@ -135,7 +135,8 @@ const INLINE = new RegExp(
 /** A link only when it leads to this site; anything else stays text (an answer can't send people away). */
 function internalPath(url: string): string | null {
   const clean = url.replace(/[.,;:!?'"»”]+$/, '');
-  if (/^\/(?!\/)/.test(clean)) return clean;
+  // a path of this site — not `//host` or `/\host`, which browsers read as another site
+  if (/^\/(?![/\\])/.test(clean)) return clean;
   try {
     const u = new URL(clean);
     return u.origin === window.location.origin ? `${u.pathname}${u.search}${u.hash}` : null;

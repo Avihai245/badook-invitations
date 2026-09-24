@@ -76,9 +76,26 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
 
   let media = null;
   if (link) {
-    media = <HeroEmbed link={link} poster={poster} sound={sound} captions={d.captions} start={link.start} />;
+    media = (
+      <HeroEmbed
+        link={link}
+        poster={poster}
+        sound={sound}
+        captions={d.captions}
+        start={link.start}
+        calm={ctx.mode === 'live'}
+      />
+    );
   } else if (d.media.kind === 'video' && src) {
-    media = <HeroVideo src={src} poster={poster} focal={focal} sound={sound ? doc.music.volume : null} />;
+    media = (
+      <HeroVideo
+        src={src}
+        poster={poster}
+        focal={focal}
+        sound={sound ? doc.music.volume : null}
+        calm={ctx.mode === 'live'}
+      />
+    );
   } else if (d.media.kind === 'video' && poster) {
     media = <img src={poster} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
   } else if (d.media.kind === 'image' && src) {

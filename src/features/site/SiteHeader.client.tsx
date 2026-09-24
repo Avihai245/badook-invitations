@@ -7,7 +7,7 @@ import { BrandLogo, Button, cn } from '@/components/app';
 import { UiLanguageToggle } from '@/app/(site)/UiLanguageToggle';
 import { useUi } from '@/lib/i18n/client';
 
-const SECTIONS = ['sample', 'designs', 'how', 'pricing', 'faq'] as const;
+const SECTIONS = ['sample', 'how', 'designs', 'pricing', 'faq'] as const;
 
 /**
  * The public site's header: the brand, links to the home page's sections, the UI language, sign-in

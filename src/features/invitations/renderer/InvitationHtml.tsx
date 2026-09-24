@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { dirOf, type InvitationDocument, type Locale, type TemplateManifest } from '../contracts/types';
 import { displayFontPreloads, fontFaceCss, templateFontFamilies } from '../fonts';
-import { FRAMED_BOOT, FrameScrollCue } from './FrameScrollCue.client';
+import { FrameScrollCue } from './FrameScrollCue.client';
+import { FRAMED_BOOT } from './framed';
 import { resolveFontPair, themeMode, themeVars } from './theme';
 
 /**

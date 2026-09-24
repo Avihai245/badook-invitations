@@ -6,7 +6,8 @@ import { Icon } from '../../ui/Icon';
 /**
  * A venue's map (§2.2 Venues, §7 performance): the static placeholder until it comes near the
  * viewport, then Google's key-less embed on top of it, faded in once loaded. Without `src` (editor
- * and previews) it stays the placeholder. The class list never changes after mount: RevealObserver
+ * and previews), or with ?external=0 (the site's sample when its visitor turned external content
+ * off), it stays the placeholder. The class list never changes after mount: RevealObserver
  * adds `in` to it directly.
  */
 export function MapEmbed({
@@ -24,7 +25,8 @@ export function MapEmbed({
 
   useEffect(() => {
     const el = ref.current;
-    if (!src || !el) return;
+    // inside the site's sample when its visitor turned external content off: the drawing stays
+    if (!src || !el || new URLSearchParams(window.location.search).get('external') === '0') return;
     if (typeof IntersectionObserver === 'undefined') {
       setNear(true);
       return;

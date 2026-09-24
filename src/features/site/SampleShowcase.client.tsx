@@ -122,7 +122,8 @@ export function SampleShowcase({
           ) : (
             <PhoneFrame
               key={`${kind}-${run}`}
-              src={samples[kind]}
+              // external content off: the classic sample shows its map as a drawing too
+              src={mediaAllowed(consent) ? samples[kind] : `${samples[kind]}&external=0`}
               title={labels.frameTitle.replace('{kind}', name)}
               scale={scale}
               loading="lazy"

@@ -4,7 +4,7 @@
 
 Cover: `envelope_seal` · overlay `wax_seal` · exit `crack` · categories: wedding, engagement, save_the_date
 
-Put files in `public/templates/sahar-bordeaux/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `sahar-bordeaux/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

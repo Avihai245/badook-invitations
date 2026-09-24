@@ -10,7 +10,7 @@ Look: A Marrakech riad at night: green zellige, pierced brass, warm candlelight,
 
 Until these files exist the invitation shows its scene (`src/features/invitations/renderer/scenes/marrakech.tsx`) — keep the media in the same palette and composition (calm centre for the names).
 
-Put files in `public/templates/marrakech/`. Prompts: see invitation-templates-kit-he.md §5.
+Upload them to the Supabase Storage bucket `template-media`, folder `marrakech/`, then run `npm run media:sync` (docs/template-media.md). Prompts: see invitation-templates-kit-he.md §5.
 
 | file | spec | notes |
 |---|---|---|

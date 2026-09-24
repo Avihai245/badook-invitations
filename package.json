@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "fonts": "node scripts/build-fonts.mjs --write-index",
+    "fonts": "node scripts/build-fonts.mjs",
     "templates:validate": "tsx scripts/validate-templates.ts",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -24,6 +24,7 @@
     "qa:screens": "tsx scripts/qa-screens.ts",
     "qa:app-ui": "node scripts/qa-app-ui.mjs",
     "db:seed": "tsx scripts/seed.ts",
+    "media:sync": "tsx scripts/media-sync.ts",
     "test:db": "vitest run --config vitest.db.config.ts",
     "qa:host": "node scripts/qa-host.mjs"
   },
