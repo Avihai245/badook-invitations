@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { fontFaceCss, templateFontFamilies } from '@/features/invitations/fonts';
+import { FrameScrollCue } from '@/features/invitations/renderer/FrameScrollCue.client';
 import { getTemplate } from '@/features/invitations/templates/registry';
 import '@/features/invitations/ui/invitation.css';
 import { assertInvitationsEnabled } from '@/lib/feature';
@@ -31,11 +32,22 @@ export default async function PreviewFrameLayout({
   const entry = getTemplate((await params).template);
   if (!entry) notFound();
   return (
-    <html lang="he" dir="rtl" data-template={entry.manifest.id} data-opened="1" suppressHydrationWarning>
+    // always inside the editor's phone frame: data-framed (no scrollbar, a floating arrow instead)
+    <html
+      lang="he"
+      dir="rtl"
+      data-template={entry.manifest.id}
+      data-opened="1"
+      data-framed=""
+      suppressHydrationWarning
+    >
       <head>
         <style dangerouslySetInnerHTML={{ __html: fontFaceCss(templateFontFamilies(entry.manifest)) }} />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        {children}
+        <FrameScrollCue />
+      </body>
     </html>
   );
 }

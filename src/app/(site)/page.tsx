@@ -29,6 +29,10 @@ import { parseVideoLink } from '@/features/invitations/lib/video-links';
 import { SAMPLES } from '@/features/invitations/templates/demo';
 import { requireTemplate, TEMPLATES } from '@/features/invitations/templates/registry';
 import { BackgroundVideo } from '@/features/site/BackgroundVideo.client';
+import { FeatureSpotlight } from '@/features/site/home/FeatureSpotlight.client';
+import { HowItWorks } from '@/features/site/home/HowItWorks';
+import { Journey } from '@/features/site/home/Journey';
+import type { FeatureKey, MomentKey } from '@/features/site/home/scenes';
 import { Petals } from '@/features/site/Petals';
 import { PlanCards } from '@/features/site/PlanCards';
 import { Reveal } from '@/features/site/Reveal.client';
@@ -38,7 +42,10 @@ import { SiteHeader } from '@/features/site/SiteHeader.client';
 import { invitationsEnabled } from '@/lib/feature';
 import { fmt } from '@/lib/i18n/app';
 import { getUi } from '@/lib/i18n/server';
+import '@/styles/site-home.css';
 
+/** The designs fanned out in "how it works" (the last one is in front). */
+const FAN = ['kalanit', 'midnight-bloom', 'sahar-bordeaux'] as const;
 /** The three phones of the first screen: [left, center, right]. */
 const PHONES = ['papercut-gold', 'sahar-bordeaux', 'rooftop-dusk'] as const;
 /** The event types the band under the first screen names. */
@@ -150,21 +157,21 @@ export default async function HomePage() {
       </main>
     );
   }
-  const features: { icon: ReactNode; title: string; body: string }[] = [
-    { icon: <Sparkles />, ...h.features.opening },
-    { icon: <ListChecks />, ...h.features.rsvp },
-    { icon: <MessageCircle />, ...h.features.share },
-    { icon: <Clapperboard />, ...h.features.video },
-    { icon: <Languages />, ...h.features.languages },
-    { icon: <CalendarHeart />, ...h.features.saveTheDate },
+  const features: { key: FeatureKey; icon: ReactNode; title: string; body: string }[] = [
+    { key: 'opening', icon: <Sparkles />, ...h.features.opening },
+    { key: 'rsvp', icon: <ListChecks />, ...h.features.rsvp },
+    { key: 'share', icon: <MessageCircle />, ...h.features.share },
+    { key: 'video', icon: <Clapperboard />, ...h.features.video },
+    { key: 'languages', icon: <Languages />, ...h.features.languages },
+    { key: 'saveTheDate', icon: <CalendarHeart />, ...h.features.saveTheDate },
   ];
-  const more: { icon: ReactNode; title: string; body: string }[] = [
-    { icon: <FileSpreadsheet />, ...s.more.items.guests },
-    { icon: <UserRound />, ...s.more.items.personal },
-    { icon: <Send />, ...s.more.items.whatsapp },
-    { icon: <Users />, ...s.more.items.statuses },
-    { icon: <Bot />, ...s.more.items.assistant },
-    { icon: <CircleHelp />, ...s.more.items.help },
+  const more: { key: MomentKey; icon: ReactNode; title: string; body: string }[] = [
+    { key: 'guests', icon: <FileSpreadsheet />, ...s.more.items.guests },
+    { key: 'personal', icon: <UserRound />, ...s.more.items.personal },
+    { key: 'whatsapp', icon: <Send />, ...s.more.items.whatsapp },
+    { key: 'statuses', icon: <Users />, ...s.more.items.statuses },
+    { key: 'assistant', icon: <Bot />, ...s.more.items.assistant },
+    { key: 'help', icon: <CircleHelp />, ...s.more.items.help },
   ];
   const designs = [...TEMPLATES.values()].map(({ manifest }) => manifest);
   const number = (v: number) => new Intl.NumberFormat(locale === 'he' ? 'he-IL' : 'en-GB').format(v);
@@ -335,30 +342,34 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ── how it works ──────────────────────────────────────────────────────────────────── */}
-        <section id="how" className="scroll-mt-16 border-y border-line bg-surface">
+        {/* ── how it works: three live scenes along a path ──────────────────────────────────── */}
+        <section
+          id="how"
+          className="relative isolate scroll-mt-16 overflow-hidden border-y border-line bg-surface"
+        >
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10"
+            style={{
+              background:
+                'radial-gradient(40% 55% at 12% 20%, #FBF3EA 0%, transparent 70%), radial-gradient(38% 50% at 90% 85%, #F8EBE4 0%, transparent 70%)',
+            }}
+          />
           <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-24">
             <SectionTitle title={h.how.title} className="text-center" />
-            <ol className="relative mt-12 grid gap-5 md:grid-cols-3">
-              <span
-                aria-hidden
-                className="absolute inset-x-[16%] top-[52px] h-px bg-[linear-gradient(90deg,transparent,var(--color-brand-line)_15%,var(--color-brand-line)_85%,transparent)] max-md:hidden"
-              />
-              {h.how.steps.map((step, i) => (
-                <Reveal
-                  as="li"
-                  key={step.title}
-                  delay={i * 140}
-                  className="site-lift relative rounded-[20px] border border-line bg-canvas p-7"
-                >
-                  <span className="relative grid size-12 place-items-center rounded-full bg-brand font-display text-[20px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(122,82,48,0.8)]">
-                    {i + 1}
-                  </span>
-                  <h3 className="mt-5 text-[18px] font-bold">{step.title}</h3>
-                  <p className="mt-2 text-[15px] text-pretty text-muted">{step.body}</p>
-                </Reveal>
+            <HowItWorks
+              steps={h.how.steps}
+              s={s.scenes}
+              posters={FAN.map((id) => (
+                <TemplatePoster
+                  key={id}
+                  template={requireTemplate(id).manifest}
+                  locale={locale}
+                  text={posterSample(id, locale)}
+                  frameless
+                />
               ))}
-            </ol>
+            />
           </div>
         </section>
 
@@ -377,14 +388,30 @@ export default async function HomePage() {
           <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
             {designs.map((manifest, i) => (
               <Reveal as="li" key={manifest.id} delay={(i % 4) * 90}>
-                <div className="site-lift rounded-[var(--radius-poster)]">
-                  <TemplatePoster
-                    template={manifest}
-                    locale={locale}
-                    text={posterSample(manifest.id, locale)}
-                    className="shadow-[0_18px_36px_-18px_rgba(60,35,15,0.45)]"
-                  />
-                </div>
+                {/* each design opens its live demo, as guests would get it */}
+                <a
+                  href={`/i/demo-${manifest.id}?lang=${locale}`}
+                  target="_blank"
+                  rel="noopener"
+                  aria-label={`${manifest.name[locale] ?? manifest.name.en} · ${t.gallery.preview.liveDemo}`}
+                  className="group relative block rounded-[var(--radius-poster)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
+                >
+                  <span className="site-lift block rounded-[var(--radius-poster)]">
+                    <TemplatePoster
+                      template={manifest}
+                      locale={locale}
+                      text={posterSample(manifest.id, locale)}
+                      className="shadow-[0_18px_36px_-18px_rgba(60,35,15,0.45)]"
+                    />
+                  </span>
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-0 bottom-3 mx-auto flex w-fit items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-[12.5px] font-semibold text-white opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 [&_svg]:size-3.5"
+                  >
+                    <Play fill="currentColor" />
+                    {h.sample}
+                  </span>
+                </a>
                 <p className="mt-3 text-[15px] font-semibold">{manifest.name[locale] ?? manifest.name.en}</p>
                 <p className="text-[13px] text-muted">
                   {manifest.categories
@@ -397,68 +424,34 @@ export default async function HomePage() {
           </ul>
         </section>
 
-        {/* ── what it does ──────────────────────────────────────────────────────────────────── */}
-        <section className="bg-blush/70">
+        {/* ── everything an invitation needs: a phone that shows each feature live ──────────── */}
+        <section className="relative isolate overflow-hidden bg-blush/70">
           <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-24">
             <SectionTitle title={h.features.title} className="text-center" />
-            <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {features.map((f, i) => (
-                <Reveal
-                  as="li"
-                  key={f.title}
-                  delay={(i % 3) * 110}
-                  className="site-lift rounded-[20px] bg-surface p-6 shadow-sm ring-1 ring-line"
-                >
-                  <span
-                    aria-hidden
-                    className="grid size-12 place-items-center rounded-[14px] bg-brand-soft text-brand [&_svg]:size-[22px]"
-                  >
-                    {f.icon}
-                  </span>
-                  <h3 className="mt-4 text-[17px] font-bold">{f.title}</h3>
-                  <p className="mt-1.5 text-[14.5px] text-pretty text-muted">{f.body}</p>
-                </Reveal>
-              ))}
-            </ul>
+            <Reveal className="mt-12" delay={100}>
+              <FeatureSpotlight items={features} s={s.scenes} label={h.features.title} />
+            </Reveal>
           </div>
         </section>
 
-        {/* ── from the invitation to the big day (dark band) ────────────────────────────────── */}
+        {/* ── from the invitation to the big day: a lit path through six moments (dark band) ── */}
         <section className="relative isolate overflow-hidden bg-[#1c1510] text-white">
           <div
             aria-hidden
             className="absolute inset-0 -z-10"
             style={{
               background:
-                'radial-gradient(50% 60% at 15% 0%, rgba(160,112,63,.45), transparent 70%), radial-gradient(45% 55% at 100% 100%, rgba(181,82,59,.35), transparent 70%)',
+                'radial-gradient(50% 40% at 15% 0%, rgba(160,112,63,.45), transparent 70%), radial-gradient(45% 35% at 100% 100%, rgba(181,82,59,.35), transparent 70%)',
             }}
           />
-          <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-24">
-            <Reveal className="max-w-2xl">
+          <div className="mx-auto max-w-[1100px] px-5 py-20 sm:px-6 lg:py-24">
+            <Reveal className="mx-auto max-w-2xl text-center">
               <h2 className="font-display text-[32px] leading-tight font-bold text-balance sm:text-[42px]">
                 {s.more.title}
               </h2>
               <p className="mt-3 text-[17px] text-pretty text-white/75">{s.more.subtitle}</p>
             </Reveal>
-            <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {more.map((f, i) => (
-                <Reveal
-                  as="li"
-                  key={f.title}
-                  delay={(i % 3) * 110}
-                  className="rounded-[20px] border border-white/10 bg-white/[0.06] p-6 backdrop-blur transition-colors hover:bg-white/[0.1]"
-                >
-                  <span
-                    aria-hidden
-                    className="grid size-11 place-items-center rounded-[12px] bg-[#e7a977]/20 text-[#f3c9a0] [&_svg]:size-5"
-                  >
-                    {f.icon}
-                  </span>
-                  <h3 className="mt-4 text-[17px] font-bold">{f.title}</h3>
-                  <p className="mt-1.5 text-[14.5px] text-pretty text-white/70">{f.body}</p>
-                </Reveal>
-              ))}
-            </ul>
+            <Journey items={more} s={s.scenes} />
           </div>
         </section>
 

@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { dirOf, type InvitationDocument, type Locale, type TemplateManifest } from '../contracts/types';
 import { displayFontPreloads, fontFaceCss, templateFontFamilies } from '../fonts';
+import { FRAMED_BOOT, FrameScrollCue } from './FrameScrollCue.client';
 import { resolveFontPair, themeMode, themeVars } from './theme';
 
 /**
@@ -38,9 +39,14 @@ export function InvitationHtml({
         <style dangerouslySetInnerHTML={{ __html: fontCss }} />
         {/* Reveal animations only when JS runs — without it everything stays visible. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.remove('no-js')" }} />
+        {/* inside another page's frame: no scrollbar, a floating arrow instead (FrameScrollCue) */}
+        <script dangerouslySetInnerHTML={{ __html: FRAMED_BOOT }} />
       </head>
       {/* the cover locks scroll before hydration (body.locked) — expected attribute difference */}
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        {children}
+        <FrameScrollCue />
+      </body>
     </html>
   );
 }

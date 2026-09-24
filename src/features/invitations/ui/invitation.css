@@ -557,6 +557,64 @@ a {
   bottom: calc(16px + env(safe-area-inset-bottom));
   inset-inline-end: 16px;
 }
+/* Inside another page's frame (FrameScrollCue: the site's sample phone, the gallery's preview, the
+   editor) the invitation shows no scrollbar, like on a phone — a floating arrow says there's more. */
+html[data-framed] {
+  scrollbar-width: none;
+}
+html[data-framed]::-webkit-scrollbar,
+html[data-framed] body::-webkit-scrollbar {
+  display: none;
+}
+.frame-cue {
+  position: fixed;
+  z-index: 39;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  margin-left: -23px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--inv-accent-text);
+  background: color-mix(in srgb, var(--inv-surface) 78%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--inv-accent) 45%, var(--inv-line));
+  box-shadow:
+    0 10px 28px -10px rgb(0 0 0 / 0.45),
+    0 0 0 6px color-mix(in srgb, var(--inv-accent) 12%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.9);
+  transition:
+    opacity 0.4s,
+    transform 0.4s var(--ease);
+}
+.frame-cue[data-shown] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+.frame-cue[data-shown] svg {
+  animation: frame-cue 2s var(--ease) infinite;
+}
+@keyframes frame-cue {
+  0%,
+  100% {
+    transform: translateY(-2px);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .frame-cue[data-shown] svg {
+    animation: none;
+  }
+}
 /* the browser wouldn't start the music by itself: the button asks for the one tap it needs */
 .fab-music[data-blocked] {
   border-color: var(--inv-accent);
