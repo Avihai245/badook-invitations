@@ -16,7 +16,8 @@ import type { PublishedInvitation } from './published';
 /**
  * POST /api/invitations/rsvp (§4, §6, §9): everything except I/O, so it is unit-testable.
  * Order: size → JSON → schema → honeypot (fake success) → timing → invitation → rate limit →
- * deadline → rules of the invitation's RSVP section → sanitize → one-transaction write.
+ * deadline → rules of the invitation's RSVP section → sanitize → one-transaction write. The site's
+ * sample invitations go through the same checks but store nothing (`demo: true` in the answer).
  */
 
 export const MAX_BODY_BYTES = 20 * 1024;
@@ -66,11 +67,16 @@ export interface RsvpDeps {
   ipHashSalt: string;
   /** a personal link's guest in this invitation (null: not one of its tokens) */
   guestId?(invitationId: string, token: string): Promise<string | null>;
+  /** one of the site's sample invitations: replies are checked, never stored (INVITES_DEMO_RSVP) */
+  isDemo?(invitationId: string): Promise<boolean>;
 }
+
+/** The answer; `demo`: a sample invitation's reply — the form thanks the guest, nothing was kept. */
+export type RsvpReply = RsvpResult | (Extract<RsvpResult, { ok: true }> & { demo: true });
 
 export interface RsvpOutcome {
   status: number;
-  body: RsvpResult;
+  body: RsvpReply;
   /** a reply really saved (not the honeypot's fake success): what the host notification needs */
   saved?: { invitationId: string; doc: InvitationDocument; reply: ReplySummary };
 }
@@ -270,8 +276,10 @@ export async function handleRsvp(raw: string, ip: string | null, deps: RsvpDeps)
   const { doc } = invitation;
   if (!doc.locales.includes(sub.locale)) return fail(400, 'invalid');
 
+  // visitors try the samples with their real names and phones: nothing of it is kept (not even a hit)
+  const demo = (await deps.isDemo?.(invitation.id)) ?? false;
   const ipHash = ip && deps.ipHashSalt ? sha256(`${deps.ipHashSalt}:${ip}`) : null;
-  if (!(await deps.rateHit(invitation.id, ipHash ?? 'unknown'))) return fail(429, 'rate_limited');
+  if (!demo && !(await deps.rateHit(invitation.id, ipHash ?? 'unknown'))) return fail(429, 'rate_limited');
 
   if (doc.event.rsvpDeadline && deps.now() > endOfDayUtc(doc.event.rsvpDeadline, doc.timezone).getTime()) {
     return fail(409, 'closed');
@@ -280,14 +288,20 @@ export async function handleRsvp(raw: string, ip: string | null, deps: RsvpDeps)
   const fieldErrors = validateAgainstConfig(sub, section.data);
   if (Object.keys(fieldErrors).length) return fail(400, 'invalid', fieldErrors);
 
+  const token = newToken();
+  if (demo)
+    return { status: 200, body: { ok: true, responseId: randomUUID(), editToken: token, demo: true } };
+
   const { response, attendees } = toRows(sub, section.data, ipHash);
   if (sub.guestToken && deps.guestId) response.guest_id = await deps.guestId(invitation.id, sub.guestToken);
-  const token = newToken();
+  // A personal link finds its guest's reply by itself. The browser's edit token only serves replies
+  // through the general link: on a shared browser it may be another guest's reply.
+  const existingTokenHash = sub.editToken && !response.guest_id ? sha256(sub.editToken) : null;
   const saved = await deps.submit({
     invitationId: invitation.id,
     response,
     attendees,
-    existingTokenHash: sub.editToken ? sha256(sub.editToken) : null,
+    existingTokenHash,
     newTokenHash: sha256(token),
   });
   return {
@@ -295,7 +309,7 @@ export async function handleRsvp(raw: string, ip: string | null, deps: RsvpDeps)
     body: {
       ok: true,
       responseId: saved.id,
-      editToken: saved.replaced && sub.editToken ? sub.editToken : token,
+      editToken: saved.replaced && existingTokenHash && sub.editToken ? sub.editToken : token,
     },
     saved: {
       invitationId: invitation.id,

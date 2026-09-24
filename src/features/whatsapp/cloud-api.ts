@@ -24,7 +24,23 @@ export interface TemplateMessage {
   ref: string;
 }
 
+/**
+ * `retryable`: tried again later (with a wait). A request that may have reached Meta (a timeout, a
+ * dropped connection) never is — Meta may have sent it already: it fails as 'timeout'.
+ */
 export type SendResult = { ok: true; id: string } | { ok: false; error: string; retryable: boolean };
+
+/** Meta's "slow down" answers and its own hiccups (API, WABA and pair rate limits, maintenance). */
+const RETRY_LATER = new Set([4, 80007, 130429, 131016, 131048, 131056, 131057]);
+/** Connections that never opened: the request didn't reach Meta. */
+const NOT_CONNECTED = new Set([
+  'ECONNREFUSED',
+  'ENOTFOUND',
+  'EAI_AGAIN',
+  'ENETUNREACH',
+  'EHOSTUNREACH',
+  'UND_ERR_CONNECT_TIMEOUT',
+]);
 
 export function cloudApiConfigured(): boolean {
   const env = serverEnv();
@@ -72,7 +88,11 @@ export async function sendTemplate(m: TemplateMessage, fetchImpl: typeof fetch =
       signal: AbortSignal.timeout(15_000),
     });
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'network', retryable: true };
+    const e = err as { code?: unknown; cause?: { code?: unknown } } | null;
+    const code = e?.cause?.code ?? e?.code;
+    if (typeof code === 'string' && NOT_CONNECTED.has(code))
+      return { ok: false, error: code, retryable: true };
+    return { ok: false, error: 'timeout', retryable: false };
   }
   const json = (await res.json().catch(() => null)) as {
     messages?: { id?: string }[];
@@ -83,18 +103,33 @@ export async function sendTemplate(m: TemplateMessage, fetchImpl: typeof fetch =
   const e = json?.error;
   const error =
     [e?.code, e?.error_data?.details ?? e?.message].filter(Boolean).join(' · ') || `HTTP ${res.status}`;
-  // throughput / rate limits and Meta's own hiccups: try again later; the rest won't get better
-  const retryable = res.status >= 500 || res.status === 429 || e?.code === 130429 || e?.code === 131056;
+  // rate limits and Meta's own hiccups: try again later; the rest won't get better
+  const retryable = res.status >= 500 || res.status === 429 || RETRY_LATER.has(Number(e?.code));
   return { ok: false, error, retryable };
 }
 
 /** X-Hub-Signature-256: "sha256=" + hex HMAC-SHA256 of the raw body with the app secret. */
 export function validSignature(raw: string, header: string | null, secret: string): boolean {
   if (!secret || !header?.startsWith('sha256=')) return false;
-  const expected = createHmac('sha256', secret).update(raw, 'utf8').digest('hex');
   const given = header.slice(7);
-  if (given.length !== expected.length) return false;
-  return timingSafeEqual(Buffer.from(given, 'hex'), Buffer.from(expected, 'hex'));
+  // anything but 64 hex digits isn't a signature (and would make timingSafeEqual throw)
+  if (!/^[0-9a-f]{64}$/i.test(given)) return false;
+  const expected = createHmac('sha256', secret).update(raw, 'utf8').digest();
+  return timingSafeEqual(Buffer.from(given, 'hex'), expected);
+}
+
+/** The `value` of every change in a webhook delivery (entry[].changes[].value). */
+function changeValues(payload: unknown): Record<string, unknown>[] {
+  const entries = (payload as { entry?: unknown[] } | null)?.entry;
+  if (!Array.isArray(entries)) return [];
+  return entries.flatMap((entry) => {
+    const changes = (entry as { changes?: unknown[] } | null)?.changes;
+    if (!Array.isArray(changes)) return [];
+    return changes.flatMap((change) => {
+      const value = (change as { value?: unknown } | null)?.value;
+      return value && typeof value === 'object' ? [value as Record<string, unknown>] : [];
+    });
+  });
 }
 
 export interface StatusUpdate {
@@ -106,31 +141,56 @@ export interface StatusUpdate {
 /** The message statuses in a webhook delivery (entry[].changes[].value.statuses[]). */
 export function statusesOf(payload: unknown): StatusUpdate[] {
   const out: StatusUpdate[] = [];
-  const entries = (payload as { entry?: unknown[] } | null)?.entry;
-  if (!Array.isArray(entries)) return out;
-  for (const entry of entries) {
-    const changes = (entry as { changes?: unknown[] }).changes;
-    if (!Array.isArray(changes)) continue;
-    for (const change of changes) {
-      const statuses = (change as { value?: { statuses?: unknown[] } }).value?.statuses;
-      if (!Array.isArray(statuses)) continue;
-      for (const s of statuses) {
-        const st = s as {
-          id?: unknown;
-          status?: unknown;
-          errors?: { code?: number; title?: string; message?: string; error_data?: { details?: string } }[];
-        };
-        if (typeof st.id !== 'string' || !['sent', 'delivered', 'read', 'failed'].includes(String(st.status)))
-          continue;
-        const e = st.errors?.[0];
-        out.push({
-          id: st.id,
-          status: st.status as StatusUpdate['status'],
-          error: e
-            ? [e.code, e.error_data?.details ?? e.message ?? e.title].filter(Boolean).join(' · ')
-            : null,
-        });
-      }
+  for (const value of changeValues(payload)) {
+    const statuses = value.statuses;
+    if (!Array.isArray(statuses)) continue;
+    for (const s of statuses) {
+      const st = s as {
+        id?: unknown;
+        status?: unknown;
+        errors?: { code?: number; title?: string; message?: string; error_data?: { details?: string } }[];
+      };
+      if (typeof st.id !== 'string' || !['sent', 'delivered', 'read', 'failed'].includes(String(st.status)))
+        continue;
+      const e = st.errors?.[0];
+      out.push({
+        id: st.id,
+        status: st.status as StatusUpdate['status'],
+        error: e ? [e.code, e.error_data?.details ?? e.message ?? e.title].filter(Boolean).join(' · ') : null,
+      });
+    }
+  }
+  return out;
+}
+
+export interface InboundMessage {
+  /** the sender, E.164 */
+  from: string;
+  /** what they wrote, or the label of the button they tapped */
+  text: string;
+}
+
+/** Messages guests sent to the system's number (entry[].changes[].value.messages[]). */
+export function inboundOf(payload: unknown): InboundMessage[] {
+  const out: InboundMessage[] = [];
+  for (const value of changeValues(payload)) {
+    const messages = value.messages;
+    if (!Array.isArray(messages)) continue;
+    for (const m of messages) {
+      const msg = m as {
+        from?: unknown;
+        text?: { body?: unknown };
+        button?: { text?: unknown; payload?: unknown };
+        interactive?: { button_reply?: { title?: unknown } };
+      };
+      const from = typeof msg.from === 'string' ? msg.from.replace(/^\+/, '') : '';
+      const text = [
+        msg.text?.body,
+        msg.button?.text,
+        msg.button?.payload,
+        msg.interactive?.button_reply?.title,
+      ].find((v): v is string => typeof v === 'string');
+      if (/^[1-9]\d{6,14}$/.test(from) && text) out.push({ from: `+${from}`, text });
     }
   }
   return out;

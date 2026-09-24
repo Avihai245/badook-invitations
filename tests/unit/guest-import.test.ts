@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   csvCell,
+  decodeCsv,
+  isLegacyExcel,
+  MAX_IMPORT_ROWS,
   normalizeGuestPhone,
   parseCsv,
   readGuestRows,
+  whatsappCapable,
 } from '@/features/invitations/lib/guest-import';
 
 describe('guest list import', () => {
@@ -96,6 +100,104 @@ describe('guest list import', () => {
       ['Dana', '0501234567'],
     ]);
     expect(parseCsv('name\tphone\nDana\t0501234567')[1]).toEqual(['Dana', '0501234567']);
+  });
+
+  it('reads numbered and compound titles in Hebrew too, never a "Type" column, a mobile column first', () => {
+    const he = readGuestRows([
+      ['שם', 'טלפון 1', 'טלפון 2', 'מייל 1'],
+      ['דנה', '050-1234567', '03-1234567', 'dana@example.com'],
+    ]);
+    expect(he.mapping).toEqual({ name: 0, phone: 1, email: 3 });
+    expect(he.guests[0]).toMatchObject({ phone: '+972501234567', email: 'dana@example.com' });
+    // a contacts export: "… - Type" says what kind of number it is
+    const google = readGuestRows([
+      ['Name', 'E-mail 1 - Type', 'E-mail 1 - Value', 'Phone 1 - Type', 'Phone 1 - Value'],
+      ['Noa Cohen', '* Home', 'noa@example.com', 'Mobile', '054-111-2222'],
+    ]);
+    expect(google.mapping).toEqual({ name: 0, email: 2, phone: 4 });
+    expect(google.issues).toEqual([]);
+    const both = readGuestRows([
+      ['שם', 'טלפון', 'נייד'],
+      ['דנה', '03-1234567', '050-1234567'],
+    ]);
+    expect(both.guests[0]!.phone).toBe('+972501234567');
+  });
+
+  it('only a clear title is a party size: a bare "מספר" is the row number', () => {
+    const numbered = readGuestRows([
+      ['מספר', 'שם', 'טלפון'],
+      ['1', 'דנה', '0501234567'],
+      ['2', 'יוסי', '0527654321'],
+    ]);
+    expect(numbered.mapping.partySize).toBeUndefined();
+    expect(numbered.guests.map((g) => [g.name, g.partySize])).toEqual([
+      ['דנה', null],
+      ['יוסי', null],
+    ]);
+    // without a name title, the text column holds the names (not the numbers)
+    expect(
+      readGuestRows([
+        ['מספר', 'טלפון', ''],
+        ['1', '0501234567', 'דנה'],
+      ]).mapping,
+    ).toMatchObject({
+      phone: 1,
+      name: 2,
+    });
+    // "מוזמנים" / "guests": a head count when it holds small numbers, the names when it holds text
+    const counts = readGuestRows([
+      ['שם', 'מוזמנים'],
+      ['דנה', '2'],
+    ]);
+    expect(counts.mapping).toEqual({ name: 0, partySize: 1 });
+    expect(counts.guests[0]!.partySize).toBe(2);
+    const names = readGuestRows([
+      ['guests', 'phone'],
+      ['Dana Levi', '0501234567'],
+    ]);
+    expect(names.mapping).toEqual({ name: 0, phone: 1 });
+    expect(
+      readGuestRows([
+        ['שם', 'מספר מוזמנים'],
+        ['דנה', 3],
+      ]).guests[0]!.partySize,
+    ).toBe(3);
+  });
+
+  it('says how many rows past the limit it did not read', () => {
+    const sheet = [['שם'], ...Array.from({ length: MAX_IMPORT_ROWS + 3 }, (_, i) => [`אורח ${i}`])];
+    const r = readGuestRows(sheet);
+    expect(r.rows).toBe(MAX_IMPORT_ROWS);
+    expect(r.guests).toHaveLength(MAX_IMPORT_ROWS);
+    expect(r.truncated).toBe(3);
+    expect(readGuestRows([['שם'], ['דנה']]).truncated).toBe(0);
+  });
+
+  it("decodes CSV as UTF-8, or as Windows-1255 (Excel's plain CSV on Hebrew Windows)", () => {
+    const utf8 = new TextEncoder().encode('\uFEFFשם,טלפון\nדנה,0501234567');
+    expect(parseCsv(decodeCsv(utf8))).toEqual([
+      ['שם', 'טלפון'],
+      ['דנה', '0501234567'],
+    ]);
+    // "שם,טלפון" in Windows-1255
+    const cp1255 = new Uint8Array([0xf9, 0xed, 0x2c, 0xe8, 0xec, 0xf4, 0xe5, 0xef]);
+    expect(decodeCsv(cp1255)).toBe('שם,טלפון');
+    const utf16 = new Uint8Array([0xff, 0xfe, 0xe9, 0x05, 0xdd, 0x05]);
+    expect(decodeCsv(utf16)).toBe('שם');
+  });
+
+  it('knows an old .xls file by its first bytes', () => {
+    expect(isLegacyExcel(new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0]))).toBe(true);
+    expect(isLegacyExcel(new Uint8Array([0x50, 0x4b, 0x03, 0x04]))).toBe(false);
+    expect(isLegacyExcel(new Uint8Array([]))).toBe(false);
+  });
+
+  it('WhatsApp reaches Israeli mobiles only; other countries as they are', () => {
+    expect(whatsappCapable('+972501234567')).toBe(true);
+    expect(whatsappCapable('+97231234567')).toBe(false);
+    expect(whatsappCapable('+972771234567')).toBe(false);
+    expect(whatsappCapable('+442079460958')).toBe(true);
+    expect(whatsappCapable(null)).toBe(false);
   });
 
   it('writes CSV cells that Excel opens safely', () => {

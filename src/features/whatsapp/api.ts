@@ -18,6 +18,8 @@ const SendSchema = z.strictObject({
   guestIds: z.array(z.string().refine(isUuid)).min(1).max(5000),
   /** the host confirmed their guests expect this invitation (WhatsApp opt-in policy) */
   consent: z.literal(true),
+  /** also guests who already have the invitation (sent, opened, answered) — paid again */
+  resend: z.boolean().optional(),
 });
 
 /** Messages sent right away in the request; the page asks for the rest batch by batch. */
@@ -25,7 +27,9 @@ const FIRST_BATCH = 25;
 
 /**
  * POST /api/invitations/:id/whatsapp — queue the invitation for the chosen guests (one credit each),
- * then send a first batch. The platform's admins never run out of credits (they pay Meta directly).
+ * then send a first batch. Guests without WhatsApp (a landline), who asked us to stop, or — unless
+ * `resend` — who already have the invitation are left out and never charged (`skipped`). The
+ * platform's admins never run out of credits (they pay Meta directly).
  */
 export async function sendInvitations(userId: string, id: string, raw: unknown): Promise<ApiResult> {
   if (!isUuid(id)) return fail(404, 'not_found');
@@ -45,20 +49,29 @@ export async function sendInvitations(userId: string, id: string, raw: unknown):
     userId,
     parsed.data.guestIds,
     serverEnv().INVITES_WHATSAPP_PRICE_USD,
+    parsed.data.resend ?? false,
   );
   if (!queued) return fail(409, 'not_published');
+  const skipped = queued.skipped ? { skipped: queued.skipped } : {};
   if (!queued.ok)
     return queued.code === 'credits'
-      ? fail(402, 'credits', { needed: queued.needed, balance: queued.balance })
-      : fail(422, 'nobody');
+      ? fail(402, 'credits', { needed: queued.needed, balance: queued.balance, ...skipped })
+      : fail(422, 'nobody', skipped);
   const first = await processQueue(id, FIRST_BATCH);
   return ok({
     ok: true,
     queued: queued.queued,
     balance: queued.balance,
+    ...skipped,
     ...first,
-    pending: await whatsappDb.pending(id),
+    ...(await progress(id)),
   });
+}
+
+/** What's left of the invitation's queue: sendable now, and waiting for a later try. */
+async function progress(id: string) {
+  const [pending, waiting] = await Promise.all([whatsappDb.pending(id), whatsappDb.waiting(id)]);
+  return { pending, waiting: waiting.count, retryAt: waiting.nextAt };
 }
 
 /** POST /api/invitations/:id/whatsapp/process — the next batch of this invitation's queue. */
@@ -68,5 +81,5 @@ export async function continueSending(userId: string, id: string): Promise<ApiRe
   if (!inv) return fail(404, 'not_found');
   if (!cloudApiConfigured()) return fail(503, 'not_configured');
   const result = await processQueue(id, FIRST_BATCH);
-  return ok({ ok: true, ...result, pending: await whatsappDb.pending(id) });
+  return ok({ ok: true, ...result, ...(await progress(id)) });
 }

@@ -37,6 +37,15 @@ const deps = (): RsvpDeps => ({
   now: Date.now,
   ipHashSalt: serverEnv().INVITES_IP_HASH_SALT,
   guestId: (invitationId, token) => guestsDb.byToken(invitationId, token),
+  // the site's sample invitations keep no replies — unless INVITES_DEMO_RSVP=store (e2e tests)
+  isDemo:
+    serverEnv().INVITES_DEMO_RSVP === 'store'
+      ? undefined
+      : async (invitationId) => {
+          const { data, error } = await serviceDb().rpc('invitation_is_demo', { p_id: invitationId });
+          if (error) throw new Error(`invitation_is_demo failed: ${error.message}`);
+          return data === true;
+        },
 });
 
 /** Guest RSVP (§4): validated with the shared schema + the invitation's rules; written in one transaction. */
