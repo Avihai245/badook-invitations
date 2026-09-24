@@ -1,0 +1,237 @@
+{
+  "id": "coquette-bow",
+  "version": 2,
+  "name": {
+    "he": "פפיון",
+    "en": "Coquette Bow"
+  },
+  "description": {
+    "he": "רכות קוקטית — פפיונים מסאטן, מחרוזות פנינים, תחרה מסולסלת, דובדבנים ולבבות, הכל בוורוד אבקתי.",
+    "en": "Soft coquette charm — satin bows, strands of pearls, scalloped lace, cherries and hearts, all in powder pink."
+  },
+  "tier": "premium",
+  "categories": [
+    "bat_mitzvah",
+    "baby_shower",
+    "engagement"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/coquette-bow/preview.webp",
+  "previewVideo": "/templates/coquette-bow/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F9DFE4",
+      "surface": "#FFF8F6",
+      "ink": "#4A2C33",
+      "inkMuted": "#744F57",
+      "accent": "#B83D61",
+      "accentInk": "#FFFFFF",
+      "line": "#F0C3CD",
+      "heroText": "#4A2C33"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink"
+    ],
+    "radius": {
+      "card": 24,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "rose",
+      "name": {
+        "he": "ורד",
+        "en": "Rose"
+      },
+      "palette": {
+        "accent": "#B83D61"
+      }
+    },
+    {
+      "id": "cherry",
+      "name": {
+        "he": "דובדבן",
+        "en": "Cherry"
+      },
+      "palette": {
+        "accent": "#B32635"
+      }
+    },
+    {
+      "id": "lilac",
+      "name": {
+        "he": "לילך",
+        "en": "Lilac"
+      },
+      "palette": {
+        "accent": "#8A5AA8"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "coquette",
+      "display": {
+        "latin": "Ballet",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Bellefair"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "dainty",
+      "display": {
+        "latin": "Italiana",
+        "hebrew": "Miriam Libre"
+      },
+      "heading": {
+        "latin": "Josefin Sans",
+        "hebrew": "Miriam Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ribbon",
+    "renderer": "video",
+    "poster": "/templates/coquette-bow/cover-poster.webp",
+    "posterDesktop": "/templates/coquette-bow/cover-poster-desktop.webp",
+    "openVideo": "/templates/coquette-bow/cover-open.mp4",
+    "openVideoDesktop": "/templates/coquette-bow/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/coquette-bow/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#C9486D",
+      "#E9A3B4",
+      "#9E2F44"
+    ],
+    "monogramFont": {
+      "latin": "Ballet",
+      "hebrew": "Bellefair"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "סאטן ורוד ופנינים",
+          "en": "Pink satin and pearls"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#4A2C33",
+    "overlayColor": "#FFF8F6",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "coquette-bow-theme",
+    "tracks": [
+      {
+        "id": "coquette-bow-theme",
+        "title": "Pearls & Lace (music box)",
+        "url": "/templates/coquette-bow/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/coquette-bow/hero.mp4",
+    "hero-poster": "/templates/coquette-bow/hero-poster.webp",
+    "hero-desktop": "/templates/coquette-bow/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/coquette-bow/hero-desktop-poster.webp",
+    "lace-band": "/templates/coquette-bow/lace-band.webp",
+    "pearl-swags": "/templates/coquette-bow/pearl-swags.webp",
+    "cherries": "/templates/coquette-bow/cherries.webp",
+    "satin-bow": "/templates/coquette-bow/satin-bow.webp",
+    "bow": "/templates/coquette-bow/bow.webp"
+  },
+  "decorations": {
+    "afterHero": "template:lace-band",
+    "betweenVenues": "template:pearl-swags",
+    "afterTimeline": "template:cherries",
+    "beforeRsvp": "template:satin-bow",
+    "footer": "template:bow"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

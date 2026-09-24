@@ -1,0 +1,242 @@
+{
+  "id": "jasper-cameo",
+  "version": 2,
+  "name": {
+    "he": "קמיאו",
+    "en": "Jasper Cameo"
+  },
+  "description": {
+    "he": "רוקוקו בהשראת חרסינת ג׳ספר כחולה עם תבליט לבן — קמיאו סגלגל, זר דפנה, סרטים משתלשלים, עלי אקנתוס ומסגרת של פנינים.",
+    "en": "A rococo revival in blue jasperware and white relief — an oval cameo, a laurel wreath, ribbon swags, acanthus corners and a border of pearls."
+  },
+  "tier": "premium",
+  "categories": [
+    "wedding",
+    "engagement",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/jasper-cameo/preview.webp",
+  "previewVideo": "/templates/jasper-cameo/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#AFC6DE",
+      "surface": "#F7F4EE",
+      "ink": "#23324A",
+      "inkMuted": "#3F4D63",
+      "accent": "#B08F52",
+      "accentInk": "#1B2638",
+      "line": "#8FAACB",
+      "heroText": "#23324A"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "ink",
+      "accent"
+    ],
+    "radius": {
+      "card": 20,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "wedgwood",
+      "name": {
+        "he": "כחול ג׳ספר",
+        "en": "Jasper blue"
+      },
+      "palette": {
+        "bg": "#AFC6DE",
+        "ink": "#23324A"
+      }
+    },
+    {
+      "id": "sage",
+      "name": {
+        "he": "ירוק מרווה",
+        "en": "Sage jasper"
+      },
+      "palette": {
+        "bg": "#BCCFB5",
+        "ink": "#263A2B"
+      }
+    },
+    {
+      "id": "lilac",
+      "name": {
+        "he": "לילך",
+        "en": "Lilac jasper"
+      },
+      "palette": {
+        "bg": "#CBC0DB",
+        "ink": "#35284A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "cameo",
+      "display": {
+        "latin": "Bodoni Moda",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Bodoni Moda",
+        "hebrew": "Bellefair"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "rococo",
+      "display": {
+        "latin": "Pinyon Script",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ribbon",
+    "renderer": "video",
+    "poster": "/templates/jasper-cameo/cover-poster.webp",
+    "posterDesktop": "/templates/jasper-cameo/cover-poster-desktop.webp",
+    "openVideo": "/templates/jasper-cameo/cover-open.mp4",
+    "openVideoDesktop": "/templates/jasper-cameo/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/jasper-cameo/cameo-blank.png",
+      "recolor": true,
+      "size": 0.32,
+      "offset": {
+        "x": 0,
+        "y": -0.02
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#8FAACB",
+      "#9DB795",
+      "#A99BC2",
+      "#23324A"
+    ],
+    "monogramFont": {
+      "latin": "Bodoni Moda",
+      "hebrew": "Bellefair"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "חרסינה כחולה בתבליט לבן",
+          "en": "Blue jasperware in white relief"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#23324A",
+    "overlayColor": "#F7F4EE",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "jasper-cameo-theme",
+    "tracks": [
+      {
+        "id": "jasper-cameo-theme",
+        "title": "Minuet in Blue (string quartet)",
+        "url": "/templates/jasper-cameo/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/jasper-cameo/hero.mp4",
+    "hero-poster": "/templates/jasper-cameo/hero-poster.webp",
+    "hero-desktop": "/templates/jasper-cameo/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/jasper-cameo/hero-desktop-poster.webp",
+    "pearl-band": "/templates/jasper-cameo/pearl-band.webp",
+    "swag-panorama": "/templates/jasper-cameo/swag-panorama.webp",
+    "laurel-wreath": "/templates/jasper-cameo/laurel-wreath.webp",
+    "ribbon-bow": "/templates/jasper-cameo/ribbon-bow.webp",
+    "cameo": "/templates/jasper-cameo/cameo.webp"
+  },
+  "decorations": {
+    "afterHero": "template:pearl-band",
+    "betweenVenues": "template:swag-panorama",
+    "afterTimeline": "template:laurel-wreath",
+    "beforeRsvp": "template:ribbon-bow",
+    "footer": "template:cameo"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

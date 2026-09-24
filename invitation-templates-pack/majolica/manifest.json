@@ -1,0 +1,241 @@
+{
+  "id": "majolica",
+  "version": 2,
+  "name": {
+    "he": "מיוליקה",
+    "en": "Majolica Summer"
+  },
+  "description": {
+    "he": "קיץ על חוף אמלפי — אריחי מיוליקה בכחול קובלט, לימונים עם עלים, פרוסות הדרים וגגון מפוספס עם שוליים מסולסלים.",
+    "en": "Summer on the Amalfi coast — cobalt majolica tiles, lemons with their leaves, citrus slices and a striped awning with a scalloped edge."
+  },
+  "tier": "standard",
+  "categories": [
+    "wedding",
+    "engagement",
+    "baby_shower",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/majolica/preview.webp",
+  "previewVideo": "/templates/majolica/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FBF8F1",
+      "surface": "#FFFFFF",
+      "ink": "#1D2F6F",
+      "inkMuted": "#56648F",
+      "accent": "#2F55B5",
+      "accentInk": "#FFFFFF",
+      "line": "#DCE3F2",
+      "heroText": "#1D2F6F"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink"
+    ],
+    "radius": {
+      "card": 12,
+      "button": 8
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "cobalt",
+      "name": {
+        "he": "קובלט",
+        "en": "Cobalt"
+      },
+      "palette": {
+        "accent": "#2F55B5",
+        "ink": "#1D2F6F"
+      }
+    },
+    {
+      "id": "terracotta",
+      "name": {
+        "he": "טרקוטה",
+        "en": "Terracotta"
+      },
+      "palette": {
+        "accent": "#B5502B",
+        "ink": "#3B1F14"
+      }
+    },
+    {
+      "id": "olive",
+      "name": {
+        "he": "מטע זיתים",
+        "en": "Olive grove"
+      },
+      "palette": {
+        "accent": "#4F6B2A",
+        "ink": "#24301A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "amalfi",
+      "display": {
+        "latin": "Young Serif",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Young Serif",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "riviera",
+      "display": {
+        "latin": "Playfair Display",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Playfair Display",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/majolica/cover-poster.webp",
+    "posterDesktop": "/templates/majolica/cover-poster-desktop.webp",
+    "openVideo": "/templates/majolica/cover-open.mp4",
+    "openVideoDesktop": "/templates/majolica/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/majolica/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#2F55B5",
+      "#E5B21E",
+      "#E07A1F"
+    ],
+    "monogramFont": {
+      "latin": "Young Serif",
+      "hebrew": "Suez One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "מרפסת לימונים מול הים",
+          "en": "A lemon terrace above the sea"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#1D2F6F",
+    "overlayColor": "#FFFFFF",
+    "defaultOverlay": 0.4
+  },
+  "music": {
+    "defaultTrackId": "majolica-theme",
+    "tracks": [
+      {
+        "id": "majolica-theme",
+        "title": "Limoncello (mandolin & guitar)",
+        "url": "/templates/majolica/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/majolica/hero.mp4",
+    "hero-poster": "/templates/majolica/hero-poster.webp",
+    "hero-desktop": "/templates/majolica/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/majolica/hero-desktop-poster.webp",
+    "tile-band": "/templates/majolica/tile-band.webp",
+    "coast-panorama": "/templates/majolica/coast-panorama.webp",
+    "lemon-branch": "/templates/majolica/lemon-branch.webp",
+    "citrus-slices": "/templates/majolica/citrus-slices.webp",
+    "lemon": "/templates/majolica/lemon.webp"
+  },
+  "decorations": {
+    "afterHero": "template:tile-band",
+    "betweenVenues": "template:coast-panorama",
+    "afterTimeline": "template:lemon-branch",
+    "beforeRsvp": "template:citrus-slices",
+    "footer": "template:lemon"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

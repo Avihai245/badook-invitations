@@ -241,10 +241,12 @@ export const en: AppDict = {
     barBat: 'Bar/Bat mitzvah',
     playPreview: 'Play the {name} preview',
     noResults: 'No designs for this event type yet.',
+    premium: 'Premium',
     preview: {
       title: '{name}',
       palettes: 'Colors',
       fonts: 'Fonts',
+      moreFonts: 'More fonts',
       liveDemo: 'Live demo in a new tab',
       use: 'Use this design',
       phoneLabel: 'Live preview of {name}',

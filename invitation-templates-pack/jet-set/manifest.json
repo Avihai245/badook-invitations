@@ -1,0 +1,237 @@
+{
+  "id": "jet-set",
+  "version": 2,
+  "name": {
+    "he": "דרכון",
+    "en": "Jet-Set Passport"
+  },
+  "description": {
+    "he": "תעופה רטרו — מסגרת של דואר אוויר, חותמות ויזה, מסלול טיסה מקווקו עם מטוס, ברקוד ותג מזוודה. כרטיס עלייה למטוס אל האירוע שלכם.",
+    "en": "Retro air travel — an airmail chevron border, visa stamps, a dashed flight path with a plane, a barcode stub and a luggage tag. A boarding pass to your celebration."
+  },
+  "tier": "premium",
+  "categories": [
+    "wedding",
+    "save_the_date",
+    "corporate",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/jet-set/preview.webp",
+  "previewVideo": "/templates/jet-set/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#D6EAF5",
+      "surface": "#FFFDF7",
+      "ink": "#1F2A44",
+      "inkMuted": "#4E586C",
+      "accent": "#F26B38",
+      "accentInk": "#1F2A44",
+      "line": "#B8D4E6",
+      "heroText": "#1F2A44"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 12,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "orange",
+      "name": {
+        "he": "כתום מסלול",
+        "en": "Runway orange"
+      },
+      "palette": {
+        "accent": "#F26B38",
+        "accentInk": "#1F2A44"
+      }
+    },
+    {
+      "id": "red",
+      "name": {
+        "he": "אדום דואר",
+        "en": "Airmail red"
+      },
+      "palette": {
+        "accent": "#C8322F",
+        "accentInk": "#FFFFFF"
+      }
+    },
+    {
+      "id": "navy",
+      "name": {
+        "he": "כחול טייס",
+        "en": "Pilot navy"
+      },
+      "palette": {
+        "accent": "#2E4B8F",
+        "accentInk": "#FFFFFF"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "boarding",
+      "display": {
+        "latin": "Space Mono",
+        "hebrew": "Cousine"
+      },
+      "heading": {
+        "latin": "Space Mono",
+        "hebrew": "Cousine"
+      },
+      "body": {
+        "latin": "Space Mono",
+        "hebrew": "Cousine"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "departures",
+      "display": {
+        "latin": "Bebas Neue",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "video",
+    "poster": "/templates/jet-set/cover-poster.webp",
+    "posterDesktop": "/templates/jet-set/cover-poster-desktop.webp",
+    "openVideo": "/templates/jet-set/cover-open.mp4",
+    "openVideoDesktop": "/templates/jet-set/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#1F2A44",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Space Mono",
+      "hebrew": "Cousine"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "מבט מחלון המטוס",
+          "en": "The view from a plane window"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#1F2A44",
+    "overlayColor": "#FFFDF7",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "jet-set-theme",
+    "tracks": [
+      {
+        "id": "jet-set-theme",
+        "title": "Take Off (bossa nova)",
+        "url": "/templates/jet-set/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/jet-set/hero.mp4",
+    "hero-poster": "/templates/jet-set/hero-poster.webp",
+    "hero-desktop": "/templates/jet-set/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/jet-set/hero-desktop-poster.webp",
+    "airmail-band": "/templates/jet-set/airmail-band.webp",
+    "flight-panorama": "/templates/jet-set/flight-panorama.webp",
+    "stamps": "/templates/jet-set/stamps.webp",
+    "luggage-tag": "/templates/jet-set/luggage-tag.webp",
+    "plane": "/templates/jet-set/plane.webp"
+  },
+  "decorations": {
+    "afterHero": "template:airmail-band",
+    "betweenVenues": "template:flight-panorama",
+    "afterTimeline": "template:stamps",
+    "beforeRsvp": "template:luggage-tag",
+    "footer": "template:plane"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

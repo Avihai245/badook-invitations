@@ -1,0 +1,233 @@
+{
+  "id": "neon-night",
+  "version": 2,
+  "name": {
+    "he": "ניאון",
+    "en": "Neon Night"
+  },
+  "description": {
+    "he": "זוהר של אחרי חצות — צינורות ניאון כפולים עם הילה, ברק, שלט לב, מניפות לייזר ורצפת רשת בפרספקטיבה. מסיבה שמתחילה עוד לפני שנכנסים.",
+    "en": "An after-dark glow — double-stroke neon tubes with a halo, a lightning bolt, a heart sign, laser fans and a perspective grid floor. The party starts before you walk in."
+  },
+  "tier": "premium",
+  "categories": [
+    "bar_mitzvah",
+    "bat_mitzvah",
+    "birthday",
+    "corporate"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/neon-night/preview.webp",
+  "previewVideo": "/templates/neon-night/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#0B0A12",
+      "surface": "#17142B",
+      "ink": "#FFFFFF",
+      "inkMuted": "#A9A3C9",
+      "accent": "#FF2BD6",
+      "accentInk": "#0B0A12",
+      "line": "#2A2548",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 18,
+      "button": 999
+    },
+    "divider": "none"
+  },
+  "palettePresets": [
+    {
+      "id": "magenta",
+      "name": {
+        "he": "מג׳נטה",
+        "en": "Magenta"
+      },
+      "palette": {
+        "accent": "#FF2BD6"
+      }
+    },
+    {
+      "id": "cyan",
+      "name": {
+        "he": "טורקיז",
+        "en": "Cyan"
+      },
+      "palette": {
+        "accent": "#22E4FF"
+      }
+    },
+    {
+      "id": "lime",
+      "name": {
+        "he": "ליים",
+        "en": "Lime"
+      },
+      "palette": {
+        "accent": "#B6FF3B"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "neon",
+      "display": {
+        "latin": "Monoton",
+        "hebrew": "Rubik"
+      },
+      "heading": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "club",
+      "display": {
+        "latin": "Bebas Neue",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "video",
+    "poster": "/templates/neon-night/cover-poster.webp",
+    "posterDesktop": "/templates/neon-night/cover-poster-desktop.webp",
+    "openVideo": "/templates/neon-night/cover-open.mp4",
+    "openVideoDesktop": "/templates/neon-night/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Monoton",
+      "hebrew": "Rubik"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "מועדון מואר בניאון",
+          "en": "A club lit in neon"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0B0A12",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "neon-night-theme",
+    "tracks": [
+      {
+        "id": "neon-night-theme",
+        "title": "Afterglow (synthwave)",
+        "url": "/templates/neon-night/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 60,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/neon-night/hero.mp4",
+    "hero-poster": "/templates/neon-night/hero-poster.webp",
+    "hero-desktop": "/templates/neon-night/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/neon-night/hero-desktop-poster.webp",
+    "neon-band": "/templates/neon-night/neon-band.webp",
+    "grid-panorama": "/templates/neon-night/grid-panorama.webp",
+    "bolt": "/templates/neon-night/bolt.webp",
+    "heart-sign": "/templates/neon-night/heart-sign.webp",
+    "neon-star": "/templates/neon-night/neon-star.webp"
+  },
+  "decorations": {
+    "afterHero": "template:neon-band",
+    "betweenVenues": "template:grid-panorama",
+    "afterTimeline": "template:bolt",
+    "beforeRsvp": "template:heart-sign",
+    "footer": "template:neon-star"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

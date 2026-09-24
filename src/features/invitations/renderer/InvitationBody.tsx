@@ -9,6 +9,7 @@ import { GuestLink } from './guest.client';
 import { LiveLocale } from './live/LiveLocale.client';
 import type { LivePayload } from './live/payload';
 import { RevealObserver } from './RevealObserver.client';
+import { Scene } from './scenes';
 
 /**
  * A tap on the cover before React has taken over (its scripts still loading on a slow connection)
@@ -113,6 +114,9 @@ export function InvitationBody({
               hint={ctx.text(doc.cover.hint) || ctx.t('cover.hint')}
               skipLabel={ctx.t('cover.skip')}
               skipFromUrl={skipCoverFromUrl}
+              card={
+                ctx.art.scene ? <Scene id={ctx.art.scene} place="card" date={doc.event.date} /> : undefined
+              }
             />
           </>
         ) : (

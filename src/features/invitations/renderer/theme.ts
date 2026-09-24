@@ -1,6 +1,7 @@
 import type { FontPair, InvitationDocument, Locale, Palette, TemplateManifest } from '../contracts/types';
 import { headingColor, isDarkPalette, readableAccent } from '../lib/contrast';
 import { displayEmPerChar, fontStack, monogramStack } from '../fonts';
+import { findFontPair } from '../fonts/library';
 import { placeholderArt, placeholderScrim } from './placeholders';
 
 /** Template palette + the host's overrides, restricted to template.editablePaletteKeys. */
@@ -13,11 +14,12 @@ export function resolvePalette(template: TemplateManifest, doc: Pick<InvitationD
   return palette;
 }
 
+/** The document's font pair — one of the template's own or one from the font library — else the default. */
 export function resolveFontPair(
   template: TemplateManifest,
   doc: Pick<InvitationDocument, 'theme'>,
 ): FontPair {
-  return template.fontPairs.find((p) => p.id === doc.theme.fontPairId) ?? template.fontPairs[0]!;
+  return findFontPair(template, doc.theme.fontPairId) ?? template.fontPairs[0]!;
 }
 
 /**
@@ -75,6 +77,9 @@ export function themeVars(
     '--flap-2': art.cover.flap[1],
     '--env-card': art.cover.card,
     '--cover-hint': art.cover.hint,
+    ...(art.cover.ticket
+      ? { '--ticket-paper': art.cover.ticket.paper, '--ticket-edge': art.cover.ticket.edge }
+      : null),
   };
 }
 

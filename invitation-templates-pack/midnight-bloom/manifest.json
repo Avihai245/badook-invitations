@@ -1,0 +1,237 @@
+{
+  "id": "midnight-bloom",
+  "version": 2,
+  "name": {
+    "he": "פריחת לילה",
+    "en": "Midnight Bloom"
+  },
+  "description": {
+    "he": "דרמה של טבע דומם הולנדי על רקע כמעט שחור — אדמוניות, צבעונים, נוריות ועלים מסתלסלים, עש לילה ומסגרת של רדיד זהב.",
+    "en": "Dutch still-life drama on near-black — peonies, tulips, ranunculus and curling leaves, a night moth and a gilded foil frame."
+  },
+  "tier": "premium",
+  "categories": [
+    "wedding",
+    "engagement",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/midnight-bloom/preview.webp",
+  "previewVideo": "/templates/midnight-bloom/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#141519",
+      "surface": "#202227",
+      "ink": "#F4EDE3",
+      "inkMuted": "#A89F94",
+      "accent": "#E8A33D",
+      "accentInk": "#141519",
+      "line": "#34363D",
+      "heroText": "#F4EDE3"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 12,
+      "button": 4
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "amber",
+      "name": {
+        "he": "ענבר",
+        "en": "Amber"
+      },
+      "palette": {
+        "accent": "#E8A33D"
+      }
+    },
+    {
+      "id": "rose",
+      "name": {
+        "he": "ורד",
+        "en": "Rose"
+      },
+      "palette": {
+        "accent": "#E58FA6"
+      }
+    },
+    {
+      "id": "pearl",
+      "name": {
+        "he": "פנינה",
+        "en": "Pearl"
+      },
+      "palette": {
+        "accent": "#E9DCCB"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "still-life",
+      "display": {
+        "latin": "Gloock",
+        "hebrew": "Noto Serif Hebrew"
+      },
+      "heading": {
+        "latin": "Gloock",
+        "hebrew": "Noto Serif Hebrew"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Noto Serif Hebrew"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "nocturne",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Bellefair"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/midnight-bloom/cover-poster.webp",
+    "posterDesktop": "/templates/midnight-bloom/cover-poster-desktop.webp",
+    "openVideo": "/templates/midnight-bloom/cover-open.mp4",
+    "openVideoDesktop": "/templates/midnight-bloom/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/midnight-bloom/seal-blank.png",
+      "recolor": true,
+      "size": 0.32,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#C98A2E",
+      "#8E2A45",
+      "#E9DCCB",
+      "#3E5A3C"
+    ],
+    "monogramFont": {
+      "latin": "Gloock",
+      "hebrew": "Noto Serif Hebrew"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "טבע דומם באור נרות",
+          "en": "A still life by candlelight"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#F4EDE3",
+    "overlayColor": "#0B0C0F",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "midnight-bloom-theme",
+    "tracks": [
+      {
+        "id": "midnight-bloom-theme",
+        "title": "Nocturne for Flowers (cello & piano)",
+        "url": "/templates/midnight-bloom/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/midnight-bloom/hero.mp4",
+    "hero-poster": "/templates/midnight-bloom/hero-poster.webp",
+    "hero-desktop": "/templates/midnight-bloom/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/midnight-bloom/hero-desktop-poster.webp",
+    "foil-band": "/templates/midnight-bloom/foil-band.webp",
+    "bloom-panorama": "/templates/midnight-bloom/bloom-panorama.webp",
+    "tulips": "/templates/midnight-bloom/tulips.webp",
+    "moth": "/templates/midnight-bloom/moth.webp",
+    "peony": "/templates/midnight-bloom/peony.webp"
+  },
+  "decorations": {
+    "afterHero": "template:foil-band",
+    "betweenVenues": "template:bloom-panorama",
+    "afterTimeline": "template:tulips",
+    "beforeRsvp": "template:moth",
+    "footer": "template:peony"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

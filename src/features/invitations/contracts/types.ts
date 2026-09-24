@@ -276,12 +276,16 @@ export interface FontPair {
   ui: { latin: string; hebrew: string }; // forms/buttons
 }
 export type CoverStyle = 'envelope_seal' | 'ribbon' | 'gatefold' | 'pouch' | 'swaddle' | 'ticket' | 'none';
+/** A design's tier — the gallery badges premium designs ('standard' when a manifest leaves it out). */
+export type TemplateTier = 'standard' | 'premium';
+export const TEMPLATE_TIERS = ['standard', 'premium'] as const satisfies readonly TemplateTier[];
 
 export interface TemplateManifest {
   id: string;
   version: number;
   name: L10n;
   description: L10n;
+  tier: TemplateTier;
   categories: EventType[];
   supportsLocales: Locale[];
   previewImage: string;

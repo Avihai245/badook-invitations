@@ -294,6 +294,10 @@ a {
   height: 100%;
   overflow: visible;
 }
+/* neon-night: the ticket glows like its signs */
+:root[data-template='neon-night'] .ticket svg {
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 12px var(--inv-accent));
+}
 @keyframes pulse-flat {
   50% {
     transform: scale(1.04);
@@ -687,6 +691,87 @@ a {
   width: 100%;
   height: 46%;
 }
+/* a drawn scene (renderer/scenes) in the hero: gentle loops on a few of its pieces */
+@media (prefers-reduced-motion: no-preference) {
+  .scene[data-place='hero'] [data-anim='float'] {
+    animation: scene-float 6s ease-in-out infinite alternate;
+  }
+  .scene[data-place='hero'] [data-anim='sway'] {
+    transform-origin: 50% 100%;
+    transform-box: fill-box;
+    animation: scene-sway 7s ease-in-out infinite alternate;
+  }
+  .scene[data-place='hero'] [data-anim='drift'] {
+    animation: scene-drift 18s ease-in-out infinite alternate;
+  }
+  .scene[data-place='hero'] [data-anim='twinkle'] {
+    animation: scene-twinkle 2.8s ease-in-out infinite alternate;
+  }
+  .scene[data-place='hero'] [data-anim='flicker'] {
+    animation: scene-flicker 7s linear infinite;
+  }
+  .scene[data-place='hero'] [data-anim='sweep'] {
+    animation: scene-sweep 9s ease-in-out infinite alternate;
+  }
+  .scene[data-place='hero'] [data-anim='spin'] {
+    transform-box: fill-box;
+    animation: scene-spin 60s linear infinite;
+  }
+}
+@keyframes scene-float {
+  to {
+    transform: translateY(-1.4cqmin);
+  }
+}
+@keyframes scene-sway {
+  from {
+    transform: rotate(-1.6deg);
+  }
+  to {
+    transform: rotate(1.6deg);
+  }
+}
+@keyframes scene-drift {
+  from {
+    transform: translateX(-1.5cqw);
+  }
+  to {
+    transform: translateX(1.5cqw);
+  }
+}
+@keyframes scene-twinkle {
+  to {
+    opacity: 0.45;
+  }
+}
+@keyframes scene-flicker {
+  0%,
+  88%,
+  90%,
+  94%,
+  100% {
+    opacity: 1;
+  }
+  89% {
+    opacity: 0.35;
+  }
+  92% {
+    opacity: 0.6;
+  }
+}
+@keyframes scene-sweep {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+@keyframes scene-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
 .hero-media .scrim {
   position: absolute;
   inset: 0;
@@ -807,6 +892,52 @@ a {
   font-size: 17px;
   margin-top: 6px;
   opacity: 0.9;
+}
+/* template touches on the hero text: neon tubes for the names (neon-night); a highlighter under the
+   opening line and a pen loop around the date (scribble-love) */
+/* marrakech: over its drawn keyhole arch, the hero text stays between the arch's dotted lines (the
+   arch is min(88cqw, 60cqh) wide, ~68% of it inside — renderer/scenes/marrakech.tsx) */
+.hero:has(.scene[data-scene='marrakech']) .hero-inner {
+  max-width: calc(min(88vw, 60svh) * 0.64);
+  padding-inline: 0;
+}
+.hero:has(.scene[data-scene='marrakech']) :is(.eyebrow, .hero-date, .hero-loc) {
+  text-wrap: balance;
+}
+:root[data-template='neon-night'] .hero .names {
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--inv-accent) 70%, transparent),
+    0 0 30px color-mix(in srgb, var(--inv-accent) 55%, transparent),
+    0 0 60px color-mix(in srgb, var(--inv-accent) 35%, transparent);
+}
+:root[data-template='scribble-love'] .hero .eyebrow {
+  width: fit-content;
+  margin-inline: auto;
+  padding: 0 0.35em;
+  background: linear-gradient(
+    176deg,
+    transparent 38%,
+    color-mix(in srgb, #ffe45c 80%, transparent) 38% 88%,
+    transparent 88%
+  );
+  box-decoration-break: clone;
+}
+:root[data-template='scribble-love'] .hero-date:not(:empty) {
+  position: relative;
+  width: fit-content;
+  margin-inline: auto;
+  padding: 18px 22px;
+  text-wrap: balance;
+}
+:root[data-template='scribble-love'] .hero-date:not(:empty)::before {
+  content: '';
+  position: absolute;
+  inset: 0 -2px;
+  border: 2px solid var(--inv-accent);
+  border-radius: 54% 46% 52% 48% / 58% 44% 56% 42%;
+  rotate: -2deg;
+  opacity: 0.85;
+  pointer-events: none;
 }
 .hero .cue {
   position: absolute;

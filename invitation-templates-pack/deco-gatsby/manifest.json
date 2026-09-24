@@ -1,0 +1,237 @@
+{
+  "id": "deco-gatsby",
+  "version": 2,
+  "name": {
+    "he": "גטסבי",
+    "en": "Deco Gatsby"
+  },
+  "description": {
+    "he": "שנות העשרים השואגות בזהב על אוניקס — מניפות קרני שמש, מסגרת זיגורת מדורגת, שברונים, קווים משולשים עם יהלומים וגביע שמפניה.",
+    "en": "The Roaring Twenties in gold on onyx — sunburst fans, a stepped ziggurat frame, chevrons, triple-line borders with diamonds and a champagne coupe."
+  },
+  "tier": "premium",
+  "categories": [
+    "corporate",
+    "wedding",
+    "birthday",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/deco-gatsby/preview.webp",
+  "previewVideo": "/templates/deco-gatsby/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#0E0E10",
+      "surface": "#1B1B1E",
+      "ink": "#F1E8D4",
+      "inkMuted": "#A0957F",
+      "accent": "#CFAE6B",
+      "accentInk": "#0E0E10",
+      "line": "#2E2E33",
+      "heroText": "#F1E8D4"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 0,
+      "button": 0
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב",
+        "en": "Gold"
+      },
+      "palette": {
+        "accent": "#CFAE6B"
+      }
+    },
+    {
+      "id": "silver",
+      "name": {
+        "he": "כסף",
+        "en": "Silver"
+      },
+      "palette": {
+        "accent": "#C9CCD3"
+      }
+    },
+    {
+      "id": "emerald",
+      "name": {
+        "he": "אמרלד",
+        "en": "Emerald"
+      },
+      "palette": {
+        "accent": "#3FA27C"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "gatsby",
+      "display": {
+        "latin": "Limelight",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Josefin Sans",
+        "hebrew": "Karantina"
+      },
+      "body": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "speakeasy",
+      "display": {
+        "latin": "Cinzel Decorative",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "Bellefair"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "video",
+    "poster": "/templates/deco-gatsby/cover-poster.webp",
+    "posterDesktop": "/templates/deco-gatsby/cover-poster-desktop.webp",
+    "openVideo": "/templates/deco-gatsby/cover-open.mp4",
+    "openVideoDesktop": "/templates/deco-gatsby/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/deco-gatsby/medallion-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#0E0E10",
+        "effect": "foil",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#CFAE6B",
+      "#C9CCD3",
+      "#2E2E33"
+    ],
+    "monogramFont": {
+      "latin": "Limelight",
+      "hebrew": "Karantina"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "אולם נשפים בסגנון ארט דקו",
+          "en": "An art deco ballroom"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#F1E8D4",
+    "overlayColor": "#060607",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "deco-gatsby-theme",
+    "tracks": [
+      {
+        "id": "deco-gatsby-theme",
+        "title": "Roaring Twenties (big band)",
+        "url": "/templates/deco-gatsby/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/deco-gatsby/hero.mp4",
+    "hero-poster": "/templates/deco-gatsby/hero-poster.webp",
+    "hero-desktop": "/templates/deco-gatsby/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/deco-gatsby/hero-desktop-poster.webp",
+    "chevron-band": "/templates/deco-gatsby/chevron-band.webp",
+    "deco-panorama": "/templates/deco-gatsby/deco-panorama.webp",
+    "coupe": "/templates/deco-gatsby/coupe.webp",
+    "fan": "/templates/deco-gatsby/fan.webp",
+    "deco-medallion": "/templates/deco-gatsby/deco-medallion.webp"
+  },
+  "decorations": {
+    "afterHero": "template:chevron-band",
+    "betweenVenues": "template:deco-panorama",
+    "afterTimeline": "template:coupe",
+    "beforeRsvp": "template:fan",
+    "footer": "template:deco-medallion"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

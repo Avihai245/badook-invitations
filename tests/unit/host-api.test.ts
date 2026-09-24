@@ -200,6 +200,9 @@ describe('create (wizard)', () => {
     expect((await createInvitation(USER, wizard({ fontPairId: 'comic' }), d)).body).toMatchObject({
       issues: ['fontPairId'],
     });
+    // a pair from the font library ("More fonts")
+    await createInvitation(USER, wizard({ fontPairId: 'lib-typewriter' }), d);
+    expect((d.db.create.mock.calls[1]![4] as InvitationDocument).theme.fontPairId).toBe('lib-typewriter');
   });
 
   it('falls back to a random slug when the names give none', async () => {

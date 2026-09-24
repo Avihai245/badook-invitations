@@ -1,0 +1,138 @@
+{
+  "templateId": "dino-hatch",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו כדי לבקוע",
+        "en": "Tap to hatch"
+      },
+      "eyebrow": {
+        "he": "רוארר! בואו לחגוג עם",
+        "en": "Roar! Come celebrate with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהביצה בוקעת",
+          "en": "Until the egg hatches"
+        },
+        "afterEvent": {
+          "he": "רוארר! תודה שבאתם",
+          "en": "Roar! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "מסיבה פרהיסטורית",
+          "en": "A prehistoric party"
+        },
+        "body": {
+          "he": "ב־{date} הדינוזאורים חוזרים — עם עוגה, משחקים והרבה רעש.\nבואו לחגוג איתנו!",
+          "en": "On {date} the dinosaurs are back — with cake, games and lots of noise.\nCome celebrate with us!"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "חפירת מאובנים",
+            "en": "Fossil dig"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "ארוחת דינוזאורים",
+            "en": "Dino snacks"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "מה להביא",
+            "en": "What to bring"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "בגדים שמותר ללכלך — יהיו חפירות, צבעים ובוץ של דינוזאורים.",
+            "en": "Clothes that can get messy — there’ll be digging, paint and dino mud."
+          },
+          "illustration": "template:footprints"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לשאוג?",
+          "en": "Coming to roar?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "רוארר! נתראה במסיבה",
+          "en": "Roar! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! נשאג בשבילכם",
+          "en": "Too bad! We’ll roar for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "רוארר, ונתראה!",
+        "en": "Roar — see you soon!"
+      }
+    }
+  }
+}

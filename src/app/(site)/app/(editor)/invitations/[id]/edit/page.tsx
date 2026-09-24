@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { loadAccount } from '@/features/billing/server/account';
 import { Editor } from '@/features/invitations/editor/Editor';
-import { fontFaceCss, templateFontFamilies } from '@/features/invitations/fonts';
+import { fontFaceCss, libraryDisplayFamilies, templateFontFamilies } from '@/features/invitations/fonts';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { hostDb } from '@/features/invitations/server/host-db';
@@ -35,8 +35,16 @@ export default async function EditInvitationPage({ params }: { params: Params })
     inv.status === 'published' && JSON.stringify(inv.draft) !== JSON.stringify(inv.published);
   return (
     <>
-      {/* The font pair cards render the hosts' names in every pair of the template. */}
-      <style dangerouslySetInnerHTML={{ __html: fontFaceCss(templateFontFamilies(entry.manifest)) }} />
+      {/* The font pair cards render the hosts' names in every pair of the template, and each font
+          library pair's name in its display faces. */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: [
+            fontFaceCss(templateFontFamilies(entry.manifest)),
+            fontFaceCss(libraryDisplayFamilies(), [400]),
+          ].join('\n'),
+        }}
+      />
       <Editor
         draft={inv.draft}
         meta={{

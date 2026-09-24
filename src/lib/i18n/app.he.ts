@@ -229,10 +229,12 @@ export const he = {
     barBat: 'בר/בת מצווה',
     playPreview: 'הצגת התצוגה המקדימה של {name}',
     noResults: 'אין עיצובים לסוג האירוע הזה עדיין.',
+    premium: 'פרימיום',
     preview: {
       title: '{name}',
       palettes: 'צבעים',
       fonts: 'גופנים',
+      moreFonts: 'עוד גופנים',
       liveDemo: 'דמו חי בלשונית חדשה',
       use: 'שימוש בעיצוב הזה',
       phoneLabel: 'תצוגה חיה של {name}',

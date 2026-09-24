@@ -83,7 +83,7 @@ describe('anonymous', () => {
       async () => (await c.query('select id from invitation_templates')).rowCount,
     );
     await c.query(`update invitation_templates set is_active = true where id = 'atara'`);
-    expect(n).toBe(7);
+    expect(n).toBe(27);
   });
 
   it('cannot read invitations, versions, responses or attendees', async () => {

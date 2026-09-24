@@ -2,7 +2,8 @@
 /**
  * Self-hosted fonts (runs in `predev` / `prebuild`).
  *
- * Reads the font pairs + monogram fonts of every pack template, picks the weights each role needs
+ * Reads the font pairs + monogram fonts of every pack template and the font library's pairs
+ * (src/features/invitations/fonts/library.json), picks the weights each role needs
  * (§9A.2), and for each family copies the matching @fontsource woff2 files (hebrew / latin /
  * latin-ext subsets only) to public/fonts/<id>/<version>/, then writes:
  *   - src/features/invitations/fonts/font-faces.generated.json  (faces + unicode-range + size-adjust)
@@ -19,6 +20,7 @@ const packDir = join(root, 'invitation-templates-pack');
 const fontsourceDir = join(root, 'node_modules', '@fontsource');
 const publicDir = join(root, 'public', 'fonts');
 const jsonOut = join(root, 'src', 'features', 'invitations', 'fonts', 'font-faces.generated.json');
+const libraryFile = join(root, 'src', 'features', 'invitations', 'fonts', 'library.json');
 const appCssOut = join(root, 'src', 'styles', 'app-fonts.generated.css');
 
 const SUBSETS = ['hebrew', 'latin', 'latin-ext'];
@@ -93,19 +95,22 @@ function collectInvitationNeeds() {
     for (const [w, s] of variants) set.add(`${w}:${s}`);
     needs.set(family, set);
   };
+  const addPair = (pair) => {
+    for (const role of ['display', 'heading', 'body', 'ui']) {
+      add(pair[role].hebrew, ROLE_VARIANTS[role].hebrew);
+      add(pair[role].latin, ROLE_VARIANTS[role].latin);
+    }
+  };
   for (const id of readdirSync(packDir)) {
     const file = join(packDir, id, 'manifest.json');
     if (!existsSync(file)) continue;
     const manifest = JSON.parse(readFileSync(file, 'utf8'));
-    for (const pair of manifest.fontPairs) {
-      for (const role of ['display', 'heading', 'body', 'ui']) {
-        add(pair[role].hebrew, ROLE_VARIANTS[role].hebrew);
-        add(pair[role].latin, ROLE_VARIANTS[role].latin);
-      }
-    }
+    for (const pair of manifest.fontPairs) addPair(pair);
     add(manifest.cover.monogramFont.hebrew, ROLE_VARIANTS.monogram.hebrew);
     add(manifest.cover.monogramFont.latin, ROLE_VARIANTS.monogram.latin);
   }
+  // the font library: pairs any template can use
+  for (const pair of JSON.parse(readFileSync(libraryFile, 'utf8')).pairs) addPair(pair);
   return needs;
 }
 
@@ -123,26 +128,22 @@ function readMeta(family) {
 const nearest = (available, weight) =>
   [...available].sort((a, b) => Math.abs(a - weight) - Math.abs(b - weight) || b - a)[0];
 
-/** Parse one fontsource CSS file into { subset → { file, unicodeRange } }. */
-function parseFaces(cssFile) {
+/**
+ * Parse one fontsource CSS file into { subset → { file, unicodeRange } }. Files are named
+ * <id>-<subset>-<weight>-<style>.woff2, and the family id may itself contain a subset's name
+ * ("noto-serif-hebrew-latin-400-normal.woff2"), so the subset is read after the id.
+ */
+function parseFaces(cssFile, id) {
   const css = readFileSync(cssFile, 'utf8');
   const faces = {};
   for (const block of css.matchAll(/@font-face\s*{([^}]*)}/g)) {
     const body = block[1];
     const file = /url\(\.\/files\/([^)]+\.woff2)\)/.exec(body)?.[1];
     const range = /unicode-range:\s*([^;]+);/.exec(body)?.[1]?.trim();
-    const subset = file && SUBSETS.find((s) => file.includes(`-${s}-`));
-    if (file && subset && !(subset === 'latin' && file.includes('-latin-ext-'))) {
-      faces[subset] = { file, unicodeRange: range ?? null };
-    }
-  }
-  // "latin" also matches "latin-ext" files above; resolve explicitly.
-  for (const block of css.matchAll(/@font-face\s*{([^}]*)}/g)) {
-    const body = block[1];
-    const file = /url\(\.\/files\/([^)]+\.woff2)\)/.exec(body)?.[1];
-    const range = /unicode-range:\s*([^;]+);/.exec(body)?.[1]?.trim();
-    if (file?.includes('-latin-ext-')) faces['latin-ext'] = { file, unicodeRange: range ?? null };
-    else if (file?.includes('-latin-')) faces.latin = { file, unicodeRange: range ?? null };
+    const subset = file?.startsWith(`${id}-`)
+      ? file.slice(id.length + 1).replace(/-\d+-(normal|italic)\.woff2$/, '')
+      : null;
+    if (file && SUBSETS.includes(subset)) faces[subset] = { file, unicodeRange: range ?? null };
   }
   return faces;
 }
@@ -161,7 +162,7 @@ function buildFamily(family, variants) {
     if (seen.has(key)) continue;
     seen.add(key);
     const cssFile = join(dir, `${weight}${style === 'italic' ? '-italic' : ''}.css`);
-    const parsed = parseFaces(cssFile);
+    const parsed = parseFaces(cssFile, meta.id);
     for (const subset of subsets) {
       const face = parsed[subset];
       if (!face) continue;

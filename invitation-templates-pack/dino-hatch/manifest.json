@@ -1,0 +1,234 @@
+{
+  "id": "dino-hatch",
+  "version": 2,
+  "name": {
+    "he": "דינו",
+    "en": "Dino Hatch"
+  },
+  "description": {
+    "he": "דינוזאורים עגלגלים והר געש — טי־רקס וסטגוזאורוס, ביצה מנוקדת שנסדקת, שרכים, עקבות וענן עשן. יום הולדת פרהיסטורי.",
+    "en": "Chunky dinos and a volcano — a T-rex and a stegosaurus, a cracking spotted egg, ferns, footprints and a puff of smoke. A prehistoric birthday."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/dino-hatch/preview.webp",
+  "previewVideo": "/templates/dino-hatch/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#EAF6CF",
+      "surface": "#FFFFFF",
+      "ink": "#23311F",
+      "inkMuted": "#5A6650",
+      "accent": "#FF7A1A",
+      "accentInk": "#23311F",
+      "line": "#D3E5B2",
+      "heroText": "#23311F"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 22,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "lava",
+      "name": {
+        "he": "לבה",
+        "en": "Lava"
+      },
+      "palette": {
+        "accent": "#FF7A1A"
+      }
+    },
+    {
+      "id": "jungle",
+      "name": {
+        "he": "ג׳ונגל",
+        "en": "Jungle"
+      },
+      "palette": {
+        "accent": "#4FA83A"
+      }
+    },
+    {
+      "id": "sunny",
+      "name": {
+        "he": "שמש",
+        "en": "Sunny"
+      },
+      "palette": {
+        "accent": "#F9C74F"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "roar",
+      "display": {
+        "latin": "Titan One",
+        "hebrew": "Fredoka"
+      },
+      "heading": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "body": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "ui": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      }
+    },
+    {
+      "id": "jurassic",
+      "display": {
+        "latin": "Righteous",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/dino-hatch/cover-poster.webp",
+    "posterDesktop": "/templates/dino-hatch/cover-poster-desktop.webp",
+    "openVideo": "/templates/dino-hatch/cover-open.mp4",
+    "openVideoDesktop": "/templates/dino-hatch/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/dino-hatch/egg-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "print",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#FF7A1A",
+      "#4FA83A",
+      "#E8B22E"
+    ],
+    "monogramFont": {
+      "latin": "Titan One",
+      "hebrew": "Fredoka"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "עמק פרהיסטורי עם הר געש",
+          "en": "A prehistoric valley with a volcano"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#23311F",
+    "overlayColor": "#F6FBE9",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "dino-hatch-theme",
+    "tracks": [
+      {
+        "id": "dino-hatch-theme",
+        "title": "Stomp Stomp Roar (marimba & drums)",
+        "url": "/templates/dino-hatch/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/dino-hatch/hero.mp4",
+    "hero-poster": "/templates/dino-hatch/hero-poster.webp",
+    "hero-desktop": "/templates/dino-hatch/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/dino-hatch/hero-desktop-poster.webp",
+    "fern-band": "/templates/dino-hatch/fern-band.webp",
+    "volcano-panorama": "/templates/dino-hatch/volcano-panorama.webp",
+    "egg": "/templates/dino-hatch/egg.webp",
+    "footprints": "/templates/dino-hatch/footprints.webp",
+    "dino": "/templates/dino-hatch/dino.webp"
+  },
+  "decorations": {
+    "afterHero": "template:fern-band",
+    "betweenVenues": "template:volcano-panorama",
+    "afterTimeline": "template:egg",
+    "beforeRsvp": "template:footprints",
+    "footer": "template:dino"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

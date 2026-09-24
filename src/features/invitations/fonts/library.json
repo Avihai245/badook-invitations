@@ -1,0 +1,116 @@
+{
+  "pairs": [
+    {
+      "id": "lib-classic",
+      "name": { "he": "קלאסי", "en": "Classic" },
+      "display": { "latin": "Cormorant Garamond", "hebrew": "Frank Ruhl Libre" },
+      "heading": { "latin": "Cormorant Garamond", "hebrew": "Frank Ruhl Libre" },
+      "body": { "latin": "EB Garamond", "hebrew": "Frank Ruhl Libre" },
+      "ui": { "latin": "Assistant", "hebrew": "Assistant" }
+    },
+    {
+      "id": "lib-heritage",
+      "name": { "he": "מורשת", "en": "Heritage" },
+      "display": { "latin": "Cinzel", "hebrew": "David Libre" },
+      "heading": { "latin": "Cinzel", "hebrew": "David Libre" },
+      "body": { "latin": "EB Garamond", "hebrew": "David Libre" },
+      "ui": { "latin": "Assistant", "hebrew": "Assistant" }
+    },
+    {
+      "id": "lib-editorial",
+      "name": { "he": "מגזין", "en": "Editorial" },
+      "display": { "latin": "DM Serif Display", "hebrew": "Noto Serif Hebrew" },
+      "heading": { "latin": "DM Serif Display", "hebrew": "Noto Serif Hebrew" },
+      "body": { "latin": "Inter", "hebrew": "Heebo" },
+      "ui": { "latin": "Inter", "hebrew": "Heebo" }
+    },
+    {
+      "id": "lib-romantic",
+      "name": { "he": "רומנטי", "en": "Romantic" },
+      "display": { "latin": "Allura", "hebrew": "Bona Nova" },
+      "heading": { "latin": "Cormorant Garamond", "hebrew": "Bona Nova" },
+      "body": { "latin": "Cormorant Garamond", "hebrew": "Frank Ruhl Libre" },
+      "ui": { "latin": "Assistant", "hebrew": "Assistant" }
+    },
+    {
+      "id": "lib-airy",
+      "name": { "he": "אוורירי", "en": "Airy" },
+      "display": { "latin": "Italiana", "hebrew": "Bellefair" },
+      "heading": { "latin": "Josefin Sans", "hebrew": "Bellefair" },
+      "body": { "latin": "Josefin Sans", "hebrew": "Assistant" },
+      "ui": { "latin": "Josefin Sans", "hebrew": "Assistant" }
+    },
+    {
+      "id": "lib-modern",
+      "name": { "he": "מודרני", "en": "Modern" },
+      "display": { "latin": "Jost", "hebrew": "Heebo" },
+      "heading": { "latin": "Jost", "hebrew": "Heebo" },
+      "body": { "latin": "Jost", "hebrew": "Heebo" },
+      "ui": { "latin": "Jost", "hebrew": "Heebo" }
+    },
+    {
+      "id": "lib-geometric",
+      "name": { "he": "גאומטרי", "en": "Geometric" },
+      "display": { "latin": "Outfit", "hebrew": "Rubik" },
+      "heading": { "latin": "Outfit", "hebrew": "Rubik" },
+      "body": { "latin": "Outfit", "hebrew": "Rubik" },
+      "ui": { "latin": "Outfit", "hebrew": "Rubik" }
+    },
+    {
+      "id": "lib-bold",
+      "name": { "he": "נועז", "en": "Bold" },
+      "display": { "latin": "Unbounded", "hebrew": "Secular One" },
+      "heading": { "latin": "Oswald", "hebrew": "Secular One" },
+      "body": { "latin": "Inter", "hebrew": "Heebo" },
+      "ui": { "latin": "Inter", "hebrew": "Heebo" }
+    },
+    {
+      "id": "lib-poster",
+      "name": { "he": "פוסטר", "en": "Poster" },
+      "display": { "latin": "Bebas Neue", "hebrew": "Karantina" },
+      "heading": { "latin": "Oswald", "hebrew": "Karantina" },
+      "body": { "latin": "Rubik", "hebrew": "Rubik" },
+      "ui": { "latin": "Rubik", "hebrew": "Rubik" }
+    },
+    {
+      "id": "lib-retro",
+      "name": { "he": "רטרו", "en": "Retro" },
+      "display": { "latin": "Abril Fatface", "hebrew": "Suez One" },
+      "heading": { "latin": "Young Serif", "hebrew": "Suez One" },
+      "body": { "latin": "Lora", "hebrew": "Assistant" },
+      "ui": { "latin": "Assistant", "hebrew": "Assistant" }
+    },
+    {
+      "id": "lib-typewriter",
+      "name": { "he": "כתב מכונה", "en": "Typewriter" },
+      "display": { "latin": "Special Elite", "hebrew": "Cousine" },
+      "heading": { "latin": "Courier Prime", "hebrew": "Cousine" },
+      "body": { "latin": "Courier Prime", "hebrew": "Cousine" },
+      "ui": { "latin": "Assistant", "hebrew": "Assistant" }
+    },
+    {
+      "id": "lib-handwritten",
+      "name": { "he": "כתב יד", "en": "Handwritten" },
+      "display": { "latin": "Caveat", "hebrew": "Playpen Sans Hebrew" },
+      "heading": { "latin": "Caveat", "hebrew": "Playpen Sans Hebrew" },
+      "body": { "latin": "Nunito", "hebrew": "Assistant" },
+      "ui": { "latin": "Nunito", "hebrew": "Assistant" }
+    },
+    {
+      "id": "lib-chalk",
+      "name": { "he": "לוח גיר", "en": "Chalkboard" },
+      "display": { "latin": "Amatic SC", "hebrew": "Amatic SC" },
+      "heading": { "latin": "Quicksand", "hebrew": "Varela Round" },
+      "body": { "latin": "Quicksand", "hebrew": "Varela Round" },
+      "ui": { "latin": "Quicksand", "hebrew": "Varela Round" }
+    },
+    {
+      "id": "lib-soft",
+      "name": { "he": "רך ועגול", "en": "Soft & round" },
+      "display": { "latin": "Fredoka", "hebrew": "Fredoka" },
+      "heading": { "latin": "Fredoka", "hebrew": "Fredoka" },
+      "body": { "latin": "Nunito", "hebrew": "Varela Round" },
+      "ui": { "latin": "Nunito", "hebrew": "Varela Round" }
+    }
+  ]
+}

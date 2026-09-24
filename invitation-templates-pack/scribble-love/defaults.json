@@ -1,0 +1,369 @@
+{
+  "templateId": "scribble-love",
+  "defaults": {
+    "engagement": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "חדשות חמות: התארסנו!",
+        "en": "Big news: we’re engaged!"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד המסיבה (כן, עושים מסיבה!)",
+          "en": "Until the party (yes, there’s a party!)"
+        },
+        "afterEvent": {
+          "he": "תודה שבאתם! ♥",
+          "en": "Thanks for coming! ♥"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "רשימת מטלות",
+          "en": "To-do list"
+        },
+        "body": {
+          "he": "✓ למצוא אהבה\n✓ להגיד כן\n☐ לחגוג איתכם ב־{date}",
+          "en": "✓ Find love\n✓ Say yes\n☐ Celebrate with you on {date}"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:00",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "לחיים!",
+            "en": "Cheers!"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "אוכל טוב",
+            "en": "Good food"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "רוקדים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "רק דבר אחד קטן",
+            "en": "Just one small thing"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "תביאו מצב רוח טוב. את כל השאר אנחנו מסדרים.",
+            "en": "Bring good vibes. We’ll take care of everything else."
+          },
+          "illustration": "template:hearts"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מגיעים?",
+          "en": "Coming?"
+        },
+        "subtitle": {
+          "he": "סמנו לנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כתבו לנו משהו נחמד",
+          "en": "Write us something nice"
+        },
+        "successMessage": {
+          "he": "יששש! נתראה ♥",
+          "en": "Yay! See you there ♥"
+        },
+        "declineMessage": {
+          "he": "אוף, חבל! נחגוג בפעם הבאה",
+          "en": "Aw, too bad! Next time"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נשיקות",
+        "en": "xoxo"
+      }
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "שמרו את הערב: יום הולדת!",
+        "en": "Save the night: it’s a birthday!"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "יום ההולדת של {primary}",
+          "en": "{primary}’s Birthday"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד העוגה",
+          "en": "Until the cake"
+        },
+        "afterEvent": {
+          "he": "תודה שבאתם לחגוג! ♥",
+          "en": "Thanks for coming to celebrate! ♥"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "תזכורת",
+          "en": "Reminder"
+        },
+        "body": {
+          "he": "לא לשכוח: ב־{date} חוגגים!\nעוגה, מוזיקה, חברים — ואתם, כמובן.",
+          "en": "Don’t forget: we’re celebrating on {date}!\nCake, music, friends — and you, of course."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "21:00",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "נשנושים",
+            "en": "Snacks"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "עוגה ושירה",
+            "en": "Cake & singing"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "רוקדים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "באים?",
+          "en": "You in?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה במסיבה",
+          "en": "Awesome! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! נאכל חתיכת עוגה בשבילכם",
+          "en": "Too bad! We’ll eat a slice of cake for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה!",
+        "en": "See you!"
+      }
+    },
+    "other": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "פתק קטן: אתם מוזמנים!",
+        "en": "A little note: you’re invited!"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנתראה",
+          "en": "Until we meet"
+        },
+        "afterEvent": {
+          "he": "תודה שבאתם!",
+          "en": "Thanks for coming!"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "למה?",
+          "en": "Why?"
+        },
+        "body": {
+          "he": "כי בא לנו לחגוג, ואין סיבה טובה יותר מכם.\nנתראה ב־{date}.",
+          "en": "Because we feel like celebrating — and there’s no better reason than you.\nSee you on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "איפה",
+          "en": "Where"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "אוכל",
+            "en": "Food"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "מוזיקה",
+            "en": "Music"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "מגיעים?",
+          "en": "Coming?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "משהו שרציתם להגיד?",
+          "en": "Anything you’d like to say?"
+        },
+        "successMessage": {
+          "he": "יופי! נתראה",
+          "en": "Great! See you"
+        },
+        "declineMessage": {
+          "he": "חבל! בפעם הבאה",
+          "en": "Too bad! Next time"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה",
+        "en": "See you"
+      }
+    }
+  }
+}

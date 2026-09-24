@@ -345,6 +345,10 @@ export const editorEn: EditorDict = {
       sealColor: 'Seal color',
       hint: 'Hint text',
     },
+    fonts: {
+      more: 'More fonts',
+      moreHelp: 'Font pairs that suit any design.',
+    },
     palette: {
       reset: 'Back to the design’s colors',
       keys: {

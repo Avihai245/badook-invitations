@@ -1,0 +1,490 @@
+{
+  "templateId": "jet-set",
+  "defaults": {
+    "wedding": {
+      "coverHint": {
+        "he": "לחצו על כרטיס העלייה למטוס",
+        "en": "Tap your boarding pass"
+      },
+      "eyebrow": {
+        "he": "התחנה הבאה: לנצח",
+        "en": "Next stop: forever"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until take-off"
+        },
+        "afterEvent": {
+          "he": "נחתנו! תודה שטסתם איתנו",
+          "en": "We’ve landed! Thank you for flying with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "תוכנית טיסה",
+          "en": "Flight plan"
+        },
+        "body": {
+          "he": "אחרי הרבה טיסות, תחנות וחותמות בדרכון — מצאנו את היעד.\nב־{date} אנחנו מתחתנים, ומזמינים אתכם לעלות למטוס.",
+          "en": "After many flights, layovers and passport stamps, we found our destination.\nWe’re getting married on {date} — and you’re invited aboard."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "היעד",
+          "en": "Destination"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "צ׳ק־אין וקוקטייל",
+            "en": "Check-in & cocktails"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:00",
+          "label": {
+            "he": "חופה",
+            "en": "Ceremony"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "ארוחה במחלקה ראשונה",
+            "en": "First-class dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "שיק של טיסה",
+            "en": "Jet-set chic"
+          },
+          "body": {
+            "he": "אלגנטי וקליל, כמו לפני טיסה לריביירה.",
+            "en": "Elegant and breezy — like you’re flying to the Riviera."
+          },
+          "illustration": "template:luggage-tag"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור עלייה למטוס",
+          "en": "Confirm your seat"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "המקום שלכם שמור! נתראה בשער",
+          "en": "Your seat is booked! See you at the gate"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נשלח לכם גלויה",
+          "en": "Thanks for letting us know — we’ll send a postcard"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "טיסה נעימה, ובאהבה",
+        "en": "Bon voyage, with love"
+      }
+    },
+    "save_the_date": {
+      "coverHint": {
+        "he": "לחצו על כרטיס העלייה למטוס",
+        "en": "Tap your boarding pass"
+      },
+      "eyebrow": {
+        "he": "שמרו את התאריך — אנחנו מתחתנים!",
+        "en": "Save the date — we’re getting married!"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until take-off"
+        },
+        "afterEvent": {
+          "he": "נחתנו! תודה שהייתם איתנו",
+          "en": "We’ve landed! Thank you for being with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הודעה חשובה",
+          "en": "An important announcement"
+        },
+        "body": {
+          "he": "ההזמנה הרשמית תגיע בקרוב.\nבינתיים — שמרו את התאריך ביומן.",
+          "en": "The formal invitation is on its way.\nIn the meantime, please save the date."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "היעד",
+          "en": "Destination"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:00",
+          "label": {
+            "he": "חופה",
+            "en": "Ceremony"
+          },
+          "icon": "chuppah"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה על המטוס",
+          "en": "Thank you! See you on board"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נחגוג יחד בהזדמנות",
+          "en": "Thanks for letting us know — we’ll celebrate together soon"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "נתראה על המטוס!",
+        "en": "See you on board!"
+      }
+    },
+    "corporate": {
+      "coverHint": {
+        "he": "לחצו על כרטיס העלייה למטוס",
+        "en": "Tap your boarding pass"
+      },
+      "eyebrow": {
+        "he": "כרטיס עלייה לאירוע של",
+        "en": "Your boarding pass to"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until take-off"
+        },
+        "afterEvent": {
+          "he": "נחתנו בשלום — תודה שטסתם איתנו",
+          "en": "Safely landed — thanks for flying with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "יעד: השנה הבאה",
+          "en": "Destination: next year"
+        },
+        "body": {
+          "he": "הגיע הזמן לעצור לרגע, להרים כוסית ולהמריא יחד אל השנה הבאה.\nנתראה ב־{date}.",
+          "en": "Time to pause, raise a glass and take off together into the year ahead.\nSee you on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "שער היציאה",
+          "en": "Departure gate"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "18:30",
+          "label": {
+            "he": "צ׳ק־אין",
+            "en": "Check-in"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:15",
+          "label": {
+            "he": "הודעת הקברניט",
+            "en": "Captain’s address"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "מוזיקה",
+            "en": "Music"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור עלייה למטוס",
+          "en": "Confirm your seat"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "הערה למארגנים",
+          "en": "A note for the organizers"
+        },
+        "successMessage": {
+          "he": "המקום שלכם שמור!",
+          "en": "Your seat is booked!"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון",
+          "en": "Thanks for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "טיסה נעימה!",
+        "en": "Bon voyage!"
+      }
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "לחצו על כרטיס העלייה למטוס",
+        "en": "Tap your boarding pass"
+      },
+      "eyebrow": {
+        "he": "ממריאים לבת המצווה של",
+        "en": "Now boarding: the Bat Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until take-off"
+        },
+        "afterEvent": {
+          "he": "מזל טוב! תודה שטסתם איתנו",
+          "en": "Mazal tov! Thanks for flying with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "יעד חדש",
+          "en": "A new destination"
+        },
+        "body": {
+          "he": "ב־{date} {primary} חוגגת בת מצווה וממריאה לפרק חדש.\nנשמח שתצטרפו לטיסה.",
+          "en": "On {date}, {primary} celebrates her Bat Mitzvah and takes off into a new chapter.\nWe’d love you to join the flight."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "היעד",
+          "en": "Destination"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "צ׳ק־אין",
+            "en": "Check-in"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות ומצגת",
+            "en": "Blessings & slideshow"
+          },
+          "icon": "camera"
+        },
+        {
+          "time": "20:30",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור עלייה למטוס",
+          "en": "Confirm your seat"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A blessing for the Bat Mitzvah girl"
+        },
+        "successMessage": {
+          "he": "המקום שלכם שמור! נתראה",
+          "en": "Your seat is booked! See you there"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נשלח לכם גלויה",
+          "en": "Thanks for letting us know — we’ll send a postcard"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה, המשפחה",
+        "en": "With love, the family"
+      }
+    }
+  }
+}

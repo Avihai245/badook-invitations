@@ -2,6 +2,8 @@ import type { CSSProperties } from 'react';
 import type { AssetRef, SectionOf } from '../../contracts/types';
 import { longestWordLength } from '../../lib/text';
 import { parseVideoLink } from '../../lib/video-links';
+import type { PlaceholderArt } from '../../renderer/placeholders';
+import { Scene } from '../../renderer/scenes';
 import { Icon } from '../../ui/Icon';
 import { editPath, type SectionViewProps } from '../shared';
 import { GuestGreeting } from '../../renderer/guest.client';
@@ -18,9 +20,13 @@ const CLOUDS: [number, number, number, number][] = [
 
 /**
  * Sky + drifting clouds + hills — the reference's CSS/SVG stand-in for the hero video — plus, for
- * pale skies, a scrim that keeps the white hero text legible.
+ * pale skies, a scrim that keeps the white hero text legible. A scene template draws its scene
+ * instead (its centre is kept calm for the names).
  */
-function HeroPlaceholder({ hills, scrim }: { hills: [string, string, string, string]; scrim: boolean }) {
+function HeroPlaceholder({ art, date }: { art: PlaceholderArt; date: string }) {
+  if (art.scene) return <Scene id={art.scene} place="hero" date={date} />;
+  const { hills } = art;
+  const scrim = art.shade !== null;
   return (
     <>
       {CLOUDS.map(([x, y, w, h], i) => (
@@ -93,7 +99,7 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
   return (
     <header className="hero" data-edit-path={path}>
       <div className="hero-media" aria-hidden="true">
-        {placeholder ? <HeroPlaceholder hills={ctx.art.hills} scrim={ctx.art.shade !== null} /> : null}
+        {placeholder ? <HeroPlaceholder art={ctx.art} date={doc.event.date} /> : null}
         {media}
       </div>
       <div className="hero-overlay" style={{ '--ov': d.overlayOpacity } as CSSProperties} />

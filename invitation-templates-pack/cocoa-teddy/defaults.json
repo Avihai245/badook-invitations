@@ -1,0 +1,381 @@
+{
+  "templateId": "cocoa-teddy",
+  "defaults": {
+    "brit": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בשמחה גדולה ובלב מלא, מזמינים אתכם",
+        "en": "With full hearts, we invite you"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "לברית המילה של בננו",
+          "en": "To our son’s Brit Milah"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הברית",
+          "en": "Until the Brit"
+        },
+        "afterEvent": {
+          "he": "מזל טוב! תודה שחגגתם איתנו",
+          "en": "Mazal tov! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הדובון הכי קטן שלנו",
+          "en": "Our littlest bear"
+        },
+        "body": {
+          "he": "הוא קטן, רך ומתוק — וכבר גנב לנו את הלב.\nב־{date} נכניס אותו בבריתו ונגלה לכולם את שמו.",
+          "en": "He’s tiny, soft and sweet — and he has already stolen our hearts.\nOn {date} we will welcome him into the covenant and share his name."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הברית",
+          "en": "The Brit"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "09:00",
+          "label": {
+            "he": "התכנסות וכיבוד",
+            "en": "Welcome & refreshments"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "09:30",
+          "label": {
+            "he": "ברית המילה",
+            "en": "Brit Milah"
+          },
+          "icon": "baby"
+        },
+        {
+          "time": "10:00",
+          "label": {
+            "he": "סעודת מצווה",
+            "en": "Celebration meal"
+          },
+          "icon": "dinner"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה למשפחה",
+          "en": "A blessing for the family"
+        },
+        "successMessage": {
+          "he": "תודה! נשמח לראותכם",
+          "en": "Thank you! We look forward to seeing you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נחגוג יחד בהזדמנות",
+          "en": "Thanks for letting us know — we’ll celebrate together soon"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה, המשפחה",
+        "en": "With love, the family"
+      }
+    },
+    "baby_shower": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "דובון קטן בדרך אלינו",
+        "en": "A little bear is on the way"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "בייבי שאוור ל{primary}",
+          "en": "{primary}’s Baby Shower"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד המסיבה המתוקה",
+          "en": "Until the sweet party"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו!",
+          "en": "Thank you for celebrating with us!"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "חיבוק גדול",
+          "en": "A big hug"
+        },
+        "body": {
+          "he": "שמיכה רכה, עוגיות שוקולד והרבה חיבוקים.\nבואו לחגוג את {primary} ב־{date}.",
+          "en": "A soft blanket, chocolate cookies and plenty of hugs.\nCome celebrate {primary} on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "11:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "11:45",
+          "label": {
+            "he": "משחקים",
+            "en": "Games"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "12:30",
+          "label": {
+            "he": "מתנות",
+            "en": "Gifts"
+          },
+          "icon": "gift"
+        },
+        {
+          "time": "13:15",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "ספר במקום כרטיס",
+            "en": "A book instead of a card"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הביאו את ספר הילדים האהוב עליכם עם הקדשה קטנה.",
+            "en": "Bring your favourite children’s book with a little note inside."
+          },
+          "illustration": "template:teddy"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה להורים לעתיד",
+          "en": "A note for the parents-to-be"
+        },
+        "successMessage": {
+          "he": "תודה! מחכים לחבק אתכם",
+          "en": "Thank you! Can’t wait to hug you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נתגעגע!",
+          "en": "Thanks for letting us know — you’ll be missed!"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "חיבוק גדול",
+        "en": "Big hugs"
+      }
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בואו לחגוג איתנו!",
+        "en": "Come celebrate with us!"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "יום ההולדת של {primary}",
+          "en": "{primary}’s Birthday"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד המסיבה",
+          "en": "Until the party"
+        },
+        "afterEvent": {
+          "he": "תודה שבאתם לחגוג!",
+          "en": "Thanks for coming to celebrate!"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "מסיבת דובונים",
+          "en": "A teddy bears’ party"
+        },
+        "body": {
+          "he": "בלונים, עוגה, משחקים ודובונים — ב־{date} חוגגים!\nמחכים לכם.",
+          "en": "Balloons, cake, games and teddy bears — we’re celebrating on {date}!\nWe can’t wait to see you."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "משחקים",
+            "en": "Games"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "פיצה",
+            "en": "Pizza"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ושירה",
+            "en": "Cake & singing"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "באים?",
+          "en": "Coming?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "יש! נתראה במסיבה",
+          "en": "Yay! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם חתיכת עוגה",
+          "en": "Too bad! We’ll save you a slice"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "חיבוק גדול",
+        "en": "Big hugs"
+      }
+    }
+  }
+}

@@ -1,0 +1,532 @@
+{
+  "templateId": "deco-gatsby",
+  "defaults": {
+    "corporate": {
+      "coverHint": {
+        "he": "לחצו לפתיחת השער",
+        "en": "Tap to open the gate"
+      },
+      "eyebrow": {
+        "he": "נשף השנה של",
+        "en": "The annual gala of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהשמפניה תימזג",
+          "en": "Until the champagne is poured"
+        },
+        "afterEvent": {
+          "he": "איזה נשף! תודה שהייתם איתנו",
+          "en": "What a gala! Thank you for joining us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שנות העשרים השואגות",
+          "en": "The Roaring Twenties"
+        },
+        "body": {
+          "he": "שמפניה, ג׳אז וזהב — ערב אחד בסגנון שנות העשרים לכבוד שנה מצוינת.\nנתראה ב־{date}.",
+          "en": "Champagne, jazz and gold — one evening in Twenties style to toast a great year.\nSee you on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הנשף",
+          "en": "The gala"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "שמפניה",
+            "en": "Champagne"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "דברי ברכה",
+            "en": "Opening remarks"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת גאלה",
+            "en": "Gala dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "להקת ג׳אז",
+            "en": "Jazz band"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "זוהר של שנות העשרים",
+            "en": "Twenties glamour"
+          },
+          "body": {
+            "he": "פאייטים, נוצות, חליפות וכובעים — כמה שיותר גטסבי.",
+            "en": "Sequins, feathers, suits and hats — as Gatsby as you dare."
+          },
+          "illustration": "template:fan"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "הערה למארגנים",
+          "en": "A note for the organizers"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בנשף",
+          "en": "Thank you! See you at the gala"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון",
+          "en": "Thank you for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על רחבת הריקודים",
+        "en": "See you on the dance floor"
+      }
+    },
+    "wedding": {
+      "coverHint": {
+        "he": "לחצו לפתיחת השער",
+        "en": "Tap to open the gate"
+      },
+      "eyebrow": {
+        "he": "בזוהר ובזהב, אנחנו מתחתנים",
+        "en": "In gold and glamour, we wed"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הלילה הגדול",
+          "en": "Until the big night"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו בסטייל",
+          "en": "Thank you for celebrating with us in style"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "אהבה בסגנון גטסבי",
+          "en": "A Gatsby love story"
+        },
+        "body": {
+          "he": "שמפניה, ג׳אז ואהבה אחת גדולה.\nב־{date} אנחנו מתחתנים — והמסיבה תהיה אגדית.",
+          "en": "Champagne, jazz and one great love.\nWe’re getting married on {date} — and the party will be legendary."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הטקס והנשף",
+          "en": "Ceremony & ball"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "שמפניה",
+            "en": "Champagne"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "חופה",
+            "en": "Ceremony"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "ג׳אז וריקודים",
+            "en": "Jazz & dancing"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "00:00",
+          "label": {
+            "he": "אפטר",
+            "en": "After party"
+          },
+          "icon": "party"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "שחור וזהב",
+            "en": "Black and gold"
+          },
+          "body": {
+            "he": "ערב שנות העשרים — שחור, זהב ונצנוץ. נוצות יתקבלו בברכה.",
+            "en": "A Twenties evening — black, gold and sparkle. Feathers welcome."
+          },
+          "illustration": "template:coupe"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A toast to the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בנשף",
+          "en": "Thank you! See you at the ball"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נרים כוסית לכבודכם",
+          "en": "Thanks for letting us know — we’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה ובזוהר",
+        "en": "With love and glamour"
+      }
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לפתיחת השער",
+        "en": "Tap to open the gate"
+      },
+      "eyebrow": {
+        "he": "ערב של זהב וג׳אז לכבוד",
+        "en": "An evening of gold and jazz for"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהג׳אז יתחיל",
+          "en": "Until the jazz begins"
+        },
+        "afterEvent": {
+          "he": "איזה ערב! תודה שבאתם",
+          "en": "What a night! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד שנה זוהרת",
+          "en": "Another golden year"
+        },
+        "body": {
+          "he": "ב־{date} חוגגים עוד שנה בסטייל של שנות העשרים.\nשמפניה, ג׳אז, ריקודים — ואתם.",
+          "en": "On {date} we celebrate another year, Twenties style.\nChampagne, jazz, dancing — and you."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:30",
+          "label": {
+            "he": "שמפניה",
+            "en": "Champagne"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "ארוחה",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:15",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "22:45",
+          "label": {
+            "he": "ג׳אז וריקודים",
+            "en": "Jazz & dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "זוהר של שנות העשרים",
+            "en": "Twenties glamour"
+          },
+          "body": {
+            "he": "פאייטים, נוצות, חליפות וכובעים — כמה שיותר גטסבי.",
+            "en": "Sequins, feathers, suits and hats — as Gatsby as you dare."
+          },
+          "illustration": "template:fan"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "תצטרפו?",
+          "en": "Will you join?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מושלם! נתראה במסיבה",
+          "en": "Splendid! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! נרים כוסית לכבודכם",
+          "en": "Too bad! We’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "לחיים!",
+        "en": "Cheers!"
+      }
+    },
+    "other": {
+      "coverHint": {
+        "he": "לחצו לפתיחת השער",
+        "en": "Tap to open the gate"
+      },
+      "eyebrow": {
+        "he": "הוזמנתם לערב זוהר עם",
+        "en": "A glamorous evening with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהערב יתחיל",
+          "en": "Until the evening begins"
+        },
+        "afterEvent": {
+          "he": "תודה שהייתם איתנו",
+          "en": "Thank you for joining us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "ערב אחד של זהב",
+          "en": "One golden evening"
+        },
+        "body": {
+          "he": "שמפניה, מוזיקה טובה ואנשים שאנחנו אוהבים.\nנתראה ב־{date}.",
+          "en": "Champagne, good music and people we love.\nSee you on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הערב",
+          "en": "The evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "שמפניה",
+            "en": "Champagne"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחה",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "ג׳אז",
+            "en": "Jazz"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כמה מילים טובות",
+          "en": "A few kind words"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה",
+          "en": "Thank you! See you there"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם",
+          "en": "Thank you for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "לחיים!",
+        "en": "Cheers!"
+      }
+    }
+  }
+}

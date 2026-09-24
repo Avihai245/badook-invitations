@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from 'react';
 import { Button, Dialog, PhoneFrame, Segmented, cn } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import type { Locale, Palette } from '../../contracts/types';
+import { LibraryFontPairs } from '../../editor/fields/font-library';
 import { usePreviewChannel } from '../../editor/preview/usePreviewChannel';
 import { demoDocument } from '../../templates/demo';
 import { requireTemplate } from '../../templates/registry';
@@ -16,7 +17,8 @@ export interface DesignChoice {
 
 /**
  * Gallery preview (§9B.3-B): the template's demo invitation live in a phone, with its palette presets
- * and font pairs switching the preview instantly; "Use this design" continues to the wizard.
+ * and font pairs (its own, then the font library's) switching the preview instantly; "Use this
+ * design" continues to the wizard.
  */
 export function PreviewDialog({
   templateId,
@@ -169,6 +171,12 @@ export function PreviewDialog({
                 );
               })}
             </div>
+            <LibraryFontPairs
+              mode="pressed"
+              selected={fontPairId}
+              onSelect={setFontPairId}
+              title={t.gallery.preview.moreFonts}
+            />
           </fieldset>
         </div>
       </div>

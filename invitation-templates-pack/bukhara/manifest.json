@@ -1,0 +1,237 @@
+{
+  "id": "bukhara",
+  "version": 2,
+  "name": {
+    "he": "משי בוכרה",
+    "en": "Bukhara Silk"
+  },
+  "description": {
+    "he": "איקט ורקמת סוזאני בצבעים עזים — פסי מעוינים בקצוות מטושטשים, רוזטות רקומות, ענפי צבעונים, תפר שרשרת וגדילים משתלשלים.",
+    "en": "Bold ikat and suzani embroidery — feathered lozenge bands, stitched rosettes, tulip sprigs, chain-stitch borders and swinging tassels."
+  },
+  "tier": "premium",
+  "categories": [
+    "henna",
+    "engagement",
+    "wedding"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/bukhara/preview.webp",
+  "previewVideo": "/templates/bukhara/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F4E6CF",
+      "surface": "#FFF8EE",
+      "ink": "#22254F",
+      "inkMuted": "#5F5B7E",
+      "accent": "#C2185B",
+      "accentInk": "#FFFFFF",
+      "line": "#E6D0AE",
+      "heroText": "#22254F"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink"
+    ],
+    "radius": {
+      "card": 10,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "magenta",
+      "name": {
+        "he": "מג׳נטה",
+        "en": "Magenta"
+      },
+      "palette": {
+        "accent": "#C2185B"
+      }
+    },
+    {
+      "id": "indigo",
+      "name": {
+        "he": "אינדיגו",
+        "en": "Indigo"
+      },
+      "palette": {
+        "accent": "#3949AB"
+      }
+    },
+    {
+      "id": "pomegranate",
+      "name": {
+        "he": "רימון",
+        "en": "Pomegranate"
+      },
+      "palette": {
+        "accent": "#B3261E"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "silk",
+      "display": {
+        "latin": "Yeseva One",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Yeseva One",
+        "hebrew": "Secular One"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "caravan",
+      "display": {
+        "latin": "Cinzel Decorative",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "pouch",
+    "renderer": "video",
+    "poster": "/templates/bukhara/cover-poster.webp",
+    "posterDesktop": "/templates/bukhara/cover-poster-desktop.webp",
+    "openVideo": "/templates/bukhara/cover-open.mp4",
+    "openVideoDesktop": "/templates/bukhara/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/bukhara/patch-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": -0.02
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#C2185B",
+      "#3949AB",
+      "#E09B00"
+    ],
+    "monogramFont": {
+      "latin": "Yeseva One",
+      "hebrew": "Secular One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "בד סוזאני רקום ביד",
+          "en": "A hand-embroidered suzani"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#22254F",
+    "overlayColor": "#FFF8EE",
+    "defaultOverlay": 0.45
+  },
+  "music": {
+    "defaultTrackId": "bukhara-theme",
+    "tracks": [
+      {
+        "id": "bukhara-theme",
+        "title": "Silk Road (tar & doyra)",
+        "url": "/templates/bukhara/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/bukhara/hero.mp4",
+    "hero-poster": "/templates/bukhara/hero-poster.webp",
+    "hero-desktop": "/templates/bukhara/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/bukhara/hero-desktop-poster.webp",
+    "ikat-band": "/templates/bukhara/ikat-band.webp",
+    "tulip-panorama": "/templates/bukhara/tulip-panorama.webp",
+    "rosette": "/templates/bukhara/rosette.webp",
+    "tassels": "/templates/bukhara/tassels.webp",
+    "suzani-medallion": "/templates/bukhara/suzani-medallion.webp"
+  },
+  "decorations": {
+    "afterHero": "template:ikat-band",
+    "betweenVenues": "template:tulip-panorama",
+    "afterTimeline": "template:rosette",
+    "beforeRsvp": "template:tassels",
+    "footer": "template:suzani-medallion"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

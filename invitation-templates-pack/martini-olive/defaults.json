@@ -1,0 +1,401 @@
+{
+  "templateId": "martini-olive",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו על הכרטיס",
+        "en": "Tap the ticket"
+      },
+      "eyebrow": {
+        "he": "שייקן, לא בחוש — חוגגים!",
+        "en": "Shaken, not stirred — let’s celebrate"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "יום ההולדת של {primary}",
+          "en": "{primary}’s Birthday"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הכוסית הראשונה",
+          "en": "Until the first round"
+        },
+        "afterEvent": {
+          "he": "לחיים! תודה שבאתם",
+          "en": "Cheers! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "מרטיני עם זית",
+          "en": "A martini with an olive"
+        },
+        "body": {
+          "he": "זית אחד, כוס אחת, והרבה סיבות לחגוג.\nב־{date} מרימים כוסית — ואתם מוזמנים.",
+          "en": "One olive, one glass and plenty of reasons to celebrate.\nWe’re raising a glass on {date} — and you’re invited."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הבר",
+          "en": "The bar"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "21:00",
+          "label": {
+            "he": "שעת קוקטייל",
+            "en": "Cocktail hour"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "A toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "תקליטים וריקודים",
+            "en": "Records & dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "שיק רטרו",
+            "en": "Retro chic"
+          },
+          "body": {
+            "he": "שמלות קוקטייל, חליפות ומשהו מבריק. שנות ה־60 מתקבלות בברכה.",
+            "en": "Cocktail dresses, sharp suits and a little shine. The ’60s are very welcome."
+          },
+          "illustration": "template:martini"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "שומרים לכם כוס?",
+          "en": "Shall we save you a glass?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "לחיים! נתראה בבר",
+          "en": "Cheers! See you at the bar"
+        },
+        "declineMessage": {
+          "he": "חבל! נשתה לחייכם",
+          "en": "Too bad! We’ll drink to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "לחיים!",
+        "en": "Cheers!"
+      }
+    },
+    "engagement": {
+      "coverHint": {
+        "he": "לחצו על הכרטיס",
+        "en": "Tap the ticket"
+      },
+      "eyebrow": {
+        "he": "מרימים כוסית: התארסנו!",
+        "en": "Raise a glass: we’re engaged!"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנקיש כוסות",
+          "en": "Until we clink glasses"
+        },
+        "afterEvent": {
+          "he": "לחיים! תודה שחגגתם איתנו",
+          "en": "Cheers! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שניים על הבר",
+          "en": "Two at the bar"
+        },
+        "body": {
+          "he": "היו שני קוקטיילים, שיחה אחת ארוכה — והשאר היסטוריה.\nבואו לחגוג איתנו ב־{date}.",
+          "en": "Two cocktails, one very long conversation — and the rest is history.\nCome celebrate with us on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "מסיבת האירוסין",
+          "en": "Engagement party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:00",
+          "label": {
+            "he": "שעת קוקטייל",
+            "en": "Cocktail hour"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "Toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "אוכל",
+            "en": "Food"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג המאורס",
+          "en": "A wish for the happy couple"
+        },
+        "successMessage": {
+          "he": "לחיים! נתראה",
+          "en": "Cheers! See you there"
+        },
+        "declineMessage": {
+          "he": "חבל! נרים כוסית לכבודכם",
+          "en": "Too bad! We’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "לחיים, ובאהבה",
+        "en": "Cheers, with love"
+      }
+    },
+    "corporate": {
+      "coverHint": {
+        "he": "לחצו על הכרטיס",
+        "en": "Tap the ticket"
+      },
+      "eyebrow": {
+        "he": "שעת קוקטייל עם",
+        "en": "Cocktail hour with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנרים כוסית יחד",
+          "en": "Until we raise a glass together"
+        },
+        "afterEvent": {
+          "he": "תודה שהייתם איתנו",
+          "en": "Thank you for joining us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "לחיים לשנה טובה",
+          "en": "Here’s to a good year"
+        },
+        "body": {
+          "he": "ערב של קוקטיילים, מוזיקה טובה ותודה גדולה.\nנתראה ב־{date}.",
+          "en": "An evening of cocktails, good music and a big thank-you.\nSee you on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הערב",
+          "en": "The evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "שעת קוקטייל",
+            "en": "Cocktail hour"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "כמה מילים",
+            "en": "A few words"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "אוכל ומפגש",
+            "en": "Food & mingling"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "תקליטן",
+            "en": "DJ"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "קוקטייל",
+            "en": "Cocktail attire"
+          },
+          "body": {
+            "he": "לבוש קוקטייל — אלגנטי, קליל ובלי עניבות חובה.",
+            "en": "Cocktail attire — elegant, relaxed, ties optional."
+          },
+          "illustration": "template:olive-pick"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "הערה למארגנים",
+          "en": "A note for the organizers"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בערב",
+          "en": "Thank you! See you there"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון",
+          "en": "Thanks for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "לחיים!",
+        "en": "Cheers!"
+      }
+    }
+  }
+}

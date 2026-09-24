@@ -3,6 +3,7 @@ import saveTheDateFixture from '@kit/fixtures/example-savethedate-he.json';
 import weddingFixture from '@kit/fixtures/example-wedding-he-en.json';
 import { migrateDocument } from '../contracts/migrate';
 import type { EventType, InvitationDocument, L10n, Locale, Section } from '../contracts/types';
+import { visibleGlyphCount } from '../lib/text';
 import { requireTemplate } from './registry';
 import { demoPeople } from './demo-people';
 import { seedDocument } from './seed-document';
@@ -92,7 +93,14 @@ export function demoDocument(
     timezone: 'Asia/Jerusalem',
     slug: `demo-${templateId}`,
   });
-  if (people.monogram) doc.cover.monogram = pick(people.monogram, locales);
+  // the sample monogram ("DANA 30", "ACME") where the template's cover fits it — but a ticket prints
+  // the seeded name rather than a lone initial; else the seeded one
+  const sample = people.monogram ? pick(people.monogram, locales) : null;
+  const { kind, text } = manifest.cover.overlay;
+  const glyphs = (l: Locale) => visibleGlyphCount(sample?.[l] ?? '', l);
+  const fits = locales.every((l) => glyphs(l) <= text.maxGlyphs);
+  const initialOnTicket = kind === 'ticket_text' && locales.every((l) => glyphs(l) <= 1);
+  if (sample && fits && !initialOnTicket) doc.cover.monogram = sample;
   // a save-the-date keeps its §10.3 shape (hero → reveal → note → footer); the samples are filled in
   // for when its other sections are switched on
   const saveTheDate = type === 'save_the_date';

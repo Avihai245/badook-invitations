@@ -11,6 +11,7 @@ import {
   LOCALES,
   PALETTE_KEYS,
   SECTION_TYPES,
+  TEMPLATE_TIERS,
   TIMELINE_ICONS,
   type EventDefaults,
   type InvitationDocument,
@@ -347,6 +348,8 @@ export const TemplateManifestSchema = z.strictObject({
   version: z.number().int().min(1),
   name: L10nSchema,
   description: L10nSchema,
+  // added after v2: a manifest without it is a standard design
+  tier: z.enum(TEMPLATE_TIERS).default('standard'),
   categories: z.array(EventTypeSchema).min(1),
   supportsLocales: z.array(LocaleSchema).min(1),
   previewImage: TemplatePathSchema,

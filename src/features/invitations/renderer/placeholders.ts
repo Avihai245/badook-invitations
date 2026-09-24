@@ -1,4 +1,20 @@
 import type { IconName } from '../ui/Icon';
+import type { SceneId } from './scenes/ids';
+
+/** Line-art drawn for a missing panorama decoration (afterHero / betweenVenues). */
+export type PanoramaKind =
+  | 'vineyard'
+  | 'hills'
+  | 'arches'
+  | 'garden'
+  | 'swags'
+  | 'waves'
+  | 'doodle'
+  | 'stars'
+  | 'pitch'
+  | 'flight'
+  | 'deco'
+  | 'skyline';
 
 /**
  * CSS/SVG placeholder art used while a template's media files don't exist yet (§5 "missing media
@@ -24,11 +40,18 @@ export interface PlaceholderArt {
     flap: [string, string];
     card: string;
     hint: string;
+    /** the ticket cover's paper and edge (TicketArt), when not the vintage cream */
+    ticket?: { paper: string; edge: string };
   };
   /** Line-art drawn for a missing panorama decoration (betweenVenues). */
-  panorama: 'vineyard' | 'hills';
+  panorama: PanoramaKind;
   /** Stands in for missing section illustrations and the footer decoration. */
   ornament: IconName;
+  /**
+   * A drawn scene (renderer/scenes) instead of the sky + clouds + hills: the hero, the posters and the
+   * cover's card draw it over `sky`. The 8 original templates have none.
+   */
+  scene?: SceneId;
 }
 
 const DARK_HINT = 'rgba(255,255,255,.8)';
@@ -187,7 +210,188 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'hills',
     ornament: 'heart',
   },
+  // ── scene templates: a drawn scene over a base gradient ──
+  'cloud-arch': drawn('cloud-arch', ['#F5F3EF', '#EFECE6', '#E6E1D8'], {
+    bg: ['#F2F0EB', '#E9E5DE', '#DCD5CB'],
+    paper: ['#FBFAF7', '#F3F0EA', '#E6E0D6'],
+    hint: '#6F675E',
+    panorama: 'arches',
+    ornament: 'arch',
+  }),
+  'jasper-cameo': drawn('jasper-cameo', ['#BCD0E4', '#AFC6DE', '#9CB6D2'], {
+    bg: ['#B4CAE0', '#A6BFD9', '#8FAACB'],
+    paper: ['#F9F6F0', '#EFEAE1', '#E1D9CC'],
+    hint: '#23324A',
+    panorama: 'swags',
+    ornament: 'cameo',
+  }),
+  'midnight-bloom': drawn('midnight-bloom', ['#1D1C20', '#141519', '#0D0E11'], {
+    bg: ['#1F2025', '#17181C', '#0F1013'],
+    paper: ['#2B2A2E', '#222226', '#1A1A1E'],
+    hint: 'rgba(244,237,227,.82)',
+    panorama: 'garden',
+    ornament: 'peony',
+  }),
+  kalanit: drawn('kalanit', ['#FBF5E9', '#F6EFE1', '#EFE5CF'], {
+    bg: ['#F6F1E7', '#EDE5D5', '#E0D5BF'],
+    paper: ['#FFFDF8', '#F5EFE3', '#E9E0CE'],
+    hint: '#6A635A',
+    panorama: 'garden',
+    ornament: 'anemone',
+  }),
+  majolica: drawn('majolica', ['#FFFDF8', '#FBF8F1', '#F3EDDD'], {
+    bg: ['#E6EEFB', '#D6E2F6', '#C2D2EE'],
+    paper: ['#FFFFFF', '#F6F3EC', '#EAE5D9'],
+    hint: '#1D2F6F',
+    panorama: 'waves',
+    ornament: 'citrus',
+  }),
+  'jerusalem-stone': drawn('jerusalem-stone', ['#98BCD7', '#BCD4E5', '#E8EEF0'], {
+    bg: ['#EADFC9', '#DECDAE', '#CFBA93'],
+    paper: ['#F6EEDF', '#EBDFC9', '#DCCBAE'],
+    hint: '#5A4B38',
+    panorama: 'arches',
+    ornament: 'olive-branch',
+  }),
+  marrakech: drawn('marrakech', ['#14493F', '#0F3B34', '#0A2A25'], {
+    bg: ['#134539', '#0F3B34', '#0A2A25'],
+    paper: ['#F6EBD6', '#EBDDC2', '#DDCBA9'],
+    hint: 'rgba(251,243,228,.86)',
+    panorama: 'arches',
+    ornament: 'hamsa',
+  }),
+  bukhara: drawn('bukhara', ['#F8EDDA', '#F4E6CF', '#EAD6B6'], {
+    bg: ['#F4E6CF', '#EAD6B6', '#DCC39B'],
+    paper: ['#FFF8EE', '#F5EAD8', '#E8D8BD'],
+    hint: '#4B4870',
+    panorama: 'garden',
+    ornament: 'rosette',
+  }),
+  'scribble-love': drawn('scribble-love', ['#FDFCF9', '#FBFAF6', '#F4F2EB'], {
+    bg: ['#FBFAF6', '#F1EFE8', '#E6E3DA'],
+    paper: ['#FFFFFF', '#F6F4EF', '#EAE7DF'],
+    hint: '#5B5B57',
+    panorama: 'doodle',
+    ornament: 'scribble-heart',
+  }),
+  'martini-olive': drawn('martini-olive', ['#5B6829', '#4F5B24', '#3E481B'], {
+    bg: ['#56632A', '#4F5B24', '#3E481B'],
+    paper: ['#F7F0E1', '#EDE3CE', '#DFD2B7'],
+    hint: 'rgba(247,240,225,.88)',
+    panorama: 'stars',
+    ornament: 'martini',
+  }),
+  klaf: drawn('klaf', ['#F5ECD7', '#EFE3C8', '#E2D0AA'], {
+    bg: ['#EFE3C8', '#E3D2B0', '#D4BF97'],
+    paper: ['#F9F3E4', '#EFE5CF', '#E1D3B6'],
+    hint: '#5E4B38',
+    panorama: 'hills',
+    ornament: 'torah',
+  }),
+  'neon-night': drawn('neon-night', ['#16122B', '#0B0A12', '#07060C'], {
+    bg: ['#171431', '#0E0C1C', '#07060C'],
+    paper: ['#221E40', '#1A1733', '#131028'],
+    hint: 'rgba(255,255,255,.82)',
+    panorama: 'stars',
+    ornament: 'zap',
+    ticket: { paper: '#1D1938', edge: 'var(--inv-accent)' },
+  }),
+  'match-day': drawn('match-day', ['#0E3D1F', '#1B6F37', '#1E7A3C'], {
+    bg: ['#1E7A3C', '#176331', '#0E4722'],
+    paper: ['#FFFFFF', '#F1F1EC', '#E2E3DB'],
+    hint: 'rgba(255,255,255,.88)',
+    panorama: 'pitch',
+    ornament: 'ball',
+  }),
+  'jet-set': drawn('jet-set', ['#C3E0F2', '#D6EAF5', '#EBF5FA'], {
+    bg: ['#D6EAF5', '#C4E0F1', '#ADD2EA'],
+    paper: ['#FFFDF7', '#F4F1E8', '#E6E1D4'],
+    hint: '#3D475C',
+    panorama: 'flight',
+    ornament: 'plane',
+    ticket: { paper: '#FFFDF7', edge: 'rgba(31,42,68,.22)' },
+  }),
+  'coquette-bow': drawn('coquette-bow', ['#FCE9ED', '#F9DFE4', '#F3CDD6'], {
+    bg: ['#F9DFE4', '#F3CED6', '#EABAC6'],
+    paper: ['#FFF8F6', '#FBEDEE', '#F1DADF'],
+    hint: '#6A4650',
+    panorama: 'swags',
+    ornament: 'bow',
+  }),
+  'almond-blossom': drawn('almond-blossom', ['#C6DAE6', '#DCE6EB', '#F4EEE8'], {
+    bg: ['#EEF1F2', '#E2E9EC', '#D3DFE6'],
+    paper: ['#FFFDFB', '#F6F0EB', '#EAE1DA'],
+    hint: '#5E504A',
+    panorama: 'garden',
+    ornament: 'blossom',
+  }),
+  'cocoa-teddy': drawn('cocoa-teddy', ['#DCEAF6', '#EEE6DA', '#F1E6D6'], {
+    bg: ['#F1E6D6', '#E7D8C3', '#DAC6AB'],
+    paper: ['#FFFDF8', '#F6EEE2', '#E9DDCB'],
+    hint: '#5E4838',
+    panorama: 'hills',
+    ornament: 'teddy',
+  }),
+  'dino-hatch': drawn('dino-hatch', ['#DDF1F3', '#E6F4DA', '#EAF6CF'], {
+    bg: ['#EAF6CF', '#DCEDB5', '#C9E09A'],
+    paper: ['#FFFFFF', '#F4F8EA', '#E4ECD2'],
+    hint: '#4A5641',
+    panorama: 'hills',
+    ornament: 'dino',
+  }),
+  'deco-gatsby': drawn('deco-gatsby', ['#18181B', '#0E0E10', '#08080A'], {
+    bg: ['#18181C', '#0F0F11', '#08080A'],
+    paper: ['#232326', '#1B1B1E', '#141416'],
+    hint: 'rgba(241,232,212,.82)',
+    panorama: 'deco',
+    ornament: 'deco-fan',
+  }),
+  'white-city': drawn('white-city', ['#F8F7F2', '#F3F1EA', '#EAE7DD'], {
+    bg: ['#F3F1EA', '#E8E5DB', '#DCD8CB'],
+    paper: ['#FFFFFF', '#F4F2EC', '#E6E3DA'],
+    hint: '#55554F',
+    panorama: 'skyline',
+    ornament: 'bauhaus',
+  }),
 };
+
+/**
+ * A scene template's art: the scene draws over `sky` (a plain gradient — also the backdrop of its
+ * link-preview image); the CSS cover's envelope is `paper` [light, mid, shade] on `bg`, and its card
+ * shows the scene.
+ */
+function drawn(
+  scene: SceneId,
+  sky: [string, string, string],
+  o: {
+    bg: [string, string, string];
+    paper: [string, string, string];
+    hint: string;
+    panorama: PanoramaKind;
+    ornament: IconName;
+    ticket?: { paper: string; edge: string };
+  },
+): PlaceholderArt {
+  const [light, mid, shade] = o.paper;
+  return {
+    sky: `linear-gradient(180deg,${sky[0]} 0%,${sky[1]} 55%,${sky[2]} 100%)`,
+    shade: null,
+    cloud: 'rgba(255,255,255,.4)',
+    hills: [sky[2], sky[2], sky[2], sky[2]],
+    cover: {
+      bg: o.bg,
+      envelope: [light, mid],
+      pocket: [light, mid],
+      flap: [mid, shade],
+      card: `linear-gradient(180deg,${sky[0]},${sky[2]})`,
+      hint: o.hint,
+      ...(o.ticket ? { ticket: o.ticket } : null),
+    },
+    panorama: o.panorama,
+    ornament: o.ornament,
+    scene,
+  };
+}
 
 const FALLBACK = PLACEHOLDERS['sahar-bordeaux']!;
 

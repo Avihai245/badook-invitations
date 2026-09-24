@@ -1,0 +1,236 @@
+{
+  "id": "white-city",
+  "version": 2,
+  "name": {
+    "he": "העיר הלבנה",
+    "en": "White City"
+  },
+  "description": {
+    "he": "באוהאוס תל אביבי — מרפסות סרט מעוגלות עם קווי צל, חלון מדרגות \"מדחום\", עמודי פילוטיס, עיגול, ריבוע ומשולש בצבעי יסוד וספרות ענק.",
+    "en": "Tel Aviv Bauhaus — rounded ribbon balconies with shadow lines, a thermometer stair window, pilotis, a primary circle, square and triangle, and oversized numerals."
+  },
+  "tier": "premium",
+  "categories": [
+    "corporate",
+    "wedding",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/white-city/preview.webp",
+  "previewVideo": "/templates/white-city/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F3F1EA",
+      "surface": "#FFFFFF",
+      "ink": "#1E1E1E",
+      "inkMuted": "#64645D",
+      "accent": "#CC3A27",
+      "accentInk": "#FFFFFF",
+      "line": "#D8D3C7",
+      "heroText": "#1E1E1E"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 0,
+      "button": 0
+    },
+    "divider": "none"
+  },
+  "palettePresets": [
+    {
+      "id": "red",
+      "name": {
+        "he": "אדום",
+        "en": "Red"
+      },
+      "palette": {
+        "accent": "#CC3A27"
+      }
+    },
+    {
+      "id": "blue",
+      "name": {
+        "he": "כחול",
+        "en": "Blue"
+      },
+      "palette": {
+        "accent": "#2B59C3"
+      }
+    },
+    {
+      "id": "black",
+      "name": {
+        "he": "שחור",
+        "en": "Black"
+      },
+      "palette": {
+        "accent": "#1E1E1E"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "bauhaus",
+      "display": {
+        "latin": "Jost",
+        "hebrew": "Alef"
+      },
+      "heading": {
+        "latin": "Jost",
+        "hebrew": "Alef"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Alef"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Alef"
+      }
+    },
+    {
+      "id": "modernist",
+      "display": {
+        "latin": "Syne",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Syne",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/white-city/cover-poster.webp",
+    "posterDesktop": "/templates/white-city/cover-poster-desktop.webp",
+    "openVideo": "/templates/white-city/cover-open.mp4",
+    "openVideoDesktop": "/templates/white-city/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/white-city/dot-blank.png",
+      "recolor": true,
+      "size": 0.28,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "print",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#CC3A27",
+      "#2B59C3",
+      "#E0A800"
+    ],
+    "monogramFont": {
+      "latin": "Jost",
+      "hebrew": "Alef"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "בניין באוהאוס בשדרות רוטשילד",
+          "en": "A Bauhaus building on Rothschild Boulevard"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#1E1E1E",
+    "overlayColor": "#FFFFFF",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "white-city-theme",
+    "tracks": [
+      {
+        "id": "white-city-theme",
+        "title": "White City (modern jazz trio)",
+        "url": "/templates/white-city/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 30,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/white-city/hero.mp4",
+    "hero-poster": "/templates/white-city/hero-poster.webp",
+    "hero-desktop": "/templates/white-city/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/white-city/hero-desktop-poster.webp",
+    "balcony-band": "/templates/white-city/balcony-band.webp",
+    "boulevard-panorama": "/templates/white-city/boulevard-panorama.webp",
+    "primary-shapes": "/templates/white-city/primary-shapes.webp",
+    "stair-window": "/templates/white-city/stair-window.webp",
+    "bauhaus-mark": "/templates/white-city/bauhaus-mark.webp"
+  },
+  "decorations": {
+    "afterHero": "template:balcony-band",
+    "betweenVenues": "template:boulevard-panorama",
+    "afterTimeline": "template:primary-shapes",
+    "beforeRsvp": "template:stair-window",
+    "footer": "template:bauhaus-mark"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

@@ -38,6 +38,7 @@ import {
   hostsText,
   usePreviewControls,
 } from '../fields/fields';
+import { LibraryFontPairs } from '../fields/font-library';
 import { AUDIO_TYPES, ImageField, UploadTile, useUploader } from '../fields/media';
 import { addLocale, removeLocale } from '../locales';
 import { useEditor, type PanelId } from '../state/EditorProvider';
@@ -324,6 +325,12 @@ function FontsPanel() {
               </button>
             );
           })}
+          <LibraryFontPairs
+            selected={doc.theme.fontPairId}
+            onSelect={(id) => update('theme.fontPairId', id, null)}
+            title={e.f.fonts.more}
+            help={e.f.fonts.moreHelp}
+          />
         </div>
       </FieldFrame>
     </PanelCard>
