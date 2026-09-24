@@ -25,8 +25,18 @@ function Building({ u }: { u: Url }) {
       return (
         <g key={y}>
           <path d={d} fill="#FFFFFF" />
-          <path d={`M${x + 6} ${y + 2 * r + 4}H${x + w - 6}`} stroke={CONCRETE} strokeWidth="6" opacity=".9" />
-          <path d={`M${x + 10} ${y + 2 * r + 9}H${x + w - 10}`} stroke={BLACK} strokeWidth="1.2" opacity=".18" />
+          <path
+            d={`M${x + 6} ${y + 2 * r + 4}H${x + w - 6}`}
+            stroke={CONCRETE}
+            strokeWidth="6"
+            opacity=".9"
+          />
+          <path
+            d={`M${x + 10} ${y + 2 * r + 9}H${x + w - 10}`}
+            stroke={BLACK}
+            strokeWidth="1.2"
+            opacity=".18"
+          />
         </g>
       );
     });
@@ -77,9 +87,21 @@ export default function WhiteCity({ place, date }: SceneProps) {
           </filter>
         </defs>
       </svg>
-      <Layer style={{ background: 'radial-gradient(90cqw 60cqh at 70% 20%, rgba(255,255,255,.8), transparent 70%)' }} />
+      <Layer
+        style={{
+          background: 'radial-gradient(90cqw 60cqh at 70% 20%, rgba(255,255,255,.8), transparent 70%)',
+        }}
+      />
       {/* the oversized numeral */}
-      <Piece vb={[0, 0, 200, 200]} style={{ left: '50%', top: '50%', width: card ? '50cqmin' : 'min(118cqmin, 86cqh)', translate: '-50% -54%' }}>
+      <Piece
+        vb={[0, 0, 200, 200]}
+        style={{
+          left: '50%',
+          top: '50%',
+          width: card ? '50cqmin' : 'min(118cqmin, 86cqh)',
+          translate: '-50% -54%',
+        }}
+      >
         <text
           x="100"
           y="100"
@@ -98,17 +120,50 @@ export default function WhiteCity({ place, date }: SceneProps) {
       <Piece vb={[0, 0, 100, 100]} style={{ right: cm(-14), top: cm(-12), width: cm(card ? 34 : 56) }}>
         <circle cx="50" cy="50" r="46" style={{ fill: RED }} />
       </Piece>
-      <Layer style={{ inset: 'auto', left: cm(7), top: cm(card ? 6 : 9), width: cm(card ? 10 : 16), aspectRatio: '1', background: BLUE, rotate: '-8deg' }} />
+      <Layer
+        style={{
+          inset: 'auto',
+          left: cm(7),
+          top: cm(card ? 6 : 9),
+          width: cm(card ? 10 : 16),
+          aspectRatio: '1',
+          background: BLUE,
+          rotate: '-8deg',
+        }}
+      />
       <Piece vb={[0, 0, 100, 90]} style={{ left: cm(-4), top: '46%', width: cm(card ? 12 : 18) }}>
         <path d="M0 90L50 0L100 90Z" fill={YELLOW} />
       </Piece>
-      <Layer style={{ inset: 'auto', left: cm(4), right: '38%', top: cm(card ? 20 : 30), height: '1.5px', background: BLACK }} />
-      <Layer style={{ inset: 'auto', right: cm(18), top: cm(card ? 16 : 24), bottom: card ? '30cqh' : '28cqh', width: '1.5px', background: BLACK, opacity: 0.8 }} />
+      <Layer
+        style={{
+          inset: 'auto',
+          left: cm(4),
+          right: '38%',
+          top: cm(card ? 20 : 30),
+          height: '1.5px',
+          background: BLACK,
+        }}
+      />
+      <Layer
+        style={{
+          inset: 'auto',
+          right: cm(18),
+          top: cm(card ? 16 : 24),
+          bottom: card ? '30cqh' : '28cqh',
+          width: '1.5px',
+          background: BLACK,
+          opacity: 0.8,
+        }}
+      />
       <Piece vb={[0, 0, 40, 40]} style={{ right: cm(10), top: cm(card ? 24 : 40), width: cm(card ? 4 : 5) }}>
         <circle cx="20" cy="20" r="18" fill={BLACK} />
       </Piece>
       {/* the building along the foot */}
-      <Piece vb={[0, 0, 1000, 260]} fit="xMidYMax meet" style={{ left: '50%', bottom: 0, width: card ? '96cqw' : 'min(150cqw, 110cqh)', translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 1000, 260]}
+        fit="xMidYMax meet"
+        style={{ left: '50%', bottom: 0, width: card ? '96cqw' : 'min(150cqw, 110cqh)', translate: '-50% 0' }}
+      >
         <Building u={url} />
       </Piece>
     </>

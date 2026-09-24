@@ -1,6 +1,14 @@
 {
   "generatedBy": "scripts/measure-display-fonts.ts",
   "emPerChar": {
+    "Abril Fatface": {
+      "latin": 0.555,
+      "hebrew": 0.447
+    },
+    "Alef": {
+      "latin": 0.524,
+      "hebrew": 0.465
+    },
     "Allura": {
       "latin": 0.443,
       "hebrew": 0.447
@@ -21,9 +29,21 @@
       "latin": 0.445,
       "hebrew": 0.447
     },
+    "Ballet": {
+      "latin": 0.514,
+      "hebrew": 0.447
+    },
+    "Bebas Neue": {
+      "latin": 0.381,
+      "hebrew": 0.447
+    },
     "Bellefair": {
       "latin": 0.438,
       "hebrew": 0.363
+    },
+    "Big Shoulders Display": {
+      "latin": 0.328,
+      "hebrew": 0.447
     },
     "Bodoni Moda": {
       "latin": 0.542,
@@ -32,6 +52,10 @@
     "Bona Nova": {
       "latin": 0.512,
       "hebrew": 0.44
+    },
+    "Caveat": {
+      "latin": 0.402,
+      "hebrew": 0.447
     },
     "Cinzel": {
       "latin": 0.64,
@@ -45,9 +69,25 @@
       "latin": 0.462,
       "hebrew": 0.447
     },
+    "Courier Prime": {
+      "latin": 0.6,
+      "hebrew": 0.447
+    },
+    "Cousine": {
+      "latin": 0.6,
+      "hebrew": 0.6
+    },
+    "DM Serif Display": {
+      "latin": 0.518,
+      "hebrew": 0.447
+    },
     "David Libre": {
       "latin": 0.48,
       "hebrew": 0.495
+    },
+    "EB Garamond": {
+      "latin": 0.458,
+      "hebrew": 0.447
     },
     "Frank Ruhl Libre": {
       "latin": 0.506,
@@ -55,6 +95,14 @@
     },
     "Fraunces": {
       "latin": 0.557,
+      "hebrew": 0.447
+    },
+    "Fredoka": {
+      "latin": 0.527,
+      "hebrew": 0.493
+    },
+    "Gloock": {
+      "latin": 0.549,
       "hebrew": 0.447
     },
     "Great Vibes": {
@@ -65,17 +113,37 @@
       "latin": 0.515,
       "hebrew": 0.478
     },
+    "IM Fell English": {
+      "latin": 0.495,
+      "hebrew": 0.447
+    },
     "Inter": {
       "latin": 0.545,
+      "hebrew": 0.447
+    },
+    "Italiana": {
+      "latin": 0.482,
       "hebrew": 0.447
     },
     "Italianno": {
       "latin": 0.336,
       "hebrew": 0.447
     },
+    "Josefin Sans": {
+      "latin": 0.536,
+      "hebrew": 0.447
+    },
+    "Jost": {
+      "latin": 0.478,
+      "hebrew": 0.447
+    },
     "Karantina": {
       "latin": 0.324,
       "hebrew": 0.296
+    },
+    "Limelight": {
+      "latin": 0.642,
+      "hebrew": 0.447
     },
     "Lora": {
       "latin": 0.538,
@@ -85,16 +153,52 @@
       "latin": 0.518,
       "hebrew": 0.447
     },
+    "Miriam Libre": {
+      "latin": 0.553,
+      "hebrew": 0.476
+    },
+    "Monoton": {
+      "latin": 0.763,
+      "hebrew": 0.447
+    },
     "Noto Serif Hebrew": {
       "latin": 0.565,
+      "hebrew": 0.472
+    },
+    "Nunito": {
+      "latin": 0.521,
+      "hebrew": 0.447
+    },
+    "Oswald": {
+      "latin": 0.408,
+      "hebrew": 0.447
+    },
+    "Outfit": {
+      "latin": 0.532,
+      "hebrew": 0.447
+    },
+    "Petit Formal Script": {
+      "latin": 0.685,
       "hebrew": 0.447
     },
     "Pinyon Script": {
       "latin": 0.456,
       "hebrew": 0.447
     },
+    "Playfair Display": {
+      "latin": 0.523,
+      "hebrew": 0.447
+    },
     "Playpen Sans Hebrew": {
       "latin": 0.549,
+      "hebrew": 0.454
+    },
+    "Quicksand": {
+      "latin": 0.549,
+      "hebrew": 0.447
+    },
+    "Righteous": {
+      "latin": 0.542,
       "hebrew": 0.447
     },
     "Rubik": {
@@ -105,12 +209,28 @@
       "latin": 0.51,
       "hebrew": 0.446
     },
+    "Shantell Sans": {
+      "latin": 0.572,
+      "hebrew": 0.447
+    },
+    "Space Mono": {
+      "latin": 0.61,
+      "hebrew": 0.447
+    },
+    "Special Elite": {
+      "latin": 0.583,
+      "hebrew": 0.447
+    },
     "Suez One": {
       "latin": 0.524,
       "hebrew": 0.435
     },
     "Syne": {
       "latin": 0.522,
+      "hebrew": 0.447
+    },
+    "Titan One": {
+      "latin": 0.634,
       "hebrew": 0.447
     },
     "Unbounded": {
@@ -120,6 +240,14 @@
     "Varela Round": {
       "latin": 0.524,
       "hebrew": 0.472
+    },
+    "Yeseva One": {
+      "latin": 0.596,
+      "hebrew": 0.447
+    },
+    "Young Serif": {
+      "latin": 0.61,
+      "hebrew": 0.447
     }
   }
 }

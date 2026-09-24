@@ -1,6 +1,7 @@
 import type { FontPair, Locale, TemplateManifest } from '../contracts/types';
 import generated from './font-faces.generated.json';
 import measured from './font-metrics.generated.json';
+import { FONT_LIBRARY, findFontPair } from './library';
 
 export type FontRole = 'display' | 'heading' | 'body' | 'ui';
 
@@ -51,19 +52,32 @@ export function monogramStack(template: TemplateManifest, locale: Locale): strin
   );
 }
 
-/** Families a template can use (all its pairs — the editor can switch — plus the monogram fonts). */
-export function templateFontFamilies(template: TemplateManifest, pairId?: string): string[] {
-  const pairs = pairId ? template.fontPairs.filter((p) => p.id === pairId) : template.fontPairs;
+/** A pair's families: every role, both scripts. */
+export function pairFontFamilies(pair: FontPair): string[] {
   const set = new Set<string>();
-  for (const pair of pairs) {
-    for (const role of ['display', 'heading', 'body', 'ui'] as const) {
-      set.add(pair[role].latin);
-      set.add(pair[role].hebrew);
-    }
+  for (const role of ['display', 'heading', 'body', 'ui'] as const) {
+    set.add(pair[role].latin);
+    set.add(pair[role].hebrew);
   }
+  return [...set];
+}
+
+/**
+ * Families a template can use: all its pairs (the editor can switch) — or only the pair `pairId`
+ * names, one of its own or one from the font library — plus the monogram fonts.
+ */
+export function templateFontFamilies(template: TemplateManifest, pairId?: string): string[] {
+  const found = pairId ? findFontPair(template, pairId) : undefined;
+  const pairs = pairId ? (found ? [found] : []) : template.fontPairs;
+  const set = new Set(pairs.flatMap(pairFontFamilies));
   set.add(template.cover.monogramFont.latin);
   set.add(template.cover.monogramFont.hebrew);
   return [...set];
+}
+
+/** The font library's display faces — what its pickers write each pair's name in. */
+export function libraryDisplayFamilies(): string[] {
+  return [...new Set(FONT_LIBRARY.flatMap((p) => [p.display.hebrew, p.display.latin]))];
 }
 
 /**

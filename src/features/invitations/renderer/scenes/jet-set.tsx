@@ -37,7 +37,13 @@ function RoundStamp({ color, label }: { color: string; label?: [string, string] 
         <circle key={i} cx={x} cy={y} r="1.8" style={{ fill: color }} stroke="none" />
       ))}
       {label ? (
-        <text x="0" y="9" textAnchor="middle" style={{ fill: color, font: '700 26px "Space Mono", "Cousine", monospace' }} stroke="none">
+        <text
+          x="0"
+          y="9"
+          textAnchor="middle"
+          style={{ fill: color, font: '700 26px "Space Mono", "Cousine", monospace' }}
+          stroke="none"
+        >
           {label[0]}.{label[1]}
         </text>
       ) : (
@@ -79,7 +85,7 @@ function Tag({ u }: { u: Url }) {
 function Barcode() {
   const rand = rng(8);
   const bars: [number, number][] = [];
-  for (let x = 12; x < 108; ) {
+  for (let x = 12; x < 108;) {
     const w = 1 + Math.floor(rand() * 3.4);
     bars.push([x, w]);
     x += w + 1 + Math.floor(rand() * 2.5);
@@ -107,8 +113,14 @@ export default function JetSet({ place, date }: SceneProps) {
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
           <linearGradient id={ref('leather')} x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #F26B38) 70%, #FFE2C9)' }} />
-            <stop offset="1" style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #F26B38) 75%, #4A1E0C)' }} />
+            <stop
+              offset="0"
+              style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #F26B38) 70%, #FFE2C9)' }}
+            />
+            <stop
+              offset="1"
+              style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #F26B38) 75%, #4A1E0C)' }}
+            />
           </linearGradient>
           <filter id={ref('soft')} x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="1.5" dy="4" stdDeviation="3" floodColor="#1F2A44" floodOpacity=".25" />
@@ -136,7 +148,11 @@ export default function JetSet({ place, date }: SceneProps) {
           boxShadow: 'inset 0 0 0 1px rgba(31,42,68,.12)',
         }}
       />
-      <Piece vb={[0, 0, 400, 700]} fit="xMidYMid slice" style={{ inset: border, width: `calc(100% - 2 * ${border})`, height: `calc(100% - 2 * ${border})` }}>
+      <Piece
+        vb={[0, 0, 400, 700]}
+        fit="xMidYMid slice"
+        style={{ inset: border, width: `calc(100% - 2 * ${border})`, height: `calc(100% - 2 * ${border})` }}
+      >
         <g filter={url('cloud')} opacity=".85">
           <Cloud x={70} y={120} s={1.1} />
           <Cloud x={330} y={250} s={0.8} />
@@ -145,36 +161,101 @@ export default function JetSet({ place, date }: SceneProps) {
         </g>
       </Piece>
       {/* the flight path */}
-      <Piece vb={[0, 0, 400, 700]} fit="none" style={{ inset: border, width: `calc(100% - 2 * ${border})`, height: `calc(100% - 2 * ${border})` }}>
-        <path d="M-10 660C60 520 40 380 110 300S330 170 352 70" fill="none" stroke={NAVY} strokeWidth="2.4" strokeDasharray="8 10" opacity=".45" vectorEffect="non-scaling-stroke" />
+      <Piece
+        vb={[0, 0, 400, 700]}
+        fit="none"
+        style={{ inset: border, width: `calc(100% - 2 * ${border})`, height: `calc(100% - 2 * ${border})` }}
+      >
+        <path
+          d="M-10 660C60 520 40 380 110 300S330 170 352 70"
+          fill="none"
+          stroke={NAVY}
+          strokeWidth="2.4"
+          strokeDasharray="8 10"
+          opacity=".45"
+          vectorEffect="non-scaling-stroke"
+        />
       </Piece>
-      <Piece vb={[0, 0, 100, 100]} anim="float" style={{ right: cm(card ? 9 : 10), top: cm(card ? 8 : 10), width: cm(card ? 9 : 14), rotate: '-32deg' }}>
+      <Piece
+        vb={[0, 0, 100, 100]}
+        anim="float"
+        style={{
+          right: cm(card ? 9 : 10),
+          top: cm(card ? 8 : 10),
+          width: cm(card ? 9 : 14),
+          rotate: '-32deg',
+        }}
+      >
         <g filter={url('soft')}>
-          <path d="M50 6c4 0 6 6 6 14v22l36 20v10L56 60v20l12 10v6l-18-5-18 5v-6l12-10V60L8 72V62l36-20V20c0-8 2-14 6-14z" fill="#fff" stroke={NAVY} strokeWidth="2.4" strokeLinejoin="round" />
+          <path
+            d="M50 6c4 0 6 6 6 14v22l36 20v10L56 60v20l12 10v6l-18-5-18 5v-6l12-10V60L8 72V62l36-20V20c0-8 2-14 6-14z"
+            fill="#fff"
+            stroke={NAVY}
+            strokeWidth="2.4"
+            strokeLinejoin="round"
+          />
           <path d="M44 44h12" stroke={ORANGE} strokeWidth="4" style={{ stroke: ORANGE }} />
         </g>
       </Piece>
-      <Piece vb={[-60, -60, 120, 120]} style={{ left: cm(card ? 6 : 8), top: cm(card ? 6 : 9), width: cm(card ? 15 : 24), rotate: '-14deg', opacity: 0.75 }}>
+      <Piece
+        vb={[-60, -60, 120, 120]}
+        style={{
+          left: cm(card ? 6 : 8),
+          top: cm(card ? 6 : 9),
+          width: cm(card ? 15 : 24),
+          rotate: '-14deg',
+          opacity: 0.75,
+        }}
+      >
         <g filter={url('ink')}>
           <RoundStamp color={RED} label={dm} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 150, 90]} style={{ right: cm(card ? 6 : 7), bottom: cm(card ? 18 : 30), width: cm(card ? 15 : 24), rotate: '9deg', opacity: 0.7 }}>
+      <Piece
+        vb={[0, 0, 150, 90]}
+        style={{
+          right: cm(card ? 6 : 7),
+          bottom: cm(card ? 18 : 30),
+          width: cm(card ? 15 : 24),
+          rotate: '9deg',
+          opacity: 0.7,
+        }}
+      >
         <g filter={url('ink')}>
           <RectStamp color={BLUE} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 110, 170]} anim="sway" style={{ right: cm(card ? 5 : 7), bottom: cm(card ? 5 : 7), width: cm(card ? 11 : 17), rotate: '12deg' }}>
+      <Piece
+        vb={[0, 0, 110, 170]}
+        anim="sway"
+        style={{
+          right: cm(card ? 5 : 7),
+          bottom: cm(card ? 5 : 7),
+          width: cm(card ? 11 : 17),
+          rotate: '12deg',
+        }}
+      >
         <g filter={url('soft')}>
           <Tag u={url} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 120, 60]} style={{ left: cm(card ? 6 : 8), bottom: cm(card ? 6 : 9), width: cm(card ? 16 : 24), rotate: '-6deg' }}>
+      <Piece
+        vb={[0, 0, 120, 60]}
+        style={{
+          left: cm(card ? 6 : 8),
+          bottom: cm(card ? 6 : 9),
+          width: cm(card ? 16 : 24),
+          rotate: '-6deg',
+        }}
+      >
         <g filter={url('soft')}>
           <Barcode />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 60, 20]} style={{ left: '50%', bottom: cm(card ? 5 : 8), width: cm(card ? 8 : 11), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 60, 20]}
+        style={{ left: '50%', bottom: cm(card ? 5 : 8), width: cm(card ? 8 : 11), translate: '-50% 0' }}
+      >
         {[0, 1, 2].map((i) => (
           <circle key={i} cx={10 + i * 20} cy="10" r="3" fill={i === 1 ? SKY : NAVY} opacity=".5" />
         ))}
@@ -182,4 +263,3 @@ export default function JetSet({ place, date }: SceneProps) {
     </>
   );
 }
-

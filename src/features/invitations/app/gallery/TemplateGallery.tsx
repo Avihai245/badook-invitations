@@ -1,5 +1,6 @@
 'use client';
 
+import { Crown } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { cn, PaletteDots, Segmented } from '@/components/app';
 import type { UiLocale } from '@/lib/i18n/app';
@@ -116,6 +117,7 @@ export function TemplateGallery({
             <li key={manifest.id}>
               <GalleryCard
                 name={manifest.name[locale as UiLocale] ?? manifest.name.en ?? manifest.id}
+                premium={manifest.tier === 'premium'}
                 categories={manifest.categories.map((c) => t.eventTypes[c]).join(' · ')}
                 palette={manifest.tokens.palette}
                 template={manifest}
@@ -156,6 +158,7 @@ export function TemplateGallery({
 
 function GalleryCard({
   name,
+  premium,
   categories,
   palette,
   template,
@@ -167,6 +170,7 @@ function GalleryCard({
   onOpen,
 }: {
   name: string;
+  premium: boolean;
   categories: string;
   palette: { bg: string; accent: string; ink: string };
   template: PosterTemplate;
@@ -197,7 +201,7 @@ function GalleryCard({
       onClick={onOpen}
       onMouseEnter={() => videos.hover(ref.current, true)}
       onMouseLeave={() => videos.hover(ref.current, false)}
-      aria-label={fmt(t.gallery.playPreview, { name })}
+      aria-label={fmt(t.gallery.playPreview, { name }) + (premium ? ` (${t.gallery.premium})` : '')}
       className="group block w-full text-start"
     >
       <TemplatePoster
@@ -206,6 +210,7 @@ function GalleryCard({
         text={sample}
         image={image}
         play={!playing}
+        badge={premium ? <PremiumBadge label={t.gallery.premium} /> : null}
         className="transition-[transform,box-shadow] duration-250 group-hover:-translate-y-1 group-hover:shadow-lg motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
       >
         {video && !failed ? (
@@ -239,5 +244,18 @@ function GalleryCard({
         <div className="mt-0.5 text-[12px] text-muted">{categories}</div>
       </div>
     </button>
+  );
+}
+
+/** Premium designs wear a small tag on their poster. */
+function PremiumBadge({ label }: { label: string }) {
+  return (
+    <span
+      data-premium=""
+      className="inline-flex h-[22px] items-center gap-1 rounded-full bg-black/60 px-2 text-[11px] font-semibold text-white shadow-sm backdrop-blur-[2px]"
+    >
+      <Crown aria-hidden size={12} className="text-[#F3D98B]" />
+      {label}
+    </span>
   );
 }

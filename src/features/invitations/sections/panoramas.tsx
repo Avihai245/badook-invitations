@@ -41,7 +41,10 @@ const PANORAMAS: Partial<Record<PanoramaKind, () => ReactNode>> = {
         return (
           <g key={i} opacity={big ? 1 : 0.55 + (i % 2) * 0.15}>
             <path d={`M${x} 176V${176 - h}a${w / 2} ${w / 2} 0 0 1 ${w} 0V176`} />
-            <path d={`M${x + 8} 176V${176 - h + 4}a${w / 2 - 8} ${w / 2 - 8} 0 0 1 ${w - 16} 0V176`} opacity=".5" />
+            <path
+              d={`M${x + 8} 176V${176 - h + 4}a${w / 2 - 8} ${w / 2 - 8} 0 0 1 ${w - 16} 0V176`}
+              opacity=".5"
+            />
           </g>
         );
       })}
@@ -63,7 +66,9 @@ const PANORAMAS: Partial<Record<PanoramaKind, () => ReactNode>> = {
             ) : (
               [0, 72, 144, 216, 288].map((a) => {
                 const rad = ((a - 90) * Math.PI) / 180;
-                return <circle key={a} cx={r1(x + Math.cos(rad) * 5)} cy={r1(top + Math.sin(rad) * 5)} r="3.4" />;
+                return (
+                  <circle key={a} cx={r1(x + Math.cos(rad) * 5)} cy={r1(top + Math.sin(rad) * 5)} r="3.4" />
+                );
               })
             )}
           </g>
@@ -92,7 +97,11 @@ const PANORAMAS: Partial<Record<PanoramaKind, () => ReactNode>> = {
       <path d="M640 94v6M662 118h6M618 118h-6M656 102l4-4M624 102l-4-4" opacity=".6" />
       <path d="M210 150V104l30 40zM206 104v48M190 152h44l-6 8h-32z" />
       {[0, 1, 2].map((row) => (
-        <path key={row} opacity={1 - row * 0.25} d={`M${row * 10} ${152 + row * 10}${'q10 -7 20 0t20 0'.repeat(20)}`} />
+        <path
+          key={row}
+          opacity={1 - row * 0.25}
+          d={`M${row * 10} ${152 + row * 10}${'q10 -7 20 0t20 0'.repeat(20)}`}
+        />
       ))}
     </Band>
   ),
@@ -121,7 +130,14 @@ const PANORAMAS: Partial<Record<PanoramaKind, () => ReactNode>> = {
         <path key={x} d={sparkle(x!, y!, s!)} />
       ))}
       {range(24).map((i) => (
-        <circle key={i} cx={20 + i * 33} cy={100 + ((i * 17) % 50)} r=".9" fill="currentColor" stroke="none" />
+        <circle
+          key={i}
+          cx={20 + i * 33}
+          cy={100 + ((i * 17) % 50)}
+          r=".9"
+          fill="currentColor"
+          stroke="none"
+        />
       ))}
     </Band>
   ),

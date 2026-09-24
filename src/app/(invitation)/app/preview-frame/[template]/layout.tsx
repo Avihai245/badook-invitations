@@ -17,7 +17,8 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, view
 /**
  * Root layout of the editor's preview iframe (§9B.3-D): the invitation's own document (so svh, media
  * queries, dir and lang behave like on a phone), with every font pair of the template available —
- * the host can switch pairs. lang/dir/theme are set by the frame once the editor posts the document.
+ * the host can switch pairs (a pair from the font library brings its own faces: PreviewFrame).
+ * lang/dir/theme are set by the frame once the editor posts the document.
  */
 export default async function PreviewFrameLayout({
   children,

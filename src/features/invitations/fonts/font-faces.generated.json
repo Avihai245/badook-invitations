@@ -688,6 +688,59 @@
         }
       ]
     },
+    "Courier Prime": {
+      "id": "courier-prime",
+      "category": "monospace",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/courier-prime/5.3.0/courier-prime-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/courier-prime/5.3.0/courier-prime-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/courier-prime/5.3.0/courier-prime-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/courier-prime/5.3.0/courier-prime-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/courier-prime/5.3.0/courier-prime-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/courier-prime/5.3.0/courier-prime-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
     "Cousine": {
       "id": "cousine",
       "category": "monospace",
@@ -1985,8 +2038,8 @@
           "weight": 300,
           "style": "normal",
           "subset": "hebrew",
-          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
-          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-latin-300-normal.woff2"
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-hebrew-300-normal.woff2"
         },
         {
           "weight": 300,
@@ -2006,8 +2059,8 @@
           "weight": 400,
           "style": "normal",
           "subset": "hebrew",
-          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
-          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-latin-400-normal.woff2"
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-hebrew-400-normal.woff2"
         },
         {
           "weight": 400,
@@ -2027,8 +2080,8 @@
           "weight": 500,
           "style": "normal",
           "subset": "hebrew",
-          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
-          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-latin-500-normal.woff2"
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-hebrew-500-normal.woff2"
         },
         {
           "weight": 500,
@@ -2048,8 +2101,8 @@
           "weight": 700,
           "style": "normal",
           "subset": "hebrew",
-          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
-          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-latin-700-normal.woff2"
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-hebrew-700-normal.woff2"
         },
         {
           "weight": 700,
@@ -2201,6 +2254,73 @@
         }
       ]
     },
+    "Outfit": {
+      "id": "outfit",
+      "category": "sans-serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/outfit/5.3.0/outfit-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/outfit/5.3.0/outfit-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/outfit/5.3.0/outfit-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/outfit/5.3.0/outfit-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/outfit/5.3.0/outfit-latin-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/outfit/5.3.0/outfit-latin-ext-600-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/outfit/5.3.0/outfit-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/outfit/5.3.0/outfit-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
     "Petit Formal Script": {
       "id": "petit-formal-script",
       "category": "handwriting",
@@ -2332,8 +2452,8 @@
           "weight": 300,
           "style": "normal",
           "subset": "hebrew",
-          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
-          "url": "/fonts/playpen-sans-hebrew/5.3.0/playpen-sans-hebrew-latin-300-normal.woff2"
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/playpen-sans-hebrew/5.3.0/playpen-sans-hebrew-hebrew-300-normal.woff2"
         },
         {
           "weight": 300,
@@ -2353,8 +2473,8 @@
           "weight": 400,
           "style": "normal",
           "subset": "hebrew",
-          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
-          "url": "/fonts/playpen-sans-hebrew/5.3.0/playpen-sans-hebrew-latin-400-normal.woff2"
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/playpen-sans-hebrew/5.3.0/playpen-sans-hebrew-hebrew-400-normal.woff2"
         },
         {
           "weight": 400,
@@ -2374,8 +2494,8 @@
           "weight": 500,
           "style": "normal",
           "subset": "hebrew",
-          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
-          "url": "/fonts/playpen-sans-hebrew/5.3.0/playpen-sans-hebrew-latin-500-normal.woff2"
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/playpen-sans-hebrew/5.3.0/playpen-sans-hebrew-hebrew-500-normal.woff2"
         },
         {
           "weight": 500,
@@ -2808,6 +2928,31 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/space-mono/5.3.0/space-mono-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "Special Elite": {
+      "id": "special-elite",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/special-elite/5.3.0/special-elite-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/special-elite/5.3.0/special-elite-latin-ext-400-normal.woff2"
         }
       ]
     },

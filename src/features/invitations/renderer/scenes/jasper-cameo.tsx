@@ -1,45 +1,60 @@
-import { cm, Frame, Layer, Piece, polar, r1, useIds, type SceneProps } from './kit';
+import { cm, cmh, Frame, Layer, leafPath, Piece, polar, r1, useIds, type SceneProps } from './kit';
 
 /**
- * Jasper Cameo — blue jasperware with white relief: a border of pearls, acanthus scrolls in the
+ * Jasper Cameo — blue jasperware with white relief: a border of pearls, leafy scrolls in the
  * corners, a ribbon swag with a bow at the crown holding an oval cameo (a classical profile in a gilt
  * frame), a laurel garland below. The ground follows the page colour (the sage / lilac presets turn the
  * whole piece), the gilt follows the accent.
  */
 const WHITE = '#FFFFFF';
-const RELIEF_SHADE = 'rgba(35,50,74,.28)';
 const GILT = 'var(--inv-accent, #B08F52)';
 const GROUND = 'var(--inv-bg, #AFC6DE)';
 const GROUND_DEEP = 'color-mix(in srgb, var(--inv-bg, #AFC6DE) 78%, #23324A)';
 
 type Url = (name: string) => string;
 
-/** An acanthus scroll for the top-left corner (viewBox 0 0 160 160). */
-function Acanthus() {
-  const leaf = (x: number, y: number, deg: number, s: number) => {
-    const [tx, ty] = polar(x, y, s, deg);
-    const [ax, ay] = polar(x, y, s * 0.55, deg - 28);
-    const [bx, by] = polar(x, y, s * 0.55, deg + 28);
-    const [n1x, n1y] = polar(x, y, s * 0.72, deg - 12);
-    const [n2x, n2y] = polar(x, y, s * 0.72, deg + 12);
-    return `M${x} ${y}Q${ax} ${ay} ${n1x} ${n1y}L${tx} ${ty}L${n2x} ${n2y}Q${bx} ${by} ${x} ${y}Z`;
-  };
-  return (
-    <g fill={WHITE}>
-      <path d="M8 150C8 70 50 20 132 10c-38 16-66 40-80 76-9 24-10 44-4 64z" />
-      <path d="M48 150c-6-34 4-60 30-74 18-10 36-8 44 4 8 13 0 28-15 30-11 1-17-6-15-13 2-6 9-7 12-4" fill="none" stroke={WHITE} strokeWidth="6" strokeLinecap="round" />
-      <path d="M132 10c16 2 24 12 20 22-3 8-12 10-18 6" fill="none" stroke={WHITE} strokeWidth="6" strokeLinecap="round" />
-      {[
-        [30, 96, -30, 34],
-        [42, 64, -55, 30],
-        [66, 40, -70, 28],
-        [96, 24, -85, 24],
-        [20, 124, -12, 30],
-      ].map(([x, y, d, s], i) => (
-        <path key={i} d={leaf(x!, y!, d!, s!)} />
+/**
+ * A corner fleuron for the top-left (viewBox 0 0 160 160): a rosette in the corner and two slender
+ * scrolls running along the edges, each ending in a curl, with small leaves sprouting from them.
+ */
+function CornerScroll() {
+  // one scroll along the top edge; the left one is its mirror across the diagonal
+  const stem = 'M42 30C66 22 92 16 118 17c17 1 27 10 23 20-3 7-12 9-17 4-4-4-2-10 4-10';
+  const leaves: [number, number, number, number, number][] = [
+    [56, 26, -40, 17, 6],
+    [64, 25, 28, 14, 5],
+    [80, 21, -44, 16, 5.5],
+    [88, 20, 24, 13, 4.6],
+    [104, 18, -48, 14, 5],
+  ];
+  const branch = (
+    <g>
+      <path d={stem} fill="none" stroke={WHITE} strokeWidth="3.4" strokeLinecap="round" />
+      {leaves.map(([x, y, deg, len, wid], i) => (
+        <path key={i} d={leafPath(x, y, deg, len, wid, deg < 0 ? -8 : 8)} fill={WHITE} />
       ))}
-      <circle cx="146" cy="30" r="4.5" />
-      <circle cx="104" cy="104" r="4" />
+      <circle cx="132" cy="14" r="2.6" fill={WHITE} />
+      <circle cx="96" cy="30" r="2.2" fill={WHITE} />
+    </g>
+  );
+  const petals = Array.from({ length: 8 }, (_, i) => polar(28, 28, 9, i * 45));
+  return (
+    <g>
+      {branch}
+      <g transform="matrix(0 1 1 0 0 0)">{branch}</g>
+      {petals.map(([x, y], i) => (
+        <ellipse
+          key={i}
+          cx={x}
+          cy={y}
+          rx="5.2"
+          ry="3.4"
+          fill={WHITE}
+          transform={`rotate(${i * 45} ${x} ${y})`}
+        />
+      ))}
+      <circle cx="28" cy="28" r="5" fill={WHITE} />
+      <circle cx="28" cy="28" r="2.2" style={{ fill: GROUND_DEEP }} opacity=".5" />
     </g>
   );
 }
@@ -106,11 +121,13 @@ function Swag() {
   );
 }
 
-
 export default function JasperCameo({ place }: SceneProps) {
   const { ref, url } = useIds();
   const card = place === 'card';
   const corner = cm(card ? 22 : 30);
+  // the swag at the crown; the cameo hangs from its bow
+  const swag = card ? cm(60) : cmh(78);
+  const top = cm(card ? 3 : 4);
   return (
     <>
       <Layer
@@ -121,9 +138,15 @@ export default function JasperCameo({ place }: SceneProps) {
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
           <linearGradient id={ref('gilt')} x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #B08F52) 55%, #FFF6DC)' }} />
+            <stop
+              offset="0"
+              style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #B08F52) 55%, #FFF6DC)' }}
+            />
             <stop offset=".5" style={{ stopColor: GILT }} />
-            <stop offset="1" style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #B08F52) 70%, #3A2A10)' }} />
+            <stop
+              offset="1"
+              style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #B08F52) 70%, #3A2A10)' }}
+            />
           </linearGradient>
           <radialGradient id={ref('dome')} cx=".4" cy=".3" r=".8">
             <stop offset="0" stopColor="#fff" stopOpacity=".22" />
@@ -152,7 +175,17 @@ export default function JasperCameo({ place }: SceneProps) {
         />
       </Frame>
       <Frame inset={card ? '5.6cqmin' : '5.4cqmin'}>
-        <rect x="0" y="0" width="100%" height="100%" rx="10" fill="none" stroke={WHITE} strokeWidth="1" opacity=".75" />
+        <rect
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          rx="10"
+          fill="none"
+          stroke={WHITE}
+          strokeWidth="1"
+          opacity=".75"
+        />
       </Frame>
       {(['tl', 'tr', 'bl', 'br'] as const).map((c) => (
         <Piece
@@ -166,19 +199,30 @@ export default function JasperCameo({ place }: SceneProps) {
           }}
         >
           <g filter={url('relief')}>
-            <Acanthus />
+            <CornerScroll />
           </g>
         </Piece>
       ))}
-      <Piece vb={[0, 0, 400, 110]} style={{ left: '50%', top: cm(card ? 3 : 4), width: cm(card ? 60 : 78), translate: '-50% 0' }}>
+      <Piece vb={[0, 0, 400, 110]} style={{ left: '50%', top, width: swag, translate: '-50% 0' }}>
         <g filter={url('relief')}>
           <Swag />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 120, 150]} style={{ left: '50%', top: cm(card ? 9 : 13), width: cm(card ? 11 : 19), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 120, 150]}
+        style={{
+          left: '50%',
+          top: `calc(${top} + ${swag} * .13)`,
+          width: `calc(${swag} * .24)`,
+          translate: '-50% 0',
+        }}
+      >
         <Cameo u={url} />
       </Piece>
-      <Piece vb={[0, 0, 420, 90]} style={{ left: '50%', bottom: cm(card ? 5 : 8), width: cm(card ? 44 : 62), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 420, 90]}
+        style={{ left: '50%', bottom: cm(card ? 5 : 9), width: card ? cm(50) : cmh(76), translate: '-50% 0' }}
+      >
         <g filter={url('relief')}>
           <g transform="translate(212 6)">
             <Laurel />

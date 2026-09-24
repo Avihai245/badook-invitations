@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { Layer, Piece, cm, useIds, type SceneProps } from './kit';
+import { Layer, Piece, cm, cmh, useIds, type SceneProps } from './kit';
 
 /**
  * Scribble Love — a notes-app collage, imperfect on purpose: grid paper, washi tape at the corners,
@@ -64,7 +64,8 @@ function StarSticker({ fill, u }: { fill: string; u: Url }) {
 }
 
 function HeartSticker({ u }: { u: Url }) {
-  const heart = 'M50 86C24 66 8 50 10 32 12 16 30 8 42 16c4 3 7 7 8 11 1-4 4-8 8-11 12-8 30 0 32 16 2 18-14 34-40 54z';
+  const heart =
+    'M50 86C24 66 8 50 10 32 12 16 30 8 42 16c4 3 7 7 8 11 1-4 4-8 8-11 12-8 30 0 32 16 2 18-14 34-40 54z';
   return (
     <g filter={u('sticker')}>
       <path d={heart} fill="#fff" stroke="#fff" strokeWidth="14" strokeLinejoin="round" />
@@ -105,7 +106,12 @@ export default function ScribbleLove({ place }: SceneProps) {
           opacity: 0.75,
         }}
       />
-      <Layer style={{ background: 'radial-gradient(70cqw 45cqh at 50% 50%, rgba(251,250,246,.85), rgba(251,250,246,0) 75%)' }} />
+      <Layer
+        style={{
+          background:
+            'radial-gradient(70cqw 45cqh at 50% 50%, rgba(251,250,246,.85), rgba(251,250,246,0) 75%)',
+        }}
+      />
       <Tape
         stripes={`repeating-linear-gradient(90deg, ${YELLOW} 0 1.6cqmin, #FFE44D 1.6cqmin 3.2cqmin)`}
         style={{ left: cm(-4), top: cm(7), width: cm(card ? 24 : 34), rotate: '-32deg' }}
@@ -118,28 +124,71 @@ export default function ScribbleLove({ place }: SceneProps) {
         stripes={`repeating-linear-gradient(45deg, ${SKY} 0 1.2cqmin, #D8E8FF 1.2cqmin 2.4cqmin)`}
         style={{ left: cm(-3), bottom: cm(12), width: cm(card ? 18 : 26), rotate: '18deg' }}
       />
-      <Piece vb={[0, 0, 200, 170]} style={{ left: '50%', top: card ? '6cqh' : '9cqh', width: cm(card ? 12 : 24), translate: '-50% 0', rotate: '-6deg' }}>
+      <Piece
+        vb={[0, 0, 200, 170]}
+        style={{
+          left: '50%',
+          top: card ? '6cqh' : '9cqh',
+          width: card ? cm(12) : cmh(24),
+          translate: '-50% 0',
+          rotate: '-6deg',
+        }}
+      >
         <ScribbleHeart />
       </Piece>
-      <Piece vb={[0, 0, 100, 100]} anim="float" style={{ right: cm(8), top: cm(card ? 16 : 26), width: cm(card ? 9 : 13), rotate: '14deg' }}>
+      <Piece
+        vb={[0, 0, 100, 100]}
+        anim="float"
+        style={{ right: cm(8), top: cm(card ? 16 : 26), width: cm(card ? 9 : 13), rotate: '14deg' }}
+      >
         <StarSticker fill="#FFD84A" u={url} />
       </Piece>
-      <Piece vb={[0, 0, 100, 100]} style={{ left: cm(10), bottom: cm(card ? 6 : 26), width: cm(card ? 8 : 11), rotate: '-12deg' }}>
+      <Piece
+        vb={[0, 0, 100, 100]}
+        style={{ left: cm(10), bottom: cm(card ? 6 : 26), width: cm(card ? 8 : 11), rotate: '-12deg' }}
+      >
         <StarSticker fill={SKY} u={url} />
       </Piece>
-      <Piece vb={[0, 0, 100, 100]} anim="float" style={{ right: cm(10), bottom: cm(card ? 8 : 10), width: cm(card ? 9 : 14), rotate: '-10deg' }}>
+      <Piece
+        vb={[0, 0, 100, 100]}
+        anim="float"
+        style={{ right: cm(10), bottom: cm(card ? 8 : 10), width: cm(card ? 9 : 14), rotate: '-10deg' }}
+      >
         <HeartSticker u={url} />
       </Piece>
-      <Piece vb={[0, 0, 160, 120]} style={{ left: cm(6), bottom: cm(card ? 14 : 40), width: cm(card ? 12 : 20), rotate: '-4deg', opacity: 0.8 }}>
+      <Piece
+        vb={[0, 0, 160, 120]}
+        style={{
+          left: cm(6),
+          bottom: cm(card ? 14 : 40),
+          width: cm(card ? 12 : 20),
+          rotate: '-4deg',
+          opacity: 0.8,
+        }}
+      >
         <Arrow />
       </Piece>
-      <Piece vb={[0, 0, 160, 120]} style={{ right: cm(4), top: cm(card ? 24 : 46), width: cm(card ? 10 : 16), scale: '-1 -1', opacity: 0.8 }}>
+      <Piece
+        vb={[0, 0, 160, 120]}
+        style={{
+          right: cm(4),
+          top: cm(card ? 24 : 46),
+          width: cm(card ? 10 : 16),
+          scale: '-1 -1',
+          opacity: 0.8,
+        }}
+      >
         <Arrow />
       </Piece>
-      <Piece vb={[0, 0, 120, 60]} style={{ left: cm(12), top: cm(card ? 6 : 22), width: cm(card ? 8 : 12) }}>
-        <g fill="none" style={{ stroke: CORAL }} strokeWidth="4" strokeLinecap="round">
-          <path d="M30 40c-10-8-24-6-24 4s16 12 24 4" />
-          <path d="M60 10l6 14M84 22l-12 8M54 34l12-2" />
+      {/* "xoxo" in coral pen */}
+      <Piece
+        vb={[0, 0, 120, 60]}
+        style={{ left: cm(10), top: cm(card ? 6 : 22), width: cm(card ? 9 : 14), rotate: '-8deg' }}
+      >
+        <g fill="none" style={{ stroke: CORAL }} strokeWidth="4.5" strokeLinecap="round">
+          <path d="M8 18l18 24M27 17L9 43M64 18l18 24M83 17L65 43" />
+          <path d="M47 19c-7 0-11 6-10 12s6 11 12 10 10-7 9-13-5-9-11-9" />
+          <path d="M103 19c-7 0-11 6-10 12s6 11 12 10 10-7 9-13-5-9-11-9" />
         </g>
       </Piece>
     </>

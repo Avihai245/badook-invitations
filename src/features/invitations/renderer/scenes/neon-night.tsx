@@ -25,7 +25,23 @@ function Tube({ d, color, w = 5, u }: { d: string; color: string; w?: number; u:
 }
 
 /** A fan of laser beams from (x, y). */
-function Lasers({ x, y, from, to, n, color, len }: { x: number; y: number; from: number; to: number; n: number; color: string; len: number }): ReactNode {
+function Lasers({
+  x,
+  y,
+  from,
+  to,
+  n,
+  color,
+  len,
+}: {
+  x: number;
+  y: number;
+  from: number;
+  to: number;
+  n: number;
+  color: string;
+  len: number;
+}): ReactNode {
   return Array.from({ length: n }, (_, i) => {
     const a = ((from + ((to - from) * i) / (n - 1)) * Math.PI) / 180;
     return (
@@ -82,17 +98,36 @@ export default function NeonNight({ place }: SceneProps) {
             'linear-gradient(180deg, #120E26 0%, #0B0A12 55%, #150A24 100%)',
         }}
       />
-      <Piece vb={[0, 0, 400, 400]} anim="sweep" style={{ left: cm(-6), top: cm(-6), width: cm(card ? 48 : 76) }}>
+      {/* the fans pivot on their corner (invitation.css sweeps them in the hero) */}
+      <Piece
+        vb={[0, 0, 400, 400]}
+        anim="sweep"
+        style={{ left: cm(-6), top: cm(-6), width: cm(card ? 48 : 76), transformOrigin: '0 0' }}
+      >
         <g filter={url('beam')}>
           <Lasers x={0} y={0} from={18} to={72} n={8} color={CYAN} len={560} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 400, 400]} anim="sweep" style={{ right: cm(-6), top: cm(-6), width: cm(card ? 48 : 76), scale: '-1 1' }}>
+      <Piece
+        vb={[0, 0, 400, 400]}
+        anim="sweep"
+        style={{
+          right: cm(-6),
+          top: cm(-6),
+          width: cm(card ? 48 : 76),
+          transformOrigin: '100% 0',
+          animationDirection: 'alternate-reverse',
+        }}
+      >
         <g filter={url('beam')}>
-          <Lasers x={0} y={0} from={20} to={70} n={7} color="var(--inv-accent, #FF2BD6)" len={560} />
+          <Lasers x={400} y={0} from={110} to={160} n={7} color="var(--inv-accent, #FF2BD6)" len={560} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 800, 260]} fit="xMidYMin slice" style={{ left: 0, bottom: 0, width: '100%', height: card ? '34cqh' : '22cqh' }}>
+      <Piece
+        vb={[0, 0, 800, 260]}
+        fit="xMidYMin slice"
+        style={{ left: 0, bottom: 0, width: '100%', height: card ? '34cqh' : '22cqh' }}
+      >
         <Grid />
       </Piece>
       <Layer
@@ -121,13 +156,39 @@ export default function NeonNight({ place }: SceneProps) {
           <Tube d="M10 90V30Q10 10 30 10H90" color={CYAN} w={4} u={url} />
         </Piece>
       ))}
-      <Piece vb={[0, 0, 100, 140]} anim="flicker" style={{ left: cm(card ? 12 : 14), top: cm(card ? 12 : 17), width: cm(card ? 9 : 14), rotate: '-10deg' }}>
+      <Piece
+        vb={[0, 0, 100, 140]}
+        anim="flicker"
+        style={{
+          left: cm(card ? 12 : 14),
+          top: cm(card ? 12 : 17),
+          width: cm(card ? 9 : 14),
+          rotate: '-10deg',
+        }}
+      >
         <Tube d="M62 8L22 76H50L36 132L84 56H54L70 8Z" color={YELLOW} w={5} u={url} />
       </Piece>
-      <Piece vb={[0, 0, 140, 120]} style={{ right: cm(card ? 12 : 13), top: cm(card ? 11 : 16), width: cm(card ? 11 : 17), rotate: '8deg' }}>
-        <Tube d="M70 108C28 78 10 60 10 38 10 20 24 10 38 10c14 0 26 8 32 22 6-14 18-22 32-22 14 0 28 10 28 28 0 22-18 40-60 70z" color={MAGENTA} w={5} u={url} />
+      <Piece
+        vb={[0, 0, 140, 120]}
+        style={{
+          right: cm(card ? 12 : 13),
+          top: cm(card ? 11 : 16),
+          width: cm(card ? 11 : 17),
+          rotate: '8deg',
+        }}
+      >
+        <Tube
+          d="M70 108C28 78 10 60 10 38 10 20 24 10 38 10c14 0 26 8 32 22 6-14 18-22 32-22 14 0 28 10 28 28 0 22-18 40-60 70z"
+          color={MAGENTA}
+          w={5}
+          u={url}
+        />
       </Piece>
-      <Piece vb={[0, 0, 60, 60]} anim="twinkle" style={{ left: '50%', top: cm(card ? 8 : 11), width: cm(card ? 5 : 7), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 60, 60]}
+        anim="twinkle"
+        style={{ left: '50%', top: cm(card ? 8 : 11), width: cm(card ? 5 : 7), translate: '-50% 0' }}
+      >
         <Tube d="M30 6V54M6 30H54M13 13l34 34M47 13 13 47" color={LIME} w={3} u={url} />
       </Piece>
     </>

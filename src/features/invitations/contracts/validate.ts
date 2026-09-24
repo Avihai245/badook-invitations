@@ -7,6 +7,7 @@
  * Issues carry the document path of the offending value (the editor jumps there) and a `field` key the
  * editor turns into a human label ("missing English translation in 'Location line'").
  */
+import { findFontPair } from '../fonts/library';
 import { contrastRatio } from '../lib/contrast';
 import { cappedLength } from '../lib/l10n';
 import { visibleGlyphCount } from '../lib/text';
@@ -558,7 +559,8 @@ export function validateDocument(
   for (const key of Object.keys(doc.theme.palette ?? {}))
     if (!editable.has(key))
       add({ path: `theme.palette.${key}`, code: 'palette_key', severity: 'error', field: 'theme.palette' });
-  if (!template.fontPairs.some((p) => p.id === doc.theme.fontPairId))
+  // a pair of the template's own or one from the font library
+  if (!findFontPair(template, doc.theme.fontPairId))
     add({ path: 'theme.fontPairId', code: 'font_pair', severity: 'error', field: 'theme.fontPairId' });
   // (no cover → no seal to color)
   const seal = doc.cover.enabled ? doc.cover.sealColor : null;

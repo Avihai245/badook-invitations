@@ -17,6 +17,7 @@ import {
 } from '../contracts/schemas';
 import type { InvitationDocument, L10n, Locale } from '../contracts/types';
 import { validateDocument } from '../contracts/validate';
+import { findFontPair } from '../fonts/library';
 import { graphemes } from '../lib/text';
 import { followUpDocument, followUpSlug, saveTheDateSlug } from '../templates/follow-up';
 import { COUPLE_EVENTS } from '../templates/seed-copy';
@@ -91,7 +92,7 @@ export async function createInvitation(userId: string, raw: unknown, deps: HostD
   if (couple && !filled(input.hosts.secondary, locales)) bad.push('hosts.secondary');
   const preset = input.paletteId ? manifest.palettePresets.find((p) => p.id === input.paletteId) : null;
   if (input.paletteId && !preset) bad.push('paletteId');
-  if (input.fontPairId && !manifest.fontPairs.some((p) => p.id === input.fontPairId)) bad.push('fontPairId');
+  if (input.fontPairId && !findFontPair(manifest, input.fontPairId)) bad.push('fontPairId');
   if (bad.length) return fail(400, 'invalid', { issues: bad });
 
   const doc = seedDocument(manifest, defaults, {

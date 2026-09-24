@@ -17,14 +17,50 @@ const CREAM = '#FFFDF7';
 type Url = (name: string) => string;
 
 function Lemon({ x, y, s, deg = 0, u }: { x: number; y: number; s: number; deg?: number; u: Url }) {
+  // a lemon lying along x: full in the middle, drawn out to a nub at each end
+  const P = (dx: number, dy: number) => `${r1(x + dx * s)} ${r1(y + dy * s)}`;
+  const body =
+    `M${P(-1.1, 0)}C${P(-0.98, -0.3)} ${P(-0.72, -0.8)} ${P(0, -0.8)}` +
+    `C${P(0.72, -0.8)} ${P(0.98, -0.3)} ${P(1.1, 0)}` +
+    `C${P(0.98, 0.3)} ${P(0.72, 0.8)} ${P(0, 0.8)}` +
+    `C${P(-0.72, 0.8)} ${P(-0.98, 0.3)} ${P(-1.1, 0)}Z`;
   return (
     <g transform={`rotate(${deg} ${x} ${y})`}>
-      <path
-        d={`M${x - s * 1.08} ${y}Q${x - s * 1.02} ${y - s * 0.72} ${x} ${y - s * 0.74}Q${x + s * 1.02} ${y - s * 0.72} ${x + s * 1.08} ${y}Q${x + s * 1.02} ${y + s * 0.72} ${x} ${y + s * 0.74}Q${x - s * 1.02} ${y + s * 0.72} ${x - s * 1.08} ${y}Z`}
-        fill={u('lemon')}
+      <path d={body} fill={u('lemon')} />
+      <ellipse cx={r1(x + s * 1.12)} cy={y} rx={r1(s * 0.12)} ry={r1(s * 0.09)} fill={LEMON_DEEP} />
+      <ellipse
+        cx={r1(x - s * 1.1)}
+        cy={y}
+        rx={r1(s * 0.08)}
+        ry={r1(s * 0.07)}
+        fill={LEMON_DEEP}
+        opacity=".8"
       />
-      <path d={`M${x + s * 1.06} ${y}l${s * 0.2} ${-s * 0.04}l${-s * 0.02} ${s * 0.1}z`} fill={LEMON_DEEP} />
-      <ellipse cx={r1(x - s * 0.3)} cy={r1(y - s * 0.34)} rx={r1(s * 0.34)} ry={r1(s * 0.14)} fill="#fff" opacity=".45" transform={`rotate(-12 ${x} ${y})`} />
+      <ellipse
+        cx={r1(x - s * 0.28)}
+        cy={r1(y - s * 0.4)}
+        rx={r1(s * 0.36)}
+        ry={r1(s * 0.13)}
+        fill="#fff"
+        opacity=".45"
+        transform={`rotate(-8 ${x} ${y})`}
+      />
+      {/* pores */}
+      {[
+        [0.35, 0.3],
+        [0.55, -0.1],
+        [-0.1, 0.45],
+        [0.15, 0.05],
+      ].map(([dx, dy], i) => (
+        <circle
+          key={i}
+          cx={r1(x + dx! * s)}
+          cy={r1(y + dy! * s)}
+          r={r1(s * 0.03)}
+          fill={LEMON_DEEP}
+          opacity=".35"
+        />
+      ))}
     </g>
   );
 }
@@ -36,7 +72,11 @@ function Leaf({ x, y, len, deg }: { x: number; y: number; len: number; deg: numb
   return (
     <g>
       <path d={`M${x} ${y}Q${ax} ${ay} ${tx} ${ty}Q${bx} ${by} ${x} ${y}Z`} fill={LEAF} />
-      <path d={`M${x} ${y}Q${ax} ${ay} ${tx} ${ty}Q${r1((x + tx) / 2)} ${r1((y + ty) / 2)} ${x} ${y}Z`} fill={LEAF_DEEP} opacity=".55" />
+      <path
+        d={`M${x} ${y}Q${ax} ${ay} ${tx} ${ty}Q${r1((x + tx) / 2)} ${r1((y + ty) / 2)} ${x} ${y}Z`}
+        fill={LEAF_DEEP}
+        opacity=".55"
+      />
       <path d={`M${x} ${y}L${tx} ${ty}`} stroke="#9CC271" strokeWidth={r1(len * 0.02)} opacity=".6" />
     </g>
   );
@@ -46,8 +86,20 @@ function Leaf({ x, y, len, deg }: { x: number; y: number; len: number; deg: numb
 function Branch({ u }: { u: Url }) {
   return (
     <g filter={u('soft')}>
-      <path d="M-10 20C60 30 110 60 150 110" stroke="#6B4E2E" strokeWidth="6" fill="none" strokeLinecap="round" />
-      <path d="M70 38C90 60 100 80 104 112" stroke="#6B4E2E" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+      <path
+        d="M-10 20C60 30 110 60 150 110"
+        stroke="#6B4E2E"
+        strokeWidth="6"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M70 38C90 60 100 80 104 112"
+        stroke="#6B4E2E"
+        strokeWidth="3.4"
+        fill="none"
+        strokeLinecap="round"
+      />
       <Leaf x={20} y={24} len={62} deg={-30} />
       <Leaf x={48} y={30} len={70} deg={70} />
       <Leaf x={86} y={50} len={66} deg={-10} />
@@ -72,7 +124,14 @@ function Slice({ x, y, r, color = LEMON }: { x: number; y: number; r: number; co
         const a = i * 45;
         const [ax, ay] = polar(x, y, r * 0.78, a + 4);
         const [bx, by] = polar(x, y, r * 0.78, a + 41);
-        return <path key={i} d={`M${x} ${y}L${ax} ${ay}Q${polar(x, y, r * 0.86, a + 22.5).join(' ')} ${bx} ${by}Z`} fill={color} opacity=".85" />;
+        return (
+          <path
+            key={i}
+            d={`M${x} ${y}L${ax} ${ay}Q${polar(x, y, r * 0.86, a + 22.5).join(' ')} ${bx} ${by}Z`}
+            fill={color}
+            opacity=".85"
+          />
+        );
       })}
       <circle cx={x} cy={y} r={r1(r * 0.1)} fill="#FFF6CF" />
     </g>
@@ -99,7 +158,15 @@ export default function Majolica({ place }: SceneProps) {
           </filter>
           <pattern id={ref('tile')} width="100" height="100" patternUnits="userSpaceOnUse">
             <rect width="100" height="100" fill={CREAM} />
-            <rect x="1.5" y="1.5" width="97" height="97" fill="none" style={{ stroke: COBALT }} strokeWidth="3" />
+            <rect
+              x="1.5"
+              y="1.5"
+              width="97"
+              height="97"
+              fill="none"
+              style={{ stroke: COBALT }}
+              strokeWidth="3"
+            />
             {[0, 90, 180, 270].map((a) => {
               const [x, y] = polar(50, 50, 17, a);
               return <circle key={a} cx={x} cy={y} r="15" style={{ fill: COBALT }} />;
@@ -150,13 +217,23 @@ export default function Majolica({ place }: SceneProps) {
           filter: 'drop-shadow(0 6px 5px rgba(29,47,111,.18))',
         }}
       />
-      <Piece vb={[0, 0, 260, 220]} anim="sway" style={{ left: cm(-4), top: `calc(${awning} - ${cm(2)})`, width: cm(card ? 34 : 50) }}>
+      <Piece
+        vb={[0, 0, 260, 220]}
+        anim="sway"
+        style={{ left: cm(-4), top: `calc(${awning} - ${cm(2)})`, width: cm(card ? 34 : 50) }}
+      >
         <Branch u={url} />
       </Piece>
-      <Piece vb={[0, 0, 260, 220]} style={{ right: cm(-6), bottom: cm(tile * 2 - 2), width: cm(card ? 30 : 44), scale: '-1 -1' }}>
+      <Piece
+        vb={[0, 0, 260, 220]}
+        style={{ right: cm(-6), bottom: cm(tile * 2 - 2), width: cm(card ? 30 : 44), scale: '-1 -1' }}
+      >
         <Branch u={url} />
       </Piece>
-      <Piece vb={[0, 0, 200, 100]} style={{ left: cm(4), bottom: cm(tile * 2 + 2), width: cm(card ? 14 : 22) }}>
+      <Piece
+        vb={[0, 0, 200, 100]}
+        style={{ left: cm(4), bottom: cm(tile * 2 + 2), width: cm(card ? 14 : 22) }}
+      >
         <g filter={url('soft')}>
           <Slice x={50} y={56} r={34} />
           <Slice x={132} y={40} r={26} color={ORANGE} />

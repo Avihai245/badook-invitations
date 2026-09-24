@@ -40,6 +40,8 @@ export interface PlaceholderArt {
     flap: [string, string];
     card: string;
     hint: string;
+    /** the ticket cover's paper and edge (TicketArt), when not the vintage cream */
+    ticket?: { paper: string; edge: string };
   };
   /** Line-art drawn for a missing panorama decoration (betweenVenues). */
   panorama: PanoramaKind;
@@ -292,6 +294,7 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     hint: 'rgba(255,255,255,.82)',
     panorama: 'stars',
     ornament: 'zap',
+    ticket: { paper: '#1D1938', edge: 'var(--inv-accent)' },
   }),
   'match-day': drawn('match-day', ['#0E3D1F', '#1B6F37', '#1E7A3C'], {
     bg: ['#1E7A3C', '#176331', '#0E4722'],
@@ -306,6 +309,7 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     hint: '#3D475C',
     panorama: 'flight',
     ornament: 'plane',
+    ticket: { paper: '#FFFDF7', edge: 'rgba(31,42,68,.22)' },
   }),
   'coquette-bow': drawn('coquette-bow', ['#FCE9ED', '#F9DFE4', '#F3CDD6'], {
     bg: ['#F9DFE4', '#F3CED6', '#EABAC6'],
@@ -365,6 +369,7 @@ function drawn(
     hint: string;
     panorama: PanoramaKind;
     ornament: IconName;
+    ticket?: { paper: string; edge: string };
   },
 ): PlaceholderArt {
   const [light, mid, shade] = o.paper;
@@ -380,6 +385,7 @@ function drawn(
       flap: [mid, shade],
       card: `linear-gradient(180deg,${sky[0]},${sky[2]})`,
       hint: o.hint,
+      ...(o.ticket ? { ticket: o.ticket } : null),
     },
     panorama: o.panorama,
     ornament: o.ornament,

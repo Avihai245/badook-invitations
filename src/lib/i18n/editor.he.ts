@@ -332,6 +332,10 @@ export const editorHe = {
       sealColor: 'צבע החותם',
       hint: 'טקסט ההנחיה',
     },
+    fonts: {
+      more: 'עוד גופנים',
+      moreHelp: 'זוגות גופנים שמתאימים לכל עיצוב.',
+    },
     palette: {
       reset: 'חזרה לצבעי העיצוב',
       keys: {

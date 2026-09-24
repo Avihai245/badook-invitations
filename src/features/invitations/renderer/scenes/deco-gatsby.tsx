@@ -56,7 +56,16 @@ function Coupe({ u }: { u: Url }) {
         [70, 20, 2],
         [60, 6, 1.4],
       ].map(([x, y, r], i) => (
-        <circle key={i} cx={x} cy={y} r={r} fill="none" style={{ stroke: GOLD_LIGHT }} strokeWidth="1" data-anim={i > 2 ? 'twinkle' : undefined} />
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r={r}
+          fill="none"
+          style={{ stroke: GOLD_LIGHT }}
+          strokeWidth="1"
+          data-anim={i > 2 ? 'twinkle' : undefined}
+        />
       ))}
     </g>
   );
@@ -173,7 +182,10 @@ export default function DecoGatsby({ place }: SceneProps) {
       {diamond({ top: `calc(50% - 1.3cqmin)`, left: `calc(${inset} + ${gap} / 2 - 1.3cqmin)` })}
       {diamond({ top: `calc(50% - 1.3cqmin)`, right: `calc(${inset} + ${gap} / 2 - 1.3cqmin)` })}
       {/* the fan rising from a rule at the crown */}
-      <Piece vb={[0, 0, 200, 110]} style={{ left: '50%', top: card ? '6cqh' : '7cqh', width: cm(card ? 26 : 40), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 200, 110]}
+        style={{ left: '50%', top: card ? '6cqh' : '7cqh', width: cm(card ? 26 : 40), translate: '-50% 0' }}
+      >
         <Fan u={url} />
       </Piece>
       <div
@@ -191,7 +203,14 @@ export default function DecoGatsby({ place }: SceneProps) {
       <Piece
         vb={[0, 0, 400, 40]}
         fit="xMidYMid slice"
-        style={{ left: `calc(${inset} + ${gap} + 3cqmin)`, right: `calc(${inset} + ${gap} + 3cqmin)`, bottom: `calc(${inset} + ${gap} + 3cqmin)`, width: 'auto', height: card ? '4cqmin' : '5cqmin' }}
+        style={{
+          left: `calc(${inset} + ${gap} + 3cqmin)`,
+          width: `calc(100% - 2 * (${inset} + ${gap} + 3cqmin))`,
+          bottom: `calc(${inset} + ${gap} + 3cqmin)`,
+          height: card ? '4cqmin' : '5cqmin',
+          aspectRatio: 'auto',
+          overflow: 'hidden',
+        }}
       >
         {[0, 1].map((row) => (
           <path
@@ -204,7 +223,16 @@ export default function DecoGatsby({ place }: SceneProps) {
           />
         ))}
       </Piece>
-      <Piece vb={[0, 0, 120, 160]} anim="float" style={{ left: '50%', bottom: card ? '10cqh' : '9cqh', width: cm(card ? 8 : 12), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 120, 160]}
+        anim="float"
+        style={{
+          left: '50%',
+          bottom: card ? '10cqh' : '9cqh',
+          width: cm(card ? 8 : 12),
+          translate: '-50% 0',
+        }}
+      >
         <Coupe u={url} />
       </Piece>
     </>

@@ -1,4 +1,4 @@
-import { Frame, Layer, Piece, cm, polar, r1, rng, useIds, type SceneProps } from './kit';
+import { Layer, Piece, cm, polar, r1, rng, useIds, type SceneProps } from './kit';
 
 /**
  * Bukhara Silk — bold ikat bands with feathered (dye-bled) lozenges at the top and bottom, suzani
@@ -15,18 +15,23 @@ const CREAM = '#FFF8EE';
 
 type Url = (name: string) => string;
 
-/** A feathered ikat lozenge: horizontal bars following a diamond, jittered at the edges. */
+/**
+ * A feathered ikat lozenge: a diamond whose side edges bleed into thin horizontal wedges of uneven
+ * length, as the dye does along the resist-tied threads.
+ */
 function lozenge(cx: number, cy: number, w: number, h: number, seed: number): string {
   const rand = rng(seed);
-  const bar = 5;
-  let d = '';
-  for (let y = cy - h / 2; y < cy + h / 2; y += bar) {
-    const t = 1 - Math.abs((y + bar / 2 - cy) / (h / 2));
-    const half = (w / 2) * t;
-    if (half < 1) continue;
-    const jl = (rand() - 0.5) * 7;
-    const jr = (rand() - 0.5) * 7;
-    d += `M${r1(cx - half + jl)} ${r1(y)}H${r1(cx + half + jr)}V${r1(y + bar + 0.6)}H${r1(cx - half + jl)}Z`;
+  let d = `M${cx} ${r1(cy - h / 2)}L${r1(cx + w / 2)} ${cy}L${cx} ${r1(cy + h / 2)}L${r1(cx - w / 2)} ${cy}Z`;
+  const step = Math.max(2.4, h / 30);
+  for (let y = cy - h / 2 + step; y < cy + h / 2 - step / 2; y += step) {
+    const half = (w / 2) * (1 - Math.abs((y - cy) / (h / 2)));
+    for (const side of [-1, 1]) {
+      const len = (1.5 + rand() * 6) * (w / 92 + 0.35);
+      const x0 = cx + side * (half - 1.2);
+      const x1 = cx + side * (half + len);
+      const t = step * 0.3;
+      d += `M${r1(x0)} ${r1(y - t)}L${r1(x1)} ${r1(y)}L${r1(x0)} ${r1(y + t)}Z`;
+    }
   }
   return d;
 }
@@ -45,7 +50,11 @@ function Ikat({ seed }: { seed: number }) {
             <path d={lozenge(cx, 60, 92, 112, seed + i)} style={{ fill: alt ? SAFFRON : MAGENTA }} />
             <path d={lozenge(cx, 60, 58, 72, seed + i + 40)} fill={alt ? INDIGO : CREAM} />
             <path d={lozenge(cx, 60, 26, 34, seed + i + 80)} style={{ fill: alt ? MAGENTA : GREEN }} />
-            <path d={`M${cx + 50} 8l7 10-7 10-7-10zM${cx + 50} 92l7 10-7 10-7-10z`} fill={GREEN} opacity=".9" />
+            <path
+              d={`M${cx + 50} 8l7 10-7 10-7-10zM${cx + 50} 92l7 10-7 10-7-10z`}
+              fill={GREEN}
+              opacity=".9"
+            />
           </g>
         );
       })}
@@ -63,7 +72,13 @@ function Rosette({ u }: { u: Url }) {
       const [tx, ty] = polar(0, 0, r1v, deg);
       const [c1x, c1y] = polar(0, 0, r1v * 0.98, deg - spread * 1.6);
       const [c2x, c2y] = polar(0, 0, r1v * 0.98, deg + spread * 1.6);
-      return <path key={i} d={`M${ax} ${ay}Q${c1x} ${c1y} ${tx} ${ty}Q${c2x} ${c2y} ${bx} ${by}Z`} style={{ fill }} />;
+      return (
+        <path
+          key={i}
+          d={`M${ax} ${ay}Q${c1x} ${c1y} ${tx} ${ty}Q${c2x} ${c2y} ${bx} ${by}Z`}
+          style={{ fill }}
+        />
+      );
     });
   return (
     <g filter={u('stitch')}>
@@ -89,14 +104,31 @@ function Rosette({ u }: { u: Url }) {
 function Tulips() {
   const tulip = (x: number, y: number, s: number) => (
     <g>
-      <path d={`M${x - 9 * s} ${y - 6 * s}Q${x - 10 * s} ${y + 8 * s} ${x} ${y + 9 * s}Q${x + 10 * s} ${y + 8 * s} ${x + 9 * s} ${y - 6 * s}L${x + 4 * s} ${y - 1 * s}L${x} ${y - 10 * s}L${x - 4 * s} ${y - 1 * s}Z`} style={{ fill: MAGENTA }} />
-      <path d={`M${x - 3 * s} ${y}Q${x} ${y + 7 * s} ${x + 3 * s} ${y}`} stroke={SAFFRON} strokeWidth={1.6 * s} fill="none" />
+      <path
+        d={`M${x - 9 * s} ${y - 6 * s}Q${x - 10 * s} ${y + 8 * s} ${x} ${y + 9 * s}Q${x + 10 * s} ${y + 8 * s} ${x + 9 * s} ${y - 6 * s}L${x + 4 * s} ${y - 1 * s}L${x} ${y - 10 * s}L${x - 4 * s} ${y - 1 * s}Z`}
+        style={{ fill: MAGENTA }}
+      />
+      <path
+        d={`M${x - 3 * s} ${y}Q${x} ${y + 7 * s} ${x + 3 * s} ${y}`}
+        stroke={SAFFRON}
+        strokeWidth={1.6 * s}
+        fill="none"
+      />
     </g>
   );
   return (
     <g>
-      <path d="M30 140C28 110 34 80 30 40M30 100C20 90 16 76 18 62M30 86c10-8 14-20 12-32" stroke={GREEN} strokeWidth="2.6" fill="none" strokeLinecap="round" />
-      <path d="M30 120c-10-4-16-12-16-22 10 2 16 10 16 22zM30 112c10-4 16-12 16-22-10 2-16 10-16 22z" fill={GREEN} />
+      <path
+        d="M30 140C28 110 34 80 30 40M30 100C20 90 16 76 18 62M30 86c10-8 14-20 12-32"
+        stroke={GREEN}
+        strokeWidth="2.6"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M30 120c-10-4-16-12-16-22 10 2 16 10 16 22zM30 112c10-4 16-12 16-22-10 2-16 10-16 22z"
+        fill={GREEN}
+      />
       {tulip(30, 34, 1.3)}
       {tulip(18, 58, 0.95)}
       {tulip(42, 50, 0.95)}
@@ -123,6 +155,7 @@ export default function Bukhara({ place }: SceneProps) {
   const { ref, url } = useIds();
   const card = place === 'card';
   const band = card ? '13cqh' : '10cqh';
+  const side = cm(card ? 4 : 4.5);
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -132,53 +165,99 @@ export default function Bukhara({ place }: SceneProps) {
           </filter>
         </defs>
       </svg>
-      <Layer style={{ background: 'radial-gradient(80cqw 60cqh at 50% 50%, rgba(255,250,240,.7), transparent 70%)' }} />
-      <Piece vb={[0, 0, 600, 120]} fit="xMidYMid slice" style={{ left: 0, top: 0, width: '100%', height: band }}>
+      <Layer
+        style={{
+          background: 'radial-gradient(80cqw 60cqh at 50% 50%, rgba(255,250,240,.7), transparent 70%)',
+        }}
+      />
+      <Piece
+        vb={[0, 0, 600, 120]}
+        fit="xMidYMid slice"
+        style={{ left: 0, top: 0, width: '100%', height: band }}
+      >
         <Ikat seed={3} />
       </Piece>
-      <Piece vb={[0, 0, 600, 120]} fit="xMidYMid slice" style={{ left: 0, bottom: 0, width: '100%', height: band }}>
+      <Piece
+        vb={[0, 0, 600, 120]}
+        fit="xMidYMid slice"
+        style={{ left: 0, bottom: 0, width: '100%', height: band }}
+      >
         <Ikat seed={9} />
       </Piece>
-      <Frame inset={card ? '4cqmin' : '4.5cqmin'}>
-        <rect
-          x="0"
-          y="0"
-          width="100%"
-          height="100%"
-          rx="10"
-          fill="none"
-          style={{ stroke: MAGENTA, strokeWidth: '0.55cqmin', strokeDasharray: '1.6cqmin 1cqmin', strokeLinecap: 'round' }}
-        />
-      </Frame>
-      <Frame inset={card ? '5.8cqmin' : '6.3cqmin'}>
-        <rect x="0" y="0" width="100%" height="100%" rx="7" fill="none" stroke={INDIGO} strokeWidth="1" opacity=".5" />
-      </Frame>
+      {/* a chain-stitch frame between the bands, and a hairline inside it */}
+      <Layer
+        style={{
+          inset: 'auto',
+          left: side,
+          right: side,
+          top: `calc(${band} + ${cm(2.5)})`,
+          bottom: `calc(${band} + ${cm(2.5)})`,
+          border: `0.55cqmin dashed ${MAGENTA}`,
+          borderRadius: '1.4cqmin',
+        }}
+      />
+      <Layer
+        style={{
+          inset: 'auto',
+          left: `calc(${side} + ${cm(1.8)})`,
+          right: `calc(${side} + ${cm(1.8)})`,
+          top: `calc(${band} + ${cm(4.3)})`,
+          bottom: `calc(${band} + ${cm(4.3)})`,
+          border: `1px solid color-mix(in srgb, ${INDIGO} 50%, transparent)`,
+          borderRadius: '0.8cqmin',
+        }}
+      />
       {[12, 30, 50, 70, 88].map((x, i) => (
         <Piece
           key={x}
           vb={[0, 0, 30, 90]}
           anim="sway"
-          style={{ left: `${x}%`, top: `calc(${band} - 0.5cqmin)`, width: cm(card ? 3.5 : 5.5), translate: '-50% 0' }}
+          style={{
+            left: `${x}%`,
+            top: `calc(${band} - 0.5cqmin)`,
+            width: cm(card ? 3.5 : 5.5),
+            translate: '-50% 0',
+          }}
         >
           <Tassel color={i % 2 ? SAFFRON : MAGENTA} />
         </Piece>
       ))}
-      <Piece vb={[-100, -100, 200, 200]} style={{ left: cm(-14), top: `calc(${band} - ${cm(16)})`, width: cm(card ? 26 : 40) }}>
+      <Piece
+        vb={[-100, -100, 200, 200]}
+        style={{ left: cm(-14), top: `calc(${band} - ${cm(16)})`, width: cm(card ? 26 : 40) }}
+      >
         <Rosette u={url} />
       </Piece>
-      <Piece vb={[-100, -100, 200, 200]} style={{ right: cm(-14), bottom: `calc(${band} - ${cm(18)})`, width: cm(card ? 28 : 44) }}>
+      <Piece
+        vb={[-100, -100, 200, 200]}
+        style={{ right: cm(-14), bottom: `calc(${band} - ${cm(18)})`, width: cm(card ? 28 : 44) }}
+      >
         <Rosette u={url} />
       </Piece>
-      <Piece vb={[-100, -100, 200, 200]} style={{ right: cm(4), top: `calc(${band} + ${cm(5)})`, width: cm(card ? 9 : 13) }}>
+      <Piece
+        vb={[-100, -100, 200, 200]}
+        style={{ right: cm(4), top: `calc(${band} + ${cm(5)})`, width: cm(card ? 9 : 13) }}
+      >
         <Rosette u={url} />
       </Piece>
-      <Piece vb={[-100, -100, 200, 200]} style={{ left: cm(5), bottom: `calc(${band} + ${cm(6)})`, width: cm(card ? 9 : 13) }}>
+      <Piece
+        vb={[-100, -100, 200, 200]}
+        style={{ left: cm(5), bottom: `calc(${band} + ${cm(6)})`, width: cm(card ? 9 : 13) }}
+      >
         <Rosette u={url} />
       </Piece>
-      <Piece vb={[0, 0, 60, 140]} style={{ left: cm(1.5), top: '44%', width: cm(card ? 7 : 11) }}>
+      {/* tulip sprigs just inside the frame */}
+      <Piece
+        vb={[0, 0, 60, 140]}
+        style={{ left: `calc(${side} + ${cm(2.2)})`, top: '45%', width: cm(card ? 6 : 8) }}
+      >
         <Tulips />
       </Piece>
-      <Piece vb={[0, 0, 60, 140]} flip style={{ right: cm(1.5), top: '44%', width: cm(card ? 7 : 11) }}>
+      <Piece
+        vb={[0, 0, 60, 140]}
+        flip
+        style={{ right: `calc(${side} + ${cm(2.2)})`, top: '45%', width: cm(card ? 6 : 8) }}
+      >
         <Tulips />
       </Piece>
     </>

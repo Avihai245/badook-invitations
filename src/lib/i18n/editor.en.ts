@@ -179,7 +179,8 @@ export const editorEn: EditorDict = {
     locationLine: 'Location line',
     overlay: 'Background dimming',
     captions: 'Show subtitles',
-    captionsHelp: 'Off — YouTube or Vimeo subtitles stay hidden. Text burned into the video itself can’t be hidden.',
+    captionsHelp:
+      'Off — YouTube or Vimeo subtitles stay hidden. Text burned into the video itself can’t be hidden.',
     heroOptions: 'Design backgrounds',
     target: 'Count down to',
     targets: { event: 'Start of the event', custom: 'Another moment' },
@@ -336,6 +337,10 @@ export const editorEn: EditorDict = {
       monogramHelp: 'Up to {max} characters',
       sealColor: 'Seal color',
       hint: 'Hint text',
+    },
+    fonts: {
+      more: 'More fonts',
+      moreHelp: 'Font pairs that suit any design.',
     },
     palette: {
       reset: 'Back to the design’s colors',

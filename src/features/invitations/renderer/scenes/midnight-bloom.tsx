@@ -17,7 +17,17 @@ const GOLD = 'var(--inv-accent, #E8A33D)';
 
 type Url = (name: string) => string;
 
-function ellipsePetals(x: number, y: number, r: number, n: number, at: number, rx: number, ry: number, turn: number, fill: string) {
+function ellipsePetals(
+  x: number,
+  y: number,
+  r: number,
+  n: number,
+  at: number,
+  rx: number,
+  ry: number,
+  turn: number,
+  fill: string,
+) {
   return Array.from({ length: n }, (_, i) => {
     const deg = turn + (i * 360) / n;
     const [cx, cy] = polar(x, y, r * at, deg);
@@ -36,7 +46,21 @@ function ellipsePetals(x: number, y: number, r: number, n: number, at: number, r
 }
 
 /** A peony from above: guard petals, cupped petals, a ruffled heart of arcs. */
-function Peony({ x, y, r, tone = 'pink', turn = 0, u }: { x: number; y: number; r: number; tone?: 'pink' | 'blush'; turn?: number; u: Url }) {
+function Peony({
+  x,
+  y,
+  r,
+  tone = 'pink',
+  turn = 0,
+  u,
+}: {
+  x: number;
+  y: number;
+  r: number;
+  tone?: 'pink' | 'blush';
+  turn?: number;
+  u: Url;
+}) {
   const [base, mid, deep, light] =
     tone === 'pink' ? [PINK, PINK_DEEP, PINK_DARK, '#F7C3D0'] : [BLUSH, BLUSH_DEEP, '#B97B66', '#FFF1EA'];
   const ruffles = Array.from({ length: 14 }, (_, i) => {
@@ -45,7 +69,16 @@ function Peony({ x, y, r, tone = 'pink', turn = 0, u }: { x: number; y: number; 
     const [ax, ay] = polar(x, y, rr, deg - 40);
     const [bx, by] = polar(x, y, rr, deg + 40);
     const [cx, cy] = polar(x, y, rr * 1.45, deg);
-    return <path key={i} d={`M${ax} ${ay}Q${cx} ${cy} ${bx} ${by}`} fill="none" stroke={i % 3 ? light : mid} strokeWidth={r1(r * 0.07)} strokeLinecap="round" />;
+    return (
+      <path
+        key={i}
+        d={`M${ax} ${ay}Q${cx} ${cy} ${bx} ${by}`}
+        fill="none"
+        stroke={i % 3 ? light : mid}
+        strokeWidth={r1(r * 0.07)}
+        strokeLinecap="round"
+      />
+    );
   });
   return (
     <g>
@@ -60,14 +93,49 @@ function Peony({ x, y, r, tone = 'pink', turn = 0, u }: { x: number; y: number; 
 }
 
 /** A tulip cup, stem downward at `deg` (0 = upright). */
-function Tulip({ x, y, s, deg = 0, color = '#C8455E', dark = '#8C2239' }: { x: number; y: number; s: number; deg?: number; color?: string; dark?: string }) {
+function Tulip({
+  x,
+  y,
+  s,
+  deg = 0,
+  color = '#C8455E',
+  dark = '#8C2239',
+}: {
+  x: number;
+  y: number;
+  s: number;
+  deg?: number;
+  color?: string;
+  dark?: string;
+}) {
   return (
     <g transform={`rotate(${deg} ${x} ${y})`}>
-      <path d={`M${x} ${y + s * 1.9}Q${x + s * 0.1} ${y + s} ${x} ${y + s * 0.6}`} stroke={GREEN_LIGHT} strokeWidth={r1(s * 0.14)} fill="none" />
-      <path d={`M${x - s * 0.62} ${y - s * 0.5}Q${x - s * 0.72} ${y + s * 0.62} ${x} ${y + s * 0.66}Q${x + s * 0.72} ${y + s * 0.62} ${x + s * 0.62} ${y - s * 0.5}L${x + s * 0.3} ${y - s * 0.1}L${x} ${y - s * 0.72}L${x - s * 0.3} ${y - s * 0.1}Z`} fill={dark} />
-      <path d={`M${x - s * 0.66} ${y - s * 0.62}Q${x - s * 0.62} ${y + s * 0.6} ${x + s * 0.06} ${y + s * 0.64}Q${x + s * 0.22} ${y + s * 0.02} ${x - s * 0.02} ${y - s * 0.52}Q${x - s * 0.32} ${y - s * 0.36} ${x - s * 0.66} ${y - s * 0.62}Z`} fill={color} />
-      <path d={`M${x + s * 0.66} ${y - s * 0.6}Q${x + s * 0.6} ${y + s * 0.6} ${x - s * 0.04} ${y + s * 0.64}Q${x - s * 0.16} ${y + s * 0.05} ${x + s * 0.08} ${y - s * 0.44}Q${x + s * 0.36} ${y - s * 0.32} ${x + s * 0.66} ${y - s * 0.6}Z`} fill={color} opacity=".86" />
-      <path d={`M${x - s * 0.4} ${y - s * 0.3}Q${x - s * 0.38} ${y + s * 0.3} ${x - s * 0.1} ${y + s * 0.5}`} stroke="#fff" strokeWidth={r1(s * 0.05)} opacity=".25" fill="none" />
+      <path
+        d={`M${x} ${y + s * 1.9}Q${x + s * 0.1} ${y + s} ${x} ${y + s * 0.6}`}
+        stroke={GREEN_LIGHT}
+        strokeWidth={r1(s * 0.14)}
+        fill="none"
+      />
+      <path
+        d={`M${x - s * 0.62} ${y - s * 0.5}Q${x - s * 0.72} ${y + s * 0.62} ${x} ${y + s * 0.66}Q${x + s * 0.72} ${y + s * 0.62} ${x + s * 0.62} ${y - s * 0.5}L${x + s * 0.3} ${y - s * 0.1}L${x} ${y - s * 0.72}L${x - s * 0.3} ${y - s * 0.1}Z`}
+        fill={dark}
+      />
+      <path
+        d={`M${x - s * 0.66} ${y - s * 0.62}Q${x - s * 0.62} ${y + s * 0.6} ${x + s * 0.06} ${y + s * 0.64}Q${x + s * 0.22} ${y + s * 0.02} ${x - s * 0.02} ${y - s * 0.52}Q${x - s * 0.32} ${y - s * 0.36} ${x - s * 0.66} ${y - s * 0.62}Z`}
+        fill={color}
+      />
+      <path
+        d={`M${x + s * 0.66} ${y - s * 0.6}Q${x + s * 0.6} ${y + s * 0.6} ${x - s * 0.04} ${y + s * 0.64}Q${x - s * 0.16} ${y + s * 0.05} ${x + s * 0.08} ${y - s * 0.44}Q${x + s * 0.36} ${y - s * 0.32} ${x + s * 0.66} ${y - s * 0.6}Z`}
+        fill={color}
+        opacity=".86"
+      />
+      <path
+        d={`M${x - s * 0.4} ${y - s * 0.3}Q${x - s * 0.38} ${y + s * 0.3} ${x - s * 0.1} ${y + s * 0.5}`}
+        stroke="#fff"
+        strokeWidth={r1(s * 0.05)}
+        opacity=".25"
+        fill="none"
+      />
     </g>
   );
 }
@@ -80,7 +148,18 @@ function Ranunculus({ x, y, r, u }: { x: number; y: number; r: number; u: Url })
       {Array.from({ length: 7 }, (_, k) => {
         const rr = r * (0.92 - k * 0.13);
         const [cx, cy] = polar(x, y, r * 0.04 * k, 200);
-        return <circle key={k} cx={cx} cy={cy} r={r1(rr)} fill="none" stroke="#B9765A" strokeWidth={r1(r * 0.035)} opacity={0.35 + k * 0.06} />;
+        return (
+          <circle
+            key={k}
+            cx={cx}
+            cy={cy}
+            r={r1(rr)}
+            fill="none"
+            stroke="#B9765A"
+            strokeWidth={r1(r * 0.035)}
+            opacity={0.35 + k * 0.06}
+          />
+        );
       })}
       <circle cx={x} cy={y} r={r1(r * 0.12)} fill="#8E4A33" opacity=".5" />
     </g>
@@ -88,7 +167,23 @@ function Ranunculus({ x, y, r, u }: { x: number; y: number; r: number; u: Url })
 }
 
 /** A long leaf blade from (x, y) at `deg`, curled by `bend`. */
-function Blade({ x, y, len, deg, bend = 16, w = 0.22, tone = GREEN }: { x: number; y: number; len: number; deg: number; bend?: number; w?: number; tone?: string }) {
+function Blade({
+  x,
+  y,
+  len,
+  deg,
+  bend = 16,
+  w = 0.22,
+  tone = GREEN,
+}: {
+  x: number;
+  y: number;
+  len: number;
+  deg: number;
+  bend?: number;
+  w?: number;
+  tone?: string;
+}) {
   const [tx, ty] = polar(x, y, len, deg + bend);
   const [a1x, a1y] = polar(x, y, len * 0.55, deg - (w * 100) / 2 + bend * 0.3);
   const [a2x, a2y] = polar(x, y, len * 0.55, deg + (w * 100) / 2 + bend * 0.3);
@@ -96,7 +191,13 @@ function Blade({ x, y, len, deg, bend = 16, w = 0.22, tone = GREEN }: { x: numbe
   return (
     <g>
       <path d={`M${x} ${y}Q${a1x} ${a1y} ${tx} ${ty}Q${a2x} ${a2y} ${x} ${y}Z`} fill={tone} />
-      <path d={`M${x} ${y}Q${mx} ${my} ${tx} ${ty}`} stroke={GREEN_LIGHT} strokeWidth={r1(len * 0.018)} fill="none" opacity=".7" />
+      <path
+        d={`M${x} ${y}Q${mx} ${my} ${tx} ${ty}`}
+        stroke={GREEN_LIGHT}
+        strokeWidth={r1(len * 0.018)}
+        fill="none"
+        opacity=".7"
+      />
     </g>
   );
 }
@@ -148,17 +249,25 @@ function Moth() {
       <circle cx="76" cy="20" r="5" fill="#8A6F52" />
       <circle cx="76" cy="20" r="2" fill="#F4D6C7" />
       <ellipse cx="50" cy="36" rx="4" ry="14" fill="#6E5A44" />
-      <path d="M48 24c-4-8-10-12-16-14M52 24c4-8 10-12 16-14" stroke="#6E5A44" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      <path
+        d="M48 24c-4-8-10-12-16-14M52 24c4-8 10-12 16-14"
+        stroke="#6E5A44"
+        strokeWidth="1.2"
+        fill="none"
+        strokeLinecap="round"
+      />
     </g>
   );
 }
-
 
 export default function MidnightBloom({ place }: SceneProps) {
   const { ref, url } = useIds();
   const card = place === 'card';
   const rand = rng(11);
-  const motes = Array.from({ length: 16 }, () => [r1(rand() * 100), r1(rand() * 60), r1(0.25 + rand() * 0.5)] as const);
+  const motes = Array.from(
+    { length: 16 },
+    () => [r1(rand() * 100), r1(rand() * 60), r1(0.25 + rand() * 0.5)] as const,
+  );
   return (
     <>
       <Layer
@@ -187,9 +296,15 @@ export default function MidnightBloom({ place }: SceneProps) {
             <stop offset="1" stopColor="#C87852" />
           </radialGradient>
           <linearGradient id={ref('foil')} x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #E8A33D) 50%, #FFF3D6)' }} />
+            <stop
+              offset="0"
+              style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #E8A33D) 50%, #FFF3D6)' }}
+            />
             <stop offset=".45" style={{ stopColor: GOLD }} />
-            <stop offset="1" style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #E8A33D) 60%, #3A2408)' }} />
+            <stop
+              offset="1"
+              style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #E8A33D) 60%, #3A2408)' }}
+            />
           </linearGradient>
           <filter id={ref('shadow')} x="-10%" y="-10%" width="130%" height="130%">
             <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#000" floodOpacity=".55" />
@@ -200,7 +315,16 @@ export default function MidnightBloom({ place }: SceneProps) {
         <rect x="0" y="0" width="100%" height="100%" fill="none" stroke={url('foil')} strokeWidth="1.6" />
       </Frame>
       <Frame inset={card ? '6.4cqmin' : '6cqmin'}>
-        <rect x="0" y="0" width="100%" height="100%" fill="none" stroke={url('foil')} strokeWidth=".7" opacity=".7" />
+        <rect
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          fill="none"
+          stroke={url('foil')}
+          strokeWidth=".7"
+          opacity=".7"
+        />
       </Frame>
       <Piece vb={[0, 0, 300, 300]} style={{ left: cm(-12), top: cm(-12), width: cm(card ? 46 : 70) }}>
         <TopArrangement u={url} />
@@ -208,7 +332,11 @@ export default function MidnightBloom({ place }: SceneProps) {
       <Piece vb={[0, 0, 300, 300]} style={{ right: cm(-12), bottom: cm(-12), width: cm(card ? 44 : 66) }}>
         <BottomArrangement u={url} />
       </Piece>
-      <Piece vb={[0, 0, 100, 70]} anim="sway" style={{ right: cm(12), top: cm(card ? 8 : 12), width: cm(card ? 10 : 14), rotate: '14deg' }}>
+      <Piece
+        vb={[0, 0, 100, 70]}
+        anim="sway"
+        style={{ right: cm(12), top: cm(card ? 8 : 12), width: cm(card ? 10 : 14), rotate: '14deg' }}
+      >
         <Moth />
       </Piece>
       <Piece vb={[0, 0, 100, 60]} anim="twinkle" style={{ left: 0, top: 0, width: '100%' }}>

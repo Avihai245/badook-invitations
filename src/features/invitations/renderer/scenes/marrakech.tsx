@@ -61,7 +61,10 @@ function Crown({ u }: { u: Url }) {
       <path d={`${crown(0)}L${CROWN_END.r} 222H${CROWN_END.l}Z`} fill={INSIDE} />
       <path d={crown(0)} {...stroke(LINE, GOLD)} />
       <path d={crown(0)} {...stroke(`calc(${LINE} / 3)`, INSIDE)} />
-      <path d={crown(11)} {...stroke(DOTS, GOLD, { strokeDasharray: `0 calc(${DOTS} * 2.4)`, strokeLinecap: 'round' })} />
+      <path
+        d={crown(11)}
+        {...stroke(DOTS, GOLD, { strokeDasharray: `0 calc(${DOTS} * 2.4)`, strokeLinecap: 'round' })}
+      />
       <g transform="translate(150 62)">
         <path d={star8(0, 0, 26)} fill={u('gold')} />
         <path d={star8(0, 0, 19)} fill={EMERALD} />
@@ -176,7 +179,12 @@ export default function Marrakech({ place }: SceneProps) {
           </radialGradient>
           <pattern id={ref('zellige')} width="60" height="60" patternUnits="userSpaceOnUse">
             <path d={star8(30, 30, 16)} fill="none" stroke={EMERALD_LIGHT} strokeWidth="1.4" opacity=".55" />
-            <path d="M0 30H14M46 30H60M30 0V14M30 46V60" stroke={EMERALD_LIGHT} strokeWidth="1.4" opacity=".45" />
+            <path
+              d="M0 30H14M46 30H60M30 0V14M30 46V60"
+              stroke={EMERALD_LIGHT}
+              strokeWidth="1.4"
+              opacity=".45"
+            />
             <circle cx="0" cy="0" r="5" fill={EMERALD_LIGHT} opacity=".35" />
             <circle cx="60" cy="0" r="5" fill={EMERALD_LIGHT} opacity=".35" />
             <circle cx="0" cy="60" r="5" fill={EMERALD_LIGHT} opacity=".35" />
@@ -192,8 +200,7 @@ export default function Marrakech({ place }: SceneProps) {
       </Piece>
       <Layer
         style={{
-          background:
-            'radial-gradient(70cqw 55cqh at 50% 45%, rgba(15,59,52,.1), rgba(5,25,22,.75) 100%)',
+          background: 'radial-gradient(70cqw 55cqh at 50% 45%, rgba(15,59,52,.1), rgba(5,25,22,.75) 100%)',
         }}
       />
       {/* the arch: crown (SVG) + jambs (CSS), lit from inside */}
@@ -227,13 +234,29 @@ export default function Marrakech({ place }: SceneProps) {
           background: `radial-gradient(calc(${W} * .7) 38cqh at 50% 36%, rgba(255,200,110,.16), transparent 70%)`,
         }}
       />
-      <Piece vb={[0, 0, 60, 200]} anim="sway" style={{ left: cm(card ? 2 : 3), top: 0, height: card ? '46cqh' : '30cqh', width: 'auto' }}>
+      <Piece
+        vb={[0, 0, 60, 200]}
+        anim="sway"
+        style={{ left: cm(card ? 2 : 3), top: 0, height: card ? '46cqh' : '30cqh', width: 'auto' }}
+      >
         <Lantern u={url} />
       </Piece>
-      <Piece vb={[0, 0, 60, 200]} anim="sway" style={{ right: cm(card ? 2 : 3), top: 0, height: card ? '38cqh' : '22cqh', width: 'auto' }}>
+      <Piece
+        vb={[0, 0, 60, 200]}
+        anim="sway"
+        style={{ right: cm(card ? 2 : 3), top: 0, height: card ? '38cqh' : '22cqh', width: 'auto' }}
+      >
         <Lantern u={url} />
       </Piece>
-      <Piece vb={[0, 0, 100, 110]} style={{ left: '50%', bottom: card ? '6cqh' : '5cqh', width: cm(card ? 9 : 12), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 100, 110]}
+        style={{
+          left: '50%',
+          bottom: card ? '6cqh' : '9.5cqh',
+          width: cm(card ? 9 : 11),
+          translate: '-50% 0',
+        }}
+      >
         <Hamsa u={url} />
       </Piece>
       <Piece vb={[0, 0, 160, 100]} style={{ left: cm(-3), bottom: cm(-2), width: cm(card ? 22 : 34) }}>
@@ -242,7 +265,10 @@ export default function Marrakech({ place }: SceneProps) {
           <Pomegranate x={112} y={70} s={0.8} deg={18} u={url} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 160, 100]} style={{ right: cm(-3), bottom: cm(-2), width: cm(card ? 18 : 28), scale: '-1 1' }}>
+      <Piece
+        vb={[0, 0, 160, 100]}
+        style={{ right: cm(-3), bottom: cm(-2), width: cm(card ? 18 : 28), scale: '-1 1' }}
+      >
         <g filter={url('soft')}>
           <Pomegranate x={60} y={64} s={0.95} deg={-8} u={url} />
         </g>

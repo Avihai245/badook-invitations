@@ -9,7 +9,7 @@
  * 2. The same frames of docs/invitations/design-reference/invitation.html rendered live in the same
  *    Chromium → per-frame pixel diff (pixelmatch).
  * 3. Side-by-side PNGs: ours | live reference | provided screenshot (design-reference/screenshots).
- * 4. Desktop 1440×900 hero (HE/EN), cover, all 8 templates × he/en (demo) — checks for horizontal
+ * 4. Desktop 1440×900 hero (HE/EN), cover, every template × he/en (demo) — checks for horizontal
  *    overflow and console errors.
  * 5. P4 sections in every template × he/en: gallery (carousel in HE, grid in EN), a reveal (scratch /
  *    tap / spin in turn) and gifts with account details; the seeded save-the-date demos (§10.3).

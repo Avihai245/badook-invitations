@@ -70,10 +70,16 @@ function Floodlight({ u }: { u: Url }) {
     <g>
       <path d="M40 60L260 300H-120Z" fill={u('beam')} opacity=".55" />
       <path d="M58 60V260M50 260h16" stroke="#3A4044" strokeWidth="4" />
-      <path d="M54 90l8 20M62 90l-8 20M54 130l8 20M62 130l-8 20M54 170l8 20M62 170l-8 20" stroke="#3A4044" strokeWidth="2" />
+      <path
+        d="M54 90l8 20M62 90l-8 20M54 130l8 20M62 130l-8 20M54 170l8 20M62 170l-8 20"
+        stroke="#3A4044"
+        strokeWidth="2"
+      />
       <rect x="18" y="14" width="80" height="48" rx="4" fill="#2A2F33" />
       {[0, 1, 2].map((r) =>
-        [0, 1, 2, 3].map((c) => <circle key={`${r}${c}`} cx={30 + c * 19} cy={25 + r * 13} r="5.4" fill="#FFFBE0" />),
+        [0, 1, 2, 3].map((c) => (
+          <circle key={`${r}${c}`} cx={30 + c * 19} cy={25 + r * 13} r="5.4" fill="#FFFBE0" />
+        )),
       )}
     </g>
   );
@@ -143,10 +149,15 @@ export default function MatchDay({ place, date }: SceneProps) {
       <Layer
         style={{
           background:
-            `repeating-linear-gradient(180deg, ${PITCH} 0 ${stripe}, ${PITCH_LIGHT} ${stripe} calc(2 * ${stripe})),` + PITCH,
+            `repeating-linear-gradient(180deg, ${PITCH} 0 ${stripe}, ${PITCH_LIGHT} ${stripe} calc(2 * ${stripe})),` +
+            PITCH,
         }}
       />
-      <Layer style={{ background: 'radial-gradient(80cqw 60cqh at 50% 50%, transparent 55%, rgba(4,30,14,.55) 100%)' }} />
+      <Layer
+        style={{
+          background: 'radial-gradient(80cqw 60cqh at 50% 50%, transparent 55%, rgba(4,30,14,.55) 100%)',
+        }}
+      />
       {/* chalk: halfway line (broken by the circle), centre circle, penalty box */}
       <Layer
         style={{
@@ -187,16 +198,34 @@ export default function MatchDay({ place, date }: SceneProps) {
       <Piece vb={[0, 0, 120, 260]} style={{ left: cm(-8), top: cm(-2), width: cm(card ? 18 : 30) }}>
         <Floodlight u={url} />
       </Piece>
-      <Piece vb={[0, 0, 120, 260]} style={{ right: cm(-8), top: cm(-2), width: cm(card ? 18 : 30), scale: '-1 1' }}>
+      <Piece
+        vb={[0, 0, 120, 260]}
+        style={{ right: cm(-8), top: cm(-2), width: cm(card ? 18 : 30), scale: '-1 1' }}
+      >
         <Floodlight u={url} />
       </Piece>
-      <Piece vb={[0, 0, 240, 90]} style={{ left: '50%', top: cm(card ? 4 : 7), width: cm(card ? 26 : 38), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 240, 90]}
+        style={{ left: '50%', top: cm(card ? 4 : 7), width: cm(card ? 26 : 38), translate: '-50% 0' }}
+      >
         <Scoreboard dd={dd} mm={mm} u={url} />
       </Piece>
-      <Piece vb={[-50, -50, 100, 100]} anim="float" style={{ left: '50%', bottom: card ? '4cqh' : '6.5cqh', width: cm(card ? 8 : 12), translate: '-50% 0' }}>
+      <Piece
+        vb={[-50, -50, 100, 100]}
+        anim="float"
+        style={{
+          left: '50%',
+          bottom: card ? '4cqh' : '6.5cqh',
+          width: cm(card ? 8 : 12),
+          translate: '-50% 0',
+        }}
+      >
         <Ball u={url} />
       </Piece>
-      <Piece vb={[0, 0, 120, 120]} style={{ left: cm(4), bottom: cm(card ? 4 : 30), width: cm(card ? 11 : 17), rotate: '-12deg' }}>
+      <Piece
+        vb={[0, 0, 120, 120]}
+        style={{ left: cm(4), bottom: cm(card ? 4 : 30), width: cm(card ? 11 : 17), rotate: '-12deg' }}
+      >
         <g filter={url('soft')}>
           <Jersey />
         </g>
@@ -209,4 +238,3 @@ export default function MatchDay({ place, date }: SceneProps) {
     </>
   );
 }
-

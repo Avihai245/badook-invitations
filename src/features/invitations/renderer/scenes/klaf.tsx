@@ -5,7 +5,6 @@ import { Layer, Piece, cm, rng, r1, useIds, type SceneProps } from './kit';
  * rollers (atzei chaim) with turned handles; a band of tallit stripes crosses its foot, a silver yad
  * points in from the side, a scribe's quill rests at the top. No crowns. The stripes follow the accent.
  */
-const WOOD = '#7B4A2A';
 const WOOD_DEEP = '#4E2C17';
 const WOOD_LIGHT = '#A8704A';
 const PARCH = '#F4EAD3';
@@ -39,7 +38,11 @@ function Yad({ u }: { u: Url }) {
       <path d="M56 27L196 22v16L56 33z" fill={u('silver')} />
       <circle cx="120" cy="30" r="6" fill={u('silver')} />
       <circle cx="160" cy="30" r="5" fill={u('silver')} />
-      <path d="M56 26c-8-4-18-4-26 0h-12c-3 0-3 4 0 4h14c-2 2-2 4 0 6 8 2 16 2 24-2z" fill={u('silver')} />
+      {/* the little hand at the tip, its index finger pointing */}
+      <path d="M54 21h6v18h-6z" fill={u('silver')} stroke="#7E858E" strokeWidth=".8" />
+      <path d="M54 25c0-4-4-6-10-6h-7c-5 0-8 3-8 7v7c0 5 4 8 9 8h7c5 0 9-3 9-7z" fill={u('silver')} />
+      <path d="M36 22H13c-4 0-6 2-6 4.5S9 31 13 31h23z" fill={u('silver')} />
+      <path d="M38 34h11M38 38h9" stroke="#7E858E" strokeWidth="1" opacity=".7" strokeLinecap="round" />
       <path d="M70 28H190" stroke="#fff" strokeWidth="1.4" opacity=".6" />
     </g>
   );
@@ -51,7 +54,9 @@ function Quill() {
   for (let i = 0; i < 18; i++) {
     const y = 20 + i * 9;
     const w = 20 - Math.abs(i - 7) * 1.5;
-    barbs.push(`M30 ${y}Q${r1(30 - w * 0.7)} ${y - 4} ${r1(30 - w)} ${y - 12}M30 ${y}Q${r1(30 + w * 0.7)} ${y - 4} ${r1(30 + w)} ${y - 12}`);
+    barbs.push(
+      `M30 ${y}Q${r1(30 - w * 0.7)} ${y - 4} ${r1(30 - w)} ${y - 12}M30 ${y}Q${r1(30 + w * 0.7)} ${y - 4} ${r1(30 + w)} ${y - 12}`,
+    );
   }
   return (
     <g>
@@ -71,7 +76,10 @@ export default function Klaf({ place }: SceneProps) {
   const roller = card ? '7cqmin' : '9cqmin';
   const handle = `calc(${roller} * 110 / 60)`;
   const rand = rng(5);
-  const flecks = Array.from({ length: 40 }, () => [r1(rand() * 100), r1(rand() * 160), r1(0.3 + rand() * 0.8)] as const);
+  const flecks = Array.from(
+    { length: 70 },
+    () => [r1(rand() * 100), r1(rand() * 160), r1(0.12 + rand() * 0.38)] as const,
+  );
   const side = (s: 'left' | 'right') => ({ [s]: `calc(50% - ${W} / 2 - ${roller} / 2)` });
   return (
     <>
@@ -103,7 +111,7 @@ export default function Klaf({ place }: SceneProps) {
       />
       <Piece vb={[0, 0, 100, 160]} fit="xMidYMid slice" style={{ inset: 0, width: '100%', height: '100%' }}>
         {flecks.map(([x, y, r], i) => (
-          <circle key={i} cx={x} cy={y} r={r} fill="#8C6A3E" opacity={0.08 + (i % 3) * 0.04} />
+          <circle key={i} cx={x} cy={y} r={r} fill="#8C6A3E" opacity={0.1 + (i % 4) * 0.05} />
         ))}
       </Piece>
       {/* the rolled parchment on each roller (shaded cylinders), then the turned handles */}
@@ -128,7 +136,11 @@ export default function Klaf({ place }: SceneProps) {
             <Handle u={url} />
           </g>
         </Piece>,
-        <Piece key={`${s}b`} vb={[0, 0, 60, 110]} style={{ ...side(s), bottom: 0, width: roller, scale: '1 -1' }}>
+        <Piece
+          key={`${s}b`}
+          vb={[0, 0, 60, 110]}
+          style={{ ...side(s), bottom: 0, width: roller, scale: '1 -1' }}
+        >
           <g filter={url('soft')}>
             <Handle u={url} />
           </g>
@@ -149,12 +161,29 @@ export default function Klaf({ place }: SceneProps) {
           opacity: 0.95,
         }}
       />
-      <Piece vb={[0, 0, 220, 60]} style={{ right: `calc(50% - ${W} / 2 + ${roller})`, bottom: card ? '24cqh' : '20cqh', width: cm(card ? 30 : 44), rotate: '-18deg' }}>
+      <Piece
+        vb={[0, 0, 220, 60]}
+        style={{
+          right: `calc(50% - ${W} / 2 + ${roller})`,
+          bottom: card ? '24cqh' : '20cqh',
+          width: cm(card ? 30 : 44),
+          rotate: '-18deg',
+        }}
+      >
         <g filter={url('soft')}>
           <Yad u={url} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 60, 240]} anim="sway" style={{ left: `calc(50% - ${W} / 2 + ${roller} * 1.6)`, top: cm(card ? 4 : 6), width: cm(card ? 7 : 10), rotate: '-28deg' }}>
+      <Piece
+        vb={[0, 0, 60, 240]}
+        anim="sway"
+        style={{
+          left: `calc(50% - ${W} / 2 + ${roller} * 1.6)`,
+          top: cm(card ? 4 : 6),
+          width: cm(card ? 7 : 10),
+          rotate: '-28deg',
+        }}
+      >
         <g filter={url('soft')}>
           <Quill />
         </g>

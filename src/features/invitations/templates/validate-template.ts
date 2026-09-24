@@ -1,4 +1,5 @@
 import { EVENT_TYPES, type L10n, type Locale, type TemplateManifest } from '../contracts/types';
+import { LIBRARY_PAIR_PREFIX } from '../fonts/library';
 import type { TemplateEntry } from './registry';
 
 const templateKey = (ref: string | null | undefined) =>
@@ -33,6 +34,9 @@ export function validateTemplate({ manifest, defaults }: TemplateEntry): string[
   }
   if (new Set(manifest.fontPairs.map((p) => p.id)).size !== manifest.fontPairs.length)
     at('duplicate font pair ids');
+  for (const pair of manifest.fontPairs)
+    if (pair.id.startsWith(LIBRARY_PAIR_PREFIX))
+      at(`font pair id "${pair.id}" uses the font library's "${LIBRARY_PAIR_PREFIX}" prefix`);
 
   // cover
   const { overlay } = manifest.cover;

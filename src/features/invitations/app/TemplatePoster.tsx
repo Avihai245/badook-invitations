@@ -34,6 +34,7 @@ export function TemplatePoster({
   frameless = false,
   className,
   children,
+  badge = null,
 }: {
   template: PosterTemplate;
   locale: Locale;
@@ -45,6 +46,8 @@ export function TemplatePoster({
   frameless?: boolean;
   className?: string;
   children?: ReactNode;
+  /** a tag in the top corner (the gallery's "Premium") */
+  badge?: ReactNode;
 }) {
   const art = placeholderArt(template.id);
   const pair = template.fontPairs[0];
@@ -136,6 +139,7 @@ export function TemplatePoster({
           <Play size={14} />
         </span>
       ) : null}
+      {badge ? <span className="absolute start-[4cqw] top-[4cqw]">{badge}</span> : null}
     </div>
   );
 }

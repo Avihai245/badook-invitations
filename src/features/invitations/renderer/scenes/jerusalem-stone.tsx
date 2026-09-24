@@ -31,7 +31,14 @@ function Wall() {
       <rect width="1000" height="1000" fill={JOINT} />
       {blocks.map((b, i) => (
         <g key={i}>
-          <rect x={r1(b.x + 2)} y={r1(b.y + 2)} width={r1(b.w - 4)} height={r1(b.h - 4)} rx="2" fill={b.tone} />
+          <rect
+            x={r1(b.x + 2)}
+            y={r1(b.y + 2)}
+            width={r1(b.w - 4)}
+            height={r1(b.h - 4)}
+            rx="2"
+            fill={b.tone}
+          />
           <rect
             x={r1(b.x + 11)}
             y={r1(b.y + 11)}
@@ -41,7 +48,13 @@ function Wall() {
             fill="#fff"
             opacity={0.1 + (i % 3) * 0.05}
           />
-          <path d={`M${r1(b.x + 11)} ${r1(b.y + b.h - 11)}H${r1(b.x + b.w - 11)}V${r1(b.y + 11)}`} stroke="#8C7550" strokeWidth="1.2" opacity=".25" fill="none" />
+          <path
+            d={`M${r1(b.x + 11)} ${r1(b.y + b.h - 11)}H${r1(b.x + b.w - 11)}V${r1(b.y + 11)}`}
+            stroke="#8C7550"
+            strokeWidth="1.2"
+            opacity=".25"
+            fill="none"
+          />
         </g>
       ))}
     </>
@@ -51,7 +64,10 @@ function Wall() {
 /** The view through the window: hills, cypresses and an olive tree (viewBox 0 0 400 160). */
 function View() {
   const cypress = (x: number, h: number, w: number) => (
-    <path d={`M${x} ${160 - h}C${x + w * 0.55} ${160 - h * 0.7} ${x + w * 0.6} ${160 - h * 0.25} ${x + w * 0.2} 160H${x - w * 0.2}C${x - w * 0.6} ${160 - h * 0.25} ${x - w * 0.55} ${160 - h * 0.7} ${x} ${160 - h}Z`} fill={CYPRESS} />
+    <path
+      d={`M${x} ${160 - h}C${x + w * 0.55} ${160 - h * 0.7} ${x + w * 0.6} ${160 - h * 0.25} ${x + w * 0.2} 160H${x - w * 0.2}C${x - w * 0.6} ${160 - h * 0.25} ${x - w * 0.55} ${160 - h * 0.7} ${x} ${160 - h}Z`}
+      fill={CYPRESS}
+    />
   );
   return (
     <>
@@ -62,7 +78,13 @@ function View() {
       {cypress(96, 88, 17)}
       {cypress(330, 104, 20)}
       <g>
-        <path d="M252 160c2-18 0-30-4-40M252 140c6-8 14-12 22-14" stroke="#5B4A36" strokeWidth="3.2" fill="none" strokeLinecap="round" />
+        <path
+          d="M252 160c2-18 0-30-4-40M252 140c6-8 14-12 22-14"
+          stroke="#5B4A36"
+          strokeWidth="3.2"
+          fill="none"
+          strokeLinecap="round"
+        />
         <ellipse cx="250" cy="112" rx="30" ry="18" fill={OLIVE_LEAF} />
         <ellipse cx="274" cy="118" rx="22" ry="14" fill={OLIVE_LEAF_LIGHT} />
         <ellipse cx="236" cy="120" rx="18" ry="12" fill={OLIVE_LEAF_LIGHT} opacity=".8" />
@@ -87,12 +109,24 @@ function OliveBranch({ u }: { u: Url }) {
   ] as const;
   return (
     <g filter={u('soft')}>
-      <path d="M-10 6C60 24 120 70 184 164" stroke="#5B4A36" strokeWidth="3.6" fill="none" strokeLinecap="round" />
+      <path
+        d="M-10 6C60 24 120 70 184 164"
+        stroke="#5B4A36"
+        strokeWidth="3.6"
+        fill="none"
+        strokeLinecap="round"
+      />
       {leaves.map(([x, y, deg, len], i) => {
         const [tx, ty] = polar(x, y, len, deg);
         const [ax, ay] = polar(x, y, len * 0.5, deg - 16);
         const [bx, by] = polar(x, y, len * 0.5, deg + 16);
-        return <path key={i} d={`M${x} ${y}Q${ax} ${ay} ${tx} ${ty}Q${bx} ${by} ${x} ${y}Z`} fill={i % 2 ? OLIVE_LEAF : OLIVE_LEAF_LIGHT} />;
+        return (
+          <path
+            key={i}
+            d={`M${x} ${y}Q${ax} ${ay} ${tx} ${ty}Q${bx} ${by} ${x} ${y}Z`}
+            fill={i % 2 ? OLIVE_LEAF : OLIVE_LEAF_LIGHT}
+          />
+        );
       })}
       {[
         [104, 96],
@@ -127,7 +161,12 @@ export default function JerusalemStone({ place }: SceneProps) {
       <Piece vb={[0, 0, 1000, 1000]} fit="xMidYMid slice" style={{ inset: 0, width: '100%', height: '100%' }}>
         <Wall />
       </Piece>
-      <Layer style={{ background: 'radial-gradient(90cqw 70cqh at 50% 40%, rgba(255,244,220,.35), rgba(120,90,50,.18) 90%)' }} />
+      <Layer
+        style={{
+          background:
+            'radial-gradient(90cqw 70cqh at 50% 40%, rgba(255,244,220,.35), rgba(120,90,50,.18) 90%)',
+        }}
+      />
       {/* voussoirs: a stone band around the arch, jointed radially */}
       <Layer
         style={{
@@ -158,10 +197,15 @@ export default function JerusalemStone({ place }: SceneProps) {
           borderRadius: '9999px 9999px 0 0',
           overflow: 'hidden',
           background: 'linear-gradient(180deg, #8DB3CF 0%, #B7D0E2 45%, #E3ECF0 78%, #F2EEE4 100%)',
-          boxShadow: 'inset 0 10px 18px -8px rgba(60,40,20,.35), inset 8px 0 14px -10px rgba(60,40,20,.3), inset -8px 0 14px -10px rgba(60,40,20,.3)',
+          boxShadow:
+            'inset 0 10px 18px -8px rgba(60,40,20,.35), inset 8px 0 14px -10px rgba(60,40,20,.3), inset -8px 0 14px -10px rgba(60,40,20,.3)',
         }}
       >
-        <Piece vb={[0, 0, 400, 160]} fit="xMidYMax slice" style={{ left: 0, bottom: 0, width: '100%', height: card ? '38%' : '22%' }}>
+        <Piece
+          vb={[0, 0, 400, 160]}
+          fit="xMidYMax slice"
+          style={{ left: 0, bottom: 0, width: '100%', height: card ? '38%' : '22%' }}
+        >
           <View />
         </Piece>
       </Layer>
@@ -192,7 +236,11 @@ export default function JerusalemStone({ place }: SceneProps) {
           borderRadius: '2px',
         }}
       />
-      <Piece vb={[0, 0, 240, 200]} anim="sway" style={{ right: cm(-6), top: cm(-3), width: cm(card ? 32 : 56), scale: '-1 1' }}>
+      <Piece
+        vb={[0, 0, 240, 200]}
+        anim="sway"
+        style={{ right: cm(-6), top: cm(-3), width: cm(card ? 32 : 56), scale: '-1 1' }}
+      >
         <OliveBranch u={url} />
       </Piece>
     </>

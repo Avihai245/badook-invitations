@@ -24,10 +24,22 @@ export function dayMonth(date: string | null | undefined): [string, string] | nu
 
 /** `n` hundredths of the scene's shorter side. */
 export const cm = (n: number) => `${n}cqmin`;
+/**
+ * `n` hundredths of the shorter side, at most what they are on a 9:16 portrait: the same on phones
+ * and posters, smaller on a landscape hero, where a crown ornament or a centrepiece sized by the
+ * shorter side (the height there) would reach the text.
+ */
+export const cmh = (n: number) => `min(${n}cqmin, ${Math.round(n * 56.25) / 100}cqh)`;
 export const cw = (n: number) => `${n}cqw`;
 export const ch = (n: number) => `${n}cqh`;
 
 type ViewBox = readonly [number, number, number, number];
+
+/**
+ * The hero's gentle loops (invitation.css): float up and down, sway on the base, drift sideways,
+ * twinkle / flicker (opacity), sweep (a light fan on its corner), spin (a slow turn).
+ */
+export type SceneAnim = 'float' | 'sway' | 'drift' | 'twinkle' | 'flicker' | 'sweep' | 'spin';
 
 /**
  * One SVG piece of a scene. `vb` is its drawing's viewBox; give it a position and a width (the height
@@ -47,7 +59,7 @@ export function Piece({
   /** mirrored horizontally (the same corner art on the other side) */
   flip?: boolean;
   /** a gentle loop in the hero (invitation.css `.scene [data-anim]`), off with reduced motion */
-  anim?: 'float' | 'sway' | 'drift' | 'twinkle' | 'flicker' | 'sweep';
+  anim?: SceneAnim;
   children: ReactNode;
 }) {
   const [, , w, h] = vb;
@@ -93,7 +105,15 @@ export function Frame({ inset, children }: { inset: string; children: ReactNode 
 }
 
 /** A full-bleed (or positioned) HTML layer: CSS gradients, patterns, arches. */
-export function Layer({ style, anim, children }: { style: CSSProperties; anim?: string; children?: ReactNode }) {
+export function Layer({
+  style,
+  anim,
+  children,
+}: {
+  style: CSSProperties;
+  anim?: SceneAnim;
+  children?: ReactNode;
+}) {
   return (
     <div data-anim={anim} style={{ position: 'absolute', inset: 0, ...style }}>
       {children}

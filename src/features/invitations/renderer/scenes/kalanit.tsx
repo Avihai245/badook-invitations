@@ -40,7 +40,15 @@ function Anemone({ x, y, r, turn = 0, u }: { x: number; y: number; r: number; tu
       {[0, 60, 120, 180, 240, 300].map((a) => {
         const [x1, y1] = polar(x, y, r * 0.42, a + turn + 8);
         const [x2, y2] = polar(x, y, r * 0.86, a + turn + 12);
-        return <path key={a} d={`M${x1} ${y1}L${x2} ${y2}`} stroke="#fff" strokeWidth={r1(r * 0.02)} opacity=".22" />;
+        return (
+          <path
+            key={a}
+            d={`M${x1} ${y1}L${x2} ${y2}`}
+            stroke="#fff"
+            strokeWidth={r1(r * 0.02)}
+            opacity=".22"
+          />
+        );
       })}
       <circle cx={x} cy={y} r={r1(r * 0.36)} fill="#FBF3EC" />
       <circle cx={x} cy={y} r={r1(r * 0.36)} fill={RED_DEEP} opacity=".18" />
@@ -98,7 +106,19 @@ function Bud({ x, y, r, deg = 0 }: { x: number; y: number; r: number; deg?: numb
 }
 
 /** Finely cut anemone leaf: a midrib with forked leaflets. */
-function Feather({ x, y, len, deg, tone = LEAF }: { x: number; y: number; len: number; deg: number; tone?: string }) {
+function Feather({
+  x,
+  y,
+  len,
+  deg,
+  tone = LEAF,
+}: {
+  x: number;
+  y: number;
+  len: number;
+  deg: number;
+  tone?: string;
+}) {
   const [tx, ty] = polar(x, y, len, deg);
   const w = r1(Math.max(1.2, len * 0.03));
   return (
@@ -112,14 +132,34 @@ function Feather({ x, y, len, deg, tone = LEAF }: { x: number; y: number; len: n
           const [fx, fy] = polar(lx, ly, l * 0.45, deg + side * 20);
           const [gx, gy] = polar(bx, by, l * 0.55, deg + side * 50);
           const [hx, hy] = polar(gx, gy, l * 0.35, deg + side * 85);
-          return <path key={`${i}${side}`} d={`M${bx} ${by}L${lx} ${ly}L${fx} ${fy}M${gx} ${gy}L${hx} ${hy}`} strokeWidth={w} />;
+          return (
+            <path
+              key={`${i}${side}`}
+              d={`M${bx} ${by}L${lx} ${ly}L${fx} ${fy}M${gx} ${gy}L${hx} ${hy}`}
+              strokeWidth={w}
+            />
+          );
         });
       })}
     </g>
   );
 }
 
-function Stem({ x0, y0, x1, y1, bow = 0, w = 2.6 }: { x0: number; y0: number; x1: number; y1: number; bow?: number; w?: number }) {
+function Stem({
+  x0,
+  y0,
+  x1,
+  y1,
+  bow = 0,
+  w = 2.6,
+}: {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  bow?: number;
+  w?: number;
+}) {
   return (
     <path
       d={`M${x0} ${y0}Q${(x0 + x1) / 2 + bow} ${(y0 + y1) / 2} ${x1} ${y1}`}
@@ -195,12 +235,32 @@ function Hills({ u }: { u: Url }) {
   });
   return (
     <>
-      <path d="M0 128C150 92 270 100 390 116S630 150 770 116 1050 80 1200 108V300H0Z" fill={LEAF_LIGHT} opacity=".5" />
-      <path d="M0 162C160 134 300 144 420 156S700 182 860 152 1080 132 1200 150V300H0Z" fill={u('hill-mid')} filter={u('lift')} />
+      <path
+        d="M0 128C150 92 270 100 390 116S630 150 770 116 1050 80 1200 108V300H0Z"
+        fill={LEAF_LIGHT}
+        opacity=".5"
+      />
+      <path
+        d="M0 162C160 134 300 144 420 156S700 182 860 152 1080 132 1200 150V300H0Z"
+        fill={u('hill-mid')}
+        filter={u('lift')}
+      />
       {far.map(([x, y, s], i) => (
-        <ellipse key={i} cx={x} cy={y} rx={s} ry={r1(s * 0.75)} style={{ fill: RED }} opacity={0.55 + (i % 3) * 0.15} />
+        <ellipse
+          key={i}
+          cx={x}
+          cy={y}
+          rx={s}
+          ry={r1(s * 0.75)}
+          style={{ fill: RED }}
+          opacity={0.55 + (i % 3) * 0.15}
+        />
       ))}
-      <path d="M0 206C180 186 320 198 480 206S780 216 960 198 1120 192 1200 200V300H0Z" fill={u('hill-near')} filter={u('lift')} />
+      <path
+        d="M0 206C180 186 320 198 480 206S780 216 960 198 1120 192 1200 200V300H0Z"
+        fill={u('hill-near')}
+        filter={u('lift')}
+      />
       {near.map(([x, y, s], i) => (
         <g key={i}>
           <path d={`M${x} ${y + s * 3}V${y}`} stroke={LEAF_DARK} strokeWidth="1.2" />
@@ -275,9 +335,21 @@ export default function Kalanit({ place }: SceneProps) {
           <Spray u={url} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 120, 90]} anim="float" style={{ left: cm(12), top: cm(card ? 8 : 16), width: cm(12) }}>
+      <Piece
+        vb={[0, 0, 120, 90]}
+        anim="float"
+        style={{ left: cm(12), top: cm(card ? 8 : 16), width: cm(12) }}
+      >
         <ellipse cx="34" cy="60" rx="20" ry="15" transform="rotate(-30 34 60)" fill={url('petal')} />
-        <ellipse cx="92" cy="24" rx="12" ry="9" transform="rotate(24 92 24)" fill={url('petal')} opacity=".85" />
+        <ellipse
+          cx="92"
+          cy="24"
+          rx="12"
+          ry="9"
+          transform="rotate(24 92 24)"
+          fill={url('petal')}
+          opacity=".85"
+        />
       </Piece>
     </>
   );

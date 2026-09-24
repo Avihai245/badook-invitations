@@ -20,7 +20,14 @@ function Olive({ x, y, r, deg = 0, u }: { x: number; y: number; r: number; deg?:
     <g transform={`rotate(${deg} ${x} ${y})`}>
       <ellipse cx={x} cy={y} rx={r} ry={r1(r * 0.78)} fill={u('olive')} />
       <ellipse cx={r1(x + r * 0.62)} cy={y} rx={r1(r * 0.3)} ry={r1(r * 0.34)} style={{ fill: PIMENTO }} />
-      <ellipse cx={r1(x - r * 0.3)} cy={r1(y - r * 0.36)} rx={r1(r * 0.28)} ry={r1(r * 0.12)} fill="#fff" opacity=".5" />
+      <ellipse
+        cx={r1(x - r * 0.3)}
+        cy={r1(y - r * 0.36)}
+        rx={r1(r * 0.28)}
+        ry={r1(r * 0.12)}
+        fill="#fff"
+        opacity=".5"
+      />
     </g>
   );
 }
@@ -35,7 +42,14 @@ function Martini({ u }: { u: Url }) {
       <path d="M36 86H164L102 156H98Z" fill="#EEF0C9" opacity=".75" />
       <path d="M36 86H164" stroke="#fff" strokeWidth="2" opacity=".8" />
       <Olive x={112} y={104} r={15} deg={-58} u={u} />
-      <path d="M22 70H178L104 160H96Z" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinejoin="round" opacity=".9" />
+      <path
+        d="M22 70H178L104 160H96Z"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="2.4"
+        strokeLinejoin="round"
+        opacity=".9"
+      />
       <path d="M40 78L92 142" stroke="#fff" strokeWidth="3" opacity=".45" strokeLinecap="round" />
       <path d="M97 160h6v96h-6z" fill={SILVER} />
       <path d="M99 160v96" stroke="#fff" strokeWidth="1.4" opacity=".7" />
@@ -132,12 +146,26 @@ export default function MartiniOlive({ place }: SceneProps) {
           opacity: 0.6,
         }}
       />
-      {/* olives tumbling */}
-      <Piece vb={[0, 0, 300, 120]} anim="float" style={{ left: '50%', top: `calc(${scallop} * 2.2)`, width: cm(card ? 26 : 40), translate: '-50% 0' }}>
+      {/* three olives on a cocktail pick */}
+      <Piece
+        vb={[0, 0, 300, 120]}
+        anim="float"
+        style={{
+          left: '50%',
+          top: `calc(${scallop} * 2)`,
+          width: cm(card ? 30 : 46),
+          translate: '-50% 0',
+          rotate: '-6deg',
+        }}
+      >
         <g filter={url('soft')}>
-          <Olive x={60} y={60} r={16} deg={-20} u={url} />
-          <Olive x={150} y={34} r={13} deg={30} u={url} />
-          <Olive x={236} y={70} r={15} deg={-150} u={url} />
+          <path d="M18 62H286" stroke="#B8322A" strokeWidth="4" strokeLinecap="round" />
+          <path d="M286 62l-14-7v14z" fill="#B8322A" />
+          <circle cx="16" cy="62" r="8" fill="#D8A93B" />
+          <circle cx="13" cy="59" r="2.6" fill="#fff" opacity=".5" />
+          <Olive x={88} y={62} r={25} deg={0} u={url} />
+          <Olive x={152} y={62} r={25} deg={0} u={url} />
+          <Olive x={216} y={62} r={25} deg={0} u={url} />
         </g>
       </Piece>
       {/* the floor: checkerboard with a scalloped edge */}
@@ -161,20 +189,41 @@ export default function MartiniOlive({ place }: SceneProps) {
           background: `radial-gradient(circle calc(${check} / 2) at 50% 100%, ${CREAM} 96%, transparent 100%) 0 0 / ${check} 100% repeat-x`,
         }}
       />
-      <Piece vb={[0, 0, 200, 300]} style={{ right: cm(card ? 4 : 1), bottom: `calc(${check} * 2 + ${check} / 2 - 1cqmin)`, width: cm(card ? 22 : 36), rotate: '6deg' }}>
+      <Piece
+        vb={[0, 0, 200, 300]}
+        style={{
+          right: cm(card ? 4 : 1),
+          bottom: `calc(${check} * 2 + ${check} / 2 - 1cqmin)`,
+          width: cm(card ? 22 : 36),
+          rotate: '6deg',
+        }}
+      >
         <g filter={url('soft')}>
           <Martini u={url} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 160, 300]} style={{ left: cm(card ? 3 : 0), bottom: `calc(${check} * 2 + ${check} / 2 - 1.5cqmin)`, width: cm(card ? 18 : 28) }}>
+      <Piece
+        vb={[0, 0, 160, 300]}
+        style={{
+          left: cm(card ? 3 : 0),
+          bottom: `calc(${check} * 2 + ${check} / 2 - 1.5cqmin)`,
+          width: cm(card ? 18 : 28),
+        }}
+      >
         <g filter={url('soft')}>
           <Candles u={url} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 60, 60]} style={{ left: '30%', bottom: `calc(${check} * 2 + ${check} / 2)`, width: cm(card ? 5 : 7) }}>
+      <Piece
+        vb={[0, 0, 60, 60]}
+        style={{ left: '30%', bottom: `calc(${check} * 2 + ${check} / 2)`, width: cm(card ? 5 : 7) }}
+      >
         <Olive x={30} y={36} r={15} deg={12} u={url} />
       </Piece>
-      <Piece vb={[0, 0, 120, 40]} style={{ right: cm(10), top: cm(card ? 16 : 30), width: cm(card ? 8 : 12) }}>
+      <Piece
+        vb={[0, 0, 120, 40]}
+        style={{ right: cm(10), top: cm(card ? 16 : 30), width: cm(card ? 8 : 12) }}
+      >
         {[0, 1, 2, 3].map((i) => {
           const [x, y] = polar(60, 20, 30 + i * 6, -20 + i * 40);
           return <circle key={i} cx={x} cy={y} r={2 + (i % 2)} fill={CREAM} opacity=".45" />;

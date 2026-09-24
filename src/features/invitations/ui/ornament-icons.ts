@@ -3,7 +3,8 @@
  * in for a missing section illustration and the footer decoration (PlaceholderArt.ornament), drawn at
  * 72–88px with a hairline stroke. A string is a path; `circle` / `dot` are circles (a dot is filled).
  */
-type Shape = string | { circle: { cx: number; cy: number; r: number } } | { dot: { cx: number; cy: number; r: number } };
+type Shape =
+  string | { circle: { cx: number; cy: number; r: number } } | { dot: { cx: number; cy: number; r: number } };
 
 const ring = (cx: number, cy: number, r: number) => ({ circle: { cx, cy, r } });
 const dot = (cx: number, cy: number, r = 0.45) => ({ dot: { cx, cy, r } });
@@ -102,7 +103,9 @@ export const ORNAMENT_PATHS = {
     ...[0, 72, 144, 216, 288].map((a) => petal(12, 12, 1.8, 8.4, a - 90, 30)),
     ring(12, 12, 1.5),
     ...[-54, -18, 18, 54, 90, 126, 162, 198, 234].map((a) => {
-      const [x, y] = at(12, 12, 3.6, a - 90).split(' ').map(Number) as [number, number];
+      const [x, y] = at(12, 12, 3.6, a - 90)
+        .split(' ')
+        .map(Number) as [number, number];
       return dot(x, y, 0.35);
     }),
   ],
@@ -123,7 +126,9 @@ export const ORNAMENT_PATHS = {
   'deco-fan': [
     'M3 18a9 9 0 0 1 18 0z',
     'M7.6 18a4.4 4.4 0 0 1 8.8 0',
-    ...[180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5, 360].map((a) => `M${at(12, 18, 4.4, a)}L${at(12, 18, 9, a)}`),
+    ...[180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5, 360].map(
+      (a) => `M${at(12, 18, 4.4, a)}L${at(12, 18, 9, a)}`,
+    ),
     'M3 20.5h18',
     'M12 21.5l-.9.9.9.9.9-.9z',
   ],

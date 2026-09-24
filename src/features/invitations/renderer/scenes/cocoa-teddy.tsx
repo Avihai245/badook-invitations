@@ -1,4 +1,4 @@
-import { Frame, Layer, Piece, cm, useIds, type SceneProps } from './kit';
+import { Frame, Layer, Piece, cm, cmh, useIds, type SceneProps } from './kit';
 
 /**
  * Cocoa Teddy — a nursery: a powder-blue sky with puffy clouds and a little crescent moon, a
@@ -17,7 +17,10 @@ type Url = (name: string) => string;
 function Cloud({ x, y, s }: { x: number; y: number; s: number }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <path d="M-50 20c-16 0-22-22-6-28 0-16 20-22 30-12 6-18 34-18 40 0 12-8 30 0 28 14 16 2 16 26 0 26z" fill="#fff" />
+      <path
+        d="M-50 20c-16 0-22-22-6-28 0-16 20-22 30-12 6-18 34-18 40 0 12-8 30 0 28 14 16 2 16 26 0 26z"
+        fill="#fff"
+      />
       <path d="M-44 18h86c6 0 10-4 10-8" stroke="#CFE2F3" strokeWidth="5" fill="none" strokeLinecap="round" />
     </g>
   );
@@ -45,7 +48,13 @@ function Teddy({ u }: { u: Url }) {
       <circle cx="100" cy="76" r="54" fill={u('fur')} />
       <ellipse cx="100" cy="96" rx="26" ry="20" fill={TAN} />
       <ellipse cx="100" cy="86" rx="9" ry="6.5" fill={INK} />
-      <path d="M100 92v8M92 104c4 4 12 4 16 0" stroke={INK} strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path
+        d="M100 92v8M92 104c4 4 12 4 16 0"
+        stroke={INK}
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
       <circle cx="80" cy="68" r="5.6" fill={INK} />
       <circle cx="120" cy="68" r="5.6" fill={INK} />
       <circle cx="82" cy="66" r="1.8" fill="#fff" />
@@ -69,6 +78,7 @@ export default function CocoaTeddy({ place }: SceneProps) {
   const card = place === 'card';
   const check = card ? '3.2cqmin' : '4cqmin';
   const blanket = card ? '22cqh' : '15cqh';
+  const teddy = card ? cm(26) : cmh(36);
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -83,8 +93,17 @@ export default function CocoaTeddy({ place }: SceneProps) {
           </filter>
         </defs>
       </svg>
-      <Layer style={{ background: 'radial-gradient(80cqw 50cqh at 50% 50%, rgba(255,253,248,.7), transparent 75%)' }} />
-      <Piece vb={[0, 0, 400, 300]} anim="float" fit="xMidYMin meet" style={{ left: 0, top: 0, width: '100%', height: card ? '40cqh' : '26cqh' }}>
+      <Layer
+        style={{
+          background: 'radial-gradient(80cqw 50cqh at 50% 50%, rgba(255,253,248,.7), transparent 75%)',
+        }}
+      />
+      <Piece
+        vb={[0, 0, 400, 300]}
+        anim="float"
+        fit="xMidYMin meet"
+        style={{ left: 0, top: 0, width: '100%', height: card ? '40cqh' : '26cqh' }}
+      >
         <g filter={url('soft')}>
           <Cloud x={80} y={70} s={1.1} />
           <Cloud x={320} y={120} s={0.85} />
@@ -108,7 +127,13 @@ export default function CocoaTeddy({ place }: SceneProps) {
           height="100%"
           rx="18"
           fill="none"
-          style={{ stroke: COCOA, strokeWidth: '0.55cqmin', strokeDasharray: '1.4cqmin 1.1cqmin', strokeLinecap: 'round', opacity: 0.7 }}
+          style={{
+            stroke: COCOA,
+            strokeWidth: '0.55cqmin',
+            strokeDasharray: '1.4cqmin 1.1cqmin',
+            strokeLinecap: 'round',
+            opacity: 0.7,
+          }}
         />
       </Frame>
       {/* gingham blanket */}
@@ -128,7 +153,10 @@ export default function CocoaTeddy({ place }: SceneProps) {
           borderRadius: '40% 60% 0 0 / 6cqmin 6cqmin 0 0',
         }}
       />
-      <Piece vb={[0, 0, 200, 220]} style={{ left: '50%', bottom: `calc(${blanket} - ${cm(card ? 9 : 12)})`, width: cm(card ? 26 : 36), translate: '-50% 0' }}>
+      <Piece
+        vb={[0, 0, 200, 220]}
+        style={{ left: '50%', bottom: `calc(${blanket} - ${teddy} / 3)`, width: teddy, translate: '-50% 0' }}
+      >
         <g filter={url('soft')}>
           <Teddy u={url} />
         </g>

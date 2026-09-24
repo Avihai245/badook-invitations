@@ -10,10 +10,11 @@ import {
   type CSSProperties,
 } from 'react';
 import { dirOf, type InvitationDocument, type Locale, type TemplateManifest } from '../../contracts/types';
+import { fontFaceCss, pairFontFamilies } from '../../fonts';
 import type { AssetBases } from '../../renderer/assets';
 import { buildRenderContext } from '../../renderer/context';
 import { InvitationBody } from '../../renderer/InvitationBody';
-import { themeMode, themeVars } from '../../renderer/theme';
+import { resolveFontPair, themeMode, themeVars } from '../../renderer/theme';
 import {
   closestRenderedPath,
   isEnvelope,
@@ -183,16 +184,37 @@ export function PreviewFrame({
 
   if (standalone)
     return (
-      <StandalonePreview
-        {...standalone}
-        template={template}
-        brand={brand}
-        bases={bases}
-        publicBaseUrl={publicBaseUrl}
-      />
+      <>
+        <LibraryFonts template={template} doc={standalone.doc} />
+        <StandalonePreview
+          {...standalone}
+          template={template}
+          brand={brand}
+          bases={bases}
+          publicBaseUrl={publicBaseUrl}
+        />
+      </>
     );
-  if (!ctx) return null;
-  return <InvitationBody key={replay} ctx={ctx} showCover={replay > 0} langSwitchHref={null} />;
+  if (!ctx || !state) return null;
+  return (
+    <>
+      <LibraryFonts template={template} doc={state.doc} />
+      <InvitationBody key={replay} ctx={ctx} showCover={replay > 0} langSwitchHref={null} />
+    </>
+  );
+}
+
+/**
+ * The frame's layout declares the faces of the template's own pairs; a pair from the font library
+ * brings its own.
+ */
+function LibraryFonts({ template, doc }: { template: TemplateManifest; doc: InvitationDocument }) {
+  const pair = resolveFontPair(template, doc);
+  const css = useMemo(
+    () => (template.fontPairs.includes(pair) ? '' : fontFaceCss(pairFontFamilies(pair))),
+    [template, pair],
+  );
+  return css ? <style dangerouslySetInnerHTML={{ __html: css }} /> : null;
 }
 
 function StandalonePreview({

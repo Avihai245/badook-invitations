@@ -1,4 +1,4 @@
-import { Layer, Piece, cm, polar, r1, rng, useIds, type SceneProps } from './kit';
+import { Layer, Piece, cm, cmh, polar, r1, rng, useIds, type SceneProps } from './kit';
 
 /**
  * Almond Blossom — the first bloom against a pale winter sky: dark bark branches reaching in from the
@@ -50,9 +50,23 @@ function Blossom({ x, y, r, turn = 0, u }: { x: number; y: number; r: number; tu
 function Bud({ x, y, r, deg }: { x: number; y: number; r: number; deg: number }) {
   return (
     <g transform={`rotate(${deg} ${x} ${y})`}>
-      <path d={`M${x} ${y + r}C${x - r} ${y} ${x - r * 0.6} ${y - r * 1.2} ${x} ${y - r * 1.4}C${x + r * 0.6} ${y - r * 1.2} ${x + r} ${y} ${x} ${y + r}Z`} style={{ fill: BLUSH }} />
-      <path d={`M${x} ${y - r * 1.3}C${x + r * 0.4} ${y - r * 0.8} ${x + r * 0.4} ${y} ${x} ${y + r * 0.8}`} stroke="#fff" strokeWidth={r1(r * 0.25)} opacity=".5" fill="none" />
-      <path d={`M${x - r * 0.6} ${y + r * 0.9}Q${x} ${y + r * 0.4} ${x + r * 0.6} ${y + r * 0.9}`} stroke={BARK} strokeWidth={r1(r * 0.4)} fill="none" />
+      <path
+        d={`M${x} ${y + r}C${x - r} ${y} ${x - r * 0.6} ${y - r * 1.2} ${x} ${y - r * 1.4}C${x + r * 0.6} ${y - r * 1.2} ${x + r} ${y} ${x} ${y + r}Z`}
+        style={{ fill: BLUSH }}
+      />
+      <path
+        d={`M${x} ${y - r * 1.3}C${x + r * 0.4} ${y - r * 0.8} ${x + r * 0.4} ${y} ${x} ${y + r * 0.8}`}
+        stroke="#fff"
+        strokeWidth={r1(r * 0.25)}
+        opacity=".5"
+        fill="none"
+      />
+      <path
+        d={`M${x - r * 0.6} ${y + r * 0.9}Q${x} ${y + r * 0.4} ${x + r * 0.6} ${y + r * 0.9}`}
+        stroke={BARK}
+        strokeWidth={r1(r * 0.4)}
+        fill="none"
+      />
     </g>
   );
 }
@@ -73,9 +87,27 @@ function Branch({ u, seed }: { u: Url; seed: number }) {
   ];
   return (
     <g>
-      <path d="M-20 20C40 34 90 60 150 88S260 140 360 196" stroke={BARK_DEEP} strokeWidth="11" fill="none" strokeLinecap="round" />
-      <path d="M-20 20C40 34 90 60 150 88S260 140 360 196" stroke={BARK} strokeWidth="7" fill="none" strokeLinecap="round" />
-      <path d="M100 70C90 100 76 130 50 180" stroke={BARK} strokeWidth="5" fill="none" strokeLinecap="round" />
+      <path
+        d="M-20 20C40 34 90 60 150 88S260 140 360 196"
+        stroke={BARK_DEEP}
+        strokeWidth="11"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M-20 20C40 34 90 60 150 88S260 140 360 196"
+        stroke={BARK}
+        strokeWidth="7"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M100 70C90 100 76 130 50 180"
+        stroke={BARK}
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
       <path d="M180 104c10-20 12-36 8-54" stroke={BARK} strokeWidth="4" fill="none" strokeLinecap="round" />
       <path d="M268 146c20-2 40 6 60 20" stroke={BARK} strokeWidth="3.4" fill="none" strokeLinecap="round" />
       {flowers.map(([x, y, r, t], i) => (
@@ -93,14 +125,20 @@ export default function AlmondBlossom({ place }: SceneProps) {
   const { ref, url } = useIds();
   const card = place === 'card';
   const rand = rng(17);
-  const petals = Array.from({ length: 9 }, () => [r1(rand() * 100), r1(rand() * 100), r1(rand() * 360), r1(0.8 + rand() * 0.8)] as const);
+  const petals = Array.from(
+    { length: 9 },
+    () => [r1(rand() * 100), r1(rand() * 100), r1(rand() * 360), r1(0.8 + rand() * 0.8)] as const,
+  );
   const moon = card ? '52cqmin' : 'min(84cqmin, 62cqh)';
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
           <radialGradient id={ref('petal')} cx=".2" cy=".5" r=".9">
-            <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #D9849B) 40%, #fff)' }} />
+            <stop
+              offset="0"
+              style={{ stopColor: 'color-mix(in srgb, var(--inv-accent, #D9849B) 40%, #fff)' }}
+            />
             <stop offset=".45" stopColor={PETAL} />
             <stop offset="1" stopColor="#F7F1EE" />
           </radialGradient>
@@ -126,21 +164,35 @@ export default function AlmondBlossom({ place }: SceneProps) {
           aspectRatio: '1',
           translate: '-50% -52%',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255,255,255,.55) 0 60%, rgba(255,255,255,.2) 70%, transparent 71%)',
-          boxShadow: '0 0 0 1px rgba(255,255,255,.9), 0 0 0 1.4cqmin rgba(255,255,255,.18), 0 0 8cqmin rgba(255,255,255,.35)',
+          background:
+            'radial-gradient(circle, rgba(255,255,255,.55) 0 60%, rgba(255,255,255,.2) 70%, transparent 71%)',
+          boxShadow:
+            '0 0 0 1px rgba(255,255,255,.9), 0 0 0 1.4cqmin rgba(255,255,255,.18), 0 0 8cqmin rgba(255,255,255,.35)',
         }}
       />
-      <Piece vb={[0, 0, 400, 300]} anim="sway" style={{ left: cm(-6), top: cm(-4), width: cm(card ? 58 : 92) }}>
+      <Piece
+        vb={[0, 0, 400, 300]}
+        anim="sway"
+        style={{ left: cm(-6), top: cm(-4), width: card ? cm(58) : cmh(92) }}
+      >
         <g filter={url('soft')}>
           <Branch u={url} seed={2} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 400, 300]} style={{ right: cm(-8), bottom: cm(-6), width: cm(card ? 44 : 70), scale: '-1 -1' }}>
+      <Piece
+        vb={[0, 0, 400, 300]}
+        style={{ right: cm(-8), bottom: cm(-6), width: card ? cm(44) : cmh(70), scale: '-1 -1' }}
+      >
         <g filter={url('soft')}>
           <Branch u={url} seed={6} />
         </g>
       </Piece>
-      <Piece vb={[0, 0, 100, 100]} anim="drift" fit="xMidYMid slice" style={{ inset: 0, width: '100%', height: '100%' }}>
+      <Piece
+        vb={[0, 0, 100, 100]}
+        anim="drift"
+        fit="xMidYMid slice"
+        style={{ inset: 0, width: '100%', height: '100%' }}
+      >
         {petals.map(([x, y, a, s], i) => (
           <ellipse
             key={i}

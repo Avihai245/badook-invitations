@@ -1,12 +1,11 @@
-import { Layer, Piece, r1, rng, type SceneProps } from './kit';
+import { Layer, r1, rng, type SceneProps } from './kit';
 
 /**
  * Cloud Arch — hushed gallery-white minimalism: an arch-topped card lifted off a warm wall by a long
- * soft shadow, an inner hairline, a blind-embossed roundel at its crown, hairline rules and a sheet
- * of sand paper with a torn deckle edge peeking below. The bronze follows the accent.
+ * soft shadow, an inner hairline, a blind-embossed roundel at its crown, hairline rules, and the
+ * card's foot torn into a deckle edge. The bronze follows the accent.
  */
 const BRONZE = 'var(--inv-accent, #8E6B4F)';
-const SAND = '#DCD5CB';
 const SAND_DEEP = '#C9BBA8';
 const CARD = '#FAF9F6';
 
@@ -78,10 +77,24 @@ export default function CloudArch({ place }: SceneProps) {
           }}
         >
           <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
-            <circle cx="50" cy="50" r="36" fill="none" style={{ stroke: BRONZE }} strokeWidth="1.2" opacity=".55" />
+            <circle
+              cx="50"
+              cy="50"
+              r="36"
+              fill="none"
+              style={{ stroke: BRONZE }}
+              strokeWidth="1.2"
+              opacity=".55"
+            />
             {[1, -1].map((side) => (
               <g key={side} transform={side < 0 ? 'translate(100 0) scale(-1 1)' : undefined}>
-                <g transform="translate(.9 .9)" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round">
+                <g
+                  transform="translate(.9 .9)"
+                  stroke="#fff"
+                  strokeWidth="2.2"
+                  fill="none"
+                  strokeLinecap="round"
+                >
                   <path d={WREATH} />
                 </g>
                 <g stroke={SAND_DEEP} strokeWidth="2.2" fill="none" strokeLinecap="round">
@@ -111,7 +124,14 @@ export default function CloudArch({ place }: SceneProps) {
         {/* hairline rules with a bronze point, low on the card */}
         <svg
           viewBox="0 0 200 12"
-          style={{ position: 'absolute', left: '50%', bottom: card ? '5cqmin' : '8cqmin', width: '46%', translate: '-50% 0', overflow: 'visible' }}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            bottom: card ? '5cqmin' : '8cqmin',
+            width: '46%',
+            translate: '-50% 0',
+            overflow: 'visible',
+          }}
         >
           <path d="M0 6H86M114 6H200" stroke={SAND_DEEP} strokeWidth=".8" />
           <path d="M100 1.5 104.5 6 100 10.5 95.5 6Z" style={{ fill: BRONZE }} opacity=".8" />
