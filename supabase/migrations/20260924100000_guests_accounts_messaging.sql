@@ -910,9 +910,11 @@ language sql stable security definer set search_path = '' as $$
   select id from auth.users where lower(email) = lower(trim(p_email)) limit 1
 $$;
 
--- Links a user to the partner that opened it (and keeps the name / phone the partner sent).
+-- Links a user to the partner, with the name / phone / id it sent: a user the partner has just
+-- created (p_claim) becomes the partner's, and one that already is gets updated. Anyone else's account
+-- is left alone (null): the partner can't take over an account that was opened some other way.
 create function public.account_link_partner(
-  p_user_id uuid, p_source text, p_external_id text, p_full_name text, p_phone text
+  p_user_id uuid, p_source text, p_external_id text, p_full_name text, p_phone text, p_claim boolean
 ) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare
@@ -920,12 +922,34 @@ declare
 begin
   perform public.account_get(p_user_id);
   update public.accounts set
-    source = case when source = 'signup' then p_source else source end,
+    source = p_source,
     external_id = coalesce(p_external_id, external_id),
     full_name = coalesce(nullif(left(trim(p_full_name), 120), ''), full_name),
     phone = coalesce(p_phone, phone)
-  where user_id = p_user_id returning * into v;
+  where user_id = p_user_id and (source = p_source or (p_claim and source = 'signup'))
+  returning * into v;
+  if not found then
+    return null;
+  end if;
   return public.account_json(v);
+end $$;
+
+-- The partner's own user, by our id or by the partner's id, with its email (null when it isn't one of
+-- the partner's users).
+create function public.partner_account(p_source text, p_user_id uuid, p_external_id text) returns jsonb
+language plpgsql stable security definer set search_path = '' as $$
+declare
+  v public.accounts;
+begin
+  select * into v from public.accounts
+  where source = p_source
+    and ((p_user_id is not null and user_id = p_user_id)
+      or (p_external_id is not null and external_id = p_external_id))
+  limit 1;
+  if not found then
+    return null;
+  end if;
+  return public.account_json(v) || jsonb_build_object('email', (select email from auth.users where id = v.user_id));
 end $$;
 
 -- ─── privileges ─────────────────────────────────────────────────────────────────────────────────
@@ -966,7 +990,8 @@ begin
     'public.contact_submit(text, text, text, text, text, text, uuid)',
     'public.purge_expired()',
     'public.user_id_by_email(text)',
-    'public.account_link_partner(uuid, text, text, text, text)'
+    'public.account_link_partner(uuid, text, text, text, text, boolean)',
+    'public.partner_account(text, uuid, text)'
   ] loop
     execute format('revoke all on function %s from public, anon, authenticated', f);
     execute format('grant execute on function %s to service_role', f);

@@ -89,6 +89,8 @@ export default defineConfig({
             // the support assistant: the Anthropic API stand-in above (tests/e2e/support.spec.ts)
             ANTHROPIC_API_KEY: 'e2e-anthropic-key',
             INVITES_AI_MODEL: 'e2e-model',
+            // the partner API (tests/e2e/partner.spec.ts)
+            INVITES_PARTNER_API_KEY: 'e2e-partner-key-0123456789abcdef0123',
             INVITES_AI_API_BASE: `http://127.0.0.1:${whatsappPort}`,
           },
           timeout: 120_000,

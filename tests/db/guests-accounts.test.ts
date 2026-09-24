@@ -409,21 +409,37 @@ describe('support chat and partners', () => {
     ).toBe(0);
   });
 
-  it('finds users by email (any case) and links them to the partner', async () => {
+  it('finds users by email (any case); the partner claims only users it created, and sees only its own', async () => {
+    const P = 'partner:badook-events';
     expect(await call('user_id_by_email', [' b@EXAMPLE.com '])).toBe(OWNER_B);
     expect(await call('user_id_by_email', ['nobody@example.com'])).toBeNull();
-    const linked = await call<{ source: string; fullName: string; phone: string }>('account_link_partner', [
+    // an account opened some other way stays as it is
+    expect(await call('account_link_partner', [OWNER_B, P, 'be-7', 'Someone', null, false])).toBeNull();
+    // a user the partner has just created becomes the partner's
+    const linked = await commit('account_link_partner', [
       OWNER_A,
-      'partner:badook-events',
+      P,
       'be-42',
       'Dana Partner',
       '+972500000000',
+      true,
     ]);
-    expect(linked).toMatchObject({
-      source: 'partner:badook-events',
-      fullName: 'Dana Partner',
+    expect(linked).toMatchObject({ source: P, fullName: 'Dana Partner', phone: '+972500000000' });
+    // already the partner's: updated (what isn't sent stays)
+    expect(await call('account_link_partner', [OWNER_A, P, null, 'Dana P.', null, false])).toMatchObject({
+      fullName: 'Dana P.',
       phone: '+972500000000',
     });
+    // another partner can't claim it
+    expect(await call('account_link_partner', [OWNER_A, 'partner:other', null, 'X', null, true])).toBeNull();
+    // found by our id or by the partner's id, with the email; never someone else's user
+    expect(await call('partner_account', [P, null, 'be-42'])).toMatchObject({
+      userId: OWNER_A,
+      email: 'a@example.com',
+    });
+    expect(await call('partner_account', [P, OWNER_A, null])).toMatchObject({ userId: OWNER_A });
+    expect(await call('partner_account', [P, OWNER_B, null])).toBeNull();
+    expect(await call('partner_account', ['partner:other', OWNER_A, null])).toBeNull();
   });
 
   it('none of it is reachable with the public keys', async () => {

@@ -4,6 +4,7 @@
 //   · Auth  /auth/v1 — email + password sign-up (auto-confirmed), password / refresh-token grants,
 //     GET/PUT /user, logout, recover; HS256 access tokens; users live in auth.users; "Continue with
 //     Google" through a stand-in account chooser (authorize → code → the PKCE grant); /settings;
+//     admin: create users, one-time sign-in links (generate_link → POST /verify), get / delete;
 //   · Storage /storage/v1 — signed upload URLs (service role), uploads, public reads; files on disk,
 //     bucket size/MIME limits from storage.buckets.
 //
@@ -70,6 +71,7 @@ const FUNCTIONS = new Set([
   'purge_expired',
   'user_id_by_email',
   'account_link_partner',
+  'partner_account',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
@@ -232,6 +234,7 @@ async function userById(id) {
 // ── "Continue with Google": the browser comes to /authorize, picks an account on a stand-in page,
 // and goes back to the app with a one-time code, which the app trades for a session (PKCE). ──
 const oauthCodes = new Map(); // code → { userId, challenge }
+const signInTokens = new Map(); // hashed token → { userId, type, expires }
 const html = (res, body) => {
   res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
   res.end(body);
@@ -402,7 +405,63 @@ async function auth(req, res, path, query) {
     const row = await userById(claims.sub);
     return row ? send(res, 200, userJson(row)) : authError(res, 403, 'user_not_found', 'User not found');
   }
+  // one-time sign-in links (admin generate_link → the hashed token → POST /verify)
+  if (req.method === 'POST' && path === 'verify') {
+    const { type, token_hash } = await readBody(req);
+    const entry = signInTokens.get(token_hash);
+    signInTokens.delete(token_hash);
+    if (!entry || entry.type !== type || entry.expires < Date.now())
+      return authError(res, 403, 'otp_expired', 'Email link is invalid or has expired');
+    const row = await userById(entry.userId);
+    return row ? send(res, 200, session(row)) : authError(res, 404, 'user_not_found', 'User not found');
+  }
   // ── admin (service role): what the server does with auth.admin.* ──
+  if (req.method === 'POST' && (path === 'admin/users' || path === 'admin/generate_link')) {
+    if (ROLES[req.headers.apikey] !== 'service_role')
+      return authError(res, 403, 'not_admin', 'User not allowed');
+    const body = await readBody(req);
+    const address = String(body.email ?? '')
+      .trim()
+      .toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(address))
+      return authError(res, 400, 'validation_failed', 'Invalid email');
+    const existing = (await pool.query('select * from auth.users where email = $1', [address])).rows[0];
+    if (path === 'admin/users') {
+      if (existing)
+        return authError(
+          res,
+          422,
+          'email_exists',
+          'A user with this email address has already been registered',
+        );
+      const row = (
+        await pool.query(
+          `insert into auth.users (id, aud, role, email, encrypted_password, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+           values ($1, 'authenticated', 'authenticated', $2, $3, $4, $5, now(), now()) returning *`,
+          [
+            randomUUID(),
+            address,
+            body.password ? hashPassword(body.password) : null,
+            { provider: 'email', providers: ['email'], ...(body.app_metadata ?? {}) },
+            body.user_metadata ?? {},
+          ],
+        )
+      ).rows[0];
+      return send(res, 200, userJson(row));
+    }
+    if (!existing || !['magiclink', 'recovery'].includes(body.type))
+      return authError(res, 422, 'validation_failed', 'Unsupported link');
+    const token = randomBytes(24).toString('hex');
+    signInTokens.set(token, { userId: existing.id, type: body.type, expires: Date.now() + 3600_000 });
+    return send(res, 200, {
+      ...userJson(existing),
+      action_link: `http://127.0.0.1/auth/v1/verify?token=${token}&type=${body.type}`,
+      email_otp: '000000',
+      hashed_token: token,
+      redirect_to: '',
+      verification_type: body.type,
+    });
+  }
   const admin = /^admin\/users\/([0-9a-f-]{36})$/.exec(path);
   if (admin) {
     if (ROLES[req.headers.apikey] !== 'service_role')
