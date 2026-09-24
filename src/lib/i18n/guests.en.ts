@@ -5,7 +5,7 @@ export const guestsEn: typeof guestsHe = {
   metaTitle: 'Guests · {name}',
   title: 'Guest list',
   subtitle:
-    'Upload a spreadsheet, send each guest a personal link, and see who got it, who opened it and who replied.',
+    'Upload your list from Excel, send every guest a personal link on WhatsApp, and see who opened it and who is coming.',
   kpi: {
     total: 'Guests on the list',
     sent: 'Got the invitation',
@@ -14,10 +14,49 @@ export const guestsEn: typeof guestsHe = {
     declined: 'Not coming',
     pending: 'No reply yet',
   },
+  start: {
+    importStep: 'Step 1 · The list',
+    importHint:
+      "An Excel or CSV file with names and phones. A guest who's already on the list is updated, not doubled.",
+    sendStep: 'Step 2 · Sending',
+    sendHint: "{n} guests haven't got it yet · {price} per message · {credits} credits left",
+    sendHintUnlimited: "{n} guests haven't got it yet · {price} per message",
+    allSent: 'Every guest with a mobile number already has the invitation.',
+  },
+  sendBlocked: {
+    empty: 'No guests on the list yet — upload a list first.',
+    noMobile: 'No guest has a mobile number WhatsApp can reach.',
+    notConfigured:
+      "Sending from Badook's number isn't connected yet. You can send from your own WhatsApp, next to each guest.",
+    notPublished: 'Publish the invitation before sending it.',
+  },
+  guide: {
+    title: "Let's build your guest list",
+    body: "Three short steps, and you'll see who's coming.",
+    steps: [
+      {
+        title: 'Upload an Excel file',
+        text: 'With name and phone columns (email, party size and group are optional). The columns are recognized automatically.',
+      },
+      {
+        title: 'Every guest gets a personal link',
+        text: 'The invitation opens with their name, and the RSVP form is already filled in.',
+      },
+      {
+        title: 'Send on WhatsApp and follow along',
+        text: 'One tap sends it to everyone; see here who got it, who opened it and who replied.',
+      },
+    ],
+    upload: 'Upload an Excel file',
+    manual: 'Add by hand',
+    sample: 'Download a sample file',
+  },
   actions: {
-    import: 'Import from Excel',
+    import: 'Upload a list from Excel',
     add: 'Add a guest',
+    addManual: 'Add by hand',
     whatsapp: 'Send on WhatsApp',
+    whatsappAll: 'Send on WhatsApp to all guests',
     export: 'Export to Excel',
     sample: 'Sample file',
     copyLink: 'Copy the personal link',
@@ -33,20 +72,31 @@ export const guestsEn: typeof guestsHe = {
     selectGuest: 'Select {name}',
   },
   help: {
+    title: 'Guests: what each button does',
     import:
-      'Upload an Excel or CSV file with name and phone columns (email is optional). The columns are recognized automatically, with a preview before anything is saved.',
+      "Upload an Excel or CSV file with name and phone columns (email is optional). The columns are recognized automatically, with a preview before anything is saved. A guest who's already on the list is updated, not doubled.",
     add: 'Add one guest by hand — name, phone, and an optional email.',
     whatsapp:
-      "Send everyone (or the selected guests) an official WhatsApp message from the system's number, with a button to their personal link. Each message costs one credit.",
+      "Send everyone who hasn't got it yet (or the selected guests) an official WhatsApp message from the system's number, with a button to their personal link. Each message costs one credit; guests who already have it don't get it again unless you choose so.",
     export: 'Download an Excel file with every guest, their status and their personal link.',
     sample: 'Download a sample file with the columns the system reads — fill it in and upload it.',
+    search: 'Find a guest by name, phone number (written any way) or group.',
+    filters:
+      "Filter by where each guest stands: not sent, sent, failed (WhatsApp didn't reach them), opened, coming, not coming, no reply.",
+    selectLabel: 'Selecting guests',
+    select:
+      'Tick guests in the checkboxes, then use the bar above the list: send on WhatsApp, mark as sent or delete — all of them at once.',
     copyLink:
       "Copy this guest's personal link: the invitation opens with their name, and the RSVP form is already filled in.",
     sendOwn: 'Opens your own WhatsApp with a ready message and the personal link — just press send.',
     markSent: 'Sent it yourself? Mark it as sent so the status is right.',
-    filters: 'Filter by where each guest stands: not sent, sent, opened, coming, not coming, no reply.',
+    unmarkSent: 'Puts a guest you marked as sent by mistake back to "not sent".',
+    edit: "Change a guest's name, phone, email, party size or group.",
+    delete: "Removes the guest from the list; their personal link stops working. A reply they've sent stays.",
+    greeting:
+      "Opens the editor at the opening section, where you write the personal greeting — the line with the guest's name shown when they open their personal link.",
     status:
-      "Statuses update by themselves: sent → delivered → read (on the system's WhatsApp), opened the invitation, and replied.",
+      "Statuses update by themselves: sent → delivered → read (on the system's WhatsApp), opened the invitation, and replied. When something didn't get through, the reason is shown.",
   },
   status: {
     none: 'Not sent',
@@ -59,6 +109,18 @@ export const guestsEn: typeof guestsHe = {
     attending: 'Coming',
     declined: 'Not coming',
     manual: 'Sent by hand',
+  },
+  reach: {
+    landline: 'Landline — no WhatsApp',
+    optedOut: 'Asked not to get WhatsApp messages',
+    retry: 'Trying again in a few minutes',
+  },
+  failure: {
+    timeout: "WhatsApp didn't confirm it — you can send it again",
+    optedOut: 'Asked not to get WhatsApp messages',
+    notOnWhatsapp: "This number isn't on WhatsApp",
+    limited: 'WhatsApp held the message back — try again tomorrow',
+    other: "WhatsApp didn't deliver the message",
   },
   reply: {
     attending: 'Coming · {n}',
@@ -79,6 +141,7 @@ export const guestsEn: typeof guestsHe = {
     all: 'All',
     notSent: 'Not sent',
     sent: 'Sent',
+    failed: 'Failed',
     opened: 'Opened',
     attending: 'Coming',
     declined: 'Not coming',
@@ -86,10 +149,6 @@ export const guestsEn: typeof guestsHe = {
   },
   search: 'Search by name, phone or group',
   noMatches: 'No guests match the filter.',
-  empty: {
-    title: 'No guests yet',
-    body: 'Upload an Excel or CSV file with name and phone columns (email is optional), or add guests one by one. Each guest gets a personal link.',
-  },
   notPublished:
     "The invitation isn't published yet — personal links and WhatsApp sending start working once it is.",
   publish: 'Go to the editor to publish',
@@ -100,13 +159,14 @@ export const guestsEn: typeof guestsHe = {
     edit: 'Edit the greeting',
   },
   import: {
-    title: 'Import guests from a file',
+    title: 'Upload a guest list',
     drop: 'Drop an Excel (xlsx) or CSV file here, or click to choose one',
     formats:
       'Columns the system reads: name or full name (or first + last name), phone, email (optional), party size and group (optional). A title row is optional.',
     reading: 'Reading the file…',
     badFile: "We couldn't read the file. Save it as xlsx or CSV and try again.",
-    oldExcel: "Old .xls files aren't supported — open it in Excel and save as xlsx or CSV.",
+    oldExcel:
+      "This is an Excel file in the old format (xls), which can't be read. Open it in Excel, choose “Save As” and save it as xlsx (or CSV) — then upload it again.",
     emptyFile: 'No guests found in the file.',
     found: '{n} guests found',
     mapping: 'Columns found',
@@ -121,13 +181,19 @@ export const guestsEn: typeof guestsHe = {
       bad_email: 'Invalid email — imported without it',
       bad_party_size: 'Invalid party size — imported without it',
     },
+    truncated:
+      "The file has more than {max} rows: the first {max} are imported, the {n} rows after them aren't.",
+    landlines:
+      "{n} guests have a landline number — they're added to the list, but WhatsApp can't reach them.",
     sampleTitle: 'Here is how it looks',
     confirm: 'Import {n} guests',
     importing: 'Importing…',
     done: '{added} guests added, {updated} updated',
+    doneTruncated: "{added} guests added, {updated} updated. {n} rows after row {max} weren't imported.",
     limit: 'Your plan allows up to {max} guests per invitation. Upgrade to add more.',
     upgrade: 'See plans',
-    replaceHint: 'A guest whose phone is already on the list is updated (not duplicated).',
+    replaceHint:
+      "A guest who's already on the list (by phone, or by name when there's no phone) is updated, not doubled.",
     columns: {
       name: 'Name',
       firstName: 'First name',
@@ -150,6 +216,8 @@ export const guestsEn: typeof guestsHe = {
     groupHint: 'e.g. family, friends, work',
     save: 'Save',
     duplicate: 'This number is already on the list',
+    duplicateOf: 'A guest with this phone is already on the list: {name}',
+    landline: "A landline: you can keep it, but WhatsApp can't reach it.",
     badPhone: 'Invalid phone number',
     badEmail: 'Invalid email address',
     required: 'Required',
@@ -197,7 +265,16 @@ export const guestsEn: typeof guestsHe = {
     recipients: 'Send to',
     toUnsent: "Guests who haven't got it ({n})",
     toSelected: 'Selected guests ({n})',
-    toAll: 'Everyone with a phone ({n})',
+    toAll: 'All guests ({n})',
+    willSend: '{n} messages will be sent',
+    skipped: {
+      received: "{n} already have the invitation — they won't get it again",
+      noPhone: '{n} without a phone',
+      landline: '{n} with a landline (no WhatsApp)',
+      optedOut: '{n} asked not to get messages',
+      queued: '{n} already waiting to be sent',
+    },
+    resend: 'Also send it again to those who already have it ({n}) — each message is paid',
     preview: 'The message',
     previewButton: 'Invitation & RSVP',
     cost: 'Cost',
@@ -210,8 +287,16 @@ export const guestsEn: typeof guestsHe = {
     sending: 'Sending… {done}/{n}',
     done: 'Sent to {n} guests. Statuses update as the messages are delivered and read.',
     failed: '{n} messages failed (their credits are back)',
-    nobody: 'Nobody to send to — the chosen guests already got it, or have no phone.',
+    waiting: '{n} messages will be sent again in a few minutes — WhatsApp asked us to slow down.',
+    nobody: 'Nobody to send to — the chosen guests already got it, or have no mobile number.',
     consent: 'I confirm my guests know me and are happy to get this invitation from me.',
-    optOut: 'Every message lets the guest opt out.',
+    optOut: "Guests who reply “STOP” (or block the number) won't get messages from it again.",
+    blocked: {
+      notConfigured: "WhatsApp sending isn't connected yet",
+      notPublished: 'Publish the invitation first',
+      nobody: 'Nobody to send to',
+      credits: 'You need {n} more credits to send',
+      consent: 'Tick the confirmation to send',
+    },
   },
 };

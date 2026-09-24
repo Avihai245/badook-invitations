@@ -52,3 +52,11 @@ export function sendFailure(error: string | null | undefined): SendFailure {
   if (/^(131049|131048|130429|80007|131056)\b/.test(error)) return 'limited';
   return 'other';
 }
+
+/** A price in shekels, in the host's language (₪0.14 / ‏0.14 ₪). */
+export function formatIls(value: number, locale: 'he' | 'en'): string {
+  return new Intl.NumberFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
+    style: 'currency',
+    currency: 'ILS',
+  }).format(value);
+}

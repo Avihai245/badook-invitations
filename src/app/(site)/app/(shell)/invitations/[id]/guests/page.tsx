@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { InvitationNav } from '@/features/invitations/app/InvitationNav';
 import { GuestsScreen } from '@/features/invitations/app/guests/GuestsScreen';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { hostDb } from '@/features/invitations/server/host-db';
@@ -9,6 +10,7 @@ import { getUi } from '@/lib/i18n/server';
 import { getSessionUser, requireUser } from '@/lib/supabase/session';
 
 type Params = Promise<{ id: string }>;
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const [{ id }, { t, locale }, user] = await Promise.all([params, getUi(), getSessionUser()]);
@@ -20,12 +22,33 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-/** /app/invitations/[id]/guests — the guest list: import, personal links, WhatsApp, statuses. */
-export default async function GuestsPage({ params }: { params: Params }) {
-  const { id } = await params;
+/**
+ * /app/invitations/[id]/guests — the guest list: upload, personal links, WhatsApp, statuses.
+ * ?import=1 opens the upload dialog, ?send=1 the WhatsApp one (links from the invitation's pages).
+ */
+export default async function GuestsPage({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) {
+  const [{ id }, query] = await Promise.all([params, searchParams]);
   const user = await requireUser(`/app/invitations/${id}/guests`);
   const { locale } = await getUi();
   const data = await loadGuestsPage(id, user, locale);
   if (!data) notFound();
-  return <GuestsScreen data={data} />;
+  const open = query.import ? 'import' : query.send ? 'send' : null;
+  return (
+    <>
+      <InvitationNav
+        id={data.id}
+        title={data.title}
+        dateLine={data.dateLine}
+        published={data.published}
+        current="guests"
+      />
+      <GuestsScreen data={data} open={open} />
+    </>
+  );
 }

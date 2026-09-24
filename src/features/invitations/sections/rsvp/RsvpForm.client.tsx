@@ -6,6 +6,7 @@ import type { DietaryKey, Locale, RsvpResult, RsvpSubmission } from '../../contr
 import { t } from '../../i18n/dictionary';
 import { Icon } from '../../ui/Icon';
 import { CalendarMenu, type CalendarLinks } from '../venues/CalendarMenu.client';
+import { RSVP_NOTES } from './notes';
 
 /** Everything the form needs, already localized on the server. */
 export interface RsvpFormConfig {
@@ -59,7 +60,11 @@ interface Child {
 }
 type Errors = Record<string, string>;
 
-/** What the browser keeps after a reply (§6.6): `rsvp:<slug>` → the edit token (+ the answers, to prefill an edit). */
+/**
+ * What the browser keeps after a reply (§6.6): the edit token (+ the answers, to prefill an edit) —
+ * under `rsvp:<slug>`, or `rsvp:<slug>:<guest token>` for a personal link, so guests sharing a browser
+ * (or a host trying several personal links) never see or edit each other's reply.
+ */
 interface StoredReply {
   responseId: string;
   editToken: string;
@@ -67,10 +72,11 @@ interface StoredReply {
     ({ attending: true; adults: Adult[]; children: Child[] } | { attending: false; contact: Contact });
 }
 type Contact = { fullName?: string; phone?: string; email?: string };
-const storageKey = (slug: string) => `rsvp:${slug}`;
-function readReply(slug: string): StoredReply | null {
+const storageKey = (slug: string, guestToken?: string) =>
+  guestToken ? `rsvp:${slug}:${guestToken}` : `rsvp:${slug}`;
+function readReply(key: string): StoredReply | null {
   try {
-    const raw = window.localStorage.getItem(storageKey(slug));
+    const raw = window.localStorage.getItem(key);
     const v = raw ? (JSON.parse(raw) as StoredReply) : null;
     return v && typeof v.editToken === 'string' ? v : null;
   } catch {
@@ -90,12 +96,14 @@ interface Draft {
   message: string;
   decline: Contact;
   sent: boolean;
+  /** the reply went to one of the site's sample invitations: nothing was kept */
+  demo: boolean;
 }
 const drafts = new Map<string, Draft>();
 
-function writeReply(slug: string, reply: StoredReply) {
+function writeReply(key: string, reply: StoredReply) {
   try {
-    window.localStorage.setItem(storageKey(slug), JSON.stringify(reply));
+    window.localStorage.setItem(key, JSON.stringify(reply));
   } catch {
     // private mode / storage full: editing later just creates a new reply
   }
@@ -106,6 +114,17 @@ const EMAIL_OK = (s: string) => /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(s);
 
 const ALLERGIES: DietaryKey[] = ['nut_allergy', 'other_allergy'];
 const needsNotes = (p: { dietary?: DietaryKey[] }) => (p.dietary ?? []).some((k) => ALLERGIES.includes(k));
+
+/** The notes under the form and in its "thank you": the invitation's own quiet UI text. */
+const NOTE_STYLE: CSSProperties = {
+  fontFamily: 'var(--f-ui)',
+  fontSize: 13,
+  lineHeight: 1.55,
+  color: 'var(--inv-ink-muted)',
+  maxWidth: '44ch',
+  marginInline: 'auto',
+  textAlign: 'center',
+};
 
 function Field({
   id,
@@ -151,6 +170,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
   const [decline, setDecline] = useState<Contact>(kept?.decline ?? {});
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(kept?.sent ? 'sent' : 'idle');
+  const [demo, setDemo] = useState(kept?.demo ?? false);
   const [focusFirstError, setFocusFirstError] = useState(0);
   const [closed, setClosed] = useState(false);
   const [reply, setReply] = useState<StoredReply | null>(null);
@@ -176,8 +196,12 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
 
   useEffect(() => {
     renderedAt.current = Date.now();
-    if (config.submitMode === 'api') setReply(readReply(config.slug));
-  }, [config.submitMode, config.slug]);
+  }, []);
+  // the reply this browser sent — through this guest's personal link, or the general link
+  const replyKey = storageKey(config.slug, guest?.token);
+  useEffect(() => {
+    if (config.submitMode === 'api') setReply(readReply(replyKey));
+  }, [config.submitMode, replyKey]);
 
   useEffect(() => {
     drafts.set(config.slug, {
@@ -189,8 +213,9 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       message,
       decline,
       sent: status === 'sent',
+      demo,
     });
-  }, [config.slug, attending, adults, children, answers, message, decline, status]);
+  }, [config.slug, attending, adults, children, answers, message, decline, status, demo]);
 
   /** "You already replied — edit": refill the form from the stored answers; the next send replaces the reply. */
   const editStoredReply = () => {
@@ -376,24 +401,30 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     const wait = 3100 - (Date.now() - renderedAt.current);
     if (wait > 0) await new Promise((r) => setTimeout(r, wait));
     const body = payload();
-    let result: RsvpResult | null = null;
+    let result: (RsvpResult & { demo?: boolean }) | null = null;
     try {
       const res = await fetch('/api/invitations/rsvp', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
       });
-      result = (await res.json().catch(() => null)) as RsvpResult | null;
+      result = (await res.json().catch(() => null)) as (RsvpResult & { demo?: boolean }) | null;
     } catch {
       result = null;
     }
     if (result?.ok) {
+      // a sample invitation keeps nothing: neither does the browser
+      if ('demo' in result && result.demo) {
+        setDemo(true);
+        setStatus('sent');
+        return;
+      }
       const { hp: _hp, renderedAt: _r, invitationSlug: _s, locale: _l, editToken: _t, ...rest } = body;
       const draft = (
         rest.attending ? { ...rest, adults, children } : { ...rest, contact: decline }
       ) as StoredReply['draft'];
       const stored = { responseId: result.responseId, editToken: result.editToken, draft };
-      writeReply(config.slug, stored);
+      writeReply(replyKey, stored);
       setReply(stored);
       setStatus('sent');
       return;
@@ -431,6 +462,11 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
           <path className="draw" d="m7.5 12.5 3 3 6-6.5" />
         </svg>
         <h3>{attending ? config.successMessage : config.declineMessage}</h3>
+        {demo ? (
+          <p className="demo-note" style={NOTE_STYLE}>
+            {RSVP_NOTES[L].demo}
+          </p>
+        ) : null}
         {attending && config.calendar ? (
           <div className="actions">
             <CalendarMenu
@@ -877,6 +913,17 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
               style={{ display: status === 'error' ? 'block' : 'none' } as CSSProperties}
             >
               {status === 'error' ? t(L, 'rsvp.error.network') : ''}
+            </p>
+            <p className="privacy-note" style={{ ...NOTE_STYLE, marginTop: 14 }}>
+              {RSVP_NOTES[L].privacy}{' '}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener"
+                style={{ color: 'inherit', textDecoration: 'underline' }}
+              >
+                {RSVP_NOTES[L].privacyLink}
+              </a>
             </p>
           </div>
           {/* honeypot: visually hidden, not display:none (§6.4) */}

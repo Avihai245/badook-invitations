@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  formatIls,
   LIST_FILTERS,
   matchesListFilter,
   sendFailure,
@@ -38,6 +39,11 @@ describe('the guests screen', () => {
     expect(whatsappReach(guest({ phone: null }))).toBe('noPhone');
     expect(whatsappReach(guest({ phone: '+97231234567' }))).toBe('landline');
     expect(whatsappReach(guest({ optedOut: true }))).toBe('optedOut');
+  });
+
+  it("prices a message in the host's language", () => {
+    expect(formatIls(0.14, 'en')).toBe('₪0.14');
+    expect(formatIls(0.14, 'he')).toMatch(/^\u200f?0\.14\s\u200f?₪$/);
   });
 
   it('turns a stored failure into one the host can act on', () => {

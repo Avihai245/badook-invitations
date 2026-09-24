@@ -2,28 +2,36 @@
 
 import { useState } from 'react';
 import { Button, Dialog, Field, Input, useToast } from '@/components/app';
+import { upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
 import { useUi } from '@/lib/i18n/client';
 import { hostApi, loginUrl } from '../api';
-import { normalizeGuestPhone } from '../../lib/guest-import';
+import { normalizeGuestPhone, whatsappCapable } from '../../lib/guest-import';
 import { displayPhone } from '../../lib/guest-status';
 import type { GuestRecord } from '../../server/guests';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-/** Add one guest, or edit one: name (required), phone, email, party size and group (optional). */
+/**
+ * Add one guest, or edit one: name (required), phone, email, party size and group (optional). A phone
+ * another guest already has is refused, never merged into them; past the plan's list size the upgrade
+ * dialog takes over.
+ */
 export function GuestDialog({
   id,
   guest,
   onClose,
   onSaved,
+  onLimit,
 }: {
   id: string;
   /** null = a new guest */
   guest: GuestRecord | null;
   onClose: () => void;
   onSaved: (guest: GuestRecord | null) => void;
+  /** the plan's guest list is full */
+  onLimit: (reason: UpgradeReason) => void;
 }) {
-  const { t } = useUi();
+  const { t, fmt } = useUi();
   const g = t.guests;
   const f = g.form;
   const { toast } = useToast();
@@ -34,11 +42,12 @@ export function GuestDialog({
   const [group, setGroup] = useState(guest?.group ?? '');
   const [errors, setErrors] = useState<Partial<Record<'name' | 'phone' | 'email' | 'party', string>>>({});
   const [saving, setSaving] = useState(false);
+  const e164 = phone.trim() ? normalizeGuestPhone(phone) : null;
 
   const save = async () => {
     const next: typeof errors = {};
     if (!name.trim()) next.name = f.required;
-    if (phone.trim() && !normalizeGuestPhone(phone)) next.phone = f.badPhone;
+    if (phone.trim() && !e164) next.phone = f.badPhone;
     if (email.trim() && !EMAIL_RE.test(email.trim())) next.email = f.badEmail;
     const size = party.trim() ? Number(party) : null;
     if (size !== null && !(Number.isInteger(size) && size >= 1 && size <= 99)) next.party = ' ';
@@ -52,21 +61,20 @@ export function GuestDialog({
       group: group.trim() || null,
     };
     setSaving(true);
-    const res = guest
-      ? await hostApi<{ guest: GuestRecord; code?: string }>(`/api/invitations/${id}/guests/${guest.id}`, {
-          method: 'PATCH',
-          body,
-        })
-      : await hostApi<{ code?: string }>(`/api/invitations/${id}/guests`, {
-          method: 'POST',
-          body: { guests: [body] },
-        });
+    const res = await hostApi<{ guest?: GuestRecord | { id: string; name: string }; code?: string }>(
+      guest ? `/api/invitations/${id}/guests/${guest.id}` : `/api/invitations/${id}/guests`,
+      guest ? { method: 'PATCH', body } : { method: 'POST', body: { guest: body } },
+    );
     setSaving(false);
     if (res.status === 401) return window.location.assign(loginUrl());
-    if (res.status === 409) return setErrors({ phone: f.duplicate });
-    if (res.status === 402) return toast({ title: g.import.upgrade, variant: 'danger' });
+    if (res.status === 409) {
+      const other = res.body?.guest?.name;
+      return setErrors({ phone: other ? fmt(f.duplicateOf, { name: other }) : f.duplicate });
+    }
+    const limit = upgradeReason(res.status, res.body);
+    if (limit) return onLimit(limit);
     if (!res.ok) return toast({ title: g.toast.error, variant: 'danger' });
-    onSaved(guest ? ((res.body as { guest?: GuestRecord } | null)?.guest ?? null) : null);
+    onSaved((res.body?.guest as GuestRecord | undefined) ?? null);
   };
 
   return (
@@ -96,10 +104,17 @@ export function GuestDialog({
         <Field label={f.name} required error={errors.name} className="sm:col-span-2">
           <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} autoFocus />
         </Field>
-        <Field label={f.phone} help={f.optional} error={errors.phone}>
+        <Field
+          label={f.phone}
+          help={e164 && !whatsappCapable(e164) ? f.landline : f.optional}
+          error={errors.phone}
+        >
           <Input
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              if (errors.phone) setErrors(({ phone: _, ...rest }) => rest);
+            }}
             dir="ltr"
             inputMode="tel"
             type="tel"
