@@ -2,7 +2,6 @@
 
 import { Accessibility, Minus, Plus, RotateCcw, X } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { cn, Switch } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
@@ -37,11 +36,12 @@ function load(): Prefs {
  * The accessibility menu (site and app): text size, high contrast, highlighted links, a readable
  * font, line spacing, no animations and a large cursor. Each is a `data-a11y-*` attribute on <html>
  * (site.css styles them), kept in localStorage and applied before the first paint by A11Y_BOOT.
+ * Its button floats on the left side of every page, halfway down (the corners belong to the support
+ * assistant and the cookie notice); the menu opens beside it.
  */
-export function AccessibilityMenu({ placement = 'floating' }: { placement?: 'floating' | 'header' }) {
+export function AccessibilityMenu() {
   const { t } = useUi();
   const a = t.site.a11y;
-  const path = usePathname();
   const [open, setOpen] = useState(false);
   const [prefs, setPrefs] = useState<Prefs>(EMPTY);
   const panel = useRef<HTMLDivElement>(null);
@@ -79,9 +79,6 @@ export function AccessibilityMenu({ placement = 'floating' }: { placement?: 'flo
     }
   };
   const active = prefs.text > 0 || TOGGLES.some((k) => prefs[k]);
-  // the app's pages have it in their header (a floating button would cover their controls)
-  if (placement === 'floating' && path.startsWith('/app')) return null;
-  const header = placement === 'header';
 
   return (
     <>
@@ -95,16 +92,12 @@ export function AccessibilityMenu({ placement = 'floating' }: { placement?: 'flo
         title={a.open}
         data-testid="a11y-button"
         className={cn(
-          header
-            ? // in the app's header: a small round button
-              'grid size-9 place-items-center rounded-full text-white transition-colors'
-            : // phones: a round button in the bottom corner; wide screens: a tab on the side
-              'fixed start-3 bottom-3 z-[55] grid size-11 place-items-center rounded-full text-white shadow-md transition-colors print:hidden lg:start-0 lg:top-1/2 lg:bottom-auto lg:h-11 lg:w-10 lg:-translate-y-1/2 lg:rounded-none lg:rounded-e-[12px]',
+          'fixed top-1/2 left-3 z-[55] grid size-12 -translate-y-1/2 place-items-center rounded-full text-white shadow-[0_10px_28px_-8px_rgba(30,58,138,0.65)] ring-2 ring-white/85 transition-[background-color,scale] hover:scale-105 print:hidden sm:left-4',
           'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb]',
           active ? 'bg-[#1d4ed8]' : 'bg-[#1e3a8a] hover:bg-[#1d4ed8]',
         )}
       >
-        <Accessibility aria-hidden className={header ? 'size-5' : 'size-6'} />
+        <Accessibility aria-hidden className="size-6" />
       </button>
       {open ? (
         <div
@@ -112,12 +105,7 @@ export function AccessibilityMenu({ placement = 'floating' }: { placement?: 'flo
           id="a11y-menu"
           role="dialog"
           aria-labelledby="a11y-title"
-          className={cn(
-            'site-swap fixed z-[56] w-[min(300px,calc(100vw-24px))] rounded-[16px] border border-line bg-surface p-4 text-ink shadow-[0_24px_60px_-12px_rgba(28,25,23,0.35)]',
-            header
-              ? 'end-3 top-16'
-              : 'start-3 bottom-16 lg:start-12 lg:top-1/2 lg:bottom-auto lg:-translate-y-1/2',
-          )}
+          className="site-swap fixed top-1/2 left-3 z-[56] max-h-[calc(100dvh-24px)] w-[min(300px,calc(100vw-24px))] -translate-y-1/2 overflow-y-auto rounded-[16px] border border-line bg-surface p-4 text-ink shadow-[0_24px_60px_-12px_rgba(28,25,23,0.35)] sm:left-[4.75rem]"
         >
           <div className="flex items-center justify-between gap-2">
             <h2 id="a11y-title" className="text-[16px] font-bold">

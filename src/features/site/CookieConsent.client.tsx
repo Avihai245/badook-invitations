@@ -7,13 +7,15 @@ import { Button, cn, Switch } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 
 /**
- * Cookie consent (opt-in): essential cookies are always on; external content (YouTube, Vimeo,
- * Google Maps on the site's own pages) loads only once the visitor allows it. The choice is kept for a
- * year in a first-party cookie, so the server could read it too; changing it later: the footer's
- * "cookie settings" (the `cookies:open` event).
+ * Cookie consent: essential cookies are always on; external content on the site's own pages (the home
+ * page's background video and live sample from YouTube's privacy-enhanced mode, Vimeo, Google Maps) is
+ * on unless the visitor turns it off ("essential only", or the switch in the settings). The choice is
+ * kept for a year in a first-party cookie, so the server could read it too; changing it later: the
+ * footer's "cookie settings" (the `cookies:open` event). Version 2: choices made under the earlier
+ * opt-in wording are asked again.
  */
 export interface Consent {
-  v: 1;
+  v: 2;
   media: boolean;
   /** ISO date of the choice */
   at: string;
@@ -33,8 +35,8 @@ function readCookie(): Consent | null {
   if (!raw) return null;
   try {
     const value = JSON.parse(decodeURIComponent(raw)) as Partial<Consent>;
-    return value.v === 1 && typeof value.media === 'boolean'
-      ? { v: 1, media: value.media, at: String(value.at ?? '') }
+    return value.v === 2 && typeof value.media === 'boolean'
+      ? { v: 2, media: value.media, at: String(value.at ?? '') }
       : null;
   } catch {
     return null;
@@ -45,7 +47,7 @@ let cached: Consent | null | undefined;
 const snapshot = () => (cached === undefined ? (cached = readCookie()) : cached);
 
 export function saveConsent(media: boolean) {
-  const value: Consent = { v: 1, media, at: new Date().toISOString() };
+  const value: Consent = { v: 2, media, at: new Date().toISOString() };
   const secure = window.location.protocol === 'https:' ? '; Secure' : '';
   document.cookie = `${COOKIE}=${encodeURIComponent(JSON.stringify(value))}; Max-Age=${YEAR}; Path=/; SameSite=Lax${secure}`;
   cached = value;
@@ -64,6 +66,9 @@ export function useConsent(): Consent | null {
   );
 }
 
+/** External content may load: on until the visitor turns it off. */
+export const mediaAllowed = (consent: Consent | null): boolean => consent?.media ?? true;
+
 /** The footer's "cookie settings": opens the banner on its settings. */
 export function CookieSettingsButton({ label, className }: { label: string; className?: string }) {
   return (
@@ -81,12 +86,12 @@ export function CookieConsent() {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [detail, setDetail] = useState(false);
-  const [media, setMedia] = useState(false);
+  const [media, setMedia] = useState(true);
 
   useEffect(() => {
     setMounted(true);
     const onOpen = () => {
-      setMedia(readCookie()?.media ?? false);
+      setMedia(mediaAllowed(readCookie()));
       setDetail(true);
       setOpen(true);
     };

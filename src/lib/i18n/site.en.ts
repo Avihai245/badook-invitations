@@ -147,7 +147,7 @@ export const siteEn: typeof siteHe = {
   cookies: {
     label: 'Cookie notice',
     title: 'We use cookies',
-    body: 'Essential cookies run the site (sign-in, language and security). Videos and maps from YouTube, Vimeo and Google load only if you allow external content.',
+    body: 'Essential cookies run the site (sign-in, language and security). The site’s videos play from YouTube in its privacy-enhanced mode, and you can turn external content off at any time.',
     policy: 'Cookie policy',
     acceptAll: 'Accept all',
     necessaryOnly: 'Essential only',
@@ -162,10 +162,10 @@ export const siteEn: typeof siteHe = {
       },
       media: {
         title: 'External content',
-        body: 'YouTube and Vimeo videos and Google Maps on the site. These providers may set cookies of their own.',
+        body: 'YouTube (privacy-enhanced mode) and Vimeo videos and Google Maps on the site. On by default; when it’s off, a still image shows instead of the video. These providers may set cookies of their own.',
       },
     },
-    blocked: 'This video comes from YouTube and shows once you allow external content.',
+    blocked: 'You turned external content off, so this YouTube video isn’t shown here.',
     allow: 'Allow and show the video',
   },
   a11y: {

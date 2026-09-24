@@ -12,21 +12,34 @@ const e2eDb = () => {
   return Object.assign(new URL(admin), { pathname: `/${process.env.PW_DB_NAME || 'badook_e2e'}` }).toString();
 };
 
-test('cookie consent: asked once, necessary only by default, changeable from the footer', async ({
+test('cookie consent: asked once, external content on until turned off, changeable from the footer', async ({
   page,
+  baseURL,
 }) => {
+  // a choice made under the earlier (opt-in) wording is asked again
+  await page.context().addCookies([
+    {
+      name: 'cookie_consent',
+      value: encodeURIComponent(JSON.stringify({ v: 1, media: false, at: '2026-09-01T00:00:00Z' })),
+      url: baseURL!,
+    },
+  ]);
   await page.goto('/privacy');
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   const banner = page.getByTestId('cookie-banner');
   await expect(banner.getByRole('heading', { name: 'אנחנו משתמשים בעוגיות' })).toBeVisible();
   await expect(banner.getByRole('link', { name: 'למדיניות העוגיות' })).toHaveAttribute('href', '/cookies');
+  // external content is on until the visitor turns it off
+  await banner.getByRole('button', { name: 'הגדרות' }).click();
+  await expect(banner.getByRole('switch', { name: 'תוכן חיצוני' })).toBeChecked();
+  await banner.getByRole('button', { name: 'חזרה' }).click();
   await banner.getByRole('button', { name: 'רק חיוניות' }).click();
   await expect(banner).toBeHidden();
   const consent = async () =>
     JSON.parse(
       decodeURIComponent((await page.context().cookies()).find((c) => c.name === 'cookie_consent')!.value),
     );
-  expect(await consent()).toMatchObject({ v: 1, media: false });
+  expect(await consent()).toMatchObject({ v: 2, media: false });
   await page.reload();
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await expect(banner).toBeHidden();
@@ -39,7 +52,7 @@ test('cookie consent: asked once, necessary only by default, changeable from the
   await media.click();
   await banner.getByRole('button', { name: 'שמירת ההגדרות' }).click();
   await expect(banner).toBeHidden();
-  expect(await consent()).toMatchObject({ v: 1, media: true });
+  expect(await consent()).toMatchObject({ v: 2, media: true });
 });
 
 test('the accessibility menu: settings apply at once and stay after a reload', async ({ page }) => {

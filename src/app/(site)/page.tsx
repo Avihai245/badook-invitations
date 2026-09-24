@@ -107,14 +107,18 @@ function SectionTitle({
   title,
   subtitle,
   className,
+  reveal = true,
 }: {
   eyebrow?: string;
   title: string;
   subtitle?: string;
   className?: string;
+  /** false: inside a block that reveals itself */
+  reveal?: boolean;
 }) {
+  const Wrap = reveal ? Reveal : 'div';
   return (
-    <Reveal className={className}>
+    <Wrap className={className}>
       {eyebrow ? (
         <p className="mb-3 inline-flex items-center gap-2 text-[13px] font-bold tracking-wide text-brand uppercase">
           <Sparkles aria-hidden className="size-3.5" />
@@ -125,7 +129,7 @@ function SectionTitle({
         {title}
       </h2>
       {subtitle ? <p className="mt-3 text-[17px] text-pretty text-muted">{subtitle}</p> : null}
-    </Reveal>
+    </Wrap>
   );
 }
 
@@ -313,14 +317,17 @@ export default async function HomePage() {
             }}
           />
           <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-28">
-            <SectionTitle
-              eyebrow={s.showcase.eyebrow}
-              title={s.showcase.title}
-              subtitle={s.showcase.subtitle}
-              className="max-w-2xl"
-            />
-            <Reveal className="mt-10" delay={120}>
+            <Reveal>
               <SampleShowcase
+                intro={
+                  <SectionTitle
+                    eyebrow={s.showcase.eyebrow}
+                    title={s.showcase.title}
+                    subtitle={s.showcase.subtitle}
+                    className="max-w-2xl"
+                    reveal={false}
+                  />
+                }
                 samples={{ classic: sample(SAMPLES.classic), video: `${sample(SAMPLES.video)}&open=1` }}
                 labels={{ ...s.showcase, blocked: s.cookies.blocked, allow: s.cookies.allow }}
               />

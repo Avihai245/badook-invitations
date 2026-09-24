@@ -1,10 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
-// The support assistant, against the Anthropic API stand-in (tests/support/mock-whatsapp.mjs): a
-// visitor asks on the site and the answer streams in (links lead only inside the site); the
-// conversation stays while moving between pages; an answer can be stopped; a failure gets a kind
-// message; in the app it opens from the header, the "?" explanations and the editor's bar — and what
-// goes to the API is only the conversation and the screen, without ids or the user's details.
+// The support assistant, against the Anthropic API stand-in (tests/support/mock-whatsapp.mjs): only
+// for signed-in hosts (the public pages don't have it, and the API refuses anyone else); a host asks
+// and the answer streams in (links lead only inside the site); the conversation stays while moving
+// between pages; an answer can be stopped; a failure gets a kind message; it opens from the floating
+// button, the "?" explanations and the editor's bar — and what goes to the API is only the conversation
+// and the screen, without ids or the user's details.
 
 const LOCAL = !process.env.PW_BASE_URL;
 const MOCK = `http://127.0.0.1:${Number(process.env.PW_WHATSAPP_PORT || 54340)}`;
@@ -63,11 +64,25 @@ const createInvitation = (page: Page) =>
 test.describe('the support assistant', () => {
   test.skip(!LOCAL, 'the answers come from the local API stand-in');
 
-  test('a visitor asks: the answer streams in, links stay inside the site, and the conversation stays', async ({
+  test('only after signing in: the public pages have no assistant, and its API refuses visitors', async ({
     page,
   }) => {
-    await open(page, '/');
-    await page.getByTestId('cookie-banner').getByRole('button', { name: 'רק חיוניות' }).click();
+    for (const url of ['/', '/login', '/signup', '/terms']) {
+      await open(page, url);
+      await expect(page.getByTestId('support-launcher')).toHaveCount(0);
+      await expect(page.getByTestId('support-chat')).toHaveCount(0);
+    }
+    const res = await page.request.post('/api/support/chat', {
+      data: { messages: [{ role: 'user', content: 'איך יוצרים הזמנה?' }], page: '/' },
+    });
+    expect(res.status()).toBe(401);
+    expect(await res.json()).toEqual({ ok: false, code: 'unauthorized' });
+  });
+
+  test('a host asks: the answer streams in, links stay inside the site, and the conversation stays', async ({
+    page,
+  }) => {
+    await signUp(page);
     const launcher = page.getByTestId('support-launcher');
     await launcher.click();
     const chat = page.getByRole('dialog', { name: 'העוזר של Badook' });
@@ -93,7 +108,7 @@ test.describe('the support assistant', () => {
     expect(sent?.body.stream).toBe(true);
     expect(sent?.body.system[0]?.cache_control).toEqual({ type: 'ephemeral' });
     expect(sent?.body.system[0]?.text).toContain('<manual>');
-    expect(sent?.body.system[1]?.text).toContain('screen of the app: /.');
+    expect(sent?.body.system[1]?.text).toContain('screen of the app: /app/invitations.');
     expect(sent?.body.messages).toEqual([{ role: 'user', content: question }]);
 
     // off topic: a kind no, and the conversation carries on
@@ -113,7 +128,7 @@ test.describe('the support assistant', () => {
     await expect(launcher).toBeVisible();
 
     // on another page the conversation is still there (this tab only), until starting over
-    await open(page, '/terms');
+    await open(page, '/app/account');
     await page.getByTestId('support-launcher').click();
     await expect(chat.getByRole('log').getByText(question, { exact: true })).toBeVisible();
     await chat.getByRole('button', { name: 'שיחה חדשה' }).click();
@@ -122,8 +137,7 @@ test.describe('the support assistant', () => {
   });
 
   test('a long answer can be stopped; when the API fails, a kind message', async ({ page }) => {
-    await open(page, '/contact');
-    await page.getByTestId('cookie-banner').getByRole('button', { name: 'רק חיוניות' }).click();
+    await signUp(page);
     await page.getByTestId('support-launcher').click();
     const chat = page.getByTestId('support-chat');
     const input = chat.getByRole('textbox', { name: 'כתבו שאלה…' });
@@ -140,15 +154,13 @@ test.describe('the support assistant', () => {
     await expect(chat.getByRole('button', { name: 'שליחה' })).toBeVisible();
   });
 
-  test('in the app: from the header, the "?" explanations and the editor, with that screen’s suggestions', async ({
+  test('in the app: from the floating button, the "?" explanations and the editor, with that screen’s suggestions', async ({
     page,
   }, testInfo) => {
     const email = await signUp(page);
     const { id } = await createInvitation(page);
     await open(page, `/app/invitations/${id}/guests`);
-    // the app has it in its header instead of a floating button
-    await expect(page.getByTestId('support-launcher')).toHaveCount(0);
-    await page.getByTestId('support-button').click();
+    await page.getByTestId('support-launcher').click();
     const chat = page.getByRole('dialog', { name: 'העוזר של Badook' });
     const question = 'איך שולחים לכולם בוואטסאפ?';
     await chat.getByRole('button', { name: question }).click();
@@ -166,8 +178,10 @@ test.describe('the support assistant', () => {
     await expect(chat).toBeVisible();
     await chat.getByRole('button', { name: 'סגירת הצ׳אט' }).click();
 
-    // the editor's bar (phones: its ⋯ menu); a new conversation there suggests editor questions
+    // the editor's bar (phones: its ⋯ menu) instead of a floating button that would cover the editor;
+    // a new conversation there suggests editor questions
     await open(page, `/app/invitations/${id}/edit`);
+    await expect(page.getByTestId('support-launcher')).toHaveCount(0);
     if (testInfo.project.name === 'mobile') {
       await page.getByRole('button', { name: 'פעולות נוספות' }).click();
       await page.getByRole('menuitem', { name: 'עזרה: שאלו את העוזר' }).click();

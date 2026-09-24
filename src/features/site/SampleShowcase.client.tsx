@@ -1,9 +1,9 @@
 'use client';
 
 import { Check, ExternalLink, Play, RotateCcw } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button, PHONE_VIEWPORT, PhoneFrame, Segmented } from '@/components/app';
-import { saveConsent, useConsent } from './CookieConsent.client';
+import { mediaAllowed, saveConsent, useConsent } from './CookieConsent.client';
 
 export type SampleKind = 'classic' | 'video';
 
@@ -13,12 +13,16 @@ const PHONE_OUTER = PHONE_VIEWPORT.width + 22;
 /**
  * The home page's live sample (#sample): a real published invitation inside a phone — exactly the
  * layout guests get on theirs, whatever the visitor's screen — with a switch between the plain opening
- * and the same invitation with a YouTube video behind it. The phone scales to its column.
+ * and the same invitation with a YouTube video behind it. The phone scales to its column; on wide
+ * screens the section's title, the switch and the points form one block, centered beside it.
  */
 export function SampleShowcase({
+  intro,
   samples,
   labels,
 }: {
+  /** the section's title and subtitle */
+  intro: ReactNode;
   samples: Record<SampleKind, string>;
   labels: {
     toggle: string;
@@ -28,7 +32,7 @@ export function SampleShowcase({
     replay: string;
     open: string;
     points: Record<SampleKind, readonly string[]>;
-    /** the video sample before external content is allowed */
+    /** the video sample when external content is off */
     blocked: string;
     allow: string;
   };
@@ -51,9 +55,11 @@ export function SampleShowcase({
 
   const name = kind === 'video' ? labels.video : labels.classic;
   return (
-    // phones: the switch, the phone, then the details; wide screens: switch and details beside the phone
-    <div className="grid items-center gap-x-16 gap-y-8 [grid-template-areas:'toggle'_'phone'_'details'] lg:grid-cols-[1fr_minmax(0,400px)] lg:[grid-template-areas:'toggle_phone'_'details_phone']">
-      <div className="self-end [grid-area:toggle] max-lg:mx-auto">
+    // phones: the title, the switch, the phone, then the details; wide screens: title, switch and
+    // details as one block beside the phone, centered on it by the two flexible rows around them
+    <div className="grid gap-y-8 [grid-template-areas:'intro'_'toggle'_'phone'_'details'] lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:grid-rows-[1fr_auto_auto_auto_1fr] lg:gap-x-16 lg:gap-y-0 lg:[grid-template-areas:'._phone'_'intro_phone'_'toggle_phone'_'details_phone'_'._phone']">
+      <div className="[grid-area:intro]">{intro}</div>
+      <div className="[grid-area:toggle] max-lg:mx-auto lg:mt-8">
         <Segmented<SampleKind>
           label={labels.toggle}
           value={kind}
@@ -67,7 +73,7 @@ export function SampleShowcase({
           ]}
         />
       </div>
-      <div className="self-start [grid-area:details]">
+      <div className="[grid-area:details] lg:mt-7">
         <ul key={kind} className="site-swap flex flex-col gap-3" data-testid="sample-points">
           {labels.points[kind].map((point) => (
             <li key={point} className="flex items-start gap-3 text-[16px] text-pretty">
@@ -94,11 +100,14 @@ export function SampleShowcase({
       </div>
 
       {/* narrower on phones: room at the sides to scroll the page past it */}
-      <div ref={column} className="relative mx-auto w-full max-w-[300px] [grid-area:phone] sm:max-w-[380px]">
+      <div
+        ref={column}
+        className="relative mx-auto w-full max-w-[300px] [grid-area:phone] sm:max-w-[380px] lg:self-center"
+      >
         <div aria-hidden className="site-glow absolute inset-[-12%] -z-10 rounded-full" />
         <div className="flex justify-center">
-          {kind === 'video' && !consent?.media ? (
-            // YouTube only after the visitor allows external content (cookie consent)
+          {kind === 'video' && !mediaAllowed(consent) ? (
+            // the visitor turned external content off (cookie settings): no YouTube until they allow it
             <PhoneFrame scale={scale} className="shadow-[0_40px_80px_-30px_rgba(60,35,15,0.55)]">
               <div className="flex size-full flex-col items-center justify-center gap-5 bg-[linear-gradient(160deg,#3a2a1e,#15110d)] p-10 text-center text-white">
                 <span aria-hidden className="grid size-16 place-items-center rounded-full bg-white/15">

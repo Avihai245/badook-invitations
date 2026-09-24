@@ -13,7 +13,7 @@ export function cookiesDoc(c: LegalContext): LegalDoc {
       title: 'Cookie policy',
       description: `Which cookies ${c.brand} uses, why, and how to change your choice.`,
       intro: [
-        'Cookies are small files a website keeps in your browser. We use only cookies the site needs in order to work, and we load external content (videos and maps from other companies) on the site’s own pages only if you allow it. We do not use advertising or tracking cookies.',
+        'Cookies are small files a website keeps in your browser. We use only cookies the site needs in order to work, and the site’s own pages show external content (videos and maps from other companies) that you can turn off at any time. We do not use advertising or tracking cookies.',
       ],
       sections: [
         {
@@ -46,9 +46,9 @@ export function cookiesDoc(c: LegalContext): LegalDoc {
         },
         {
           id: 'external',
-          heading: '3. External content (with your consent)',
+          heading: '3. External content',
           body: [
-            'On the site’s pages, videos from YouTube (in its privacy-enhanced mode) and Vimeo, and maps from Google, load only after you choose “Accept all” or allow external content in the settings. These companies may set cookies of their own under their privacy policies.',
+            'On the site’s pages, videos from YouTube (in its privacy-enhanced mode, youtube-nocookie.com) and Vimeo, and maps from Google, load by default — the home page’s background video and its live sample invitation among them. You can turn them off at any time: choose “Essential only” in the notice, or switch off external content in its settings; a still image then shows instead. These companies may set cookies of their own under their privacy policies.',
             'Invitations are the hosts’ own pages: a video or map a host added to an invitation loads when a guest opens it, in the same privacy-enhanced modes.',
           ],
         },
@@ -66,7 +66,7 @@ export function cookiesDoc(c: LegalContext): LegalDoc {
     title: 'מדיניות עוגיות',
     description: `באילו עוגיות ${c.brand} משתמשת, לשם מה, ואיך משנים את הבחירה.`,
     intro: [
-      'עוגיות (Cookies) הן קבצים קטנים שאתר שומר בדפדפן שלכם. אנחנו משתמשים רק בעוגיות שהאתר צריך כדי לעבוד, ובעמודי האתר עצמו טוענים תוכן חיצוני (סרטונים ומפות של חברות אחרות) רק אם תאשרו. אנחנו לא משתמשים בעוגיות פרסום או מעקב.',
+      'עוגיות (Cookies) הן קבצים קטנים שאתר שומר בדפדפן שלכם. אנחנו משתמשים רק בעוגיות שהאתר צריך כדי לעבוד, ובעמודי האתר עצמו מוצג תוכן חיצוני (סרטונים ומפות של חברות אחרות) שאפשר לכבות בכל רגע. אנחנו לא משתמשים בעוגיות פרסום או מעקב.',
     ],
     sections: [
       {
@@ -99,9 +99,9 @@ export function cookiesDoc(c: LegalContext): LegalDoc {
       },
       {
         id: 'external',
-        heading: '3. תוכן חיצוני (בהסכמתכם)',
+        heading: '3. תוכן חיצוני',
         body: [
-          'בעמודי האתר, סרטונים מ־YouTube (במצב הפרטיות המוגברת שלו) ומ־Vimeo, ומפות מ־Google, נטענים רק אחרי שבחרתם ״אישור הכל״ או אישרתם תוכן חיצוני בהגדרות. החברות האלה עשויות לשמור עוגיות משלהן לפי מדיניות הפרטיות שלהן.',
+          'בעמודי האתר, סרטונים מ־YouTube (במצב הפרטיות המוגברת שלו, youtube-nocookie.com) ומ־Vimeo, ומפות מ־Google, נטענים כברירת מחדל, ביניהם סרטון הרקע של עמוד הבית וההזמנה לדוגמה. אפשר לכבות אותם בכל רגע: לבחור ״רק חיוניות״ בהודעה, או לכבות תוכן חיצוני בהגדרות שלה, ואז מוצגת תמונה במקומם. החברות האלה עשויות לשמור עוגיות משלהן לפי מדיניות הפרטיות שלהן.',
           'ההזמנות הן העמודים של המארחים: סרטון או מפה שמארח הוסיף להזמנה נטענים כשאורח פותח אותה, באותם מצבי פרטיות מוגברת.',
         ],
       },

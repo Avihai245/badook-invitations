@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUp, MessageCircleQuestion, RotateCcw, Sparkles, Square, X } from 'lucide-react';
+import { ArrowUp, RotateCcw, Sparkles, Square, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -229,7 +229,8 @@ export function SupportChat() {
   const field = useRef<HTMLTextAreaElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
   const stick = useRef(true);
-  const inApp = path.startsWith('/app');
+  // the full-screen editor has the assistant in its top bar: a floating button would cover its controls
+  const inEditor = /^\/app\/invitations\/[^/]+\/edit/.test(path);
   const brand = t.brand;
 
   useEffect(() => setMessages(load()), []);
@@ -370,7 +371,7 @@ export function SupportChat() {
 
   return (
     <>
-      {!inApp ? (
+      {!inEditor ? (
         <button
           type="button"
           hidden={open}
@@ -605,26 +606,5 @@ function Bubble({
         {children}
       </div>
     </div>
-  );
-}
-
-/** The app header's button for the assistant. */
-export function SupportButton({ className }: { className?: string }) {
-  const { t } = useUi();
-  return (
-    <button
-      type="button"
-      onClick={() => openSupport()}
-      aria-label={t.support.open}
-      title={t.support.open}
-      aria-haspopup="dialog"
-      data-testid="support-button"
-      className={cn(
-        'grid size-9 place-items-center rounded-full bg-brand-soft text-brand-deep transition-colors hover:bg-brand hover:text-white',
-        className,
-      )}
-    >
-      <MessageCircleQuestion aria-hidden className="size-5" />
-    </button>
   );
 }

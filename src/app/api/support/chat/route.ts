@@ -5,12 +5,17 @@ import { getSessionUser } from '@/lib/supabase/session';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 
-/** POST /api/support/chat — the support assistant (features/support/chat.ts): the answer as a text stream. */
+/**
+ * POST /api/support/chat — the support assistant (features/support/chat.ts) for signed-in hosts: the
+ * answer as a text stream.
+ */
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as unknown;
   try {
     const user = await getSessionUser().catch(() => null);
-    const result = await supportChat(body, { userId: user?.id ?? null, ip: clientIp(request) });
+    if (!user)
+      return NextResponse.json({ ok: false, code: 'unauthorized' }, { status: 401, headers: NO_STORE });
+    const result = await supportChat(body, { userId: user.id, ip: clientIp(request) });
     if ('stream' in result)
       return new Response(result.stream, {
         headers: {

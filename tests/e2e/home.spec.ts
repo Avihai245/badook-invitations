@@ -60,13 +60,18 @@ test('a visitor sees the pitch and the way in; a signed-in host goes to the invi
   await page.waitForURL(/\/app\/invitations$/);
 });
 
-test('the sample invitation in a phone: without video, and with the YouTube video once allowed', async ({
+test('the sample invitation in a phone: without and with the YouTube video; external content can be turned off', async ({
   page,
 }) => {
   await page.goto('/');
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   // the first screen's link goes to the sample
   await expect(page.getByRole('link', { name: 'לצפייה בהזמנה לדוגמה' })).toHaveAttribute('href', '#sample');
+  // the first screen's background plays from 3:27 right away (YouTube's privacy-enhanced mode)
+  await expect(page.getByTestId('site-hero-video')).toHaveAttribute(
+    'src',
+    /youtube-nocookie\.com\/embed\/5GvcO2lufGU\?.*cc_load_policy=0.*start=207/,
+  );
 
   const banner = page.getByTestId('cookie-banner');
   await expect(banner).toBeVisible();
@@ -79,21 +84,24 @@ test('the sample invitation in a phone: without video, and with the YouTube vide
   expect(await phone.evaluate((el) => [el.clientWidth, el.clientHeight])).toEqual([390, 844]);
   expect((await page.request.get('/i/noa-and-itay?lang=he')).status()).toBe(200);
 
-  // with a video: YouTube only after the visitor allows external content
+  // with a video: the same invitation, playing the video from 3:27
   await sample.getByRole('radio', { name: 'עם סרטון ברקע' }).click();
-  await expect(sample.getByText('הסרטון מגיע מיוטיוב ויוצג אחרי אישור תוכן חיצוני.')).toBeVisible();
   await expect(sample.getByTestId('sample-points')).toContainText('3:27');
-  await sample.getByRole('button', { name: 'אישור והצגת הסרטון' }).click();
-  await expect(banner).toBeHidden();
   await expect(sample.locator('iframe')).toHaveAttribute('src', '/i/noa-and-itay-video?lang=he&open=1');
-  const response = await page.request.get('/i/noa-and-itay-video?lang=he');
-  expect(response.status()).toBe(200);
-  // the invitation plays the video from 3:27
+  expect((await page.request.get('/i/noa-and-itay-video?lang=he')).status()).toBe(200);
   const invitation = page.frameLocator('#sample iframe');
   await expect(invitation.locator('.hero-embed iframe')).toHaveAttribute(
     'src',
     /youtube-nocookie\.com\/embed\/5GvcO2lufGU\?.*start=207/,
   );
-  // and so does the first screen's background, now that it's allowed
+
+  // "essential only" turns external content off: a still instead of both videos…
+  await banner.getByRole('button', { name: 'רק חיוניות' }).click();
+  await expect(banner).toBeHidden();
+  await expect(page.getByTestId('site-hero-video')).toHaveCount(0);
+  await expect(sample.getByText('כיביתם תוכן חיצוני, ולכן הסרטון מיוטיוב לא מוצג כאן.')).toBeVisible();
+  // …until the visitor allows it again
+  await sample.getByRole('button', { name: 'אישור והצגת הסרטון' }).click();
+  await expect(sample.locator('iframe')).toHaveAttribute('src', '/i/noa-and-itay-video?lang=he&open=1');
   await expect(page.getByTestId('site-hero-video')).toHaveAttribute('src', /embed\/5GvcO2lufGU\?.*start=207/);
 });

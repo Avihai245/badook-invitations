@@ -133,7 +133,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           id: 'cookies',
           heading: '9. Cookies',
           body: [
-            'We use essential cookies to run the site, and load external content (YouTube, Vimeo, Google Maps) on the site’s own pages only with your consent. The cookie policy has the details, and the “Cookie settings” link at the bottom of every page changes your choice.',
+            'We use essential cookies to run the site. External content on the site’s own pages (videos from YouTube in its privacy-enhanced mode, Vimeo, Google Maps) loads by default, and you can turn it off at any time. The cookie policy has the details, and the “Cookie settings” link at the bottom of every page changes your choice.',
           ],
         },
         {
@@ -292,7 +292,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
         id: 'cookies',
         heading: '9. עוגיות',
         body: [
-          'אנחנו משתמשים בעוגיות חיוניות להפעלת האתר, ובעמודי האתר עצמו טוענים תוכן חיצוני (YouTube, Vimeo ומפות Google) רק בהסכמתכם. כל הפרטים במדיניות העוגיות, ובקישור ״הגדרות עוגיות״ בתחתית כל עמוד אפשר לשנות את הבחירה.',
+          'אנחנו משתמשים בעוגיות חיוניות להפעלת האתר. תוכן חיצוני בעמודי האתר עצמו (סרטונים מ־YouTube במצב הפרטיות המוגברת שלו, Vimeo ומפות Google) נטען כברירת מחדל, ואפשר לכבות אותו בכל רגע. כל הפרטים במדיניות העוגיות, ובקישור ״הגדרות עוגיות״ בתחתית כל עמוד אפשר לשנות את הבחירה.',
         ],
       },
       {

@@ -4,7 +4,7 @@ import { Pause, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/components/app';
 import { videoEmbedUrl, videoStillUrl, type VideoLink } from '@/features/invitations/lib/video-links';
-import { useConsent } from './CookieConsent.client';
+import { mediaAllowed, useConsent } from './CookieConsent.client';
 
 const PLAYER = 'https://www.youtube-nocookie.com';
 
@@ -33,9 +33,9 @@ function read(data: unknown): { event: string | null; state: number | null } {
 /**
  * The home page's background video: a YouTube link played muted, looping (back to the link's start
  * time), without controls or subtitles, covering its box. The still shows until it really plays — and
- * instead of it for visitors who prefer reduced motion or save data, or who haven't allowed external
- * content (cookie consent; the play button loads it for this visit). It pauses while off screen, and
- * the button pauses it for good (WCAG 2.2.2: moving content can be stopped).
+ * instead of it for visitors who prefer reduced motion or save data, or who turned external content off
+ * (cookie settings; the play button loads it for this visit). It pauses while off screen, and the
+ * button pauses it for good (WCAG 2.2.2: moving content can be stopped).
  */
 export function BackgroundVideo({
   link,
@@ -51,7 +51,7 @@ export function BackgroundVideo({
   const consent = useConsent();
   const [origin, setOrigin] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
-  // null: nobody chose yet — plays when external content is allowed; true/false: the button's choice
+  // null: nobody chose yet — plays unless external content is off; true/false: the button's choice
   const [wanted, setWanted] = useState<boolean | null>(null);
   const stills = [videoStillUrl(link, 'maxres'), videoStillUrl(link, 'hq')].filter((u): u is string => !!u);
   const [stillAt, setStillAt] = useState(0);
@@ -69,18 +69,26 @@ export function BackgroundVideo({
     return () => window.removeEventListener('a11y:change', onA11y);
   }, []);
 
-  const paused = wanted === null ? !consent?.media : !wanted;
+  const paused = wanted === null ? !mediaAllowed(consent) : !wanted;
 
   useEffect(() => {
     if (!origin || paused) return;
     const post = (message: unknown) =>
       frame.current?.contentWindow?.postMessage(JSON.stringify(message), PLAYER);
     const command = (func: string, args: unknown[] = []) => post({ event: 'command', func, args });
+    // no subtitles: YouTube loads its captions module with the player and again whenever the video
+    // (re)starts — each loop included — so it is unloaded each time
+    const hideCaptions = () => {
+      for (const name of ['captions', 'cc']) command('unloadModule', [name]);
+    };
     const onMessage = (e: MessageEvent) => {
       if (e.origin !== PLAYER || e.source !== frame.current?.contentWindow) return;
       const { event, state } = read(e.data);
-      if (event === 'onReady') for (const name of ['captions', 'cc']) command('unloadModule', [name]);
-      if (state === 1) setPlaying(true);
+      if (event === 'onReady') hideCaptions();
+      if (state === 1) {
+        setPlaying(true);
+        hideCaptions();
+      }
       // a looping playlist restarts at 0: back to the link's moment instead
       if (state === 0 && link.start) {
         command('seekTo', [link.start, true]);
