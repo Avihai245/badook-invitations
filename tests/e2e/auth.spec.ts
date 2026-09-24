@@ -81,6 +81,7 @@ test.describe('sign-in links and pages', () => {
     await expect(page.getByText('חבילת Pro (חודשי)')).toBeVisible();
     await page.getByRole('button', { name: 'תשלום (בדיקה)' }).click();
     await page.waitForURL(/\/app\/billing\?status=success/);
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
     await expect(page.getByTestId('current-plan')).toContainText('Pro');
 
     // signed in already: the pricing's link goes on to paying too (here, switching to Business)

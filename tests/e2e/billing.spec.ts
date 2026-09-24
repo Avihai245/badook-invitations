@@ -127,6 +127,7 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await page.getByRole('button', { name: 'כישלון (בדיקה)' }).click();
   await page.waitForURL(/status=failure/);
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await expect(page.getByTestId('billing-returned')).toContainText('התשלום לא עבר');
   await expect(kpi(page, 'קרדיטים לוואטסאפ')).toContainText('150');
 
@@ -136,6 +137,7 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
     applied: true,
   });
   await page.reload();
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await expect(kpi(page, 'קרדיטים לוואטסאפ')).toContainText('200');
   // the monthly charge is in the payments too
   await expect(page.getByTestId('payments')).toContainText('חידוש חודשי');
@@ -162,6 +164,7 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
     await client.end();
   }
   await page.reload();
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await expect(current).toContainText('חינם');
   await pay(page, page.getByRole('button', { name: 'שדרוג ל־Pro' }), 'תשלום (בדיקה)');
   await expect(page.getByTestId('billing-returned')).toContainText('התשלום התקבל');
@@ -187,6 +190,7 @@ test('the account: details, and deleting it deletes everything', async ({ page }
   await form.getByRole('button', { name: 'שמירה' }).click();
   await expect(page.locator('li').filter({ hasText: 'הפרטים נשמרו' })).toBeVisible();
   await page.reload();
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await expect(form.getByRole('textbox', { name: /^טלפון/ })).toHaveValue('050-123-4567');
 
   await page.getByRole('button', { name: 'מחיקת החשבון' }).click();

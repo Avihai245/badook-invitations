@@ -30,13 +30,16 @@ const UiContext = createContext<UiContextValue | null>(null);
  * provider picks one by the locale the server resolved, so no strings travel in the RSC payload.
  */
 export function UiProvider({ locale, children }: { locale: UiLocale; children: ReactNode }) {
-  // <html data-hydrated> once React owns the page and every part streamed in behind a loading
-  // skeleton has taken its place — until then React keeps such a part in a hidden <div id="S:…">, a
-  // second copy of it (end-to-end tests wait for this before looking and typing).
+  // <html data-hydrated> once React owns the page and the parts streamed in behind a loading skeleton
+  // have taken their place — React reveals them a moment later and keeps each one in a hidden
+  // <div id="S:…"> until then, a second copy (end-to-end tests wait for this before looking and
+  // typing). At most a few seconds: a part whose page turned out not found stays hidden for good.
   useEffect(() => {
+    const start = performance.now();
     let frame = 0;
     const settle = () => {
-      if (document.querySelector('div[hidden][id^="S:"]')) frame = requestAnimationFrame(settle);
+      const pending = document.querySelector('div[hidden][id^="S:"]');
+      if (pending && performance.now() - start < 3000) frame = requestAnimationFrame(settle);
       else document.documentElement.dataset.hydrated = '1';
     };
     settle();
