@@ -49,6 +49,27 @@ export const he = {
     helpTitle: 'מה כל כפתור עושה',
     people: { one: 'איש אחד', other: '{n} אנשים' },
   },
+  /** the site's own "not found" and "something went wrong" pages */
+  errorPages: {
+    notFound: {
+      metaTitle: 'העמוד לא נמצא',
+      code: 'שגיאה 404',
+      title: 'לא מצאנו את העמוד הזה',
+      body: 'אולי הקישור לא מדויק, או שההזמנה נמחקה או שייכת לחשבון אחר.',
+      toInvitations: 'לכל ההזמנות שלי',
+      newInvitation: 'הזמנה חדשה',
+      home: 'לדף הבית',
+      login: 'כניסה לחשבון',
+    },
+    error: {
+      title: 'משהו השתבש',
+      body: 'זו תקלה אצלנו, לא אצלכם. נסו שוב בעוד רגע — ואם זה חוזר, העוזר שלנו או צוות התמיכה ישמחו לעזור.',
+      retry: 'ניסיון חוזר',
+      toInvitations: 'לכל ההזמנות שלי',
+      contact: 'יצירת קשר',
+      code: 'קוד התקלה: {code}',
+    },
+  },
   shell: {
     nav: {
       label: 'ניווט ראשי',
@@ -58,7 +79,20 @@ export const he = {
       account: 'החשבון שלי',
       assistant: 'שאלו את העוזר',
       contact: 'יצירת קשר',
+      /** the sidebar's help entry: opens the assistant */
+      help: 'עזרה והעוזר',
     },
+    /** the phones' bottom bar (short labels) */
+    tabs: {
+      label: 'ניווט',
+      invitations: 'ההזמנות',
+      newInvitation: 'חדשה',
+      billing: 'חבילה',
+      help: 'עזרה',
+    },
+    /** the sidebar's small print: the legal pages */
+    legal: 'מידע ומדיניות',
+    signedInAs: 'מחוברים בתור',
     userMenu: 'תפריט החשבון',
     uiLanguage: 'שפת הממשק',
     account: 'החשבון שלי',
@@ -71,6 +105,99 @@ export const he = {
       responses: 'אישורי הגעה',
       share: 'שיתוף',
       back: 'כל ההזמנות',
+    },
+  },
+  /** an invitation's own pages: the header and tabs above the overview, guests, RSVPs and sharing */
+  workspace: {
+    label: 'ניווט בהזמנה',
+    back: 'כל ההזמנות',
+    tabs: {
+      overview: 'סקירה',
+      guests: 'מוזמנים ושליחה בוואטסאפ',
+      guestsShort: 'מוזמנים ו־וואטסאפ',
+      responses: 'אישורי הגעה',
+      share: 'שיתוף',
+      edit: 'עריכת העיצוב',
+    },
+    /** under the tab: opens the full-screen editor */
+    editHint: 'העורך נפתח במסך מלא. "חזרה" מחזירה לרשימת ההזמנות.',
+    publish: 'פרסום',
+    openInvitation: 'פתיחת ההזמנה',
+    editDesign: 'עריכת העיצוב',
+    guestsCount: { one: 'מוזמן אחד', other: '{n} מוזמנים' },
+    responsesCount: { one: 'תשובה אחת', other: '{n} תשובות' },
+  },
+  /** /app/invitations/[id] — the invitation's overview */
+  overview: {
+    metaTitle: 'סקירה · {name}',
+    title: 'סקירה',
+    subtitle: 'מה קורה עם ההזמנה, ומה הצעד הבא.',
+    stats: {
+      label: 'המספרים של ההזמנה',
+      guests: 'מוזמנים ברשימה',
+      sent: 'קיבלו את ההזמנה',
+      attending: 'אישרו הגעה',
+      declined: 'לא מגיעים',
+      pending: 'עוד לא ענו',
+      people: { one: 'אדם אחד מגיע', other: '{n} אנשים מגיעים' },
+      ofGuests: 'מתוך {n}',
+      noGuests: 'הרשימה ריקה',
+    },
+    main: {
+      title: 'מה עושים עכשיו',
+      import: {
+        title: 'העלאת רשימת מוזמנים מאקסל',
+        body: 'קובץ Excel או CSV עם שמות וטלפונים. כל מוזמן מקבל קישור אישי עם השם שלו.',
+        cta: 'העלאת קובץ',
+        more: 'להוספת מוזמנים',
+      },
+      send: {
+        title: 'שליחה בוואטסאפ לכל המוזמנים',
+        body: 'הזמנה אישית לכל אחד, מהמספר הרשמי שלנו — ורואים מי קיבל, מי פתח ומי אישר.',
+        cta: 'שליחה בוואטסאפ',
+        noGuests: 'קודם מעלים רשימת מוזמנים',
+        notPublished: 'קודם מפרסמים את ההזמנה',
+        allSent: 'ההזמנה נשלחה לכל המוזמנים',
+        toSend: { one: 'מוזמן אחד עוד לא קיבל', other: '{n} מוזמנים עוד לא קיבלו' },
+      },
+    },
+    steps: {
+      title: 'הדרך להזמנה מושלמת',
+      progress: '{done} מתוך {total}',
+      done: 'בוצע',
+      design: {
+        title: 'עיצוב ההזמנה',
+        body: 'שמות, תאריך, מקום, צבעים ומוזיקה.',
+        cta: 'לעריכת העיצוב',
+      },
+      publish: {
+        title: 'פרסום',
+        body: 'הקישור מתחיל לעבוד, ואפשר לשלוח לאורחים.',
+        cta: 'לפרסום',
+        again: 'יש שינויים שעוד לא פורסמו',
+      },
+      import: {
+        title: 'רשימת מוזמנים מאקסל',
+        body: 'שמות וטלפונים — וכל מוזמן מקבל קישור אישי.',
+        cta: 'העלאת רשימה',
+      },
+      send: {
+        title: 'שליחה בוואטסאפ',
+        body: 'לכל המוזמנים, בלחיצה אחת.',
+        cta: 'לשליחה',
+      },
+      track: {
+        title: 'מעקב אחרי אישורי ההגעה',
+        body: 'מי מגיע ועם כמה, בזמן אמת.',
+        cta: 'לאישורי ההגעה',
+      },
+    },
+    link: {
+      title: 'הקישור להזמנה',
+      copy: 'העתקה',
+      copied: 'הקישור הועתק',
+      notLive: 'הקישור יתחיל לעבוד אחרי הפרסום.',
+      share: 'עוד דרכים לשתף',
     },
   },
   auth: {
@@ -166,20 +293,45 @@ export const he = {
     responsesTotal: { one: 'תשובה אחת', other: '{n} תשובות' },
     attendingTotal: { one: 'מגיע אחד', other: '{n} מגיעים' },
     statsLabel: 'סיכום ההזמנות',
-    countdown: { zero: 'היום!', one: 'מחר', two: 'בעוד יומיים', other: 'בעוד {n} ימים' },
+    /** on the poster: how far the event is, in the visitor's own day */
+    countdown: {
+      today: 'היום!',
+      days: { one: 'מחר', two: 'בעוד יומיים', other: 'בעוד {n} ימים' },
+    },
     past: 'האירוע עבר',
+    /** hover hints */
+    nextHint: 'הדבר הבא שכדאי לעשות עם ההזמנה הזו. לחיצה לוקחת אתכם ישר לשם.',
+    archiveHint: 'הזמנות שהעברתם לארכיון: לא מופיעות ברשימה ולא נספרות בחבילה. מחזירים אחת מהתפריט ⋯ שלה.',
+    hideArchivedHint: 'חזרה לרשימת ההזמנות הפעילות.',
     next: {
       publish: 'הצעד הבא: לפרסם',
       republish: 'יש שינויים: לפרסם שוב',
-      share: 'הצעד הבא: לשלוח לאורחים',
-      send: { one: 'לשלוח למוזמן שעוד לא קיבל', other: 'לשלוח ל־{n} מוזמנים שעוד לא קיבלו' },
+      import: 'הצעד הבא: להעלות את רשימת המוזמנים',
+      send: { one: 'לשלוח בוואטסאפ למוזמן אחד', other: 'לשלוח בוואטסאפ ל־{n} מוזמנים' },
       track: 'לראות מי מגיע',
     },
     steps: {
       title: 'איך זה עובד',
       design: { title: 'בוחרים עיצוב', body: '{n} עיצובים לכל סוג אירוע, עם פתיחה מונפשת ומוזיקה.' },
-      details: { title: 'ממלאים פרטים', body: 'שמות, תאריך ומקום. הטקסטים כבר כתובים, ואפשר לשנות הכל.' },
-      send: { title: 'שולחים ועוקבים', body: 'בוואטסאפ, עם קישור אישי לכל מוזמן, ורואים מי מגיע בזמן אמת.' },
+      details: {
+        title: 'ממלאים פרטים ומפרסמים',
+        body: 'שמות, תאריך ומקום. הטקסטים כבר כתובים, ואפשר לשנות הכל.',
+      },
+      guests: { title: 'מעלים את רשימת המוזמנים', body: 'מקובץ אקסל, וכל מוזמן מקבל קישור אישי עם השם שלו.' },
+      send: { title: 'שולחים בוואטסאפ ועוקבים', body: 'בלחיצה אחת לכל הרשימה, ורואים מי מגיע בזמן אמת.' },
+    },
+    /** the quick actions on each card */
+    actions: {
+      label: 'פעולות מהירות: {name}',
+      guests: 'מוזמנים ו־וואטסאפ',
+      responses: 'אישורי הגעה',
+      share: 'שיתוף',
+      edit: 'עריכה',
+    },
+    progress: {
+      sent: 'נשלח ל־{sent} מתוך {guests}',
+      attending: '{attending} מגיעים',
+      noGuests: 'עוד אין רשימת מוזמנים',
     },
     followUp: {
       title: 'ההזמנה המלאה',
@@ -250,7 +402,8 @@ export const he = {
     previewLanguage: 'שפת התצוגה המקדימה',
     filterLabel: 'סינון לפי סוג אירוע',
     all: 'הכל',
-    barBat: 'בר/בת מצווה',
+    /** read out after the filter changes */
+    results: { one: 'עיצוב אחד', other: '{n} עיצובים' },
     playPreview: 'הצגת התצוגה המקדימה של {name}',
     noResults: 'אין עיצובים לסוג האירוע הזה עדיין.',
     premium: 'פרימיום',
@@ -309,6 +462,8 @@ export const he = {
     title: 'אישורי הגעה',
     share: 'שיתוף',
     export: 'ייצוא ל-Excel',
+    exportHelp: 'מוריד את כל התשובות לקובץ שנפתח באקסל, כולל העדפות תזונה ותשובות לשאלות.',
+    exportEmpty: 'עוד אין תשובות לייצוא. הכפתור יפעל כשתגיע התשובה הראשונה.',
     kpi: {
       attending: 'מגיעים',
       attendingSub: '{adults} · {children}',
@@ -332,6 +487,12 @@ export const he = {
     withMessage: 'עם הודעה',
     withDietary: 'עם העדפות תזונה',
     clearFilters: 'ניקוי הסינון',
+    /** the active filters as removable chips */
+    activeFilters: 'סינונים פעילים',
+    removeFilter: 'הסרת הסינון: {name}',
+    showing: 'מוצגות {shown} מתוך {total}',
+    /** a reply's row / card: its button */
+    openReply: 'פרטי התשובה של {name}',
     columns: {
       name: 'שם',
       status: 'סטטוס',
@@ -345,6 +506,12 @@ export const he = {
     noMatches: 'אין תשובות שמתאימות לחיפוש',
     emptyTitle: 'עוד אין תשובות',
     emptyBody: 'שתפו את ההזמנה — התשובות יופיעו כאן ברגע שיגיעו.',
+    emptyDraftTitle: 'ההזמנה עוד לא פורסמה',
+    emptyDraftBody: 'אחרי הפרסום האורחים יוכלו לאשר הגעה, והתשובות יופיעו כאן מיד.',
+    toPublish: 'לפרסום ההזמנה',
+    emptyArchivedTitle: 'ההזמנה בארכיון',
+    emptyArchivedBody: 'הקישור שלה לא פעיל כרגע. אפשר להחזיר אותה מהארכיון ברשימת ההזמנות.',
+    toList: 'לרשימת ההזמנות',
     notify: {
       label: 'התראות במייל',
       each: 'על כל תשובה',
@@ -433,6 +600,10 @@ export const he = {
     whatsapp: 'שליחה בוואטסאפ',
     copyMessage: 'העתקת ההודעה',
     messageCopied: 'ההודעה הועתקה',
+    /** hover hints */
+    copyLinkHint: 'מעתיק את הקישור בלבד, להדבקה בכל מקום.',
+    whatsappHint: 'פותח את הוואטסאפ שלכם עם ההודעה מוכנה. בוחרים שם אנשים או קבוצה.',
+    copyMessageHint: 'מעתיק את כל ההודעה עם הקישור — להדבקה ב־SMS, במייל או בכל אפליקציה אחרת.',
     copyFailed: 'לא הצלחנו להעתיק — סמנו את הטקסט והעתיקו ידנית.',
     preview: 'כך זה ייראה בוואטסאפ',
     previewImage: 'תמונת התצוגה המקדימה של הקישור',
@@ -443,6 +614,7 @@ export const he = {
     notPublishedTitle: 'ההזמנה עוד לא פורסמה',
     notPublishedBody: 'פרסמו אותה מהעורך — ואז יהיה כאן קישור לשיתוף, הודעה מוכנה וקוד QR.',
     toEditor: 'לעורך',
+    toPublish: 'לפרסום ההזמנה',
     guestsTitle: 'קישור אישי לכל מוזמן',
     guestsBody:
       'העלו את רשימת המוזמנים מאקסל — כל אחד יקבל קישור עם השם שלו, הטופס יגיע ממולא ותראו מי פתח ומי אישר.',

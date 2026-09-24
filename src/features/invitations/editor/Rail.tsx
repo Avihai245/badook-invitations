@@ -51,11 +51,12 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { Popover } from 'radix-ui';
-import { useId, useMemo, useState } from 'react';
+import { useDeferredValue, useId, useMemo, useState } from 'react';
 import { Switch, cn, rovingKeyDown, useDir } from '@/components/app';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import type { Section } from '../contracts/types';
+import { validateDocument } from '../contracts/validate';
 import { availableEntries, insertionIndex, LOCKED_TYPES, newSection, type CatalogKey } from './catalog';
 import { sectionName } from './fields/fields';
 import { insertAt, moveAt } from './paths';
@@ -209,6 +210,9 @@ function RowShell({
   );
 }
 
+/** A section's dot: something to check (yellow), or something that blocks publishing (red). */
+export type IssueMark = 'warning' | 'error';
+
 function RowButton({
   icon: Icon,
   name,
@@ -220,14 +224,18 @@ function RowButton({
   name: string;
   selected: boolean;
   onClick: () => void;
-  flagged?: boolean;
+  flagged?: IssueMark;
 }) {
+  const { t } = useUi();
+  const r = t.editor.rail;
   return (
     <button
       type="button"
       aria-current={selected || undefined}
       onClick={onClick}
-      title={name}
+      // the dot's meaning, as the row's description (its name stays the section's name)
+      title={flagged ? `${name} · ${flagged === 'error' ? r.issueError : r.issueWarning}` : name}
+      data-issue={flagged}
       className="relative flex h-full min-w-0 flex-1 items-center gap-2 text-start outline-offset-[-2px] lg:max-xl:flex-none lg:max-xl:justify-center lg:max-xl:px-3"
     >
       <Icon aria-hidden size={16} strokeWidth={1.75} className="shrink-0 text-muted" />
@@ -235,7 +243,10 @@ function RowButton({
       {flagged ? (
         <span
           aria-hidden
-          className="size-1.5 shrink-0 rounded-full bg-danger lg:max-xl:absolute lg:max-xl:end-2 lg:max-xl:top-2"
+          className={cn(
+            'size-2 shrink-0 rounded-full ring-2 ring-surface lg:max-xl:absolute lg:max-xl:end-2 lg:max-xl:top-2',
+            flagged === 'error' ? 'bg-danger' : 'bg-amber-400',
+          )}
         />
       ) : null}
     </button>
@@ -253,7 +264,7 @@ function LockedRow({
   name: string;
   selected: boolean;
   onSelect: () => void;
-  flagged?: boolean;
+  flagged?: IssueMark;
 }) {
   const { t } = useUi();
   return (
@@ -283,7 +294,7 @@ function SortableRow({
   selected: boolean;
   onSelect: () => void;
   onToggle: (on: boolean) => void;
-  flagged?: boolean;
+  flagged?: IssueMark;
 }) {
   const { t } = useUi();
   const r = t.editor.rail;
@@ -332,7 +343,7 @@ function SortableRow({
 // ─── lists ─────────────────────────────────────────────────────────────────────────────────────
 
 function SectionList({ onNavigate }: { onNavigate?: () => void }) {
-  const { doc, selection, select, apply, issues, showIssues } = useEditor();
+  const { doc, template, selection, select, apply, issues, showIssues } = useEditor();
   const { t, locale } = useUi();
   const e = t.editor;
   const dir = useDir();
@@ -343,10 +354,20 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
   const middle = doc.sections.filter((s) => !LOCKED_TYPES.includes(s.type));
   const hero = doc.sections.find((s) => s.type === 'hero');
   const footer = doc.sections.find((s) => s.type === 'footer');
-  const flagged = useMemo(
-    () => new Set(showIssues ? issues.errors.map((i) => i.sectionId).filter(Boolean) : []),
-    [issues, showIssues],
+  // Yellow: the section has something to check (anything the publish window would list — an empty
+  // field, a missing translation, a warning). Red, once a publish was tried: something in it blocks
+  // publishing (the publish rules, exactly as the publish window applies them).
+  const deferred = useDeferredValue(doc);
+  const blocking = useMemo(
+    () => (showIssues ? validateDocument(deferred, template, { mode: 'publish' }).errors : []),
+    [showIssues, deferred, template],
   );
+  const flagged = useMemo(() => {
+    const marks = new Map<string, IssueMark>();
+    for (const i of issues.issues) if (i.sectionId) marks.set(i.sectionId, 'warning');
+    for (const i of blocking) if (i.sectionId) marks.set(i.sectionId, 'error');
+    return marks;
+  }, [issues, blocking]);
   const nameOf = (id: string | number) => {
     const s = doc.sections.find((x) => x.id === id);
     return s ? sectionName(s, e, locale) : '';
@@ -394,7 +415,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
           name={e.names.hero}
           selected={isSelected(hero.id)}
           onSelect={() => go(() => select({ kind: 'section', id: hero.id }))}
-          flagged={flagged.has(hero.id)}
+          flagged={flagged.get(hero.id)}
         />
       ) : null}
       <DndContext
@@ -424,7 +445,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
                     null,
                   )
                 }
-                flagged={flagged.has(s.id)}
+                flagged={flagged.get(s.id)}
               />
             );
           })}
@@ -436,7 +457,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
           name={e.names.footer}
           selected={isSelected(footer.id)}
           onSelect={() => go(() => select({ kind: 'section', id: footer.id }))}
-          flagged={flagged.has(footer.id)}
+          flagged={flagged.get(footer.id)}
         />
       ) : null}
     </ul>

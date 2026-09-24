@@ -43,6 +43,15 @@ import { AUDIO_TYPES, ImageField, UploadTile, useUploader } from '../fields/medi
 import { addLocale, removeLocale } from '../locales';
 import { useEditor, type PanelId } from '../state/EditorProvider';
 
+/**
+ * A track's licence as the template pack gives it — unless it's still a placeholder ("TBD …"),
+ * which hosts must never see.
+ */
+export function trackLicense(license: string): string | null {
+  const text = license.trim();
+  return !text || /^(tbd|todo|tba)\b/i.test(text) ? null : text;
+}
+
 export function GlobalPanel({ panel }: { panel: PanelId }) {
   switch (panel) {
     case 'cover':
@@ -421,11 +430,12 @@ function MusicPanel() {
             {template.music.tracks.map((track) => {
               const on = !custom && music.trackId === track.id;
               const url = templateFileUrl(template.id, track.url, bases);
+              const license = trackLicense(track.license);
               return (
                 <TrackRow
                   key={track.id}
                   title={track.title}
-                  subtitle={fmt(m.license, { license: track.license })}
+                  subtitle={license ? fmt(m.license, { license }) : m.designTrack}
                   selected={on}
                   onSelect={() => choose({ trackId: track.id, customUrl: null })}
                   playing={playing === track.id}

@@ -16,6 +16,9 @@ export const editorHe = {
   },
   undo: 'ביטול',
   redo: 'ביצוע מחדש',
+  /** the undo / redo tooltips while there's nothing to undo / redo */
+  undoNone: 'אין עדיין מה לבטל',
+  redoNone: 'אין מה להחזיר',
   preview: 'תצוגה מקדימה',
   publish: 'פרסום',
   publishChanges: 'פרסום השינויים',
@@ -33,6 +36,15 @@ export const editorHe = {
   languageIn: { he: 'עברית', en: 'אנגלית' },
   copyFrom: { he: 'העתקה מהעברית', en: 'העתקה מהאנגלית' },
   unpublishedChanges: 'יש שינויים שלא פורסמו',
+  /** a premium design on a plan without premium designs (the top bar's badge) */
+  premium: {
+    badge: 'פרימיום',
+    label: 'עיצוב פרימיום: מה זה אומר?',
+    title: 'עיצוב פרימיום',
+    body: 'אפשר לערוך את ההזמנה בחופשיות. כדי לפרסם אותה צריך חבילת Pro או Business.',
+    cta: 'לחבילות',
+    newTab: '(נפתח בלשונית חדשה)',
+  },
   rail: {
     label: 'ניווט בעורך',
     tabs: { sections: 'סקשנים', design: 'עיצוב', settings: 'הגדרות' },
@@ -44,6 +56,9 @@ export const editorHe = {
     toggle: 'הצגת {name}',
     addSection: 'הוספת סקשן',
     addSectionTitle: 'איזה סקשן להוסיף?',
+    /** the dots next to a section (their tooltips) */
+    issueWarning: 'יש כאן משהו לבדוק',
+    issueError: 'צריך לתקן כאן משהו לפני הפרסום',
     dnd: {
       instructions:
         'כדי להזיז סקשן: לחצו רווח או Enter, הזיזו עם החצים, ולחצו שוב רווח או Enter כדי להניח. Esc מבטל.',
@@ -57,7 +72,7 @@ export const editorHe = {
   sectionsSheet: 'כל הסקשנים',
   names: {
     cover: 'מעטפה ופתיחה',
-    hero: 'פתיחה (Hero)',
+    hero: 'המסך הראשי',
     countdown: 'ספירה לאחור',
     story: 'הסיפור שלנו',
     venues: 'מקום האירוע',
@@ -132,6 +147,8 @@ export const editorHe = {
     live: 'תצוגה חיה',
     replay: 'הפעלת הפתיחה מחדש',
     openTab: 'פתיחה בלשונית חדשה',
+    replayHint: 'מציג שוב את פתיחת המעטפה ואת האנימציות, כמו שהאורחים יראו כשיפתחו את הקישור.',
+    openTabHint: 'הטיוטה השמורה במסך מלא בלשונית חדשה — לבדיקה כמו אורח, בלי העורך מסביב.',
     frameTitle: 'תצוגה מקדימה של ההזמנה',
   },
   tip: 'טיפ: לחיצה על כל טקסט בתצוגה המקדימה קופצת לשדה שלו.',
@@ -379,6 +396,8 @@ export const editorHe = {
       sourceVideoHelp:
         'האורחים ישמעו את הסאונד של הסרטון מהרגע שהם פותחים את ההזמנה. בסרטון מיוטיוב או מ־Vimeo חלק מהדפדפנים לא מאפשרים סאונד — לסאונד בטוח העלו את הקובץ.',
       license: 'רישיון: {license}',
+      /** a track of the design whose licence details aren't filled in yet */
+      designTrack: 'המוזיקה של העיצוב',
     },
     languages: {
       default: 'השפה שנפתחת קודם',
@@ -547,6 +566,10 @@ export const editorHe = {
     errors: { one: 'צריך לתקן דבר אחד לפני הפרסום', other: 'צריך לתקן {n} דברים לפני הפרסום' },
     warnings: { one: 'כדאי לבדוק דבר אחד', other: 'כדאי לבדוק {n} דברים' },
     ready: 'הכל מוכן לפרסום',
+    /** why "publish" can't be pressed yet (its tooltip) */
+    blocked: 'קודם מתקנים את מה שמסומן באדום (לחיצה על שורה מובילה לשדה).',
+    blockedSlug: 'בחרו כתובת פנויה ותקינה כדי לפרסם.',
+    blockedChecking: 'בודקים שהכתובת פנויה…',
     goTo: 'מעבר לשדה',
     card: 'כך ייראה הקישור בוואטסאפ',
     publish: 'פרסום',

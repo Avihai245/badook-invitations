@@ -15,6 +15,8 @@ export const editorEn: EditorDict = {
   },
   undo: 'Undo',
   redo: 'Redo',
+  undoNone: 'Nothing to undo yet',
+  redoNone: 'Nothing to redo',
   preview: 'Preview',
   publish: 'Publish',
   publishChanges: 'Publish changes',
@@ -31,6 +33,14 @@ export const editorEn: EditorDict = {
   languageIn: { he: 'Hebrew', en: 'English' },
   copyFrom: { he: 'Copy from Hebrew', en: 'Copy from English' },
   unpublishedChanges: 'Unpublished changes',
+  premium: {
+    badge: 'Premium',
+    label: 'Premium design: what does it mean?',
+    title: 'Premium design',
+    body: 'Edit the invitation freely. Publishing it needs the Pro or Business plan.',
+    cta: 'See the plans',
+    newTab: '(opens in a new tab)',
+  },
   rail: {
     label: 'Editor navigation',
     tabs: { sections: 'Sections', design: 'Design', settings: 'Settings' },
@@ -42,6 +52,8 @@ export const editorEn: EditorDict = {
     toggle: 'Show {name}',
     addSection: 'Add section',
     addSectionTitle: 'Which section?',
+    issueWarning: 'Something to check here',
+    issueError: 'Something here must be fixed before publishing',
     dnd: {
       instructions:
         'To move a section, press Space or Enter, move it with the arrow keys, then press Space or Enter again to drop it. Escape cancels.',
@@ -61,7 +73,7 @@ export const editorEn: EditorDict = {
   sectionsSheet: 'All sections',
   names: {
     cover: 'Envelope & opening',
-    hero: 'Hero',
+    hero: 'Main screen',
     countdown: 'Countdown',
     story: 'Our story',
     venues: 'Venue',
@@ -136,6 +148,10 @@ export const editorEn: EditorDict = {
     live: 'Live preview',
     replay: 'Replay opening',
     openTab: 'Open in a new tab',
+    replayHint:
+      'Plays the envelope opening and the animations again, as guests see them when they open the link.',
+    openTabHint:
+      'The saved draft full screen in a new tab — to check it as a guest would, without the editor around it.',
     frameTitle: 'Invitation preview',
   },
   tip: 'Tip: click any text in the preview to jump to its field.',
@@ -385,6 +401,7 @@ export const editorEn: EditorDict = {
       sourceVideoHelp:
         'Guests hear the video’s own sound from the moment they open the invitation. Some browsers don’t allow sound from a YouTube or Vimeo video — upload the file for sound that always works.',
       license: 'License: {license}',
+      designTrack: 'The design’s own music',
     },
     languages: {
       default: 'Opens first in',
@@ -554,6 +571,9 @@ export const editorEn: EditorDict = {
     errors: { one: 'One thing to fix before publishing', other: '{n} things to fix before publishing' },
     warnings: { one: 'One thing worth checking', other: '{n} things worth checking' },
     ready: 'Everything’s ready to publish',
+    blocked: 'First fix what’s marked in red (click a row to go to its field).',
+    blockedSlug: 'Choose an available, valid address to publish.',
+    blockedChecking: 'Checking the address is available…',
     goTo: 'Go to field',
     card: 'How the link looks on WhatsApp',
     publish: 'Publish',

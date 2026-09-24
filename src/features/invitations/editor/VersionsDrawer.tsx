@@ -7,6 +7,7 @@ import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import type { InvitationDocument } from '../contracts/types';
 import { hostApi } from '../app/api';
+import { HelpFor } from '../app/HelpFor';
 import { useEditor } from './state/EditorProvider';
 
 interface VersionRow {
@@ -71,6 +72,7 @@ export function VersionsDrawer({
         title={v.title}
         description={v.description}
         closeLabel={t.common.close}
+        help={<HelpFor area="versions" inDialog />}
       >
         {rows === null && !failed ? (
           <div aria-busy className="flex flex-col gap-2">

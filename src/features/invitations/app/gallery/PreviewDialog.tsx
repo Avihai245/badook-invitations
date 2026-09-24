@@ -9,6 +9,7 @@ import { LibraryFontPairs } from '../../editor/fields/font-library';
 import { usePreviewChannel } from '../../editor/preview/usePreviewChannel';
 import { demoDocument } from '../../templates/demo';
 import { requireTemplate } from '../../templates/registry';
+import { HelpFor } from '../HelpFor';
 
 export interface DesignChoice {
   paletteId: string | null;
@@ -61,6 +62,7 @@ export function PreviewDialog({
       title={fmt(t.gallery.preview.title, { name })}
       description={manifest.description[ui] ?? manifest.description.en}
       closeLabel={t.common.close}
+      help={<HelpFor area="preview" inDialog />}
       className="max-w-[920px]!"
       footer={
         <>

@@ -5,6 +5,8 @@ import {
   Check,
   CircleAlert,
   CloudOff,
+  Crown,
+  ExternalLink,
   Eye,
   History,
   LoaderCircle,
@@ -17,7 +19,8 @@ import {
   Undo2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { Badge, Button, IconButton, Menu, Segmented, cn } from '@/components/app';
+import { Popover } from 'radix-ui';
+import { Badge, Button, IconButton, Menu, Segmented, cn, useDir } from '@/components/app';
 import { HelpFor } from '@/features/invitations/app/HelpFor';
 import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
@@ -77,6 +80,7 @@ export function Topbar({
               {e.unpublishedChanges}
             </Badge>
           ) : null}
+          <PremiumNotice />
         </div>
         <SaveLine status={status} />
       </div>
@@ -110,6 +114,7 @@ export function Topbar({
         <IconButton
           label={e.undo}
           tooltip
+          disabledTooltip={e.undoNone}
           onClick={undo}
           disabled={!canUndo}
           aria-keyshortcuts="Control+Z Meta+Z"
@@ -120,6 +125,7 @@ export function Topbar({
         <IconButton
           label={e.redo}
           tooltip
+          disabledTooltip={e.redoNone}
           onClick={redo}
           disabled={!canRedo}
           aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
@@ -163,6 +169,66 @@ export function Topbar({
         </Button>
       </div>
     </header>
+  );
+}
+
+/** A premium design (manifest tier) — publishing it needs a paid plan (the 402 of the publish route). */
+export const premiumLocked = (template: { tier?: unknown }, features: { premiumTemplates: boolean }) =>
+  template.tier === 'premium' && !features.premiumTemplates;
+
+/**
+ * A premium design on a plan without premium designs: a small "Premium" tag in the bar that says, as
+ * early as the editor opens, that publishing it needs Pro or Business — editing goes on as usual.
+ */
+function PremiumNotice() {
+  const { template, features } = useEditor();
+  const { t } = useUi();
+  const p = t.editor.premium;
+  const dir = useDir();
+  if (!premiumLocked(template, features)) return null;
+  return (
+    <Popover.Root>
+      <Popover.Trigger asChild>
+        <button
+          type="button"
+          aria-label={p.label}
+          title={p.body}
+          data-testid="premium-notice"
+          className="inline-flex h-[22px] shrink-0 items-center gap-1 rounded-full bg-[#2b2118] px-2 text-[11.5px] font-semibold text-[#f3d98b] transition-colors hover:bg-black"
+        >
+          <Crown aria-hidden className="size-3" />
+          <span className="max-sm:sr-only">{p.badge}</span>
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          dir={dir}
+          align="start"
+          sideOffset={8}
+          collisionPadding={12}
+          className="z-[70] w-[min(300px,calc(100vw-24px))] rounded-[14px] border border-brand-line bg-surface p-4 shadow-lg outline-none data-[state=open]:animate-app-dialog-in motion-reduce:animate-none"
+        >
+          <p className="flex items-center gap-2 text-[14px] font-bold">
+            <span
+              aria-hidden
+              className="grid size-7 place-items-center rounded-full bg-[#2b2118] text-[#f3d98b]"
+            >
+              <Crown className="size-3.5" />
+            </span>
+            {p.title}
+          </p>
+          <p className="mt-2 text-[13px] leading-relaxed text-muted">{p.body}</p>
+          <Button size="sm" className="mt-3" icon={<ExternalLink className="icon-dir" />} asChild>
+            {/* a new tab: the editor stays open as it is */}
+            <a href="/app/billing" target="_blank" rel="noreferrer">
+              {p.cta}
+              <span className="sr-only"> {p.newTab}</span>
+            </a>
+          </Button>
+          <Popover.Arrow className="fill-surface" width={12} height={6} />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
 

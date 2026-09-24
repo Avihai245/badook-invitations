@@ -1,9 +1,19 @@
 'use client';
 
-import { Copy, Download, ExternalLink, MessageCircle, Users } from 'lucide-react';
+import { Copy, Download, MessageCircle, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Button, Card, Field, Input, Segmented, Textarea, useToast } from '@/components/app';
+import {
+  Button,
+  Card,
+  Field,
+  Hint,
+  Input,
+  PageHeader,
+  Segmented,
+  Textarea,
+  useToast,
+} from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { dirOf, type Locale } from '../../contracts/types';
 import type { ShareData } from '../../server/share';
@@ -13,6 +23,7 @@ import { HelpFor } from '../HelpFor';
  * The share screen (§7.7, §9B.3-F, app-share.png): the link + copy, the message (prefilled in the
  * invitation's default language, editable, per language when bilingual) → WhatsApp / copy, the
  * WhatsApp bubble as guests will see it (the real OG image), and the QR code with PNG/SVG downloads.
+ * "Open the invitation" is in the invitation's header (its workspace layout).
  */
 export function ShareScreen({ id, slug, data }: { id: string; slug: string; data: ShareData }) {
   const { t } = useUi();
@@ -33,23 +44,8 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
     );
 
   return (
-    <div className="mx-auto max-w-[1000px] px-4 pt-6 pb-16 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-1">
-            <h1 className="text-[22px] font-bold tracking-[-.01em]">{s.title}</h1>
-            <HelpFor area="share" />
-          </div>
-          <p className="mt-1 text-muted">{s.subtitle}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" size="sm" icon={<ExternalLink className="icon-dir" />} asChild>
-            <a href={data.url} target="_blank" rel="noreferrer">
-              {s.open}
-            </a>
-          </Button>
-        </div>
-      </div>
+    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+      <PageHeader size="section" title={s.title} help={<HelpFor area="share" />} description={s.subtitle} />
 
       {data.unpublishedChanges ? (
         <p className="mt-4 rounded-card border border-[#fde68a] bg-warning-bg px-4 py-3 text-[13px] text-warning">
@@ -90,9 +86,11 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
                 textAlign="start"
                 onFocus={(e) => e.target.select()}
               />
-              <Button variant="secondary" icon={<Copy />} onClick={() => void copy(data.url, s.linkCopied)}>
-                {s.copyLink}
-              </Button>
+              <Hint text={s.copyLinkHint}>
+                <Button variant="secondary" icon={<Copy />} onClick={() => void copy(data.url, s.linkCopied)}>
+                  {s.copyLink}
+                </Button>
+              </Hint>
             </div>
           </Field>
 
@@ -122,19 +120,27 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
           </Field>
 
           <div className="flex flex-wrap gap-2">
-            <Button variant="whatsapp" size="lg" icon={<MessageCircle />} asChild>
-              <a href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noreferrer">
-                {s.whatsapp}
-              </a>
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              icon={<Copy />}
-              onClick={() => void copy(message, s.messageCopied)}
-            >
-              {s.copyMessage}
-            </Button>
+            <Hint text={s.whatsappHint}>
+              <Button variant="whatsapp" size="lg" icon={<MessageCircle />} asChild>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(message)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {s.whatsapp}
+                </a>
+              </Button>
+            </Hint>
+            <Hint text={s.copyMessageHint}>
+              <Button
+                variant="secondary"
+                size="lg"
+                icon={<Copy />}
+                onClick={() => void copy(message, s.messageCopied)}
+              >
+                {s.copyMessage}
+              </Button>
+            </Hint>
           </div>
         </Card>
 

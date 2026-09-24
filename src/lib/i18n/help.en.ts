@@ -9,7 +9,22 @@ export const helpEn: typeof helpHe = {
         label: 'New invitation',
         text: 'Pick a design from the gallery, fill in names and a date, and get a ready draft with texts.',
       },
-      card: { label: 'Clicking an invitation', text: 'Opens its editor. Every change saves by itself.' },
+      card: {
+        label: 'Clicking an invitation',
+        text: 'Opens its overview: the numbers, the next step, and tabs for guests, RSVPs, sharing and the editor.',
+      },
+      quick: {
+        label: 'The buttons on a card',
+        text: 'Guests & WhatsApp (upload a list from Excel and send), RSVPs, sharing and editing the design — one tap each.',
+      },
+      nextStep: {
+        label: 'The next step',
+        text: 'The colored line under each invitation: what to do now — publish, send to your guests, share or see who’s coming. One tap takes you there.',
+      },
+      countdown: {
+        label: 'Countdown',
+        text: 'On the invitation: how many days are left. On the day itself it says “Today!”, and afterwards “The event has passed”.',
+      },
       menu: {
         label: 'The ⋯ menu on each invitation',
         text: 'Edit, guests, share (once published), responses, duplicate and archive.',
@@ -30,6 +45,10 @@ export const helpEn: typeof helpHe = {
         label: 'Archive',
         text: 'Takes an invitation off the list (it stops counting toward your plan) without deleting it. You can bring it back any time.',
       },
+      archiveView: {
+        label: 'The “Archive (number)” button',
+        text: 'At the top, next to “New invitation”: shows your archived invitations. “Back to invitations” returns to the usual list.',
+      },
       followUp: {
         label: 'Create the full invitation',
         text: 'On a save-the-date: creates the full invitation with the same details and links the two once it’s published.',
@@ -40,10 +59,46 @@ export const helpEn: typeof helpHe = {
       },
     },
   },
+  overview: {
+    title: 'Your invitation: what each thing does',
+    items: {
+      tabs: {
+        label: 'The tabs',
+        text: 'Overview, guests & WhatsApp sending, RSVPs and sharing. “Edit the design” opens the editor full screen.',
+      },
+      stats: {
+        label: 'The numbers',
+        text: 'How many guests are on the list, how many received the invitation, how many are coming, can’t come or haven’t replied.',
+      },
+      import: {
+        label: 'Upload your guest list from Excel',
+        text: 'A file with names and phones. Each guest gets a personal link, and their form comes prefilled.',
+      },
+      send: {
+        label: 'Send on WhatsApp to all your guests',
+        text: 'Sends to everyone who hasn’t got it yet, from the system’s official number. See who got it, opened it and replied.',
+      },
+      steps: {
+        label: 'The way to a perfect invitation',
+        text: 'The five steps in order. A done step has a ✓, and tapping a step takes you there.',
+      },
+      link: {
+        label: 'The invitation link',
+        text: 'The general link, to copy. Once published it works for anyone who gets it.',
+      },
+      publish: {
+        label: 'Publish / Open the invitation',
+        text: 'At the top, next to the name: on a draft, “Publish” opens the publish window. Once live, “Open the invitation” shows it as guests see it.',
+      },
+    },
+  },
   gallery: {
     title: 'Choosing a design: what each button does',
     items: {
-      filter: { label: 'Event type', text: 'Shows only the designs that suit the event you chose.' },
+      filter: {
+        label: 'Event type',
+        text: 'Shows only the designs that suit the event you chose. The number next to each type: how many designs it has.',
+      },
       language: { label: 'Hebrew / English', text: 'Which language the design previews are shown in.' },
       preview: {
         label: 'Clicking a design',
@@ -60,6 +115,65 @@ export const helpEn: typeof helpHe = {
       use: {
         label: 'Use this design',
         text: 'A short wizard: event type, names and date, and language. Then the editor opens with everything ready.',
+      },
+    },
+  },
+  preview: {
+    title: 'Preview: what each button does',
+    items: {
+      phone: {
+        label: 'The phone',
+        text: 'The sample invitation, live: scroll and tap it exactly like a guest.',
+      },
+      language: { label: 'Hebrew / English', text: 'Which language the sample invitation is shown in.' },
+      palettes: {
+        label: 'Colors',
+        text: 'Ready color sets for this design. Your choice carries over to your invitation, and you can change it later.',
+      },
+      fonts: {
+        label: 'Fonts',
+        text: 'Font pairs for the names and the text, in Hebrew and English. “More fonts” opens a library of extra pairs.',
+      },
+      demo: {
+        label: 'Live demo in a new tab',
+        text: 'The sample invitation full screen, with the envelope, the music and the animations.',
+      },
+      use: {
+        label: 'Use this design',
+        text: 'Continues to the short wizard, with the colors and fonts you picked here.',
+      },
+    },
+  },
+  wizard: {
+    title: 'New invitation: what each step does',
+    items: {
+      eventType: {
+        label: 'Event type',
+        text: 'Decides which names we ask for and which ready texts go into the invitation. You can change it later in “Event details”.',
+      },
+      names: {
+        label: 'The names',
+        text: 'What appears at the top of the invitation: two names for a wedding or an engagement; for a bar or bat mitzvah, the celebrant and (optionally) the parents.',
+      },
+      date: {
+        label: 'Date and time',
+        text: 'When the event starts. The countdown, the Hebrew date and the calendar reminder are built from them.',
+      },
+      timezone: {
+        label: 'Time zone',
+        text: 'For an event abroad: guests see the time of the place where it happens.',
+      },
+      languages: {
+        label: 'Language',
+        text: 'Hebrew, English or both. With both, guests switch between them with one tap, and you fill in the names in each.',
+      },
+      steps: {
+        label: 'Continue / Back',
+        text: 'Three short steps. Going back keeps everything you filled in.',
+      },
+      create: {
+        label: 'Create the invitation',
+        text: 'Creates a draft with the design’s texts and opens the editor. Nothing is sent to guests until you publish.',
       },
     },
   },
@@ -80,6 +194,14 @@ export const helpEn: typeof helpHe = {
         label: 'Preview language',
         text: 'In a two-language invitation: which language the preview shows. Fill in every field in both.',
       },
+      replay: {
+        label: 'Replay opening',
+        text: 'Under the preview: plays the envelope opening and the animations again.',
+      },
+      openTab: {
+        label: 'Open in a new tab',
+        text: 'Under the preview: the saved draft full screen, to check it as a guest would.',
+      },
       versions: {
         label: 'Versions',
         text: 'Every publish is kept as a version. You can restore an earlier one.',
@@ -88,6 +210,14 @@ export const helpEn: typeof helpHe = {
       publish: {
         label: 'Publish',
         text: 'Checks nothing is missing, you choose an address, and it goes live. After changes press it again; the link stays the same.',
+      },
+      premium: {
+        label: 'The “Premium” tag',
+        text: 'Shows when the design belongs to the Pro and Business plans: edit as usual, and publish after upgrading.',
+      },
+      mobileTabs: {
+        label: 'The bottom bar (on phones)',
+        text: 'Edit: the sections and their forms. Preview: the live invitation. Design: colors, fonts, envelope and music. Publish: the publish window.',
       },
       assistant: {
         label: 'The assistant',
@@ -112,21 +242,219 @@ export const helpEn: typeof helpHe = {
         text: 'Gallery, gifts, transport, accommodation, FAQ, free text and more.',
       },
       issues: {
-        label: 'A red / yellow dot',
-        text: 'Red: something required is missing before publishing. Yellow: a warning or a missing translation.',
+        label: 'A yellow / red dot',
+        text: 'Yellow: something in the section to check, like an empty field or a missing translation. Red (after trying to publish): something that must be fixed before publishing.',
       },
       menu: {
         label: 'A section’s ⋯ menu',
-        text: 'Move up or down, duplicate and delete (right after deleting you can undo).',
+        text: 'Above the form: move up or down, duplicate and delete (right after deleting you can undo).',
       },
       design: {
         label: 'The Design tab',
-        text: 'Colors, fonts (including the “More fonts” library), the envelope and opening, and music.',
+        text: 'Colors, fonts (including the “More fonts” library), the envelope and opening, and music. Each has its own “?”.',
       },
       settings: {
         label: 'The Settings tab',
         text: 'Event details (names, date and time), languages, and sharing: the address and how the invitation looks when sent.',
       },
+    },
+  },
+  designPalette: {
+    title: 'Colors: what each thing does',
+    items: {
+      presets: {
+        label: 'Color sets',
+        text: 'Colors that go together, made for this design. One tap replaces them all at once.',
+      },
+      swatch: {
+        label: 'The color square',
+        text: 'Opens a color picker for one color: the background, the text, the accent and more.',
+      },
+      hex: { label: 'Color code', text: 'Have an exact color (e.g. #A0703F)? Type it here.' },
+      contrast: {
+        label: 'AA ✓ / Low ⚠',
+        text: 'Whether the text is readable on its background. “Low” means a darker or lighter color would be better.',
+      },
+      reset: { label: 'Back to the design’s colors', text: 'Undoes every color change.' },
+    },
+  },
+  designFonts: {
+    title: 'Fonts: what each thing does',
+    items: {
+      pairs: {
+        label: 'A font pair',
+        text: 'A font for the names and headings and one for the text, in Hebrew and English. The sample is written with your names.',
+      },
+      more: { label: 'More fonts', text: 'A library of extra font pairs that suit any design.' },
+      live: {
+        label: 'In the preview',
+        text: 'Your choice shows in the preview right away. ↶ brings back the previous one.',
+      },
+    },
+  },
+  designCover: {
+    title: 'Envelope and opening: what each thing does',
+    items: {
+      enabled: {
+        label: 'Opening envelope',
+        text: 'The first screen: guests tap and the envelope opens. Off — the invitation opens straight away.',
+      },
+      monogram: {
+        label: 'Monogram',
+        text: 'Short letters on the seal or the card, e.g. N&I. The number of characters depends on the design.',
+      },
+      seal: { label: 'Seal color', text: 'The color of the wax seal, from the colors that suit the design.' },
+      hint: { label: 'Hint text', text: 'The line that invites a tap, e.g. “Tap to open”.' },
+      replay: { label: 'Replay opening', text: 'Plays the envelope opening again in the preview.' },
+    },
+  },
+  designMusic: {
+    title: 'Music: what each thing does',
+    items: {
+      enabled: {
+        label: 'Background music',
+        text: 'Starts when a guest opens the invitation. Guests always have a mute button.',
+      },
+      tracks: {
+        label: 'The tracks',
+        text: 'The design’s own music. ▶ plays 10 seconds here, without changing anything.',
+      },
+      custom: {
+        label: 'Your own song',
+        text: 'An MP3 up to 10MB. Tick that you have the rights to it, then you can upload.',
+      },
+      videoSound: {
+        label: 'The background video’s sound',
+        text: 'When the main screen’s background is a video: play its own sound instead of a song.',
+      },
+      volume: { label: 'Volume', text: 'How loud the music plays for your guests.' },
+      startAt: {
+        label: 'Start at second',
+        text: 'Skip a long intro: the song starts from the second you choose.',
+      },
+    },
+  },
+  settingsEvent: {
+    title: 'Event details: what each field does',
+    items: {
+      type: {
+        label: 'Event type',
+        text: 'Decides which names show (e.g. two names for a wedding). The options are the ones the design suits.',
+      },
+      names: {
+        label: 'Names',
+        text: 'They update everywhere in the invitation: the main screen, the ending and the link you send.',
+      },
+      joiner: { label: 'Between the names', text: 'What goes between the two names, e.g. & or “and”.' },
+      parents: {
+        label: 'Parents’ names',
+        text: 'Optional. They show at the end of the invitation when turned on in the “Ending” section.',
+      },
+      date: {
+        label: 'Date and times',
+        text: 'An end time earlier than the start time is on the next day (an event that ends after midnight).',
+      },
+      timezone: {
+        label: 'Time zone',
+        text: 'For an event abroad. It affects the countdown and the calendar reminder.',
+      },
+      hebrewDate: {
+        label: 'Hebrew date',
+        text: 'By the day, “the eve of…” for an event that starts in the evening, or no Hebrew date.',
+      },
+      timeFormat: {
+        label: 'Time format',
+        text: '24-hour (19:30) or 12-hour (7:30 PM). “By language” picks for you.',
+      },
+      deadline: {
+        label: 'RSVP deadline',
+        text: 'After this date the form closes, and guests see a message that the deadline has passed.',
+      },
+    },
+  },
+  settingsLanguages: {
+    title: 'Languages: what each button does',
+    items: {
+      add: {
+        label: 'Add a language',
+        text: 'Makes the invitation bilingual. The design’s texts are translated for you; you complete the names and the other details.',
+      },
+      remove: {
+        label: 'Remove a language',
+        text: 'Deletes every text in that language from the draft. You can undo with ↶.',
+      },
+      default: {
+        label: 'The language that opens first',
+        text: 'Which language the invitation opens in. Guests switch to the other one with a tap.',
+      },
+      tabs: {
+        label: 'עב | EN next to each field',
+        text: 'Switch languages in any field. An orange dot on a language: its translation is missing.',
+      },
+    },
+  },
+  settingsShare: {
+    title: 'Link and sharing: what each thing does',
+    items: {
+      address: {
+        label: 'Invitation address',
+        text: 'The link you’ll send. Copy copies it; it starts working once you publish. You change it in the publish window.',
+      },
+      publishNow: { label: 'Publish now', text: 'Opens the publish window.' },
+      card: {
+        label: 'Share title and description',
+        text: 'What shows in the link preview on WhatsApp. Empty = the names, the date and the venue.',
+      },
+      image: {
+        label: 'Share image',
+        text: 'The picture in the link preview. Empty = an image made from the invitation for you.',
+      },
+      noindex: {
+        label: 'Hide from search engines',
+        text: 'Best left on: only people who got the link will reach the invitation.',
+      },
+    },
+  },
+  publish: {
+    title: 'Publishing: what each thing does',
+    items: {
+      slug: {
+        label: 'Invitation address',
+        text: 'The link you’ll send: English letters, numbers and hyphens. Once you’ve sent it, better not change it — the old link stops working.',
+      },
+      errors: {
+        label: 'To fix (red)',
+        text: 'Things that block publishing, like an empty required field or a missing translation. Click a row to go straight to the field.',
+      },
+      warnings: {
+        label: 'Worth checking (yellow)',
+        text: 'Warnings that don’t block, e.g. a date that has passed or an empty section. You can publish with them.',
+      },
+      card: {
+        label: 'How the link looks on WhatsApp',
+        text: 'The title, description and picture shown in the chat. Change them in Settings → “Link and sharing”.',
+      },
+      publish: {
+        label: 'The “Publish” button',
+        text: 'The invitation goes live at this address. Each publish is kept as a version, and later changes are published at the same link.',
+      },
+      after: {
+        label: 'After publishing',
+        text: 'Copy the link, open the invitation, send it on WhatsApp, and the share screen with a QR code and a ready message.',
+      },
+    },
+  },
+  versions: {
+    title: 'Versions: what each button does',
+    items: {
+      version: { label: 'Version', text: 'Every publish is kept as a version, with its date and time.' },
+      live: { label: 'Live', text: 'The version guests see right now.' },
+      view: { label: 'View', text: 'Opens that version in a new tab, without changing anything.' },
+      restore: {
+        label: 'Restore to draft',
+        text: 'Replaces the draft with this version. Guests won’t see it until you publish again.',
+      },
+      undo: { label: 'Changed your mind?', text: 'After restoring you can undo with ↶ in the top bar.' },
     },
   },
   responses: {
@@ -142,15 +470,19 @@ export const helpEn: typeof helpHe = {
       },
       export: {
         label: 'Export to Excel',
-        text: 'Downloads all replies to a file, with dietary preferences and answers.',
+        text: 'Downloads all replies to a file, with dietary preferences and answers. Works from the first reply.',
       },
       search: {
         label: 'Search and filter',
         text: 'Find a guest by name, or filter: coming, not coming, with a message.',
       },
+      chips: {
+        label: 'Active filters',
+        text: 'Each filter from the “Filter” menu shows as a tag under the search. ✕ removes it, and “Clear filters” removes them all.',
+      },
       row: {
-        label: 'Clicking a row',
-        text: 'Opens all the details of the reply. You can also delete it there.',
+        label: 'Clicking a reply',
+        text: 'Opens all its details (on a phone: tap the card). You can also delete it there.',
       },
       charts: {
         label: 'The charts',
@@ -170,6 +502,10 @@ export const helpEn: typeof helpHe = {
       whatsapp: {
         label: 'Send on WhatsApp',
         text: 'Opens your WhatsApp with the message, and you choose whom to send it to.',
+      },
+      copyMessage: {
+        label: 'Copy the message',
+        text: 'Copies the whole message with the link, to paste in a text, an email or any app.',
       },
       guests: {
         label: 'A personal link for each guest',

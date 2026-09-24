@@ -37,13 +37,18 @@ const QR_OPTIONS = {
 
 /**
  * Everything the share screen shows for a published invitation (§7.7, §9B.3-F), from the published
- * document — what guests actually get. null while the invitation isn't published.
+ * document — what guests actually get. null while the invitation isn't published. `publicBaseUrl`:
+ * the address the host sees (requestBaseUrl()); the configured one when absent.
  */
-export async function shareData(inv: OwnerInvitation, entry: TemplateEntry): Promise<ShareData | null> {
+export async function shareData(
+  inv: OwnerInvitation,
+  entry: TemplateEntry,
+  publicBaseUrl?: string,
+): Promise<ShareData | null> {
   const doc = inv.published;
   if (!doc || inv.status !== 'published') return null;
   const env = serverEnv();
-  const base = env.INVITES_PUBLIC_BASE_URL.replace(/\/+$/, '');
+  const base = (publicBaseUrl ?? env.INVITES_PUBLIC_BASE_URL).replace(/\/+$/, '');
   const url = `${base}/i/${inv.slug}`;
   const version = ogVersion(doc);
   const ordered = [doc.defaultLocale, ...doc.locales.filter((l) => l !== doc.defaultLocale)];

@@ -1,6 +1,22 @@
 'use client';
 
-import { Bell, Check, Clock, Download, Filter, Mail, Search, Share2, Trash2, Users, X } from 'lucide-react';
+import {
+  Archive,
+  Bell,
+  Check,
+  ChevronLeft,
+  Clock,
+  Download,
+  Filter,
+  Mail,
+  MessageSquareQuote,
+  Search,
+  Send,
+  Share2,
+  Trash2,
+  Users,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
@@ -13,17 +29,20 @@ import {
   Dialog,
   Drawer,
   EmptyState,
+  Hint,
   Input,
   KpiCard,
   Menu,
+  PageHeader,
   Segmented,
   Tag,
+  cn,
   useToast,
   type DataTableColumn,
 } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { hostApi, loginUrl } from '../api';
-import { InvitationNav } from '../InvitationNav';
+import { publishHref } from '../workspace/paths';
 import type { DietaryKey } from '../../contracts/types';
 import {
   NOTIFY_MODES,
@@ -190,56 +209,100 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
     const counts = questionBreakdown(list, q);
     return counts ? [{ q, counts }] : [];
   });
+  // the Filter menu's choices, shown as removable chips while they narrow the list
+  const menuFilters = [
+    ...(withMessage ? [{ key: 'message', label: r.withMessage, clear: () => setWithMessage(false) }] : []),
+    ...(withDietary ? [{ key: 'dietary', label: r.withDietary, clear: () => setWithDietary(false) }] : []),
+  ];
+  const filtering = menuFilters.length > 0 || status !== 'all' || query.trim() !== '';
+  const clearAll = () => {
+    setWithMessage(false);
+    setWithDietary(false);
+    setStatus('all');
+    setQuery('');
+  };
+
+  const statusBadge = (x: DashboardResponse) =>
+    x.attending ? <Badge variant="live">{r.attending}</Badge> : <Badge variant="danger">{r.declined}</Badge>;
 
   return (
     <>
-      <InvitationNav
-        id={data.id}
-        title={data.title}
-        dateLine={data.dateLine}
-        published={data.status === 'published'}
-        current="responses"
-      />
+      {/* the invitation's header and tabs come from its workspace layout */}
       <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1">
-              <h1 className="text-[22px] font-bold tracking-[-.01em]">{r.title}</h1>
-              <HelpFor area="responses" />
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Menu
-              trigger={
-                <Button variant="secondary" icon={<Bell />}>
-                  {r.notify.label}: {r.notify[notify]}
-                </Button>
-              }
-              items={NOTIFY_MODES.map((mode) => ({
-                label: r.notify[mode],
-                icon: mode === notify ? <Check /> : <span />,
-                onSelect: () => void saveNotify(mode),
-              }))}
-            />
-            <Button icon={<Download />} asChild>
-              <a href={exportHref} download={exportFileName(data.slug)}>
-                {r.export}
-              </a>
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          size="section"
+          title={r.title}
+          help={<HelpFor area="responses" />}
+          actions={
+            <>
+              <Menu
+                trigger={
+                  <Button variant="secondary" icon={<Bell />}>
+                    {r.notify.label}: {r.notify[notify]}
+                  </Button>
+                }
+                items={NOTIFY_MODES.map((mode) => ({
+                  label: r.notify[mode],
+                  icon: mode === notify ? <Check /> : <span />,
+                  onSelect: () => void saveNotify(mode),
+                }))}
+              />
+              {list.length ? (
+                <Hint text={r.exportHelp}>
+                  <Button icon={<Download />} asChild>
+                    <a href={exportHref} download={exportFileName(data.slug)}>
+                      {r.export}
+                    </a>
+                  </Button>
+                </Hint>
+              ) : (
+                // nothing to export yet: disabled, and it says why (hover or keyboard focus)
+                <Hint text={r.exportHelp} disabledText={r.exportEmpty}>
+                  <Button icon={<Download />} disabled>
+                    {r.export}
+                  </Button>
+                </Hint>
+              )}
+            </>
+          }
+        />
 
         {list.length === 0 ? (
           <Card className="mt-6">
-            <EmptyState
-              title={r.emptyTitle}
-              description={r.emptyBody}
-              action={
-                <Button icon={<Share2 />} asChild>
-                  <Link href={`/app/invitations/${data.id}/share`}>{r.share}</Link>
-                </Button>
-              }
-            />
+            {data.status === 'draft' ? (
+              <EmptyState
+                illustration={<RepliesArt />}
+                title={r.emptyDraftTitle}
+                description={r.emptyDraftBody}
+                action={
+                  <Button icon={<Send className="icon-dir" />} asChild>
+                    <Link href={publishHref(data.id)}>{r.toPublish}</Link>
+                  </Button>
+                }
+              />
+            ) : data.status === 'archived' ? (
+              <EmptyState
+                illustration={<RepliesArt />}
+                title={r.emptyArchivedTitle}
+                description={r.emptyArchivedBody}
+                action={
+                  <Button variant="secondary" icon={<Archive />} asChild>
+                    <Link href="/app/invitations">{r.toList}</Link>
+                  </Button>
+                }
+              />
+            ) : (
+              <EmptyState
+                illustration={<RepliesArt />}
+                title={r.emptyTitle}
+                description={r.emptyBody}
+                action={
+                  <Button icon={<Share2 />} asChild>
+                    <Link href={`/app/invitations/${data.id}/share`}>{r.share}</Link>
+                  </Button>
+                }
+              />
+            )}
           </Card>
         ) : (
           <>
@@ -342,12 +405,14 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
                       variant="secondary"
                       size="sm"
                       icon={<Filter />}
-                      aria-pressed={withMessage || withDietary}
+                      aria-pressed={menuFilters.length > 0}
                     >
                       {r.filter}
-                      {withMessage || withDietary
-                        ? ` (${(withMessage ? 1 : 0) + (withDietary ? 1 : 0)})`
-                        : ''}
+                      {menuFilters.length ? (
+                        <span className="grid min-w-5 place-items-center rounded-full bg-ink px-1 text-[11px] leading-5 text-white tabular-nums">
+                          {number(menuFilters.length)}
+                        </span>
+                      ) : null}
                     </Button>
                   }
                   items={[
@@ -361,7 +426,7 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
                       icon: withDietary ? <Check /> : <span />,
                       onSelect: () => setWithDietary((v) => !v),
                     },
-                    ...(withMessage || withDietary
+                    ...(menuFilters.length
                       ? [
                           { type: 'separator' as const },
                           {
@@ -377,14 +442,115 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
                   ]}
                 />
               </div>
+              {filtering ? (
+                // what narrows the list: the menu's filters as removable chips, and how many are shown
+                <div
+                  className="flex flex-wrap items-center gap-2 border-t border-line bg-canvas/70 px-3 py-2 text-[12.5px]"
+                  data-testid="active-filters"
+                >
+                  <span className="font-semibold text-muted" aria-live="polite">
+                    {fmt(r.showing, { shown: number(rows.length), total: number(list.length) })}
+                  </span>
+                  {menuFilters.length ? (
+                    <ul aria-label={r.activeFilters} className="flex flex-wrap gap-1.5">
+                      {menuFilters.map((f) => (
+                        <li key={f.key}>
+                          <span className="inline-flex h-7 items-center gap-1 rounded-full border border-brand-line bg-brand-soft ps-2.5 pe-1 font-semibold text-brand-deep">
+                            {f.label}
+                            <button
+                              type="button"
+                              onClick={f.clear}
+                              aria-label={fmt(r.removeFilter, { name: f.label })}
+                              className="grid size-5 place-items-center rounded-full hover:bg-brand hover:text-white"
+                            >
+                              <X aria-hidden className="size-3.5" />
+                            </button>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={clearAll}
+                    className="ms-auto rounded-btn px-2 py-1 font-semibold text-brand-deep hover:bg-brand-soft"
+                  >
+                    {r.clearFilters}
+                  </button>
+                </div>
+              ) : null}
               <DataTable
+                className="max-md:hidden"
                 caption={r.tableCaption}
                 columns={columns}
                 rows={rows}
                 getRowKey={(x) => x.id}
                 onRowClick={(x) => setOpenId(x.id)}
+                rowLabel={(x) => fmt(r.openReply, { name: x.name })}
+                rowData={(x) => ({ 'data-response-row': x.id })}
                 empty={<p className="py-10 text-center text-[14px] text-muted">{r.noMatches}</p>}
               />
+              {/* phones: one card per reply instead of a wide table */}
+              <ul className="divide-y divide-line border-t border-line md:hidden" aria-label={r.tableCaption}>
+                {rows.length ? (
+                  rows.map((x) => {
+                    const tags = replyDietary(x);
+                    return (
+                      <li key={x.id} data-response-card={x.id}>
+                        <button
+                          type="button"
+                          onClick={() => setOpenId(x.id)}
+                          aria-label={fmt(r.openReply, { name: x.name })}
+                          className="flex w-full items-start gap-3 px-4 py-3.5 text-start transition-colors hover:bg-row-hover focus-visible:bg-row-hover focus-visible:-outline-offset-2"
+                        >
+                          <span
+                            aria-hidden
+                            className={cn(
+                              'grid size-10 shrink-0 place-items-center rounded-full text-[15px] font-bold',
+                              x.attending ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger',
+                            )}
+                          >
+                            {x.name.trim()[0] ?? '?'}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="flex items-center gap-2">
+                              <span className="truncate text-[14.5px] font-semibold">
+                                <bdi>{x.name}</bdi>
+                              </span>
+                              {statusBadge(x)}
+                            </span>
+                            <span className="mt-0.5 block text-[12.5px] text-muted">
+                              {x.attending
+                                ? `${plural(t.common.adults, x.adults, { n: number(x.adults) })} · ${plural(t.common.children, x.children, { n: number(x.children) })} · `
+                                : ''}
+                              {x.receivedLabel}
+                            </span>
+                            {tags.length ? (
+                              <span className="mt-1.5 flex flex-wrap gap-1">
+                                {tags.map((k) => (
+                                  <Tag key={k}>{dietLabel(k)}</Tag>
+                                ))}
+                              </span>
+                            ) : null}
+                            {x.message ? (
+                              <span className="mt-1.5 flex items-start gap-1.5 text-[13px] text-ink/80">
+                                <MessageSquareQuote
+                                  aria-hidden
+                                  className="mt-0.5 size-3.5 shrink-0 text-faint"
+                                />
+                                <span className="line-clamp-2">{x.message}</span>
+                              </span>
+                            ) : null}
+                          </span>
+                          <ChevronLeft aria-hidden className="icon-dir mt-3 size-4 shrink-0 text-faint" />
+                        </button>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li className="py-10 text-center text-[14px] text-muted">{r.noMatches}</li>
+                )}
+              </ul>
             </Card>
           </>
         )}
@@ -578,5 +744,26 @@ function ResponseDrawer({
         }
       />
     </>
+  );
+}
+
+/** Empty-state illustration: a reply card with a check, and a few more on their way (decorative). */
+function RepliesArt() {
+  return (
+    <svg viewBox="0 0 120 120" fill="none">
+      <rect x="30" y="22" width="64" height="80" rx="10" fill="#F6EDE1" stroke="#EAD8C0" strokeWidth="2" />
+      <rect x="22" y="30" width="64" height="80" rx="10" fill="#fff" stroke="#EAD8C0" strokeWidth="2" />
+      <circle cx="54" cy="58" r="14" fill="#F0FDF4" stroke="#86EFAC" strokeWidth="2" />
+      <path
+        d="m47.5 58 4.5 4.5 9-9"
+        stroke="#15803D"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect x="38" y="82" width="32" height="5" rx="2.5" fill="#EAD8C0" />
+      <rect x="44" y="92" width="20" height="5" rx="2.5" fill="#F3E7D6" />
+      <path d="M96 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#A0703F" />
+    </svg>
   );
 }
