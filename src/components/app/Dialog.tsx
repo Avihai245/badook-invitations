@@ -20,6 +20,8 @@ export type DialogProps = {
   footer?: ReactNode;
   /** When set, shows a close (X) button with this aria-label. Esc and overlay click always close. */
   closeLabel?: string;
+  /** Next to the close button: the dialog's "?" (what each of its controls does). */
+  help?: ReactNode;
   /** Direction of the portalled dialog. Defaults to the nearest `DirProvider`, then `<html dir>`. */
   dir?: Dir;
   className?: string;
@@ -40,6 +42,7 @@ export function Dialog({
   children,
   footer,
   closeLabel,
+  help,
   dir: dirProp,
   className,
 }: DialogProps) {
@@ -73,13 +76,18 @@ export function Dialog({
                   </RadixDialog.Description>
                 )}
               </div>
-              {closeLabel && (
-                <RadixDialog.Close asChild>
-                  <IconButton label={closeLabel} className="-me-2 -mt-1.5">
-                    <X />
-                  </IconButton>
-                </RadixDialog.Close>
-              )}
+              {closeLabel || help != null ? (
+                <div className="-me-2 -mt-1.5 flex shrink-0 items-center gap-0.5">
+                  {help}
+                  {closeLabel && (
+                    <RadixDialog.Close asChild>
+                      <IconButton label={closeLabel}>
+                        <X />
+                      </IconButton>
+                    </RadixDialog.Close>
+                  )}
+                </div>
+              ) : null}
             </div>
             {children != null && <div className="mt-5">{children}</div>}
             {footer != null && (

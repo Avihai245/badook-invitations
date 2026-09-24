@@ -1,6 +1,6 @@
 'use client';
 
-import type { CSSProperties, KeyboardEvent, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Skeleton } from './Skeleton';
 import { cn } from './utils';
 
@@ -25,8 +25,13 @@ export type DataTableProps<T> = {
   columns: readonly DataTableColumn<T>[];
   rows: readonly T[];
   getRowKey: (row: T, index: number) => string | number;
-  /** Makes rows clickable (pointer + Enter/Space when focused). */
+  /**
+   * Makes rows clickable: the whole row with a pointer, and a real button in the row's first cell for
+   * keyboards and screen readers (Tab, then Enter/Space).
+   */
   onRowClick?: (row: T, index: number) => void;
+  /** The accessible name of a clickable row's button, e.g. "פרטי התשובה של דנה כהן" (default: its cell). */
+  rowLabel?: (row: T, index: number) => string;
   /** Rendered in a full-width cell when `rows` is empty (e.g. `<EmptyState>`). */
   empty?: ReactNode;
   /** Shows skeleton rows instead of data. */
@@ -56,6 +61,7 @@ export function DataTable<T>({
   rows,
   getRowKey,
   onRowClick,
+  rowLabel,
   empty,
   loading = false,
   skeletonRows = 5,
@@ -66,11 +72,8 @@ export function DataTable<T>({
   const alignOf = (c: DataTableColumn<T>) => ALIGN[c.align ?? (c.numeric ? 'center' : 'start')];
   const widthOf = (c: DataTableColumn<T>): CSSProperties | undefined =>
     c.width !== undefined ? { width: c.width } : undefined;
-  const onKey = (row: T, index: number) => (event: KeyboardEvent<HTMLTableRowElement>) => {
-    if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return;
-    event.preventDefault();
-    onRowClick?.(row, index);
-  };
+  const cellOf = (c: DataTableColumn<T>, row: T, index: number) =>
+    c.cell ? c.cell(row, index) : defaultCell(row, c.key);
 
   return (
     <div className={cn('overflow-x-auto', className)}>
@@ -120,15 +123,14 @@ export function DataTable<T>({
               <tr
                 key={getRowKey(row, index)}
                 {...rowData?.(row, index)}
+                // the pointer: anywhere on the row (the button below is the row for keyboards and AT)
                 onClick={onRowClick ? () => onRowClick(row, index) : undefined}
-                onKeyDown={onRowClick ? onKey(row, index) : undefined}
-                tabIndex={onRowClick ? 0 : undefined}
                 className={cn(
                   'transition-colors duration-100 hover:bg-row-hover motion-reduce:transition-none',
-                  onRowClick && 'cursor-pointer focus-visible:bg-row-hover focus-visible:-outline-offset-2',
+                  onRowClick && 'cursor-pointer has-[:focus-visible]:bg-row-hover',
                 )}
               >
-                {columns.map((c) => (
+                {columns.map((c, ci) => (
                   <td
                     key={c.key}
                     style={widthOf(c)}
@@ -139,7 +141,22 @@ export function DataTable<T>({
                       c.className,
                     )}
                   >
-                    {c.cell ? c.cell(row, index) : defaultCell(row, c.key)}
+                    {onRowClick && ci === 0 ? (
+                      <button
+                        type="button"
+                        aria-label={rowLabel?.(row, index)}
+                        data-row-action=""
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onRowClick(row, index);
+                        }}
+                        className="-m-1 max-w-full rounded-[6px] p-1 text-start [font:inherit] text-inherit focus-visible:outline-2 focus-visible:outline-offset-0"
+                      >
+                        {cellOf(c, row, index)}
+                      </button>
+                    ) : (
+                      cellOf(c, row, index)
+                    )}
                   </td>
                 ))}
               </tr>

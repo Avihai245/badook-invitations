@@ -3,6 +3,7 @@
 import { Tooltip } from 'radix-ui';
 import type { ComponentProps, ReactNode } from 'react';
 import { useDir } from './direction';
+import { DisabledTrigger } from './Hint';
 import { cn, iconSlot } from './utils';
 
 export type IconButtonProps = Omit<ComponentProps<'button'>, 'children' | 'aria-label'> & {
@@ -15,6 +16,8 @@ export type IconButtonProps = Omit<ComponentProps<'button'>, 'children' | 'aria-
   /** Also show `label` in a tooltip on hover/focus. */
   tooltip?: boolean;
   tooltipSide?: 'top' | 'bottom';
+  /** With `tooltip`: what the tooltip says while the button is disabled (why), e.g. "Nothing to undo". */
+  disabledTooltip?: string;
 };
 
 /** app.html `.icon-btn`: muted icon, subtle background + ink on hover, `aria-pressed` = on state. */
@@ -24,6 +27,7 @@ export function IconButton({
   size = 'md',
   tooltip = false,
   tooltipSide = 'bottom',
+  disabledTooltip,
   className,
   type = 'button',
   disabled,
@@ -47,12 +51,18 @@ export function IconButton({
       {children}
     </button>
   );
-  return tooltip ? (
-    <WithTooltip label={label} side={tooltipSide}>
-      {button}
+  if (!tooltip) return button;
+  return (
+    <WithTooltip label={disabled && disabledTooltip ? disabledTooltip : label} side={tooltipSide}>
+      {disabled ? (
+        // a disabled button gets no pointer events: the wrapper takes the hover (not a tab stop)
+        <DisabledTrigger focusable={false} className="rounded-btn">
+          {button}
+        </DisabledTrigger>
+      ) : (
+        button
+      )}
     </WithTooltip>
-  ) : (
-    button
   );
 }
 

@@ -20,6 +20,8 @@ export type DrawerProps = {
   children?: ReactNode;
   /** Sticky footer (actions), end-aligned. */
   footer?: ReactNode;
+  /** Next to the close button: the panel's "?" (what each of its controls does). */
+  help?: ReactNode;
   /**
    * Direction of the portalled panel. Defaults to the nearest `DirProvider`, then `<html dir>`.
    * The panel is attached to the inline-END edge: right in LTR, left in RTL.
@@ -44,6 +46,7 @@ export function Drawer({
   closeLabel,
   children,
   footer,
+  help,
   dir: dirProp,
   className,
 }: DrawerProps) {
@@ -76,11 +79,14 @@ export function Drawer({
                   </RadixDialog.Description>
                 )}
               </div>
-              <RadixDialog.Close asChild>
-                <IconButton label={closeLabel}>
-                  <X />
-                </IconButton>
-              </RadixDialog.Close>
+              <div className="flex shrink-0 items-center gap-0.5">
+                {help}
+                <RadixDialog.Close asChild>
+                  <IconButton label={closeLabel}>
+                    <X />
+                  </IconButton>
+                </RadixDialog.Close>
+              </div>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5">{children}</div>
             {footer != null && (
