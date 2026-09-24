@@ -10,7 +10,7 @@
 //   app env: NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 //            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=local-publishable  SUPABASE_SECRET_KEY=local-secret
 import { createHmac, randomBytes, randomUUID, scryptSync, timingSafeEqual } from 'node:crypto';
-import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, join, normalize } from 'node:path';
 import { Readable } from 'node:stream';
@@ -45,6 +45,12 @@ const FUNCTIONS = new Set([
   'billing_apply',
   'account_by_billing',
   'credits_add',
+  'checkout_create',
+  'checkout_attach',
+  'checkout_get',
+  'checkout_complete',
+  'billing_history',
+  'billing_overdue',
   'owner_guests',
   'import_guests',
   'update_guest',
@@ -297,6 +303,19 @@ async function auth(req, res, path, query) {
     const row = await userById(claims.sub);
     return row ? send(res, 200, userJson(row)) : authError(res, 403, 'user_not_found', 'User not found');
   }
+  // ── admin (service role): what the server does with auth.admin.* ──
+  const admin = /^admin\/users\/([0-9a-f-]{36})$/.exec(path);
+  if (admin) {
+    if (ROLES[req.headers.apikey] !== 'service_role') return authError(res, 403, 'not_admin', 'User not allowed');
+    if (req.method === 'DELETE') {
+      const deleted = await pool.query('delete from auth.users where id = $1', [admin[1]]);
+      return deleted.rowCount ? send(res, 200, {}) : authError(res, 404, 'user_not_found', 'User not found');
+    }
+    if (req.method === 'GET') {
+      const row = await userById(admin[1]);
+      return row ? send(res, 200, userJson(row)) : authError(res, 404, 'user_not_found', 'User not found');
+    }
+  }
   if (req.method === 'POST' && path === 'logout') return send(res, 204);
   if (req.method === 'POST' && path === 'recover') return send(res, 200, {});
   return authError(res, 404, 'not_found', 'not found');
@@ -358,6 +377,40 @@ async function storage(req, res, rest, query) {
     uploadTokens.delete(query.get('token'));
     return send(res, 200, { Key: key, Id: randomUUID() });
   }
+  m = /^object\/list\/([a-z0-9-]+)$/.exec(rest);
+  if (m && req.method === 'POST') {
+    if (ROLES[req.headers.apikey] !== 'service_role') return send(res, 403, { error: 'Unauthorized' });
+    const { prefix = '' } = await readBody(req);
+    let names = [];
+    try {
+      names = readdirSync(storagePath(m[1], prefix), { withFileTypes: true }).filter((d) => !d.name.endsWith('.type'));
+    } catch {
+      names = [];
+    }
+    // like Supabase: folders come back with id null
+    return send(
+      res,
+      200,
+      names.map((d) => ({ name: d.name, id: d.isDirectory() ? null : randomUUID(), metadata: d.isDirectory() ? null : {} })),
+    );
+  }
+  m = /^object\/([a-z0-9-]+)$/.exec(rest);
+  if (m && req.method === 'DELETE') {
+    if (ROLES[req.headers.apikey] !== 'service_role') return send(res, 403, { error: 'Unauthorized' });
+    const { prefixes = [] } = await readBody(req);
+    const removed = [];
+    for (const path of prefixes) {
+      try {
+        const target = storagePath(m[1], path);
+        rmSync(target, { force: true });
+        rmSync(`${target}.type`, { force: true });
+        removed.push({ name: path });
+      } catch {
+        // not there
+      }
+    }
+    return send(res, 200, removed);
+  }
   m = /^object\/public\/([a-z0-9-]+)\/(.+)$/.exec(rest);
   if (m && (req.method === 'GET' || req.method === 'HEAD')) {
     try {
@@ -405,7 +458,7 @@ createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
     let m = /^\/rest\/v1\/rpc\/([a-z_]+)$/.exec(url.pathname);
     if (m) return await rpc(req, res, m[1]);
-    m = /^\/auth\/v1\/([a-z]+)$/.exec(url.pathname);
+    m = /^\/auth\/v1\/([a-z_]+(?:\/[A-Za-z0-9_-]+)*)$/.exec(url.pathname);
     if (m) return await auth(req, res, m[1], url.searchParams);
     m = /^\/storage\/v1\/(.+)$/.exec(url.pathname);
     if (m) return await storage(req, res, m[1], url.searchParams);

@@ -5,6 +5,7 @@ import {
   createFollowUp,
   createInvitation,
   createUpload,
+  duplicate,
   publish,
   restoreVersion,
   saveDraft,
@@ -422,5 +423,59 @@ describe('slug, restore, archive', () => {
     expect((await setArchived(USER, ID, { archived: true }, d)).body).toMatchObject({ status: 'archived' });
     expect(d.revalidate).toHaveBeenCalledWith('noa-and-itay');
     expect((await setArchived(USER, ID, {}, d)).status).toBe(400);
+  });
+});
+
+describe('the plan’s limits', () => {
+  const limits = (
+    over: Partial<{ activeInvitations: number | null; used: number; premiumTemplates: boolean }> = {},
+  ) => vi.fn(async () => ({ activeInvitations: 1, used: 0, premiumTemplates: false, ...over }));
+
+  it('a new invitation needs room in the plan (free: one active at a time)', async () => {
+    const full = { ...deps(), entitlements: limits({ used: 1 }) };
+    expect(await createInvitation(USER, wizard(), full)).toEqual({
+      status: 402,
+      body: { ok: false, code: 'plan_limit', limit: 1 },
+    });
+    expect(full.db.create).not.toHaveBeenCalled();
+    const room = { ...deps(), entitlements: limits({ used: 0 }) };
+    expect((await createInvitation(USER, wizard(), room)).status).toBe(201);
+    const unlimited = { ...deps(), entitlements: limits({ activeInvitations: null, used: 40 }) };
+    expect((await createInvitation(USER, wizard(), unlimited)).status).toBe(201);
+  });
+
+  it('duplicating and bringing back from the archive count too; archiving never does', async () => {
+    const full = {
+      ...deps({ get: vi.fn(async () => invitation({ status: 'archived' })) }),
+      entitlements: limits({ used: 1 }),
+    };
+    expect((await duplicate(USER, ID, full)).status).toBe(402);
+    expect((await setArchived(USER, ID, { archived: false }, full)).status).toBe(402);
+    expect((await setArchived(USER, ID, { archived: true }, full)).status).toBe(200);
+    // a save-the-date's full invitation is part of the same event
+    const followUp = {
+      ...deps({
+        get: vi.fn(async () => invitation({ status: 'archived', sourceSlug: 'noa-save-the-date' })),
+      }),
+      entitlements: limits({ used: 1 }),
+    };
+    expect((await setArchived(USER, ID, { archived: false }, followUp)).status).toBe(200);
+  });
+
+  it('a premium design is published only on a plan that includes it', async () => {
+    const base = getTemplate('sahar-bordeaux')!;
+    const premium = { ...base, manifest: { ...base.manifest, tier: 'premium' } } as typeof base;
+    const free = {
+      ...deps({ get: vi.fn(async () => invitation()) }),
+      template: () => premium,
+      entitlements: limits({ premiumTemplates: false }),
+    };
+    expect(await publish(USER, ID, {}, free)).toEqual({
+      status: 402,
+      body: { ok: false, code: 'premium_template' },
+    });
+    expect(free.db.publish).not.toHaveBeenCalled();
+    const pro = { ...free, entitlements: limits({ premiumTemplates: true }) };
+    expect((await publish(USER, ID, {}, pro)).status).toBe(200);
   });
 });

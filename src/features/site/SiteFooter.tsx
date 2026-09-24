@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { BrandLogo } from '@/components/app';
 import { fmt, type AppDict } from '@/lib/i18n/app';
-import { CookieSettingsButton } from './CookieConsent.client';
+import { CookieConsent, CookieSettingsButton } from './CookieConsent.client';
 
-/** The public site's footer: the brand, the home page's sections, the policies and contact. */
+/** The public site's footer: the brand, the home page's sections, the policies and contact — and the
+ * cookie notice, which the public pages show until the visitor chooses. */
 export function SiteFooter({ t, onHome = false }: { t: AppDict; onHome?: boolean }) {
   const f = t.site.footer;
   const n = t.site.nav;
@@ -11,6 +12,8 @@ export function SiteFooter({ t, onHome = false }: { t: AppDict; onHome?: boolean
   const link = 'rounded-btn text-muted transition-colors hover:text-ink';
   return (
     <footer className="border-t border-line bg-surface">
+      {/* the public site's pages ask for consent; the app itself sets essential cookies only */}
+      <CookieConsent />
       <div className="mx-auto grid max-w-[1200px] gap-10 px-5 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <BrandLogo label={t.brand} className="text-[18px]" />

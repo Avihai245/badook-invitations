@@ -78,6 +78,8 @@ export default defineConfig({
             INVITES_WHATSAPP_APP_SECRET: 'e2e-whatsapp-app-secret',
             INVITES_WHATSAPP_VERIFY_TOKEN: 'e2e-whatsapp-verify',
             INVITES_ADMIN_EMAILS: 'wa-admin-mobile@example.com,wa-admin-desktop@example.com',
+            // billing through our own test payment page instead of PayPlus (tests/e2e/billing.spec.ts)
+            INVITES_BILLING_TEST_MODE: 'true',
           },
           timeout: 120_000,
         },

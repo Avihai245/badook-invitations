@@ -1,4 +1,5 @@
 import { timingSafeEqual } from 'node:crypto';
+import { reportOverdue } from '@/features/billing/server/billing';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { serverEnv } from '@/lib/env';
 import { invitationsEnabled } from '@/lib/feature';
@@ -29,7 +30,9 @@ export async function POST(request: Request) {
     // once a day, also what the privacy policy promises about keeping data
     const { data: purged, error } = await serviceDb().rpc('purge_expired');
     if (error) console.error('purge_expired failed', error.message);
-    return Response.json({ ...digests, purged: purged ?? null }, { headers: NO_STORE });
+    // and tells support about paid plans whose monthly renewal never arrived
+    const overdue = await reportOverdue().catch((err) => (console.error('billing_overdue failed', err), null));
+    return Response.json({ ...digests, purged: purged ?? null, overdue }, { headers: NO_STORE });
   } catch (err) {
     console.error('RSVP digest failed', err);
     return Response.json({ error: 'server_error' }, { status: 500, headers: NO_STORE });

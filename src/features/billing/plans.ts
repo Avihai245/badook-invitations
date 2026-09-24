@@ -60,16 +60,29 @@ export interface AccountPlanState {
   planRenewsAt: string | null;
 }
 
+const DAY = 86_400_000;
+/** How long a paid plan stays after a renewal that never came (a failed charge, a lost notice). */
+export const RENEWAL_GRACE_DAYS = 14;
+
 /**
- * The plan in force now: a canceled subscription keeps its plan until the end of the paid period;
- * the platform's admins always have the top plan.
+ * The plan in force now: a canceled subscription keeps its plan until the end of the paid period; a
+ * renewal that never came keeps it for a two-week grace; the platform's admins always have the top plan.
  */
 export function effectivePlan(state: AccountPlanState, now: number, admin = false): PlanId {
   if (admin) return 'business';
   if (state.plan === 'free') return 'free';
-  if (state.planStatus !== 'canceled') return state.plan;
-  return state.planRenewsAt && Date.parse(state.planRenewsAt) > now ? state.plan : 'free';
+  const renews = state.planRenewsAt ? Date.parse(state.planRenewsAt) : null;
+  if (state.planStatus === 'canceled') return renews && renews > now ? state.plan : 'free';
+  if (renews && renews + RENEWAL_GRACE_DAYS * DAY < now) return 'free';
+  return state.plan;
 }
+
+/** The products sold: the two paid plans (monthly) and the message packs (once). */
+export const PRODUCTS = ['pro', 'business', 'credits_100', 'credits_300', 'credits_1000'] as const;
+export type Product = (typeof PRODUCTS)[number];
+export const isProduct = (v: unknown): v is Product => PRODUCTS.includes(v as Product);
+export const packOf = (p: Product): CreditPack | null =>
+  p.startsWith('credits_') ? (Number(p.slice(8)) as CreditPack) : null;
 
 /** The price of one WhatsApp message in shekels (Meta's marketing rate, converted, up to the agora). */
 export function messagePriceIls(priceUsd: number, usdToIls: number): number {

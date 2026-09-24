@@ -5,7 +5,6 @@ import { UiProvider } from '@/lib/i18n/client';
 import { getUiLocale } from '@/lib/i18n/server';
 import { A11Y_BOOT } from '@/features/site/a11y';
 import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';
-import { CookieConsent } from '@/features/site/CookieConsent.client';
 import '@/styles/app.css';
 
 export const metadata: Metadata = {
@@ -31,7 +30,6 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
         <UiProvider locale={locale}>
           {children}
           <AccessibilityMenu />
-          <CookieConsent />
         </UiProvider>
       </body>
     </html>

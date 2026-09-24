@@ -42,6 +42,8 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
   const [slugState, setSlugState] = useState<SlugState>('current');
   const [phase, setPhase] = useState<'review' | 'publishing' | 'done'>('review');
   const [error, setError] = useState<string | null>(null);
+  // the design is premium and the plan doesn't include it
+  const [premium, setPremium] = useState(false);
   const base = publicBaseUrl.replace(/\/+$/, '');
   const url = `${base}/i/${phase === 'done' ? meta.slug : slug}`;
 
@@ -111,6 +113,7 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
     setPhase('review');
     if (res.status === 409) setSlugState('taken');
     else if (res.status === 422) setShowIssues(true);
+    else if (res.status === 402) setPremium(true);
     else setError(p.failed);
   };
 
@@ -290,6 +293,19 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
         {error ? (
           <p role="alert" className="rounded-input bg-danger/10 px-3 py-2 text-[13px] text-danger">
             {error}
+          </p>
+        ) : null}
+        {premium ? (
+          <p
+            role="alert"
+            data-testid="premium-needed"
+            className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-input border border-brand-line bg-brand-soft px-3 py-2.5 text-[13px]"
+          >
+            <span className="font-semibold">{t.billing.upgrade.premiumTitle}:</span>
+            {t.billing.upgrade.premiumBody}
+            <Link href="/app/billing" className="font-semibold text-brand-deep underline">
+              {t.billing.upgrade.cta}
+            </Link>
           </p>
         ) : null}
       </div>

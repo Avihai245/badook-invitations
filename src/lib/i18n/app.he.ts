@@ -1,4 +1,6 @@
 import { editorHe } from './editor.he';
+import { accountHe } from './account.he';
+import { billingHe } from './billing.he';
 import { guestsHe } from './guests.he';
 import { siteHe } from './site.he';
 
@@ -11,6 +13,8 @@ export const he = {
   brand: 'Badook',
   guests: guestsHe,
   site: siteHe,
+  billing: billingHe,
+  accountPage: accountHe,
   editor: editorHe,
   common: {
     close: 'סגירה',
@@ -42,7 +46,15 @@ export const he = {
     people: { one: 'איש אחד', other: '{n} אנשים' },
   },
   shell: {
-    nav: { invitations: 'ההזמנות שלי', newInvitation: 'הזמנה חדשה' },
+    nav: {
+      label: 'ניווט ראשי',
+      invitations: 'ההזמנות שלי',
+      newInvitation: 'הזמנה חדשה',
+      billing: 'חבילה וחיובים',
+      account: 'החשבון שלי',
+      help: 'עזרה',
+    },
+    userMenu: 'תפריט החשבון',
     uiLanguage: 'שפת הממשק',
     account: 'החשבון שלי',
     signOut: 'יציאה',
@@ -400,8 +412,9 @@ export const he = {
     notPublishedBody: 'פרסמו אותה מהעורך — ואז יהיה כאן קישור לשיתוף, הודעה מוכנה וקוד QR.',
     toEditor: 'לעורך',
     guestsTitle: 'קישור אישי לכל מוזמן',
-    guestsBody: 'העלו את רשימת המוזמנים מאקסל — כל אחד יקבל קישור עם השם שלו, הטופס יגיע ממולא ותראו מי פתח ומי אישר.',
-    toGuests: 'לרשימת המוזמנים'
+    guestsBody:
+      'העלו את רשימת המוזמנים מאקסל — כל אחד יקבל קישור עם השם שלו, הטופס יגיע ממולא ותראו מי פתח ומי אישר.',
+    toGuests: 'לרשימת המוזמנים',
   },
 };
 

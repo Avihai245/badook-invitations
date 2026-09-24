@@ -1,11 +1,11 @@
-import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { BrandLogo, Button } from '@/components/app';
+import { BrandLogo } from '@/components/app';
+import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';
 import { getUi } from '@/lib/i18n/server';
 import { getSessionUser } from '@/lib/supabase/session';
-import { signOut } from '../../(auth)/actions';
 import { UiLanguageToggle } from '../../UiLanguageToggle';
+import { ShellLinks, UserMenu } from './ShellNav.client';
 
 /** Host-app chrome for the list, gallery, responses and share pages (the editor is full-screen). */
 export default async function ShellLayout({ children }: { children: ReactNode }) {
@@ -23,33 +23,11 @@ export default async function ShellLayout({ children }: { children: ReactNode })
           <Link href="/app/invitations" className="rounded-btn text-[18px]">
             <BrandLogo label={t.brand} />
           </Link>
-          <nav aria-label={t.shell.account} className="flex items-center gap-1 text-[14px] max-sm:hidden">
-            <Link
-              href="/app/invitations"
-              className="rounded-btn px-3 py-1.5 font-semibold text-ink hover:bg-subtle"
-            >
-              {t.shell.nav.invitations}
-            </Link>
-          </nav>
-          <div className="ms-auto flex items-center gap-3">
+          <ShellLinks />
+          <div className="ms-auto flex items-center gap-2 sm:gap-3">
             <UiLanguageToggle />
-            {user?.email ? (
-              <span className="hidden max-w-[220px] truncate text-[13px] text-muted md:inline" dir="ltr">
-                {user.email}
-              </span>
-            ) : null}
-            <form action={signOut}>
-              <Button
-                type="submit"
-                variant="ghost"
-                size="sm"
-                icon={<LogOut className="icon-dir" />}
-                aria-label={t.shell.signOut}
-                title={t.shell.signOut}
-              >
-                <span className="max-sm:sr-only">{t.shell.signOut}</span>
-              </Button>
-            </form>
+            <AccessibilityMenu placement="header" />
+            <UserMenu email={user?.email ?? null} />
           </div>
         </div>
       </header>

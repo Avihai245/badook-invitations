@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
+import { UpgradeDialog, upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
 import {
   Button,
   Dialog,
@@ -101,6 +102,7 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
   const [attempted, setAttempted] = useState({ 2: false, 3: false });
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [upgrade, setUpgrade] = useState<UpgradeReason | null>(null);
 
   const formId = useId();
   const headingId = useId();
@@ -171,6 +173,12 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
         return;
       }
       const body = (await res.json().catch(() => null)) as { ok?: boolean; id?: string } | null;
+      const limit = upgradeReason(res.status, body);
+      if (limit) {
+        setCreating(false);
+        setUpgrade(limit);
+        return;
+      }
       if (res.ok && body?.ok && body.id) {
         // The skeleton stays up until the editor replaces this page.
         router.push(`/app/invitations/${body.id}/edit`);
@@ -228,216 +236,226 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
   const title = [w.step1, w.step2, w.step3][step - 1];
   const templateName = manifest.name[ui] ?? manifest.name.en ?? manifest.id;
   return (
-    <Dialog
-      open
-      onOpenChange={(open) => !open && !creating && onClose()}
-      title={fmt(w.title, { template: templateName })}
-      description={
-        <span className="flex items-center gap-2.5">
-          <span aria-hidden className="flex items-center gap-1.5">
-            {[1, 2, 3].map((n) => (
-              <span
-                key={n}
-                className={cn(
-                  'h-1.5 rounded-full transition-[width,background-color] duration-200 motion-reduce:transition-none',
-                  n === step ? 'w-5 bg-ink' : n < step ? 'w-1.5 bg-ink/60' : 'w-1.5 bg-line',
-                )}
-              />
-            ))}
+    <>
+      {upgrade ? <UpgradeDialog reason={upgrade} onClose={() => setUpgrade(null)} /> : null}
+      <Dialog
+        open
+        onOpenChange={(open) => !open && !creating && onClose()}
+        title={fmt(w.title, { template: templateName })}
+        description={
+          <span className="flex items-center gap-2.5">
+            <span aria-hidden className="flex items-center gap-1.5">
+              {[1, 2, 3].map((n) => (
+                <span
+                  key={n}
+                  className={cn(
+                    'h-1.5 rounded-full transition-[width,background-color] duration-200 motion-reduce:transition-none',
+                    n === step ? 'w-5 bg-ink' : n < step ? 'w-1.5 bg-ink/60' : 'w-1.5 bg-line',
+                  )}
+                />
+              ))}
+            </span>
+            {fmt(w.progress, { step })}
           </span>
-          {fmt(w.progress, { step })}
-        </span>
-      }
-      closeLabel={creating ? undefined : t.common.close}
-      footer={
-        creating ? null : (
-          <>
-            {step > 1 ? (
-              <Button variant="ghost" onClick={() => setStep((s) => (s === 3 ? 2 : 1))}>
-                {t.common.back}
+        }
+        closeLabel={creating ? undefined : t.common.close}
+        footer={
+          creating ? null : (
+            <>
+              {step > 1 ? (
+                <Button variant="ghost" onClick={() => setStep((s) => (s === 3 ? 2 : 1))}>
+                  {t.common.back}
+                </Button>
+              ) : null}
+              <Button type="submit" form={formId}>
+                {step === 3 ? w.create : t.common.next}
               </Button>
-            ) : null}
-            <Button type="submit" form={formId}>
-              {step === 3 ? w.create : t.common.next}
-            </Button>
-          </>
-        )
-      }
-    >
-      {creating ? (
-        <div role="status" className="flex items-center gap-4 py-2">
-          <Skeleton width={72} height={128} radius={14} />
-          <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-            <p className="text-[15px] font-semibold">{w.creating}</p>
-            <Skeleton shape="line" width="70%" />
-            <Skeleton shape="line" width="45%" />
+            </>
+          )
+        }
+      >
+        {creating ? (
+          <div role="status" className="flex items-center gap-4 py-2">
+            <Skeleton width={72} height={128} radius={14} />
+            <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+              <p className="text-[15px] font-semibold">{w.creating}</p>
+              <Skeleton shape="line" width="70%" />
+              <Skeleton shape="line" width="45%" />
+            </div>
           </div>
-        </div>
-      ) : (
-        <form ref={form} id={formId} onSubmit={submit} noValidate>
-          <h3 ref={heading} id={headingId} tabIndex={-1} className="mb-4 text-[16px] font-bold outline-none">
-            {title}
-          </h3>
-
-          {step === 1 ? (
-            <div
-              role="radiogroup"
-              aria-labelledby={headingId}
-              onKeyDown={rovingKeyDown}
-              className="grid grid-cols-2 gap-2"
+        ) : (
+          <form ref={form} id={formId} onSubmit={submit} noValidate>
+            <h3
+              ref={heading}
+              id={headingId}
+              tabIndex={-1}
+              className="mb-4 text-[16px] font-bold outline-none"
             >
-              {types.map((type) => {
-                const Icon = EVENT_ICONS[type];
-                const on = type === eventType;
-                return (
-                  <button
-                    key={type}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    tabIndex={on ? 0 : -1}
-                    data-roving-item=""
-                    onClick={() => setEventType(type)}
-                    className={cn(
-                      'flex h-16 items-center gap-3 rounded-card border px-4 text-start text-[14px] font-semibold',
-                      'transition-[background-color,border-color] duration-150 motion-reduce:transition-none',
-                      on ? 'border-ink bg-subtle ring-1 ring-ink' : 'border-line bg-surface hover:bg-subtle',
-                    )}
-                  >
-                    <Icon aria-hidden strokeWidth={1.75} className="size-[22px] shrink-0 text-muted" />
-                    {t.eventTypes[type]}
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
+              {title}
+            </h3>
 
-          {step === 2 ? (
-            <div className="flex flex-col gap-4">
-              {eventType === 'birthday' ? (
-                <div className="grid grid-cols-[2fr_1fr] gap-4">
-                  {nameInputs(first, attempted[2])}
-                  <Field
-                    label={w.fields.age}
-                    help={w.fields.ageHint}
-                    error={ageInvalid ? w.errors.age : undefined}
-                  >
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      min={1}
-                      max={120}
-                      value={age}
-                      onChange={(e) => setAge(e.target.value)}
-                      dir="ltr"
-                    />
-                  </Field>
-                </div>
-              ) : (
-                nameInputs(first, attempted[2])
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <Field
-                  label={w.fields.date}
-                  required
-                  error={attempted[2] && !date ? w.errors.date : undefined}
-                >
-                  <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} dir="ltr" />
-                </Field>
-                <Field
-                  label={w.fields.startTime}
-                  required
-                  error={attempted[2] && !startTime ? w.errors.time : undefined}
-                >
-                  <Input
-                    type="time"
-                    step={300}
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    dir="ltr"
-                  />
-                </Field>
-              </div>
-              <Field label={w.fields.timezone}>
-                <Select value={timezone} onChange={(e) => setTimezone(e.target.value)} dir="ltr">
-                  {zones.map((z) => (
-                    <option key={z.id} value={z.id}>
-                      {z.label}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-            </div>
-          ) : null}
-
-          {step === 3 ? (
-            <div className="flex flex-col gap-5">
+            {step === 1 ? (
               <div
                 role="radiogroup"
                 aria-labelledby={headingId}
                 onKeyDown={rovingKeyDown}
-                className={cn('grid gap-2', supported.length > 1 ? 'grid-cols-3' : 'grid-cols-1')}
+                className="grid grid-cols-2 gap-2"
               >
-                {[...supported, ...(supported.length > 1 ? (['both'] as const) : [])].map((option) => {
-                  const on = option === languages;
+                {types.map((type) => {
+                  const Icon = EVENT_ICONS[type];
+                  const on = type === eventType;
                   return (
                     <button
-                      key={option}
+                      key={type}
                       type="button"
                       role="radio"
                       aria-checked={on}
                       tabIndex={on ? 0 : -1}
                       data-roving-item=""
-                      onClick={() => {
-                        setLanguages(option);
-                        if (option !== 'both') setDefaultLocale(option);
-                      }}
+                      onClick={() => setEventType(type)}
                       className={cn(
-                        'flex min-h-16 flex-col items-center justify-center gap-1 rounded-card border px-3 py-3 text-center',
+                        'flex h-16 items-center gap-3 rounded-card border px-4 text-start text-[14px] font-semibold',
                         'transition-[background-color,border-color] duration-150 motion-reduce:transition-none',
                         on
                           ? 'border-ink bg-subtle ring-1 ring-ink'
                           : 'border-line bg-surface hover:bg-subtle',
                       )}
                     >
-                      <span
-                        className="text-[15px] font-semibold"
-                        lang={option === 'both' ? undefined : option}
-                      >
-                        {w.languages[option]}
-                      </span>
-                      {option === 'both' ? (
-                        <span className="text-[12px] leading-snug text-muted">{w.languages.bothHint}</span>
-                      ) : null}
+                      <Icon aria-hidden strokeWidth={1.75} className="size-[22px] shrink-0 text-muted" />
+                      {t.eventTypes[type]}
                     </button>
                   );
                 })}
               </div>
-              {languages === 'both' ? (
-                <Field label={w.languages.default}>
-                  <Segmented<Locale>
-                    value={defaultLocale}
-                    onValueChange={setDefaultLocale}
-                    options={supported.map((l) => ({ value: l, label: w.languages[l] }))}
-                  />
-                </Field>
-              ) : null}
-              {others.map((l) => (
-                <fieldset key={l} className="flex flex-col gap-3 rounded-card border border-line p-4">
-                  <legend className="px-1 text-[13px] font-bold text-muted">{w.fields.namesIn[l]}</legend>
-                  {nameInputs(l, attempted[3])}
-                </fieldset>
-              ))}
-            </div>
-          ) : null}
+            ) : null}
 
-          {error ? (
-            <p role="alert" className="mt-4 rounded-input bg-danger/10 px-3 py-2 text-[13px] text-danger">
-              {error}
-            </p>
-          ) : null}
-        </form>
-      )}
-    </Dialog>
+            {step === 2 ? (
+              <div className="flex flex-col gap-4">
+                {eventType === 'birthday' ? (
+                  <div className="grid grid-cols-[2fr_1fr] gap-4">
+                    {nameInputs(first, attempted[2])}
+                    <Field
+                      label={w.fields.age}
+                      help={w.fields.ageHint}
+                      error={ageInvalid ? w.errors.age : undefined}
+                    >
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        max={120}
+                        value={age}
+                        onChange={(e) => setAge(e.target.value)}
+                        dir="ltr"
+                      />
+                    </Field>
+                  </div>
+                ) : (
+                  nameInputs(first, attempted[2])
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <Field
+                    label={w.fields.date}
+                    required
+                    error={attempted[2] && !date ? w.errors.date : undefined}
+                  >
+                    <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} dir="ltr" />
+                  </Field>
+                  <Field
+                    label={w.fields.startTime}
+                    required
+                    error={attempted[2] && !startTime ? w.errors.time : undefined}
+                  >
+                    <Input
+                      type="time"
+                      step={300}
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      dir="ltr"
+                    />
+                  </Field>
+                </div>
+                <Field label={w.fields.timezone}>
+                  <Select value={timezone} onChange={(e) => setTimezone(e.target.value)} dir="ltr">
+                    {zones.map((z) => (
+                      <option key={z.id} value={z.id}>
+                        {z.label}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+              </div>
+            ) : null}
+
+            {step === 3 ? (
+              <div className="flex flex-col gap-5">
+                <div
+                  role="radiogroup"
+                  aria-labelledby={headingId}
+                  onKeyDown={rovingKeyDown}
+                  className={cn('grid gap-2', supported.length > 1 ? 'grid-cols-3' : 'grid-cols-1')}
+                >
+                  {[...supported, ...(supported.length > 1 ? (['both'] as const) : [])].map((option) => {
+                    const on = option === languages;
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        role="radio"
+                        aria-checked={on}
+                        tabIndex={on ? 0 : -1}
+                        data-roving-item=""
+                        onClick={() => {
+                          setLanguages(option);
+                          if (option !== 'both') setDefaultLocale(option);
+                        }}
+                        className={cn(
+                          'flex min-h-16 flex-col items-center justify-center gap-1 rounded-card border px-3 py-3 text-center',
+                          'transition-[background-color,border-color] duration-150 motion-reduce:transition-none',
+                          on
+                            ? 'border-ink bg-subtle ring-1 ring-ink'
+                            : 'border-line bg-surface hover:bg-subtle',
+                        )}
+                      >
+                        <span
+                          className="text-[15px] font-semibold"
+                          lang={option === 'both' ? undefined : option}
+                        >
+                          {w.languages[option]}
+                        </span>
+                        {option === 'both' ? (
+                          <span className="text-[12px] leading-snug text-muted">{w.languages.bothHint}</span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+                {languages === 'both' ? (
+                  <Field label={w.languages.default}>
+                    <Segmented<Locale>
+                      value={defaultLocale}
+                      onValueChange={setDefaultLocale}
+                      options={supported.map((l) => ({ value: l, label: w.languages[l] }))}
+                    />
+                  </Field>
+                ) : null}
+                {others.map((l) => (
+                  <fieldset key={l} className="flex flex-col gap-3 rounded-card border border-line p-4">
+                    <legend className="px-1 text-[13px] font-bold text-muted">{w.fields.namesIn[l]}</legend>
+                    {nameInputs(l, attempted[3])}
+                  </fieldset>
+                ))}
+              </div>
+            ) : null}
+
+            {error ? (
+              <p role="alert" className="mt-4 rounded-input bg-danger/10 px-3 py-2 text-[13px] text-danger">
+                {error}
+              </p>
+            ) : null}
+          </form>
+        )}
+      </Dialog>
+    </>
   );
 }

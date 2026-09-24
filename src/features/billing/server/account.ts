@@ -1,5 +1,6 @@
 import 'server-only';
 import type { User } from '@supabase/supabase-js';
+import type { Entitlements } from '@/features/invitations/server/host-api';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import { PLAN_LIMITS, effectivePlan, type PlanId, type PlanLimits } from '../plans';
@@ -13,6 +14,8 @@ export interface AccountRecord {
   planStatus: 'active' | 'trialing' | 'past_due' | 'canceled';
   planRenewsAt: string | null;
   billingProvider: string | null;
+  /** the provider's id of the monthly charge (server only — never sent to the browser) */
+  billingSubscriptionId: string | null;
   hasSubscription: boolean;
   credits: number;
   source: string;
@@ -103,6 +106,16 @@ export async function loadAccount(user: Pick<User, 'id' | 'email'>): Promise<Acc
   const admin = isAdminEmail(user.email);
   const effective = effectivePlan(record, Date.now(), admin);
   return { ...record, email: user.email ?? null, effective, limits: PLAN_LIMITS[effective], admin };
+}
+
+/** What the user's plan allows now — the host API's limits (invitations, premium designs). */
+export async function entitlementsFor(user: Pick<User, 'id' | 'email'>): Promise<Entitlements> {
+  const account = await loadAccount(user);
+  return {
+    activeInvitations: account.limits.activeInvitations,
+    used: account.activeInvitations,
+    premiumTemplates: account.limits.premiumTemplates,
+  };
 }
 
 /** Monthly plan prices (shekels incl. VAT) from the configuration. */

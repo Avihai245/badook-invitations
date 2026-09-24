@@ -32,12 +32,34 @@ const fail = (status: number, code: string, extra: Record<string, unknown> = {})
   body: { ok: false, code, ...extra },
 });
 
+/** What the signed-in host's plan allows right now (features/billing/plans.ts). */
+export interface Entitlements {
+  /** invitations that may be active at once; null = unlimited */
+  activeInvitations: number | null;
+  /** active now (not archived; a save-the-date's full invitation doesn't count) */
+  used: number;
+  premiumTemplates: boolean;
+}
+
 export interface HostDeps {
   db: HostDb;
   template(id: string): TemplateEntry | undefined;
   /** refreshes the cached public page /i/<slug> (all languages) */
   revalidate(slug: string): void;
   now(): number;
+  /** the host's plan limits (absent: nothing is limited) */
+  entitlements?(): Promise<Entitlements>;
+}
+
+/** A premium design (the gallery marks them): publishing one needs a paid plan. */
+export const isPremiumTemplate = (manifest: object) => (manifest as { tier?: unknown }).tier === 'premium';
+
+/** 402 when the plan has no room for one more active invitation. */
+async function noRoom(deps: HostDeps): Promise<ApiResult | null> {
+  const e = await deps.entitlements?.();
+  if (e && e.activeInvitations !== null && e.used >= e.activeInvitations)
+    return fail(402, 'plan_limit', { limit: e.activeInvitations });
+  return null;
 }
 
 // ─── create (wizard) ─────────────────────────────────────────────────────────────────────────────
@@ -93,6 +115,8 @@ export async function createInvitation(userId: string, raw: unknown, deps: HostD
   if (input.paletteId && !preset) bad.push('paletteId');
   if (input.fontPairId && !manifest.fontPairs.some((p) => p.id === input.fontPairId)) bad.push('fontPairId');
   if (bad.length) return fail(400, 'invalid', { issues: bad });
+  const limited = await noRoom(deps);
+  if (limited) return limited;
 
   const doc = seedDocument(manifest, defaults, {
     eventType: input.eventType,
@@ -234,6 +258,8 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
   // (share.slug is checked here too — the schema's slug format rule.)
   const { errors, warnings } = validateDocument(draft, entry.manifest, { mode: 'publish', now: deps.now() });
   if (errors.length) return fail(422, 'invalid', { issues: errors, warnings });
+  if (isPremiumTemplate(entry.manifest) && deps.entitlements && !(await deps.entitlements()).premiumTemplates)
+    return fail(402, 'premium_template');
   if (slug !== inv.slug) {
     const res = await deps.db.setSlug(id, userId, slug);
     if (!res) return fail(404, 'not_found');
@@ -284,6 +310,8 @@ export async function restoreVersion(
 // ─── duplicate / archive ─────────────────────────────────────────────────────────────────────────
 
 export async function duplicate(userId: string, id: string, deps: HostDeps): Promise<ApiResult> {
+  const limited = await noRoom(deps);
+  if (limited) return limited;
   const copy = await deps.db.duplicate(id, userId);
   return copy ? ok({ ok: true, ...copy }, 201) : fail(404, 'not_found');
 }
@@ -298,6 +326,14 @@ export async function setArchived(
 ): Promise<ApiResult> {
   const parsed = ArchiveSchema.safeParse(raw);
   if (!parsed.success) return fail(400, 'invalid');
+  if (!parsed.data.archived) {
+    // back from the archive: it counts again
+    const inv = await deps.db.get(id, userId);
+    if (inv?.status === 'archived' && !inv.sourceSlug) {
+      const limited = await noRoom(deps);
+      if (limited) return limited;
+    }
+  }
   const res = await deps.db.setArchived(id, userId, parsed.data.archived);
   if (!res) return fail(404, 'not_found');
   deps.revalidate(res.slug);

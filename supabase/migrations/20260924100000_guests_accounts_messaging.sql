@@ -52,6 +52,24 @@ create table public.billing_events (
   created_at timestamptz not null default now()
 );
 
+-- A purchase opened with the payment provider: what is bought, for whom and for how much, and the
+-- provider's payment-page request — the provider's callback is matched to it and checked against it.
+create table public.billing_checkouts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  product text not null
+    check (product in ('pro', 'business', 'credits_100', 'credits_300', 'credits_1000')),
+  amount numeric(10, 2) not null check (amount >= 0),
+  provider text not null check (char_length(provider) <= 40),
+  provider_ref text check (provider_ref is null or char_length(provider_ref) <= 200),
+  status text not null default 'pending' check (status in ('pending', 'paid', 'failed', 'canceled')),
+  created_at timestamptz not null default now(),
+  completed_at timestamptz
+);
+create index on public.billing_checkouts (user_id, created_at desc);
+create unique index billing_checkouts_provider_ref on public.billing_checkouts (provider, provider_ref)
+  where provider_ref is not null;
+
 -- ─── guests ─────────────────────────────────────────────────────────────────────────────────────
 
 -- The host's guest list for one invitation (imported from Excel/CSV or added by hand). `token` is the
@@ -153,8 +171,10 @@ alter table public.invitation_guests enable row level security;
 alter table public.whatsapp_messages enable row level security;
 alter table public.support_rate_events enable row level security;
 alter table public.contact_messages enable row level security;
+alter table public.billing_checkouts enable row level security;
 revoke all on public.accounts, public.credit_ledger, public.billing_events, public.invitation_guests,
-  public.whatsapp_messages, public.support_rate_events, public.contact_messages from anon, authenticated;
+  public.whatsapp_messages, public.support_rate_events, public.contact_messages, public.billing_checkouts
+  from anon, authenticated;
 
 -- ─── account functions ──────────────────────────────────────────────────────────────────────────
 
@@ -168,12 +188,16 @@ language sql stable set search_path = '' as $$
     'planStatus', a.plan_status,
     'planRenewsAt', a.plan_renews_at,
     'billingProvider', a.billing_provider,
+    'billingSubscriptionId', a.billing_subscription_id,
     'hasSubscription', a.billing_subscription_id is not null,
     'credits', a.message_credits,
     'source', a.source,
     'createdAt', a.created_at,
+    -- what the plan's limit counts: not archived, and not the full invitation of a save-the-date
+    -- (the two are one event)
     'activeInvitations', (
-      select count(*) from public.invitations i where i.owner_id = a.user_id and i.status <> 'archived'
+      select count(*) from public.invitations i
+      where i.owner_id = a.user_id and i.status <> 'archived' and i.source_id is null
     )
   )
 $$;
@@ -251,6 +275,91 @@ begin
   end if;
   return true;
 end $$;
+
+-- A new purchase for the user; returns its id (the provider page is attached next).
+create function public.checkout_create(p_user_id uuid, p_product text, p_amount numeric, p_provider text)
+returns uuid
+language sql security definer set search_path = '' as $$
+  insert into public.billing_checkouts (user_id, product, amount, provider)
+  values (p_user_id, p_product, p_amount, p_provider)
+  returning id
+$$;
+
+create function public.checkout_attach(p_id uuid, p_provider_ref text) returns void
+language sql security definer set search_path = '' as $$
+  update public.billing_checkouts set provider_ref = p_provider_ref where id = p_id and status = 'pending'
+$$;
+
+create function public.checkout_json(k public.billing_checkouts) returns jsonb
+language sql stable set search_path = '' as $$
+  select jsonb_build_object(
+    'id', k.id, 'userId', k.user_id, 'product', k.product, 'amount', k.amount, 'provider', k.provider,
+    'providerRef', k.provider_ref, 'status', k.status, 'createdAt', k.created_at, 'completedAt', k.completed_at
+  )
+$$;
+
+-- One purchase (for its owner when p_user_id is given, else any — the provider's callback).
+create function public.checkout_get(p_id uuid, p_user_id uuid) returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select public.checkout_json(k) from public.billing_checkouts k
+  where k.id = p_id and (p_user_id is null or k.user_id = p_user_id)
+$$;
+
+-- Settles a purchase once: paid → the account gets the plan / credits (billing_apply); failed or
+-- canceled → just recorded. { settled: false } when it was already settled.
+create function public.checkout_complete(
+  p_id uuid, p_status text, p_event_id text, p_patch jsonb, p_credits int, p_payload jsonb
+) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  k public.billing_checkouts;
+begin
+  if p_status not in ('paid', 'failed', 'canceled') then
+    raise exception 'bad status %', p_status;
+  end if;
+  update public.billing_checkouts set status = p_status, completed_at = now()
+  where id = p_id and status = 'pending'
+  returning * into k;
+  if not found then
+    return jsonb_build_object('settled', false);
+  end if;
+  if p_status = 'paid' then
+    perform public.billing_apply(p_event_id, k.provider, 'checkout.' || k.product, k.user_id, p_patch, p_credits,
+                                 p_payload);
+  else
+    insert into public.billing_events (id, provider, type, user_id, payload)
+    values (p_event_id, k.provider, 'checkout.' || p_status, k.user_id, coalesce(p_payload, '{}'))
+    on conflict (id) do nothing;
+  end if;
+  return jsonb_build_object('settled', true, 'userId', k.user_id, 'product', k.product);
+end $$;
+
+-- The billing screen's history: purchases and credit movements, newest first.
+create function public.billing_history(p_user_id uuid) returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object(
+    'checkouts', coalesce((
+      select jsonb_agg(public.checkout_json(k) order by k.created_at desc)
+      from (select * from public.billing_checkouts where user_id = p_user_id and status <> 'pending'
+            order by created_at desc limit 50) k
+    ), '[]'::jsonb),
+    'credits', coalesce((
+      select jsonb_agg(jsonb_build_object('delta', l.delta, 'reason', l.reason, 'at', l.created_at)
+                       order by l.created_at desc)
+      from (select * from public.credit_ledger where user_id = p_user_id order by created_at desc limit 50) l
+    ), '[]'::jsonb)
+  )
+$$;
+
+-- Paid plans whose renewal is overdue (the provider's renewal never arrived): support checks them.
+create function public.billing_overdue(p_days int) returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select coalesce(jsonb_agg(jsonb_build_object('userId', a.user_id, 'email', u.email, 'plan', a.plan,
+                                               'renewsAt', a.plan_renews_at)), '[]'::jsonb)
+  from public.accounts a join auth.users u on u.id = a.user_id
+  where a.plan <> 'free' and a.plan_status in ('active', 'past_due')
+    and a.plan_renews_at < now() - make_interval(days => p_days)
+$$;
 
 -- The account paying through this provider subscription / customer (webhooks without our user id).
 create function public.account_by_billing(p_provider text, p_subscription_id text, p_customer_id text)
@@ -830,6 +939,13 @@ begin
     'public.account_get(uuid)',
     'public.account_update(uuid, text, text)',
     'public.billing_apply(text, text, text, uuid, jsonb, int, jsonb)',
+    'public.checkout_create(uuid, text, numeric, text)',
+    'public.checkout_attach(uuid, text)',
+    'public.checkout_json(public.billing_checkouts)',
+    'public.checkout_get(uuid, uuid)',
+    'public.checkout_complete(uuid, text, text, jsonb, int, jsonb)',
+    'public.billing_history(uuid)',
+    'public.billing_overdue(int)',
     'public.account_by_billing(text, text, text)',
     'public.credits_add(uuid, int, text, text)',
     'public.guest_json(public.invitation_guests)',

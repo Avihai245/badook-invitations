@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { UpgradeDialog, upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
 import { useState, useTransition } from 'react';
 import { Badge, Button, EmptyState, IconButton, Menu, useToast, type BadgeVariant } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
@@ -38,6 +39,7 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
   const [showArchived, setShowArchived] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [followUp, setFollowUp] = useState<InvitationSummary | null>(null);
+  const [upgrade, setUpgrade] = useState<UpgradeReason | null>(null);
   const [, startTransition] = useTransition();
 
   const active = items.filter((i) => i.status !== 'archived');
@@ -49,6 +51,8 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
     const res = await hostApi<Record<string, unknown>>(url, { method: 'POST', body });
     setBusy(null);
     if (res.status === 401) return router.push(loginUrl());
+    const limit = upgradeReason(res.status, res.body);
+    if (limit) return setUpgrade(limit);
     if (!res.ok || !res.body) return void toast({ title: t.common.error, variant: 'danger' });
     toast({ title: done(res.body), variant: 'success' });
     startTransition(() => router.refresh());
@@ -113,6 +117,7 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
         />
       )}
       {followUp ? <FollowUpDialog item={followUp} onClose={() => setFollowUp(null)} /> : null}
+      {upgrade ? <UpgradeDialog reason={upgrade} onClose={() => setUpgrade(null)} /> : null}
     </div>
   );
 }

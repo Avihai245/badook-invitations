@@ -1,4 +1,6 @@
 import type { AppDict } from './app.he';
+import { accountEn } from './account.en';
+import { billingEn } from './billing.en';
 import { guestsEn } from './guests.en';
 import { siteEn } from './site.en';
 import { editorEn } from './editor.en';
@@ -8,6 +10,8 @@ export const en: AppDict = {
   brand: 'Badook',
   guests: guestsEn,
   site: siteEn,
+  billing: billingEn,
+  accountPage: accountEn,
   editor: editorEn,
   common: {
     close: 'Close',
@@ -37,7 +41,15 @@ export const en: AppDict = {
     people: { one: '1 person', other: '{n} people' },
   },
   shell: {
-    nav: { invitations: 'My invitations', newInvitation: 'New invitation' },
+    nav: {
+      label: 'Main navigation',
+      invitations: 'My invitations',
+      newInvitation: 'New invitation',
+      billing: 'Plan & billing',
+      account: 'My account',
+      help: 'Help',
+    },
+    userMenu: 'Account menu',
     uiLanguage: 'Interface language',
     account: 'My account',
     signOut: 'Sign out',
@@ -414,7 +426,8 @@ export const en: AppDict = {
       'Publish it from the editor — then you’ll find the link, a ready message and a QR code here.',
     toEditor: 'Open the editor',
     guestsTitle: 'A personal link for every guest',
-    guestsBody: 'Upload your guest list from Excel — each guest gets a link with their name, a prefilled form, and you see who opened and who replied.',
-    toGuests: 'To the guest list'
+    guestsBody:
+      'Upload your guest list from Excel — each guest gets a link with their name, a prefilled form, and you see who opened and who replied.',
+    toGuests: 'To the guest list',
   },
 };

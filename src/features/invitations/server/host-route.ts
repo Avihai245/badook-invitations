@@ -1,6 +1,7 @@
 import 'server-only';
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
+import { entitlementsFor } from '@/features/billing/server/account';
 import { invitationsEnabled } from '@/lib/feature';
 import { getSessionUser } from '@/lib/supabase/session';
 import { getTemplate } from '../templates/registry';
@@ -50,7 +51,10 @@ export async function hostRoute(
   const user = await getSessionUser();
   if (!user) return json(401, { ok: false, code: 'unauthorized' });
   try {
-    const result = await handler(user.id, body, hostDeps);
+    // the plan's limits, read only by the handlers that need them
+    let entitlements: ReturnType<typeof entitlementsFor> | null = null;
+    const deps: HostDeps = { ...hostDeps, entitlements: () => (entitlements ??= entitlementsFor(user)) };
+    const result = await handler(user.id, body, deps);
     return json(result.status, result.body);
   } catch (err) {
     console.error('[host api]', request.method, new URL(request.url).pathname, err);

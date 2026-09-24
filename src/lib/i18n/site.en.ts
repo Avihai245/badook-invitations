@@ -187,8 +187,10 @@ export const siteEn: typeof siteHe = {
   contact: {
     title: 'Contact us',
     description: 'A question, a request or something not working? Write to us and we’ll get back to you.',
-    subtitle: 'A question, a request or something not working? Write to us and we’ll get back to you soon, usually within one business day.',
-    assistant: 'A question about using the app? The smart assistant in the corner of the screen answers right away.',
+    subtitle:
+      'A question, a request or something not working? Write to us and we’ll get back to you soon, usually within one business day.',
+    assistant:
+      'A question about using the app? The smart assistant in the corner of the screen answers right away.',
     name: 'Name',
     email: 'Email',
     phone: 'Phone',
