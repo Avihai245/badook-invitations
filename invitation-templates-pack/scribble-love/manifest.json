@@ -1,0 +1,237 @@
+{
+  "id": "scribble-love",
+  "version": 2,
+  "name": {
+    "he": "שרבוט",
+    "en": "Scribble Love"
+  },
+  "description": {
+    "he": "קולאז׳ של פתקים, לא מושלם בכוונה — דף משבצות, לבבות משורבטים, עיגול טוש סביב התאריך, חצים עקומים, סלוטייפ צבעוני ומדבקות כוכבים.",
+    "en": "A notes-app collage, imperfect on purpose — grid paper, loop-scribble hearts, a marker circle around the date, wobbly arrows, washi tape and star stickers."
+  },
+  "tier": "standard",
+  "categories": [
+    "engagement",
+    "birthday",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/scribble-love/preview.webp",
+  "previewVideo": "/templates/scribble-love/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FBFAF6",
+      "surface": "#FFFFFF",
+      "ink": "#1F1F1F",
+      "inkMuted": "#6B6B67",
+      "accent": "#2F5BEA",
+      "accentInk": "#FFFFFF",
+      "line": "#DCE6F6",
+      "heroText": "#1F1F1F"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 999
+    },
+    "divider": "none"
+  },
+  "palettePresets": [
+    {
+      "id": "blue",
+      "name": {
+        "he": "עט כחול",
+        "en": "Blue pen"
+      },
+      "palette": {
+        "accent": "#2F5BEA"
+      }
+    },
+    {
+      "id": "coral",
+      "name": {
+        "he": "טוש קורל",
+        "en": "Coral marker"
+      },
+      "palette": {
+        "accent": "#CF3B29"
+      }
+    },
+    {
+      "id": "green",
+      "name": {
+        "he": "דיו ירוקה",
+        "en": "Green ink"
+      },
+      "palette": {
+        "accent": "#1E7F4F"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "doodle",
+      "display": {
+        "latin": "Shantell Sans",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "heading": {
+        "latin": "Shantell Sans",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "body": {
+        "latin": "Shantell Sans",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "notes",
+      "display": {
+        "latin": "Caveat",
+        "hebrew": "Amatic SC"
+      },
+      "heading": {
+        "latin": "Caveat",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/scribble-love/cover-poster.webp",
+    "posterDesktop": "/templates/scribble-love/cover-poster-desktop.webp",
+    "openVideo": "/templates/scribble-love/cover-open.mp4",
+    "openVideoDesktop": "/templates/scribble-love/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/scribble-love/sticker-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "print",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#FF6B5B",
+      "#2F5BEA",
+      "#F2C800"
+    ],
+    "monogramFont": {
+      "latin": "Shantell Sans",
+      "hebrew": "Playpen Sans Hebrew"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שולחן כתיבה עם פתקים ושרבוטים",
+          "en": "A desk of notes and doodles"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#1F1F1F",
+    "overlayColor": "#FBFAF6",
+    "defaultOverlay": 0.25
+  },
+  "music": {
+    "defaultTrackId": "scribble-love-theme",
+    "tracks": [
+      {
+        "id": "scribble-love-theme",
+        "title": "Doodle Pop (ukulele & claps)",
+        "url": "/templates/scribble-love/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 30,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/scribble-love/hero.mp4",
+    "hero-poster": "/templates/scribble-love/hero-poster.webp",
+    "hero-desktop": "/templates/scribble-love/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/scribble-love/hero-desktop-poster.webp",
+    "washi-band": "/templates/scribble-love/washi-band.webp",
+    "doodle-panorama": "/templates/scribble-love/doodle-panorama.webp",
+    "hearts": "/templates/scribble-love/hearts.webp",
+    "arrow": "/templates/scribble-love/arrow.webp",
+    "scribble-heart": "/templates/scribble-love/scribble-heart.webp"
+  },
+  "decorations": {
+    "afterHero": "template:washi-band",
+    "betweenVenues": "template:doodle-panorama",
+    "afterTimeline": "template:hearts",
+    "beforeRsvp": "template:arrow",
+    "footer": "template:scribble-heart"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

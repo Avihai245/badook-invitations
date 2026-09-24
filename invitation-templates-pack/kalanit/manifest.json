@@ -1,0 +1,237 @@
+{
+  "id": "kalanit",
+  "version": 2,
+  "name": {
+    "he": "כלנית",
+    "en": "Kalanit"
+  },
+  "description": {
+    "he": "כלניות אדומות על גבעות ירוקות, בהשראת \"דרום אדום\" — פרחים עגולים עם לב שחור, עלווה נוצתית וגבעות מתגלגלות. שמחה של אביב ישראלי.",
+    "en": "Red anemones on rolling green hills, inspired by the Darom Adom bloom — round petals with a black heart, feathery leaves and layered hills. Israeli spring joy."
+  },
+  "tier": "standard",
+  "categories": [
+    "wedding",
+    "engagement",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/kalanit/preview.webp",
+  "previewVideo": "/templates/kalanit/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F6F1E7",
+      "surface": "#FFFDF8",
+      "ink": "#1E1B18",
+      "inkMuted": "#6A635A",
+      "accent": "#D62839",
+      "accentInk": "#FFFFFF",
+      "line": "#E6DCC8",
+      "heroText": "#1E1B18"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink"
+    ],
+    "radius": {
+      "card": 18,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "red",
+      "name": {
+        "he": "אדום כלנית",
+        "en": "Anemone red"
+      },
+      "palette": {
+        "accent": "#D62839"
+      }
+    },
+    {
+      "id": "purple",
+      "name": {
+        "he": "כלנית סגולה",
+        "en": "Purple anemone"
+      },
+      "palette": {
+        "accent": "#7A3E9D"
+      }
+    },
+    {
+      "id": "coral",
+      "name": {
+        "he": "אלמוג",
+        "en": "Coral"
+      },
+      "palette": {
+        "accent": "#B8402E"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "meadow",
+      "display": {
+        "latin": "Fraunces",
+        "hebrew": "David Libre"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "David Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "David Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "sketch",
+      "display": {
+        "latin": "Amatic SC",
+        "hebrew": "Amatic SC"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/kalanit/cover-poster.webp",
+    "posterDesktop": "/templates/kalanit/cover-poster-desktop.webp",
+    "openVideo": "/templates/kalanit/cover-open.mp4",
+    "openVideoDesktop": "/templates/kalanit/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/kalanit/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#D62839",
+      "#7A3E9D",
+      "#5E7A30"
+    ],
+    "monogramFont": {
+      "latin": "Fraunces",
+      "hebrew": "David Libre"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "גבעות כלניות בשעת זהב",
+          "en": "Anemone hills at golden hour"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#1E1B18",
+    "overlayColor": "#FFFDF8",
+    "defaultOverlay": 0.4
+  },
+  "music": {
+    "defaultTrackId": "kalanit-theme",
+    "tracks": [
+      {
+        "id": "kalanit-theme",
+        "title": "Darom Adom (acoustic guitar)",
+        "url": "/templates/kalanit/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/kalanit/hero.mp4",
+    "hero-poster": "/templates/kalanit/hero-poster.webp",
+    "hero-desktop": "/templates/kalanit/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/kalanit/hero-desktop-poster.webp",
+    "anemone-band": "/templates/kalanit/anemone-band.webp",
+    "hills-panorama": "/templates/kalanit/hills-panorama.webp",
+    "anemone-bunch": "/templates/kalanit/anemone-bunch.webp",
+    "bud-sprig": "/templates/kalanit/bud-sprig.webp",
+    "anemone": "/templates/kalanit/anemone.webp"
+  },
+  "decorations": {
+    "afterHero": "template:anemone-band",
+    "betweenVenues": "template:hills-panorama",
+    "afterTimeline": "template:anemone-bunch",
+    "beforeRsvp": "template:bud-sprig",
+    "footer": "template:anemone"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

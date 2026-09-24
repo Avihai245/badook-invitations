@@ -1,0 +1,236 @@
+{
+  "id": "klaf",
+  "version": 2,
+  "name": {
+    "he": "קלף",
+    "en": "Klaf"
+  },
+  "description": {
+    "he": "קלף, דיו של נוצה וקריאה בתורה — מגילה על שני עצי חיים, יד מכסף, פס טלית בכחול ונוצת סופר. חגיגי, עמוק ומרגש.",
+    "en": "Parchment, quill ink and the Torah reading — a scroll on twin wooden rollers, a silver yad, a band of tallit stripes and a scribe’s quill. Festive, deep and moving."
+  },
+  "tier": "premium",
+  "categories": [
+    "bar_mitzvah",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/klaf/preview.webp",
+  "previewVideo": "/templates/klaf/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#EFE3C8",
+      "surface": "#F9F3E4",
+      "ink": "#2A1D12",
+      "inkMuted": "#6E5A45",
+      "accent": "#2F6EA5",
+      "accentInk": "#FFFFFF",
+      "line": "#DCCAA2",
+      "heroText": "#2A1D12"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink"
+    ],
+    "radius": {
+      "card": 4,
+      "button": 4
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "tallit",
+      "name": {
+        "he": "כחול טלית",
+        "en": "Tallit blue"
+      },
+      "palette": {
+        "accent": "#2F6EA5"
+      }
+    },
+    {
+      "id": "ink",
+      "name": {
+        "he": "דיו סופר",
+        "en": "Scribe’s ink"
+      },
+      "palette": {
+        "accent": "#4A3322"
+      }
+    },
+    {
+      "id": "rose",
+      "name": {
+        "he": "ורד",
+        "en": "Rose"
+      },
+      "palette": {
+        "accent": "#9A4A5E"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "scroll",
+      "display": {
+        "latin": "IM Fell English",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "IM Fell English",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "EB Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "sofer",
+      "display": {
+        "latin": "Cinzel",
+        "hebrew": "David Libre"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "David Libre"
+      },
+      "body": {
+        "latin": "EB Garamond",
+        "hebrew": "David Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ribbon",
+    "renderer": "video",
+    "poster": "/templates/klaf/cover-poster.webp",
+    "posterDesktop": "/templates/klaf/cover-poster-desktop.webp",
+    "openVideo": "/templates/klaf/cover-open.mp4",
+    "openVideoDesktop": "/templates/klaf/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/klaf/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#8E2A33",
+      "#2F6EA5",
+      "#7B4A2A"
+    ],
+    "monogramFont": {
+      "latin": "IM Fell English",
+      "hebrew": "Frank Ruhl Libre"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "ספר תורה פתוח באור חלון",
+          "en": "An open Torah scroll in window light"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#2A1D12",
+    "overlayColor": "#F9F3E4",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "klaf-theme",
+    "tracks": [
+      {
+        "id": "klaf-theme",
+        "title": "Aliyah (violin & harp)",
+        "url": "/templates/klaf/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/klaf/hero.mp4",
+    "hero-poster": "/templates/klaf/hero-poster.webp",
+    "hero-desktop": "/templates/klaf/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/klaf/hero-desktop-poster.webp",
+    "tallit-band": "/templates/klaf/tallit-band.webp",
+    "jerusalem-panorama": "/templates/klaf/jerusalem-panorama.webp",
+    "quill": "/templates/klaf/quill.webp",
+    "yad": "/templates/klaf/yad.webp",
+    "torah-scroll": "/templates/klaf/torah-scroll.webp"
+  },
+  "decorations": {
+    "afterHero": "template:tallit-band",
+    "betweenVenues": "template:jerusalem-panorama",
+    "afterTimeline": "template:quill",
+    "beforeRsvp": "template:yad",
+    "footer": "template:torah-scroll"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

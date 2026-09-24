@@ -58,12 +58,13 @@ afterAll(async () => {
 });
 
 describe('seed', () => {
-  it('has the 8 templates and 12 published invitations with versions', async () => {
-    expect((await c.query('select count(*)::int n from invitation_templates')).rows[0].n).toBe(8);
+  it('has the 28 templates and 72 published invitations with versions', async () => {
+    expect((await c.query('select count(*)::int n from invitation_templates')).rows[0].n).toBe(28);
     const rows = (
       await c.query(`select status, version from invitations where owner_id = $1`, [DEMO_OWNER_ID])
     ).rows;
-    expect(rows).toHaveLength(12);
+    // the 3 kit fixtures + one demo per template × event type with seed copy
+    expect(rows).toHaveLength(72);
     expect(rows.every((r) => r.status === 'published' && r.version === 1)).toBe(true);
   });
 });
@@ -78,7 +79,7 @@ describe('anonymous', () => {
       async () => (await c.query('select id from invitation_templates')).rowCount,
     );
     await c.query(`update invitation_templates set is_active = true where id = 'atara'`);
-    expect(n).toBe(7);
+    expect(n).toBe(27);
   });
 
   it('cannot read invitations, versions, responses or attendees', async () => {

@@ -1,0 +1,238 @@
+{
+  "id": "jerusalem-stone",
+  "version": 2,
+  "name": {
+    "he": "אבן ירושלמית",
+    "en": "Jerusalem Stone"
+  },
+  "description": {
+    "he": "אבן גיר חמימה בגוון דבש — אבני גזית עם שוליים מסותתים, חלון מקושת אל השמיים, ענף זית וברושים. מכובד, מסורתי ומלא אור.",
+    "en": "Warm honey-toned limestone — ashlar blocks with chiselled margins, an arched window onto the sky, an olive branch and cypresses. Dignified, traditional and full of light."
+  },
+  "tier": "standard",
+  "categories": [
+    "bar_mitzvah",
+    "bat_mitzvah",
+    "wedding",
+    "brit"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/jerusalem-stone/preview.webp",
+  "previewVideo": "/templates/jerusalem-stone/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#EFE4D2",
+      "surface": "#FAF5EC",
+      "ink": "#3A2E22",
+      "inkMuted": "#6B5B46",
+      "accent": "#66742F",
+      "accentInk": "#FFFFFF",
+      "line": "#DCCBAA",
+      "heroText": "#3A2E22"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink"
+    ],
+    "radius": {
+      "card": 6,
+      "button": 4
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "olive",
+      "name": {
+        "he": "זית",
+        "en": "Olive"
+      },
+      "palette": {
+        "accent": "#66742F"
+      }
+    },
+    {
+      "id": "sky",
+      "name": {
+        "he": "תכלת",
+        "en": "Sky blue"
+      },
+      "palette": {
+        "accent": "#3F6E8C"
+      }
+    },
+    {
+      "id": "copper",
+      "name": {
+        "he": "נחושת",
+        "en": "Copper"
+      },
+      "palette": {
+        "accent": "#9A5A32"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "stone",
+      "display": {
+        "latin": "Cinzel",
+        "hebrew": "Bona Nova"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "Bona Nova"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "olive",
+      "display": {
+        "latin": "Marcellus",
+        "hebrew": "David Libre"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "David Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "David Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "video",
+    "poster": "/templates/jerusalem-stone/cover-poster.webp",
+    "posterDesktop": "/templates/jerusalem-stone/cover-poster-desktop.webp",
+    "openVideo": "/templates/jerusalem-stone/cover-open.mp4",
+    "openVideoDesktop": "/templates/jerusalem-stone/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/jerusalem-stone/medallion-blank.png",
+      "recolor": true,
+      "size": 0.28,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#66742F",
+      "#B08D57",
+      "#3F6E8C"
+    ],
+    "monogramFont": {
+      "latin": "Cinzel",
+      "hebrew": "Bona Nova"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "חלון אבן אל גבעות ירושלים",
+          "en": "A stone window onto the Jerusalem hills"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#3A2E22",
+    "overlayColor": "#FAF5EC",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "jerusalem-stone-theme",
+    "tracks": [
+      {
+        "id": "jerusalem-stone-theme",
+        "title": "Stones of Gold (oud & strings)",
+        "url": "/templates/jerusalem-stone/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/jerusalem-stone/hero.mp4",
+    "hero-poster": "/templates/jerusalem-stone/hero-poster.webp",
+    "hero-desktop": "/templates/jerusalem-stone/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/jerusalem-stone/hero-desktop-poster.webp",
+    "ashlar-band": "/templates/jerusalem-stone/ashlar-band.webp",
+    "arches-panorama": "/templates/jerusalem-stone/arches-panorama.webp",
+    "olive-branch": "/templates/jerusalem-stone/olive-branch.webp",
+    "cypresses": "/templates/jerusalem-stone/cypresses.webp",
+    "olive-sprig": "/templates/jerusalem-stone/olive-sprig.webp"
+  },
+  "decorations": {
+    "afterHero": "template:ashlar-band",
+    "betweenVenues": "template:arches-panorama",
+    "afterTimeline": "template:olive-branch",
+    "beforeRsvp": "template:cypresses",
+    "footer": "template:olive-sprig"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

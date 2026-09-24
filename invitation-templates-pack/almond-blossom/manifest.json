@@ -1,0 +1,240 @@
+{
+  "id": "almond-blossom",
+  "version": 2,
+  "name": {
+    "he": "שקדייה",
+    "en": "Almond Blossom"
+  },
+  "description": {
+    "he": "הפריחה הראשונה בשמי חורף — ענפי שקדייה כהים, פרחים בחמישה עלי כותרת, ניצנים, עלים נושרים ועיגול דק כמו ירח.",
+    "en": "The first bloom against a winter sky — dark almond branches, five-petal blossoms, buds, drifting petals and a thin moon-circle frame."
+  },
+  "tier": "standard",
+  "categories": [
+    "wedding",
+    "baby_shower",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/almond-blossom/preview.webp",
+  "previewVideo": "/templates/almond-blossom/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F4EEE8",
+      "surface": "#FFFDFB",
+      "ink": "#3E2F2A",
+      "inkMuted": "#6E5F58",
+      "accent": "#D9849B",
+      "accentInk": "#3E2F2A",
+      "line": "#E8DDD5",
+      "heroText": "#3E2F2A"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "blossom",
+      "name": {
+        "he": "ורוד פריחה",
+        "en": "Blossom pink"
+      },
+      "palette": {
+        "accent": "#D9849B",
+        "accentInk": "#3E2F2A"
+      }
+    },
+    {
+      "id": "bark",
+      "name": {
+        "he": "קליפת עץ",
+        "en": "Bark"
+      },
+      "palette": {
+        "accent": "#7A5A4C",
+        "accentInk": "#FFFFFF"
+      }
+    },
+    {
+      "id": "winter",
+      "name": {
+        "he": "שמי חורף",
+        "en": "Winter sky"
+      },
+      "palette": {
+        "accent": "#8FB3C9",
+        "accentInk": "#3E2F2A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "blossom",
+      "display": {
+        "latin": "Petit Formal Script",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Assistant"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "spring",
+      "display": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/almond-blossom/cover-poster.webp",
+    "posterDesktop": "/templates/almond-blossom/cover-poster-desktop.webp",
+    "openVideo": "/templates/almond-blossom/cover-open.mp4",
+    "openVideoDesktop": "/templates/almond-blossom/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/almond-blossom/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#D9849B",
+      "#F4F1EC",
+      "#7A5A4C"
+    ],
+    "monogramFont": {
+      "latin": "Petit Formal Script",
+      "hebrew": "Bellefair"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שקדייה פורחת בשמי חורף",
+          "en": "An almond tree in bloom under a winter sky"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#3E2F2A",
+    "overlayColor": "#FFFDFB",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "almond-blossom-theme",
+    "tracks": [
+      {
+        "id": "almond-blossom-theme",
+        "title": "First Bloom (piano & flute)",
+        "url": "/templates/almond-blossom/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/almond-blossom/hero.mp4",
+    "hero-poster": "/templates/almond-blossom/hero-poster.webp",
+    "hero-desktop": "/templates/almond-blossom/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/almond-blossom/hero-desktop-poster.webp",
+    "branch-band": "/templates/almond-blossom/branch-band.webp",
+    "orchard-panorama": "/templates/almond-blossom/orchard-panorama.webp",
+    "blossom-sprig": "/templates/almond-blossom/blossom-sprig.webp",
+    "petals": "/templates/almond-blossom/petals.webp",
+    "blossom": "/templates/almond-blossom/blossom.webp"
+  },
+  "decorations": {
+    "afterHero": "template:branch-band",
+    "betweenVenues": "template:orchard-panorama",
+    "afterTimeline": "template:blossom-sprig",
+    "beforeRsvp": "template:petals",
+    "footer": "template:blossom"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

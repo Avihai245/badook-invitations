@@ -1,0 +1,391 @@
+{
+  "templateId": "almond-blossom",
+  "defaults": {
+    "wedding": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "השקדייה פורחת — ואנחנו מתחתנים",
+        "en": "The almond tree blooms — and we marry"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הפריחה הגדולה",
+          "en": "Until the great bloom"
+        },
+        "afterEvent": {
+          "he": "תודה שפרחתם איתנו",
+          "en": "Thank you for blooming with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "פריחה ראשונה",
+          "en": "First bloom"
+        },
+        "body": {
+          "he": "כמו השקדייה שפורחת ראשונה, עוד לפני האביב — כך התחילה האהבה שלנו.\nב־{date} נעמוד תחת החופה.",
+          "en": "Like the almond tree that blooms first, before spring even begins — that is how our love began.\nOn {date} we will stand beneath the chuppah."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החופה והחגיגה",
+          "en": "Ceremony & celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "18:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:30",
+          "label": {
+            "he": "חופה",
+            "en": "Chuppah"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "גוונים רכים",
+            "en": "Soft tones"
+          },
+          "body": {
+            "he": "לבן, ורוד עדין ותכלת חורפית — נשמח לראותכם בגוונים של פריחה.",
+            "en": "White, soft pink and wintry blue — we’d love you in the colours of blossom."
+          },
+          "illustration": "template:blossom-sprig"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה תחת הפריחה",
+          "en": "Thank you! See you beneath the blossoms"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נחשוב עליכם",
+          "en": "Thank you for letting us know — you’ll be in our thoughts"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      }
+    },
+    "baby_shower": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "ניצן קטן בדרך",
+        "en": "A little bud is on its way"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "בייבי שאוור ל{primary}",
+          "en": "{primary}’s Baby Shower"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנחגוג יחד",
+          "en": "Until we celebrate together"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו!",
+          "en": "Thank you for celebrating with us!"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד מעט פריחה",
+          "en": "Almost in bloom"
+        },
+        "body": {
+          "he": "משהו חדש עומד לפרוח.\nבואו לחגוג איתנו את {primary} ב־{date}, בבראנץ׳ רך ומתוק.",
+          "en": "Something new is about to bloom.\nJoin us to celebrate {primary} on {date}, with a soft and sweet brunch."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הבראנץ׳",
+          "en": "The brunch"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "11:00",
+          "label": {
+            "he": "בראנץ׳",
+            "en": "Brunch"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "12:00",
+          "label": {
+            "he": "משאלות לתינוק",
+            "en": "Wishes for baby"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "12:45",
+          "label": {
+            "he": "מתנות",
+            "en": "Gifts"
+          },
+          "icon": "gift"
+        },
+        {
+          "time": "13:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "במקום כרטיס",
+            "en": "Instead of a card"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הביאו שתיל או פרח קטן — נשתול לתינוק גינה ראשונה.",
+            "en": "Bring a seedling or a little flower — we’ll plant baby’s first garden."
+          },
+          "illustration": "template:petals"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה להורים לעתיד",
+          "en": "A note for the parents-to-be"
+        },
+        "successMessage": {
+          "he": "תודה! מחכים לראותכם",
+          "en": "Thank you! Can’t wait to see you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נתגעגע!",
+          "en": "Thanks for letting us know — you’ll be missed!"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      }
+    },
+    "other": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "עם הפריחה הראשונה, חוגגים עם",
+        "en": "With the first bloom, celebrate with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנחגוג יחד",
+          "en": "Until we celebrate"
+        },
+        "afterEvent": {
+          "he": "תודה שהייתם איתנו",
+          "en": "Thank you for being with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "רגע של אור",
+          "en": "A moment of light"
+        },
+        "body": {
+          "he": "יש רגעים שמבקשים לעצור ולחגוג.\nב־{date} — ערב רך של אנשים אהובים.",
+          "en": "Some moments ask us to pause and celebrate.\nOn {date}: a gentle evening with people we love."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החגיגה",
+          "en": "The celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ארוחה",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "מוזיקה",
+            "en": "Music"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כמה מילים טובות",
+          "en": "A few kind words"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה",
+          "en": "Thank you! See you there"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם",
+          "en": "Thank you for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      }
+    }
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "id": "cloud-arch",
+  "version": 2,
+  "name": {
+    "he": "קשת לבנה",
+    "en": "Cloud Arch"
+  },
+  "description": {
+    "he": "מינימליזם שקט בלבן של גלריה — כרטיס בקשת רכה, שוליים קרועים ביד, חותם מובלט וקווים דקים כחוט. מאופק, אוורירי ומדויק.",
+    "en": "Hushed gallery-white minimalism — an arch-topped card, a hand-torn deckle edge, an embossed roundel and hairline rules. Restrained, airy and precise."
+  },
+  "tier": "standard",
+  "categories": [
+    "wedding",
+    "engagement",
+    "corporate"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/cloud-arch/preview.webp",
+  "previewVideo": "/templates/cloud-arch/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F0EEE9",
+      "surface": "#FAF9F6",
+      "ink": "#2A2622",
+      "inkMuted": "#6F675E",
+      "accent": "#8E6B4F",
+      "accentInk": "#FFFFFF",
+      "line": "#DCD5CB",
+      "heroText": "#2A2622"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "ink",
+      "bg"
+    ],
+    "radius": {
+      "card": 4,
+      "button": 2
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "bronze",
+      "name": {
+        "he": "ברונזה",
+        "en": "Bronze"
+      },
+      "palette": {
+        "accent": "#8E6B4F"
+      }
+    },
+    {
+      "id": "sage",
+      "name": {
+        "he": "מרווה",
+        "en": "Sage"
+      },
+      "palette": {
+        "accent": "#5B6B55",
+        "ink": "#262B22"
+      }
+    },
+    {
+      "id": "clay",
+      "name": {
+        "he": "חמר",
+        "en": "Clay"
+      },
+      "palette": {
+        "accent": "#9A5B4C",
+        "ink": "#33241F"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "gallery",
+      "display": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Miriam Libre"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Miriam Libre"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Miriam Libre"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Miriam Libre"
+      }
+    },
+    {
+      "id": "script",
+      "display": {
+        "latin": "Pinyon Script",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Bellefair"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/cloud-arch/cover-poster.webp",
+    "posterDesktop": "/templates/cloud-arch/cover-poster-desktop.webp",
+    "openVideo": "/templates/cloud-arch/cover-open.mp4",
+    "openVideoDesktop": "/templates/cloud-arch/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/cloud-arch/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#6F675E",
+        "effect": "deboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#F4F1EA",
+      "#8E6B4F",
+      "#2A2622"
+    ],
+    "monogramFont": {
+      "latin": "Cormorant Garamond",
+      "hebrew": "Miriam Libre"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "אור רך על קיר לבן",
+          "en": "Soft light on a white wall"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#2A2622",
+    "overlayColor": "#FAF9F6",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "cloud-arch-theme",
+    "tracks": [
+      {
+        "id": "cloud-arch-theme",
+        "title": "Quiet Gallery (solo piano)",
+        "url": "/templates/cloud-arch/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 32,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/cloud-arch/hero.mp4",
+    "hero-poster": "/templates/cloud-arch/hero-poster.webp",
+    "hero-desktop": "/templates/cloud-arch/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/cloud-arch/hero-desktop-poster.webp",
+    "deckle-band": "/templates/cloud-arch/deckle-band.webp",
+    "arch-panorama": "/templates/cloud-arch/arch-panorama.webp",
+    "paper-leaf": "/templates/cloud-arch/paper-leaf.webp",
+    "roundel": "/templates/cloud-arch/roundel.webp",
+    "arch-mark": "/templates/cloud-arch/arch-mark.webp"
+  },
+  "decorations": {
+    "afterHero": "template:deckle-band",
+    "betweenVenues": "template:arch-panorama",
+    "afterTimeline": "template:paper-leaf",
+    "beforeRsvp": "template:roundel",
+    "footer": "template:arch-mark"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

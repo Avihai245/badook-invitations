@@ -1,0 +1,232 @@
+{
+  "id": "martini-olive",
+  "version": 2,
+  "name": {
+    "he": "מרטיני",
+    "en": "Martini Olive"
+  },
+  "description": {
+    "he": "מסיבת קוקטייל רטרו — כוס מרטיני עם זית על שיפוד, זיתים ירוקים, רצועת משבצות, נרות גבוהים ושוליים מסולסלים על ירוק זית.",
+    "en": "A retro cocktail party — a martini with a speared olive, green olives, a checkerboard strip, taper candles and a scalloped edge on olive green."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "engagement",
+    "corporate"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/martini-olive/preview.webp",
+  "previewVideo": "/templates/martini-olive/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F7F0E1",
+      "surface": "#FFFBF2",
+      "ink": "#1C1C1A",
+      "inkMuted": "#66614F",
+      "accent": "#CC4128",
+      "accentInk": "#FFFFFF",
+      "line": "#E4D9C0",
+      "heroText": "#F7F0E1"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 20,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "tomato",
+      "name": {
+        "he": "עגבנייה",
+        "en": "Tomato"
+      },
+      "palette": {
+        "accent": "#CC4128"
+      }
+    },
+    {
+      "id": "olive",
+      "name": {
+        "he": "זית",
+        "en": "Olive"
+      },
+      "palette": {
+        "accent": "#5C6B1F"
+      }
+    },
+    {
+      "id": "noir",
+      "name": {
+        "he": "שחור",
+        "en": "Noir"
+      },
+      "palette": {
+        "accent": "#1C1C1A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "cocktail",
+      "display": {
+        "latin": "DM Serif Display",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "DM Serif Display",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "lounge",
+      "display": {
+        "latin": "Abril Fatface",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Playfair Display",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "video",
+    "poster": "/templates/martini-olive/cover-poster.webp",
+    "posterDesktop": "/templates/martini-olive/cover-poster-desktop.webp",
+    "openVideo": "/templates/martini-olive/cover-open.mp4",
+    "openVideoDesktop": "/templates/martini-olive/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#1C1C1A",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "DM Serif Display",
+      "hebrew": "Suez One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "בר קוקטיילים בשעת בין ערביים",
+          "en": "A cocktail bar at dusk"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#F7F0E1",
+    "overlayColor": "#1E2410",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "martini-olive-theme",
+    "tracks": [
+      {
+        "id": "martini-olive-theme",
+        "title": "Shaken, Not Stirred (lounge jazz)",
+        "url": "/templates/martini-olive/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/martini-olive/hero.mp4",
+    "hero-poster": "/templates/martini-olive/hero-poster.webp",
+    "hero-desktop": "/templates/martini-olive/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/martini-olive/hero-desktop-poster.webp",
+    "checker-band": "/templates/martini-olive/checker-band.webp",
+    "bar-panorama": "/templates/martini-olive/bar-panorama.webp",
+    "martini": "/templates/martini-olive/martini.webp",
+    "candles": "/templates/martini-olive/candles.webp",
+    "olive-pick": "/templates/martini-olive/olive-pick.webp"
+  },
+  "decorations": {
+    "afterHero": "template:checker-band",
+    "betweenVenues": "template:bar-panorama",
+    "afterTimeline": "template:martini",
+    "beforeRsvp": "template:candles",
+    "footer": "template:olive-pick"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

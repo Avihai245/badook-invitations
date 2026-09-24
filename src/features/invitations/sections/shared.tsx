@@ -1,6 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { DecorationSlot, Section } from '../contracts/types';
 import type { RenderContext } from '../renderer/context';
+import type { PanoramaKind } from '../renderer/placeholders';
+import { ScenePanorama } from './panoramas';
 
 /** Reveal stagger index (`--i`) — children reveal 80ms apart (§9A.6). */
 export const iv = (i: number) => ({ '--i': i }) as CSSProperties;
@@ -34,7 +36,8 @@ export function SecHead({ title, sub, path }: { title: string; sub?: string | nu
  * Line-art stand-ins for a missing panorama decoration (the reference's vineyard sketch for
  * sahar-bordeaux). Each viewBox hugs its drawing, so the band adds no empty space of its own.
  */
-function PanoramaPlaceholder({ kind }: { kind: 'vineyard' | 'hills' }) {
+function PanoramaPlaceholder({ kind }: { kind: PanoramaKind }) {
+  if (kind !== 'vineyard' && kind !== 'hills') return <ScenePanorama kind={kind} />;
   if (kind === 'vineyard') {
     return (
       <svg

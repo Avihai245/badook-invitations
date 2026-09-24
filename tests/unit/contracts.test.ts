@@ -16,7 +16,7 @@ const fixtures = readdirSync(fixturesDir)
   .map((f) => [f, JSON.parse(readFileSync(join(fixturesDir, f), 'utf8'))] as const);
 
 describe('template pack', () => {
-  it('registers all 8 templates in gallery order', () => {
+  it('registers all 28 templates in gallery order: the 8 originals first', () => {
     expect(TEMPLATE_IDS).toEqual([
       'sahar-bordeaux',
       'papercut-gold',
@@ -26,6 +26,46 @@ describe('template pack', () => {
       'nitzan',
       'rooftop-dusk',
       'honey-meadow',
+      'midnight-bloom',
+      'klaf',
+      'cocoa-teddy',
+      'neon-night',
+      'cloud-arch',
+      'marrakech',
+      'dino-hatch',
+      'jasper-cameo',
+      'match-day',
+      'almond-blossom',
+      'deco-gatsby',
+      'coquette-bow',
+      'kalanit',
+      'jet-set',
+      'scribble-love',
+      'jerusalem-stone',
+      'bukhara',
+      'martini-olive',
+      'majolica',
+      'white-city',
+    ]);
+  });
+
+  it('a manifest without a tier is a standard design; the premium ones say so', () => {
+    const { manifest } = TEMPLATES.get('sahar-bordeaux')!;
+    const { tier: _tier, ...legacy } = manifest;
+    expect(TemplateManifestSchema.parse(legacy).tier).toBe('standard');
+    expect(TemplateManifestSchema.safeParse({ ...manifest, tier: 'gold' }).success).toBe(false);
+    const premium = TEMPLATE_IDS.filter((id) => TEMPLATES.get(id)!.manifest.tier === 'premium');
+    expect(premium).toEqual([
+      'midnight-bloom',
+      'klaf',
+      'neon-night',
+      'marrakech',
+      'jasper-cameo',
+      'deco-gatsby',
+      'coquette-bow',
+      'jet-set',
+      'bukhara',
+      'white-city',
     ]);
   });
 

@@ -1,0 +1,235 @@
+{
+  "id": "match-day",
+  "version": 2,
+  "name": {
+    "he": "יום משחק",
+    "en": "Match Day"
+  },
+  "description": {
+    "he": "ערב באצטדיון — פסי דשא מכוסח, עיגול אמצע בגיר, כדור, לוח תוצאות, מספר על החולצה וזרקורים. לחובבי הכדורגל שבינינו.",
+    "en": "A night at the stadium — mowed stripes, a chalk centre circle, a ball, a split-digit scoreboard, a jersey number and floodlights. For the football fans among us."
+  },
+  "tier": "standard",
+  "categories": [
+    "bar_mitzvah",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/match-day/preview.webp",
+  "previewVideo": "/templates/match-day/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F4F4F0",
+      "surface": "#FFFFFF",
+      "ink": "#111111",
+      "inkMuted": "#56645A",
+      "accent": "#FFD100",
+      "accentInk": "#111111",
+      "line": "#DCE0D5",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 10,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "yellow",
+      "name": {
+        "he": "צהוב",
+        "en": "Yellow"
+      },
+      "palette": {
+        "accent": "#FFD100",
+        "accentInk": "#111111"
+      }
+    },
+    {
+      "id": "red",
+      "name": {
+        "he": "אדום",
+        "en": "Red"
+      },
+      "palette": {
+        "accent": "#D62F3C",
+        "accentInk": "#FFFFFF"
+      }
+    },
+    {
+      "id": "sky",
+      "name": {
+        "he": "תכלת",
+        "en": "Sky blue"
+      },
+      "palette": {
+        "accent": "#6CB4EE",
+        "accentInk": "#111111"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "stadium",
+      "display": {
+        "latin": "Big Shoulders Display",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Big Shoulders Display",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "scoreboard",
+      "display": {
+        "latin": "Bebas Neue",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "video",
+    "poster": "/templates/match-day/cover-poster.webp",
+    "posterDesktop": "/templates/match-day/cover-poster-desktop.webp",
+    "openVideo": "/templates/match-day/cover-open.mp4",
+    "openVideoDesktop": "/templates/match-day/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#111111",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Big Shoulders Display",
+      "hebrew": "Secular One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "אצטדיון תחת זרקורים",
+          "en": "A stadium under floodlights"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0D3A1C",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "match-day-theme",
+    "tracks": [
+      {
+        "id": "match-day-theme",
+        "title": "Stadium Anthem (brass & drums)",
+        "url": "/templates/match-day/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 60,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/match-day/hero.mp4",
+    "hero-poster": "/templates/match-day/hero-poster.webp",
+    "hero-desktop": "/templates/match-day/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/match-day/hero-desktop-poster.webp",
+    "stripes-band": "/templates/match-day/stripes-band.webp",
+    "stadium-panorama": "/templates/match-day/stadium-panorama.webp",
+    "ball": "/templates/match-day/ball.webp",
+    "scoreboard": "/templates/match-day/scoreboard.webp",
+    "trophy": "/templates/match-day/trophy.webp"
+  },
+  "decorations": {
+    "afterHero": "template:stripes-band",
+    "betweenVenues": "template:stadium-panorama",
+    "afterTimeline": "template:ball",
+    "beforeRsvp": "template:scoreboard",
+    "footer": "template:trophy"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

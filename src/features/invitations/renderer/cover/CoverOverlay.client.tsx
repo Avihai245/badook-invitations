@@ -1,6 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 import type { CoverStyle, Locale, TemplateManifest } from '../../contracts/types';
 import type { CoverMedia } from './media';
 import { Monogram } from './Monogram';
@@ -20,6 +28,8 @@ export interface CoverOverlayProps {
   skipLabel: string;
   /** cached public page: `?open=1` in the URL skips the cover (see InvitationBody) */
   skipFromUrl?: boolean;
+  /** a scene template: its scene, drawn on the CSS cover's card (rendered by the caller) */
+  card?: ReactNode;
 }
 
 type Phase = 'idle' | 'opening' | 'gone' | 'removed';
@@ -327,6 +337,7 @@ function CssCover({
   monogram,
   hint,
   skipLabel,
+  card,
   phase,
   setPhase,
   showSkip,
@@ -358,7 +369,7 @@ function CssCover({
     );
 
   return (
-    <div className={cls} data-style={style} data-exit={overlay.exit}>
+    <div className={cls} data-style={style} data-exit={overlay.exit} data-scene={card ? '' : undefined}>
       <button
         type="button"
         className="cover-tap"
@@ -378,7 +389,7 @@ function CssCover({
         ) : (
           <span className="env" aria-hidden="true">
             <span className="env-back" />
-            <span className="env-card" />
+            <span className="env-card">{card}</span>
             <span className="env-pocket" />
             <span className="env-flap" />
             {art ? (

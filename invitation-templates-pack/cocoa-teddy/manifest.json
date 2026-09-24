@@ -1,0 +1,232 @@
+{
+  "id": "cocoa-teddy",
+  "version": 2,
+  "name": {
+    "he": "דובון",
+    "en": "Cocoa Teddy"
+  },
+  "description": {
+    "he": "דובון בצבע שוקולד על משבצות גינגהם בתכלת אבקתי — פפיונים, עננים תפוחים ותפר רקמה מסביב. רך, מתוק ומחבק.",
+    "en": "A chocolate teddy on powder-blue gingham — bows, puffy clouds and a running-stitch border. Soft, sweet and cuddly."
+  },
+  "tier": "standard",
+  "categories": [
+    "brit",
+    "baby_shower",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/cocoa-teddy/preview.webp",
+  "previewVideo": "/templates/cocoa-teddy/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F1E6D6",
+      "surface": "#FFFDF8",
+      "ink": "#3B2618",
+      "inkMuted": "#6E5746",
+      "accent": "#7FAAD4",
+      "accentInk": "#3B2618",
+      "line": "#E2D2BC",
+      "heroText": "#3B2618"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 24,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "powder",
+      "name": {
+        "he": "תכלת",
+        "en": "Powder blue"
+      },
+      "palette": {
+        "accent": "#7FAAD4"
+      }
+    },
+    {
+      "id": "blush",
+      "name": {
+        "he": "ורוד",
+        "en": "Blush"
+      },
+      "palette": {
+        "accent": "#E7A6B4"
+      }
+    },
+    {
+      "id": "sage",
+      "name": {
+        "he": "מרווה",
+        "en": "Sage"
+      },
+      "palette": {
+        "accent": "#9DBB93"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "cuddly",
+      "display": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "heading": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "body": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "ui": {
+        "latin": "Quicksand",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "storybook",
+      "display": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "heading": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "swaddle",
+    "renderer": "video",
+    "poster": "/templates/cocoa-teddy/cover-poster.webp",
+    "posterDesktop": "/templates/cocoa-teddy/cover-poster-desktop.webp",
+    "openVideo": "/templates/cocoa-teddy/cover-open.mp4",
+    "openVideoDesktop": "/templates/cocoa-teddy/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "tag",
+      "image": "/templates/cocoa-teddy/tag-blank.png",
+      "recolor": false,
+      "size": 0.24,
+      "offset": {
+        "x": 0,
+        "y": 0.08
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#3B2618",
+        "effect": "print",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Quicksand",
+      "hebrew": "Varela Round"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "חדר תינוקות רך",
+          "en": "A soft nursery"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#3B2618",
+    "overlayColor": "#FFFDF8",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "cocoa-teddy-theme",
+    "tracks": [
+      {
+        "id": "cocoa-teddy-theme",
+        "title": "Lullaby Bear (music box & glockenspiel)",
+        "url": "/templates/cocoa-teddy/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/cocoa-teddy/hero.mp4",
+    "hero-poster": "/templates/cocoa-teddy/hero-poster.webp",
+    "hero-desktop": "/templates/cocoa-teddy/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/cocoa-teddy/hero-desktop-poster.webp",
+    "gingham-band": "/templates/cocoa-teddy/gingham-band.webp",
+    "clouds-panorama": "/templates/cocoa-teddy/clouds-panorama.webp",
+    "teddy": "/templates/cocoa-teddy/teddy.webp",
+    "bow": "/templates/cocoa-teddy/bow.webp",
+    "teddy-face": "/templates/cocoa-teddy/teddy-face.webp"
+  },
+  "decorations": {
+    "afterHero": "template:gingham-band",
+    "betweenVenues": "template:clouds-panorama",
+    "afterTimeline": "template:teddy",
+    "beforeRsvp": "template:bow",
+    "footer": "template:teddy-face"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

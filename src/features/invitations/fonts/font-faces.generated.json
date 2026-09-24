@@ -1,6 +1,70 @@
 {
   "generatedBy": "scripts/build-fonts.mjs",
   "families": {
+    "Abril Fatface": {
+      "id": "abril-fatface",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/abril-fatface/5.3.0/abril-fatface-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/abril-fatface/5.3.0/abril-fatface-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
+    "Alef": {
+      "id": "alef",
+      "category": "sans-serif",
+      "subsets": [
+        "hebrew",
+        "latin"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/alef/5.3.0/alef-hebrew-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/alef/5.3.0/alef-latin-400-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/alef/5.3.0/alef-hebrew-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/alef/5.3.0/alef-latin-700-normal.woff2"
+        }
+      ]
+    },
     "Allura": {
       "id": "allura",
       "category": "handwriting",
@@ -218,6 +282,56 @@
         }
       ]
     },
+    "Ballet": {
+      "id": "ballet",
+      "category": "handwriting",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/ballet/5.3.0/ballet-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/ballet/5.3.0/ballet-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
+    "Bebas Neue": {
+      "id": "bebas-neue",
+      "category": "sans-serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/bebas-neue/5.3.0/bebas-neue-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/bebas-neue/5.3.0/bebas-neue-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
     "Bellefair": {
       "id": "bellefair",
       "category": "serif",
@@ -248,6 +362,45 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/bellefair/5.3.0/bellefair-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
+    "Big Shoulders Display": {
+      "id": "big-shoulders-display",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/big-shoulders-display/5.3.0/big-shoulders-display-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/big-shoulders-display/5.3.0/big-shoulders-display-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/big-shoulders-display/5.3.0/big-shoulders-display-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/big-shoulders-display/5.3.0/big-shoulders-display-latin-ext-500-normal.woff2"
         }
       ]
     },
@@ -348,6 +501,45 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/bona-nova/5.3.0/bona-nova-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
+    "Caveat": {
+      "id": "caveat",
+      "category": "handwriting",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/caveat/5.3.0/caveat-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/caveat/5.3.0/caveat-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/caveat/5.3.0/caveat-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/caveat/5.3.0/caveat-latin-ext-500-normal.woff2"
         }
       ]
     },
@@ -496,6 +688,99 @@
         }
       ]
     },
+    "Cousine": {
+      "id": "cousine",
+      "category": "monospace",
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/cousine/5.3.0/cousine-hebrew-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/cousine/5.3.0/cousine-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/cousine/5.3.0/cousine-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/cousine/5.3.0/cousine-hebrew-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/cousine/5.3.0/cousine-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/cousine/5.3.0/cousine-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "DM Serif Display": {
+      "id": "dm-serif-display",
+      "category": "serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/dm-serif-display/5.3.0/dm-serif-display-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/dm-serif-display/5.3.0/dm-serif-display-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/dm-serif-display/5.3.0/dm-serif-display-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/dm-serif-display/5.3.0/dm-serif-display-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
     "David Libre": {
       "id": "david-libre",
       "category": "serif",
@@ -547,6 +832,80 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/david-libre/5.3.0/david-libre-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/david-libre/5.3.0/david-libre-hebrew-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/david-libre/5.3.0/david-libre-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/david-libre/5.3.0/david-libre-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "EB Garamond": {
+      "id": "eb-garamond",
+      "category": "serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/eb-garamond/5.3.0/eb-garamond-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/eb-garamond/5.3.0/eb-garamond-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/eb-garamond/5.3.0/eb-garamond-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/eb-garamond/5.3.0/eb-garamond-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/eb-garamond/5.3.0/eb-garamond-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/eb-garamond/5.3.0/eb-garamond-latin-ext-700-normal.woff2"
         }
       ]
     },
@@ -713,6 +1072,148 @@
         }
       ]
     },
+    "Fredoka": {
+      "id": "fredoka",
+      "category": "sans-serif",
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 300,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/fredoka/5.3.0/fredoka-hebrew-300-normal.woff2"
+        },
+        {
+          "weight": 300,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-300-normal.woff2"
+        },
+        {
+          "weight": 300,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-ext-300-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/fredoka/5.3.0/fredoka-hebrew-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/fredoka/5.3.0/fredoka-hebrew-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/fredoka/5.3.0/fredoka-hebrew-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-ext-600-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/fredoka/5.3.0/fredoka-hebrew-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/fredoka/5.3.0/fredoka-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "Gloock": {
+      "id": "gloock",
+      "category": "serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/gloock/5.3.0/gloock-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/gloock/5.3.0/gloock-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
     "Great Vibes": {
       "id": "great-vibes",
       "category": "handwriting",
@@ -749,6 +1250,27 @@
       "sizeAdjust": null,
       "faces": [
         {
+          "weight": 300,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/heebo/5.3.0/heebo-hebrew-300-normal.woff2"
+        },
+        {
+          "weight": 300,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/heebo/5.3.0/heebo-latin-300-normal.woff2"
+        },
+        {
+          "weight": 300,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/heebo/5.3.0/heebo-latin-ext-300-normal.woff2"
+        },
+        {
           "weight": 400,
           "style": "normal",
           "subset": "hebrew",
@@ -768,6 +1290,27 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/heebo/5.3.0/heebo-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/heebo/5.3.0/heebo-hebrew-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/heebo/5.3.0/heebo-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/heebo/5.3.0/heebo-latin-ext-500-normal.woff2"
         },
         {
           "weight": 600,
@@ -810,6 +1353,30 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/heebo/5.3.0/heebo-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "IM Fell English": {
+      "id": "im-fell-english",
+      "category": "serif",
+      "subsets": [
+        "latin"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/im-fell-english/5.3.0/im-fell-english-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/im-fell-english/5.3.0/im-fell-english-latin-400-normal.woff2"
         }
       ]
     },
@@ -880,6 +1447,23 @@
         }
       ]
     },
+    "Italiana": {
+      "id": "italiana",
+      "category": "sans-serif",
+      "subsets": [
+        "latin"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/italiana/5.3.0/italiana-latin-400-normal.woff2"
+        }
+      ]
+    },
     "Italianno": {
       "id": "italianno",
       "category": "handwriting",
@@ -905,6 +1489,196 @@
         }
       ]
     },
+    "Josefin Sans": {
+      "id": "josefin-sans",
+      "category": "sans-serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-ext-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-ext-600-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/josefin-sans/5.3.0/josefin-sans-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "Jost": {
+      "id": "jost",
+      "category": "sans-serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/jost/5.3.0/jost-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/jost/5.3.0/jost-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/jost/5.3.0/jost-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/jost/5.3.0/jost-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/jost/5.3.0/jost-latin-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/jost/5.3.0/jost-latin-ext-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/jost/5.3.0/jost-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/jost/5.3.0/jost-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/jost/5.3.0/jost-latin-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/jost/5.3.0/jost-latin-ext-600-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/jost/5.3.0/jost-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/jost/5.3.0/jost-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
     "Karantina": {
       "id": "karantina",
       "category": "display",
@@ -915,6 +1689,27 @@
       ],
       "sizeAdjust": "115%",
       "faces": [
+        {
+          "weight": 300,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/karantina/5.3.0/karantina-hebrew-300-normal.woff2"
+        },
+        {
+          "weight": 300,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/karantina/5.3.0/karantina-latin-300-normal.woff2"
+        },
+        {
+          "weight": 300,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/karantina/5.3.0/karantina-latin-ext-300-normal.woff2"
+        },
         {
           "weight": 400,
           "style": "normal",
@@ -935,6 +1730,31 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/karantina/5.3.0/karantina-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
+    "Limelight": {
+      "id": "limelight",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/limelight/5.3.0/limelight-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/limelight/5.3.0/limelight-latin-ext-400-normal.woff2"
         }
       ]
     },
@@ -1030,6 +1850,127 @@
         }
       ]
     },
+    "Miriam Libre": {
+      "id": "miriam-libre",
+      "category": "sans-serif",
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-hebrew-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-hebrew-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-hebrew-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-latin-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-latin-ext-600-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-hebrew-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/miriam-libre/5.3.0/miriam-libre-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "Monoton": {
+      "id": "monoton",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/monoton/5.3.0/monoton-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/monoton/5.3.0/monoton-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
     "Noto Serif Hebrew": {
       "id": "noto-serif-hebrew",
       "category": "serif",
@@ -1102,6 +2043,186 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "hebrew",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/noto-serif-hebrew/5.3.0/noto-serif-hebrew-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "Nunito": {
+      "id": "nunito",
+      "category": "sans-serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-ext-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-ext-600-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/nunito/5.3.0/nunito-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "Oswald": {
+      "id": "oswald",
+      "category": "sans-serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/oswald/5.3.0/oswald-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/oswald/5.3.0/oswald-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/oswald/5.3.0/oswald-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/oswald/5.3.0/oswald-latin-ext-500-normal.woff2"
+        }
+      ]
+    },
+    "Petit Formal Script": {
+      "id": "petit-formal-script",
+      "category": "handwriting",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/petit-formal-script/5.3.0/petit-formal-script-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/petit-formal-script/5.3.0/petit-formal-script-latin-ext-400-normal.woff2"
         }
       ]
     },
@@ -1127,6 +2248,73 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/pinyon-script/5.3.0/pinyon-script-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
+    "Playfair Display": {
+      "id": "playfair-display",
+      "category": "serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/playfair-display/5.3.0/playfair-display-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/playfair-display/5.3.0/playfair-display-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/playfair-display/5.3.0/playfair-display-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/playfair-display/5.3.0/playfair-display-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/playfair-display/5.3.0/playfair-display-latin-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/playfair-display/5.3.0/playfair-display-latin-ext-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/playfair-display/5.3.0/playfair-display-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/playfair-display/5.3.0/playfair-display-latin-ext-500-normal.woff2"
         }
       ]
     },
@@ -1205,6 +2393,98 @@
         }
       ]
     },
+    "Quicksand": {
+      "id": "quicksand",
+      "category": "sans-serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/quicksand/5.3.0/quicksand-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/quicksand/5.3.0/quicksand-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/quicksand/5.3.0/quicksand-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/quicksand/5.3.0/quicksand-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/quicksand/5.3.0/quicksand-latin-600-normal.woff2"
+        },
+        {
+          "weight": 600,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/quicksand/5.3.0/quicksand-latin-ext-600-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/quicksand/5.3.0/quicksand-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/quicksand/5.3.0/quicksand-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "Righteous": {
+      "id": "righteous",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/righteous/5.3.0/righteous-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/righteous/5.3.0/righteous-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
     "Rubik": {
       "id": "rubik",
       "category": "sans-serif",
@@ -1238,6 +2518,27 @@
         },
         {
           "weight": 400,
+          "style": "italic",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/rubik/5.3.0/rubik-hebrew-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/rubik/5.3.0/rubik-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/rubik/5.3.0/rubik-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
           "style": "normal",
           "subset": "hebrew",
           "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
@@ -1256,6 +2557,27 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/rubik/5.3.0/rubik-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "hebrew",
+          "unicodeRange": "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F",
+          "url": "/fonts/rubik/5.3.0/rubik-hebrew-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/rubik/5.3.0/rubik-latin-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/rubik/5.3.0/rubik-latin-ext-500-italic.woff2"
         },
         {
           "weight": 500,
@@ -1355,6 +2677,140 @@
         }
       ]
     },
+    "Shantell Sans": {
+      "id": "shantell-sans",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-ext-500-italic.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-500-normal.woff2"
+        },
+        {
+          "weight": 500,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-ext-500-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/shantell-sans/5.3.0/shantell-sans-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
+    "Space Mono": {
+      "id": "space-mono",
+      "category": "monospace",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/space-mono/5.3.0/space-mono-latin-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "italic",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/space-mono/5.3.0/space-mono-latin-ext-400-italic.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/space-mono/5.3.0/space-mono-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/space-mono/5.3.0/space-mono-latin-ext-400-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/space-mono/5.3.0/space-mono-latin-700-normal.woff2"
+        },
+        {
+          "weight": 700,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/space-mono/5.3.0/space-mono-latin-ext-700-normal.woff2"
+        }
+      ]
+    },
     "Suez One": {
       "id": "suez-one",
       "category": "serif",
@@ -1427,6 +2883,31 @@
         }
       ]
     },
+    "Titan One": {
+      "id": "titan-one",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/titan-one/5.3.0/titan-one-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/titan-one/5.3.0/titan-one-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
     "Unbounded": {
       "id": "unbounded",
       "category": "sans-serif",
@@ -1482,6 +2963,56 @@
           "subset": "latin-ext",
           "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
           "url": "/fonts/varela-round/5.3.0/varela-round-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
+    "Yeseva One": {
+      "id": "yeseva-one",
+      "category": "display",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/yeseva-one/5.3.0/yeseva-one-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/yeseva-one/5.3.0/yeseva-one-latin-ext-400-normal.woff2"
+        }
+      ]
+    },
+    "Young Serif": {
+      "id": "young-serif",
+      "category": "serif",
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "sizeAdjust": null,
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin",
+          "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+          "url": "/fonts/young-serif/5.3.0/young-serif-latin-400-normal.woff2"
+        },
+        {
+          "weight": 400,
+          "style": "normal",
+          "subset": "latin-ext",
+          "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+          "url": "/fonts/young-serif/5.3.0/young-serif-latin-ext-400-normal.woff2"
         }
       ]
     }

@@ -1,0 +1,552 @@
+{
+  "templateId": "neon-night",
+  "defaults": {
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "לחצו להדלקת האורות",
+        "en": "Tap to switch on the lights"
+      },
+      "eyebrow": {
+        "he": "מדליקים את הלילה לכבוד בר המצווה של",
+        "en": "Lighting up the Bar Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהרחבה נדלקת",
+          "en": "Until the dance floor lights up"
+        },
+        "afterEvent": {
+          "he": "איזה לילה! מזל טוב ותודה",
+          "en": "What a night! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלוש־עשרה ומאיר",
+          "en": "Thirteen and glowing"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה — ובלילה מדליקים את הרחבה.\nבואו לרקוד איתנו.",
+          "en": "On {date}, {primary} is called to the Torah — and at night we light up the dance floor.\nCome dance with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "אוכל",
+            "en": "Food"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "רחבה",
+            "en": "Dance floor"
+          },
+          "icon": "party"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "הפתעה",
+            "en": "Surprise!"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "זוהר!",
+            "en": "Glow up!"
+          },
+          "body": {
+            "he": "לבן, ניאון ומשהו שזוהר — אנחנו נדאג לשאר.",
+            "en": "White, neon and something that glows — we’ll handle the rest."
+          },
+          "illustration": "template:bolt"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לרקוד?",
+          "en": "Coming to dance?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the Bar Mitzvah boy"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה על הרחבה",
+          "en": "Awesome! See you on the dance floor"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד בשבילכם",
+          "en": "Too bad! We’ll dance for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה!",
+        "en": "Mazal tov — see you there!"
+      }
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "לחצו להדלקת האורות",
+        "en": "Tap to switch on the lights"
+      },
+      "eyebrow": {
+        "he": "מדליקים את הלילה לכבוד בת המצווה של",
+        "en": "Lighting up the Bat Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהרחבה נדלקת",
+          "en": "Until the dance floor lights up"
+        },
+        "afterEvent": {
+          "he": "איזה לילה! מזל טוב ותודה",
+          "en": "What a night! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שתים־עשרה וזוהרת",
+          "en": "Twelve and glowing"
+        },
+        "body": {
+          "he": "ב־{date} {primary} חוגגת בת מצווה — ואנחנו מדליקים את הרחבה.\nבואו לזהור איתנו.",
+          "en": "On {date}, {primary} celebrates her Bat Mitzvah — and we’re lighting up the dance floor.\nCome glow with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ומצגת",
+            "en": "Blessings & slideshow"
+          },
+          "icon": "camera"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "אוכל",
+            "en": "Food"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "רחבה",
+            "en": "Dance floor"
+          },
+          "icon": "party"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "הפתעה",
+            "en": "Surprise!"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "זוהר!",
+            "en": "Glow up!"
+          },
+          "body": {
+            "he": "לבן, ניאון ומשהו שזוהר — אנחנו נדאג לשאר.",
+            "en": "White, neon and something that glows — we’ll handle the rest."
+          },
+          "illustration": "template:bolt"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באות לרקוד?",
+          "en": "Coming to dance?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A blessing for the Bat Mitzvah girl"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה על הרחבה",
+          "en": "Awesome! See you on the dance floor"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד בשבילכם",
+          "en": "Too bad! We’ll dance for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה!",
+        "en": "Mazal tov — see you there!"
+      }
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו להדלקת האורות",
+        "en": "Tap to switch on the lights"
+      },
+      "eyebrow": {
+        "he": "הלילה זוהר לכבוד",
+        "en": "Tonight glows for"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמוזיקה מתחילה",
+          "en": "Until the music starts"
+        },
+        "afterEvent": {
+          "he": "איזה לילה! תודה שבאתם",
+          "en": "What a night! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "לילה שלם של אור",
+          "en": "A whole night of light"
+        },
+        "body": {
+          "he": "ב־{date} מכבים את האורות ומדליקים את הניאון.\nמוזיקה, ריקודים ועוגה בחושך.",
+          "en": "On {date} we switch off the lights and turn on the neon.\nMusic, dancing and cake in the dark."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "21:00",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "די־ג׳יי",
+            "en": "DJ set"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "רחבה עד הבוקר",
+            "en": "Dancing till dawn"
+          },
+          "icon": "party"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "זוהר!",
+            "en": "Glow up!"
+          },
+          "body": {
+            "he": "לבן, ניאון ומשהו שזוהר — אנחנו נדאג לשאר.",
+            "en": "White, neon and something that glows — we’ll handle the rest."
+          },
+          "illustration": "template:bolt"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים?",
+          "en": "You in?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה במסיבה",
+          "en": "Awesome! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד בשבילכם",
+          "en": "Too bad! We’ll dance for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בחושך",
+        "en": "See you in the dark"
+      }
+    },
+    "corporate": {
+      "coverHint": {
+        "he": "לחצו להדלקת האורות",
+        "en": "Tap to switch on the lights"
+      },
+      "eyebrow": {
+        "he": "מסיבת סוף השנה של",
+        "en": "The end-of-year party of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהאורות נדלקים",
+          "en": "Until the lights come on"
+        },
+        "afterEvent": {
+          "he": "איזו מסיבה! תודה שבאתם",
+          "en": "What a party! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שנה מבריקה",
+          "en": "A brilliant year"
+        },
+        "body": {
+          "he": "עבדנו קשה, הצלחנו בגדול — ועכשיו מגיע לנו לחגוג.\nב־{date}, מסיבה עם הרבה אור.",
+          "en": "We worked hard and did great — now we deserve a party.\nOn {date}, a night full of light."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome drinks"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "הוקרה",
+            "en": "Thank-yous"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "אוכל",
+            "en": "Food"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "די־ג׳יי",
+            "en": "DJ set"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "הערה למארגנים",
+          "en": "A note for the organizers"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה במסיבה",
+          "en": "Thank you! See you at the party"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון",
+          "en": "Thanks for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על הרחבה",
+        "en": "See you on the dance floor"
+      }
+    }
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "id": "marrakech",
+  "version": 2,
+  "name": {
+    "he": "מרקש",
+    "en": "Marrakech Henna"
+  },
+  "description": {
+    "he": "ליל חינה מרוקאי — קשת בצורת חור מנעול, כוכב זליג׳ בן שמונה קצוות, חמסה מנוקדת, פנסי נחושת מחוררים ורימונים, על ירוק אמרלד וזהב.",
+    "en": "A Moroccan henna night — a keyhole arch, an eight-point zellige star, a dotted hamsa, pierced brass lanterns and pomegranates on emerald and gold."
+  },
+  "tier": "premium",
+  "categories": [
+    "henna",
+    "engagement"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/marrakech/preview.webp",
+  "previewVideo": "/templates/marrakech/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FBF3E4",
+      "surface": "#F4E8D2",
+      "ink": "#2A1A14",
+      "inkMuted": "#735A48",
+      "accent": "#D4A640",
+      "accentInk": "#2A1A14",
+      "line": "#E6D3B0",
+      "heroText": "#FBF3E4"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב",
+        "en": "Gold"
+      },
+      "palette": {
+        "accent": "#D4A640",
+        "accentInk": "#2A1A14"
+      }
+    },
+    {
+      "id": "saffron",
+      "name": {
+        "he": "זעפרן",
+        "en": "Saffron"
+      },
+      "palette": {
+        "accent": "#E39A17",
+        "accentInk": "#2A1A14"
+      }
+    },
+    {
+      "id": "ruby",
+      "name": {
+        "he": "אודם",
+        "en": "Ruby"
+      },
+      "palette": {
+        "accent": "#B8243A",
+        "accentInk": "#FFFFFF"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "souk",
+      "display": {
+        "latin": "Marcellus",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "riad",
+      "display": {
+        "latin": "Cinzel Decorative",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "Suez One"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "video",
+    "poster": "/templates/marrakech/cover-poster.webp",
+    "posterDesktop": "/templates/marrakech/cover-poster-desktop.webp",
+    "openVideo": "/templates/marrakech/cover-open.mp4",
+    "openVideoDesktop": "/templates/marrakech/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/marrakech/medallion-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "foil",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#D4A640",
+      "#C8283C",
+      "#1F6F5C"
+    ],
+    "monogramFont": {
+      "latin": "Marcellus",
+      "hebrew": "Bellefair"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "חצר ריאד בלילה, פנסים דולקים",
+          "en": "A riad courtyard at night, lanterns aglow"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FBF3E4",
+    "overlayColor": "#08231F",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "marrakech-theme",
+    "tracks": [
+      {
+        "id": "marrakech-theme",
+        "title": "Riad Nights (oud & darbuka)",
+        "url": "/templates/marrakech/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/marrakech/hero.mp4",
+    "hero-poster": "/templates/marrakech/hero-poster.webp",
+    "hero-desktop": "/templates/marrakech/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/marrakech/hero-desktop-poster.webp",
+    "zellige-band": "/templates/marrakech/zellige-band.webp",
+    "keyhole-panorama": "/templates/marrakech/keyhole-panorama.webp",
+    "lanterns": "/templates/marrakech/lanterns.webp",
+    "pomegranates": "/templates/marrakech/pomegranates.webp",
+    "hamsa": "/templates/marrakech/hamsa.webp"
+  },
+  "decorations": {
+    "afterHero": "template:zellige-band",
+    "betweenVenues": "template:keyhole-panorama",
+    "afterTimeline": "template:lanterns",
+    "beforeRsvp": "template:pomegranates",
+    "footer": "template:hamsa"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}
