@@ -878,12 +878,20 @@ a {
 }
 /* template touches on the hero text: neon tubes for the names (neon-night); a highlighter under the
    opening line and a pen loop around the date (scribble-love) */
+/* marrakech: over its drawn keyhole arch, the hero text stays between the arch's dotted lines (the
+   arch is min(88cqw, 60cqh) wide, ~68% of it inside — renderer/scenes/marrakech.tsx) */
+.hero:has(.scene[data-scene='marrakech']) .hero-inner {
+  max-width: calc(min(88vw, 60svh) * 0.64);
+  padding-inline: 0;
+}
+.hero:has(.scene[data-scene='marrakech']) :is(.eyebrow, .hero-date, .hero-loc) {
+  text-wrap: balance;
+}
 :root[data-template='neon-night'] .hero .names {
   text-shadow:
-    0 0 2px #fff,
-    0 0 10px var(--inv-accent),
-    0 0 26px var(--inv-accent),
-    0 0 52px color-mix(in srgb, var(--inv-accent) 55%, transparent);
+    0 0 12px color-mix(in srgb, var(--inv-accent) 70%, transparent),
+    0 0 30px color-mix(in srgb, var(--inv-accent) 55%, transparent),
+    0 0 60px color-mix(in srgb, var(--inv-accent) 35%, transparent);
 }
 :root[data-template='scribble-love'] .hero .eyebrow {
   width: fit-content;
@@ -901,7 +909,8 @@ a {
   position: relative;
   width: fit-content;
   margin-inline: auto;
-  padding: 20px 34px;
+  padding: 18px 22px;
+  text-wrap: balance;
 }
 :root[data-template='scribble-love'] .hero-date:not(:empty)::before {
   content: '';

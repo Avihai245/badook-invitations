@@ -82,7 +82,7 @@
     },
     {
       "id": "lib-typewriter",
-      "name": { "he": "מכונת כתיבה", "en": "Typewriter" },
+      "name": { "he": "כתב מכונה", "en": "Typewriter" },
       "display": { "latin": "Special Elite", "hebrew": "Cousine" },
       "heading": { "latin": "Courier Prime", "hebrew": "Cousine" },
       "body": { "latin": "Courier Prime", "hebrew": "Cousine" },

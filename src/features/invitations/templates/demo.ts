@@ -66,11 +66,14 @@ export function demoDocument(
     timezone: 'Asia/Jerusalem',
     slug: `demo-${templateId}`,
   });
-  // the sample monogram ("DANA 30", "ACME") where the template's cover fits it; else the seeded one
+  // the sample monogram ("DANA 30", "ACME") where the template's cover fits it — but a ticket prints
+  // the seeded name rather than a lone initial; else the seeded one
   const sample = people.monogram ? pick(people.monogram, locales) : null;
-  const max = manifest.cover.overlay.text.maxGlyphs;
-  if (sample && locales.every((l) => visibleGlyphCount(sample[l] ?? '', l) <= max))
-    doc.cover.monogram = sample;
+  const { kind, text } = manifest.cover.overlay;
+  const glyphs = (l: Locale) => visibleGlyphCount(sample?.[l] ?? '', l);
+  const fits = locales.every((l) => glyphs(l) <= text.maxGlyphs);
+  const initialOnTicket = kind === 'ticket_text' && locales.every((l) => glyphs(l) <= 1);
+  if (sample && fits && !initialOnTicket) doc.cover.monogram = sample;
   // a save-the-date keeps its §10.3 shape (hero → reveal → note → footer); the samples are filled in
   // for when its other sections are switched on
   const saveTheDate = type === 'save_the_date';

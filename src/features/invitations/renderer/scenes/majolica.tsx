@@ -1,4 +1,4 @@
-import { Layer, Piece, ch, cm, polar, r1, useIds, type SceneProps } from './kit';
+import { Layer, Piece, ch, cm, cmh, polar, r1, useIds, type SceneProps } from './kit';
 
 /**
  * Majolica Summer — the Amalfi coast: a striped awning with a scalloped edge at the top, lemon
@@ -143,7 +143,8 @@ export default function Majolica({ place }: SceneProps) {
   const card = place === 'card';
   const stripe = card ? '5cqmin' : '7cqmin';
   const awning = card ? '9cqh' : '8.5cqh';
-  const tile = card ? 13 : 14;
+  // two rows of tiles along the foot (capped on a landscape hero, where they would reach the text)
+  const tiles = card ? cm(26) : cmh(28);
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -226,13 +227,18 @@ export default function Majolica({ place }: SceneProps) {
       </Piece>
       <Piece
         vb={[0, 0, 260, 220]}
-        style={{ right: cm(-6), bottom: cm(tile * 2 - 2), width: cm(card ? 30 : 44), scale: '-1 -1' }}
+        style={{
+          right: cm(-6),
+          bottom: `calc(${tiles} - 2cqmin)`,
+          width: cm(card ? 30 : 44),
+          scale: '-1 -1',
+        }}
       >
         <Branch u={url} />
       </Piece>
       <Piece
         vb={[0, 0, 200, 100]}
-        style={{ left: cm(4), bottom: cm(tile * 2 + 2), width: cm(card ? 14 : 22) }}
+        style={{ left: cm(4), bottom: `calc(${tiles} + 2cqmin)`, width: cm(card ? 14 : 22) }}
       >
         <g filter={url('soft')}>
           <Slice x={50} y={56} r={34} />
@@ -243,7 +249,7 @@ export default function Majolica({ place }: SceneProps) {
       <Piece
         vb={[0, 0, 1400, 200]}
         fit="xMidYMin slice"
-        style={{ left: 0, bottom: 0, width: '100%', height: cm(tile * 2) }}
+        style={{ left: 0, bottom: 0, width: '100%', height: tiles }}
       >
         <rect x="0" y="0" width="1400" height="200" fill={url('tile')} />
         <rect x="0" y="0" width="1400" height="6" style={{ fill: COBALT }} />
@@ -252,7 +258,7 @@ export default function Majolica({ place }: SceneProps) {
         style={{
           inset: 'auto',
           left: 0,
-          bottom: cm(tile * 2),
+          bottom: tiles,
           width: '100%',
           height: ch(6),
           background: 'linear-gradient(0deg, rgba(29,47,111,.12), transparent)',
