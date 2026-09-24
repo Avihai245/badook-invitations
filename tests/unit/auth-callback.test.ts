@@ -80,15 +80,15 @@ describe('Supabase’s answer on a page (its Site URL fallback)', () => {
     ).toBe(
       '/auth/callback?error=access_denied&error_code=otp_expired&error_description=x&next=%2Fapp%2Finvitations',
     );
-    expect(authAnswerRedirect('/app/invitations', q('error_description=Email+link+expired'))).toMatch(
-      /^\/auth\/callback\?/,
-    );
   });
 
-  it('leaves /auth, /api and pages without an answer alone (our own ?error= included)', () => {
+  it('leaves /auth, /api, /app and pages without an answer alone (our own ?error= included)', () => {
     expect(authAnswerRedirect('/auth/callback', q('code=abc'))).toBeNull();
     expect(authAnswerRedirect('/auth/continue', q('token_hash=abc'))).toBeNull();
     expect(authAnswerRedirect('/api/billing/checkout', q('code=abc'))).toBeNull();
+    // the app's own pages: the payment provider returns to /app/billing with query keys of its own
+    expect(authAnswerRedirect('/app/billing', q('status=failure&checkout=x&error_code=1'))).toBeNull();
+    expect(authAnswerRedirect('/app/invitations', q('code=abc'))).toBeNull();
     expect(authAnswerRedirect('/login', q('error=oauth_failed'))).toBeNull();
     expect(authAnswerRedirect('/', q(''))).toBeNull();
   });

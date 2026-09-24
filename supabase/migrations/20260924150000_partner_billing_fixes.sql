@@ -79,6 +79,8 @@ alter table public.billing_events
   add column product text check (product is null or char_length(product) <= 40),
   add column amount numeric(10, 2) check (amount is null or amount >= 0);
 create index billing_events_user on public.billing_events (user_id, created_at desc);
+-- (it covers the plain user_id index the foreign key had)
+drop index if exists public.billing_events_user_id_idx;
 
 -- Applies one payment-provider event exactly once: the plan fields present in p_patch, and
 -- p_credits (a credit pack or a plan's monthly grant); p_product / p_amount say what it paid for.

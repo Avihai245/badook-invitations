@@ -477,6 +477,36 @@ describe('the plan’s limits', () => {
     expect((await setArchived(USER, ID, { archived: false }, followUp)).status).toBe(200);
   });
 
+  it('two at the same moment: the database’s own check refuses the second with the same 402', async () => {
+    const overLimit = () =>
+      vi.fn(async () => {
+        throw Object.assign(new Error('create_invitation: plan_limit'), { code: 'P0001' });
+      });
+    const race = {
+      ...deps({
+        create: overLimit(),
+        duplicate: overLimit(),
+        setArchived: overLimit(),
+        get: vi.fn(async () => invitation({ status: 'archived' })),
+      }),
+      entitlements: limits({ used: 0 }),
+    };
+    const refused = { status: 402, body: { ok: false, code: 'plan_limit', limit: 1 } };
+    expect(await createInvitation(USER, wizard(), race)).toEqual(refused);
+    expect(await duplicate(USER, ID, race)).toEqual(refused);
+    expect(await setArchived(USER, ID, { archived: false }, race)).toEqual(refused);
+    // any other database error is not a plan limit
+    const broken = {
+      ...deps({
+        create: vi.fn(async () => {
+          throw Object.assign(new Error('create_invitation: bad status x'), { code: 'P0001' });
+        }),
+      }),
+      entitlements: limits({ used: 0 }),
+    };
+    await expect(createInvitation(USER, wizard(), broken)).rejects.toThrow(/bad status/);
+  });
+
   it('a premium design is published only on a plan that includes it', async () => {
     const base = getTemplate('sahar-bordeaux')!;
     const premium = { ...base, manifest: { ...base.manifest, tier: 'premium' } } as typeof base;

@@ -55,10 +55,11 @@ const AUTH_ANSWER_KEYS = ['code', 'token_hash', 'error_code', 'error_description
  * Supabase sends the visitor to the Site URL (the home page) with its answer when the redirect address
  * isn't on its allow list: `/?code=…`, `/?token_hash=…&type=…`, `/?error=…&error_code=…`. Such a visit
  * goes on to /auth/callback with the same query (`next`: the invitations, unless it says otherwise).
- * Pages under /auth and /api are left alone.
+ * Pages under /auth and /api are left alone, and so are the app's own pages (/app/…): Supabase never
+ * lands there, while the payment provider's return to /app/billing may bring query keys of its own.
  */
 export function authAnswerRedirect(pathname: string, query: URLSearchParams): string | null {
-  if (/^\/(auth|api)(\/|$)/.test(pathname)) return null;
+  if (/^\/(auth|api|app)(\/|$)/.test(pathname)) return null;
   if (!AUTH_ANSWER_KEYS.some((key) => query.has(key))) return null;
   const forwarded = new URLSearchParams(query);
   if (!forwarded.get('next')) forwarded.set('next', HOME_PATH);

@@ -65,6 +65,18 @@ async function noRoom(deps: HostDeps): Promise<ApiResult | null> {
   return null;
 }
 
+/**
+ * The database's own check refused one more active invitation — two made at the same moment (it counts
+ * under a lock per owner; the check above can't see the other one): the same 402. Anything else is
+ * thrown on.
+ */
+async function refusedOverLimit(err: unknown, deps: HostDeps): Promise<ApiResult> {
+  const { code, message } = (err ?? {}) as { code?: string; message?: string };
+  if (code !== 'P0001' || !/\bplan_limit\b/.test(message ?? '')) throw err;
+  const e = await deps.entitlements?.().catch(() => undefined);
+  return fail(402, 'plan_limit', { limit: e?.activeInvitations ?? null });
+}
+
 // ─── create (wizard) ─────────────────────────────────────────────────────────────────────────────
 
 export const CreateInvitationSchema = z.strictObject({
@@ -164,10 +176,15 @@ export async function createInvitation(userId: string, raw: unknown, deps: HostD
   const base = usableSlug(doc.share.slug) ?? randomSlug();
   // a save-the-date leaves the plain slug to the full invitation that follows it
   const slug = input.eventType === 'save_the_date' ? saveTheDateSlug(base) : base;
-  const created = await deps.db.create(userId, manifest.id, input.eventType, slug, {
-    ...doc,
-    share: { ...doc.share, slug },
-  });
+  let created: { id: string; slug: string };
+  try {
+    created = await deps.db.create(userId, manifest.id, input.eventType, slug, {
+      ...doc,
+      share: { ...doc.share, slug },
+    });
+  } catch (err) {
+    return refusedOverLimit(err, deps);
+  }
   return ok({ ok: true, id: created.id, slug: created.slug }, 201);
 }
 
@@ -319,7 +336,12 @@ export async function restoreVersion(
 export async function duplicate(userId: string, id: string, deps: HostDeps): Promise<ApiResult> {
   const limited = await noRoom(deps);
   if (limited) return limited;
-  const copy = await deps.db.duplicate(id, userId);
+  let copy: { id: string; slug: string } | null;
+  try {
+    copy = await deps.db.duplicate(id, userId);
+  } catch (err) {
+    return refusedOverLimit(err, deps);
+  }
   return copy ? ok({ ok: true, ...copy }, 201) : fail(404, 'not_found');
 }
 
@@ -341,7 +363,12 @@ export async function setArchived(
       if (limited) return limited;
     }
   }
-  const res = await deps.db.setArchived(id, userId, parsed.data.archived);
+  let res: Awaited<ReturnType<HostDeps['db']['setArchived']>>;
+  try {
+    res = await deps.db.setArchived(id, userId, parsed.data.archived);
+  } catch (err) {
+    return refusedOverLimit(err, deps);
+  }
   if (!res) return fail(404, 'not_found');
   deps.revalidate(res.slug);
   // a save-the-date links to its full invitation only while that one is published
