@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Button, Card, cn, Input, KpiCard, PageHeader, useToast } from '@/components/app';
+import { Button, Card, cn, Hint, Input, KpiCard, PageHeader, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import type { GuestStats } from '../../lib/guest-status';
 import type { ResponseStats } from '../../lib/responses';
@@ -92,10 +92,11 @@ export function InvitationOverview({
       () => toast({ title: t.share.copyFailed, variant: 'danger' }),
     );
 
-  // the WhatsApp card: what stands in the way, or how many are still waiting
-  const send =
+  // the WhatsApp card: what stands in the way (no guests yet: the button waits and says why; not
+  // published: publish first), or how many are still waiting
+  const send: { note: string; href: string | null; cta: string; ready: boolean } =
     guests.total === 0
-      ? { note: o.main.send.noGuests, href: `${base}/guests?import=1`, cta: o.main.import.cta, ready: false }
+      ? { note: o.main.send.noGuests, href: null, cta: o.main.send.cta, ready: false }
       : !live
         ? {
             note: o.main.send.notPublished,
@@ -214,14 +215,28 @@ export function InvitationOverview({
           body={o.main.send.body}
           note={send.note}
           action={
-            <Button
-              size="lg"
-              variant={send.ready ? 'whatsapp' : 'secondary'}
-              icon={send.ready ? <Send className="icon-dir" /> : <ArrowLeft className="icon-dir" />}
-              asChild
-            >
-              <Link href={send.href}>{send.cta}</Link>
-            </Button>
+            send.href === null ? (
+              <Hint text={o.main.send.body} disabledText={send.note} className="max-sm:w-full">
+                <Button
+                  size="lg"
+                  variant="whatsapp"
+                  icon={<Send className="icon-dir" />}
+                  disabled
+                  className="max-sm:w-full"
+                >
+                  {send.cta}
+                </Button>
+              </Hint>
+            ) : (
+              <Button
+                size="lg"
+                variant={send.ready ? 'whatsapp' : 'secondary'}
+                icon={send.ready ? <Send className="icon-dir" /> : <ArrowLeft className="icon-dir" />}
+                asChild
+              >
+                <Link href={send.href}>{send.cta}</Link>
+              </Button>
+            )
           }
         />
       </div>
@@ -385,7 +400,7 @@ function ActionCard({
       <h3 className="mt-4 text-[18px] leading-snug font-bold">{title}</h3>
       <p className="mt-1.5 text-[14px] text-pretty text-muted">{body}</p>
       {note ? <p className={cn('mt-3 text-[13px] font-semibold', c.note)}>{note}</p> : null}
-      <div className="mt-5 flex flex-wrap gap-2 [&_a]:max-sm:w-full">{action}</div>
+      <div className="mt-5 flex flex-wrap gap-2 [&>*]:max-sm:w-full">{action}</div>
     </section>
   );
 }

@@ -16,14 +16,30 @@ export type KpiCardProps = {
   className?: string;
 };
 
-/** app.html `.kpi`: padding 18; label 13px muted + icon (gap 6); value 30px/700 tabular (-.02em); sub 12px muted. */
+/**
+ * app.html `.kpi`: padding 18; label 13px muted after its icon (in a small tinted badge); value
+ * 30px/700 tabular (-.02em); sub 12px muted.
+ */
 export function KpiCard({ label, value, sub, icon, loading = false, className }: KpiCardProps) {
   return (
-    <Card padding="md" className={className} aria-busy={loading || undefined}>
+    <Card
+      padding="md"
+      className={cn(
+        'transition-shadow duration-200 hover:shadow-md motion-reduce:transition-none',
+        className,
+      )}
+      aria-busy={loading || undefined}
+    >
       <dl>
-        <dt className="flex items-center gap-1.5 text-[13px] text-muted">
+        <dt className="flex items-center gap-2 text-[13px] text-muted">
           {icon != null && (
-            <span aria-hidden className={cn(iconSlot, '[&_svg]:size-[15px]')}>
+            <span
+              aria-hidden
+              className={cn(
+                iconSlot,
+                'size-7 rounded-[9px] bg-brand-soft text-brand-deep [&_svg]:size-[15px]',
+              )}
+            >
               {icon}
             </span>
           )}
@@ -31,7 +47,7 @@ export function KpiCard({ label, value, sub, icon, loading = false, className }:
         </dt>
         {loading ? (
           <>
-            <dd className="mt-1.5 flex h-[45px] items-center">
+            <dd className="mt-2 flex h-[45px] items-center">
               <Skeleton shape="line" width={96} height={28} radius={6} />
             </dd>
             <dd className="mt-0.5 flex h-[18px] items-center">
@@ -40,7 +56,9 @@ export function KpiCard({ label, value, sub, icon, loading = false, className }:
           </>
         ) : (
           <>
-            <dd className="mt-1.5 text-[30px] font-bold tracking-[-0.02em] tabular-nums">{value}</dd>
+            <dd className="mt-2 text-[30px] leading-[1.5] font-bold tracking-[-0.02em] tabular-nums">
+              {value}
+            </dd>
             {sub != null && <dd className="mt-0.5 text-[12px] text-muted">{sub}</dd>}
           </>
         )}
