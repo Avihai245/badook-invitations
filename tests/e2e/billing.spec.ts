@@ -98,7 +98,7 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
   await expect(page.getByText('עוד אין תשלומים.')).toBeVisible();
   await expect(page.getByText('עוד אין תנועות קרדיטים.')).toBeVisible();
   // the "?" explains every part of the screen
-  await page.getByTestId('area-help').click();
+  await page.locator('#main').getByTestId('area-help').click();
   const help = page.getByRole('dialog');
   for (const label of ['מעבר לחינם', 'השימוש בחבילה', 'היסטוריה'])
     await expect(help.getByText(label, { exact: true })).toBeVisible();

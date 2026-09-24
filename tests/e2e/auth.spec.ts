@@ -29,7 +29,9 @@ test.describe('sign-in links and pages', () => {
       '/?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired',
     );
     await page.waitForURL(/\/login\?error=link_expired/);
-    await expect(page.getByRole('alert')).toContainText('הקישור פג תוקף או שכבר השתמשו בו');
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'הקישור פג תוקף או שכבר השתמשו בו' }),
+    ).toBeVisible();
 
     // a confirmation link opened in another browser (no PKCE verifier here): the email is confirmed
     await page.goto('/?code=0b6b1f8e-1a57-4a47-9d4b-2c3a3f1e5d10');
@@ -39,7 +41,7 @@ test.describe('sign-in links and pages', () => {
     // Google canceled is still Google's message
     await page.goto('/auth/callback?error=access_denied&error_description=The+user+canceled');
     await page.waitForURL(/\/login\?error=oauth_failed/);
-    await expect(page.getByRole('alert')).toContainText('הכניסה עם Google לא הושלמה');
+    await expect(page.getByRole('alert').filter({ hasText: 'הכניסה עם Google לא הושלמה' })).toBeVisible();
   });
 
   test('the terms line on sign-up, and the policies in small print', async ({ page }) => {

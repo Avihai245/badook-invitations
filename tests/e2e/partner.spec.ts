@@ -75,7 +75,9 @@ test.describe('the partner API', () => {
     await page.context().clearCookies();
     await continueWith(page, body.loginUrl);
     await page.waitForURL(/\/login\?error=link_expired/);
-    await expect(page.getByRole('alert')).toContainText('הקישור פג תוקף או שכבר השתמשו בו');
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'הקישור פג תוקף או שכבר השתמשו בו' }),
+    ).toBeVisible();
 
     // the same person again: updated, same user; a fresh link by the partner's id
     const again = await provision(request, { email, fullName: 'שירן א.' });

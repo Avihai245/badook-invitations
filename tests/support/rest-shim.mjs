@@ -402,7 +402,7 @@ async function auth(req, res, path, query) {
         return authError(res, 422, 'weak_password', 'Password should be at least 6 characters');
       await pool.query(
         `update auth.users set encrypted_password = coalesce($2, encrypted_password),
-           raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || coalesce($3, '{}'), updated_at = now() where id = $1`,
+           raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || coalesce($3::jsonb, '{}'), updated_at = now() where id = $1`,
         [claims.sub, password === undefined ? null : hashPassword(password), data ?? null],
       );
     }
