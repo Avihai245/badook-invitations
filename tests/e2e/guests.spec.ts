@@ -383,7 +383,7 @@ test.describe('guest list', () => {
     await expect(dialog.getByRole('radio', { name: 'למי שעוד לא קיבל (4)' })).toBeChecked();
     const plan = dialog.getByTestId('whatsapp-plan');
     await expect(plan).toContainText('יישלחו 4 הודעות');
-    await expect(plan).toContainText('1 בלי טלפון');
+    await expect(plan).toContainText('מוזמן אחד בלי טלפון');
     // the message as the guest will see it, from the approved template
     await expect(dialog.getByText(/שלום דנה לוי 👋/)).toBeVisible();
     await expect(dialog.getByText(/נועה & איתי מזמינים אותך לחתונה ביום חמישי, 17 ביוני 2027/)).toBeVisible();
@@ -465,7 +465,7 @@ test.describe('guest list', () => {
     await dialog.getByRole('radio', { name: 'לכל המוזמנים (1)' }).check();
     await expect(dialog.getByTestId('whatsapp-plan')).toContainText('תישלח הודעה אחת');
     await expect(dialog.getByTestId('whatsapp-plan')).toContainText('2 כבר קיבלו את ההזמנה — לא יקבלו שוב');
-    await expect(dialog.getByTestId('whatsapp-plan')).toContainText('1 כבר בתור לשליחה');
+    await expect(dialog.getByTestId('whatsapp-plan')).toContainText('מוזמן אחד כבר בתור לשליחה');
     await dialog.getByRole('checkbox', { name: /לשלוח שוב גם למי שכבר קיבל \(2\)/ }).check();
     await expect(dialog.getByRole('radio', { name: 'לכל המוזמנים (3)' })).toBeChecked();
     await expect(dialog.getByText(/^3 הודעות × .*0\.16.* = .*0\.48/)).toBeVisible();
@@ -533,7 +533,7 @@ test.describe('guest list', () => {
     await expect(dialog.getByText('1 credit short')).toBeVisible();
     await dialog.getByRole('checkbox', { name: /I confirm my guests know me/ }).click();
     await expect(dialog.getByRole('button', { name: 'Send to 1 guest' })).toBeDisabled();
-    await expect(dialog.getByTestId('whatsapp-blocked')).toHaveText('You need 1 more credits to send');
+    await expect(dialog.getByTestId('whatsapp-blocked')).toHaveText('You need 1 more credit to send');
     // the server refuses too
     const res = await page.evaluate(async (invitationId) => {
       const guests = (await (await fetch(`/api/invitations/${invitationId}/guests`)).json()) as {
