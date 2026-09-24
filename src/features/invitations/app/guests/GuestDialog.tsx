@@ -6,7 +6,7 @@ import { upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDia
 import { useUi } from '@/lib/i18n/client';
 import { hostApi, loginUrl } from '../api';
 import { normalizeGuestPhone, whatsappCapable } from '../../lib/guest-import';
-import { displayPhone } from '../../lib/guest-status';
+import { guestPhone } from '../../lib/guest-list';
 import type { GuestRecord } from '../../server/guests';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -36,7 +36,7 @@ export function GuestDialog({
   const f = g.form;
   const { toast } = useToast();
   const [name, setName] = useState(guest?.name ?? '');
-  const [phone, setPhone] = useState(displayPhone(guest?.phone ?? null));
+  const [phone, setPhone] = useState(guestPhone(guest?.phone ?? null));
   const [email, setEmail] = useState(guest?.email ?? '');
   const [party, setParty] = useState(guest?.partySize ? String(guest.partySize) : '');
   const [group, setGroup] = useState(guest?.group ?? '');

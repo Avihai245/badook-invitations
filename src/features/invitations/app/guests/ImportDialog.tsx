@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRef, useState, type DragEvent } from 'react';
 import { Button, Dialog, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
-import { displayPhone } from '../../lib/guest-status';
+import { guestPhone } from '../../lib/guest-list';
 import { hostApi, loginUrl } from '../api';
 import {
   csvCell,
@@ -245,7 +245,7 @@ export function ImportDialog({
                         <bdi>{guest.name}</bdi>
                       </td>
                       <td className="px-3 py-2 text-muted" dir="ltr">
-                        {displayPhone(guest.phone) || '—'}
+                        {guestPhone(guest.phone) || '—'}
                       </td>
                       <td className="px-3 py-2 text-muted max-sm:hidden" dir="ltr">
                         {guest.email ?? ''}
@@ -257,23 +257,6 @@ export function ImportDialog({
             </div>
             <p className="text-[12px] text-muted">{im.replaceHint}</p>
           </div>
-        ) : null}
-
-        {preview?.truncated ? (
-          <p
-            role="status"
-            className="flex items-start gap-2 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
-          >
-            <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {fmt(im.truncated, { n: number(preview.truncated), max: number(MAX_IMPORT_ROWS) })}
-          </p>
-        ) : null}
-
-        {landlines ? (
-          <p className="flex items-start gap-2 rounded-card bg-info-bg px-3 py-2.5 text-[13px] text-ink">
-            <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-muted" />
-            {fmt(im.landlines, { n: number(landlines) })}
-          </p>
         ) : null}
 
         {preview?.issues.length ? (
@@ -300,6 +283,23 @@ export function ImportDialog({
               ) : null}
             </ul>
           </div>
+        ) : null}
+
+        {preview?.truncated ? (
+          <p
+            role="status"
+            className="flex items-start gap-2 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+          >
+            <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" />
+            {fmt(im.truncated, { n: number(preview.truncated), max: number(MAX_IMPORT_ROWS) })}
+          </p>
+        ) : null}
+
+        {landlines ? (
+          <p className="flex items-start gap-2 rounded-card bg-info-bg px-3 py-2.5 text-[13px] text-ink">
+            <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-muted" />
+            {fmt(im.landlines, { n: number(landlines) })}
+          </p>
         ) : null}
 
         {limit !== null ? (

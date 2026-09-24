@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   formatIls,
+  guestPhone,
   LIST_FILTERS,
   matchesListFilter,
   sendFailure,
@@ -39,6 +40,13 @@ describe('the guests screen', () => {
     expect(whatsappReach(guest({ phone: null }))).toBe('noPhone');
     expect(whatsappReach(guest({ phone: '+97231234567' }))).toBe('landline');
     expect(whatsappReach(guest({ optedOut: true }))).toBe('optedOut');
+  });
+
+  it('shows phones as dialled: landlines too', () => {
+    expect(guestPhone('+972501234567')).toBe('050-123-4567');
+    expect(guestPhone('+97235551234')).toBe('03-555-1234');
+    expect(guestPhone('+442079460958')).toBe('+44 20 7946 0958');
+    expect(guestPhone(null)).toBe('');
   });
 
   it("prices a message in the host's language", () => {

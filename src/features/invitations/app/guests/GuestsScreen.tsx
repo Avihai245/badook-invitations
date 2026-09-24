@@ -50,20 +50,14 @@ import { hostApi, loginUrl } from '../api';
 import { whatsappCapable } from '../../lib/guest-import';
 import {
   formatIls,
+  guestPhone,
   LIST_FILTERS,
   matchesListFilter,
   sendFailure,
   whatsappReach,
   type ListFilter,
 } from '../../lib/guest-list';
-import {
-  displayPhone,
-  guestState,
-  guestStats,
-  matchesGuestSearch,
-  wasSent,
-  type GuestState,
-} from '../../lib/guest-status';
+import { guestState, guestStats, matchesGuestSearch, wasSent, type GuestState } from '../../lib/guest-status';
 import type { GuestRecord, GuestsPageData } from '../../server/guests';
 import { GuestDialog } from './GuestDialog';
 import { GuestsActions, GuestsGuide } from './GuestsStart';
@@ -356,7 +350,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
       header: g.columns.phone,
       cell: (x) => (
         <span dir="ltr" className="text-muted tabular-nums">
-          {displayPhone(x.phone) || '—'}
+          {guestPhone(x.phone) || '—'}
         </span>
       ),
     },
@@ -575,7 +569,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
                         </p>
                         <p className="truncate text-[12px] text-muted">
                           <span dir="ltr" className="tabular-nums">
-                            {displayPhone(x.phone) || '—'}
+                            {guestPhone(x.phone) || '—'}
                           </span>
                           {x.group ? ` · ${x.group}` : ''}
                         </p>

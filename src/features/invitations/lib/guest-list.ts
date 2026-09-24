@@ -1,4 +1,5 @@
 import { whatsappCapable } from './guest-import';
+import { formatPhone } from './phone';
 import { matchesGuestFilter, wasSent, type GuestFilter, type GuestLike } from './guest-status';
 
 /**
@@ -60,3 +61,6 @@ export function formatIls(value: number, locale: 'he' | 'en'): string {
     currency: 'ILS',
   }).format(value);
 }
+
+/** A guest's phone for the host: Israeli numbers as dialled (050-123-4567, 03-555-1234), others international. */
+export const guestPhone = (e164: string | null): string => (e164 ? formatPhone(e164) : '');
