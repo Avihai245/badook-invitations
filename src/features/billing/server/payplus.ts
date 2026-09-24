@@ -157,7 +157,9 @@ export function readTransaction(payload: unknown): PayplusTransaction {
     paid: statusCode === '000',
     statusCode,
     transactionUid: str(t.uid ?? t.transaction_uid ?? p.transaction_uid),
-    pageRequestUid: str(t.payment_page_request_uid ?? p.payment_page_request_uid ?? data.page_request_uid),
+    pageRequestUid: str(
+      t.payment_page_request_uid ?? p.payment_page_request_uid ?? data.page_request_uid ?? p.page_request_uid,
+    ),
     moreInfo: str(t.more_info ?? p.more_info),
     amount: Number.isFinite(Number(t.amount ?? p.amount)) ? Number(t.amount ?? p.amount) : null,
     recurringUid,

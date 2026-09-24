@@ -22,7 +22,12 @@ export function upgradeReason(status: number, body: unknown): UpgradeReason | nu
 export function UpgradeDialog({ reason, onClose }: { reason: UpgradeReason; onClose: () => void }) {
   const { t, fmt, number } = useUi();
   const u = t.billing.upgrade;
-  const title = reason.code === 'premium_template' ? u.premiumTitle : u.planLimitTitle;
+  const title =
+    reason.code === 'premium_template'
+      ? u.premiumTitle
+      : reason.code === 'guest_limit'
+        ? u.guestsTitle
+        : u.planLimitTitle;
   const body =
     reason.code === 'plan_limit'
       ? fmt(u.planLimitBody, { limit: number(reason.limit) })

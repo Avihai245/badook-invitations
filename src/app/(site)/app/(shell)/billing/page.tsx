@@ -20,6 +20,6 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   const { status, checkout, plan } = await searchParams;
   const start = paidPlanParam(plan);
   const user = await requireUser(start ? `/app/billing?plan=${start}` : '/app/billing');
-  const data = await loadBillingPage(user, checkout ?? null);
+  const data = await loadBillingPage(user, checkout ?? null, typeof status === 'string' ? status : null);
   return <BillingScreen data={data} status={typeof status === 'string' ? status : null} start={start} />;
 }

@@ -24,14 +24,16 @@
 1. **Authentication → Sign In / Providers → Google**: מפעילים, ומדביקים את ה־Client ID וה־Client Secret. (ה־Secret נשאר רק שם. לא צריך אותו באתר או ב־Amplify.)
 2. **Authentication → URL Configuration**:
    - Site URL: `https://invitations.badooks.com`
-   - Redirect URLs: מוסיפים `https://invitations.badooks.com/auth/callback` (או `https://invitations.badooks.com/**`).
+   - Redirect URLs: מוסיפים `https://invitations.badooks.com/**` (עם הכוכביות: הכתובת שחוזרים אליה היא `/auth/callback` עם פרמטרים, כמו `?next=`). כתובת בדומיין של ה־Site URL תמיד מתקבלת; כל כתובת אחרת (למשל הכתובת של Amplify, `*.amplifyapp.com`) חייבת להתאים לאחת הכתובות ברשימה, כולל הפרמטרים.
+
+   המערכת שולחת ל־Supabase את הכתובת שהמשתמש גולש בה (גם כש־`INVITES_PUBLIC_BASE_URL` עוד מצביע על הכתובת של Amplify). כתובת שלא מתקבלת גורמת ל־Supabase לחזור ל־Site URL, כלומר לדף הבית עם `?code=…` (או `?error=…`). האתר מזהה את זה ומעביר ל־`/auth/callback`, כך שהכניסה מסתיימת גם אז, אבל הדף שהמשתמש ביקש (`next`) הולך לאיבוד. לכן כדאי שההגדרות יהיו נכונות.
 
 ## 3. בדיקה
 
 1. תוך כחמש דקות מופיע בעמוד `/login` הכפתור "המשך עם Google".
 2. נכנסים עם חשבון Google. אמורים להגיע ל"ההזמנות שלי", ובמסך "החשבון שלי" רואים "כניסה: Google" והשם מ־Google.
 3. אם Google מחזיר שגיאה (למשל `redirect_uri_mismatch`), בודקים שה־Redirect URI בסעיף 1.3 הוא בדיוק הכתובת של Supabase.
-4. משתמש שביטל באמצע חוזר לעמוד הכניסה עם ההודעה "הכניסה עם Google לא הושלמה".
+4. משתמש שביטל באמצע חוזר לעמוד הכניסה עם ההודעה "הכניסה עם Google לא הושלמה". כך גם אם Google כובה ב־Supabase בזמן שהכפתור עוד הופיע בדף (הכפתור נבדק מחדש בכל לחיצה).
 
 ## הערות
 

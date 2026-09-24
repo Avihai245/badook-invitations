@@ -84,12 +84,26 @@ export const isProduct = (v: unknown): v is Product => PRODUCTS.includes(v as Pr
 export const packOf = (p: Product): CreditPack | null =>
   p.startsWith('credits_') ? (Number(p.slice(8)) as CreditPack) : null;
 
-/** The price of one WhatsApp message in shekels (Meta's marketing rate, converted, up to the agora). */
+/** Israeli VAT (מע״מ), 18% since 2025-01-01: every price shown and charged includes it. */
+export const VAT_RATE = 0.18;
+
+/**
+ * The price of one WhatsApp message in shekels, VAT included: what Meta charges us for it (its
+ * marketing-message rate in USD) × the dollar rate × (1 + VAT), rounded up to the agora — so what is
+ * left after VAT still covers Meta's charge.
+ *
+ * The rate (INVITES_WHATSAPP_PRICE_USD, default 0.0353): Meta's rate card for the WhatsApp Business
+ * Platform, a marketing message to an Israeli number, per delivered message — US$0.0353 since the
+ * per-message pricing of 2025-07-01, unchanged as of 2026-09
+ * (developers.facebook.com/documentation/business-messaging/whatsapp/pricing). Check it again when
+ * Meta publishes a new rate card; the dollar rate is INVITES_USD_TO_ILS.
+ */
 export function messagePriceIls(priceUsd: number, usdToIls: number): number {
-  return Math.ceil(priceUsd * usdToIls * 100) / 100;
+  // toFixed: 15.000000000000002 agorot is 15, not 16
+  return Math.ceil(Number((priceUsd * usdToIls * (1 + VAT_RATE) * 100).toFixed(6))) / 100;
 }
 
-/** A credit pack's price in shekels: messages × the per-message price, to the agora. */
+/** A credit pack's price in shekels (VAT included): messages × the per-message price, to the agora. */
 export function packPriceIls(count: number, priceUsd: number, usdToIls: number): number {
   return Math.round(count * messagePriceIls(priceUsd, usdToIls) * 100) / 100;
 }

@@ -60,6 +60,9 @@ export const accountDb = {
     patch: BillingPatch;
     credits: number;
     payload: unknown;
+    /** what was paid for, and how much (a renewal in the billing history) */
+    product?: string | null;
+    amount?: number | null;
   }) =>
     rpc<boolean>('billing_apply', {
       p_event_id: event.id,
@@ -69,7 +72,12 @@ export const accountDb = {
       p_patch: event.patch,
       p_credits: event.credits,
       p_payload: event.payload ?? {},
+      p_product: event.product ?? null,
+      p_amount: event.amount ?? null,
     }),
+  /** the active-invitations limit the database enforces on the write itself (null: unlimited) */
+  noteInvitationLimit: (userId: string, limit: number | null) =>
+    rpc<null>('account_note_limit', { p_user_id: userId, p_limit: limit }),
   byBilling: (provider: string, subscriptionId: string | null, customerId: string | null) =>
     rpc<string | null>('account_by_billing', {
       p_provider: provider,
@@ -94,9 +102,16 @@ export async function loadAccount(user: Pick<User, 'id' | 'email'>): Promise<Acc
   return { ...record, email: user.email ?? null, effective, limits: PLAN_LIMITS[effective], admin };
 }
 
-/** What the user's plan allows now — the host API's limits (invitations, premium designs). */
+/**
+ * What the user's plan allows now — the host API's limits (invitations, premium designs). The
+ * invitations limit is also handed to the database, which enforces it on the insert itself (two
+ * creates at the same moment can't both pass this check and exceed it).
+ */
 export async function entitlementsFor(user: Pick<User, 'id' | 'email'>): Promise<Entitlements> {
   const account = await loadAccount(user);
+  await accountDb
+    .noteInvitationLimit(user.id, account.limits.activeInvitations)
+    .catch((err) => console.error('[billing] account_note_limit', err));
   return {
     activeInvitations: account.limits.activeInvitations,
     used: account.activeInvitations,
