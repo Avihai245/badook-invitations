@@ -34,6 +34,8 @@ export interface ResponseRow {
   message: string | null;
   answers: Record<string, string | boolean>;
   ip_hash: string | null;
+  /** the guest whose personal link this reply came through (submit_rsvp links it) */
+  guest_id?: string | null;
 }
 
 export interface AttendeeRow {
@@ -62,6 +64,8 @@ export interface RsvpDeps {
   }): Promise<{ id: string; replaced: boolean }>;
   now(): number;
   ipHashSalt: string;
+  /** a personal link's guest in this invitation (null: not one of its tokens) */
+  guestId?(invitationId: string, token: string): Promise<string | null>;
 }
 
 export interface RsvpOutcome {
@@ -277,6 +281,7 @@ export async function handleRsvp(raw: string, ip: string | null, deps: RsvpDeps)
   if (Object.keys(fieldErrors).length) return fail(400, 'invalid', fieldErrors);
 
   const { response, attendees } = toRows(sub, section.data, ipHash);
+  if (sub.guestToken && deps.guestId) response.guest_id = await deps.guestId(invitation.id, sub.guestToken);
   const token = newToken();
   const saved = await deps.submit({
     invitationId: invitation.id,

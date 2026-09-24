@@ -5,6 +5,7 @@ import { CoverOverlay } from './cover/CoverOverlay.client';
 import { FitNames } from './FitNames.client';
 import { FloatingControls, type MusicProps } from './FloatingControls.client';
 import { InvitationSections } from './InvitationSections';
+import { GuestLink } from './guest.client';
 import { LiveLocale } from './live/LiveLocale.client';
 import type { LivePayload } from './live/payload';
 import { RevealObserver } from './RevealObserver.client';
@@ -136,6 +137,7 @@ export function InvitationBody({
         )}
         <RevealObserver />
         <FitNames />
+        {ctx.mode === 'live' ? <GuestLink slug={doc.share.slug} /> : null}
       </div>
     </Suspense>
   );

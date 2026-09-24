@@ -17,5 +17,6 @@
   "gifts.copied": "Copied",
   "followUp.title": "The invitation is here",
   "followUp.body": "All the details are waiting in the full invitation.",
-  "followUp.cta": "View the invitation"
+  "followUp.cta": "View the invitation",
+  "guest.sample": "Dana"
 }

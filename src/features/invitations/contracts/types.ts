@@ -117,6 +117,8 @@ export type Section =
         overlayOpacity: number; // 0..0.7
         /** a YouTube / Vimeo background's own subtitles (burned-in text can't be hidden) */
         captions: boolean;
+        /** greets the guest by name on their personal link — `{guest}` = the name; null = none */
+        greeting: L10n | null;
       }
     >
   | Base<
@@ -380,6 +382,7 @@ export type RsvpSubmission = {
   answers: Record<string, string | boolean>;
   message: string | null; // ≤ 500 chars
   editToken?: string; // present when updating an existing response
+  guestToken?: string; // from a guest's personal link: the reply is linked to that guest
 } & (
   | {
       attending: true;

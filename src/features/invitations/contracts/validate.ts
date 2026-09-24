@@ -70,6 +70,7 @@ export type FieldKey =
   | 'section.title'
   | 'section.subtitle'
   | 'hero.eyebrow'
+  | 'hero.greeting'
   | 'hero.title'
   | 'hero.locationLine'
   | 'hero.media'
@@ -184,6 +185,7 @@ export function* l10nFields(doc: InvitationDocument): Generator<L10nField> {
       case 'hero': {
         const d = section.data;
         yield f('eyebrow', d.eyebrow, 'hero.eyebrow', CAPS.eyebrow);
+        yield f('greeting', d.greeting, 'hero.greeting', CAPS.subtitle);
         if (d.title.mode === 'custom') yield f('title.text', d.title.text, 'hero.title', CAPS.heroTitle);
         yield f('locationLine', d.locationLine, 'hero.locationLine', CAPS.locationLine);
         break;

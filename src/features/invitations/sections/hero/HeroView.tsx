@@ -4,6 +4,7 @@ import { longestWordLength } from '../../lib/text';
 import { parseVideoLink } from '../../lib/video-links';
 import { Icon } from '../../ui/Icon';
 import { editPath, type SectionViewProps } from '../shared';
+import { GuestGreeting } from '../../renderer/guest.client';
 import { HeroEmbed, HeroVideo } from './HeroMedia.client';
 
 /** An upload or a link: resolves to a URL whether or not the file exists. */
@@ -97,13 +98,21 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
       </div>
       <div className="hero-overlay" style={{ '--ov': d.overlayOpacity } as CSSProperties} />
       <div className="hero-inner hero-enter">
-        {d.eyebrow ? (
-          <p className="eyebrow" data-edit-path={path && `${path}.data.eyebrow`}>
-            {ctx.text(d.eyebrow)}
-          </p>
-        ) : (
-          <span />
-        )}
+        {/* one child for the entrance's stagger: the guest's greeting (personal links) + the eyebrow */}
+        <div className="hero-lead">
+          {d.greeting ? (
+            <GuestGreeting
+              text={ctx.text(d.greeting)}
+              sample={ctx.mode === 'editor' ? ctx.t('guest.sample') : undefined}
+              editPath={path && `${path}.data.greeting`}
+            />
+          ) : null}
+          {d.eyebrow ? (
+            <p className="eyebrow" data-edit-path={path && `${path}.data.eyebrow`}>
+              {ctx.text(d.eyebrow)}
+            </p>
+          ) : null}
+        </div>
         <h1 className={custom ? 'names custom' : 'names'} data-edit-path={path && `${path}.data.title`}>
           {custom ? (
             <span className="n" style={fit(customTitle)}>

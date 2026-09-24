@@ -710,6 +710,23 @@ a {
   max-width: 640px;
   text-shadow: 0 2px 22px color-mix(in srgb, var(--hero-overlay) 35%, transparent);
 }
+/* the guest's name on a personal link, above the eyebrow (appears once the link is resolved) */
+.hero-greeting {
+  font-family: var(--f-heading);
+  font-size: 18px;
+  letter-spacing: var(--track);
+  margin-bottom: 10px;
+  animation: greetIn 0.7s var(--ease) both;
+}
+.hero-greeting bdi {
+  font-weight: 600;
+}
+@keyframes greetIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
 .eyebrow {
   font-family: var(--f-heading);
   font-style: italic;

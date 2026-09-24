@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useGuest } from '../../renderer/guest.client';
 import type { DietaryKey, Locale, RsvpResult, RsvpSubmission } from '../../contracts/types';
 import { t } from '../../i18n/dictionary';
 import { Icon } from '../../ui/Icon';
@@ -154,6 +155,24 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
   const [closed, setClosed] = useState(false);
   const [reply, setReply] = useState<StoredReply | null>(null);
   const hpRef = useRef<HTMLInputElement>(null);
+  // a personal link (?g=): the guest's name and phone fill whatever is still empty
+  const guest = useGuest();
+  useEffect(() => {
+    if (!guest) return;
+    const phone = guest.phone?.startsWith('+972') ? `0${guest.phone.slice(4)}` : (guest.phone ?? undefined);
+    const [first, ...rest] = guest.name.trim().split(/\s+/);
+    setAdults((list) => {
+      const p = { ...(list[0] ?? {}) };
+      if (config.nameFormat === 'full') p.fullName ||= guest.name;
+      else if (!p.firstName && !p.lastName) {
+        p.firstName = first ?? '';
+        p.lastName = rest.join(' ');
+      }
+      if (!p.phone && phone) p.phone = phone;
+      return [p, ...list.slice(1)];
+    });
+    setDecline((d) => ({ ...d, fullName: d.fullName || guest.name, phone: d.phone || phone }));
+  }, [guest, config.nameFormat]);
 
   useEffect(() => {
     renderedAt.current = Date.now();
@@ -305,6 +324,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       answers: attending ? answered : {},
       message: config.askMessage ? message.trim() || null : null,
       ...(reply ? { editToken: reply.editToken } : {}),
+      ...(guest ? { guestToken: guest.token } : {}),
     };
     const nullable = (v: string | undefined) => (v?.trim() ? v.trim() : null);
     if (!attending) {

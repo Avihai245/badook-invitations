@@ -1,9 +1,11 @@
 import type { AppDict } from './app.he';
+import { guestsEn } from './guests.en';
 import { editorEn } from './editor.en';
 
 /** Host-app UI strings, English. Same shape as app.he.ts (checked by the type). */
 export const en: AppDict = {
   brand: 'Badook',
+  guests: guestsEn,
   editor: editorEn,
   common: {
     close: 'Close',

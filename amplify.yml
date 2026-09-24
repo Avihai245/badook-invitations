@@ -11,7 +11,7 @@ frontend:
       commands:
         # Amplify console env vars are NOT visible to the SSR runtime by default:
         # copy the ones the app needs into .env.production before building (MASTER_PROMPT §1.1 rule 3).
-        - env | grep -E '^(NEXT_PUBLIC_|SUPABASE_|INVITES_)' >> .env.production || true
+        - env | grep -E '^(NEXT_PUBLIC_|SUPABASE_|INVITES_|ANTHROPIC_API_KEY=)' >> .env.production || true
         # `npm run build` runs `prebuild` (template validation + font files) then `next build`.
         # Tests (Vitest / Playwright) never run here — they run locally or in CI (§1.1 rule 7).
         - npm run build

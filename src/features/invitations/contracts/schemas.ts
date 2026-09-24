@@ -156,6 +156,8 @@ export const HeroSectionSchema = section(
     overlayOpacity: z.number().min(0).max(0.7),
     // added after v1 (see migrate.ts): a YouTube / Vimeo background's subtitles — hidden unless on
     captions: z.boolean().default(false),
+    // added after v1: the line greeting a guest by name on their personal link ({guest}); null = none
+    greeting: L10nSchema.nullable().default(null),
   }),
 );
 
@@ -473,6 +475,11 @@ const RsvpBaseShape = {
   answers: z.record(z.string(), z.union([z.string().max(500), z.boolean()])),
   message: z.string().max(500).nullable(),
   editToken: z.string().min(16).max(200).optional(),
+  // a personal link's token (/i/<slug>?g=…): the reply belongs to that guest
+  guestToken: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{16,64}$/)
+    .optional(),
 };
 
 export const RsvpSubmissionSchema = z.discriminatedUnion('attending', [

@@ -24,6 +24,7 @@ export { DirProvider, useDir, type Dir } from './direction';
 export { Drawer, type DrawerProps } from './Drawer';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Field, useFieldContext, useFieldControl, type FieldContextValue, type FieldProps } from './Field';
+export { AreaHelp, Hint, HintProvider, type AreaHelpItem } from './Hint';
 export { IconButton, type IconButtonProps } from './IconButton';
 export {
   Input,

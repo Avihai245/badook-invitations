@@ -1,3 +1,4 @@
+import { guestsDb } from '@/features/invitations/server/guests';
 import { notifyReply } from '@/features/invitations/server/notify';
 import { getPublishedInvitation } from '@/features/invitations/server/published';
 import { MAX_BODY_BYTES, RATE_LIMIT, handleRsvp, type RsvpDeps } from '@/features/invitations/server/rsvp';
@@ -47,6 +48,7 @@ const deps = (): RsvpDeps => ({
   },
   now: Date.now,
   ipHashSalt: serverEnv().INVITES_IP_HASH_SALT,
+  guestId: (invitationId, token) => guestsDb.byToken(invitationId, token),
 });
 
 /** Guest RSVP (§4): validated with the shared schema + the invitation's rules; written in one transaction. */

@@ -85,6 +85,28 @@ function HeroForm({ base, section }: { base: string; section: SectionOf<'hero'> 
   return (
     <>
       <PanelCard title={cards.texts}>
+        <SwitchRow
+          path={`${base}.greeting`}
+          label={f.greeting}
+          help={f.greetingHelp}
+          checked={d.greeting !== null}
+          onCheckedChange={(on) =>
+            update(
+              `${base}.greeting`,
+              on ? Object.fromEntries(doc.locales.map((l) => [l, f.greetingDefault[l]])) : null,
+              null,
+            )
+          }
+        />
+        {d.greeting ? (
+          <L10nField
+            path={`${base}.greeting`}
+            label={f.greetingText}
+            help={f.greetingTextHelp}
+            cap={CAPS.subtitle}
+            nullable
+          />
+        ) : null}
         <L10nField path={`${base}.eyebrow`} label={f.eyebrow} cap={CAPS.eyebrow} nullable />
         <SegmentedField
           path={`${base}.title`}
