@@ -653,7 +653,7 @@ begin
   return jsonb_build_object('id', v_id, 'replaced', v_replaced);
 end $$;
 
--- The list card also counts the guest list.
+-- The list card also counts the guest list, and how many of them were sent the invitation.
 create or replace function public.owner_invitations(p_owner_id uuid) returns jsonb
 language sql stable security definer set search_path = '' as $$
   select coalesce(jsonb_agg(jsonb_build_object(
@@ -675,7 +675,11 @@ language sql stable security definer set search_path = '' as $$
       'updatedAt', i.updated_at,
       'responses', coalesce(r.responses, 0),
       'attending', coalesce(r.attending, 0),
-      'guests', (select count(*) from public.invitation_guests g where g.invitation_id = i.id)
+      'guests', (select count(*) from public.invitation_guests g where g.invitation_id = i.id),
+      'sent', (
+        select count(*) from public.invitation_guests g
+        where g.invitation_id = i.id and g.send_status in ('sent', 'delivered', 'read')
+      )
     ) order by i.updated_at desc), '[]'::jsonb)
   from public.invitations i
   left join lateral (

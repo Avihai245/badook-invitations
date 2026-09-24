@@ -31,6 +31,9 @@ export interface InvitationSummary {
   updatedAt: string;
   responses: number;
   attending: number;
+  /** the guest list, and how many of them were sent the invitation (WhatsApp or by hand) */
+  guests: number;
+  sent: number;
 }
 
 export interface OwnerInvitation {

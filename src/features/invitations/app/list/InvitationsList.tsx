@@ -3,24 +3,37 @@
 import {
   Archive,
   ArchiveRestore,
+  ArrowRight,
+  CalendarHeart,
   Copy,
   ListChecks,
   MailPlus,
   MoreHorizontal,
+  Palette,
   PencilLine,
   Plus,
+  Send,
   Share2,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UpgradeDialog, upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
-import { useState, useTransition } from 'react';
-import { Badge, Button, EmptyState, IconButton, Menu, useToast, type BadgeVariant } from '@/components/app';
+import { useEffect, useState, useTransition } from 'react';
+import {
+  Badge,
+  Button,
+  cn,
+  EmptyState,
+  IconButton,
+  Menu,
+  useToast,
+  type BadgeVariant,
+} from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
-import { getTemplate } from '../../templates/registry';
+import { getTemplate, TEMPLATE_IDS } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
 import { HelpFor } from '../HelpFor';
 import { TemplatePoster } from '../TemplatePoster';
@@ -32,9 +45,22 @@ const BADGE: Record<InvitationSummary['status'], BadgeVariant> = {
   archived: 'neutral',
 };
 
+type NextStep = { key: 'publish' | 'republish' | 'share' | 'send' | 'track'; href: string; n?: number };
+
+/** What the host would do next with this invitation: publish, send it, then follow the replies. */
+export function nextStep(item: InvitationSummary): NextStep | null {
+  const base = `/app/invitations/${item.id}`;
+  if (item.status === 'archived') return null;
+  if (item.status === 'draft') return { key: 'publish', href: `${base}/edit` };
+  if (item.unpublishedChanges) return { key: 'republish', href: `${base}/edit` };
+  if (item.guests > item.sent) return { key: 'send', href: `${base}/guests`, n: item.guests - item.sent };
+  if (item.guests === 0 && item.responses === 0) return { key: 'share', href: `${base}/share` };
+  return { key: 'track', href: `${base}/responses` };
+}
+
 /** §9B.3-A: the host's invitations as poster cards (4/3/2/1 columns), archive view, empty state. */
-export function InvitationsList({ items }: { items: InvitationSummary[] }) {
-  const { t, fmt, plural } = useUi();
+export function InvitationsList({ items, name }: { items: InvitationSummary[]; name: string | null }) {
+  const { t, fmt, plural, number } = useUi();
   const router = useRouter();
   const { toast } = useToast();
   const [showArchived, setShowArchived] = useState(false);
@@ -65,32 +91,69 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
       on ? t.list.archived : t.list.unarchived,
     );
 
+  const responses = active.reduce((n, i) => n + i.responses, 0);
+  const attending = active.reduce((n, i) => n + i.attending, 0);
+  // the replies only once there are some
+  const summary = active.length
+    ? [
+        plural(t.list.active, active.length, { n: number(active.length) }),
+        ...(responses
+          ? [
+              plural(t.list.responsesTotal, responses, { n: number(responses) }),
+              plural(t.list.attendingTotal, attending, { n: number(attending) }),
+            ]
+          : []),
+      ]
+    : [];
+
   return (
-    <div className="mx-auto max-w-[1280px] px-6 pt-8 pb-16">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-1">
-          <h1 className="font-display text-[32px] leading-tight font-bold tracking-[-0.01em]">
-            {showArchived
-              ? plural(t.list.showArchived, archived.length, { n: archived.length })
-              : t.list.title}
-          </h1>
-          <HelpFor area="list" />
-        </div>
-        <div className="flex items-center gap-2">
-          {showArchived ? (
-            <Button variant="ghost" onClick={() => setShowArchived(false)}>
-              {t.list.hideArchived}
+    <div className="mx-auto max-w-[1280px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
+      <section className="list-hero relative overflow-hidden rounded-[24px] border border-brand-line px-5 py-6 sm:px-8 sm:py-7">
+        <EnvelopeDecor />
+        <div className="relative flex flex-wrap items-end justify-between gap-5">
+          <div className="min-w-0">
+            <p className="text-[14px] font-semibold text-brand-deep">
+              {name ? fmt(t.list.greeting, { name }) : t.list.greetingNoName}
+            </p>
+            <div className="mt-1 flex items-center gap-1">
+              <h1 className="font-display text-[30px] leading-tight font-bold tracking-[-0.01em] sm:text-[34px]">
+                {showArchived
+                  ? plural(t.list.showArchived, archived.length, { n: archived.length })
+                  : t.list.title}
+              </h1>
+              <HelpFor area="list" />
+            </div>
+            {summary.length ? (
+              <ul aria-label={t.list.statsLabel} className="mt-3 flex flex-wrap gap-2">
+                {summary.map((line) => (
+                  <li
+                    key={line}
+                    className="rounded-full border border-brand-line bg-surface/80 px-3 py-1 text-[13px] font-medium text-ink backdrop-blur"
+                  >
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-[14px] text-muted">{t.list.summaryEmpty}</p>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {showArchived ? (
+              <Button variant="ghost" onClick={() => setShowArchived(false)}>
+                {t.list.hideArchived}
+              </Button>
+            ) : archived.length ? (
+              <Button variant="ghost" icon={<Archive />} onClick={() => setShowArchived(true)}>
+                {plural(t.list.showArchived, archived.length, { n: archived.length })}
+              </Button>
+            ) : null}
+            <Button asChild icon={<Plus />} size="lg">
+              <Link href="/app/invitations/new">{t.list.newInvitation}</Link>
             </Button>
-          ) : archived.length ? (
-            <Button variant="ghost" icon={<Archive />} onClick={() => setShowArchived(true)}>
-              {plural(t.list.showArchived, archived.length, { n: archived.length })}
-            </Button>
-          ) : null}
-          <Button asChild icon={<Plus />}>
-            <Link href="/app/invitations/new">{t.list.newInvitation}</Link>
-          </Button>
+          </div>
         </div>
-      </div>
+      </section>
 
       {visible.length ? (
         <ul className="mt-6 grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -109,18 +172,50 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
       ) : showArchived ? (
         <p className="mt-10 text-center text-muted">{t.list.archivedEmpty}</p>
       ) : (
-        <EmptyState
-          className="mt-10"
-          titleAs="h2"
-          illustration={<EnvelopeArt />}
-          title={t.list.emptyTitle}
-          description={t.list.emptyBody}
-          action={
-            <Button asChild size="lg">
-              <Link href="/app/invitations/new">{t.list.emptyCta}</Link>
-            </Button>
-          }
-        />
+        <>
+          <EmptyState
+            className="mt-8"
+            titleAs="h2"
+            illustration={<EnvelopeArt />}
+            title={t.list.emptyTitle}
+            description={t.list.emptyBody}
+            action={
+              <Button asChild size="lg">
+                <Link href="/app/invitations/new">{t.list.emptyCta}</Link>
+              </Button>
+            }
+          />
+          <section aria-labelledby="list-steps" className="mx-auto mt-4 max-w-[900px]">
+            <h2 id="list-steps" className="sr-only">
+              {t.list.steps.title}
+            </h2>
+            <ol className="grid gap-3 sm:grid-cols-3">
+              {(
+                [
+                  ['design', Palette],
+                  ['details', PencilLine],
+                  ['send', Send],
+                ] as const
+              ).map(([key, Icon], i) => (
+                <li key={key} className="rounded-card border border-line bg-surface p-4 shadow-sm">
+                  <span
+                    aria-hidden
+                    className="grid size-9 place-items-center rounded-full bg-brand-soft text-brand-deep"
+                  >
+                    <Icon className="size-[18px]" />
+                  </span>
+                  <p className="mt-3 text-[14px] font-bold">
+                    <span className="text-brand">{number(i + 1)}. </span>
+                    {t.list.steps[key].title}
+                  </p>
+                  <p className="mt-1 text-[13px] text-muted">
+                    {fmt(t.list.steps[key].body, { n: number(TEMPLATE_IDS.length) })}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </section>
+        </>
       )}
       {followUp ? <FollowUpDialog item={followUp} onClose={() => setFollowUp(null)} /> : null}
       {upgrade ? <UpgradeDialog reason={upgrade} onClose={() => setUpgrade(null)} /> : null}
@@ -156,11 +251,13 @@ function InvitationCard({
       })
     : t.list.noResponses;
   const archived = item.status === 'archived';
+  const next = nextStep(item);
 
   return (
     // One column on phones: a row (small poster + details) instead of a full-width 9:16 poster.
     <article className="group max-sm:flex max-sm:items-start max-sm:gap-4" aria-busy={busy || undefined}>
-      <Link href={href} tabIndex={-1} aria-hidden className="block max-sm:w-24 max-sm:shrink-0">
+      <Link href={href} tabIndex={-1} aria-hidden className="relative block max-sm:w-24 max-sm:shrink-0">
+        {archived ? null : <Countdown date={item.date} />}
         {template ? (
           // the invitation's own names and date on its design (the event type as the opening line)
           <TemplatePoster
@@ -196,8 +293,23 @@ function InvitationCard({
             {' · '}
             {stats}
           </p>
-          {item.status === 'published' && item.unpublishedChanges ? (
-            <p className="mt-0.5 text-[12px] font-medium text-warning">{t.status.unpublishedChanges}</p>
+          {next ? (
+            <Link
+              href={next.href}
+              className={cn(
+                'mt-2 inline-flex max-w-full items-center gap-1.5 rounded-full px-3 py-1 text-[12.5px] font-semibold transition-colors',
+                next.key === 'republish'
+                  ? 'bg-warning-bg text-warning hover:bg-[#fef3c7]'
+                  : 'bg-brand-soft text-brand-deep hover:bg-brand hover:text-white',
+              )}
+            >
+              <span className="truncate">
+                {next.key === 'send'
+                  ? plural(t.list.next.send, next.n ?? 0, { n: number(next.n ?? 0) })
+                  : t.list.next[next.key]}
+              </span>
+              <ArrowRight aria-hidden className="icon-dir size-3.5 shrink-0" />
+            </Link>
           ) : null}
         </div>
         <Menu
@@ -233,6 +345,53 @@ function InvitationCard({
         />
       </div>
     </article>
+  );
+}
+
+/** Days to the event on the poster ("in 12 days", "tomorrow"), counted in the visitor's own day. */
+function Countdown({ date }: { date: string }) {
+  const { t, plural, number } = useUi();
+  const [days, setDays] = useState<number | null>(null);
+  // after mounting: the server doesn't know the visitor's day
+  useEffect(() => {
+    const now = new Date();
+    const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    setDays(Math.round((Date.parse(`${date}T00:00:00Z`) - today) / 86_400_000));
+  }, [date]);
+  if (days === null || days < 0) return null;
+  return (
+    <span className="absolute start-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-surface/90 px-2 py-0.5 text-[11.5px] font-semibold text-ink shadow-sm backdrop-blur max-sm:start-1 max-sm:top-1 max-sm:px-1.5 max-sm:text-[10px]">
+      <CalendarHeart aria-hidden className="size-3.5 text-brand max-sm:hidden" />
+      {plural(t.list.countdown, days, { n: number(days) })}
+    </span>
+  );
+}
+
+/** The header's corner: an envelope with a heart seal and a few sparkles (decorative). */
+function EnvelopeDecor() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 220 160"
+      className="list-hero-art pointer-events-none absolute end-[300px] top-1/2 w-[190px] -translate-y-1/2 opacity-90 max-lg:hidden"
+    >
+      <g transform="rotate(-8 110 80)">
+        <rect x="40" y="42" width="140" height="92" rx="10" fill="#fff" stroke="#ead8c0" strokeWidth="2" />
+        <path d="M42 48l68 48 68-48" fill="none" stroke="#ead8c0" strokeWidth="2" strokeLinejoin="round" />
+        <circle cx="110" cy="96" r="15" fill="#a0703f" />
+        <path
+          d="M110 104c-6-4.5-9-7.6-9-11a4.6 4.6 0 0 1 9-1.6 4.6 4.6 0 0 1 9 1.6c0 3.4-3 6.5-9 11z"
+          fill="#fff"
+          opacity=".9"
+        />
+      </g>
+      <path d="M36 30l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#e7a977" className="list-hero-spark" />
+      <path
+        d="M196 120l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"
+        fill="#a0703f"
+        className="list-hero-spark [animation-delay:1.2s]"
+      />
+    </svg>
   );
 }
 

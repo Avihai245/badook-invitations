@@ -196,6 +196,39 @@
   transform: rotate(45deg);
 }
 
+/* ── the app's invitations list: its header ─────────────────────────────────────────────────── */
+.list-hero {
+  background:
+    radial-gradient(120% 140% at 100% 0%, #fff7ee 0%, rgba(255, 247, 238, 0) 55%),
+    radial-gradient(90% 120% at 0% 100%, #f8ebe4 0%, rgba(248, 235, 228, 0) 60%),
+    linear-gradient(120deg, #fbf4ea 0%, #f6ede1 100%);
+}
+.list-hero-art {
+  animation: list-float 7s ease-in-out infinite alternate;
+}
+@keyframes list-float {
+  to {
+    transform: translateY(8px) rotate(2deg);
+  }
+}
+.list-hero-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: list-spark 2.4s ease-in-out infinite;
+}
+@keyframes list-spark {
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .list-hero-art,
+  .list-hero-spark {
+    animation: none !important;
+  }
+}
+
 /* ── the support assistant (SupportChat.client.tsx) ─────────────────────────────────────────── */
 .support-launcher {
   animation:

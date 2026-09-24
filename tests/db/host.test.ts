@@ -128,6 +128,8 @@ describe('owner_invitations / owner_invitation', () => {
       responses: 0,
       attending: 0,
       unpublishedChanges: false,
+      guests: 0,
+      sent: 0,
     });
     expect(list[0]).not.toHaveProperty('draft');
     expect(await call('owner_invitations', ['55555555-5555-4555-8555-555555555555'])).toEqual([]);

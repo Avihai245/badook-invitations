@@ -158,6 +158,37 @@ export const en: AppDict = {
     emptyBody: 'Pick a design and you’ll have a moving invitation in minutes',
     emptyCta: 'Choose a design',
     archivedEmpty: 'No archived invitations',
+    greeting: 'Hi, {name}',
+    greetingNoName: 'Hi there!',
+    summaryEmpty: 'Let’s create your first invitation.',
+    active: { one: '1 active invitation', other: '{n} active invitations' },
+    responsesTotal: { one: '1 response', other: '{n} responses' },
+    attendingTotal: { one: '1 attending', other: '{n} attending' },
+    statsLabel: 'Your invitations at a glance',
+    countdown: { zero: 'Today!', one: 'Tomorrow', two: 'In 2 days', other: 'In {n} days' },
+    past: 'The event has passed',
+    next: {
+      publish: 'Next step: publish',
+      republish: 'You have changes: publish again',
+      share: 'Next step: send it to your guests',
+      send: { one: 'Send to 1 guest who hasn’t got it', other: 'Send to {n} guests who haven’t got it' },
+      track: 'See who’s coming',
+    },
+    steps: {
+      title: 'How it works',
+      design: {
+        title: 'Pick a design',
+        body: '{n} designs for every kind of event, with an animated opening and music.',
+      },
+      details: {
+        title: 'Fill in the details',
+        body: 'Names, date and venue. The texts are already written, and you can change everything.',
+      },
+      send: {
+        title: 'Send and follow',
+        body: 'On WhatsApp, with a personal link for each guest, and see who’s coming as it happens.',
+      },
+    },
     followUp: {
       title: 'The full invitation',
       description:
