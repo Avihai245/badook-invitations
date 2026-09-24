@@ -66,6 +66,7 @@ import {
   type PanelId,
   type RailTab,
 } from './state/EditorProvider';
+import { HelpFor } from '../app/HelpFor';
 
 type IconKey = CatalogKey | 'cover' | 'hero' | 'footer' | PanelId;
 
@@ -149,6 +150,7 @@ export function Rail({ onNavigate }: { onNavigate?: () => void }) {
             </button>
           );
         })}
+        <HelpFor area="rail" className="size-8 shrink-0 lg:max-xl:size-9" />
       </div>
       <div
         role="tabpanel"

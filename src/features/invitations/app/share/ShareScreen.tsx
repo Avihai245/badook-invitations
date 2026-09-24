@@ -7,6 +7,7 @@ import { Button, Card, Field, Input, Segmented, Textarea, useToast } from '@/com
 import { useUi } from '@/lib/i18n/client';
 import { dirOf, type Locale } from '../../contracts/types';
 import type { ShareData } from '../../server/share';
+import { HelpFor } from '../HelpFor';
 
 /**
  * The share screen (§7.7, §9B.3-F, app-share.png): the link + copy, the message (prefilled in the
@@ -35,7 +36,10 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
     <div className="mx-auto max-w-[1000px] px-4 pt-6 pb-16 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-[22px] font-bold tracking-[-.01em]">{s.title}</h1>
+          <div className="flex items-center gap-1">
+            <h1 className="text-[22px] font-bold tracking-[-.01em]">{s.title}</h1>
+            <HelpFor area="share" />
+          </div>
           <p className="mt-1 text-muted">{s.subtitle}</p>
         </div>
         <div className="flex flex-wrap gap-2">

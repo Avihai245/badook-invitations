@@ -3,6 +3,7 @@ import { accountHe } from './account.he';
 import { billingHe } from './billing.he';
 import { guestsHe } from './guests.he';
 import { siteHe } from './site.he';
+import { helpHe } from './help.he';
 import { supportHe } from './support.he';
 
 /**
@@ -14,6 +15,7 @@ export const he = {
   brand: 'Badook',
   guests: guestsHe,
   site: siteHe,
+  help: helpHe,
   support: supportHe,
   billing: billingHe,
   accountPage: accountHe,

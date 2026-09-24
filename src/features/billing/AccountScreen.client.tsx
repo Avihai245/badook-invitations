@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { Button, Card, Checkbox, Dialog, Field, Hint, Input, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
+import { HelpFor } from '@/features/invitations/app/HelpFor';
 
 export interface AccountScreenData {
   email: string;
@@ -59,7 +60,10 @@ export function AccountScreen({ data }: { data: AccountScreenData }) {
 
   return (
     <div className="mx-auto max-w-[760px] px-4 pt-8 pb-16 sm:px-6">
-      <h1 className="text-[26px] font-bold tracking-[-.01em]">{a.title}</h1>
+      <div className="flex items-center gap-1">
+        <h1 className="text-[26px] font-bold tracking-[-.01em]">{a.title}</h1>
+        <HelpFor area="account" />
+      </div>
       <p className="mt-1 text-muted">{a.subtitle}</p>
 
       <Card padding="lg" className="mt-6">

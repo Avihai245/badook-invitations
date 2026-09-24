@@ -38,6 +38,7 @@ import {
   type NotifyMode,
 } from '../../lib/responses';
 import type { DashboardData, DashboardQuestion, DashboardResponse } from '../../server/responses';
+import { HelpFor } from '../HelpFor';
 
 type Status = 'all' | 'attending' | 'declined';
 
@@ -202,7 +203,10 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
       <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="text-[22px] font-bold tracking-[-.01em]">{r.title}</h1>
+            <div className="flex items-center gap-1">
+              <h1 className="text-[22px] font-bold tracking-[-.01em]">{r.title}</h1>
+              <HelpFor area="responses" />
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Menu

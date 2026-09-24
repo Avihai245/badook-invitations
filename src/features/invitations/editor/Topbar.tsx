@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge, Button, IconButton, Menu, Segmented, cn } from '@/components/app';
+import { HelpFor } from '@/features/invitations/app/HelpFor';
 import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import type { Locale } from '../contracts/types';
@@ -105,6 +106,7 @@ export function Topbar({
       </div>
 
       <div className="ms-auto flex shrink-0 items-center gap-1.5 lg:ms-0 lg:gap-2">
+        <HelpFor area="editor" />
         <IconButton
           label={e.undo}
           tooltip
@@ -114,12 +116,14 @@ export function Topbar({
         >
           <Undo2 className="icon-dir" />
         </IconButton>
+        {/* phones: in the ⋯ menu, to leave room for the "?" */}
         <IconButton
           label={e.redo}
           tooltip
           onClick={redo}
           disabled={!canRedo}
           aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
+          className="max-sm:hidden"
         >
           <Redo2 className="icon-dir" />
         </IconButton>
@@ -148,6 +152,7 @@ export function Topbar({
             }
             items={[
               { label: e.preview, icon: <Eye />, onSelect: onPreview },
+              { label: e.redo, icon: <Redo2 className="icon-dir" />, onSelect: redo, disabled: !canRedo },
               { label: e.versions, icon: <History />, onSelect: onVersions },
               { label: t.support.open, icon: <MessageCircleQuestion />, onSelect: () => openSupport() },
             ]}

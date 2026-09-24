@@ -14,6 +14,7 @@ import { TemplatePoster, type PosterTemplate } from '../TemplatePoster';
 import { CreateWizard, type WizardSeed } from './CreateWizard';
 import { PreviewDialog } from './PreviewDialog';
 import { usePreviewVideos } from './preview-videos';
+import { HelpFor } from '../HelpFor';
 
 type Filter = 'all' | 'wedding' | 'barbat' | 'brit' | 'birthday' | 'baby_shower' | 'save_the_date';
 
@@ -80,9 +81,12 @@ export function TemplateGallery({
       <style dangerouslySetInnerHTML={{ __html: fontCss }} />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-[32px] leading-tight font-bold tracking-[-0.01em]">
-            {t.gallery.title}
-          </h1>
+          <div className="flex items-center gap-1">
+            <h1 className="font-display text-[32px] leading-tight font-bold tracking-[-0.01em]">
+              {t.gallery.title}
+            </h1>
+            <HelpFor area="gallery" />
+          </div>
           <p className="mt-1 text-muted">{t.gallery.subtitle}</p>
         </div>
         <Segmented<Locale>

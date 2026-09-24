@@ -22,6 +22,7 @@ import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
 import { getTemplate } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
+import { HelpFor } from '../HelpFor';
 import { TemplatePoster } from '../TemplatePoster';
 import { FollowUpDialog, followUpTypes } from './FollowUpDialog';
 
@@ -67,9 +68,14 @@ export function InvitationsList({ items }: { items: InvitationSummary[] }) {
   return (
     <div className="mx-auto max-w-[1280px] px-6 pt-8 pb-16">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-[32px] leading-tight font-bold tracking-[-0.01em]">
-          {showArchived ? plural(t.list.showArchived, archived.length, { n: archived.length }) : t.list.title}
-        </h1>
+        <div className="flex items-center gap-1">
+          <h1 className="font-display text-[32px] leading-tight font-bold tracking-[-0.01em]">
+            {showArchived
+              ? plural(t.list.showArchived, archived.length, { n: archived.length })
+              : t.list.title}
+          </h1>
+          <HelpFor area="list" />
+        </div>
         <div className="flex items-center gap-2">
           {showArchived ? (
             <Button variant="ghost" onClick={() => setShowArchived(false)}>

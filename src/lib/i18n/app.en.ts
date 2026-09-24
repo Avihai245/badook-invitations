@@ -3,6 +3,7 @@ import { accountEn } from './account.en';
 import { billingEn } from './billing.en';
 import { guestsEn } from './guests.en';
 import { siteEn } from './site.en';
+import { helpEn } from './help.en';
 import { supportEn } from './support.en';
 import { editorEn } from './editor.en';
 
@@ -11,6 +12,7 @@ export const en: AppDict = {
   brand: 'Badook',
   guests: guestsEn,
   site: siteEn,
+  help: helpEn,
   support: supportEn,
   billing: billingEn,
   accountPage: accountEn,
