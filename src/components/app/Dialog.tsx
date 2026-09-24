@@ -58,7 +58,8 @@ export function Dialog({
         >
           <RadixDialog.Content
             className={cn(
-              'relative w-full max-w-[560px] rounded-dialog bg-surface p-6 shadow-lg outline-none',
+              // min-w-0: a grid item may not grow past the screen because of a wide child
+              'relative w-full max-w-[560px] min-w-0 rounded-dialog bg-surface p-5 shadow-lg outline-none sm:p-6',
               'motion-safe:data-[state=open]:animate-app-dialog-in motion-safe:data-[state=closed]:animate-app-dialog-out',
               className,
             )}

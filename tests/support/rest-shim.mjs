@@ -56,6 +56,8 @@ const FUNCTIONS = new Set([
   'whatsapp_claim',
   'whatsapp_result',
   'whatsapp_status',
+  'whatsapp_requeue',
+  'whatsapp_pending',
   'support_rate_hit',
   'user_id_by_email',
   'account_link_partner',
@@ -85,6 +87,21 @@ async function readBody(req) {
 
 // ─── REST (RPC) ─────────────────────────────────────────────────────────────────────────────────
 
+/** A function's parameter names → their types ("uuid[]", "jsonb", …), read once. */
+const argTypeCache = new Map();
+async function argTypes(client, fn) {
+  if (!argTypeCache.has(fn)) {
+    const { rows } = await client.query(
+      `select a.name, format_type(a.type, null) as type
+         from pg_proc p, unnest(p.proargnames, p.proargtypes::oid[]) as a(name, type)
+        where p.proname = $1 and p.pronamespace = 'public'::regnamespace`,
+      [fn],
+    );
+    argTypeCache.set(fn, new Map(rows.map((r) => [r.name, r.type])));
+  }
+  return argTypeCache.get(fn);
+}
+
 async function rpc(req, res, fn) {
   if (req.method !== 'POST' || !FUNCTIONS.has(fn)) return send(res, 404, { message: 'not found' });
   const role = ROLES[req.headers.apikey];
@@ -92,12 +109,17 @@ async function rpc(req, res, fn) {
   const args = await readBody(req);
   const names = Object.keys(args);
   if (!names.every((n) => IDENT.test(n))) return send(res, 400, { message: 'bad argument name' });
-  const values = names.map((n) =>
-    args[n] !== null && typeof args[n] === 'object' ? JSON.stringify(args[n]) : args[n],
-  );
-  const call = `select public.${fn}(${names.map((n, i) => `${n} => $${i + 1}`).join(', ')}) as r`;
   const client = await pool.connect();
   try {
+    // like PostgREST: a JSON array for an array parameter (uuid[]) is a Postgres array; objects and
+    // arrays for json/jsonb parameters stay JSON
+    const types = await argTypes(client, fn);
+    const values = names.map((n) => {
+      const v = args[n];
+      if (Array.isArray(v) && types.get(n)?.endsWith('[]')) return v;
+      return v !== null && typeof v === 'object' ? JSON.stringify(v) : v;
+    });
+    const call = `select public.${fn}(${names.map((n, i) => `${n} => $${i + 1}`).join(', ')}) as r`;
     await client.query('begin');
     await client.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ role })]);
     await client.query(`set local role ${role}`);

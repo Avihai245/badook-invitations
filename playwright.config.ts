@@ -7,6 +7,7 @@ import { defineConfig, devices } from '@playwright/test';
 //   local Postgres reachable at TEST_DATABASE_URL — see tests/db).
 const port = Number(process.env.PW_PORT || 3100);
 const shimPort = Number(process.env.PW_SHIM_PORT || 54329);
+const whatsappPort = Number(process.env.PW_WHATSAPP_PORT || 54340);
 const baseURL = process.env.PW_BASE_URL || `http://127.0.0.1:${port}`;
 const admin = new URL(
   process.env.TEST_DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5432/postgres',
@@ -50,6 +51,14 @@ export default defineConfig({
           timeout: 120_000,
         },
         {
+          // the WhatsApp Cloud API stand-in (tests/e2e/guests.spec.ts)
+          command: 'node tests/support/mock-whatsapp.mjs',
+          url: `http://127.0.0.1:${whatsappPort}/health`,
+          reuseExistingServer: false,
+          env: { MOCK_WHATSAPP_PORT: String(whatsappPort), MOCK_WHATSAPP_TOKEN: 'e2e-whatsapp-token' },
+          timeout: 30_000,
+        },
+        {
           command: `npx next start -p ${port}`,
           url: `${baseURL}/`,
           reuseExistingServer: !process.env.CI,
@@ -62,6 +71,13 @@ export default defineConfig({
             NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${shimPort}`,
             NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'local-publishable',
             SUPABASE_SECRET_KEY: 'local-secret',
+            // WhatsApp: the stand-in above; these two accounts send without buying credits
+            INVITES_WHATSAPP_TOKEN: 'e2e-whatsapp-token',
+            INVITES_WHATSAPP_PHONE_NUMBER_ID: '100000000000001',
+            INVITES_WHATSAPP_API_BASE: `http://127.0.0.1:${whatsappPort}`,
+            INVITES_WHATSAPP_APP_SECRET: 'e2e-whatsapp-app-secret',
+            INVITES_WHATSAPP_VERIFY_TOKEN: 'e2e-whatsapp-verify',
+            INVITES_ADMIN_EMAILS: 'wa-admin-mobile@example.com,wa-admin-desktop@example.com',
           },
           timeout: 120_000,
         },

@@ -30,6 +30,9 @@ export const en: AppDict = {
     adults: { one: '1 adult', other: '{n} adults' },
     children: { one: '1 child', other: '{n} children' },
     toastViewport: 'Notifications ({hotkey})',
+    helpLabel: 'What the buttons here do',
+    helpTitle: 'What each button does',
+    people: { one: '1 person', other: '{n} people' },
   },
   shell: {
     nav: { invitations: 'My invitations', newInvitation: 'New invitation' },
@@ -37,6 +40,14 @@ export const en: AppDict = {
     account: 'My account',
     signOut: 'Sign out',
     skipToContent: 'Skip to content',
+    invitationNav: {
+      label: 'Invitation navigation',
+      edit: 'Edit',
+      guests: 'Guests',
+      responses: 'RSVPs',
+      share: 'Share',
+      back: 'All invitations',
+    },
   },
   auth: {
     panelTitle: 'Invitations your guests will love',
@@ -108,6 +119,7 @@ export const en: AppDict = {
     menu: {
       edit: 'Edit',
       share: 'Share',
+      guests: 'Guests',
       responses: 'Responses',
       duplicate: 'Duplicate',
       archive: 'Archive',
@@ -399,5 +411,8 @@ export const en: AppDict = {
     notPublishedBody:
       'Publish it from the editor — then you’ll find the link, a ready message and a QR code here.',
     toEditor: 'Open the editor',
+    guestsTitle: 'A personal link for every guest',
+    guestsBody: 'Upload your guest list from Excel — each guest gets a link with their name, a prefilled form, and you see who opened and who replied.',
+    toGuests: 'To the guest list'
   },
 };

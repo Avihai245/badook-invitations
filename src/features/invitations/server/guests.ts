@@ -7,7 +7,8 @@ import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import { getSessionUser } from '@/lib/supabase/session';
 import type { EventType, Locale } from '../contracts/types';
-import { formatEventDate } from '../lib/dates';
+import { EVENT_PHRASE } from '@/features/whatsapp/sender';
+import { formatDate, formatEventDate } from '../lib/dates';
 import { MAX_IMPORT_ROWS, NAME_MAX, normalizeGuestPhone } from '../lib/guest-import';
 import { hostsLine } from '../lib/text';
 import type { ApiResult } from './host-api';
@@ -227,7 +228,20 @@ export interface GuestsPageData {
   plan: PlanId;
   maxGuests: number;
   credits: number;
-  whatsapp: { configured: boolean; priceIls: number; priceUsd: number };
+  /** the platform's admins send without credits */
+  unlimited: boolean;
+  /** "send from my WhatsApp": the message's values in the invitation's own language */
+  own: { locale: Locale; hosts: string; event: string; date: string };
+  whatsapp: {
+    configured: boolean;
+    priceIls: number;
+    priceUsd: number;
+    /** the template's language and its values for this invitation (the dialog's preview) */
+    lang: Locale;
+    hosts: string;
+    event: string;
+    date: string;
+  };
 }
 
 export function whatsappConfigured(): boolean {
@@ -253,6 +267,8 @@ export async function loadGuestsPage(
   const greeting =
     hero?.type === 'hero' && hero.data.greeting ? (hero.data.greeting[locale] ?? '').trim() : '';
   const env = serverEnv();
+  const lang: Locale = env.INVITES_WHATSAPP_TEMPLATE_LANG.startsWith('en') ? 'en' : 'he';
+  const docLang = doc.locales.includes(lang) ? lang : doc.defaultLocale;
   return {
     id: inv.id,
     slug: inv.slug,
@@ -267,10 +283,26 @@ export async function loadGuestsPage(
     plan: account.effective,
     maxGuests: account.limits.guestsPerInvitation,
     credits: account.credits,
+    unlimited: account.admin,
+    own: {
+      locale: doc.defaultLocale,
+      hosts: hostsLine(doc.hosts, doc.defaultLocale),
+      event: EVENT_PHRASE[doc.defaultLocale][doc.eventType],
+      date: formatDate(doc.event.date, doc.defaultLocale, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+    },
     whatsapp: {
       configured: whatsappConfigured(),
       priceUsd: env.INVITES_WHATSAPP_PRICE_USD,
       priceIls: messagePriceIls(env.INVITES_WHATSAPP_PRICE_USD, env.INVITES_USD_TO_ILS),
+      lang,
+      hosts: hostsLine(doc.hosts, docLang),
+      event: EVENT_PHRASE[lang][doc.eventType],
+      date: formatDate(doc.event.date, lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
     },
   };
 }

@@ -3,7 +3,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Button, EmptyState } from '@/components/app';
+import { InvitationNav } from '@/features/invitations/app/InvitationNav';
 import { ShareScreen } from '@/features/invitations/app/share/ShareScreen';
+import { formatEventDate } from '@/features/invitations/lib/dates';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { shareData } from '@/features/invitations/server/share';
@@ -31,22 +33,40 @@ export default async function SharePage({ params }: { params: Params }) {
   const inv = await hostDb.get(id, user.id);
   const entry = inv && getTemplate(inv.templateId);
   if (!inv || !entry) notFound();
-  const data = await shareData(inv, entry);
+  const [data, { t, locale }] = await Promise.all([shareData(inv, entry), getUi()]);
+  const doc = inv.published ?? inv.draft;
+  const l = doc.locales.includes(locale) ? locale : doc.defaultLocale;
+  const nav = (
+    <InvitationNav
+      id={inv.id}
+      title={hostsLine(doc.hosts, l) || t.eventTypes[inv.eventType]}
+      dateLine={formatEventDate(doc, l)}
+      published={inv.status === 'published'}
+      current="share"
+    />
+  );
   if (!data) {
-    const { t } = await getUi();
     return (
-      <EmptyState
-        className="py-24"
-        titleAs="h1"
-        title={t.share.notPublishedTitle}
-        description={t.share.notPublishedBody}
-        action={
-          <Button icon={<PencilLine />} asChild>
-            <Link href={`/app/invitations/${id}/edit`}>{t.share.toEditor}</Link>
-          </Button>
-        }
-      />
+      <>
+        {nav}
+        <EmptyState
+          className="py-24"
+          titleAs="h1"
+          title={t.share.notPublishedTitle}
+          description={t.share.notPublishedBody}
+          action={
+            <Button icon={<PencilLine />} asChild>
+              <Link href={`/app/invitations/${id}/edit`}>{t.share.toEditor}</Link>
+            </Button>
+          }
+        />
+      </>
     );
   }
-  return <ShareScreen id={inv.id} slug={inv.slug} data={data} />;
+  return (
+    <>
+      {nav}
+      <ShareScreen id={inv.id} slug={inv.slug} data={data} />
+    </>
+  );
 }

@@ -34,6 +34,8 @@ export type DataTableProps<T> = {
   skeletonRows?: number;
   /** Visually hidden table caption (accessible name). */
   caption?: ReactNode;
+  /** `data-*` attributes for a row (tests, styling hooks). */
+  rowData?: (row: T, index: number) => Record<`data-${string}`, string>;
   className?: string;
 };
 
@@ -58,6 +60,7 @@ export function DataTable<T>({
   loading = false,
   skeletonRows = 5,
   caption,
+  rowData,
   className,
 }: DataTableProps<T>) {
   const alignOf = (c: DataTableColumn<T>) => ALIGN[c.align ?? (c.numeric ? 'center' : 'start')];
@@ -116,6 +119,7 @@ export function DataTable<T>({
             rows.map((row, index) => (
               <tr
                 key={getRowKey(row, index)}
+                {...rowData?.(row, index)}
                 onClick={onRowClick ? () => onRowClick(row, index) : undefined}
                 onKeyDown={onRowClick ? onKey(row, index) : undefined}
                 tabIndex={onRowClick ? 0 : undefined}

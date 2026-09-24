@@ -10,6 +10,7 @@ import {
   PencilLine,
   Plus,
   Share2,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -196,6 +197,7 @@ function InvitationCard({
           }
           items={[
             { label: t.list.menu.edit, icon: <PencilLine />, href },
+            { label: t.list.menu.guests, icon: <Users />, href: `/app/invitations/${item.id}/guests` },
             ...(item.status === 'published'
               ? [{ label: t.list.menu.share, icon: <Share2 />, href: `/app/invitations/${item.id}/share` }]
               : []),

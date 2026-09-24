@@ -106,6 +106,7 @@ create table public.whatsapp_messages (
     check (status in ('queued', 'sending', 'sent', 'delivered', 'read', 'failed')),
   error text check (error is null or char_length(error) <= 300),
   price_usd numeric(10, 4) not null default 0,
+  attempts int not null default 0,
   claimed_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -604,12 +605,22 @@ begin
 end $$;
 
 -- Claims up to p_limit queued messages (of one invitation, or any when p_id is null) for sending —
--- with what the template needs. Messages stuck in 'sending' for 10 minutes are claimed again.
+-- with what the template needs. Messages stuck in 'sending' for 10 minutes (the sender died) are
+-- claimed again, up to 3 tries; after that they fail and their credit goes back.
 create function public.whatsapp_claim(p_id uuid, p_limit int) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare
   v jsonb;
+  v_stuck uuid;
 begin
+  for v_stuck in
+    select m.id from public.whatsapp_messages m
+    where (p_id is null or m.invitation_id = p_id)
+      and m.status = 'sending' and m.claimed_at < now() - interval '10 minutes' and m.attempts >= 3
+    for update skip locked
+  loop
+    perform public.whatsapp_result(v_stuck, null, 'no answer from WhatsApp after 3 tries');
+  end loop;
   with picked as (
     select m.id from public.whatsapp_messages m
     where (p_id is null or m.invitation_id = p_id)
@@ -618,7 +629,7 @@ begin
     limit p_limit
     for update skip locked
   ), claimed as (
-    update public.whatsapp_messages m set status = 'sending', claimed_at = now()
+    update public.whatsapp_messages m set status = 'sending', claimed_at = now(), attempts = m.attempts + 1
     from picked where m.id = picked.id
     returning m.*
   )
@@ -665,6 +676,32 @@ begin
     values (m.owner_id, 1, 'whatsapp_refund', m.id::text);
   end if;
 end $$;
+
+-- A temporary failure (Meta's rate limits, a timeout): back in the queue — at most 3 tries, then failed.
+create function public.whatsapp_requeue(p_message_id uuid, p_error text) returns boolean
+language plpgsql security definer set search_path = '' as $$
+declare
+  n int;
+begin
+  select attempts into n from public.whatsapp_messages where id = p_message_id and status = 'sending';
+  if not found then
+    return false;
+  end if;
+  if n >= 3 then
+    perform public.whatsapp_result(p_message_id, null, p_error);
+    return false;
+  end if;
+  update public.whatsapp_messages set status = 'queued', claimed_at = null, error = left(p_error, 300)
+  where id = p_message_id;
+  return true;
+end $$;
+
+-- How many of an invitation's messages are still waiting (queued or being sent).
+create function public.whatsapp_pending(p_id uuid) returns int
+language sql stable security definer set search_path = '' as $$
+  select count(*)::int from public.whatsapp_messages
+  where invitation_id = p_id and status in ('queued', 'sending')
+$$;
 
 -- A status from Meta's webhook. Statuses only move forward (sent → delivered → read), since webhooks
 -- can arrive out of order; 'failed' (e.g. not a WhatsApp number) is recorded unless already read.
@@ -757,6 +794,8 @@ begin
     'public.whatsapp_claim(uuid, int)',
     'public.whatsapp_result(uuid, text, text)',
     'public.whatsapp_status(text, text, text)',
+    'public.whatsapp_requeue(uuid, text)',
+    'public.whatsapp_pending(uuid)',
     'public.support_rate_hit(text, int, int)',
     'public.user_id_by_email(text)',
     'public.account_link_partner(uuid, text, text, text, text)'

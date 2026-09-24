@@ -1,6 +1,6 @@
 'use client';
 
-import { Copy, Download, ExternalLink, ListChecks, MessageCircle, PencilLine } from 'lucide-react';
+import { Copy, Download, ExternalLink, MessageCircle, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Card, Field, Input, Segmented, Textarea, useToast } from '@/components/app';
@@ -32,19 +32,13 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
     );
 
   return (
-    <div className="mx-auto max-w-[1000px] px-4 pt-8 pb-16 sm:px-6">
+    <div className="mx-auto max-w-[1000px] px-4 pt-6 pb-16 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-[26px] font-bold tracking-[-.01em]">{s.title}</h1>
+          <h1 className="text-[22px] font-bold tracking-[-.01em]">{s.title}</h1>
           <p className="mt-1 text-muted">{s.subtitle}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" size="sm" icon={<PencilLine />} asChild>
-            <Link href={`/app/invitations/${id}/edit`}>{s.edit}</Link>
-          </Button>
-          <Button variant="secondary" size="sm" icon={<ListChecks />} asChild>
-            <Link href={`/app/invitations/${id}/responses`}>{t.responses.title}</Link>
-          </Button>
           <Button variant="secondary" size="sm" icon={<ExternalLink className="icon-dir" />} asChild>
             <a href={data.url} target="_blank" rel="noreferrer">
               {s.open}
@@ -58,6 +52,28 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
           {s.unpublishedChanges}
         </p>
       ) : null}
+
+      <Card
+        padding="md"
+        className="mt-4 flex flex-wrap items-center justify-between gap-3"
+        data-testid="share-guests"
+      >
+        <div className="flex items-start gap-3">
+          <span
+            aria-hidden
+            className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand"
+          >
+            <Users className="size-[18px]" />
+          </span>
+          <div>
+            <p className="text-[14px] font-semibold">{s.guestsTitle}</p>
+            <p className="max-w-[60ch] text-[13px] text-muted">{s.guestsBody}</p>
+          </div>
+        </div>
+        <Button variant="secondary" size="sm" asChild>
+          <Link href={`/app/invitations/${id}/guests`}>{s.toGuests}</Link>
+        </Button>
+      </Card>
 
       <div className="mt-6 grid items-start gap-5 min-[900px]:grid-cols-[1.2fr_1fr]">
         <Card padding="lg" className="flex flex-col gap-5">

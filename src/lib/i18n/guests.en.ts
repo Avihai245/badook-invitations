@@ -166,7 +166,7 @@ export const guestsEn: typeof guestsHe = {
     marked: 'Updated',
     error: 'Something went wrong. Try again.',
   },
-  ownMessage: 'Hi {name}!\n{hosts} invite you to {event}{date}.\nDetails and RSVP: {url}',
+  ownMessage: 'Hi {name}!\n{hosts} invite you {event} on {date}.\nDetails and RSVP: {url}',
   csv: {
     name: 'Name',
     phone: 'Phone',

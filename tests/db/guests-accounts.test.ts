@@ -323,6 +323,37 @@ describe('WhatsApp', () => {
     expect(refunds).toBe(1);
     expect(balance).toBeGreaterThan(0);
   });
+
+  it('puts a temporary failure back in the queue (3 tries), counts what is pending, fails stuck sends', async () => {
+    const guests = await call<Guest[]>('owner_guests', [inv, OWNER_A]);
+    const failed = guests.filter((g) => g.sendStatus === 'failed').map((g) => g.id);
+    expect(failed.length).toBeGreaterThan(0);
+    await commit('whatsapp_queue', [inv, OWNER_A, failed, 0.0353]);
+    expect(await call('whatsapp_pending', [inv])).toBe(failed.length);
+    const tries: boolean[] = [];
+    for (let i = 0; i < 3; i++) {
+      const [m] = await commit<{ id: string }[]>('whatsapp_claim', [inv, 1]);
+      tries.push(await commit<boolean>('whatsapp_requeue', [m!.id, '130429 · rate limit']));
+    }
+    // twice back in the queue, the third try gives up (and refunds)
+    expect(tries).toEqual([true, true, false]);
+    expect(await call('whatsapp_requeue', ['00000000-0000-4000-8000-000000000000', 'x'])).toBe(false);
+
+    // a sender that died mid-send: claimed again after 10 minutes, failed after the third try
+    await commit('whatsapp_queue', [inv, OWNER_A, failed, 0.0353]);
+    const rest = await commit<{ id: string }[]>('whatsapp_claim', [inv, 50]);
+    expect(rest).toHaveLength(failed.length);
+    for (const m of rest) {
+      await c.query(
+        `update whatsapp_messages set attempts = 3, claimed_at = now() - interval '11 minutes' where id = $1`,
+        [m.id],
+      );
+    }
+    const before = (await call<{ credits: number }>('account_get', [OWNER_A])).credits;
+    expect(await commit('whatsapp_claim', [inv, 50])).toEqual([]);
+    expect((await call<{ credits: number }>('account_get', [OWNER_A])).credits).toBe(before + rest.length);
+    expect(await call('whatsapp_pending', [inv])).toBe(0);
+  });
 });
 
 describe('support chat and partners', () => {

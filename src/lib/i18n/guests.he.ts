@@ -160,7 +160,7 @@ export const guestsHe = {
     marked: 'עודכן',
     error: 'משהו השתבש. נסו שוב.',
   },
-  ownMessage: 'שלום {name}!\n{hosts} מזמינים אותך ל{event}{date}.\nלפרטים ולאישור הגעה: {url}',
+  ownMessage: 'שלום {name}!\n{hosts} מזמינים אותך {event} ב{date}.\nלפרטים ולאישור הגעה: {url}',
   csv: {
     name: 'שם',
     phone: 'טלפון',

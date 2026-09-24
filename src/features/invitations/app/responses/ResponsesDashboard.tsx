@@ -3,7 +3,6 @@
 import {
   Bell,
   Check,
-  CircleCheckBig,
   Clock,
   Download,
   Filter,
@@ -36,6 +35,7 @@ import {
 } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { hostApi, loginUrl } from '../api';
+import { InvitationNav } from '../InvitationNav';
 import type { DietaryKey } from '../../contracts/types';
 import {
   NOTIFY_MODES,
@@ -203,221 +203,216 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
   });
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-[26px] font-bold tracking-[-.01em]">{r.title}</h1>
-          <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-muted">
-            <span>{data.title}</span>
-            <span aria-hidden>·</span>
-            <span>{data.dateLine}</span>
-            <span aria-hidden>·</span>
-            {data.status === 'published' ? (
-              <Badge variant="live" icon={<CircleCheckBig />}>
-                {t.status.published}
-              </Badge>
-            ) : (
-              <Badge variant="draft">{t.status[data.status]}</Badge>
-            )}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Menu
-            trigger={
-              <Button variant="secondary" icon={<Bell />}>
-                {r.notify.label}: {r.notify[notify]}
-              </Button>
-            }
-            items={NOTIFY_MODES.map((mode) => ({
-              label: r.notify[mode],
-              icon: mode === notify ? <Check /> : <span />,
-              onSelect: () => void saveNotify(mode),
-            }))}
-          />
-          <Button variant="secondary" icon={<Share2 />} asChild>
-            <Link href={`/app/invitations/${data.id}/share`}>{r.share}</Link>
-          </Button>
-          <Button icon={<Download />} asChild>
-            <a href={exportHref} download={exportFileName(data.slug)}>
-              {r.export}
-            </a>
-          </Button>
-        </div>
-      </div>
-
-      {list.length === 0 ? (
-        <Card className="mt-6">
-          <EmptyState
-            title={r.emptyTitle}
-            description={r.emptyBody}
-            action={
-              <Button icon={<Share2 />} asChild>
-                <Link href={`/app/invitations/${data.id}/share`}>{r.share}</Link>
-              </Button>
-            }
-          />
-        </Card>
-      ) : (
-        <>
-          <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <KpiCard
-              icon={<Users />}
-              label={r.kpi.attending}
-              value={number(stats.attending)}
-              sub={fmt(r.kpi.attendingSub, {
-                adults: plural(t.common.adults, stats.adults, { n: number(stats.adults) }),
-                children: plural(t.common.children, stats.children, { n: number(stats.children) }),
-              })}
-            />
-            <KpiCard
-              icon={<Mail />}
-              label={r.kpi.responses}
-              value={number(stats.responses)}
-              sub={fmt(r.kpi.responsesSub, { n: number(stats.newThisWeek) })}
-            />
-            <KpiCard
-              icon={<X />}
-              label={r.kpi.declined}
-              value={number(stats.declined)}
-              sub={fmt(r.kpi.declinedSub, { pct: number(stats.declinedPct) })}
-            />
-            <KpiCard
-              icon={<Clock />}
-              label={r.kpi.deadline}
-              value={deadlineValue}
-              sub={data.deadline?.label}
-            />
+    <>
+      <InvitationNav
+        id={data.id}
+        title={data.title}
+        dateLine={data.dateLine}
+        published={data.status === 'published'}
+        current="responses"
+      />
+      <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-[22px] font-bold tracking-[-.01em]">{r.title}</h1>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <Menu
+              trigger={
+                <Button variant="secondary" icon={<Bell />}>
+                  {r.notify.label}: {r.notify[notify]}
+                </Button>
+              }
+              items={NOTIFY_MODES.map((mode) => ({
+                label: r.notify[mode],
+                icon: mode === notify ? <Check /> : <span />,
+                onSelect: () => void saveNotify(mode),
+              }))}
+            />
+            <Button icon={<Download />} asChild>
+              <a href={exportHref} download={exportFileName(data.slug)}>
+                {r.export}
+              </a>
+            </Button>
+          </div>
+        </div>
 
-          {diet.length || breakdowns.length ? (
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              {diet.length ? (
-                <Card padding="md">
-                  <Bars
-                    title={r.dietary}
-                    rows={diet.map((d) => ({
-                      key: d.key,
-                      label: dietLabel(d.key),
-                      value: d.count,
-                    }))}
-                    formatValue={number}
-                  />
-                </Card>
-              ) : null}
-              {breakdowns.map(({ q, counts }) => (
-                <Card key={q.id} padding="md">
-                  <Bars
-                    title={q.label}
-                    rows={counts.map((c) => ({
-                      key: c.value,
-                      label:
-                        q.type === 'boolean'
-                          ? c.value === 'true'
-                            ? r.yes
-                            : r.no
-                          : (q.options.find((o) => o.value === c.value)?.label ?? c.value),
-                      value: c.count,
-                    }))}
-                    formatValue={number}
-                  />
-                </Card>
-              ))}
-            </div>
-          ) : null}
-
-          <Card className="mt-4 overflow-hidden">
-            <div className="flex flex-wrap items-center gap-2 p-3">
-              <div className="relative min-w-[200px] flex-1">
-                <Search
-                  aria-hidden
-                  size={16}
-                  className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-faint"
-                />
-                <Input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={r.search}
-                  aria-label={r.search}
-                  className="ps-8"
-                />
-              </div>
-              <Segmented
-                label={r.statusFilter}
-                value={status}
-                onValueChange={setStatus}
-                options={[
-                  { value: 'all', label: r.all },
-                  { value: 'attending', label: r.attending },
-                  { value: 'declined', label: r.declined },
-                ]}
-              />
-              <Menu
-                trigger={
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    icon={<Filter />}
-                    aria-pressed={withMessage || withDietary}
-                  >
-                    {r.filter}
-                    {withMessage || withDietary ? ` (${(withMessage ? 1 : 0) + (withDietary ? 1 : 0)})` : ''}
-                  </Button>
-                }
-                items={[
-                  {
-                    label: r.withMessage,
-                    icon: withMessage ? <Check /> : <span />,
-                    onSelect: () => setWithMessage((v) => !v),
-                  },
-                  {
-                    label: r.withDietary,
-                    icon: withDietary ? <Check /> : <span />,
-                    onSelect: () => setWithDietary((v) => !v),
-                  },
-                  ...(withMessage || withDietary
-                    ? [
-                        { type: 'separator' as const },
-                        {
-                          label: r.clearFilters,
-                          icon: <X />,
-                          onSelect: () => {
-                            setWithMessage(false);
-                            setWithDietary(false);
-                          },
-                        },
-                      ]
-                    : []),
-                ]}
-              />
-            </div>
-            <DataTable
-              caption={r.tableCaption}
-              columns={columns}
-              rows={rows}
-              getRowKey={(x) => x.id}
-              onRowClick={(x) => setOpenId(x.id)}
-              empty={<p className="py-10 text-center text-[14px] text-muted">{r.noMatches}</p>}
+        {list.length === 0 ? (
+          <Card className="mt-6">
+            <EmptyState
+              title={r.emptyTitle}
+              description={r.emptyBody}
+              action={
+                <Button icon={<Share2 />} asChild>
+                  <Link href={`/app/invitations/${data.id}/share`}>{r.share}</Link>
+                </Button>
+              }
             />
           </Card>
-        </>
-      )}
+        ) : (
+          <>
+            <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <KpiCard
+                icon={<Users />}
+                label={r.kpi.attending}
+                value={number(stats.attending)}
+                sub={fmt(r.kpi.attendingSub, {
+                  adults: plural(t.common.adults, stats.adults, { n: number(stats.adults) }),
+                  children: plural(t.common.children, stats.children, { n: number(stats.children) }),
+                })}
+              />
+              <KpiCard
+                icon={<Mail />}
+                label={r.kpi.responses}
+                value={number(stats.responses)}
+                sub={fmt(r.kpi.responsesSub, { n: number(stats.newThisWeek) })}
+              />
+              <KpiCard
+                icon={<X />}
+                label={r.kpi.declined}
+                value={number(stats.declined)}
+                sub={fmt(r.kpi.declinedSub, { pct: number(stats.declinedPct) })}
+              />
+              <KpiCard
+                icon={<Clock />}
+                label={r.kpi.deadline}
+                value={deadlineValue}
+                sub={data.deadline?.label}
+              />
+            </div>
 
-      {open ? (
-        <ResponseDrawer
-          response={open}
-          data={data}
-          answerLabel={answerLabel}
-          dietLabel={dietLabel}
-          onClose={() => setOpenId(null)}
-          onDeleted={(deleted) => {
-            setOpenId(null);
-            setRemoved((ids) => new Set(ids).add(deleted));
-            startRefresh(() => router.refresh());
-          }}
-        />
-      ) : null}
-    </div>
+            {diet.length || breakdowns.length ? (
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {diet.length ? (
+                  <Card padding="md">
+                    <Bars
+                      title={r.dietary}
+                      rows={diet.map((d) => ({
+                        key: d.key,
+                        label: dietLabel(d.key),
+                        value: d.count,
+                      }))}
+                      formatValue={number}
+                    />
+                  </Card>
+                ) : null}
+                {breakdowns.map(({ q, counts }) => (
+                  <Card key={q.id} padding="md">
+                    <Bars
+                      title={q.label}
+                      rows={counts.map((c) => ({
+                        key: c.value,
+                        label:
+                          q.type === 'boolean'
+                            ? c.value === 'true'
+                              ? r.yes
+                              : r.no
+                            : (q.options.find((o) => o.value === c.value)?.label ?? c.value),
+                        value: c.count,
+                      }))}
+                      formatValue={number}
+                    />
+                  </Card>
+                ))}
+              </div>
+            ) : null}
+
+            <Card className="mt-4 overflow-hidden">
+              <div className="flex flex-wrap items-center gap-2 p-3">
+                <div className="relative min-w-[200px] flex-1">
+                  <Search
+                    aria-hidden
+                    size={16}
+                    className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-faint"
+                  />
+                  <Input
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={r.search}
+                    aria-label={r.search}
+                    className="ps-8"
+                  />
+                </div>
+                <Segmented
+                  label={r.statusFilter}
+                  value={status}
+                  onValueChange={setStatus}
+                  options={[
+                    { value: 'all', label: r.all },
+                    { value: 'attending', label: r.attending },
+                    { value: 'declined', label: r.declined },
+                  ]}
+                />
+                <Menu
+                  trigger={
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      icon={<Filter />}
+                      aria-pressed={withMessage || withDietary}
+                    >
+                      {r.filter}
+                      {withMessage || withDietary
+                        ? ` (${(withMessage ? 1 : 0) + (withDietary ? 1 : 0)})`
+                        : ''}
+                    </Button>
+                  }
+                  items={[
+                    {
+                      label: r.withMessage,
+                      icon: withMessage ? <Check /> : <span />,
+                      onSelect: () => setWithMessage((v) => !v),
+                    },
+                    {
+                      label: r.withDietary,
+                      icon: withDietary ? <Check /> : <span />,
+                      onSelect: () => setWithDietary((v) => !v),
+                    },
+                    ...(withMessage || withDietary
+                      ? [
+                          { type: 'separator' as const },
+                          {
+                            label: r.clearFilters,
+                            icon: <X />,
+                            onSelect: () => {
+                              setWithMessage(false);
+                              setWithDietary(false);
+                            },
+                          },
+                        ]
+                      : []),
+                  ]}
+                />
+              </div>
+              <DataTable
+                caption={r.tableCaption}
+                columns={columns}
+                rows={rows}
+                getRowKey={(x) => x.id}
+                onRowClick={(x) => setOpenId(x.id)}
+                empty={<p className="py-10 text-center text-[14px] text-muted">{r.noMatches}</p>}
+              />
+            </Card>
+          </>
+        )}
+
+        {open ? (
+          <ResponseDrawer
+            response={open}
+            data={data}
+            answerLabel={answerLabel}
+            dietLabel={dietLabel}
+            onClose={() => setOpenId(null)}
+            onDeleted={(deleted) => {
+              setOpenId(null);
+              setRemoved((ids) => new Set(ids).add(deleted));
+              startRefresh(() => router.refresh());
+            }}
+          />
+        ) : null}
+      </div>
+    </>
   );
 }
 

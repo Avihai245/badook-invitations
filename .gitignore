@@ -25,3 +25,6 @@ coverage/
 # misc
 .DS_Store
 *.log
+
+# local agent worktrees
+/.claude/worktrees/

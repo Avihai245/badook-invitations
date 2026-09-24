@@ -34,6 +34,10 @@ export const he = {
     adults: { one: 'מבוגר אחד', other: '{n} מבוגרים' },
     children: { one: 'ילד אחד', other: '{n} ילדים' },
     toastViewport: 'התראות ({hotkey})',
+    /** the "?" next to an area's title: what each of its buttons does */
+    helpLabel: 'הסבר על הכפתורים באזור הזה',
+    helpTitle: 'מה כל כפתור עושה',
+    people: { one: 'איש אחד', other: '{n} אנשים' },
   },
   shell: {
     nav: { invitations: 'ההזמנות שלי', newInvitation: 'הזמנה חדשה' },
@@ -41,6 +45,14 @@ export const he = {
     account: 'החשבון שלי',
     signOut: 'יציאה',
     skipToContent: 'דילוג לתוכן',
+    invitationNav: {
+      label: 'ניווט בהזמנה',
+      edit: 'עריכה',
+      guests: 'מוזמנים',
+      responses: 'אישורי הגעה',
+      share: 'שיתוף',
+      back: 'כל ההזמנות',
+    },
   },
   auth: {
     panelTitle: 'הזמנות שמרגשות את האורחים',
@@ -109,6 +121,7 @@ export const he = {
     menu: {
       edit: 'עריכה',
       share: 'שיתוף',
+      guests: 'מוזמנים',
       responses: 'תשובות',
       duplicate: 'שכפול',
       archive: 'העברה לארכיון',
@@ -384,6 +397,9 @@ export const he = {
     notPublishedTitle: 'ההזמנה עוד לא פורסמה',
     notPublishedBody: 'פרסמו אותה מהעורך — ואז יהיה כאן קישור לשיתוף, הודעה מוכנה וקוד QR.',
     toEditor: 'לעורך',
+    guestsTitle: 'קישור אישי לכל מוזמן',
+    guestsBody: 'העלו את רשימת המוזמנים מאקסל — כל אחד יקבל קישור עם השם שלו, הטופס יגיע ממולא ותראו מי פתח ומי אישר.',
+    toGuests: 'לרשימת המוזמנים'
   },
 };
 
