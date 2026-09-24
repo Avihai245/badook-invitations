@@ -79,20 +79,6 @@ export const accountDb = {
   creditsAdd: (userId: string, count: number, reason: 'admin' | 'plan_grant', ref: string) =>
     rpc<number | null>('credits_add', { p_user_id: userId, p_count: count, p_reason: reason, p_ref: ref }),
   byEmail: (email: string) => rpc<string | null>('user_id_by_email', { p_email: email }),
-  linkPartner: (
-    userId: string,
-    source: string,
-    externalId: string | null,
-    fullName: string,
-    phone: string | null,
-  ) =>
-    rpc<AccountRecord>('account_link_partner', {
-      p_user_id: userId,
-      p_source: source,
-      p_external_id: externalId,
-      p_full_name: fullName,
-      p_phone: phone,
-    }),
 };
 
 export function isAdminEmail(email: string | null | undefined): boolean {
