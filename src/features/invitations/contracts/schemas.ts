@@ -5,6 +5,7 @@
  */
 import { z } from 'zod';
 import {
+  AMBIENT_KINDS,
   DECORATION_SLOTS,
   DIETARY_KEYS,
   EVENT_TYPES,
@@ -419,6 +420,8 @@ export const TemplateManifestSchema = z.strictObject({
     revealDistance: z.number().min(0),
     revealBlur: z.boolean(),
     stagger: z.number().min(0),
+    // added after v2: optional — without it the renderer picks the template's particles by id
+    ambient: z.enum(AMBIENT_KINDS).optional(),
   }),
   assets: z.record(z.string().regex(/^[A-Za-z0-9._-]+$/), TemplatePathSchema),
   decorations: z.partialRecord(z.enum(DECORATION_SLOTS), AssetRefSchema.nullable()),

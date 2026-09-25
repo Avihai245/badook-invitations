@@ -2,6 +2,9 @@ import type { CSSProperties } from 'react';
 import type { AssetRef, SectionOf } from '../../contracts/types';
 import { longestWordLength } from '../../lib/text';
 import { parseVideoLink } from '../../lib/video-links';
+import { Ambient } from '../../renderer/fx/Ambient.client';
+import { NameShine } from '../../renderer/fx/NameShine.client';
+import { fxTheme } from '../../renderer/fx/theme';
 import type { PlaceholderArt } from '../../renderer/placeholders';
 import { Scene } from '../../renderer/scenes';
 import { Icon } from '../../ui/Icon';
@@ -113,6 +116,8 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
   const primary = ctx.text(doc.hosts.primary);
   const secondary = ctx.text(doc.hosts.secondary);
   const customTitle = d.title.mode === 'custom' ? ctx.text(d.title.text) : '';
+  // the template's particles (renderer/fx) — drawn in the browser only, after the cover opens
+  const fx = fxTheme(ctx.template, doc);
   return (
     <header className="hero" data-edit-path={path}>
       <div className="hero-media" aria-hidden="true">
@@ -120,6 +125,7 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
         {media}
       </div>
       <div className="hero-overlay" style={{ '--ov': d.overlayOpacity } as CSSProperties} />
+      <Ambient kind={fx.ambient} colors={fx.ambientColors} seed={`${ctx.template.id}:${doc.share.slug}`} />
       <div className="hero-inner hero-enter">
         {/* one child for the entrance's stagger: the guest's greeting (personal links) + the eyebrow */}
         <div className="hero-lead">
@@ -140,17 +146,20 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
           {custom ? (
             <span className="n" style={fit(customTitle)}>
               {customTitle}
+              <NameShine text={customTitle} />
             </span>
           ) : (
             <>
               <span className="n" style={fit(primary)}>
                 <bdi>{primary}</bdi>
+                <NameShine text={primary} />
               </span>
               {doc.hosts.secondary ? (
                 <>
                   <span className="j">{joiner}</span>
                   <span className="n" style={fit(secondary)}>
                     <bdi>{secondary}</bdi>
+                    <NameShine text={secondary} />
                   </span>
                 </>
               ) : null}

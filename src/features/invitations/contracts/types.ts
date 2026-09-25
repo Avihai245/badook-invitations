@@ -279,6 +279,40 @@ export type CoverStyle = 'envelope_seal' | 'ribbon' | 'gatefold' | 'pouch' | 'sw
 /** A design's tier — the gallery badges premium designs ('standard' when a manifest leaves it out). */
 export type TemplateTier = 'standard' | 'premium';
 export const TEMPLATE_TIERS = ['standard', 'premium'] as const satisfies readonly TemplateTier[];
+/**
+ * The hero's ambient particles (renderer/fx): drifting petals or leaves, falling confetti, twinkling
+ * sparkles or stars, rising bubbles / balloons / hearts / music notes / embers, glowing fireflies,
+ * 8-bit pixels — or `none`. The cover's opening and the RSVP "thank you" burst in the same theme.
+ */
+export type AmbientKind =
+  | 'none'
+  | 'petals'
+  | 'leaves'
+  | 'confetti'
+  | 'sparkles'
+  | 'stars'
+  | 'bubbles'
+  | 'balloons'
+  | 'hearts'
+  | 'fireflies'
+  | 'embers'
+  | 'notes'
+  | 'pixels';
+export const AMBIENT_KINDS = [
+  'none',
+  'petals',
+  'leaves',
+  'confetti',
+  'sparkles',
+  'stars',
+  'bubbles',
+  'balloons',
+  'hearts',
+  'fireflies',
+  'embers',
+  'notes',
+  'pixels',
+] as const satisfies readonly AmbientKind[];
 
 export interface TemplateManifest {
   id: string;
@@ -328,7 +362,14 @@ export interface TemplateManifest {
     defaultTrackId: string | null;
     tracks: { id: string; title: string; url: string; license: string }[];
   };
-  motion: { preset: 'soft' | 'none'; revealDistance: number; revealBlur: boolean; stagger: number };
+  motion: {
+    preset: 'soft' | 'none';
+    revealDistance: number;
+    revealBlur: boolean;
+    stagger: number;
+    /** optional: the hero's particles; without it renderer/fx/theme.ts picks one by template id */
+    ambient?: AmbientKind;
+  };
   assets: Record<string, string>; // referenced as 'template:<key>'
   decorations: Partial<
     Record<'afterHero' | 'betweenVenues' | 'afterTimeline' | 'beforeRsvp' | 'footer', AssetRef | null>

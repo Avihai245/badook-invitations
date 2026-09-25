@@ -16,10 +16,67 @@
   /* each section's top and bottom padding — two of them separate neighbouring sections */
   --sec-pad: 56px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* motion: an expo-out for entrances; springs (a gentle overshoot) where things land — the
+     cubic-bezier is the fallback of browsers without linear() (see the @supports below) */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: cubic-bezier(0.3, 1.25, 0.6, 1);
+  --spring-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
   --accent-08: color-mix(in srgb, var(--inv-accent) 8%, transparent);
   --accent-12: color-mix(in srgb, var(--inv-accent) 12%, transparent);
   --accent-35: color-mix(in srgb, var(--inv-accent) 35%, transparent);
   color-scheme: light; /* the invitation always uses template colors, never the device theme */
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    /* damped springs (ζ .7: ~4.5% overshoot; ζ .6: ~9%) */
+    --spring: linear(
+      0,
+      0.078,
+      0.25,
+      0.449,
+      0.634,
+      0.786,
+      0.899,
+      0.974,
+      1.018,
+      1.04,
+      1.046,
+      1.043,
+      1.035,
+      1.026,
+      1.017,
+      1.01,
+      1.005,
+      1.001,
+      0.999,
+      0.998,
+      0.998,
+      0.999,
+      1
+    );
+    --spring-pop: linear(
+      0,
+      0.094,
+      0.302,
+      0.539,
+      0.751,
+      0.913,
+      1.019,
+      1.076,
+      1.094,
+      1.089,
+      1.07,
+      1.048,
+      1.027,
+      1.011,
+      1,
+      0.994,
+      0.991,
+      0.993,
+      0.997,
+      1
+    );
+  }
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -134,7 +191,21 @@ a {
     var(--cv-2, #e6ddd1) 70%,
     var(--cv-3, #dcd1c3) 100%
   );
-  transition: opacity 0.7s var(--ease);
+  transition: opacity 0.8s var(--ease);
+}
+/* the opening's warm light, behind the envelope / ticket (renderer/cover/CoverOverlay.client.tsx) */
+.cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    58% 42% at 50% 44%,
+    rgb(255 246 226 / 0.9),
+    color-mix(in srgb, var(--inv-seal) 18%, rgb(255 232 196 / 0.5)) 38%,
+    transparent 72%
+  );
+  opacity: 0;
 }
 .cover::after {
   content: '';
@@ -173,6 +244,23 @@ a {
   aspect-ratio: 1.45;
   perspective: 1400px;
   margin-top: -4vh;
+  /* the push into the card as the cover goes (`.gone`): around the risen card's centre */
+  transform-origin: 50% 0;
+  transition: transform 1.15s cubic-bezier(0.55, 0, 0.25, 1);
+}
+/* a warm glow inside the envelope once its flap opens, lighting the card as it rises */
+.env-back::after {
+  content: '';
+  position: absolute;
+  inset: 4% 8% 36%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(255 248 230),
+    color-mix(in srgb, var(--inv-seal) 14%, rgb(255 226 176 / 0.7)) 48%,
+    transparent
+  );
+  opacity: 0;
 }
 .env-back {
   position: absolute;
@@ -234,6 +322,29 @@ a {
   height: 100%;
   overflow: visible;
 }
+/* the flash of light as the seal breaks (under its halves) */
+.seal::before,
+.ticket::before,
+.cv-overlay::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 330%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(255 250 236),
+    rgb(255 232 184 / 0.75) 24%,
+    color-mix(in srgb, var(--inv-seal) 22%, rgb(255 220 160 / 0.3)) 48%,
+    transparent
+  );
+  opacity: 0;
+  transform: scale(0.2);
+  pointer-events: none;
+}
 .seal .half {
   position: absolute;
   inset: 0;
@@ -287,7 +398,21 @@ a {
   width: min(78vw, 360px);
   aspect-ratio: 2.2;
   margin-top: -4vh;
-  animation: pulse-flat 2.4s ease-in-out infinite;
+  animation:
+    pulse-flat 2.4s ease-in-out infinite,
+    coverFloat 6s ease-in-out infinite alternate;
+}
+/* the closed envelope breathes: a slow float (the `translate` property — the push is `transform`) */
+.cover .env {
+  animation: coverFloat 6s ease-in-out infinite alternate;
+}
+@keyframes coverFloat {
+  from {
+    translate: 0 -3px;
+  }
+  to {
+    translate: 0 5px;
+  }
 }
 .ticket svg {
   width: 100%;
@@ -316,16 +441,14 @@ a {
   transform: translate(18px, 34px) rotate(12deg);
   opacity: 0;
 }
-.cover.opening[data-exit='lift'] .seal .half,
-.cover.opening[data-exit='lift'] .ticket {
+.cover.opening[data-exit='lift'] .seal .half {
   transform: translateY(-24px) scale(1.08);
   opacity: 0;
   transition:
     transform 0.4s var(--ease),
     opacity 0.4s var(--ease);
 }
-.cover.opening[data-exit='fade'] .seal .half,
-.cover.opening[data-exit='fade'] .ticket {
+.cover.opening[data-exit='fade'] .seal .half {
   transform: none;
   opacity: 0;
   transition: opacity 0.25s var(--ease);
@@ -336,8 +459,100 @@ a {
   z-index: 1;
 }
 .cover.opening .env-card {
-  transform: translateY(-58%);
-  transition-delay: 1.05s;
+  transform: translateY(-60%) scale(1.035);
+  transition: transform 0.75s var(--ease-out) 1.02s;
+}
+/* light: a flash where the seal breaks, a glow from inside the envelope, a warm bloom behind it */
+.cover.opening .seal::before,
+.cover.opening .cv-overlay::before {
+  animation: coverFlash 1.1s var(--ease-out) both;
+}
+.cover.opening .env-back::after {
+  animation: envGlow 1.5s 0.55s var(--ease-out) both;
+}
+.cover.opening::before {
+  animation: coverBloom 2.3s 0.75s ease-out both;
+}
+/* the push into the card as the cover fades: the envelope grows around the card, toward the guest */
+.cover.gone .env {
+  transform: scale(2.1);
+}
+@keyframes coverFlash {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+@keyframes envGlow {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+}
+@keyframes coverBloom {
+  0% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+/* ticket covers: the stub tears off along the perforation (renderer/cover — TicketArt twice, clipped at
+   the dashed line, 168/220 of the width), the ticket lifts toward the guest as the cover fades */
+.ticket .tk {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.ticket .tk-main {
+  clip-path: inset(-30% 23.6% -30% -30%);
+}
+.ticket .tk-stub {
+  clip-path: inset(-30% -30% -30% 76.4%);
+  transform-origin: 76.4% 100%;
+}
+.ticket::before {
+  left: 76.4%;
+  width: 150%;
+}
+.cover.opening .ticket::before {
+  animation: coverFlash 1s var(--ease-out) both;
+}
+.cover.opening .tk-stub {
+  transform: translate(12%, 20%) rotate(24deg);
+  opacity: 0;
+  transition:
+    transform 0.85s cubic-bezier(0.3, 0.7, 0.35, 1),
+    opacity 0.45s 0.35s ease;
+}
+.cover.opening .tk-main {
+  transform: translateX(-3%) rotate(-2.5deg);
+  transition: transform 0.7s var(--spring);
+}
+.cover.gone .ticket {
+  transform: scale(1.3);
+  opacity: 0;
+  transition:
+    transform 0.9s var(--ease-out),
+    opacity 0.55s ease;
 }
 .cover-skip {
   position: absolute;
@@ -354,16 +569,26 @@ a {
 }
 @media (prefers-reduced-motion: reduce) {
   .seal,
-  .ticket {
+  .ticket,
+  .cover .env {
     animation: none;
   }
+  .env,
   .env-flap,
   .env-card,
-  .seal .half {
+  .seal .half,
+  .ticket .tk {
     transition: none;
   }
   .cover {
     transition: opacity 0.3s linear;
+  }
+  .cover::before,
+  .env-back::after,
+  .seal::before,
+  .ticket::before,
+  .cv-overlay::before {
+    display: none;
   }
 }
 
@@ -1011,37 +1236,78 @@ html[data-framed] body::-webkit-scrollbar {
     transform: translateY(6px);
   }
 }
+/* The entrance (§9A.6), from <html data-opened> (the cover opened, or the page shows opened): the lead,
+   then each name rises out of a soft blur and catches a gold glint (renderer/fx/NameShine), the rule
+   draws with a spark running along it, then the date and the place; meanwhile the scene settles from a
+   slight zoom. Transform, opacity and the blur only — never a layout property (FitNames measures the
+   names' own boxes, which never move). */
 .hero-enter > * {
   opacity: 0;
   filter: blur(10px);
   transform: translateY(16px);
 }
-.hero-enter.go > *,
-:root[data-opened] .hero-enter > * {
-  animation: heroIn 0.9s var(--ease) forwards;
+/* the heading stays put: its names and joiner move one by one */
+.hero-enter > .names {
+  opacity: 1;
+  filter: none;
+  transform: none;
 }
-.hero-enter.go > *:nth-child(2),
-:root[data-opened] .hero-enter > *:nth-child(2) {
-  animation-delay: 0.15s;
+.names > * {
+  opacity: 0;
+  filter: blur(12px);
+  transform: translateY(0.3em) scale(0.96);
 }
-.hero-enter.go > *:nth-child(3),
-:root[data-opened] .hero-enter > *:nth-child(3) {
-  animation-delay: 0.3s;
+.hero-enter.go > :not(.names),
+:root[data-opened] .hero-enter > :not(.names) {
+  animation: heroIn 1s var(--ease-out) forwards;
 }
-.hero-enter.go > *:nth-child(4),
-:root[data-opened] .hero-enter > *:nth-child(4) {
-  animation-delay: 0.45s;
+.hero-enter.go > .names > *,
+:root[data-opened] .hero-enter > .names > * {
+  animation: nameIn 1.35s var(--ease-out) forwards;
 }
-.hero-enter.go > *:nth-child(5),
-:root[data-opened] .hero-enter > *:nth-child(5) {
-  animation-delay: 0.55s;
+.hero-enter > .names > :nth-child(1) {
+  animation-delay: 0.14s;
+  --shine-delay: 1.05s;
+}
+.hero-enter > .names > :nth-child(2) {
+  animation-delay: 0.42s;
+}
+.hero-enter > .names > :nth-child(3) {
+  animation-delay: 0.56s;
+  --shine-delay: 1.4s;
+}
+.hero-enter > :nth-child(3) {
+  animation-delay: 0.78s;
+}
+.hero-enter > :nth-child(4) {
+  animation-delay: 0.9s;
+}
+.hero-enter > :nth-child(5) {
+  animation-delay: 1.02s;
 }
 .hero-enter.go > .rule,
 :root[data-opened] .hero-enter > .rule {
   animation-name: ruleIn;
+  animation-duration: 1.1s;
 }
 @keyframes heroIn {
   to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+@keyframes nameIn {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(0.3em) scale(0.96);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
     opacity: 1;
     filter: none;
     transform: none;
@@ -1057,6 +1323,159 @@ html[data-framed] body::-webkit-scrollbar {
     opacity: 1;
     filter: none;
     transform: none;
+  }
+}
+/* a spark runs along the rule once it has drawn (in the reading direction) */
+.hero .rule {
+  position: relative;
+  --glint-dir: 1;
+}
+:root[dir='rtl'] .hero .rule {
+  --glint-dir: -1;
+}
+.hero .rule::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  inset-inline-start: -4%;
+  width: 26%;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(255 255 255 / 0.95),
+    color-mix(in srgb, var(--inv-accent) 35%, rgb(255 236 190 / 0.7)) 50%,
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+:root[data-opened] .hero .rule::after {
+  animation: ruleGlint 1.5s 1.35s var(--ease) both;
+}
+@keyframes ruleGlint {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc(var(--glint-run, 330%) * var(--glint-dir)));
+  }
+}
+/* the gold-foil glint over each name (renderer/fx/NameShine.client.tsx): a copy of the name in a soft
+   slanted window — the window slides one way, the copy the other, so it stays over the name */
+.names .n {
+  position: relative;
+}
+.n-shine {
+  position: absolute;
+  inset: -0.22em 0 -0.28em;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  --dir: 1;
+}
+:root[dir='rtl'] .n-shine {
+  --dir: -1;
+}
+.n-shine-band {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(105deg, transparent 36%, #000 47%, #000 53%, transparent 64%);
+  mask-image: linear-gradient(105deg, transparent 36%, #000 47%, #000 53%, transparent 64%);
+  transform: translateX(calc(-100% * var(--dir)));
+}
+.n-shine-text {
+  position: absolute;
+  inset: 0;
+  padding-top: 0.22em;
+  color: var(--shine, color-mix(in srgb, var(--inv-accent) 16%, #f7dc93));
+  text-shadow:
+    0 0 0.2em rgb(255 244 214 / 0.9),
+    0 0 0.6em color-mix(in srgb, var(--inv-accent) 30%, rgb(255 222 150 / 0.55));
+  transform: translateX(calc(100% * var(--dir)));
+}
+:root[data-opened] .n-shine-band {
+  animation: shineWindow 1.35s cubic-bezier(0.45, 0.05, 0.3, 1) var(--shine-delay, 1.05s) both;
+}
+:root[data-opened] .n-shine-text {
+  animation: shineCopy 1.35s cubic-bezier(0.45, 0.05, 0.3, 1) var(--shine-delay, 1.05s) both;
+}
+@keyframes shineWindow {
+  from {
+    transform: translateX(calc(-100% * var(--dir)));
+  }
+  to {
+    transform: translateX(calc(100% * var(--dir)));
+  }
+}
+@keyframes shineCopy {
+  from {
+    transform: translateX(calc(100% * var(--dir)));
+  }
+  to {
+    transform: translateX(calc(-100% * var(--dir)));
+  }
+}
+/* depth: the scene (or photo, or video) settles from a slight zoom as the invitation opens, then —
+   where scroll-driven animations exist — drifts slower than the page while the text lifts away */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-opened] .hero-media {
+    animation: heroSettle 2.8s var(--ease-out) both;
+  }
+  @supports (animation-timeline: scroll()) {
+    :root[data-opened] .hero-media {
+      animation:
+        heroSettle 2.8s var(--ease-out) both,
+        heroDrift linear both;
+      animation-timeline: auto, scroll(root);
+      animation-range:
+        normal,
+        0 100svh;
+    }
+    .hero-inner {
+      animation: heroAway linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 90svh;
+    }
+  }
+}
+@keyframes heroSettle {
+  from {
+    scale: 1.12;
+  }
+  to {
+    scale: 1;
+  }
+}
+@keyframes heroDrift {
+  to {
+    translate: 0 28%;
+  }
+}
+@keyframes heroAway {
+  to {
+    translate: 0 -12%;
+    opacity: 0.2;
+  }
+}
+/* the scroll cue comes last */
+.hero .cue {
+  opacity: 0;
+}
+:root[data-opened] .hero .cue {
+  animation:
+    cueIn 0.8s 1.6s var(--ease) forwards,
+    bob 2.2s 2.4s ease-in-out infinite;
+}
+@keyframes cueIn {
+  to {
+    opacity: 0.8;
   }
 }
 
@@ -1106,6 +1525,7 @@ html[data-framed] body::-webkit-scrollbar {
   padding-top: 24px;
 }
 .divider {
+  position: relative;
   height: 1px;
   width: 72%;
   margin: 0 auto;
@@ -1118,6 +1538,39 @@ html[data-framed] body::-webkit-scrollbar {
     transparent
   );
   opacity: 0.9;
+  --glint-dir: 1;
+  transition: transform 1.5s var(--ease-out);
+}
+:root[dir='rtl'] .divider {
+  --glint-dir: -1;
+}
+/* it draws itself from the centre as it comes into view (RevealObserver adds .in), then a spark runs
+   along it */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.no-js) .inv:not([data-mode='editor']) .divider:not(.in) {
+    transform: scaleX(0);
+  }
+}
+.divider::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  inset-inline-start: 0;
+  width: 16%;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(255 255 255 / 0.9),
+    color-mix(in srgb, var(--inv-accent) 45%, transparent) 55%,
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+  --glint-run: 540%;
+}
+.divider.in::after {
+  animation: ruleGlint 1.9s 0.8s var(--ease) both;
 }
 .illus {
   display: block;
@@ -1138,18 +1591,191 @@ html[data-framed] body::-webkit-scrollbar {
 }
 .reveal {
   opacity: 0;
-  transform: translateY(var(--reveal-distance, 40px));
+  transform: translate3d(0, var(--reveal-distance, 40px), 0);
   filter: blur(var(--reveal-blur, 6px));
   transition:
     opacity 0.8s var(--ease),
-    transform 0.8s var(--ease),
+    transform 1.05s var(--spring),
     filter 0.8s var(--ease);
   transition-delay: calc(var(--i, 0) * var(--reveal-stagger, 80ms));
+}
+/* cards lift in: from a little lower, tipped back, slightly smaller */
+.card.reveal,
+.map.reveal {
+  transform: perspective(900px) translate3d(0, calc(var(--reveal-distance, 40px) * 1.3), 0) rotateX(9deg)
+    scale(0.95);
+  transform-origin: 50% 100%;
+  transition-duration: 0.9s, 1.2s, 0.9s;
+}
+.form.reveal {
+  transform: translate3d(0, calc(var(--reveal-distance, 40px) * 1.2), 0) scale(0.97);
+  transform-origin: 50% 0;
+}
+/* ornaments pop and settle */
+.illus.reveal {
+  transform: translate3d(0, 20px, 0) scale(0.7) rotate(-10deg);
+  transition-duration: 0.8s, 1.3s, 0.8s;
+  transition-timing-function: var(--ease), var(--spring-pop), var(--ease);
 }
 .reveal.in {
   opacity: 1;
   transform: none;
   filter: none;
+}
+/* a block's children cascade in after it (an animation with a backwards fill: once played, each child
+   is back to its own styles — a button's press, a flip card's turn) */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.no-js):not([data-motion='none'])
+    :is(
+      .cd.reveal:not(.in) > *,
+      .actions.reveal:not(.in) > *,
+      .card.reveal:not(.in) .stack > *,
+      .faq.reveal:not(.in) > details,
+      .gallery.reveal:not(.in) .g-item,
+      .gallery.reveal:not(.in) .g-dots
+    ) {
+    opacity: 0;
+  }
+}
+:is(.actions.reveal.in > *, .card.reveal.in .stack > *, .faq.reveal.in > details) {
+  animation: cascadeIn 0.9s var(--spring) backwards;
+  animation-delay: calc(var(--i, 0) * var(--reveal-stagger, 80ms) + 140ms + var(--k, 0) * 90ms);
+}
+.gallery.reveal.in :is(.g-item, .g-dots) {
+  animation: cascadePop 1s var(--spring) backwards;
+  animation-delay: calc(var(--i, 0) * var(--reveal-stagger, 80ms) + 160ms + var(--k, 0) * 80ms);
+}
+/* the countdown's cells flip down into place, one after another */
+.cd.reveal.in > * {
+  transform-origin: 50% 0;
+  animation: cellFlip 1s var(--spring-pop) backwards;
+  animation-delay: calc(var(--i, 0) * var(--reveal-stagger, 80ms) + 160ms + var(--k, 0) * 110ms);
+}
+:is(.cd, .actions, .stack, .faq, .g-grid, .g-track) > :nth-child(2) {
+  --k: 1;
+}
+:is(.cd, .actions, .stack, .faq, .g-grid, .g-track) > :nth-child(3) {
+  --k: 2;
+}
+:is(.cd, .actions, .stack, .faq, .g-grid, .g-track) > :nth-child(4) {
+  --k: 3;
+}
+:is(.cd, .actions, .stack, .faq, .g-grid, .g-track) > :nth-child(5) {
+  --k: 4;
+}
+:is(.cd, .actions, .stack, .faq, .g-grid, .g-track) > :nth-child(n + 6) {
+  --k: 5;
+}
+.gallery .g-dots {
+  --k: 5;
+}
+@keyframes cascadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.94);
+  }
+}
+@keyframes cascadePop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.9);
+  }
+}
+@keyframes cellFlip {
+  from {
+    opacity: 0;
+    transform: perspective(420px) rotateX(-80deg) translateY(-6px);
+  }
+  40% {
+    opacity: 1;
+  }
+}
+/* the map's pin drops in once the map has landed, with a ring where it lands (the placeholder only) */
+.map.reveal.in .pin {
+  animation: pinDrop 0.95s 0.55s var(--spring-pop) backwards;
+}
+.map::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 56px;
+  height: 20px;
+  margin: -10px 0 0 -28px;
+  border-radius: 50%;
+  border: 2px solid var(--inv-accent);
+  opacity: 0;
+  pointer-events: none;
+}
+.map.reveal.in:not([data-loaded])::after {
+  animation: pinRing 1.5s 1.3s ease-out 2;
+}
+@keyframes pinDrop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -260%);
+  }
+  30% {
+    opacity: 1;
+  }
+}
+@keyframes pinRing {
+  from {
+    opacity: 0.8;
+    transform: scale(0.25);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+/* the timeline: each stop's dot pops as it arrives, and the line draws down (across, when horizontal)
+   once the first stop is in — where :has() exists; elsewhere the line is simply there */
+.tl li.reveal.in .dot {
+  animation: dotPop 0.85s var(--spring-pop) backwards;
+  animation-delay: calc(var(--i, 0) * var(--reveal-stagger, 80ms) + 200ms);
+}
+@keyframes dotPop {
+  from {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+}
+@supports selector(:has(a)) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not(.no-js) .inv:not([data-mode='editor']) .tl::before {
+      transform: scaleY(0);
+      transform-origin: 50% 0;
+      transition: transform 1.8s var(--ease-out) 0.25s;
+    }
+    :root:not(.no-js) .inv:not([data-mode='editor']) .tl:has(> li.in)::before {
+      transform: none;
+    }
+    @media (min-width: 640px) {
+      :root:not(.no-js) .inv:not([data-mode='editor']) .tl.h::before {
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+      }
+      :root[dir='rtl']:not(.no-js) .inv:not([data-mode='editor']) .tl.h::before {
+        transform-origin: 100% 50%;
+      }
+      :root:not(.no-js) .inv:not([data-mode='editor']) .tl.h:has(> li.in)::before {
+        transform: none;
+      }
+    }
+  }
+}
+/* panoramas and decorations rise into place as they come into view (RevealObserver adds .in) */
+.deco {
+  transition:
+    opacity 1.1s var(--ease),
+    transform 1.3s var(--ease-out);
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.no-js) .inv:not([data-mode='editor']) .deco:not(.in) {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0) scale(0.98);
+  }
 }
 :root.no-js .reveal,
 :root[data-motion='none'] .reveal {
@@ -1160,29 +1786,74 @@ html[data-framed] body::-webkit-scrollbar {
 }
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .hero-enter > * {
+  .hero-enter > *,
+  .names > * {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
     transition: none;
     animation: none !important;
   }
+  .divider,
+  .deco,
+  .cd > *,
+  .actions > *,
+  .stack > *,
+  .faq > details,
+  .gallery .g-item,
+  .gallery .g-dots {
+    transition: none !important;
+    animation: none !important;
+  }
+  .tl::before {
+    transform: none !important;
+    transition: none !important;
+  }
   .cloud,
+  .hero .cue,
+  .hero-media,
+  .hero-inner,
+  .hero .rule::after,
+  .divider::after,
+  .tl .dot,
+  .map .pin,
+  .map::after {
+    animation: none !important;
+  }
   .hero .cue {
-    animation: none;
+    opacity: 0.8;
+  }
+  .n-shine,
+  .fx-amb,
+  .fx-burst {
+    display: none !important;
   }
 }
 /* Live language switch (LiveLocale): the other locale's nodes appear in place — the hero's entrance
    has played already, and what is on screen shows at once (lower sections still reveal on scroll). */
 :root[data-locale-switched] .hero-enter > *,
-:root[data-locale-switched] .hero-enter > .rule {
+:root[data-locale-switched] .hero-enter > .rule,
+:root[data-locale-switched] .names > * {
   opacity: 1;
   filter: none;
   transform: none;
   animation: none;
 }
-.inv[data-instant] .reveal {
+:root[data-locale-switched] .hero-media {
+  animation-name: none, heroDrift;
+}
+:root[data-locale-switched] .hero .cue {
+  opacity: 0.8;
+  animation: bob 2.2s ease-in-out infinite;
+}
+:root[data-locale-switched] .n-shine,
+:root[data-locale-switched] .hero .rule::after {
+  display: none;
+}
+.inv[data-instant] :is(.reveal, .divider, .deco),
+.inv[data-instant] .reveal * {
   transition: none !important;
+  animation: none !important;
 }
 
 /* countdown */
