@@ -53,7 +53,7 @@ export interface PosterText {
 export function posterSample(templateId: string, locale: Locale): PosterText {
   const entry = getTemplate(templateId);
   const type = entry?.manifest.categories.find((c) => c !== 'save_the_date') ?? 'wedding';
-  const people = demoPeople(type);
+  const people = demoPeople(type, templateId);
   return {
     eyebrow: entry?.defaults.defaults[type]?.eyebrow[locale] ?? null,
     primary: people.primary[locale] ?? '',

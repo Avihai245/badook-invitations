@@ -38,7 +38,18 @@ const COUPLE: DemoPeople = {
   parents: { he: 'מרים ודני לוי · רונית ואבי כהן', en: 'Miriam & Dani Levi · Ronit & Avi Cohen' },
 };
 
-/** Who a demo of this event type is for: a couple, or the event's own sample person. */
-export function demoPeople(type: EventType): DemoPeople {
+/**
+ * Designs made for one age or crowd show a person who fits them — a toddler's third birthday, a
+ * grandmother's eightieth — instead of the event type's sample: by template id, then event type.
+ */
+const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = {};
+
+/**
+ * Who a demo of this event type is for: the design's own sample person when it has one, else a
+ * couple, or the event's own sample person.
+ */
+export function demoPeople(type: EventType, templateId?: string): DemoPeople {
+  const own = templateId ? TEMPLATE_PEOPLE[templateId]?.[type] : undefined;
+  if (own) return own;
   return COUPLE_EVENTS.includes(type) ? COUPLE : (PEOPLE[type] ?? COUPLE);
 }

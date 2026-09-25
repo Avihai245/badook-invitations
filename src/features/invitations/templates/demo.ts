@@ -97,7 +97,7 @@ export function demoDocument(
 ): InvitationDocument {
   const { manifest, defaults } = requireTemplate(templateId);
   const type = eventType ?? (Object.keys(defaults.defaults)[0] as EventType);
-  const people = demoPeople(type);
+  const people = demoPeople(type, templateId);
   const [startTime, endTime] = TIMES[type] ?? ['19:30', '01:00'];
   const doc = seedDocument(manifest, defaults, {
     eventType: type,
