@@ -72,6 +72,7 @@ const FUNCTIONS = new Set([
   'user_id_by_email',
   'account_link_partner',
   'partner_account',
+  'account_set_discount',
   'app_meta_get',
   'seed_upsert',
   'billing_pending_checkouts',

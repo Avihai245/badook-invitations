@@ -21,6 +21,15 @@ export const billingHe = {
     creditsHint: 'כל הודעה מהמספר הרשמי = קרדיט אחד',
   },
   plans: 'החבילות',
+  discount: {
+    title: 'הנחה של {percent}% על החבילות',
+    sources: { 'partner:badook-events': 'בזכות Badook Events' } as Record<string, string>,
+    until: 'לרכישה עד {date}',
+    noEnd: 'ללא הגבלת זמן',
+    body: 'המחירים כאן כבר כוללים את ההנחה. חבילה שנקנית בהנחה ממשיכה להתחדש כל חודש באותו מחיר, עד שמבטלים או מחליפים אותה.',
+    listPrice: 'במקום {price}',
+    yourPrice: 'המחיר החודשי שלכם: {price}',
+  },
   choose: {
     pro: 'שדרוג ל־Pro',
     business: 'שדרוג ל־Business',

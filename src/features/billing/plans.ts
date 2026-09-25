@@ -77,6 +77,35 @@ export function effectivePlan(state: AccountPlanState, now: number, admin = fals
   return state.plan;
 }
 
+/**
+ * A discount on the account's plans, granted by the partner that opened it (Badook Events, through its
+ * API): a percentage off the monthly price of a plan bought while it is in force. A plan bought with it
+ * keeps renewing at that price. Message packs are sold at cost: never discounted.
+ */
+export interface PlanDiscount {
+  /** 1–90 */
+  percent: number;
+  /** the last moment a purchase gets it; null: no end */
+  until: string | null;
+  note: string | null;
+  /** who granted it ('partner:badook-events') */
+  source: string;
+}
+
+/** The highest discount a partner may grant (a plan is never given away through a discount). */
+export const MAX_DISCOUNT_PERCENT = 90;
+
+/** Whether a purchase now gets the discount: it has no end, or its end hasn't come. */
+export function discountActive(d: PlanDiscount | null | undefined, now: number): d is PlanDiscount {
+  return !!d && (!d.until || Date.parse(d.until) > now);
+}
+
+/** A plan's monthly price with `percent` off, to the agora. */
+export function discountedPrice(price: number, percent: number): number {
+  // toFixed: 49.9 × 80 is 3992.0000000000005 agorot, not more
+  return Math.round(Number((price * (100 - percent)).toFixed(6))) / 100;
+}
+
 /** The products sold: the two paid plans (monthly) and the message packs (once). */
 export const PRODUCTS = ['pro', 'business', 'credits_100', 'credits_300', 'credits_1000'] as const;
 export type Product = (typeof PRODUCTS)[number];

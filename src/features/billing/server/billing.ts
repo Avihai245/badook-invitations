@@ -9,10 +9,13 @@ import { serviceDb } from '@/lib/supabase/server';
 import {
   CREDIT_PACKS,
   PLAN_LIMITS,
+  discountActive,
+  discountedPrice,
   isProduct,
   messagePriceIls,
   packOf,
   packPriceIls,
+  type PlanDiscount,
   type PlanId,
   type Product,
 } from '../plans';
@@ -119,14 +122,22 @@ export function billingMode(): BillingMode {
   return payplusConfigured() ? 'payplus' : 'off';
 }
 
-/** What a product costs now (shekels incl. VAT). */
-export function productPrice(product: Product): number {
+/**
+ * What a product costs now (shekels incl. VAT): a plan with the account's discount while it is in
+ * force; a message pack at its price (packs are sold at cost, never discounted).
+ */
+export function productPrice(
+  product: Product,
+  discount: PlanDiscount | null = null,
+  now = Date.now(),
+): number {
   const pack = packOf(product);
   if (pack) {
     const env = serverEnv();
     return packPriceIls(pack, env.INVITES_WHATSAPP_PRICE_USD, env.INVITES_USD_TO_ILS);
   }
-  return planPrices()[product as Exclude<PlanId, 'free'>];
+  const price = planPrices()[product as Exclude<PlanId, 'free'>];
+  return discountActive(discount, now) ? discountedPrice(price, discount.percent) : price;
 }
 
 const isPlan = (p: Product): p is 'pro' | 'business' => p === 'pro' || p === 'business';
@@ -159,7 +170,8 @@ export async function startCheckout(
   const running = account.planStatus === 'active' || account.planStatus === 'trialing';
   if (isPlan(product) && account.effective === product && running && !account.admin)
     return fail(409, 'already');
-  const amount = productPrice(product);
+  // the partner's discount, while it is in force: the monthly charge keeps this price
+  const amount = productPrice(product, account.discount);
   if (!(amount > 0)) return fail(503, 'not_configured');
   const id = await checkoutDb.create(user.id, product, amount, mode);
   // back to the address the host is on (their session is there)
@@ -374,7 +386,8 @@ export async function payplusCallback(
 
 /**
  * A renewal of the plan paid through this subscription: another month and its credits, or past due.
- * Recorded with the plan and the amount charged (the price now when the notice doesn't say).
+ * Recorded with the plan and the amount charged (when the notice doesn't say: the price the plan was
+ * bought at, else its price now).
  */
 export async function applyRenewal(
   provider: string,
@@ -411,7 +424,7 @@ export async function applyRenewal(
     credits: paid ? PLAN_LIMITS[account.plan].monthlyCredits : 0,
     payload,
     product: account.plan,
-    amount: amount ?? planPrices()[account.plan],
+    amount: amount ?? account.planPrice ?? planPrices()[account.plan],
   });
 }
 
@@ -484,7 +497,10 @@ export async function testRenew(user: Pick<User, 'id' | 'email'>, raw: unknown):
 
 export interface BillingPageData {
   account: Omit<AccountView, 'billingSubscriptionId'>;
+  /** the plans' list prices */
   prices: Record<PlanId, number>;
+  /** the partner's discount while a purchase gets it, and the plans' prices with it */
+  discount: { percent: number; until: string | null; source: string; prices: Record<PlanId, number> } | null;
   packs: { count: number; product: Product; price: number }[];
   messagePrice: number;
   mode: BillingMode;
@@ -519,9 +535,21 @@ export async function loadBillingPage(
   }
   const [account, history] = await Promise.all([loadAccount(user), checkoutDb.history(user.id)]);
   const { billingSubscriptionId: _hidden, ...visible } = account;
+  const prices = planPrices();
+  const discount = discountActive(account.discount, Date.now()) ? account.discount : null;
   return {
     account: visible,
-    prices: planPrices(),
+    prices,
+    discount: discount && {
+      percent: discount.percent,
+      until: discount.until,
+      source: discount.source,
+      prices: {
+        free: 0,
+        pro: productPrice('pro', discount),
+        business: productPrice('business', discount),
+      },
+    },
     packs: CREDIT_PACKS.map((count) => ({
       count,
       product: `credits_${count}` as Product,

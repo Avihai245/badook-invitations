@@ -2,11 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   changeEmail,
   createLoginLink,
+  discountEnd,
   ExternalIdTaken,
   lookupUser,
   partnerAuthorized,
   partnerKeyUsable,
   provisionUser,
+  removeDiscount,
+  setDiscount,
   type PartnerDeps,
   type PartnerUser,
 } from '@/features/partner/api';
@@ -76,6 +79,7 @@ function world() {
         activeInvitations: 0,
         createdAt: '2026-09-24T00:00:00Z',
         externalId: externalId ?? current?.externalId ?? null,
+        discount: current?.discount ?? null,
       });
       return partnerView(userId);
     }),
@@ -91,6 +95,14 @@ function world() {
       users.delete(u.email);
       users.set(email, { ...u, email });
       return true;
+    }),
+    setDiscount: vi.fn(async ({ userId, externalId }, discount) => {
+      const a = [...accounts.values()].find(
+        (x) => x.userId === userId || (!!externalId && x.externalId === externalId),
+      );
+      if (!a) return null;
+      a.discount = discount;
+      return partnerView(a.userId);
     }),
     loginToken: vi.fn(async (email) => `hash-of-${email}`),
     rateHit: vi.fn(async () => true),
@@ -335,5 +347,94 @@ describe('the partner API', () => {
     expect((await q('email=nobody@example.com')).status).toBe(404);
     expect((await q('')).status).toBe(400);
     expect((await q('userId=x')).status).toBe(400);
+  });
+  it('a discount on the plans of one of its own users: set, replaced, removed', async () => {
+    const { deps, manage } = world();
+    const now = Date.parse('2026-09-25T10:00:00Z');
+    const made = await provisionUser({ email: 'noa@example.com', fullName: 'Noa', externalId: 'be-7' }, deps);
+    const userId = userOf(made).userId;
+    expect(userOf(made).discount).toBeNull();
+
+    // 20% with no end, by the partner's id
+    const set = await setDiscount(
+      { externalId: 'be-7', percent: 20, note: ' Badook Events customer ' },
+      deps,
+      now,
+    );
+    expect(set).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        user: expect.objectContaining({
+          userId,
+          discount: { percent: 20, until: null, note: 'Badook Events customer' },
+        }),
+      },
+    });
+    // replaced: 35% until the end of a day in Israel (midnight there, +02:00 in winter), by our id
+    const replaced = await setDiscount({ userId, percent: 35, until: '2026-12-31' }, deps, now);
+    expect(userOf(replaced).discount).toEqual({ percent: 35, until: '2026-12-31T22:00:00.000Z', note: null });
+    // a moment with its offset is taken as it is
+    const moment = await setDiscount({ userId, percent: 10, until: '2027-01-15T12:00:00+02:00' }, deps, now);
+    expect(userOf(moment).discount?.until).toBe('2027-01-15T10:00:00.000Z');
+    // a user who signs in by themselves keeps getting it: it is still the partner's customer
+    manage('noa@example.com');
+    expect((await setDiscount({ userId, percent: 15 }, deps, now)).status).toBe(200);
+
+    // removed
+    const removed = await removeDiscount(new URLSearchParams('externalId=be-7'), deps);
+    expect(removed.status).toBe(200);
+    expect(userOf(removed).discount).toBeNull();
+  });
+
+  it('a discount: what it refuses', async () => {
+    const { deps } = world();
+    const now = Date.parse('2026-09-25T10:00:00Z');
+    await provisionUser({ email: 'gal@example.com', fullName: 'Gal', externalId: 'be-8' }, deps);
+    const bad = async (body: Record<string, unknown>) => (await setDiscount(body, deps, now)).body;
+    expect(await bad({ externalId: 'be-8', percent: 0 })).toMatchObject({
+      code: 'invalid',
+      fields: ['percent'],
+    });
+    // a plan is never given away through a discount
+    expect(await bad({ externalId: 'be-8', percent: 91 })).toMatchObject({ fields: ['percent'] });
+    expect(await bad({ externalId: 'be-8', percent: 12.5 })).toMatchObject({ fields: ['percent'] });
+    expect(await bad({ externalId: 'be-8', percent: 10, until: '31/12/2026' })).toMatchObject({
+      fields: ['until'],
+    });
+    // an end that has passed
+    expect(await bad({ externalId: 'be-8', percent: 10, until: '2026-09-24' })).toMatchObject({
+      fields: ['until'],
+    });
+    expect(await bad({ externalId: 'be-8', percent: 10, plan: 'business' })).toMatchObject({
+      code: 'invalid',
+    });
+    expect(await bad({ percent: 10 })).toMatchObject({ code: 'invalid' });
+    expect(
+      await bad({ externalId: 'be-8', userId: '00000000-0000-4000-8000-000000000001', percent: 10 }),
+    ).toMatchObject({
+      code: 'invalid',
+    });
+    // someone else's account, or nobody: not found
+    expect(
+      await setDiscount({ userId: '00000000-0000-4000-8000-000000000001', percent: 10 }, deps, now),
+    ).toEqual({
+      status: 404,
+      body: { ok: false, code: 'not_found' },
+    });
+    expect((await removeDiscount(new URLSearchParams('externalId=nobody'), deps)).status).toBe(404);
+    expect((await removeDiscount(new URLSearchParams(''), deps)).status).toBe(400);
+    vi.mocked(deps.rateHit).mockResolvedValueOnce(false);
+    expect((await setDiscount({ externalId: 'be-8', percent: 10 }, deps, now)).status).toBe(429);
+  });
+
+  it('a day’s end is midnight in Israel, summer or winter', () => {
+    expect(discountEnd('2026-12-31')).toBe('2026-12-31T22:00:00.000Z');
+    expect(discountEnd('2026-07-31')).toBe('2026-07-31T21:00:00.000Z');
+    // the nights the clocks change (Friday 2027-03-26 at 02:00; Sunday 2026-10-25 at 02:00)
+    expect(discountEnd('2027-03-25')).toBe('2027-03-25T22:00:00.000Z');
+    expect(discountEnd('2027-03-26')).toBe('2027-03-26T21:00:00.000Z');
+    expect(discountEnd('2026-10-24')).toBe('2026-10-24T21:00:00.000Z');
+    expect(discountEnd('2026-10-25')).toBe('2026-10-25T22:00:00.000Z');
   });
 });

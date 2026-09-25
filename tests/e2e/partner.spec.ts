@@ -127,6 +127,92 @@ test.describe('the partner API', () => {
     expect((await provision(request, { email: newEmail, fullName: 'X' })).status()).toBe(409);
   });
 
+  test('a discount on one of its users’ plans: shown on their billing screen, bought and renewed at it', async ({
+    page,
+    request,
+  }, testInfo) => {
+    test.setTimeout(120_000);
+    const tag = `${testInfo.project.name}-${Date.now()}`;
+    const externalId = `be-d-${tag}`;
+    const res = await provision(request, {
+      email: `discount-${tag}@example.com`,
+      fullName: 'מאיה',
+      externalId,
+      next: '/app/billing',
+    });
+    const { loginUrl } = (await res.json()) as { loginUrl: string };
+    // 20% for purchases until the end of next year
+    const until = `${new Date().getFullYear() + 1}-12-31`;
+    const set = await request.post('/api/partner/v1/discounts', {
+      data: { externalId, percent: 20, until, note: 'Badook Events customer' },
+      headers: auth,
+    });
+    expect(set.status()).toBe(200);
+    expect(await set.json()).toMatchObject({
+      ok: true,
+      user: { discount: { percent: 20, note: 'Badook Events customer' } },
+    });
+
+    await continueWith(page, loginUrl);
+    await page.waitForURL(/\/app\/billing$/);
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    const banner = page.getByTestId('discount');
+    await expect(banner).toContainText('הנחה של 20% על החבילות');
+    await expect(banner).toContainText('בזכות Badook Events');
+    await expect(banner).toContainText(`לרכישה עד 31 בדצמבר ${until.slice(0, 4)}`);
+    const pro = page.locator('[data-plan="pro"]');
+    await expect(pro).toContainText('39.20');
+    await expect(pro.getByTestId('list-price')).toContainText('49');
+    // message packs are sold at cost: no discount
+    await expect(page.locator('[data-pack="100"]')).toContainText('16');
+
+    // Pro at the discounted price; the monthly renewal keeps it
+    await pro.getByRole('button', { name: 'שדרוג ל־Pro' }).click();
+    await page.waitForURL(/\/app\/billing\/test-checkout\?id=/);
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    await page.getByRole('button', { name: 'תשלום (בדיקה)' }).click();
+    await page.waitForURL(/\/app\/billing\?status=/);
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    await expect(page.getByTestId('current-plan')).toContainText('Pro');
+    await expect(page.getByTestId('plan-price')).toContainText('39.20');
+    const renewed = await page.evaluate(async () => {
+      const r = await fetch('/api/billing/test-renew', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ paid: true }),
+      });
+      return r.status;
+    });
+    expect(renewed).toBe(200);
+    await page.reload();
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    const payments = page.getByTestId('payments');
+    await expect(payments.locator('li')).toHaveCount(2);
+    await expect(payments.locator('li').filter({ hasText: '39.20' })).toHaveCount(2);
+
+    // removed: gone from the screen, and the plan bought with it keeps its price
+    const removed = await request.delete(
+      `/api/partner/v1/discounts?externalId=${encodeURIComponent(externalId)}`,
+      {
+        headers: auth,
+      },
+    );
+    expect(await removed.json()).toMatchObject({ ok: true, user: { discount: null } });
+    await page.reload();
+    await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+    await expect(page.getByTestId('discount')).toHaveCount(0);
+    await expect(page.getByTestId('plan-price')).toContainText('39.20');
+    // someone else's account: no
+    expect(
+      (
+        await request.post('/api/partner/v1/discounts', {
+          data: { userId: '00000000-0000-4000-8000-000000000000', percent: 10 },
+          headers: auth,
+        })
+      ).status(),
+    ).toBe(404);
+  });
+
   test('an account opened by its owner stays theirs', async ({ page, request }, testInfo) => {
     const email = `own-${testInfo.project.name}-${Date.now()}@example.com`;
     await page.goto('/signup');

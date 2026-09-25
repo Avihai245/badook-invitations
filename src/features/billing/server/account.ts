@@ -3,7 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import type { Entitlements } from '@/features/invitations/server/host-api';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
-import { PLAN_LIMITS, effectivePlan, type PlanId, type PlanLimits } from '../plans';
+import { PLAN_LIMITS, effectivePlan, type PlanDiscount, type PlanId, type PlanLimits } from '../plans';
 
 /** accounts row as account_json returns it (supabase/migrations/*_guests_accounts_messaging.sql). */
 export interface AccountRecord {
@@ -21,6 +21,10 @@ export interface AccountRecord {
   source: string;
   createdAt: string;
   activeInvitations: number;
+  /** a partner's discount on plans, as stored (discountActive says whether a purchase gets it now) */
+  discount: PlanDiscount | null;
+  /** what the plan in force is charged each month: the price it was bought at (null: not recorded) */
+  planPrice: number | null;
 }
 
 /** The account with what it may do right now. */

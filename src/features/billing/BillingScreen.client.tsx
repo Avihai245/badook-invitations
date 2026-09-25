@@ -8,6 +8,7 @@ import {
   CreditCard,
   Gauge,
   History,
+  PercentCircle,
   ShieldCheck,
   XCircle,
 } from 'lucide-react';
@@ -63,6 +64,21 @@ export function BillingScreen({
   const renews = a.planRenewsAt
     ? date(a.planRenewsAt, { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
+  const discount = data.discount;
+  // the last day a purchase gets it (it ends at midnight in Israel)
+  const discountUntil = discount?.until
+    ? date(Date.parse(discount.until) - 1, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Asia/Jerusalem',
+      })
+    : null;
+  // bought at a discount: its monthly price, which the renewals keep
+  const boughtFor =
+    a.plan !== 'free' && !a.admin && a.planPrice !== null && a.planPrice < data.prices[a.plan]
+      ? Number(a.planPrice)
+      : null;
 
   // back from the payment page while its notice hasn't arrived yet: look again in a moment (each
   // look asks PayPlus too: every few seconds for a minute, then every 15 seconds)
@@ -262,6 +278,11 @@ export function BillingScreen({
               ) : null}
             </p>
             <p className="mt-1 text-[14px] text-muted">{statusLine}</p>
+            {boughtFor !== null ? (
+              <p className="mt-0.5 text-[14px] text-muted" data-testid="plan-price">
+                {fmt(b.discount.yourPrice, { price: money(boughtFor, 2) })}
+              </p>
+            ) : null}
           </div>
           {a.plan !== 'free' && a.planStatus !== 'canceled' && !a.admin ? (
             <Hint text={b.help.cancel}>
@@ -289,11 +310,34 @@ export function BillingScreen({
       </Card>
 
       <h2 className="mt-10 text-[20px] font-bold">{b.plans}</h2>
+      {discount ? (
+        <div
+          data-testid="discount"
+          className="mt-4 flex items-start gap-3 rounded-card border border-brand/30 bg-brand-soft px-4 py-3.5"
+        >
+          <PercentCircle aria-hidden className="mt-0.5 size-6 shrink-0 text-brand" />
+          <div className="min-w-0">
+            <p className="text-[16px] font-bold text-brand-deep">
+              {fmt(b.discount.title, { percent: number(discount.percent) })}
+            </p>
+            <p className="text-[13px] font-semibold text-brand-deep/80">
+              {[
+                b.discount.sources[discount.source],
+                discountUntil ? fmt(b.discount.until, { date: discountUntil }) : b.discount.noEnd,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+            <p className="mt-1 text-[13px] text-muted">{b.discount.body}</p>
+          </div>
+        </div>
+      ) : null}
       <div className="mt-4">
         <PlanCards
           t={t}
           locale={locale}
-          prices={data.prices}
+          prices={discount?.prices ?? data.prices}
+          listPrices={discount ? data.prices : undefined}
           current={pastDue ? undefined : a.effective}
           action={planAction}
         />

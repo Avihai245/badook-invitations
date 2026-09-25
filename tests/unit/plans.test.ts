@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  discountActive,
+  discountedPrice,
   effectivePlan,
   messagePriceIls,
   packOf,
@@ -63,5 +65,30 @@ describe('prices', () => {
     expect(packOf('pro')).toBeNull();
     expect(PLAN_LIMITS.free.activeInvitations).toBe(1);
     expect(PLAN_LIMITS.business.activeInvitations).toBeNull();
+  });
+});
+
+describe('a partner’s discount on plans', () => {
+  const discount = (until: string | null) => ({
+    percent: 20,
+    until,
+    note: null,
+    source: 'partner:badook-events',
+  });
+
+  it('the monthly price with the discount, to the agora', () => {
+    expect(discountedPrice(49, 20)).toBe(39.2);
+    expect(discountedPrice(149, 15)).toBe(126.65);
+    expect(discountedPrice(49.9, 20)).toBe(39.92);
+    expect(discountedPrice(49, 33)).toBe(32.83);
+    expect(discountedPrice(149, 90)).toBe(14.9);
+  });
+
+  it('applies to a purchase until its end, or always when it has none', () => {
+    expect(discountActive(discount(null), NOW)).toBe(true);
+    expect(discountActive(discount(at(1)), NOW)).toBe(true);
+    expect(discountActive(discount(at(-1)), NOW)).toBe(false);
+    expect(discountActive(null, NOW)).toBe(false);
+    expect(discountActive(undefined, NOW)).toBe(false);
   });
 });

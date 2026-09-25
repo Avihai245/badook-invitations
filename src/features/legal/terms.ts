@@ -72,6 +72,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
           body: [
             `The Service has a free plan and paid monthly plans: Pro at ${money(c.prices.pro)} and Business at ${money(c.prices.business)} a month, VAT included. What each plan includes is described on the pricing page. WhatsApp messages from the official number use credits: plans include a monthly number of credits, and more can be bought in packs. A credit is used when a message is sent; a message that fails returns its credit. Credits do not expire.`,
             'A paid plan renews automatically every month and is charged to the payment method you gave, until you cancel. We will tell you in advance, by email, of any change in price; it will apply from the next billing period.',
+            'An account opened through a partner (Badook Events) may get a discount on the plans from that partner. The discount is shown on the billing page, and a plan bought with it keeps renewing every month at the same price until you cancel or replace it. It does not apply to WhatsApp credits.',
           ],
         },
         {
@@ -205,6 +206,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
         body: [
           `לשירות חבילה חינמית וחבילות בתשלום חודשי: Pro ב־${money(c.prices.pro)} ו־Business ב־${money(c.prices.business)} לחודש, כולל מע״מ. מה כלול בכל חבילה מפורט בעמוד המחירים. הודעות וואטסאפ מהמספר הרשמי משתמשות בקרדיטים: בחבילות יש מספר קרדיטים חודשי, ואפשר לקנות עוד בחבילות הודעות. קרדיט נוצל כשההודעה נשלחת, והודעה שנכשלה מחזירה את הקרדיט. קרדיטים לא פגים.`,
           'חבילה בתשלום מתחדשת אוטומטית בכל חודש ומחויבת באמצעי התשלום שמסרתם, עד שתבטלו. על שינוי מחיר נודיע מראש במייל, והוא יחול מתקופת החיוב הבאה.',
+          'חשבון שנפתח דרך שותף (Badook Events) יכול לקבל מהשותף הנחה על החבילות. ההנחה מופיעה בעמוד החיובים, וחבילה שנקנתה בה ממשיכה להתחדש כל חודש באותו מחיר, עד שתבטלו או תחליפו אותה. ההנחה לא חלה על קרדיטים לוואטסאפ.',
         ],
       },
       {

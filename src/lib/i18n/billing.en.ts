@@ -23,6 +23,15 @@ export const billingEn: typeof billingHe = {
     creditsHint: 'Each message from the official number = one credit',
   },
   plans: 'Plans',
+  discount: {
+    title: '{percent}% off the plans',
+    sources: { 'partner:badook-events': 'Courtesy of Badook Events' } as Record<string, string>,
+    until: 'For purchases until {date}',
+    noEnd: 'No end date',
+    body: 'The prices here already include the discount. A plan bought with it keeps renewing every month at the same price, until it is canceled or replaced.',
+    listPrice: 'Instead of {price}',
+    yourPrice: 'Your monthly price: {price}',
+  },
   choose: {
     pro: 'Upgrade to Pro',
     business: 'Upgrade to Business',

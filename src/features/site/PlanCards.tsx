@@ -26,26 +26,31 @@ export function planLines(t: AppDict, locale: UiLocale, plan: PlanId): string[] 
 /**
  * The three plans side by side (home page, billing screen): price a month, who it is for, what it
  * includes, and an action — `action(plan)` decides what the button does where the cards are shown.
+ * `listPrices`: the prices before the account's discount, shown struck through where they differ.
  */
 export function PlanCards({
   t,
   locale,
   prices,
+  listPrices,
   current,
   action,
 }: {
   t: AppDict;
   locale: UiLocale;
   prices: Record<PlanId, number>;
+  listPrices?: Record<PlanId, number>;
   current?: PlanId;
   action?: (plan: PlanId) => ReactNode;
 }) {
   const p = t.site.plans;
+  // agorot only when there are any (a discounted price)
   const money = (v: number) =>
     new Intl.NumberFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
       style: 'currency',
       currency: 'ILS',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: Number.isInteger(v) ? 0 : 2,
+      maximumFractionDigits: Number.isInteger(v) ? 0 : 2,
     }).format(v);
   return (
     <ul className="grid gap-5 md:grid-cols-3">
@@ -74,6 +79,14 @@ export function PlanCards({
               </span>
               {prices[plan] ? <span className="text-[14px] text-muted">{p.perMonth}</span> : null}
             </p>
+            {listPrices && listPrices[plan] > prices[plan] ? (
+              <p className="mt-1.5 text-[14px] text-muted" data-testid="list-price">
+                <s aria-hidden>{money(listPrices[plan])}</s>
+                <span className="sr-only">
+                  {fmt(t.billing.discount.listPrice, { price: money(listPrices[plan]) })}
+                </span>
+              </p>
+            ) : null}
             <ul className="mt-6 flex flex-1 flex-col gap-2.5">
               {planLines(t, locale, plan).map((line) => (
                 <li key={line} className="flex items-start gap-2.5 text-[14px]">

@@ -5,7 +5,7 @@ import type { UiLocale } from '@/lib/i18n/app';
 import type { LegalContext } from './types';
 
 /** When the policies were last revised (update with any change to their text). */
-export const LEGAL_UPDATED = '2026-09-24';
+export const LEGAL_UPDATED = '2026-09-25';
 
 /** The operator's details for the policies, from the deployment's settings. */
 export function legalContext(locale: UiLocale): LegalContext {

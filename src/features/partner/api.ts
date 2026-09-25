@@ -1,6 +1,7 @@
 /**
  * The partner API (Badook Events → this app, server to server): opens users remotely — name, email
- * and phone — and hands out one-time sign-in links for them. Plain functions over injected
+ * and phone — hands out one-time sign-in links for them, and gives a user's account a discount on the
+ * plans. Plain functions over injected
  * dependencies; the route files (app/api/partner/v1/…) wire Supabase in. Tested in
  * tests/unit/partner.test.ts; the contract for the partner is docs/partner-api.md.
  *
@@ -11,6 +12,7 @@
  */
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
+import { MAX_DISCOUNT_PERCENT } from '../billing/plans';
 import { normalizeGuestPhone } from '../invitations/lib/guest-import';
 
 export const PARTNER_SOURCE = 'partner:badook-events';
@@ -40,6 +42,15 @@ export interface PartnerUser {
   createdAt: string;
   /** signs in by themselves (set a password, or connected Google): no more sign-in links */
   userManaged: boolean;
+  /** the discount on plans the partner granted, while a purchase gets it (null: none, or it ended) */
+  discount: PartnerDiscount | null;
+}
+
+/** A discount on the user's plans: `percent` off a plan bought until `until` (null: no end). */
+export interface PartnerDiscount {
+  percent: number;
+  until: string | null;
+  note: string | null;
 }
 
 export interface PartnerDeps {
@@ -65,6 +76,11 @@ export interface PartnerDeps {
   find(by: { userId?: string; externalId?: string }): Promise<PartnerUser | null>;
   /** false: another account has that email */
   updateEmail(userId: string, email: string): Promise<boolean>;
+  /** one of the partner's users gets this discount (null: none); null when they aren't the partner's */
+  setDiscount(
+    by: { userId?: string; externalId?: string },
+    discount: PartnerDiscount | null,
+  ): Promise<PartnerUser | null>;
   /** the hashed token of a one-time sign-in link for this email */
   loginToken(email: string): Promise<string>;
   /** false once the partner is over its hourly limit */
@@ -128,6 +144,34 @@ export const LoginLinkSchema = z
 export const EmailChangeSchema = z
   .strictObject({ userId: z.uuid().optional(), externalId: ExternalId.optional(), email: Email })
   .refine(oneOf, ONE_OF);
+
+/** A day (2026-12-31: through the end of that day in Israel) or a moment with its offset. */
+const Until = z.union([z.iso.date(), z.iso.datetime({ offset: true })]);
+
+export const DiscountSchema = z
+  .strictObject({
+    userId: z.uuid().optional(),
+    externalId: ExternalId.optional(),
+    percent: z.number().int().min(1).max(MAX_DISCOUNT_PERCENT),
+    until: Until.nullish(),
+    note: z.string().trim().max(200).nullish(),
+  })
+  .refine(oneOf, ONE_OF);
+
+/** The moment a discount ends: a day ends at midnight in Israel; a moment is taken as it is. */
+export function discountEnd(until: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(until)) return new Date(until).toISOString();
+  // midnight after that day in Israel, with the offset there at that hour (+02:00, or +03:00 in
+  // summer; read just before midnight, as the clocks change at 02:00)
+  const next = new Date(`${until}T00:00:00Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  const zone = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', timeZoneName: 'longOffset' })
+    .formatToParts(new Date(next.getTime() - 3 * 3_600_000))
+    .find((p) => p.type === 'timeZoneName')?.value;
+  const m = zone?.match(/GMT([+-])(\d{2}):(\d{2})/);
+  const minutes = m ? (m[1] === '-' ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3])) : 0;
+  return new Date(next.getTime() - minutes * 60_000).toISOString();
+}
 
 const invalid = (error: z.ZodError) =>
   fail(400, 'invalid', { fields: [...new Set(error.issues.map((i) => i.path.join('.') || '(body)'))] });
@@ -211,6 +255,37 @@ export async function changeEmail(raw: unknown, deps: PartnerDeps): Promise<ApiR
   if (user.userManaged) return fail(409, 'user_managed');
   if (!(await deps.updateEmail(user.userId, email))) return fail(409, 'email_taken');
   return ok({ user: { ...user, email } });
+}
+
+/**
+ * POST /api/partner/v1/discounts — a discount on one of the partner's users' plans (replacing the one
+ * they had): `percent` off the monthly price of a plan bought until `until` (none: no end); the plan
+ * keeps renewing at that price. Also for a user who signs in by themselves: it is still theirs.
+ */
+export async function setDiscount(raw: unknown, deps: PartnerDeps, now = Date.now()): Promise<ApiResult> {
+  if (!(await deps.rateHit())) return fail(429, 'rate_limited');
+  const parsed = DiscountSchema.safeParse(raw);
+  if (!parsed.success) return invalid(parsed.error);
+  const { userId, externalId, percent } = parsed.data;
+  const until = parsed.data.until ? discountEnd(parsed.data.until) : null;
+  if (until && Date.parse(until) <= now) return fail(400, 'invalid', { fields: ['until'] });
+  const user = await deps.setDiscount(
+    { userId, externalId },
+    { percent, until, note: parsed.data.note || null },
+  );
+  return user ? ok({ user }) : fail(404, 'not_found');
+}
+
+/** DELETE /api/partner/v1/discounts?externalId=… | ?userId=… — the user's discount is removed. */
+export async function removeDiscount(params: URLSearchParams, deps: PartnerDeps): Promise<ApiResult> {
+  if (!(await deps.rateHit())) return fail(429, 'rate_limited');
+  const by = LoginLinkSchema.safeParse({
+    userId: params.get('userId') ?? undefined,
+    externalId: params.get('externalId') ?? undefined,
+  });
+  if (!by.success) return invalid(by.error);
+  const user = await deps.setDiscount({ userId: by.data.userId, externalId: by.data.externalId }, null);
+  return user ? ok({ user }) : fail(404, 'not_found');
 }
 
 /** GET /api/partner/v1/users?externalId=… | ?userId=… | ?email=… — one of the partner's users. */

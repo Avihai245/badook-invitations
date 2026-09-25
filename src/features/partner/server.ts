@@ -2,6 +2,7 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
+import { discountActive, type PlanDiscount } from '../billing/plans';
 import { ExternalIdTaken, PARTNER_SOURCE, type PartnerDeps, type PartnerUser } from './api';
 
 /** Requests an hour from the partner (a leaked key can't flood the system). */
@@ -16,6 +17,7 @@ type AccountJson = {
   createdAt: string;
   email?: string;
   userManaged?: boolean;
+  discount?: PlanDiscount | null;
 };
 
 const view = (a: AccountJson, email: string): PartnerUser => ({
@@ -27,6 +29,10 @@ const view = (a: AccountJson, email: string): PartnerUser => ({
   activeInvitations: a.activeInvitations,
   createdAt: a.createdAt,
   userManaged: a.userManaged === true,
+  // while a purchase gets it
+  discount: discountActive(a.discount, Date.now())
+    ? { percent: a.discount.percent, until: a.discount.until, note: a.discount.note }
+    : null,
 });
 
 /**
@@ -94,6 +100,17 @@ export function partnerDeps(site: string): PartnerDeps {
         p_source: PARTNER_SOURCE,
         p_user_id: userId ?? null,
         p_external_id: externalId ?? null,
+      });
+      return account ? view(account, account.email ?? (await emailOf(account.userId))) : null;
+    },
+    async setDiscount({ userId, externalId }, discount) {
+      const account = await rpc<AccountJson | null>('account_set_discount', {
+        p_source: PARTNER_SOURCE,
+        p_user_id: userId ?? null,
+        p_external_id: externalId ?? null,
+        p_percent: discount?.percent ?? null,
+        p_until: discount?.until ?? null,
+        p_note: discount?.note ?? null,
       });
       return account ? view(account, account.email ?? (await emailOf(account.userId))) : null;
     },

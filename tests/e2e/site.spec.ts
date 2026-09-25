@@ -93,7 +93,7 @@ test('the policy pages: privacy, terms, cookies and the accessibility statement'
     expect(res?.status(), path).toBe(200);
     await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: section })).toBeAttached();
-    await expect(page.getByText(/עודכן לאחרונה: 24 בספטמבר 2026/)).toBeVisible();
+    await expect(page.getByText(/עודכן לאחרונה: 25 בספטמבר 2026/)).toBeVisible();
     // every policy is linked from every page's footer
     const footer = page.getByRole('contentinfo');
     for (const name of ['מדיניות פרטיות', 'תנאי שימוש', 'מדיניות עוגיות', 'הצהרת נגישות'])
