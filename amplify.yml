@@ -12,9 +12,22 @@ frontend:
         # Amplify console env vars are NOT visible to the SSR runtime by default:
         # copy the ones the app needs into .env.production before building (MASTER_PROMPT §1.1 rule 3).
         - env | grep -E '^(NEXT_PUBLIC_|SUPABASE_|INVITES_|ANTHROPIC_API_KEY=)' >> .env.production || true
+        # The production branch's public address when the console has none, or still Amplify's own
+        # (*.amplifyapp.com): the site's domain — for links in emails and on invitation pages, and the
+        # policies. A value set in the console that is neither is kept as it is.
         # `npm run build` runs `prebuild` (template validation + font files) then `next build`.
         # Tests (Vitest / Playwright) never run here — they run locally or in CI (§1.1 rule 7).
-        - npm run build
+        - |
+          if [ "${AWS_BRANCH:-}" = "main" ]; then
+            case "${INVITES_PUBLIC_BASE_URL:-}" in
+              '' | *.amplifyapp.com | *.amplifyapp.com/)
+                export INVITES_PUBLIC_BASE_URL=https://invitations.badooks.com
+                sed -i '/^INVITES_PUBLIC_BASE_URL=/d' .env.production
+                echo "INVITES_PUBLIC_BASE_URL=$INVITES_PUBLIC_BASE_URL" >> .env.production
+                ;;
+            esac
+          fi
+          npm run build
   artifacts:
     baseDirectory: .next
     files:

@@ -6,7 +6,7 @@
 
 1. **מפתח סודי משותף, באורך 32 תווים לפחות.** יוצרים מחרוזת אקראית ארוכה, למשל `openssl rand -hex 32` (64 תווים). מפתח קצר מ־32 תווים לא מתקבל: ה־API נשאר כבוי (404), ובלוג של השרת נרשמת הסיבה.
 2. **במערכת ההזמנות (Amplify):** משתנה סביבה `INVITES_PARTNER_API_KEY` עם המפתח, ואחר כך Redeploy. בלי המשתנה ה־API כבוי ומחזיר 404.
-3. **גם `INVITES_PUBLIC_BASE_URL` צריך להיות מוגדר** לכתובת הציבורית של האתר (`https://invitations.badooks.com`), כי קישורי הכניסה נבנים ממנה. אם היא לא מוגדרת, או שהיא עדיין הכתובת של Amplify (`*.amplifyapp.com`), הקישורים נבנים מהכתובת ש־Badook Events פנתה אליה.
+3. **`INVITES_PUBLIC_BASE_URL`** הוא הכתובת הציבורית של האתר (`https://invitations.badooks.com`), וקישורי הכניסה נבנים ממנה. בענף `main` הבנייה משתמשת בכתובת הזו לבד אם המשתנה חסר או שהוא עדיין הכתובת של Amplify (`*.amplifyapp.com`). בסביבה אחרת, כשהמשתנה חסר או שהוא הכתובת של Amplify, הקישורים נבנים מהכתובת ש־Badook Events פנתה אליה.
 4. **ב־Badook Events:** אותו מפתח נשמר בהגדרות הסודיות של **השרת** בלבד. אסור שיופיע בקוד של הדפדפן או של האפליקציה.
 5. **ב־Supabase:** ב־Authentication → URL Configuration: ה־Site URL הוא `https://invitations.badooks.com`, וב־Redirect URLs מופיע `https://invitations.badooks.com/**` (עם הכוכביות: הכתובות שחוזרים אליהן כוללות פרמטרים). קישורי הכניסה של Badook Events לא עוברים דרך ההפניות של Supabase, אבל המיילים של איפוס סיסמה והכניסה עם Google כן.
 6. **הקריאות יוצאות מהשרת של Badook Events**, ב־HTTPS, עם הכותרת:
