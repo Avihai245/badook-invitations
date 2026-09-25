@@ -775,6 +775,36 @@ html[data-framed] body::-webkit-scrollbar {
     transform-box: fill-box;
     animation: scene-spin 60s linear infinite;
   }
+  .scene[data-place='hero'] [data-anim='bounce'] {
+    transform-origin: 50% 100%;
+    animation: scene-bounce 1.5s cubic-bezier(0.3, 0, 0.7, 1) infinite;
+  }
+  .scene[data-place='hero'] [data-anim='pop'] {
+    transform-origin: 50% 50%;
+    animation: scene-pop 2.4s ease-in-out infinite;
+  }
+  .scene[data-place='hero'] [data-anim='orbit'] {
+    animation: scene-orbit 9s linear infinite;
+  }
+  .scene[data-place='hero'] [data-anim='rise'] {
+    animation: scene-rise 9s ease-in-out infinite;
+  }
+  .scene[data-place='hero'] [data-anim='swing'] {
+    transform-origin: 50% 0;
+    animation: scene-swing 3.6s ease-in-out infinite alternate;
+  }
+  .scene[data-place='hero'] [data-anim='pulse'] {
+    animation: scene-pulse 3.2s ease-in-out infinite;
+  }
+  .scene[data-place='hero'] [data-anim='wiggle'] {
+    transform-origin: 50% 90%;
+    animation: scene-wiggle 5s ease-in-out infinite;
+  }
+  .scene[data-place='hero'] [data-anim='turn'] {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: scene-spin 6s linear infinite;
+  }
 }
 @keyframes scene-float {
   to {
@@ -828,6 +858,101 @@ html[data-framed] body::-webkit-scrollbar {
 @keyframes scene-spin {
   to {
     transform: rotate(1turn);
+  }
+}
+@keyframes scene-bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.08, 0.9);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  12% {
+    transform: translateY(-1cqmin) scale(0.96, 1.05);
+  }
+  50% {
+    transform: translateY(-9cqmin) scale(1, 1);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  92% {
+    transform: translateY(0) scale(0.98, 1.03);
+  }
+}
+@keyframes scene-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  12% {
+    transform: scale(1.1);
+  }
+  24% {
+    transform: scale(0.97);
+  }
+  36% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+@keyframes scene-orbit {
+  from {
+    transform: rotate(0turn) translateX(1.6cqmin) rotate(0turn);
+  }
+  to {
+    transform: rotate(1turn) translateX(1.6cqmin) rotate(-1turn);
+  }
+}
+@keyframes scene-rise {
+  0% {
+    transform: translateY(6cqmin);
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-14cqmin);
+    opacity: 0;
+  }
+}
+@keyframes scene-swing {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+@keyframes scene-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.8;
+    filter: brightness(1.25);
+  }
+}
+@keyframes scene-wiggle {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  74% {
+    transform: rotate(-6deg);
+  }
+  78% {
+    transform: rotate(5deg);
+  }
+  82% {
+    transform: rotate(-4deg);
+  }
+  86% {
+    transform: rotate(2deg);
   }
 }
 .hero-media .scrim {

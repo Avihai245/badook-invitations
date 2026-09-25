@@ -36,10 +36,29 @@ export const ch = (n: number) => `${n}cqh`;
 type ViewBox = readonly [number, number, number, number];
 
 /**
- * The hero's gentle loops (invitation.css): float up and down, sway on the base, drift sideways,
- * twinkle / flicker (opacity), sweep (a light fan on its corner), spin (a slow turn).
+ * The hero's loops (invitation.css): float up and down, sway on the base, drift sideways, twinkle /
+ * flicker (opacity), sweep (a light fan on its corner), spin (a slow turn); and livelier ones for
+ * playful scenes — bounce (a ball: up, down, squash), pop (a heartbeat), orbit (a small circle, a
+ * planet or a bee), rise (up and fading, a balloon or a bubble — it comes back from below), swing (a
+ * pendulum from its top: bunting, lanterns, a mirror ball), pulse (a glow breathing), wiggle (a quick
+ * shake now and then), turn (a record or a wheel, a full turn every few seconds).
  */
-export type SceneAnim = 'float' | 'sway' | 'drift' | 'twinkle' | 'flicker' | 'sweep' | 'spin';
+export type SceneAnim =
+  | 'float'
+  | 'sway'
+  | 'drift'
+  | 'twinkle'
+  | 'flicker'
+  | 'sweep'
+  | 'spin'
+  | 'bounce'
+  | 'pop'
+  | 'orbit'
+  | 'rise'
+  | 'swing'
+  | 'pulse'
+  | 'wiggle'
+  | 'turn';
 
 /**
  * One SVG piece of a scene. `vb` is its drawing's viewBox; give it a position and a width (the height
