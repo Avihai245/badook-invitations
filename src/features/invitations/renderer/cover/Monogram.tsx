@@ -3,6 +3,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import type { TemplateManifest } from '../../contracts/types';
 import { mixHex } from '../../lib/contrast';
+import { INK, inkWidth } from './ink';
 import { textDir, type Variant } from './localized';
 
 type Effect = TemplateManifest['cover']['overlay']['text']['effect'];
@@ -11,7 +12,8 @@ const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayout
 
 /**
  * The host's monogram drawn over the blank overlay PNG (§5 "Cover overlay rendering"): SVG text in the
- * template's monogram font, fitted to 58% of the overlay width, with the template's effect —
+ * template's monogram font, fitted to 58% of the overlay width (its ink, swashes included, to 90%),
+ * with the template's effect —
  * `emboss` / `deboss` (light + shadow copies around the text; ink = seal color darkened 18% /
  * lightened 22% when the overlay is recolored), `foil` (a gold sheen that sweeps once when opened)
  * and `print` (flat ink at 0.9 with a little paper roughness). A monogram in several languages ("נ&א"
@@ -55,7 +57,13 @@ export function Monogram({
       for (const [text, el] of refs.current) {
         const width = el.getComputedTextLength();
         const current = Number(el.getAttribute('font-size')) || guess(text);
-        if (width > 0) next[text] = Math.min(wide ? 44 : 42, (current * (W * 0.58)) / width);
+        if (width <= 0) continue;
+        let size = (current * (W * 0.58)) / width;
+        // a script's swashes reach past its letters' width (a Cyrillic stand-in's more than most):
+        // they may, as far as the seal's edge
+        const ink = inkWidth(el, text, current);
+        if (ink > 0) size = Math.min(size, (current * (W * INK)) / ink);
+        next[text] = Math.min(wide ? 44 : 42, size);
       }
       if (Object.keys(next).length) setSizes((s) => ({ ...s, ...next }));
     };

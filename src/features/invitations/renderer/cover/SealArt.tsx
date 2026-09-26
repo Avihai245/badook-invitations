@@ -1,8 +1,22 @@
-import { useId, type CSSProperties, type ReactNode, type SVGProps } from 'react';
+'use client';
+
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type SVGProps,
+} from 'react';
 import type { Locale } from '../../contracts/types';
 import { LOCALE_INFO } from '../../lib/locales';
 import { graphemes, visibleGlyphCount } from '../../lib/text';
+import { INK, inkWidth } from './ink';
 import { textDir, type Variant } from './localized';
+
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 /** Irregular wax-seal outline (same 28-point shape as the design reference). */
 const SEAL_PATH = (() => {
@@ -64,6 +78,56 @@ function PerLanguage({
   );
 }
 
+/**
+ * Its lines drawn smaller, once their font is in, when their ink runs wider than `max` viewBox units
+ * around (cx, cy): the estimate above counts glyphs, it can't see a face's swashes (ink.ts).
+ */
+function InkFit({
+  text,
+  max,
+  cx,
+  cy,
+  children,
+}: {
+  text: string;
+  max: number;
+  cx: number;
+  cy: number;
+  children: ReactNode;
+}) {
+  const ref = useRef<SVGGElement>(null);
+  const [k, setK] = useState(1);
+  useIsoLayoutEffect(() => {
+    let live = true;
+    const fit = () => {
+      const g = ref.current;
+      if (!live || !g) return;
+      let widest = 0;
+      for (const el of g.querySelectorAll('text')) {
+        const size = Number(el.getAttribute('font-size'));
+        for (const line of el.querySelectorAll('tspan'))
+          widest = Math.max(widest, inkWidth(el, line.textContent ?? '', size));
+      }
+      setK(widest > max ? max / widest : 1);
+    };
+    fit();
+    // the font may still be loading; another language brings its own stack
+    void document.fonts?.ready.then(fit);
+    const refit = () => void document.fonts?.ready.then(fit);
+    window.addEventListener('invitation:locale', refit);
+    return () => {
+      live = false;
+      window.removeEventListener('invitation:locale', refit);
+    };
+  }, [text, max]);
+  const at = k < 1 ? `translate(${cx} ${cy}) scale(${k.toFixed(3)}) translate(${-cx} ${-cy})` : undefined;
+  return (
+    <g ref={ref} transform={at}>
+      {children}
+    </g>
+  );
+}
+
 /** SVG text centred on (x, y), one tspan per line. */
 function Lines({
   lines,
@@ -101,7 +165,7 @@ export function SealArt({
     const { lines, size } = fitText(v.text, locale, baseSize(locale, 28, 34), 54, true);
     const textStyle: CSSProperties = { fontFamily: 'var(--f-monogram)', direction: textDir(v.text) };
     return (
-      <>
+      <InkFit text={v.text} max={100 * INK} cx={50} cy={50}>
         <Lines
           lines={lines}
           size={size}
@@ -112,7 +176,7 @@ export function SealArt({
           style={textStyle}
         />
         <Lines lines={lines} size={size} x={50} y={50} style={{ ...textStyle, fill: seal(62, '#000') }} />
-      </>
+      </InkFit>
     );
   };
   return (
@@ -164,7 +228,12 @@ export function TagArt({ variants, ink }: { variants: readonly Variant[]; ink: s
     const locale = v.locales[0]!;
     const { lines, size } = fitText(v.text, locale, baseSize(locale, 20, 22), 34, true);
     const textStyle: CSSProperties = { fontFamily: 'var(--f-monogram)', direction: textDir(v.text) };
-    return <Lines lines={lines} size={size} x={50} y={62} fill={ink} opacity=".9" style={textStyle} />;
+    // a hair inside the tag's edges (it is 40 wide)
+    return (
+      <InkFit text={v.text} max={38} cx={50} cy={62}>
+        <Lines lines={lines} size={size} x={50} y={62} fill={ink} opacity=".9" style={textStyle} />
+      </InkFit>
+    );
   };
   return (
     <svg viewBox="0 0 100 100" aria-hidden="true">
@@ -190,7 +259,12 @@ export function TicketArt({ variants, ink }: { variants: readonly Variant[]; ink
     const locale = v.locales[0]!;
     const { lines, size } = fitText(v.text, locale, baseSize(locale, 30, 24), 136, false);
     const textStyle: CSSProperties = { fontFamily: 'var(--f-monogram)', direction: textDir(v.text) };
-    return <Lines lines={lines} size={size} x={88} y={50} fill={ink} opacity=".9" style={textStyle} />;
+    // inside the printed frame (148 wide)
+    return (
+      <InkFit text={v.text} max={140} cx={88} cy={50}>
+        <Lines lines={lines} size={size} x={88} y={50} fill={ink} opacity=".9" style={textStyle} />
+      </InkFit>
+    );
   };
   return (
     <svg viewBox="0 0 220 100" aria-hidden="true">
