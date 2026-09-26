@@ -314,7 +314,7 @@ function hostWorld(
       queueNotices: rec('queueNotices', () => ({ ok: true, queued: 1, balance: 9 })),
       markNotices: rec('markNotices', () => 2),
       noticesPending: rec('noticesPending', () => 0),
-    },
+    } as unknown as DayHostDeps['db'],
     featureInput: async () => opts.input ?? input(),
     broadcast: async (channel, kind) => {
       broadcasts.push([channel, kind]);
@@ -687,7 +687,7 @@ describe('the guest’s guide page', () => {
     guideRow.mockResolvedValue(row);
     const page = await guidePage('noa-and-itay', TOKEN, IP);
     expect(page.ok).toBe(true);
-    const data = (page as { data: Record<string, unknown> }).data;
+    const data = (page as unknown as { data: Record<string, unknown> }).data;
     expect(data).toMatchObject({
       state: 'seated',
       table: { number: 12 },
