@@ -4,7 +4,8 @@ import type { Box } from './select';
 /**
  * The slow movement over each photo, as plain geometry (tested in tests/unit/film.test.ts): the frame
  * — a rectangle of the film's shape in the photo's pixels — pushes in toward the focal point (the
- * faces, when face search found them; the middle otherwise), or pulls out, or pans across, varying
+ * faces, when face search found them; otherwise the middle, or a third of the way down a photo taller
+ * than the frame, where people's faces usually are), or pulls out, or pans across, varying
  * from shot to shot. It never leaves a face out: when the faces fit the frame, every moment of the
  * movement keeps them all inside it; when they don't (a wide group in a vertical film), the frame
  * grows past the photo's edges to hold them, and the painter fills what's beyond the photo with a
@@ -108,7 +109,7 @@ export function planMotion({
   // the frame at least big enough for the faces (in the film's shape)
   const need = keep ? Math.max(keep.w, keep.h * aspect) : 0;
   const cx = keep ? keep.x + keep.w / 2 : w / 2;
-  const cy = keep ? keep.y + keep.h / 2 : h / 2;
+  const cy = keep ? keep.y + keep.h / 2 : cover.h < h ? h / 3 : h / 2;
 
   if (need > cover.w) {
     // the faces are wider (or taller) than the photo's frame can be: a frame past the photo's edges
@@ -146,9 +147,10 @@ export function planMotion({
     const b = { x: roomX * 0.85, y, w: size, h: height };
     return reverse ? { from: b, to: a } : { from: a, to: b };
   }
+  // down a tall photo: over its upper part (the faces, usually), not down to the feet
   const x = (w - size) / 2;
-  const a = { x, y: roomY * 0.15, w: size, h: height };
-  const b = { x, y: roomY * 0.85, w: size, h: height };
+  const a = { x, y: roomY * 0.05, w: size, h: height };
+  const b = { x, y: roomY * 0.3, w: size, h: height };
   return reverse ? { from: b, to: a } : { from: a, to: b };
 }
 

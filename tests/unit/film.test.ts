@@ -483,6 +483,15 @@ describe('the motion over a photo', () => {
       expect(m.from).not.toEqual(m.to);
     }
   });
+
+  it('keeps the upper part of a tall photo in view without faces (where faces usually are)', () => {
+    // a portrait photo in a horizontal film: the band from a fifth to a third of the way down stays
+    const band = { x: 900, y: 800, w: 1200, h: 600 };
+    for (let index = 0; index < 4; index++) {
+      const m = planMotion({ width: 3000, height: 4000, aspect: 1920 / 1080, faces: null, index });
+      for (const p of steps) expect(contains(rectAt(m, p), band)).toBe(true);
+    }
+  });
 });
 
 // ─── the recorded WebM's duration ───────────────────────────────────────────────────────────────
