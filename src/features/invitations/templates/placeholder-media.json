@@ -1,4 +1,27 @@
 {
   "generatedBy": "scripts/make-template-placeholders.mjs — placeholder photos shipped in public/templates/<id>/ until the real files are in the template-media bucket",
-  "templates": {}
+  "templates": {
+    "lumiere": {
+      "photo-hero.webp": {
+        "hash": "2ae197b168",
+        "bytes": 124272
+      },
+      "photo-quote.webp": {
+        "hash": "e3ea846128",
+        "bytes": 111592
+      },
+      "photo-story.webp": {
+        "hash": "0b46f63fd3",
+        "bytes": 105290
+      },
+      "photo-venue.webp": {
+        "hash": "319ce3fbd8",
+        "bytes": 164628
+      },
+      "photo-rsvp.webp": {
+        "hash": "faaed775ab",
+        "bytes": 167346
+      }
+    }
+  }
 }

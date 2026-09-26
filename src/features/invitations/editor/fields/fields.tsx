@@ -41,6 +41,8 @@ export interface PreviewControls {
   highlight: (path: string | null, label?: string) => void;
   /** play the cover opening again in the preview */
   replay: () => void;
+  /** play a section's motion in the preview as guests see it (`ms`: how long it takes) */
+  play?: (path: string, ms: number) => void;
 }
 const PreviewControlsContext = createContext<PreviewControls>({ highlight: () => {}, replay: () => {} });
 export const PreviewControlsProvider = PreviewControlsContext.Provider;

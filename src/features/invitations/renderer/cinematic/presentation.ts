@@ -66,9 +66,7 @@ export const hasThemeTokens = (doc: Pick<InvitationDocument, 'theme'>): boolean 
 /** Whether the document uses the v2 presentation anywhere (sections, the host's opening, its tokens). */
 export function usesCinematic(doc: Pick<InvitationDocument, 'sections' | 'cover' | 'theme'>): boolean {
   return (
-    !!doc.cover.opening ||
-    hasThemeTokens(doc) ||
-    doc.sections.some((s) => s.enabled && hasPresentation(s))
+    !!doc.cover.opening || hasThemeTokens(doc) || doc.sections.some((s) => s.enabled && hasPresentation(s))
   );
 }
 

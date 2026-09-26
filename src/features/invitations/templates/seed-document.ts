@@ -461,16 +461,15 @@ export function seedDocument(
       sections.push(...(bySlot[type] ?? []).map(withVariant));
     }
   }
-  // Section types that exist in the seed but not in the template order are added before the footer,
-  // hidden: the template left them out, the host can switch them on.
+  // Section types that exist in the seed but not in the template order are added hidden (the template
+  // left them out, the host can switch them on) — before the RSVP, else before the footer, so a design
+  // that ends on its RSVP still does.
   for (const [type, list] of Object.entries(bySlot)) {
     if (!order.includes(type as Section['type'])) {
+      const rsvp = sections.findIndex((s) => s.type === 'rsvp');
       const footer = sections.findIndex((s) => s.type === 'footer');
-      sections.splice(
-        footer < 0 ? sections.length : footer,
-        0,
-        ...(list ?? []).map((s) => ({ ...withVariant(s), enabled: false }) as Section),
-      );
+      const at = rsvp >= 0 ? rsvp : footer >= 0 ? footer : sections.length;
+      sections.splice(at, 0, ...(list ?? []).map((s) => ({ ...withVariant(s), enabled: false }) as Section));
     }
   }
   // v2: the template's own presentation of each seeded section — its photo, layout, motion, colors

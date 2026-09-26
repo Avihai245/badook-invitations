@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { dirOf, type InvitationDocument, type Locale, type TemplateManifest } from '../../contracts/types';
 import { fontFaceCss, pairFontFamilies } from '../../fonts';
 import type { AssetBases } from '../../renderer/assets';

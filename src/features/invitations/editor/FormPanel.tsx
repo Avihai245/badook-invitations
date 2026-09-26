@@ -18,6 +18,7 @@ import { HelpFor, type HelpArea } from '../app/HelpFor';
 const PANEL_HELP: Record<PanelId, HelpArea> = {
   palette: 'designPalette',
   fonts: 'designFonts',
+  style: 'designStyle',
   cover: 'designCover',
   music: 'designMusic',
   event: 'settingsEvent',
