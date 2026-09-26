@@ -15,7 +15,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/papercut-gold/preview.webp",
   "previewVideo": "/templates/papercut-gold/preview.mp4",

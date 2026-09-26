@@ -41,7 +41,7 @@ export function WhenView({ section, ctx }: SectionViewProps<SectionOf<'when'>>) 
         ) : null}
         {d.showTime ? (
           <p className="v-when wh-time reveal" style={iv(i++)}>
-            <Icon name="clock" size={18} /> <span className="ltr">{ctx.time(doc.event.startTime)}</span>
+            <Icon name="clock" size={18} /> <span dir="auto">{ctx.time(doc.event.startTime)}</span>
           </p>
         ) : null}
         {counting ? (

@@ -4,8 +4,11 @@
  *
  * Reads the font pairs + monogram fonts of every pack template and the font library's pairs
  * (src/features/invitations/fonts/library.json), picks the weights each role needs
- * (§9A.2), and for each family copies the matching @fontsource woff2 files (hebrew / latin /
- * latin-ext subsets only) to public/fonts/<id>/<version>/, then writes:
+ * (§9A.2), and for each family copies the matching @fontsource woff2 files to
+ * public/fonts/<id>/<version>/ — a pair's families in their hebrew / latin / latin-ext / cyrillic /
+ * cyrillic-ext subsets (those they have), and the fonts of the scripts a pair doesn't write
+ * (fonts/scripts.json): a Cyrillic stand-in for a Latin family without Cyrillic, and the Arabic and
+ * Ethiopic families, only in their own script's subset — then writes:
  *   - src/features/invitations/fonts/font-faces.generated.json  (faces + unicode-range + size-adjust)
  *   - src/styles/app-fonts.generated.css                         (the host app's Heebo, Inter + display fonts)
  * Font binaries are gitignored and regenerated on every build; the JSON/CSS are committed.
@@ -21,9 +24,19 @@ const fontsourceDir = join(root, 'node_modules', '@fontsource');
 const publicDir = join(root, 'public', 'fonts');
 const jsonOut = join(root, 'src', 'features', 'invitations', 'fonts', 'font-faces.generated.json');
 const libraryFile = join(root, 'src', 'features', 'invitations', 'fonts', 'library.json');
+const scriptsFile = join(root, 'src', 'features', 'invitations', 'fonts', 'scripts.json');
 const appCssOut = join(root, 'src', 'styles', 'app-fonts.generated.css');
 
-const SUBSETS = ['hebrew', 'latin', 'latin-ext'];
+/** The subsets a pair's own families are copied in (when they have them). */
+const PAIR_SUBSETS = ['hebrew', 'latin', 'latin-ext', 'cyrillic', 'cyrillic-ext'];
+const SUBSETS = [...PAIR_SUBSETS, 'arabic', 'ethiopic'];
+/** A Cyrillic stand-in, an Arabic or an Ethiopic family: only its own script. */
+const SCRIPT_SUBSETS = { cyrillic: ['cyrillic', 'cyrillic-ext'], arabic: ['arabic'], ethiopic: ['ethiopic'] };
+/** Arabic and Ethiopic text faces: a regular and a bold (300–500 fall on 400, 600–900 on 700). */
+const SCRIPT_TEXT_VARIANTS = [
+  [400, 'normal'],
+  [700, 'normal'],
+];
 
 /** Optical size equalization between scripts (§9A.2 starting values). */
 const SIZE_ADJUST = {
@@ -88,17 +101,30 @@ const APP_FAMILIES = {
 const familyId = (family) => family.toLowerCase().replace(/\s+/g, '-');
 
 function collectInvitationNeeds() {
-  /** @type {Map<string, Set<string>>} family → "weight:style" */
+  const scripts = JSON.parse(readFileSync(scriptsFile, 'utf8'));
+  /** @type {Map<string, { variants: Set<string>, subsets: Set<string> }>} family → "weight:style", subsets */
   const needs = new Map();
-  const add = (family, variants) => {
-    const set = needs.get(family) ?? new Set();
-    for (const [w, s] of variants) set.add(`${w}:${s}`);
-    needs.set(family, set);
+  const add = (family, variants, subsets = PAIR_SUBSETS) => {
+    const entry = needs.get(family) ?? { variants: new Set(), subsets: new Set() };
+    for (const [w, s] of variants) entry.variants.add(`${w}:${s}`);
+    for (const subset of subsets) entry.subsets.add(subset);
+    needs.set(family, entry);
+  };
+  /** the fonts of the other scripts for one Latin family in one role (fonts/index.ts scriptFamily) */
+  const addScripts = (latin, role) => {
+    const standIn = scripts.cyrillic[latin];
+    if (standIn) add(standIn, ROLE_VARIANTS[role].latin, SCRIPT_SUBSETS.cyrillic);
+    const style = scripts.classes[latin] ?? 'serif';
+    const face = role === 'display' || role === 'monogram' ? 'display' : 'text';
+    const variants = face === 'display' ? [[400, 'normal']] : SCRIPT_TEXT_VARIANTS;
+    add(scripts.arabic[style][face], variants, SCRIPT_SUBSETS.arabic);
+    add(scripts.ethiopic[style][face], variants, SCRIPT_SUBSETS.ethiopic);
   };
   const addPair = (pair) => {
     for (const role of ['display', 'heading', 'body', 'ui']) {
       add(pair[role].hebrew, ROLE_VARIANTS[role].hebrew);
       add(pair[role].latin, ROLE_VARIANTS[role].latin);
+      addScripts(pair[role].latin, role);
     }
   };
   for (const id of readdirSync(packDir)) {
@@ -108,6 +134,7 @@ function collectInvitationNeeds() {
     for (const pair of manifest.fontPairs) addPair(pair);
     add(manifest.cover.monogramFont.hebrew, ROLE_VARIANTS.monogram.hebrew);
     add(manifest.cover.monogramFont.latin, ROLE_VARIANTS.monogram.latin);
+    addScripts(manifest.cover.monogramFont.latin, 'monogram');
   }
   // the font library: pairs any template can use
   for (const pair of JSON.parse(readFileSync(libraryFile, 'utf8')).pairs) addPair(pair);
@@ -148,9 +175,9 @@ function parseFaces(cssFile, id) {
   return faces;
 }
 
-function buildFamily(family, variants) {
+function buildFamily(family, variants, wanted = PAIR_SUBSETS) {
   const { dir, meta, version } = readMeta(family);
-  const subsets = SUBSETS.filter((s) => meta.subsets.includes(s));
+  const subsets = SUBSETS.filter((s) => wanted.includes(s) && meta.subsets.includes(s));
   const weights = meta.weights;
   const faces = [];
   const seen = new Set();
@@ -213,7 +240,10 @@ function writeIfChanged(file, content) {
 
 const needs = collectInvitationNeeds();
 const families = {};
-for (const family of [...needs.keys()].sort()) families[family] = buildFamily(family, needs.get(family));
+for (const family of [...needs.keys()].sort()) {
+  const { variants, subsets } = needs.get(family);
+  families[family] = buildFamily(family, variants, [...subsets]);
+}
 
 const app = {};
 for (const [family, variants] of Object.entries(APP_FAMILIES)) {

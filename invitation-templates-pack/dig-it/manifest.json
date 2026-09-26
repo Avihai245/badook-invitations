@@ -15,7 +15,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/dig-it/preview.webp",
   "previewVideo": "/templates/dig-it/preview.mp4",

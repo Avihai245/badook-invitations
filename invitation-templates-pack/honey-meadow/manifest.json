@@ -16,7 +16,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/honey-meadow/preview.webp",
   "previewVideo": "/templates/honey-meadow/preview.mp4",

@@ -13,6 +13,8 @@ export interface GuestInfo {
   name: string;
   phone: string | null;
   partySize: number | null;
+  /** the language the host set for them (null: the invitation's default) */
+  language?: string | null;
 }
 
 let current: GuestInfo | null = null;
@@ -46,16 +48,33 @@ function readStored(slug: string): GuestInfo | null {
   }
 }
 
+/**
+ * The guest's own language (the host's guest list): the page switches to it unless the guest chose
+ * one, or the link names one (LiveLocale).
+ */
+function announceLanguage(guest: GuestInfo) {
+  if (guest.language)
+    window.dispatchEvent(
+      new CustomEvent('invitation:guest-language', { detail: { language: guest.language } }),
+    );
+}
+
 /** Mounted once on the live page: resolves ?g= (and counts the visit). */
 export function GuestLink({ slug }: { slug: string }) {
   useEffect(() => {
     const token = new URLSearchParams(window.location.search).get('g');
     const stored = readStored(slug);
     if (!token || !GUEST_TOKEN.test(token)) {
-      if (stored) setGuest(stored);
+      if (stored) {
+        setGuest(stored);
+        announceLanguage(stored);
+      }
       return;
     }
-    if (stored?.token === token) setGuest(stored);
+    if (stored?.token === token) {
+      setGuest(stored);
+      announceLanguage(stored);
+    }
     const ctrl = new AbortController();
     fetch('/api/invitations/guest', {
       method: 'POST',
@@ -68,6 +87,7 @@ export function GuestLink({ slug }: { slug: string }) {
         if (!body?.guest) return;
         const guest: GuestInfo = { token, ...body.guest };
         setGuest(guest);
+        if (guest.language !== stored?.language || stored?.token !== token) announceLanguage(guest);
         try {
           window.sessionStorage.setItem(storageKey(slug), JSON.stringify(guest));
         } catch {

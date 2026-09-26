@@ -1,7 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
-import type { EventType, Locale } from '@/features/invitations/contracts/types';
+import {
+  LOCALES as ALL_LOCALES,
+  RTL_LOCALES,
+  type EventType,
+  type Locale,
+} from '@/features/invitations/contracts/types';
+import { nativeName } from '@/features/invitations/lib/locales';
 import { isDarkPalette } from '@/features/invitations/lib/contrast';
 import { FIXTURES } from '@/features/invitations/templates/demo';
 import { TEMPLATES } from '@/features/invitations/templates/registry';
@@ -18,7 +24,11 @@ const LOCALES: Locale[] = ['he', 'en'];
 
 /** URL-driven controls (no client JS): each option is a link that keeps the other choices. */
 const CONTROLS = {
-  doc: { label: 'Document', options: ['demo', 'stress', ...Object.keys(FIXTURES)], fallback: 'demo' },
+  doc: {
+    label: 'Document',
+    options: ['demo', 'stress', 'world', 'longer', ...Object.keys(FIXTURES)],
+    fallback: 'demo',
+  },
   view: { label: 'View', options: ['open', 'cover', 'preview'], fallback: 'open' },
   scheme: { label: 'Device theme', options: ['light', 'dark'], fallback: 'light' },
   tl: {
@@ -70,8 +80,13 @@ function renderHref(
 
 function docLocales(templateId: string, doc: string): Locale[] {
   if (doc in FIXTURES) return [...FIXTURES[doc as keyof typeof FIXTURES].locales];
-  return TEMPLATES.get(templateId)?.manifest.supportsLocales ?? LOCALES;
+  const supported = TEMPLATES.get(templateId)?.manifest.supportsLocales ?? LOCALES;
+  // `world` and `longer` are in every language; the demos are seeded in Hebrew and English
+  return WORLD_DOCS.has(doc) ? supported : supported.filter((l) => l === 'he' || l === 'en');
 }
+
+/** The documents in all seven languages: a frame per language. */
+const WORLD_DOCS = new Set(['world', 'longer']);
 
 function Controls({ state }: { state: State }) {
   return (
@@ -169,9 +184,10 @@ export default async function KitchenSinkPage({ searchParams }: { searchParams: 
       <section className="mb-8 rounded-card border border-line bg-surface p-4 shadow-sm">
         <Controls state={state} />
         <p className="mt-3 text-[12px] text-faint">
-          “stress” = longest allowed strings (20-char names, 40-char eyebrow, 22-char timeline labels).
-          Fixture documents keep their own locales; a missing locale shows an empty slot. Gallery and reveal
-          render in their static P0 form (interactive variants arrive in P4).
+          “stress” = longest allowed strings (20-char names, 40-char eyebrow, 22-char timeline labels);
+          “world” = the demo in all seven languages; “longer” = that one with every text 40% longer. Fixture
+          documents keep their own locales; a missing locale shows an empty slot. Gallery and reveal render in
+          their static P0 form (interactive variants arrive in P4).
         </p>
       </section>
 
@@ -207,7 +223,7 @@ export default async function KitchenSinkPage({ searchParams }: { searchParams: 
                 </span>
               </div>
               <div className="flex flex-wrap gap-6">
-                {LOCALES.map((locale) => {
+                {(WORLD_DOCS.has(state.doc) ? ALL_LOCALES : LOCALES).map((locale) => {
                   const src = renderHref(manifest.id, locale, state.doc, state);
                   return (
                     <figure key={locale} className="grid gap-2">
@@ -227,7 +243,9 @@ export default async function KitchenSinkPage({ searchParams }: { searchParams: 
                         </div>
                       )}
                       <figcaption className="flex items-center justify-between text-[12px] text-muted">
-                        <span>{locale === 'he' ? 'עברית · RTL' : 'English · LTR'}</span>
+                        <span>
+                          {nativeName(locale)} · {RTL_LOCALES.includes(locale) ? 'RTL' : 'LTR'}
+                        </span>
                         {locales.includes(locale) ? (
                           <a className="underline" href={src} target="_blank" rel="noreferrer">
                             open ↗

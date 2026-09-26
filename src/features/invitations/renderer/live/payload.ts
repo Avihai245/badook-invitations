@@ -13,8 +13,8 @@ export interface LiveLocaleEntry {
   url: string;
   /** the language pill's plain link to this locale (before hydration, open in a new tab) */
   href: string;
-  /** the page chrome in this locale */
-  labels: { switch: string; play: string; pause: string };
+  /** the page chrome in this locale: the language menu's name, the music button's */
+  labels: { menu: string; play: string; pause: string };
 }
 
 /**

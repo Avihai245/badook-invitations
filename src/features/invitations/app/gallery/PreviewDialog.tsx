@@ -6,6 +6,7 @@ import { Button, Dialog, PhoneFrame, Segmented, cn } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import type { Locale, Palette } from '../../contracts/types';
 import { LibraryFontPairs } from '../../editor/fields/font-library';
+import { isFreeLocale } from '../../lib/locales';
 import { usePreviewChannel } from '../../editor/preview/usePreviewChannel';
 import { demoDocument } from '../../templates/demo';
 import { requireTemplate } from '../../templates/registry';
@@ -39,9 +40,12 @@ export function PreviewDialog({
   const [paletteId, setPaletteId] = useState<string | null>(null);
   const [fontPairId, setFontPairId] = useState<string | null>(null);
   const frame = useRef<HTMLIFrameElement>(null);
+  // the gallery previews in Hebrew or English (its posters' language); the other languages come
+  // with the invitation's own settings
+  const locales = useMemo(() => manifest.supportsLocales.filter(isFreeLocale), [manifest]);
 
   const doc = useMemo(() => {
-    const d = demoDocument(templateId, undefined, manifest.supportsLocales, locale);
+    const d = demoDocument(templateId, undefined, locales, locale);
     const preset = manifest.palettePresets.find((p) => p.id === paletteId);
     const editable = new Set<string>(manifest.tokens.editablePaletteKeys);
     if (preset)
@@ -50,7 +54,7 @@ export function PreviewDialog({
       ) as Partial<Palette>;
     if (fontPairId) d.theme.fontPairId = fontPairId;
     return d;
-  }, [templateId, manifest, locale, paletteId, fontPairId]);
+  }, [templateId, manifest, locales, locale, paletteId, fontPairId]);
   usePreviewChannel(frame, { doc, locale });
 
   const name = manifest.name[ui] ?? manifest.name.en ?? manifest.id;
@@ -90,7 +94,7 @@ export function PreviewDialog({
               label={t.gallery.previewLanguage}
               value={locale}
               onValueChange={onLocaleChange}
-              options={manifest.supportsLocales.map((l) => ({
+              options={locales.map((l) => ({
                 value: l,
                 label: l === 'he' ? t.common.hebrew : t.common.english,
               }))}

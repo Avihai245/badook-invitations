@@ -18,7 +18,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/majolica/preview.webp",
   "previewVideo": "/templates/majolica/preview.mp4",

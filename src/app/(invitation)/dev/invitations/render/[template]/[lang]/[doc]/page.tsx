@@ -191,7 +191,6 @@ export default async function RenderPage({ params, searchParams }: { params: Par
   };
   const ctx = buildRenderContext(rendered, entry.manifest, lang, { ...options, mode });
 
-  const next = doc.locales[(doc.locales.indexOf(lang) + 1) % doc.locales.length] as Locale;
   const query = new URLSearchParams(
     Object.entries(sp).flatMap(([k, v]) => (typeof v === 'string' ? [[k, v]] : [])),
   ).toString();
@@ -203,6 +202,11 @@ export default async function RenderPage({ params, searchParams }: { params: Par
       : null;
 
   return (
-    <InvitationBody ctx={ctx} showCover={one(sp.open) !== '1'} langSwitchHref={href(next)} live={live} />
+    <InvitationBody
+      ctx={ctx}
+      showCover={one(sp.open) !== '1'}
+      langHrefs={Object.fromEntries(doc.locales.map((l) => [l, href(l)]))}
+      live={live}
+    />
   );
 }

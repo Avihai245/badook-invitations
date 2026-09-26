@@ -3,16 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import { UpgradeDialog, upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
-import {
-  Button,
-  Dialog,
-  Field,
-  Input,
-  Select,
-  Skeleton,
-  cn,
-  rovingKeyDown,
-} from '@/components/app';
+import { Button, Dialog, Field, Input, Select, Skeleton, cn, rovingKeyDown } from '@/components/app';
 import type { AppDict } from '@/lib/i18n/app.he';
 import { useUi } from '@/lib/i18n/client';
 import { dirOf, type EventType, type L10n, type Locale } from '../../contracts/types';
@@ -413,7 +404,10 @@ export function CreateWizard({
                 <div
                   role="group"
                   aria-labelledby={headingId}
-                  className={cn('grid gap-2', supported.length > 1 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1')}
+                  className={cn(
+                    'grid gap-2',
+                    supported.length > 1 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1',
+                  )}
                 >
                   {supported.map((l) => {
                     const on = chosen.includes(l);
@@ -437,7 +431,9 @@ export function CreateWizard({
                           {NATIVE_NAMES[l]}
                         </span>
                         {NATIVE_NAMES[l] !== t.editor.languageIn[l] ? (
-                          <span className="text-[12px] leading-snug text-muted">{t.editor.languageIn[l]}</span>
+                          <span className="text-[12px] leading-snug text-muted">
+                            {t.editor.languageIn[l]}
+                          </span>
                         ) : null}
                       </button>
                     );
@@ -445,7 +441,10 @@ export function CreateWizard({
                 </div>
                 {chosen.length > 1 ? (
                   <Field label={w.languages.default} help={w.languages.defaultHelp}>
-                    <Select value={defaultLocale} onChange={(e) => setDefaultLocale(e.target.value as Locale)}>
+                    <Select
+                      value={defaultLocale}
+                      onChange={(e) => setDefaultLocale(e.target.value as Locale)}
+                    >
                       {chosen.map((l) => (
                         <option key={l} value={l} lang={l}>
                           {NATIVE_NAMES[l]}

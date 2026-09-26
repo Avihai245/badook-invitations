@@ -1,20 +1,20 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
-import type { Locale } from '../../contracts/types';
+import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react';
 import { visibleGlyphCount } from '../../lib/text';
 import { seeded } from '../fx/motion';
 import { fireworks, goldDust } from '../fx/sparks';
+import { Localized, coverName, type Variant } from './localized';
 import type { Opening } from './opening';
 import { announceOpen, reducedMotion, useOpening, type PhaseProps } from './phase';
 
 export interface CinematicCoverProps extends PhaseProps {
-  locale: Locale;
   opening: Opening;
-  monogram: string;
-  hint: string;
-  skipLabel: string;
-  scrollLabel?: string;
+  /** in each of the page's languages (cover/localized.tsx) */
+  monogram: readonly Variant[];
+  hint: readonly Variant[];
+  skipLabel: readonly Variant[];
+  scrollLabel?: readonly Variant[];
   /** the template's burst colors (renderer/fx/theme.ts): the fireworks' */
   fx?: { colors: string[] } | null;
 }
@@ -47,6 +47,7 @@ export function CinematicCover({
   later,
 }: CinematicCoverProps) {
   const root = useRef<HTMLDivElement>(null);
+  const hintId = useId();
   const { preset } = opening;
 
   const open = useOpening((skip: boolean) => {
@@ -151,10 +152,15 @@ export function CinematicCover({
     '--co-light': opening.light,
     '--co-deep': opening.deep,
     '--co-gold': opening.gold,
-    // a longer monogram (a name and an age: "DANA 30") sets smaller on the medal and the crest
-    '--co-glyphs': Math.max(3, visibleGlyphCount(monogram)),
+    // a longer monogram (a name and an age: "DANA 30") sets smaller on the medal and the crest — the
+    // longest of its languages
+    '--co-glyphs': Math.max(3, ...monogram.map((v) => visibleGlyphCount(v.text))),
   } as CSSProperties;
-  const mono = monogram ? <span className="co-mono">{monogram}</span> : null;
+  const mono = monogram.some((v) => v.text) ? (
+    <span className="co-mono">
+      <Localized variants={monogram} />
+    </span>
+  ) : null;
 
   let art: ReactNode;
   switch (preset) {
@@ -220,7 +226,7 @@ export function CinematicCover({
       <button
         type="button"
         className="cover-tap"
-        aria-label={hint}
+        {...coverName(hint, hintId)}
         onClick={() => open(false)}
         onKeyDown={(e) => {
           if (e.key === ' ' || e.key === 'Enter') {
@@ -230,12 +236,12 @@ export function CinematicCover({
         }}
       >
         {art}
-        <span className="cover-hint" aria-hidden="true">
-          {hint}
+        <span className="cover-hint" id={hintId} aria-hidden={hint.length > 1 ? undefined : true}>
+          <Localized variants={hint} />
         </span>
         {opening.scroll && scrollLabel ? (
           <span className="co-scroll" aria-hidden="true">
-            {scrollLabel}
+            <Localized variants={scrollLabel} />
             <svg
               viewBox="0 0 24 24"
               width="22"
@@ -251,7 +257,7 @@ export function CinematicCover({
       </button>
       {showSkip && phase === 'idle' ? (
         <button type="button" className="cover-skip" onClick={() => open(true)}>
-          {skipLabel}
+          <Localized variants={skipLabel} />
         </button>
       ) : null}
     </div>

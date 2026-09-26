@@ -16,7 +16,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/superhero-pow/preview.webp",
   "previewVideo": "/templates/superhero-pow/preview.mp4",

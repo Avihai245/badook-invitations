@@ -25,6 +25,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // an Israeli phone: the invitations' language detection (live/detect.ts) keeps a Hebrew-first
+    // invitation in Hebrew — a test that wants another language asks for it (test.use({ locale }))
+    locale: 'he-IL',
   },
   projects: [
     {

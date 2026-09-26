@@ -11,7 +11,9 @@ import {
 } from 'react';
 import { flushSync } from 'react-dom';
 import { dirOf, type Locale } from '../../contracts/types';
+import { nativeName } from '../../lib/locales';
 import { FloatingControls, type MusicProps } from '../FloatingControls.client';
+import { rememberChoice, storedChoice } from './detect';
 import type { LivePayload } from './payload';
 
 type Sections = ComponentType<{ payload: LivePayload; locale: Locale }>;
@@ -113,11 +115,21 @@ function showAddress(url: string) {
   window.history.replaceState(null, '', `${next.pathname}${next.search}${current.hash}`);
 }
 
+/** Which switch this is: the guest's own choice (the menu), or the language picked for them. */
+type How = 'guest' | 'auto';
+
 /**
- * The live language switch of a bilingual invitation (§2.2 Global): the pill swaps the texts and
- * `dir` in place — no reload, the music keeps playing, the guest stays at the same place in the
- * invitation, `?lang=` follows. The page's own locale is the server-rendered `children`; the other
- * one is rendered in the browser from the payload.
+ * The live language switch of an invitation in several languages (§2.2 Global): the language pill (a
+ * menu from three languages on) swaps the texts and `dir` in place — no reload, the music keeps
+ * playing, the guest stays at the same place in the invitation, `?lang=` follows, and the choice holds
+ * for the visit. The page's own locale is the server-rendered `children`; the others are rendered in
+ * the browser from the payload.
+ *
+ * The same switch serves the language picked for the guest (live/detect.ts): the browser's language —
+ * the page's inline script already set <html lang dir> and the cover's texts, so the sections follow
+ * here, unseen behind the cover — or, on a personal link, the guest's own language from the host's
+ * list (GuestLink → `invitation:guest-language`). Such a switch touches neither the address nor the
+ * guest's choice.
  */
 export function LiveLocale({
   initial,
@@ -131,20 +143,21 @@ export function LiveLocale({
   /** the sections in `initial`, rendered on the server */
   children: ReactNode;
 }) {
-  const [view, setView] = useState<{ locale: Locale; Sections: Sections | null }>({
+  const [view, setView] = useState<{ locale: Locale; Sections: Sections | null; how: How }>({
     locale: initial,
     Sections: null,
+    how: 'auto',
   });
   const { locale, Sections } = view;
   const applied = useRef(initial);
-  const busy = useRef(false);
+  const busy = useRef<Locale | null>(null);
   const anchor = useRef<Anchor | null>(null);
   const fonts = useRef(new Map<Locale, Promise<unknown>>());
   const { locales } = payload.doc;
-  const target = locales[(locales.indexOf(locale) + 1) % locales.length]!;
+  const slug = payload.doc.share.slug;
   const entry = payload.locales[locale]!;
 
-  /** Hover / press / focus on the pill: fetch what the switch needs. */
+  /** Hover / press / focus on the pill or a language: fetch what the switch needs. */
   const prepare = useCallback(
     (l: Locale) => {
       if (l !== initial) void loadSections().catch(() => undefined);
@@ -170,26 +183,55 @@ export function LiveLocale({
   }, []);
 
   const switchTo = useCallback(
-    async (next: Locale) => {
-      if (busy.current || next === applied.current) return;
-      busy.current = true;
+    async (next: Locale, how: How) => {
+      if (busy.current === next || next === applied.current) return;
+      busy.current = next;
       try {
         prepare(next);
         const NextSections = next === initial ? null : await loadSections();
+        if (busy.current !== next) return; // another language was asked for meanwhile
         // the target script's fonts usually arrived on hover/press already — never wait long for them
         await Promise.race([fonts.current.get(next), new Promise((r) => window.setTimeout(r, 250))]);
         anchor.current = captureAnchor();
         // render + restore the position before the browser paints
-        flushSync(() => setView((v) => ({ locale: next, Sections: NextSections ?? v.Sections })));
+        flushSync(() => setView((v) => ({ locale: next, Sections: NextSections ?? v.Sections, how })));
       } catch {
-        // the renderer couldn't be fetched (offline): the plain link
-        window.location.assign(payload.locales[next]?.href ?? window.location.href);
+        // the renderer couldn't be fetched (offline): the guest's choice becomes the plain link;
+        // a language picked for them stays as the page is
+        if (how === 'guest') window.location.assign(payload.locales[next]?.href ?? window.location.href);
+        else endPending();
       } finally {
-        busy.current = false;
+        if (busy.current === next) busy.current = null;
       }
     },
     [initial, payload, prepare],
   );
+
+  /** The guest picks a language in the menu: it holds for the rest of the visit. */
+  const choose = useCallback(
+    (l: Locale) => {
+      rememberChoice(slug, l);
+      void switchTo(l, 'guest');
+    },
+    [slug, switchTo],
+  );
+
+  // The language picked before React took over (the inline script: the guest's browser language),
+  // and later a personal link's language — unless the guest chose one, or the link names one.
+  useLayoutEffect(() => {
+    const pending = document.documentElement.dataset.localePending as Locale | undefined;
+    if (pending && pending !== initial && locales.includes(pending)) void switchTo(pending, 'auto');
+    else endPending();
+    const onGuestLanguage = (e: Event) => {
+      const l = (e as CustomEvent<{ language?: string | null }>).detail?.language as Locale | undefined;
+      if (!l || !locales.includes(l) || storedChoice(slug)) return;
+      if (new URLSearchParams(window.location.search).get('lang')) return;
+      void switchTo(l, 'auto');
+    };
+    window.addEventListener('invitation:guest-language', onGuestLanguage);
+    return () => window.removeEventListener('invitation:guest-language', onGuestLanguage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on the hydration commit
+  }, []);
 
   useLayoutEffect(() => {
     if (applied.current === locale) return;
@@ -197,15 +239,18 @@ export function LiveLocale({
     const e = payload.locales[locale];
     if (!e) return;
     const root = document.documentElement;
+    // the invitation is on screen (not behind its cover): a visible switch, no entrance played again
+    const visible = !!root.dataset.opened;
     root.lang = locale;
     root.dir = dirOf(locale);
     for (const [key, value] of Object.entries(e.vars)) root.style.setProperty(key, value);
-    // the hero's entrance has played already (see invitation.css)
-    root.dataset.localeSwitched = '1';
+    if (visible) root.dataset.localeSwitched = '1';
     document.title = e.title;
-    showAddress(e.url);
+    // the guest's choice shows in the address (a reload or a shared link keeps it) — a language picked
+    // for them doesn't: someone they share the link with gets their own
+    if (view.how === 'guest') showAddress(e.url);
     const a = anchor.current;
-    if (a) {
+    if (a && visible) {
       restoreAnchor(a);
       // fonts still arriving change the texts' height: settle again, unless the guest scrolled meanwhile
       const settled = window.scrollY;
@@ -213,22 +258,35 @@ export function LiveLocale({
         if (Math.abs(window.scrollY - settled) < 2) restoreAnchor(a);
       });
     }
-    revealInView();
-  }, [locale, payload]);
+    if (visible) revealInView();
+    endPending();
+    window.dispatchEvent(new CustomEvent('invitation:locale', { detail: { locale } }));
+  }, [locale, payload, view.how]);
 
   return (
     <>
       <FloatingControls
-        langSwitch={{
-          href: payload.locales[target]?.href ?? '',
-          label: entry.labels.switch,
-          targetLocale: target,
-          onSwitch: (l) => void switchTo(l),
-          onIntent: () => prepare(target),
+        language={{
+          current: locale,
+          menuLabel: entry.labels.menu,
+          options: locales.map((l) => ({
+            locale: l,
+            label: nativeName(l),
+            href: payload.locales[l]?.href ?? '',
+          })),
+          onSwitch: choose,
+          onIntent: prepare,
         }}
         music={music ? { ...music, playLabel: entry.labels.play, pauseLabel: entry.labels.pause } : null}
       />
       {locale === initial || !Sections ? children : <Sections payload={payload} locale={locale} />}
     </>
   );
+}
+
+/** The picked language is on screen (or won't come): the page shows as it is. */
+function endPending() {
+  const root = document.documentElement.dataset;
+  delete root.localePending;
+  delete root.localeHide;
 }

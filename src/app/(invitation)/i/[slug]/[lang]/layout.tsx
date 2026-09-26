@@ -1,9 +1,12 @@
 import type { Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { dirOf } from '@/features/invitations/contracts/types';
 import { InvitationHtml } from '@/features/invitations/renderer/InvitationHtml';
 import { MissingInvitationHtml } from '@/features/invitations/renderer/MissingInvitation';
+import { isLocale } from '@/features/invitations/lib/locales';
 import { getPublishedInvitation, resolveLocale } from '@/features/invitations/server/published';
 import '@/features/invitations/ui/invitation.css';
+import { serverEnv } from '@/lib/env';
 import { assertInvitationsEnabled } from '@/lib/feature';
 
 type Params = Promise<{ slug: string; lang: string }>;
@@ -29,9 +32,29 @@ export default async function PublicInvitationLayout({
   const invitation = await getPublishedInvitation(slug);
   const locale = invitation && resolveLocale(invitation.doc, lang);
   if (!invitation || !locale)
-    return <MissingInvitationHtml locale={lang === 'en' ? 'en' : 'he'}>{children}</MissingInvitationHtml>;
+    return (
+      <MissingInvitationHtml locale={isLocale(lang) ? lang : 'he'} brand={serverEnv().INVITES_BRAND_NAME}>
+        {children}
+      </MissingInvitationHtml>
+    );
+  const { doc } = invitation;
   return (
-    <InvitationHtml doc={invitation.doc} template={invitation.entry.manifest} locale={locale}>
+    <InvitationHtml
+      doc={doc}
+      template={invitation.entry.manifest}
+      locale={locale}
+      boot={
+        doc.locales.length > 1
+          ? {
+              s: doc.share.slug,
+              c: locale,
+              l: doc.locales,
+              r: doc.locales.filter((l) => dirOf(l) === 'rtl'),
+              k: doc.cover.enabled,
+            }
+          : null
+      }
+    >
       {children}
     </InvitationHtml>
   );

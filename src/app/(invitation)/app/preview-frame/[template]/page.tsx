@@ -38,13 +38,12 @@ export default async function PreviewFramePage({
     const doc = version ? await hostDb.version(invitation, user.id, n) : inv.draft;
     if (!doc) notFound();
     const locale: Locale = doc.locales.includes(lang as Locale) ? (lang as Locale) : doc.defaultLocale;
-    const other = doc.locales.find((l) => l !== locale);
     const query = (l: Locale) =>
       `?${new URLSearchParams({ invitation, ...(version ? { version } : {}), lang: l }).toString()}`;
     standalone = {
       doc,
       locale,
-      langHref: other ? query(other) : null,
+      langHrefs: doc.locales.length > 1 ? Object.fromEntries(doc.locales.map((l) => [l, query(l)])) : null,
       cinematic: await cinematicFor(inv.id),
     };
   }

@@ -1,6 +1,8 @@
-import { useId, type CSSProperties, type SVGProps } from 'react';
+import { useId, type CSSProperties, type ReactNode, type SVGProps } from 'react';
 import type { Locale } from '../../contracts/types';
+import { LOCALE_INFO } from '../../lib/locales';
 import { graphemes, visibleGlyphCount } from '../../lib/text';
+import { textDir, type Variant } from './localized';
 
 /** Irregular wax-seal outline (same 28-point shape as the design reference). */
 const SEAL_PATH = (() => {
@@ -27,10 +29,39 @@ function fitText(text: string, locale: Locale, base: number, width: number, twoL
   const cut = text.trim().lastIndexOf(' ');
   const lines =
     twoLines && cut > 0 ? [text.trim().slice(0, cut).trim(), text.trim().slice(cut + 1)] : [text.trim()];
-  const em = locale === 'he' ? 0.58 : 0.66; // average advance of a display face's capitals / letters
+  const em = EM[LOCALE_INFO[locale].script]; // average advance of a display face's capitals / letters
   const longest = Math.max(...lines.map((l) => graphemes(l, locale).length));
   const size = Math.min(base * (lines.length > 1 ? 0.8 : 1), width / (longest * em));
   return { lines, size: Math.round(size * 10) / 10 };
+}
+
+/** Average advance per glyph of a display face, by script (Ethiopic syllables are wide). */
+const EM = { hebrew: 0.58, arabic: 0.55, ethiopic: 0.82, latin: 0.66, cyrillic: 0.7 } as const;
+/** Uncased scripts (Hebrew, Arabic, Ethiopic) set a little smaller than capitals. */
+const baseSize = (locale: Locale, uncased: number, cased: number) =>
+  LOCALE_INFO[locale].cased ? cased : uncased;
+
+/**
+ * The cover's text in each of its languages: one group per text, shown for the page's language
+ * (invitation.css `[data-lg]`); a single language needs no group.
+ */
+function PerLanguage({
+  variants,
+  render,
+}: {
+  variants: readonly Variant[];
+  render: (v: Variant) => ReactNode;
+}) {
+  if (variants.length <= 1) return <>{variants[0] ? render(variants[0]) : null}</>;
+  return (
+    <>
+      {variants.map((v) => (
+        <g key={v.locales.join(' ')} data-lg={v.locales.join(' ')}>
+          {render(v)}
+        </g>
+      ))}
+    </>
+  );
 }
 
 /** SVG text centred on (x, y), one tspan per line. */
@@ -58,19 +89,31 @@ function Lines({
  * `sealColor` with the monogram pressed into it (the P3 renderer adds the PNG recolor + effects).
  */
 export function SealArt({
-  text,
-  locale,
+  variants,
   shape,
 }: {
-  text: string;
-  locale: Locale;
+  variants: readonly Variant[];
   shape: 'wax_seal' | 'medallion';
 }) {
   const id = useId().replace(/:/g, '');
-  const { lines, size } = fitText(text, locale, locale === 'he' ? 28 : 34, 54, true);
-  const textStyle: CSSProperties = {
-    fontFamily: 'var(--f-monogram)',
-    direction: locale === 'he' ? 'rtl' : 'ltr',
+  const pressed = (v: Variant) => {
+    const locale = v.locales[0]!;
+    const { lines, size } = fitText(v.text, locale, baseSize(locale, 28, 34), 54, true);
+    const textStyle: CSSProperties = { fontFamily: 'var(--f-monogram)', direction: textDir(v.text) };
+    return (
+      <>
+        <Lines
+          lines={lines}
+          size={size}
+          x={50}
+          y={50}
+          fill="rgba(255,255,255,.28)"
+          transform="translate(-.7,-.7)"
+          style={textStyle}
+        />
+        <Lines lines={lines} size={size} x={50} y={50} style={{ ...textStyle, fill: seal(62, '#000') }} />
+      </>
+    );
   };
   return (
     <svg viewBox="0 0 100 100" aria-hidden="true">
@@ -110,26 +153,18 @@ export function SealArt({
       {shape === 'medallion' ? (
         <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth=".8" />
       ) : null}
-      <Lines
-        lines={lines}
-        size={size}
-        x={50}
-        y={50}
-        fill="rgba(255,255,255,.28)"
-        transform="translate(-.7,-.7)"
-        style={textStyle}
-      />
-      <Lines lines={lines} size={size} x={50} y={50} style={{ ...textStyle, fill: seal(62, '#000') }} />
+      <PerLanguage variants={variants} render={pressed} />
     </svg>
   );
 }
 
 /** Paper/wood tag with the monogram printed on it (ramon-dusk, nitzan). */
-export function TagArt({ text, locale, ink }: { text: string; locale: Locale; ink: string }) {
-  const { lines, size } = fitText(text, locale, locale === 'he' ? 20 : 22, 34, true);
-  const textStyle: CSSProperties = {
-    fontFamily: 'var(--f-monogram)',
-    direction: locale === 'he' ? 'rtl' : 'ltr',
+export function TagArt({ variants, ink }: { variants: readonly Variant[]; ink: string }) {
+  const printed = (v: Variant) => {
+    const locale = v.locales[0]!;
+    const { lines, size } = fitText(v.text, locale, baseSize(locale, 20, 22), 34, true);
+    const textStyle: CSSProperties = { fontFamily: 'var(--f-monogram)', direction: textDir(v.text) };
+    return <Lines lines={lines} size={size} x={50} y={62} fill={ink} opacity=".9" style={textStyle} />;
   };
   return (
     <svg viewBox="0 0 100 100" aria-hidden="true">
@@ -141,7 +176,7 @@ export function TagArt({ text, locale, ink }: { text: string; locale: Locale; in
         strokeWidth=".8"
       />
       <circle cx="50" cy="24" r="3.2" fill="rgba(60,40,25,.55)" />
-      <Lines lines={lines} size={size} x={50} y={62} fill={ink} opacity=".9" style={textStyle} />
+      <PerLanguage variants={variants} render={printed} />
     </svg>
   );
 }
@@ -150,11 +185,12 @@ export function TagArt({ text, locale, ink }: { text: string; locale: Locale; in
  * Admission ticket (`ticket_text`): the text is the overlay. The paper is vintage cream unless the
  * template's placeholder art gives it another (`--ticket-paper`, `--ticket-edge`).
  */
-export function TicketArt({ text, locale, ink }: { text: string; locale: Locale; ink: string }) {
-  const { lines, size } = fitText(text, locale, locale === 'he' ? 30 : 24, 136, false);
-  const textStyle: CSSProperties = {
-    fontFamily: 'var(--f-monogram)',
-    direction: locale === 'he' ? 'rtl' : 'ltr',
+export function TicketArt({ variants, ink }: { variants: readonly Variant[]; ink: string }) {
+  const printed = (v: Variant) => {
+    const locale = v.locales[0]!;
+    const { lines, size } = fitText(v.text, locale, baseSize(locale, 30, 24), 136, false);
+    const textStyle: CSSProperties = { fontFamily: 'var(--f-monogram)', direction: textDir(v.text) };
+    return <Lines lines={lines} size={size} x={88} y={50} fill={ink} opacity=".9" style={textStyle} />;
   };
   return (
     <svg viewBox="0 0 220 100" aria-hidden="true">
@@ -175,7 +211,7 @@ export function TicketArt({ text, locale, ink }: { text: string; locale: Locale;
         strokeWidth=".8"
         opacity=".3"
       />
-      <Lines lines={lines} size={size} x={88} y={50} fill={ink} opacity=".9" style={textStyle} />
+      <PerLanguage variants={variants} render={printed} />
       <text
         x="192"
         y="50"

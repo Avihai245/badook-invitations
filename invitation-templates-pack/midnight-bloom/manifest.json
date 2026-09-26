@@ -17,7 +17,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/midnight-bloom/preview.webp",
   "previewVideo": "/templates/midnight-bloom/preview.mp4",

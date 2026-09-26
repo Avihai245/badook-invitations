@@ -50,7 +50,9 @@ export function TimelineView({ section, ctx }: SectionViewProps<SectionOf<'timel
                     <Icon name={TIMELINE_ICON[it.icon]} size={20} />
                   </span>
                   <span>
-                    <span className="pill ltr">{ctx.time(it.time)}</span>
+                    <span className="pill" dir="auto">
+                      {ctx.time(it.time)}
+                    </span>
                     <span className="lbl">{ctx.text(it.label)}</span>
                   </span>
                 </li>

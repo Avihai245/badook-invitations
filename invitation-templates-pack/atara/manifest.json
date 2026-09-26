@@ -15,7 +15,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/atara/preview.webp",
   "previewVideo": "/templates/atara/preview.mp4",

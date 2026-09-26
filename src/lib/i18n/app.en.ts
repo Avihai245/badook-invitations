@@ -466,7 +466,8 @@ export const en: AppDict = {
     languages: {
       hint: 'Pick one or more: guests switch between them with a tap, and each guest can get the invitation in their own language.',
       default: 'Default language',
-      defaultHelp: 'The invitation opens in it — unless the guest’s phone is set to another of its languages.',
+      defaultHelp:
+        'The invitation opens in it — unless the guest’s phone is set to another of its languages.',
     },
     create: 'Create invitation',
     creating: 'Preparing your invitation…',

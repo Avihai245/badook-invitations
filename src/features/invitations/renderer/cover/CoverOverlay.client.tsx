@@ -3,16 +3,18 @@
 import {
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
   type ReactNode,
 } from 'react';
-import type { CoverStyle, Locale, TemplateManifest } from '../../contracts/types';
+import type { CoverStyle, TemplateManifest } from '../../contracts/types';
 import { burstFrom } from '../fx/burst';
 import type { BurstKind } from '../fx/theme';
 import type { CoverMedia } from './media';
+import { Localized, coverName, type Variant } from './localized';
 import { Monogram } from './Monogram';
 import type { Opening } from './opening';
 import { CinematicCover } from './Openings.client';
@@ -22,15 +24,18 @@ import { SealArt, TagArt, TicketArt } from './SealArt';
 type Overlay = TemplateManifest['cover']['overlay'];
 
 export interface CoverOverlayProps {
-  locale: Locale;
   style: CoverStyle;
   overlay: Pick<Overlay, 'kind' | 'exit' | 'recolor' | 'size' | 'offset' | 'text'>;
   /** resolved seal color of a recolored overlay (null otherwise) */
   sealColor: string | null;
   media: CoverMedia;
-  monogram: string;
-  hint: string;
-  skipLabel: string;
+  /**
+   * The cover's texts in each of the page's languages (one on a single-language page): CSS shows the
+   * one of <html lang>, which may change before React takes over (cover/localized.tsx).
+   */
+  monogram: readonly Variant[];
+  hint: readonly Variant[];
+  skipLabel: readonly Variant[];
   /** cached public page: `?open=1` in the URL skips the cover (see InvitationBody) */
   skipFromUrl?: boolean;
   /** a scene template: its scene, drawn on the CSS cover's card (rendered by the caller) */
@@ -40,7 +45,7 @@ export interface CoverOverlayProps {
   /** a cinematic opening (gate, curtain, fireworks, gold dust — cover/opening.ts) instead of the style's own */
   opening?: Opening | null;
   /** its "scroll to enter" cue */
-  scrollLabel?: string;
+  scrollLabel?: readonly Variant[];
 }
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
@@ -147,7 +152,6 @@ export function CoverOverlay(props: CoverOverlayProps) {
 // ─── video-first ──────────────────────────────────────────────────────────────────────────────
 
 function VideoCover({
-  locale,
   style,
   overlay,
   sealColor,
@@ -162,6 +166,7 @@ function VideoCover({
   finish,
   later,
 }: CoverOverlayProps & PhaseProps) {
+  const hintId = useId();
   const video = useRef<HTMLVideoElement>(null);
   const overlayRef = useRef<HTMLSpanElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -256,8 +261,7 @@ function VideoCover({
         draggable={false}
       />
       <Monogram
-        text={monogram}
-        locale={locale}
+        variants={monogram}
         effect={overlay.text.effect}
         color={overlay.text.color}
         sealColor={overlay.recolor ? sealColor : null}
@@ -267,8 +271,7 @@ function VideoCover({
   ) : overlay.kind === 'ticket_text' ? (
     <span className="ov-art">
       <Monogram
-        text={monogram}
-        locale={locale}
+        variants={monogram}
         effect={overlay.text.effect}
         color={overlay.text.color}
         sealColor={null}
@@ -280,13 +283,9 @@ function VideoCover({
     // no blank PNG yet: the CSS disc / tag with the monogram (§5 missing overlay image)
     <span className="ov-art">
       {overlay.kind === 'tag' ? (
-        <TagArt text={monogram} locale={locale} ink={overlay.text.color} />
+        <TagArt variants={monogram} ink={overlay.text.color} />
       ) : (
-        <SealArt
-          text={monogram}
-          locale={locale}
-          shape={overlay.kind === 'medallion' ? 'medallion' : 'wax_seal'}
-        />
+        <SealArt variants={monogram} shape={overlay.kind === 'medallion' ? 'medallion' : 'wax_seal'} />
       )}
     </span>
   );
@@ -305,7 +304,7 @@ function VideoCover({
       <button
         type="button"
         className="cover-tap"
-        aria-label={hint}
+        {...coverName(hint, hintId)}
         onClick={() => open(false)}
         onKeyDown={(e) => {
           if (e.key === ' ' || e.key === 'Enter') {
@@ -320,13 +319,13 @@ function VideoCover({
             <span className="half r">{art}</span>
           </span>
         ) : null}
-        <span className="cover-hint" aria-hidden="true">
-          {hint}
+        <span className="cover-hint" id={hintId} aria-hidden={hint.length > 1 ? undefined : true}>
+          <Localized variants={hint} />
         </span>
       </button>
       {showSkip && phase === 'idle' ? (
         <button type="button" className="cover-skip" onClick={() => open(true)}>
-          {skipLabel}
+          <Localized variants={skipLabel} />
         </button>
       ) : null}
     </div>
@@ -336,7 +335,6 @@ function VideoCover({
 // ─── CSS 3D fallback (no media / css3d templates) ─────────────────────────────────────────────
 
 function CssCover({
-  locale,
   style,
   overlay,
   monogram,
@@ -350,6 +348,7 @@ function CssCover({
   finish,
   later,
 }: CoverOverlayProps & PhaseProps) {
+  const hintId = useId();
   const root = useRef<HTMLDivElement>(null);
   const ticket = style === 'ticket' || overlay.kind === 'ticket_text';
   const open = useOpening((immediate: boolean) => {
@@ -377,13 +376,9 @@ function CssCover({
     .join(' ');
   const art =
     overlay.kind === 'ticket_text' ? null : overlay.kind === 'tag' ? (
-      <TagArt text={monogram} locale={locale} ink={overlay.text.color} />
+      <TagArt variants={monogram} ink={overlay.text.color} />
     ) : overlay.kind === 'none' ? null : (
-      <SealArt
-        text={monogram}
-        locale={locale}
-        shape={overlay.kind === 'medallion' ? 'medallion' : 'wax_seal'}
-      />
+      <SealArt variants={monogram} shape={overlay.kind === 'medallion' ? 'medallion' : 'wax_seal'} />
     );
 
   return (
@@ -397,7 +392,7 @@ function CssCover({
       <button
         type="button"
         className="cover-tap"
-        aria-label={hint}
+        {...coverName(hint, hintId)}
         onClick={() => open(false)}
         onKeyDown={(e) => {
           if (e.key === ' ' || e.key === 'Enter') {
@@ -410,10 +405,10 @@ function CssCover({
           <span className="ticket">
             {/* twice, clipped at the perforation: the stub tears off as it opens */}
             <span className="tk tk-main">
-              <TicketArt text={monogram} locale={locale} ink={overlay.text.color} />
+              <TicketArt variants={monogram} ink={overlay.text.color} />
             </span>
             <span className="tk tk-stub">
-              <TicketArt text={monogram} locale={locale} ink={overlay.text.color} />
+              <TicketArt variants={monogram} ink={overlay.text.color} />
             </span>
           </span>
         ) : (
@@ -430,13 +425,13 @@ function CssCover({
             ) : null}
           </span>
         )}
-        <span className="cover-hint" aria-hidden="true">
-          {hint}
+        <span className="cover-hint" id={hintId} aria-hidden={hint.length > 1 ? undefined : true}>
+          <Localized variants={hint} />
         </span>
       </button>
       {showSkip && phase === 'idle' ? (
         <button type="button" className="cover-skip" onClick={() => open(true)}>
-          {skipLabel}
+          <Localized variants={skipLabel} />
         </button>
       ) : null}
     </div>

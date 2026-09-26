@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
-import type { Locale, TemplateManifest } from '../../contracts/types';
+import type { TemplateManifest } from '../../contracts/types';
 import { mixHex } from '../../lib/contrast';
+import { textDir, type Variant } from './localized';
 
 type Effect = TemplateManifest['cover']['overlay']['text']['effect'];
 
@@ -13,19 +14,18 @@ const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayout
  * template's monogram font, fitted to 58% of the overlay width, with the template's effect —
  * `emboss` / `deboss` (light + shadow copies around the text; ink = seal color darkened 18% /
  * lightened 22% when the overlay is recolored), `foil` (a gold sheen that sweeps once when opened)
- * and `print` (flat ink at 0.9 with a little paper roughness).
+ * and `print` (flat ink at 0.9 with a little paper roughness). A monogram in several languages ("נ&א"
+ * / "N&I") draws each one, fitted on its own; the page's language shows (invitation.css `[data-lg]`).
  */
 export function Monogram({
-  text,
-  locale,
+  variants,
   effect,
   color,
   sealColor,
   wide = false,
   sheen = false,
 }: {
-  text: string;
-  locale: Locale;
+  variants: readonly Variant[];
   effect: Effect;
   /** the template's text color (non-recolored overlays, foil, print) */
   color: string;
@@ -39,29 +39,36 @@ export function Monogram({
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const W = wide ? 220 : 100;
   const H = 100;
-  const glyphs = [...text].length || 1;
   // A first guess by glyph count (the server has no fonts to measure); refined after mount.
-  const guess = Math.min(wide ? 40 : 38, ((W * 0.58) / glyphs) * 1.7);
-  const [size, setSize] = useState(guess);
-  const ref = useRef<SVGTextElement>(null);
+  const guess = (text: string) => Math.min(wide ? 40 : 38, ((W * 0.58) / ([...text].length || 1)) * 1.7);
+  const [sizes, setSizes] = useState<Record<string, number>>({});
+  const refs = useRef(new Map<string, SVGTextElement>());
   const sweep = useRef<SVGAnimateElement>(null);
+  const texts = variants.map((v) => v.text).join('\u0000');
 
   useIsoLayoutEffect(() => {
     let live = true;
+    // every language's text is laid out (a hidden one only with visibility: hidden) — each is measured
     const fit = () => {
-      const el = ref.current;
-      if (!el || !live) return;
-      const width = el.getComputedTextLength();
-      const current = Number(el.getAttribute('font-size')) || guess;
-      if (width > 0) setSize(Math.min(wide ? 44 : 42, (current * (W * 0.58)) / width));
+      if (!live) return;
+      const next: Record<string, number> = {};
+      for (const [text, el] of refs.current) {
+        const width = el.getComputedTextLength();
+        const current = Number(el.getAttribute('font-size')) || guess(text);
+        if (width > 0) next[text] = Math.min(wide ? 44 : 42, (current * (W * 0.58)) / width);
+      }
+      if (Object.keys(next).length) setSizes((s) => ({ ...s, ...next }));
     };
     fit();
-    // the monogram font may still be loading on the first paint
+    // the monogram font may still be loading on the first paint; another language brings its own stack
     void document.fonts?.ready.then(fit);
+    const refit = () => void document.fonts?.ready.then(fit);
+    window.addEventListener('invitation:locale', refit);
     return () => {
       live = false;
+      window.removeEventListener('invitation:locale', refit);
     };
-  }, [text, locale, W]);
+  }, [texts, W]);
 
   useEffect(() => {
     if (sheen && effect === 'foil') sweep.current?.beginElement?.();
@@ -71,11 +78,65 @@ export function Monogram({
     sealColor && (effect === 'emboss' || effect === 'deboss')
       ? mixHex(sealColor, effect === 'emboss' ? '#000000' : '#ffffff', effect === 'emboss' ? 0.18 : 0.22)
       : color;
-  const style: CSSProperties = {
-    fontFamily: 'var(--f-monogram)',
-    direction: locale === 'he' ? 'rtl' : 'ltr',
+  const draw = (text: string) => {
+    const style: CSSProperties = { fontFamily: 'var(--f-monogram)', direction: textDir(text) };
+    const at = {
+      x: W / 2,
+      y: H / 2,
+      dy: '.35em',
+      textAnchor: 'middle' as const,
+      fontSize: sizes[text] ?? guess(text),
+      style,
+    };
+    return (
+      <>
+        {effect === 'emboss' ? (
+          <>
+            <text
+              {...at}
+              x={at.x - 0.7}
+              y={at.y - 0.7}
+              fill="rgba(255,255,255,.4)"
+              filter={`url(#soft${uid})`}
+            >
+              {text}
+            </text>
+            <text {...at} x={at.x + 0.9} y={at.y + 0.9} fill="rgba(0,0,0,.35)" filter={`url(#soft${uid})`}>
+              {text}
+            </text>
+          </>
+        ) : null}
+        {effect === 'deboss' ? (
+          <>
+            <text {...at} x={at.x - 0.7} y={at.y - 0.7} fill="rgba(0,0,0,.35)" filter={`url(#soft${uid})`}>
+              {text}
+            </text>
+            <text
+              {...at}
+              x={at.x + 0.7}
+              y={at.y + 0.7}
+              fill="rgba(255,255,255,.45)"
+              filter={`url(#soft${uid})`}
+            >
+              {text}
+            </text>
+          </>
+        ) : null}
+        <text
+          ref={(el) => {
+            if (el) refs.current.set(text, el);
+            else refs.current.delete(text);
+          }}
+          {...at}
+          fill={effect === 'foil' ? `url(#foil${uid})` : ink}
+          opacity={effect === 'print' ? 0.9 : 1}
+          filter={effect === 'print' ? `url(#prn${uid})` : undefined}
+        >
+          {text}
+        </text>
+      </>
+    );
   };
-  const at = { x: W / 2, y: H / 2, dy: '.35em', textAnchor: 'middle' as const, fontSize: size, style };
 
   return (
     <svg className="monogram" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
@@ -109,41 +170,13 @@ export function Monogram({
           <feGaussianBlur stdDeviation=".35" />
         </filter>
       </defs>
-      {effect === 'emboss' ? (
-        <>
-          <text {...at} x={at.x - 0.7} y={at.y - 0.7} fill="rgba(255,255,255,.4)" filter={`url(#soft${uid})`}>
-            {text}
-          </text>
-          <text {...at} x={at.x + 0.9} y={at.y + 0.9} fill="rgba(0,0,0,.35)" filter={`url(#soft${uid})`}>
-            {text}
-          </text>
-        </>
-      ) : null}
-      {effect === 'deboss' ? (
-        <>
-          <text {...at} x={at.x - 0.7} y={at.y - 0.7} fill="rgba(0,0,0,.35)" filter={`url(#soft${uid})`}>
-            {text}
-          </text>
-          <text
-            {...at}
-            x={at.x + 0.7}
-            y={at.y + 0.7}
-            fill="rgba(255,255,255,.45)"
-            filter={`url(#soft${uid})`}
-          >
-            {text}
-          </text>
-        </>
-      ) : null}
-      <text
-        ref={ref}
-        {...at}
-        fill={effect === 'foil' ? `url(#foil${uid})` : ink}
-        opacity={effect === 'print' ? 0.9 : 1}
-        filter={effect === 'print' ? `url(#prn${uid})` : undefined}
-      >
-        {text}
-      </text>
+      {variants.length <= 1
+        ? draw(variants[0]?.text ?? '')
+        : variants.map((v) => (
+            <g key={v.locales.join(' ')} data-lg={v.locales.join(' ')}>
+              {draw(v.text)}
+            </g>
+          ))}
     </svg>
   );
 }

@@ -18,7 +18,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/vinyl-groove/preview.webp",
   "previewVideo": "/templates/vinyl-groove/preview.mp4",

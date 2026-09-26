@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
-import type { Locale } from '../contracts/types';
+import { dirOf, type Locale } from '../contracts/types';
 import { Icon } from '../ui/Icon';
 import { withStartAt } from './assets';
 
@@ -17,6 +17,23 @@ export interface MusicProps {
 
 const FADE_MS = 1500;
 
+/** The invitation's languages, as the guest switches between them. */
+export interface LanguageControl {
+  /** the language on screen */
+  current: Locale;
+  /** every language in the switcher's order — by its own name, with its plain link (no JS, a new tab) */
+  options: { locale: Locale; label: string; href: string }[];
+  /** the menu's name in the page's language ("Language") */
+  menuLabel: string;
+  /** switch in place (the public page's LiveLocale); without it the links are followed */
+  onSwitch?: (locale: Locale) => void;
+  /** hover, press or focus on a language: the page fetches ahead */
+  onIntent?: (locale: Locale) => void;
+}
+
+/** A click the page may handle itself (not one opening a new tab or window). */
+const plainClick = (e: MouseEvent) => !(e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0);
+
 /**
  * Floating music toggle + language pill (§2.2 Global, §9A.4). Both appear once the cover opens (CSS
  * reacts to <html data-opened>).
@@ -28,45 +45,123 @@ const FADE_MS = 1500;
  * it, the button pulses for that tap. It starts at the host's second (`#t=`), pauses while the page
  * is hidden and resumes when the guest comes back. (iOS ignores `volume`: the device volume applies.)
  *
- * The language pill switches in place when the page provides `onSwitch` (the public page's
- * LiveLocale: no reload, same place in the invitation); otherwise — and before hydration — it is a
- * plain link to the other language. `onIntent` (hover, press, focus) lets the page fetch ahead.
+ * The language control switches in place when the page provides `onSwitch` (the public page's
+ * LiveLocale: no reload, same place in the invitation); otherwise — and before hydration — its
+ * languages are plain links. Two languages: a pill naming the other one. Three or more: the pill names
+ * the language on screen and opens a menu of all of them, each by its own name (a <details>, so it
+ * opens without JS too). `onIntent` (hover, press, focus) lets the page fetch ahead.
  */
 export function FloatingControls({
-  langSwitch,
+  language,
   music,
 }: {
-  langSwitch: {
-    href: string;
-    label: string;
-    targetLocale: Locale;
-    onSwitch?: (locale: Locale) => void;
-    onIntent?: () => void;
-  } | null;
+  language: LanguageControl | null;
   music: MusicProps | null;
 }) {
   return (
     <>
-      {langSwitch ? (
-        <a
-          className="fab fab-lang"
-          href={langSwitch.href}
-          hrefLang={langSwitch.targetLocale}
-          onPointerEnter={langSwitch.onIntent}
-          onPointerDown={langSwitch.onIntent}
-          onFocus={langSwitch.onIntent}
-          onClick={(e: MouseEvent<HTMLAnchorElement>) => {
-            if (!langSwitch.onSwitch || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-            e.preventDefault();
-            langSwitch.onSwitch(langSwitch.targetLocale);
-          }}
-        >
-          <Icon name="languages" size={16} />
-          <span lang={langSwitch.targetLocale}>{langSwitch.label}</span>
-        </a>
-      ) : null}
+      {language && language.options.length === 2 ? <LanguagePill {...language} /> : null}
+      {language && language.options.length > 2 ? <LanguageMenu {...language} /> : null}
       {music ? <MusicButton {...music} /> : null}
     </>
+  );
+}
+
+function LanguagePill({ current, options, onSwitch, onIntent }: LanguageControl) {
+  const target = options.find((o) => o.locale !== current) ?? options[0]!;
+  const intent = () => onIntent?.(target.locale);
+  return (
+    <a
+      className="fab fab-lang"
+      href={target.href}
+      hrefLang={target.locale}
+      onPointerEnter={intent}
+      onPointerDown={intent}
+      onFocus={intent}
+      onClick={(e: MouseEvent<HTMLAnchorElement>) => {
+        if (!onSwitch || !plainClick(e)) return;
+        e.preventDefault();
+        onSwitch(target.locale);
+      }}
+    >
+      <Icon name="languages" size={16} />
+      <span lang={target.locale} dir={dirOf(target.locale)}>
+        {target.label}
+      </span>
+    </a>
+  );
+}
+
+function LanguageMenu({ current, options, menuLabel, onSwitch, onIntent }: LanguageControl) {
+  const menu = useRef<HTMLDetailsElement>(null);
+  const [open, setOpen] = useState(false);
+  const shown = options.find((o) => o.locale === current) ?? options[0]!;
+  const close = useCallback((focus = false) => {
+    const el = menu.current;
+    if (!el?.open) return;
+    el.open = false;
+    if (focus) el.querySelector('summary')?.focus();
+  }, []);
+
+  // an open menu closes on a tap outside it and on Escape (the focus goes back to its pill)
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (!menu.current?.contains(e.target as Node)) close();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close(true);
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open, close]);
+
+  return (
+    <details
+      ref={menu}
+      className="lang-menu"
+      onToggle={(e) => {
+        const isOpen = e.currentTarget.open;
+        setOpen(isOpen);
+        if (isOpen) for (const o of options) if (o.locale !== current) onIntent?.(o.locale);
+      }}
+    >
+      <summary className="fab fab-lang" aria-label={`${menuLabel}: ${shown.label}`}>
+        <Icon name="languages" size={16} />
+        <span lang={shown.locale} dir={dirOf(shown.locale)}>
+          {shown.label}
+        </span>
+        <Icon name="chevron-down" size={14} className="lang-chev" />
+      </summary>
+      <ul className="lang-list" aria-label={menuLabel}>
+        {options.map((o) => (
+          <li key={o.locale}>
+            <a
+              href={o.href}
+              hrefLang={o.locale}
+              lang={o.locale}
+              dir={dirOf(o.locale)}
+              aria-current={o.locale === current ? 'true' : undefined}
+              onPointerEnter={() => onIntent?.(o.locale)}
+              onFocus={() => onIntent?.(o.locale)}
+              onClick={(e: MouseEvent<HTMLAnchorElement>) => {
+                if (!onSwitch || !plainClick(e)) return;
+                e.preventDefault();
+                close();
+                if (o.locale !== current) onSwitch(o.locale);
+              }}
+            >
+              <span>{o.label}</span>
+              {o.locale === current ? <Icon name="check" size={16} /> : null}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
 

@@ -5,7 +5,12 @@ import type { CountdownLabels } from './Countdown.client';
 
 /** What <Countdown> needs to name its units in `locale`: the plural forms and the Intl locale. */
 export function countdownProps(locale: Locale): { intl: string; labels: CountdownLabels } {
-  const e = dictEntries(locale, ['countdown.days', 'countdown.hours', 'countdown.minutes', 'countdown.seconds']);
+  const e = dictEntries(locale, [
+    'countdown.days',
+    'countdown.hours',
+    'countdown.minutes',
+    'countdown.seconds',
+  ]);
   return {
     intl: INTL_LOCALE[locale],
     labels: {

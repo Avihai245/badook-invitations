@@ -17,7 +17,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/cloud-arch/preview.webp",
   "previewVideo": "/templates/cloud-arch/preview.mp4",

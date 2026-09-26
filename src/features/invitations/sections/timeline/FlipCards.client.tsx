@@ -34,7 +34,9 @@ export function FlipCards({ items, hint }: { items: FlipItem[]; hint: string }) 
           >
             <span className="flip-inner">
               <span className="flip-face" aria-hidden={open.has(it.id)}>
-                <span className="pill ltr">{it.time}</span>
+                <span className="pill" dir="auto">
+                  {it.time}
+                </span>
                 <Icon name={it.icon} size={24} />
               </span>
               <span className="flip-face flip-back" aria-hidden={!open.has(it.id)}>

@@ -79,7 +79,8 @@ export function issuesAt(issues: readonly Issue[], path: string): Issue[] {
   return issues.filter(
     (i) =>
       i.path === path ||
-      (i.path.startsWith(`${path}.`) && (LOCALES as readonly string[]).includes(i.path.slice(path.length + 1))),
+      (i.path.startsWith(`${path}.`) &&
+        (LOCALES as readonly string[]).includes(i.path.slice(path.length + 1))),
   );
 }
 

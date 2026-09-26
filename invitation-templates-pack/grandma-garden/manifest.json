@@ -17,7 +17,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/grandma-garden/preview.webp",
   "previewVideo": "/templates/grandma-garden/preview.mp4",

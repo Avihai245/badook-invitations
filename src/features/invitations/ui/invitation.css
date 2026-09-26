@@ -87,12 +87,12 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 }
-:root[lang='he'] {
+:root:is(:lang(he), :lang(ar), :lang(am)) {
   --display-scale: 0.9;
   --track: 0;
   --track-wide: 0;
 }
-:root[lang='en'] {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) {
   --display-scale: 1;
   --body-size: 19px;
   --body-lh: 1.6;
@@ -104,11 +104,64 @@
   --sec-pad: calc(var(--sec-pad-base) * var(--sp-section, 1));
   --block: var(--sp-block, 1);
 }
-:root[lang='en'],
-:root[lang='en'] .cine {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)),
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .cine {
   /* Latin tracking of headings (Hebrew is never letter-spaced, §9A.2) */
   --track: calc(0.04em + var(--ls-heading, 0em));
   --track-wide: calc(0.14em + var(--ls-heading, 0em));
+}
+/* Scripts (§8). Latin and Cyrillic have letter case: the rules above (uppercase labels, tracking,
+   italics) serve English, French, Spanish and Russian alike. Hebrew, Arabic and Ethiopic have none:
+   no uppercase, no tracking, no italics — weight and size instead. Arabic is never letter-spaced (it
+   would break its joins) and gets room for its tall letters and marks; an Ethiopic syllable is a wide,
+   square glyph, so its names and titles set smaller. Russian runs longer than English: a touch smaller. */
+:root:lang(ar) {
+  --display-scale: 0.84;
+  --body-size: 18px;
+  --body-lh: 1.9;
+}
+:root:lang(ar) .inv :where(*) {
+  letter-spacing: 0 !important;
+}
+:root:lang(am) {
+  --display-scale: 0.74;
+  --body-size: 17px;
+  --body-lh: 1.9;
+}
+:root:lang(ru) {
+  --display-scale: 0.92;
+  --body-size: 18px;
+}
+/* Longer languages: a text may run 40% longer than its Hebrew or English. Every text wraps inside its
+   section instead of overflowing — a word wider than its line breaks (hyphenated in the languages the
+   browser can hyphenate), and a flex or grid item sized by its text can shrink with it. */
+.inv
+  :where(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    li,
+    dt,
+    dd,
+    blockquote,
+    figcaption,
+    label,
+    legend,
+    summary,
+    a,
+    button,
+    span
+  ) {
+  overflow-wrap: anywhere;
+}
+:root:is(:lang(ru), :lang(fr), :lang(es))
+  .inv
+  :where(h1, h2, h3, h4, p, li, blockquote, figcaption, label, legend) {
+  hyphens: auto;
 }
 @media (min-width: 768px) {
   :root {
@@ -146,8 +199,8 @@ body,
   font-size: calc(var(--body-size) * var(--ty-body, 1));
   line-height: calc(var(--body-lh) * var(--lh-body, 1));
 }
-:root[lang='en'] body,
-:root[lang='en'] .cine {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) body,
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .cine {
   letter-spacing: var(--ls-body, normal);
 }
 :root[data-cover-skipped] .cover {
@@ -410,7 +463,7 @@ a {
     transform: translateY(8px);
   }
 }
-:root[lang='en'] .cover-hint {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .cover-hint {
   text-transform: uppercase;
   font-size: 12px;
 }
@@ -854,7 +907,7 @@ a {
   opacity: 0;
   animation: fadeIn 0.8s 1.6s var(--ease) forwards;
 }
-:root[lang='en'] .co-scroll {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .co-scroll {
   text-transform: uppercase;
   font-size: 11px;
 }
@@ -1401,8 +1454,116 @@ html[data-framed] body::-webkit-scrollbar {
   outline-offset: 2px;
 }
 [data-mode='preview'] .fab-lang,
-[data-mode='editor'] .fab-lang {
+[data-mode='editor'] .fab-lang,
+[data-mode='preview'] .lang-menu,
+[data-mode='editor'] .lang-menu {
   display: none;
+}
+/* Three languages or more: the pill names the language on screen and opens a menu of all of them
+   (FloatingControls — a <details>, so it opens without JS too). */
+.lang-menu {
+  position: fixed;
+  z-index: 41;
+  top: calc(14px + env(safe-area-inset-top));
+  inset-inline-end: 16px;
+}
+.lang-menu > .fab-lang {
+  position: static;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.lang-menu > .fab-lang::-webkit-details-marker {
+  display: none;
+}
+.lang-menu .lang-chev {
+  opacity: 0.6;
+  transition: transform 0.25s var(--ease);
+}
+.lang-menu[open] .lang-chev {
+  transform: rotate(180deg);
+}
+.lang-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  min-width: 184px;
+  max-height: calc(100svh - 90px);
+  overflow-y: auto;
+  list-style: none;
+  padding: 6px;
+  background: var(--inv-popover);
+  border: 1px solid var(--inv-line);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.16);
+  animation: langIn 0.22s var(--ease-out) both;
+}
+@keyframes langIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+.lang-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: var(--inv-ink);
+  text-decoration: none;
+  font-family: var(--f-ui);
+  font-size: 15px;
+}
+.lang-list a:hover,
+.lang-list a:focus-visible {
+  background: var(--accent-08);
+  outline: none;
+}
+.lang-list a[aria-current] {
+  font-weight: 600;
+  color: var(--inv-accent-text);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lang-list {
+    animation: none;
+  }
+}
+/* The cover's texts in each of the page's languages (cover/localized.tsx): the one of <html lang>
+   shows — the language may change before React takes over, so this is CSS, right from the first
+   paint. HTML texts leave the flow; the monogram's SVG groups stay laid out (they are measured). */
+:root:lang(he) .l10n > :not([data-l~='he']),
+:root:lang(en) .l10n > :not([data-l~='en']),
+:root:lang(ru) .l10n > :not([data-l~='ru']),
+:root:lang(ar) .l10n > :not([data-l~='ar']),
+:root:lang(fr) .l10n > :not([data-l~='fr']),
+:root:lang(es) .l10n > :not([data-l~='es']),
+:root:lang(am) .l10n > :not([data-l~='am']) {
+  display: none;
+}
+:root:lang(he) [data-lg]:not([data-lg~='he']),
+:root:lang(en) [data-lg]:not([data-lg~='en']),
+:root:lang(ru) [data-lg]:not([data-lg~='ru']),
+:root:lang(ar) [data-lg]:not([data-lg~='ar']),
+:root:lang(fr) [data-lg]:not([data-lg~='fr']),
+:root:lang(es) [data-lg]:not([data-lg~='es']),
+:root:lang(am) [data-lg]:not([data-lg~='am']) {
+  visibility: hidden;
+}
+/* The guest's language is on its way (live/detect.ts → LiveLocale) and no cover hides the swap: the
+   sections wait for it, unseen — never long (the animation shows them anyway after 2.5s). */
+:root[data-locale-hide] .inv > main,
+:root[data-locale-hide] .inv .fab,
+:root[data-locale-hide] .inv .lang-menu {
+  visibility: hidden;
+  animation: localeWait 0s 2.5s forwards;
+}
+@keyframes localeWait {
+  to {
+    visibility: visible;
+  }
 }
 
 /* ============ 5. HERO ============ */
@@ -1744,7 +1905,7 @@ html[data-framed] body::-webkit-scrollbar {
   letter-spacing: var(--track);
   opacity: 0.95;
 }
-:root[lang='he'] .eyebrow {
+:root:is(:lang(he), :lang(ar), :lang(am)) .eyebrow {
   font-style: normal;
   font-weight: 300;
   font-size: calc(20px * var(--ty-heading, 1));
@@ -1777,7 +1938,7 @@ html[data-framed] body::-webkit-scrollbar {
   line-height: 1.3;
   opacity: 0.9;
 }
-:root[lang='he'] .names .j {
+:root:is(:lang(he), :lang(ar), :lang(am)) .names .j {
   font-style: normal;
 }
 .hero .rule {
@@ -1799,7 +1960,7 @@ html[data-framed] body::-webkit-scrollbar {
   letter-spacing: var(--track-wide);
   font-weight: 500;
 }
-:root[lang='he'] .hero-date {
+:root:is(:lang(he), :lang(ar), :lang(am)) .hero-date {
   font-size: calc(18px * var(--ty-heading, 1));
   font-weight: 400;
 }
@@ -2456,10 +2617,10 @@ html[data-framed] body::-webkit-scrollbar {
   text-wrap: balance;
   font-size: calc(clamp(42px, 11vw, 56px) * var(--display-scale) * var(--ty-display, 1));
 }
-:root[lang='he'] .sec-title {
+:root:is(:lang(he), :lang(ar), :lang(am)) .sec-title {
   font-size: calc(clamp(34px, 9vw, 46px) * var(--ty-display, 1));
 }
-:root[lang='en'] :is(.sec-title, .names, .f-names) {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) :is(.sec-title, .names, .f-names) {
   letter-spacing: var(--ls-display, normal);
 }
 .sec-sub {
@@ -2469,7 +2630,7 @@ html[data-framed] body::-webkit-scrollbar {
   color: var(--inv-ink-muted);
   margin-top: 8px;
 }
-:root[lang='en'] .sec-sub {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .sec-sub {
   font-size: calc(17px * var(--ty-heading, 1));
   letter-spacing: calc(0.12em + var(--ls-heading, 0em));
 }
@@ -2479,7 +2640,7 @@ html[data-framed] body::-webkit-scrollbar {
   white-space: pre-line;
   color: var(--inv-ink);
 }
-:root[lang='en'] .sec-body {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .sec-body {
   font-style: italic;
 }
 .sec.tight {
@@ -2848,7 +3009,7 @@ html[data-framed] body::-webkit-scrollbar {
   margin-top: 6px;
   letter-spacing: var(--track);
 }
-:root[lang='en'] .cd-lbl {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .cd-lbl {
   text-transform: uppercase;
   font-size: calc(10.5px * var(--ty-caption, 1));
   letter-spacing: calc(0.12em + var(--ls-caption, 0em));
@@ -4147,7 +4308,7 @@ body.lb-open {
   font-size: calc(40px * var(--display-scale));
   margin: 12px 0 6px;
 }
-:root[lang='he'] .success h3 {
+:root:is(:lang(he), :lang(ar), :lang(am)) .success h3 {
   font-size: 32px;
 }
 /* The "thank you" of a reply just sent (data-fresh — not one shown again after a language switch): the
@@ -4361,7 +4522,7 @@ footer.sec {
   line-height: 1.1;
   margin-top: 18px;
 }
-:root[lang='he'] .f-names {
+:root:is(:lang(he), :lang(ar), :lang(am)) .f-names {
   --f-names-size: calc(40px * var(--ty-display, 1));
 }
 .f-date {
@@ -4382,7 +4543,7 @@ footer.sec {
   margin-top: 18px;
   font-size: calc(19px * var(--ty-heading, 1));
 }
-:root[lang='he'] .f-close {
+:root:is(:lang(he), :lang(ar), :lang(am)) .f-close {
   font-style: normal;
 }
 .credit {
@@ -4647,7 +4808,7 @@ footer.sec {
   color: var(--inv-ink-muted);
   letter-spacing: var(--track);
 }
-:root[lang='en'] .pa-label {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .pa-label {
   text-transform: uppercase;
   font-size: calc(11.5px * var(--ty-caption, 1));
   letter-spacing: calc(0.16em + var(--ls-caption, 0em));
@@ -4684,7 +4845,7 @@ footer.sec {
   letter-spacing: var(--track-wide);
   color: var(--inv-ink);
 }
-:root[lang='en'] :is(.wh-weekday, .wh-month) {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) :is(.wh-weekday, .wh-month) {
   text-transform: uppercase;
   font-size: calc(15px * var(--ty-heading, 1));
 }
@@ -4742,7 +4903,7 @@ footer.sec {
   margin: 0 auto;
   max-width: 30ch;
 }
-:root[lang='en'] .q-text {
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .q-text {
   font-style: italic;
 }
 .q-by {
@@ -5128,41 +5289,35 @@ footer.sec {
   fill: #b5523b;
   stroke: none;
 }
-.missing-he {
-  order: 1;
+/* the link's language first, then Hebrew and English (MissingInvitation.tsx) */
+.missing-lang {
+  width: 100%;
 }
-.missing-rule {
-  order: 2;
-}
-.missing-en {
-  order: 3;
-}
-:root[lang='en'] .missing-en {
-  order: 1;
-}
-:root[lang='en'] .missing-he {
-  order: 3;
-}
-.missing h1 {
+.missing :is(h1, h2) {
   font-family: var(--f-display);
   font-weight: 500;
   color: var(--inv-ink);
-  font-size: 25px;
+  font-size: 22px;
   line-height: 1.3;
   text-wrap: balance;
+  overflow-wrap: anywhere;
 }
-.missing-en h1 {
-  font-size: 22px;
+.missing h1 {
+  font-size: 25px;
 }
 .missing p {
   margin-top: 10px;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.65;
   color: var(--inv-ink-muted);
   text-wrap: pretty;
+  overflow-wrap: anywhere;
 }
-.missing-en p {
-  font-size: 15px;
+.missing-first p {
+  font-size: 16px;
+}
+.missing-lang[data-script='arabic'] p {
+  line-height: 1.85;
 }
 .missing-rule {
   direction: ltr; /* the lines fade outwards whatever the page direction */

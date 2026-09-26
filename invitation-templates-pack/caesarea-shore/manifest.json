@@ -16,7 +16,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/caesarea-shore/preview.webp",
   "previewVideo": "/templates/caesarea-shore/preview.mp4",

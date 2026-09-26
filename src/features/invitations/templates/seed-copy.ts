@@ -172,7 +172,15 @@ export const SEED_COPY = {
       es: 'Código de vestimenta',
       am: 'የአለባበስ ሥርዓት',
     },
-    menu: { he: 'תפריט', en: 'Menu', ru: 'Меню', ar: 'قائمة الطعام', fr: 'Menu', es: 'Menú', am: 'የምግብ ዝርዝር' },
+    menu: {
+      he: 'תפריט',
+      en: 'Menu',
+      ru: 'Меню',
+      ar: 'قائمة الطعام',
+      fr: 'Menu',
+      es: 'Menú',
+      am: 'የምግብ ዝርዝር',
+    },
     activities: {
       he: 'פעילויות',
       en: 'Activities',

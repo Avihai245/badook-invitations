@@ -12,30 +12,98 @@ export interface DemoPeople {
   monogram?: L10n;
 }
 
+// every sample in every invitation language — the same people, written the way each language writes
+// their names
+const LEVI_PARENTS: L10n = {
+  he: 'מיכל ודוד לוי',
+  en: 'Michal & David Levi',
+  ru: 'Михаль и Давид Леви',
+  ar: 'ميخال ودافيد ليفي',
+  fr: 'Michal et David Lévy',
+  es: 'Michal y David Leví',
+  am: 'ሚካል እና ዳዊት ሌቪ',
+};
 const PEOPLE: Partial<Record<EventType, DemoPeople>> = {
   bar_mitzvah: {
-    primary: { he: 'יונתן', en: 'Jonathan' },
-    parents: { he: 'מיכל ודוד לוי', en: 'Michal & David Levi' },
-    monogram: { he: 'י', en: 'J' },
+    primary: {
+      he: 'יונתן',
+      en: 'Jonathan',
+      ru: 'Йонатан',
+      ar: 'يوناتان',
+      fr: 'Jonathan',
+      es: 'Jonatán',
+      am: 'ዮናታን',
+    },
+    parents: LEVI_PARENTS,
+    monogram: { he: 'י', en: 'J', ru: 'Й', ar: 'ي', fr: 'J', es: 'J', am: 'ዮ' },
   },
   bat_mitzvah: {
-    primary: { he: 'תמר', en: 'Tamar' },
-    parents: { he: 'מיכל ודוד לוי', en: 'Michal & David Levi' },
-    monogram: { he: 'ת', en: 'T' },
+    primary: { he: 'תמר', en: 'Tamar', ru: 'Тамар', ar: 'تامار', fr: 'Tamar', es: 'Tamar', am: 'ታማር' },
+    parents: LEVI_PARENTS,
+    monogram: { he: 'ת', en: 'T', ru: 'Т', ar: 'ت', fr: 'T', es: 'T', am: 'ታ' },
   },
   brit: {
-    primary: { he: 'שירה ואורי', en: 'Shira & Ori' },
-    parents: { he: 'סבא וסבתא: רות ומשה כהן', en: 'Grandparents Ruth & Moshe Cohen' },
-    monogram: { he: 'ש&א', en: 'S&O' },
+    primary: {
+      he: 'שירה ואורי',
+      en: 'Shira & Ori',
+      ru: 'Шира и Ори',
+      ar: 'شيرا وأوري',
+      fr: 'Shira et Ori',
+      es: 'Shira y Ori',
+      am: 'ሺራ እና ኦሪ',
+    },
+    parents: {
+      he: 'סבא וסבתא: רות ומשה כהן',
+      en: 'Grandparents Ruth & Moshe Cohen',
+      ru: 'Бабушка и дедушка: Рут и Моше Коэн',
+      ar: 'الجدّان: روت وموشيه كوهين',
+      fr: 'Les grands-parents Ruth et Moshé Cohen',
+      es: 'Los abuelos Ruth y Moshé Cohen',
+      am: 'አያቶች፦ ሩት እና ሞሼ ኮኸን',
+    },
+    monogram: { he: 'ש&א', en: 'S&O', ru: 'Ш&О', ar: 'ش&أ', fr: 'S&O', es: 'S&O', am: 'ሺ&ኦ' },
   },
-  baby_shower: { primary: { he: 'מאיה', en: 'Maya' }, monogram: { he: 'מ', en: 'M' } },
-  birthday: { primary: { he: 'דנה', en: 'Dana' }, monogram: { he: 'דנה 30', en: 'DANA 30' } },
-  corporate: { primary: { he: 'צוות אקמה', en: 'Team Acme' }, monogram: { he: 'אקמה', en: 'ACME' } },
+  baby_shower: {
+    primary: { he: 'מאיה', en: 'Maya', ru: 'Майя', ar: 'مايا', fr: 'Maya', es: 'Maya', am: 'ማያ' },
+    monogram: { he: 'מ', en: 'M', ru: 'М', ar: 'م', fr: 'M', es: 'M', am: 'ማ' },
+  },
+  birthday: {
+    primary: { he: 'דנה', en: 'Dana', ru: 'Дана', ar: 'دانا', fr: 'Dana', es: 'Dana', am: 'ዳና' },
+    monogram: {
+      he: 'דנה 30',
+      en: 'DANA 30',
+      ru: 'ДАНА 30',
+      ar: 'دانا 30',
+      fr: 'DANA 30',
+      es: 'DANA 30',
+      am: 'ዳና 30',
+    },
+  },
+  corporate: {
+    primary: {
+      he: 'צוות אקמה',
+      en: 'Team Acme',
+      ru: 'Команда Acme',
+      ar: 'فريق أكمي',
+      fr: "L'équipe Acme",
+      es: 'Equipo Acme',
+      am: 'የአክሜ ቡድን',
+    },
+    monogram: { he: 'אקמה', en: 'ACME', ru: 'ACME', ar: 'أكمي', fr: 'ACME', es: 'ACME', am: 'አክሜ' },
+  },
 };
 const COUPLE: DemoPeople = {
-  primary: { he: 'נועה', en: 'Noa' },
-  secondary: { he: 'איתי', en: 'Itay' },
-  parents: { he: 'מרים ודני לוי · רונית ואבי כהן', en: 'Miriam & Dani Levi · Ronit & Avi Cohen' },
+  primary: { he: 'נועה', en: 'Noa', ru: 'Ноа', ar: 'نوعا', fr: 'Noa', es: 'Noa', am: 'ኖዓ' },
+  secondary: { he: 'איתי', en: 'Itay', ru: 'Итай', ar: 'إيتاي', fr: 'Itay', es: 'Itay', am: 'ኢታይ' },
+  parents: {
+    he: 'מרים ודני לוי · רונית ואבי כהן',
+    en: 'Miriam & Dani Levi · Ronit & Avi Cohen',
+    ru: 'Мирьям и Дани Леви · Ронит и Ави Коэн',
+    ar: 'مريام وداني ليفي · رونيت وآفي كوهين',
+    fr: 'Miriam et Dani Lévy · Ronit et Avi Cohen',
+    es: 'Miriam y Dani Leví · Ronit y Avi Cohen',
+    am: 'ሚርያም እና ዳኒ ሌቪ · ሮኒት እና አቪ ኮኸን',
+  },
 };
 
 /**
@@ -147,12 +215,22 @@ const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = 
   },
 };
 
+/** The Hebrew and English of `own`, the other languages from `other` (when it has the text). */
+const completed = (own: L10n, other: L10n | undefined): L10n => ({ ...other, ...own });
+
 /**
  * Who a demo of this event type is for: the design's own sample person when it has one, else a
- * couple, or the event's own sample person.
+ * couple, or the event's own sample person. A design's own person is written in Hebrew and English:
+ * the other languages show the event's sample.
  */
 export function demoPeople(type: EventType, templateId?: string): DemoPeople {
   const own = templateId ? TEMPLATE_PEOPLE[templateId]?.[type] : undefined;
-  if (own) return own;
-  return COUPLE_EVENTS.includes(type) ? COUPLE : (PEOPLE[type] ?? COUPLE);
+  const sample = COUPLE_EVENTS.includes(type) ? COUPLE : (PEOPLE[type] ?? COUPLE);
+  if (!own) return sample;
+  return {
+    primary: completed(own.primary, sample.primary),
+    ...(own.secondary ? { secondary: completed(own.secondary, sample.secondary) } : {}),
+    ...(own.parents ? { parents: completed(own.parents, sample.parents) } : {}),
+    ...(own.monogram ? { monogram: completed(own.monogram, sample.monogram) } : {}),
+  };
 }

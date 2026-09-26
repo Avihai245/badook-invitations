@@ -42,6 +42,11 @@ export interface RenderContext {
   tokens: TokenValues;
   /** localized + token-interpolated user text ('' when missing) */
   text(value: L10n | null | undefined): string;
+  /**
+   * The same in another of the document's languages (the cover carries its texts in each of them —
+   * cover/localized.tsx). The Hebrew date token is only known in the context's own language.
+   */
+  textIn(value: L10n | null | undefined, locale: Locale): string;
   t(key: DictKey, vars?: Record<string, string | number>): string;
   eventDateLong: string;
   hebrewDate: string | null;
@@ -90,15 +95,16 @@ export function createRenderContext(
   options: RenderOptions & { hebrewDate: string | null },
 ): RenderContext {
   const { hebrewDate } = options;
-  const tokens: TokenValues = {
-    primary: localize(doc.hosts.primary, locale),
-    secondary: localize(doc.hosts.secondary, locale),
-    date: formatDate(doc.event.date, locale, DAY_MONTH_YEAR),
-    hebrewDate: hebrewDate ?? undefined,
+  const tokensIn = (l: Locale): TokenValues => ({
+    primary: localize(doc.hosts.primary, l),
+    secondary: localize(doc.hosts.secondary, l),
+    date: formatDate(doc.event.date, l, DAY_MONTH_YEAR),
+    hebrewDate: l === locale ? (hebrewDate ?? undefined) : undefined,
     deadline: doc.event.rsvpDeadline
-      ? formatDate(doc.event.rsvpDeadline, locale, { day: 'numeric', month: 'long' })
+      ? formatDate(doc.event.rsvpDeadline, l, { day: 'numeric', month: 'long' })
       : undefined,
-  };
+  });
+  const tokens = tokensIn(locale);
   const indexById = new Map(doc.sections.map((s, i) => [s.id, i]));
   return {
     doc,
@@ -114,6 +120,10 @@ export function createRenderContext(
     icsViaRoute: options.icsViaRoute ?? false,
     tokens,
     text: (value) => interpolate(localize(value, locale), tokens),
+    textIn: (value, l) =>
+      l === locale
+        ? interpolate(localize(value, locale), tokens)
+        : interpolate(localize(value, l), tokensIn(l)),
     t: (key, vars) => translate(locale, key, vars),
     eventDateLong: formatEventDate(doc, locale),
     hebrewDate,

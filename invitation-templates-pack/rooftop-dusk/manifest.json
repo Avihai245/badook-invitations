@@ -16,7 +16,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/rooftop-dusk/preview.webp",
   "previewVideo": "/templates/rooftop-dusk/preview.mp4",

@@ -11,6 +11,7 @@ import {
 import { headingColor, isDarkPalette, readableAccent } from '../lib/contrast';
 import { displayEmPerChar, fontStack, monogramStack } from '../fonts';
 import { findFontPair } from '../fonts/library';
+import { scriptsOf } from '../lib/locales';
 import { placeholderArt, placeholderScrim } from './placeholders';
 
 /** Template palette + the host's overrides, restricted to template.editablePaletteKeys. */
@@ -88,11 +89,13 @@ export function scrimOf(template: TemplateManifest): { color: string; opacity: n
  */
 export function themeVars(
   template: TemplateManifest,
-  doc: Pick<InvitationDocument, 'theme' | 'cover'>,
+  doc: Pick<InvitationDocument, 'theme' | 'cover' | 'locales'>,
   locale: Locale,
 ): Record<string, string> {
   const palette = resolvePalette(template, doc);
   const pair = resolveFontPair(template, doc);
+  // every stack also carries the faces of the document's other scripts (a name in another language)
+  const scripts = scriptsOf([locale, ...doc.locales]);
   const art = placeholderArt(template.id);
   const calm = template.motion.preset === 'none';
   const scrim = scrimOf(template);
@@ -102,11 +105,11 @@ export function themeVars(
     '--r-card': `${template.tokens.radius.card}px`,
     '--r-btn': `${template.tokens.radius.button}px`,
     '--r-media': `${template.tokens.radius.media ?? template.tokens.radius.card}px`,
-    '--f-display': fontStack(pair, 'display', locale),
-    '--f-heading': fontStack(pair, 'heading', locale),
-    '--f-body': fontStack(pair, 'body', locale),
-    '--f-ui': fontStack(pair, 'ui', locale),
-    '--f-monogram': monogramStack(template, locale),
+    '--f-display': fontStack(pair, 'display', locale, scripts),
+    '--f-heading': fontStack(pair, 'heading', locale, scripts),
+    '--f-body': fontStack(pair, 'body', locale, scripts),
+    '--f-ui': fontStack(pair, 'ui', locale, scripts),
+    '--f-monogram': monogramStack(template, locale, scripts),
     '--name-em': String(displayEmPerChar(pair, locale)),
     '--reveal-distance': `${calm ? 0 : Math.round(template.motion.revealDistance * template.motion.intensity)}px`,
     '--reveal-blur': template.motion.revealBlur && !calm ? '6px' : '0px',

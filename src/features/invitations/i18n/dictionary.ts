@@ -18,7 +18,14 @@ import extraHe from './extra.he.json';
 import fr from './fr.json';
 import ru from './ru.json';
 
-export type PluralEntry = { zero?: string; one?: string; two?: string; few?: string; many?: string; other: string };
+export type PluralEntry = {
+  zero?: string;
+  one?: string;
+  two?: string;
+  few?: string;
+  many?: string;
+  other: string;
+};
 export type DictEntry = string | PluralEntry;
 
 export type DictKey = (keyof typeof he & keyof typeof en) | (keyof typeof extraHe & keyof typeof extraEn);

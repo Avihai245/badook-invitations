@@ -16,7 +16,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/klaf/preview.webp",
   "previewVideo": "/templates/klaf/preview.mp4",

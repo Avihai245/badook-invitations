@@ -23,7 +23,7 @@ export function buildLivePayload(
       vars: themeVars(template, doc, locale),
       title: pageTitle(ctx),
       ...links(locale),
-      labels: { switch: ctx.t('locale.switch'), play: ctx.t('music.play'), pause: ctx.t('music.pause') },
+      labels: { menu: ctx.t('locale.menu'), play: ctx.t('music.play'), pause: ctx.t('music.pause') },
     };
   }
   return { doc, template, options, locales };

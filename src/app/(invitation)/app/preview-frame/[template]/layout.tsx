@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { fontFaceCss, templateFontFamilies } from '@/features/invitations/fonts';
+import { LOCALES } from '@/features/invitations/contracts/types';
+import { fontFaceCss, pageFontFaces } from '@/features/invitations/fonts';
 import { FrameScrollCue } from '@/features/invitations/renderer/FrameScrollCue.client';
 import { IMAGE_FALLBACK } from '@/features/invitations/renderer/images';
 import { getTemplate } from '@/features/invitations/templates/registry';
@@ -43,7 +44,10 @@ export default async function PreviewFrameLayout({
       suppressHydrationWarning
     >
       <head>
-        <style dangerouslySetInnerHTML={{ __html: fontFaceCss(templateFontFamilies(entry.manifest)) }} />
+        {/* every pair of the template in every script — the host may add any language while editing */}
+        <style
+          dangerouslySetInnerHTML={{ __html: fontFaceCss(pageFontFaces(entry.manifest, undefined, LOCALES)) }}
+        />
         {/* an optimized image that fails falls back to its original address (renderer/images.ts) */}
         <script dangerouslySetInnerHTML={{ __html: IMAGE_FALLBACK }} />
       </head>

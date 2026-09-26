@@ -17,7 +17,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/scribble-love/preview.webp",
   "previewVideo": "/templates/scribble-love/preview.mp4",

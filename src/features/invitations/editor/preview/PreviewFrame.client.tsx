@@ -9,8 +9,14 @@ import {
   useState,
   type CSSProperties,
 } from 'react';
-import { dirOf, type InvitationDocument, type Locale, type TemplateManifest } from '../../contracts/types';
-import { fontFaceCss, pairFontFamilies } from '../../fonts';
+import {
+  LOCALES,
+  dirOf,
+  type InvitationDocument,
+  type Locale,
+  type TemplateManifest,
+} from '../../contracts/types';
+import { fontFaceCss, pageFontFaces } from '../../fonts';
 import type { AssetBases } from '../../renderer/assets';
 import { buildRenderContext } from '../../renderer/context';
 import { InvitationBody } from '../../renderer/InvitationBody';
@@ -46,7 +52,7 @@ export function PreviewFrame({
   standalone?: {
     doc: InvitationDocument;
     locale: Locale;
-    langHref: string | null;
+    langHrefs: Partial<Record<Locale, string>> | null;
     cinematic?: boolean;
   } | null;
 }) {
@@ -210,7 +216,7 @@ export function PreviewFrame({
   return (
     <>
       <LibraryFonts template={template} doc={state.doc} />
-      <InvitationBody key={replay} ctx={ctx} showCover={replay > 0} langSwitchHref={null} />
+      <InvitationBody key={replay} ctx={ctx} showCover={replay > 0} langHrefs={null} />
     </>
   );
 }
@@ -222,7 +228,7 @@ export function PreviewFrame({
 function LibraryFonts({ template, doc }: { template: TemplateManifest; doc: InvitationDocument }) {
   const pair = resolveFontPair(template, doc);
   const css = useMemo(
-    () => (template.fontPairs.includes(pair) ? '' : fontFaceCss(pairFontFamilies(pair))),
+    () => (template.fontPairs.includes(pair) ? '' : fontFaceCss(pageFontFaces(template, pair.id, LOCALES))),
     [template, pair],
   );
   return css ? <style dangerouslySetInnerHTML={{ __html: css }} /> : null;
@@ -231,7 +237,7 @@ function LibraryFonts({ template, doc }: { template: TemplateManifest; doc: Invi
 function StandalonePreview({
   doc,
   locale,
-  langHref,
+  langHrefs,
   cinematic = true,
   template,
   brand,
@@ -240,7 +246,7 @@ function StandalonePreview({
 }: {
   doc: InvitationDocument;
   locale: Locale;
-  langHref: string | null;
+  langHrefs: Partial<Record<Locale, string>> | null;
   cinematic?: boolean;
   template: TemplateManifest;
   brand: string;
@@ -263,5 +269,5 @@ function StandalonePreview({
       if (key.startsWith('--')) root.style.setProperty(key, String(value));
     }
   }, [doc, template, locale]);
-  return <InvitationBody ctx={ctx} showCover langSwitchHref={langHref} />;
+  return <InvitationBody ctx={ctx} showCover langHrefs={langHrefs} />;
 }

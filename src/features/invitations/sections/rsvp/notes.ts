@@ -32,7 +32,8 @@ export const RSVP_NOTES: Record<Locale, RsvpNotes> = {
     demo: 'هذه دعوة تجريبية، لذلك لم يُحفظ ردّكم ولم يُرسل إلى أحد.',
   },
   fr: {
-    privacy: 'Vos informations sont transmises aux hôtes et conservées pour eux pour cet événement uniquement.',
+    privacy:
+      'Vos informations sont transmises aux hôtes et conservées pour eux pour cet événement uniquement.',
     privacyLink: 'Politique de confidentialité',
     demo: 'Ceci est une invitation d’exemple : votre réponse n’a été ni enregistrée ni envoyée.',
   },

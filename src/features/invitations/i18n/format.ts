@@ -3,7 +3,14 @@
  * dictionaries themselves: client components get the few entries they show from the server
  * (`dictEntries`) and format them here, so the guest's page never downloads every language.
  */
-export type PluralForms = { zero?: string; one?: string; two?: string; few?: string; many?: string; other: string };
+export type PluralForms = {
+  zero?: string;
+  one?: string;
+  two?: string;
+  few?: string;
+  many?: string;
+  other: string;
+};
 export type Entry = string | PluralForms;
 
 const rules = new Map<string, Intl.PluralRules>();

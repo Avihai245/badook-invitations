@@ -1,4 +1,11 @@
-import { LOCALES, type HHmm, type ISODate, type InvitationDocument, type Locale, type Venue } from '../contracts/types';
+import {
+  LOCALES,
+  type HHmm,
+  type ISODate,
+  type InvitationDocument,
+  type Locale,
+  type Venue,
+} from '../contracts/types';
 import { LOCALE_INFO } from './locales';
 
 /**

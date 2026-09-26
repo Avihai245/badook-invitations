@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { InvitationDocument, Locale } from '@/features/invitations/contracts/types';
+import type { Locale } from '@/features/invitations/contracts/types';
+import { t } from '@/features/invitations/i18n/dictionary';
+import { LOCALE_INFO, isLocale } from '@/features/invitations/lib/locales';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { pageDescription, pageTitle } from '@/features/invitations/renderer/calendar-event';
 import {
@@ -64,11 +66,6 @@ const HIDDEN_ROBOTS = {
   googleBot: { index: false, follow: false, noarchive: true, noimageindex: true },
 } satisfies Metadata['robots'];
 
-const otherLocale = (doc: InvitationDocument, locale: Locale): Locale | null =>
-  doc.locales.length > 1
-    ? (doc.locales[(doc.locales.indexOf(locale) + 1) % doc.locales.length] ?? null)
-    : null;
-
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug, lang } = await params;
   const invitation = await getPublishedInvitation(slug);
@@ -76,7 +73,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   // not-found.tsx: nothing to show on this link (yet)
   if (!invitation || !locale)
     return {
-      title: lang === 'en' ? 'Invitation not available' : 'ההזמנה לא זמינה',
+      title: t(isLocale(lang) ? lang : 'he', 'missing.metaTitle'),
       robots: { index: false, follow: false },
     };
   const ctx = context(invitation, locale);
@@ -106,7 +103,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       description,
       url,
       type: 'website',
-      locale: locale === 'he' ? 'he_IL' : 'en_GB',
+      locale: LOCALE_INFO[locale].og,
+      alternateLocale: invitation.doc.locales.filter((l) => l !== locale).map((l) => LOCALE_INFO[l].og),
       images: [image],
     },
     twitter: { card: 'summary_large_image', title, description, images: [image.url] },
@@ -119,10 +117,10 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   const invitation = await getPublishedInvitation(slug);
   const locale = invitation && resolveLocale(invitation.doc, lang);
   if (!invitation || !locale) notFound();
-  const next = otherLocale(invitation.doc, locale);
   // the event's `cinematic` feature: its v2 presentation, or the plain rendering (features/flags)
   const cinematic = await cinematicForPage(invitation.id, invitation.doc, invitation.entry.manifest);
-  // the pill's plain link keeps the cover skipped; with JS the language switches in place (LiveLocale)
+  // the language control's plain links keep the cover skipped; with JS the language switches in place
+  // (LiveLocale)
   const link = (l: Locale) => `/i/${slug}?lang=${l}&open=1`;
   const live = buildLivePayload(
     invitation.doc,
@@ -138,7 +136,7 @@ export default async function PublicInvitationPage({ params }: { params: Params 
       ctx={context(invitation, locale, cinematic)}
       showCover
       skipCoverFromUrl
-      langSwitchHref={next ? link(next) : null}
+      langHrefs={Object.fromEntries(invitation.doc.locales.map((l) => [l, link(l)]))}
       live={live}
     />
   );

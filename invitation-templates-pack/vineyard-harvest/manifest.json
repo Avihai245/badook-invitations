@@ -18,7 +18,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/vineyard-harvest/preview.webp",
   "previewVideo": "/templates/vineyard-harvest/preview.mp4",

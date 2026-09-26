@@ -36,7 +36,7 @@ export function VenuesView({ section, ctx }: SectionViewProps<SectionOf<'venues'
                   <span>{formatDate(date, ctx.locale, DAY_MONTH_YEAR)}</span>
                 </p>
                 <p className="v-when reveal" style={iv(3)}>
-                  <Icon name="clock" size={18} /> <span className="ltr">{ctx.time(v.startTime)}</span>
+                  <Icon name="clock" size={18} /> <span dir="auto">{ctx.time(v.startTime)}</span>
                 </p>
                 {v.showMap && located ? (
                   <MapEmbed

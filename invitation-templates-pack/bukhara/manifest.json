@@ -17,7 +17,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/bukhara/preview.webp",
   "previewVideo": "/templates/bukhara/preview.mp4",

@@ -615,7 +615,11 @@ function fill(value: L10n, locales: readonly NewLocale[], text: (c: CultureCopy)
  * French, Spanish, Amharic) with CULTURE_COPY. Hebrew and English — which every template has — are
  * never touched, so their seeds stay exactly as the pack writes them.
  */
-export function withCultureCopy(d: EventDefaults, eventType: EventType, locales: readonly Locale[]): EventDefaults {
+export function withCultureCopy(
+  d: EventDefaults,
+  eventType: EventType,
+  locales: readonly Locale[],
+): EventDefaults {
   const langs = locales.filter(hasNew);
   if (!langs.length) return d;
   const who: Couple = COUPLES.includes(eventType) ? 'couple' : 'one';

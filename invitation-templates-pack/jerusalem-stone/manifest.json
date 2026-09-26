@@ -18,7 +18,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/jerusalem-stone/preview.webp",
   "previewVideo": "/templates/jerusalem-stone/preview.mp4",

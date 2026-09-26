@@ -15,7 +15,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/circus-top/preview.webp",
   "previewVideo": "/templates/circus-top/preview.mp4",

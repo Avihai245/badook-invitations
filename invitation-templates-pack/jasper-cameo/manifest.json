@@ -17,7 +17,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/jasper-cameo/preview.webp",
   "previewVideo": "/templates/jasper-cameo/preview.mp4",

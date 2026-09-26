@@ -1,6 +1,15 @@
-import { EVENT_TYPES, type L10n, type Locale, type TemplateManifest } from '../contracts/types';
+import { EVENT_TYPES, FREE_LOCALES, type L10n, type Locale, type TemplateManifest } from '../contracts/types';
+import { writesScript } from '../fonts';
 import { LIBRARY_PAIR_PREFIX } from '../fonts/library';
+import { scriptsOf } from '../lib/locales';
 import type { TemplateEntry } from './registry';
+
+/**
+ * The languages a template pack writes its own copy in (names, presets, per-event defaults). The
+ * other languages it supports take the culture copy (templates/culture-copy.ts) when an invitation
+ * is created, and the host's or the translator's text after that.
+ */
+export const PACK_COPY_LOCALES: readonly Locale[] = FREE_LOCALES;
 
 const templateKey = (ref: string | null | undefined) =>
   ref && ref.startsWith('template:') ? ref.slice('template:'.length) : null;
@@ -21,7 +30,8 @@ export function validateTemplate({ manifest, defaults }: TemplateEntry): string[
     if (value == null) return;
     for (const l of locales) if (!value[l]?.trim()) at(`${where} is missing "${l}"`);
   };
-  const locales = manifest.supportsLocales;
+  const locales = manifest.supportsLocales.filter((l) => PACK_COPY_LOCALES.includes(l));
+  if (locales.length === 0) at(`supportsLocales has none of ${PACK_COPY_LOCALES.join(', ')}`);
 
   // tokens & presets
   const editable = new Set(manifest.tokens.editablePaletteKeys);
@@ -37,6 +47,15 @@ export function validateTemplate({ manifest, defaults }: TemplateEntry): string[
   for (const pair of manifest.fontPairs)
     if (pair.id.startsWith(LIBRARY_PAIR_PREFIX))
       at(`font pair id "${pair.id}" uses the font library's "${LIBRARY_PAIR_PREFIX}" prefix`);
+  // every script of a supported language has a face in every role (fonts/scripts.json)
+  for (const script of scriptsOf(manifest.supportsLocales)) {
+    for (const pair of manifest.fontPairs)
+      for (const role of ['display', 'heading', 'body', 'ui'] as const)
+        if (!writesScript(pair[role].latin, role, script))
+          at(`font pair "${pair.id}" has no ${script} face for ${role} ("${pair[role].latin}")`);
+    if (!writesScript(manifest.cover.monogramFont.latin, 'monogram', script))
+      at(`the monogram font "${manifest.cover.monogramFont.latin}" has no ${script} face`);
+  }
 
   // cover
   const { overlay } = manifest.cover;

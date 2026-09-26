@@ -16,7 +16,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/rocket-launch/preview.webp",
   "previewVideo": "/templates/rocket-launch/preview.mp4",

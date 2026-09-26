@@ -1,11 +1,13 @@
 import { Suspense } from 'react';
 import type { Locale } from '../contracts/types';
-import type { DictKey } from '../i18n/dictionary';
+import { t as translate, type DictKey } from '../i18n/dictionary';
 import type { RenderContext } from './context-core';
 import { CoverOverlay } from './cover/CoverOverlay.client';
+import { variantsOf } from './cover/localized';
 import { resolveOpening, type Opening } from './cover/opening';
 import { FitNames } from './FitNames.client';
 import { FloatingControls, type MusicProps } from './FloatingControls.client';
+import { nativeName } from '../lib/locales';
 import { fxTheme } from './fx/theme';
 import { InvitationSections } from './InvitationSections';
 import { GuestLink } from './guest.client';
@@ -61,7 +63,7 @@ export function InvitationBody({
   ctx,
   showCover,
   skipCoverFromUrl = false,
-  langSwitchHref,
+  langHrefs,
   live = null,
 }: {
   ctx: RenderContext;
@@ -72,11 +74,14 @@ export function InvitationBody({
    * script skip it before the first paint when the URL has `?open=1`.
    */
   skipCoverFromUrl?: boolean;
-  /** URL of the same invitation in the next locale (null when there is only one locale) */
-  langSwitchHref: string | null;
   /**
-   * Bilingual public page: the language pill switches in place (LiveLocale) instead of following
-   * `langSwitchHref`.
+   * The invitation's address in each locale — the language control's plain links (null: no control,
+   * e.g. the editor's preview)
+   */
+  langHrefs: Partial<Record<Locale, string>> | null;
+  /**
+   * The public page in several languages: the language control switches in place (LiveLocale)
+   * instead of following `langHrefs`.
    */
   live?: LivePayload | null;
 }) {
@@ -86,7 +91,10 @@ export function InvitationBody({
     ? resolveOpening(template, doc, resolvePalette(template, doc), ctx.cinematic)
     : null;
   const fx = fxTheme(template, doc);
-  const nextLocale = doc.locales[(doc.locales.indexOf(ctx.locale) + 1) % doc.locales.length] as Locale;
+  // the public page in several languages may change its language before React takes over (the
+  // guest's browser speaks another one — LiveLocale): its cover carries its texts in each of them
+  const coverLocales: readonly Locale[] = live && doc.locales.length > 1 ? doc.locales : [ctx.locale];
+  const perLocale = (text: (l: Locale) => string) => variantsOf(coverLocales, text);
   // the host's "video sound" option: the hero video's own sound instead of the track (HeroMedia)
   const hero = doc.sections.find((s) => s.type === 'hero');
   const videoSound =
@@ -120,7 +128,6 @@ export function InvitationBody({
       {coverOn ? (
         <Suspense fallback={null}>
           <CoverOverlay
-            locale={ctx.locale}
             style={template.cover.style}
             overlay={{
               kind: template.cover.overlay.kind,
@@ -136,9 +143,13 @@ export function InvitationBody({
                 : null
             }
             media={ctx.coverMedia}
-            monogram={ctx.text(doc.cover.monogram)}
-            hint={ctx.text(doc.cover.hint) || ctx.t(opening ? OPENING_HINT[opening.preset] : 'cover.hint')}
-            skipLabel={ctx.t('cover.skip')}
+            monogram={perLocale((l) => ctx.textIn(doc.cover.monogram, l))}
+            hint={perLocale(
+              (l) =>
+                ctx.textIn(doc.cover.hint, l) ||
+                translate(l, opening ? OPENING_HINT[opening.preset] : 'cover.hint'),
+            )}
+            skipLabel={perLocale((l) => translate(l, 'cover.skip'))}
             skipFromUrl={skipCoverFromUrl}
             card={
               // a drawn design's scene (a large drawing) streams after the cover: it is on the card inside
@@ -152,7 +163,7 @@ export function InvitationBody({
             }
             fx={{ burst: fx.burst, colors: fx.burstColors }}
             opening={opening}
-            scrollLabel={ctx.t('cover.scroll')}
+            scrollLabel={perLocale((l) => translate(l, 'cover.scroll'))}
           />
         </Suspense>
       ) : null}
@@ -164,9 +175,17 @@ export function InvitationBody({
         ) : (
           <>
             <FloatingControls
-              langSwitch={
-                doc.locales.length > 1 && langSwitchHref
-                  ? { href: langSwitchHref, label: ctx.t('locale.switch'), targetLocale: nextLocale }
+              language={
+                doc.locales.length > 1 && langHrefs
+                  ? {
+                      current: ctx.locale,
+                      menuLabel: ctx.t('locale.menu'),
+                      options: doc.locales.map((l) => ({
+                        locale: l,
+                        label: nativeName(l),
+                        href: langHrefs[l] ?? '',
+                      })),
+                    }
                   : null
               }
               music={music}

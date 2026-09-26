@@ -17,7 +17,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/coquette-bow/preview.webp",
   "previewVideo": "/templates/coquette-bow/preview.mp4",

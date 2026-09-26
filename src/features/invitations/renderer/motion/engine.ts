@@ -147,8 +147,12 @@ export const TEXT_REVEAL_TARGETS = '.sec-title, .sec-sub, .sec-body, .q-text, .q
 export const TEXT_REVEAL_LIMITS = { letters: 90, words: 140 } as const;
 
 /** How a text is revealed given its length: long texts step down to words, then lines. */
+/** Arabic script: its letters join, so a text split into letters would lose their shapes. */
+const JOINED = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
 export function revealGranularity(mode: TextReveal, text: string): TextReveal {
   if (mode === 'none') return 'none';
+  if (mode === 'letters' && JOINED.test(text)) mode = 'words';
   const letters = [...text.replace(/\s+/g, '')].length;
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   if (mode === 'letters' && letters > TEXT_REVEAL_LIMITS.letters) mode = 'words';

@@ -41,7 +41,7 @@ export function WhereView({ section, ctx }: SectionViewProps<SectionOf<'where'>>
           <span className="sep" aria-hidden="true" />
           <span>{formatDate(date, ctx.locale, DAY_MONTH_YEAR)}</span>
           <span className="sep" aria-hidden="true" />
-          <span className="ltr">{ctx.time(v.startTime)}</span>
+          <span dir="auto">{ctx.time(v.startTime)}</span>
         </p>
         {v.showMap && located ? (
           <MapEmbed

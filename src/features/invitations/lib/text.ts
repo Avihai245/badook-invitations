@@ -103,8 +103,7 @@ const RU: Record<string, string> = {
   я: 'ya',
 };
 
-const transliterateCyrillic = (word: string) =>
-  [...word.toLowerCase()].map((c) => RU[c] ?? c).join('');
+const transliterateCyrillic = (word: string) => [...word.toLowerCase()].map((c) => RU[c] ?? c).join('');
 
 /**
  * "Noa", "Itay" → "noa-and-itay"; Hebrew and Russian names are transliterated; always matches the

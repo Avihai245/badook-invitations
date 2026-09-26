@@ -18,7 +18,12 @@
   ],
   "supportsLocales": [
     "he",
-    "en"
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
   ],
   "previewImage": "/templates/jet-set/preview.webp",
   "previewVideo": "/templates/jet-set/preview.mp4",

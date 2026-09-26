@@ -426,7 +426,7 @@ describe('the openings', () => {
             mode: 'live',
           }}
           showCover
-          langSwitchHref={null}
+          langHrefs={null}
         />,
       );
     expect(render(null, 'he')).toContain('aria-label="לחצו לפתיחת השער"');
@@ -438,7 +438,7 @@ describe('the openings', () => {
     for (const opening of ['gate', 'curtain', 'fireworks', 'gold_dust'] as const) {
       const d = { ...doc, cover: { ...doc.cover, opening } };
       const html = renderToStaticMarkup(
-        <InvitationBody ctx={{ ...ctxOf(d), mode: 'live' }} showCover langSwitchHref={null} />,
+        <InvitationBody ctx={{ ...ctxOf(d), mode: 'live' }} showCover langHrefs={null} />,
       );
       expect(html, opening).toContain(`data-opening="${opening}"`);
       expect(html).toContain('class="cover-tap"');
@@ -453,7 +453,7 @@ describe('the openings', () => {
           mode: 'live',
         }}
         showCover
-        langSwitchHref={null}
+        langHrefs={null}
       />,
     );
     expect(off).not.toContain('data-opening');
