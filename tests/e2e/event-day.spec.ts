@@ -566,7 +566,8 @@ test('without the package the event day is offered, switched off it is gone, and
   // switched back on from the page itself
   await open(page, `/app/invitations/${ev.id}/live`);
   await page.getByRole('button', { name: 'להפעיל את יום האירוע' }).click();
-  await expect(page.getByTestId('live-hall')).toBeVisible({ timeout: 15_000 });
+  // after the reload React may still hold a hidden copy of the streamed page for a moment
+  await expect(page.locator('[data-testid="live-hall"]:visible')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole('link', { name: 'יום האירוע' })).toBeVisible();
 });
 
