@@ -139,6 +139,7 @@ export function SeatingScreen({
   const [runs, setRuns] = useState(0);
   const cancelRun = useRef<(() => void) | null>(null);
   const controls = useRef<CanvasControls>(null);
+  const editor = useRef<HTMLDivElement>(null);
 
   const taken = useMemo(() => occupancyOf(plan, byId), [plan, byId]);
   const stats = useMemo(() => seatingStats(plan, units), [plan, units]);
@@ -426,6 +427,13 @@ export function SeatingScreen({
         setRuns((n) => n + 1);
         setDialog(null);
         setTab('map');
+        // on a phone the map is below the buttons: bring it (with the result) into view
+        requestAnimationFrame(() => {
+          const el = editor.current;
+          if (!el || full || el.getBoundingClientRect().top < window.innerHeight / 2) return;
+          const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+        });
       },
       error: () => {
         setRunning(false);
@@ -655,9 +663,10 @@ export function SeatingScreen({
       </div>
 
       <div
+        ref={editor}
         className={cn(
           'flex flex-col overflow-hidden border-line bg-surface',
-          full ? 'fixed inset-0 z-50 h-dvh' : 'mt-3 rounded-card border shadow-sm',
+          full ? 'fixed inset-0 z-50 h-dvh' : 'mt-3 scroll-mt-16 rounded-card border shadow-sm',
         )}
         data-testid="seating-editor"
       >
@@ -770,6 +779,8 @@ export function SeatingScreen({
                     setResult(null);
                   }}
                   onClose={() => setResult(null)}
+                  // a phone has room for one panel: a picked table's comes first, the result waits
+                  className={selectedTable || selectedLandmark ? 'max-sm:hidden' : undefined}
                 />
               ) : null}
               {selectedTable ? (

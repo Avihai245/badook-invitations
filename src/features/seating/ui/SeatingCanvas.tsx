@@ -90,10 +90,16 @@ export function SeatingCanvas({
   const box = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
-  const [view, setView] = useState<View>({ scale: 20, tx: 0, ty: 0 });
+  const [view, setViewState] = useState<View>({ scale: 20, tx: 0, ty: 0 });
   const viewRef = useRef(view);
   viewRef.current = view;
-  const fitted = useRef(false);
+  // true while the view is the fitted one: a new size fits again; once the host zooms or pans, a new
+  // size keeps what they were looking at in the middle
+  const asFitted = useRef(true);
+  const setView = (next: View | ((v: View) => View)) => {
+    asFitted.current = false;
+    setViewState(next);
+  };
   const gesture = useRef<Gesture | null>(null);
   const pointers = useRef(new Map<number, Point>());
   const [preview, setPreviewState] = useState<Map<string, Point> | null>(null);
@@ -108,10 +114,15 @@ export function SeatingCanvas({
 
   const bounds = useMemo(() => contentBounds(plan), [plan]);
   const fit = useCallback(() => {
-    if (size.w > 0 && size.h > 0) setView(fitView(bounds, size.w, size.h, size.w < 500 ? 12 : 32));
+    if (size.w <= 0 || size.h <= 0) return;
+    asFitted.current = true;
+    setViewState(fitView(bounds, size.w, size.h, size.w < 500 ? 12 : 32));
   }, [bounds, size]);
+  const fitRef = useRef(fit);
+  fitRef.current = fit;
 
-  // the canvas's size; the first time it has one, everything is fitted in view
+  // the canvas's size (full screen, a turned phone, a resized window): the first time it has one,
+  // everything is fitted in view
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
@@ -121,12 +132,15 @@ export function SeatingCanvas({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+  const lastSize = useRef({ w: 0, h: 0 });
   useEffect(() => {
-    if (!fitted.current && size.w > 0 && size.h > 0) {
-      fitted.current = true;
-      fit();
-    }
-  }, [size, fit]);
+    const prev = lastSize.current;
+    // hidden (the phone's guest list is showing), or no change
+    if (size.w <= 0 || size.h <= 0 || (prev.w === size.w && prev.h === size.h)) return;
+    lastSize.current = size;
+    if (asFitted.current) return fitRef.current();
+    setViewState((v) => ({ ...v, tx: v.tx + (size.w - prev.w) / 2, ty: v.ty + (size.h - prev.h) / 2 }));
+  }, [size]);
 
   // a new plan, or a new scale: everything in view again
   const planKey = `${plan.layout.background?.path ?? ''}|${plan.layout.metersPerPixel ?? ''}`;

@@ -79,11 +79,15 @@ function Panel({
   testId: string;
 }) {
   const { t } = useUi();
+  // The site's accessibility button floats at the middle of the screen's left edge: on a phone the panel
+  // stays in the lower half (its close button would land right under that button), and on a tablet in
+  // English (the panel on the left) it starts to the button's right. On a phone the support button
+  // floats over the panel's bottom corner: the panel's end scrolls clear of it.
   return (
     <section
       aria-label={typeof title === 'string' ? title : undefined}
       data-testid={testId}
-      className="absolute inset-x-2 bottom-2 z-10 max-h-[58%] overflow-y-auto overscroll-contain rounded-card border border-line bg-surface p-3 shadow-lg sm:inset-x-auto sm:start-3 sm:bottom-3 sm:max-h-[calc(100%-24px)] sm:w-[330px]"
+      className="absolute inset-x-2 bottom-2 z-10 max-h-[min(58%,calc(50dvh-40px))] overflow-y-auto overscroll-contain rounded-card border border-line bg-surface p-3 shadow-lg max-sm:pb-16 sm:inset-x-auto sm:start-3 sm:bottom-3 sm:max-h-[calc(100%-24px)] sm:w-[330px] sm:max-lg:ltr:start-[76px]"
     >
       <div className="mb-2 flex items-center gap-2">
         <h3 className="min-w-0 flex-1 truncate text-[15px] font-bold">{title}</h3>

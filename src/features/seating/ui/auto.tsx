@@ -3,7 +3,7 @@
 import { CircleAlert, CircleCheck, Lock, RotateCcw, Sparkles, Undo2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Button, Dialog, Hint, IconButton, Segmented, Switch } from '@/components/app';
+import { Button, Dialog, Hint, IconButton, Segmented, Switch, cn } from '@/components/app';
 import type { AppDict } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { CATEGORY_MODES, type SeatingSettings } from '../model';
@@ -238,6 +238,7 @@ export function AutoResult({
   onRerun,
   onUndo,
   onClose,
+  className,
 }: {
   result: SolverResult;
   /** how many arrangements were made so far (a new one is a new result) */
@@ -247,6 +248,7 @@ export function AutoResult({
   onRerun(): void;
   onUndo(): void;
   onClose(): void;
+  className?: string;
 }) {
   const { t, fmt, plural, locale } = useUi();
   const a = t.seating.auto;
@@ -269,7 +271,10 @@ export function AutoResult({
       aria-label={a.resultTitle}
       data-testid="auto-result"
       data-run={run}
-      className="absolute inset-x-2 top-2 z-10 max-h-[60%] overflow-hidden rounded-card border border-line bg-surface shadow-lg sm:inset-x-auto sm:end-3 sm:top-3 sm:w-[360px]"
+      className={cn(
+        'absolute inset-x-2 top-2 z-10 max-h-[60%] overflow-hidden rounded-card border border-line bg-surface shadow-lg sm:inset-x-auto sm:end-3 sm:top-3 sm:w-[360px]',
+        className,
+      )}
     >
       <div className="flex items-start gap-2 border-b border-line p-3">
         {issues.some((x) => serious(x.issue)) ? (

@@ -435,7 +435,7 @@ begin
   end if;
   insert into public.venue_layouts (invitation_id) values (p_id) on conflict (invitation_id) do nothing;
   select * into l from public.venue_layouts where invitation_id = p_id for update;
-  if l.version <> p_version then
+  if l.version is distinct from p_version then
     return jsonb_build_object('ok', false, 'code', 'conflict', 'version', l.version);
   end if;
 

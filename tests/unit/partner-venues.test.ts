@@ -294,6 +294,10 @@ describe('fetching a plan by URL', () => {
           res.writeHead(302, { location: 'https://inside.test/plan.png' });
           return res.end();
         }
+        if (req.url === '/nowhere') {
+          res.writeHead(302);
+          return res.end();
+        }
         if (req.url === '/big') {
           // no Content-Length: the cap must hold while streaming
           res.writeHead(200, { 'content-type': 'image/png' });
@@ -330,6 +334,11 @@ describe('fetching a plan by URL', () => {
       const moved = await fetchPlanFile(at('/moved'), opts());
       expect(Buffer.compare(moved.bytes, plan)).toBe(0);
       await expect(fetchPlanFile(at('/nope'), opts())).rejects.toMatchObject({ code: 'failed', status: 404 });
+      // a redirect without a place to go brings no file
+      await expect(fetchPlanFile(at('/nowhere'), opts())).rejects.toMatchObject({
+        code: 'failed',
+        status: 302,
+      });
     });
 
     it.skipIf(!haveOpenssl)('a redirect into the network is refused like the URL itself', async () => {

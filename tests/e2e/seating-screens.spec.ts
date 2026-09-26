@@ -262,6 +262,12 @@ async function setup(page: Page) {
 }
 
 /** The phone's "map | guests" switch. */
+/** How many families are seated at the event (as saved). */
+const seated = async (id: string) =>
+  (
+    await sql<{ n: number }>('select count(*)::int as n from seat_assignments where invitation_id = $1', [id])
+  )[0]!.n;
+
 const tabs = (page: Page) => page.getByRole('radiogroup', { name: /^(תצוגה|View)$/ }).first();
 
 async function open(page: Page, url: string) {
@@ -278,11 +284,17 @@ test.describe('seating screens', () => {
     const vp = testInfo.project.name;
     const mobile = vp === 'mobile';
     const { id, email } = await setup(page);
-    const shot = (name: string, lang: string, full = false) =>
-      page.screenshot({ path: `${OUT}/${vp}-${lang}-${name}.png`, fullPage: full });
+    // the whole site's cookie (a cookie set by the page's URL only covers that page's folder)
+    const setLang = (lang: 'he' | 'en') =>
+      context.addCookies([{ name: 'ui_lang', value: lang, url: new URL('/', page.url()).toString() }]);
+    // after the panels' and dialogs' opening animations
+    const shot = async (name: string, lang: string, full = false) => {
+      await page.waitForTimeout(350);
+      await page.screenshot({ path: `${OUT}/${vp}-${lang}-${name}.png`, fullPage: full });
+    };
 
     for (const lang of ['he', 'en'] as const) {
-      await context.addCookies([{ name: 'ui_lang', value: lang, url: page.url() }]);
+      await setLang(lang);
       await open(page, `/app/invitations/${id}/seating`);
       await expect(page.getByTestId('seating-canvas').locator('[data-table-number="13"]')).toBeVisible();
       await page.waitForTimeout(600);
@@ -323,6 +335,7 @@ test.describe('seating screens', () => {
       await shot('plan', lang);
       await page.keyboard.press('Escape');
       // the automatic seating and its result
+      const before = await seated(id);
       await page.getByTestId('auto-seat').click();
       await expect(page.getByTestId('auto-dialog')).toBeVisible();
       await shot('auto', lang);
@@ -331,6 +344,8 @@ test.describe('seating screens', () => {
       await page.waitForTimeout(400);
       await shot('auto-result', lang);
       await page.keyboard.press('Control+z');
+      // the undo is saved before leaving (the next language starts from the same plan)
+      await expect.poll(() => seated(id), { timeout: 15_000 }).toBe(before);
       // the print view
       await open(page, `/app/invitations/${id}/seating/print`);
       await page.waitForTimeout(500);
@@ -341,7 +356,7 @@ test.describe('seating screens', () => {
       `update accounts set plan = 'free' where user_id = (select id from auth.users where email = $1)`,
       [email],
     );
-    await context.addCookies([{ name: 'ui_lang', value: 'he', url: page.url() }]);
+    await setLang('he');
     await open(page, `/app/invitations/${id}/seating`);
     await page.getByTestId('auto-seat').click();
     await expect(page.getByTestId('upgrade-link')).toBeVisible();

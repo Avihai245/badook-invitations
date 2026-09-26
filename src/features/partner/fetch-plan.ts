@@ -118,6 +118,8 @@ export async function fetchPlanFile(
         const status = res.statusCode ?? 0;
         if (status >= 300 && status < 400) {
           res.resume();
+          // a redirect to nowhere (or a 304) brings no file
+          if (!res.headers.location) return fail(new PlanFetchError('failed', status));
           return ok({
             status,
             location: res.headers.location ?? null,

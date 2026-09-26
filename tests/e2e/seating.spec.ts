@@ -245,9 +245,11 @@ test.describe('seating', () => {
       // the dialog's closing animation keeps the page from taking pointer events for a moment
       await expect(page.getByTestId('plan-dialog')).toHaveCount(0);
       await expect.poll(() => page.evaluate(() => document.body.style.pointerEvents)).not.toBe('none');
-      // across the middle of the map (a toast may sit at its bottom corner)
+      // across the map's upper part, the map in the middle of the window (the toasts stack up from the
+      // window's bottom corner, over the map)
+      await page.getByTestId('seating-canvas').evaluate((el) => el.scrollIntoView({ block: 'center' }));
       const canvas = (await page.getByTestId('seating-canvas').boundingBox())!;
-      const y = canvas.y + canvas.height / 2;
+      const y = canvas.y + canvas.height * 0.3;
       await page.mouse.move(canvas.x + canvas.width * 0.25, y);
       await page.mouse.down();
       await page.mouse.move(canvas.x + canvas.width * 0.75, y, { steps: 8 });
@@ -569,6 +571,7 @@ test.describe('the partner’s venue', () => {
     await expect(dialog).toContainText('בשימוש עכשיו');
     await expect(dialog.getByTestId('plan-scale')).toContainText('כויל: התוכנית ברוחב 36.5 מטר');
     await dialog.getByRole('button', { name: 'סגירה' }).click();
+    await page.getByTestId('seating-editor').evaluate((el) => el.scrollIntoView({ block: 'start' }));
     await shot(page, 'venue-plan-he', testInfo.project.name);
     const [layout] = await sql<{ background_type: string; source: string; venue_plan_path: string }>(
       `select background_type, source, venue_plan_path from venue_layouts where invitation_id = $1`,
