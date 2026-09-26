@@ -3,7 +3,8 @@ import { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { as, createTestDatabase } from './harness';
 
-// Phase 5B's database functions (supabase/migrations/*_gallery_film_faces.sql, *_gallery_link.sql, *_insights.sql): the host's own gallery
+// Phase 5B's database functions (supabase/migrations/*_gallery_film_faces.sql, *_gallery_link.sql, *_insights.sql,
+// and *_gallery_link_languages.sql: the gallery link's claim with the guest's language): the host's own gallery
 // items (the highlights film) and what the film chooses from; face search — indexing by the uploading
 // phone and the host's browser, searching, leaving out, forgetting, the host's view, the triggers and
 // the retention; the invitation's link to its gallery and sending it to guests (credits, the queue,
@@ -670,6 +671,8 @@ describe('the invitation’s link to its gallery, and sending it to guests', () 
       attempts: 1,
       guestName: 'דנה כהן',
       guestToken: dana.token,
+      // no language of their own: the invitation's (the sender decides)
+      guestLanguage: null,
       slug: 'p5b-test',
       uploadTokenHash: hex('a'),
       uploadTokenNonce: 'nonce-a-0123456789ab',
@@ -718,6 +721,30 @@ describe('the invitation’s link to its gallery, and sending it to guests', () 
       { delta: -1, reason: 'whatsapp_send' },
       { delta: 1, reason: 'whatsapp_refund' },
     ]);
+  });
+
+  it('the claim carries the guest’s language (*_gallery_link_languages.sql): the message is written in it', async () => {
+    await c.query(`update accounts set message_credits = message_credits + 1 where user_id = $1`, [OWNER]);
+    await c.query(`update invitation_guests set preferred_language = 'ar' where id = $1`, [dana.id]);
+    try {
+      expect(await commit('gallery_notice_queue', [inv, OWNER, [dana.id], 0.04])).toMatchObject({
+        ok: true,
+        queued: 1,
+      });
+      const [m] = await commit<Record<string, unknown>[]>('gallery_notice_claim', [inv, 10]);
+      expect(m).toMatchObject({ guestName: 'דנה כהן', guestToken: dana.token, guestLanguage: 'ar' });
+      // everything else as before: the gallery's link and the document to write the message from
+      expect(m).toMatchObject({ slug: 'p5b-test', uploadTokenNonce: 'nonce-a-0123456789ab' });
+      expect(m!.document).toBeTruthy();
+      await commit('gallery_notice_result', [m!.id, 'wamid.gallery.ar', null]);
+      // the webhook's statuses reach it like any other gallery link
+      expect(await commit('gallery_notice_status', ['wamid.gallery.ar', 'read', null])).toBe(true);
+      expect(
+        (await one<{ status: string }>(`select status from gallery_notices where id = $1`, [m!.id])).status,
+      ).toBe('read');
+    } finally {
+      await c.query(`update invitation_guests set preferred_language = null where id = $1`, [dana.id]);
+    }
   });
 
   it('the host marks what they sent themselves; nothing when the gallery is off', async () => {
