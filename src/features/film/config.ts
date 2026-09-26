@@ -51,18 +51,18 @@ export const FILM = {
     /** a photo's shot is about this long (s), in whole beats on the bar's grid */
     photoSeconds: 2.2,
     /** no shot shorter or longer (s) */
-    minSeconds: 0.9,
+    minSeconds: 1.4,
     maxSeconds: 4.8,
     /** a clip's part in the film at most (s), and the clips too short to use (s) */
     clipMaxSeconds: 4.6,
-    clipMinSeconds: 1.5,
+    clipMinSeconds: 2,
     /** where in a clip its part starts (share of the time it has to spare — the first seconds shake) */
     clipIn: 0.3,
   },
   cards: {
     /** the title card and the end card at least (s), in whole bars */
     titleSeconds: 2,
-    endSeconds: 2.6,
+    endSeconds: 2,
   },
   select: {
     /** perceptual-hash distance (bits of 64) at or under which two items are the same moment */

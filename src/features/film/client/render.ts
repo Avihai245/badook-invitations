@@ -279,13 +279,21 @@ export async function playFilm({
     const recorder = record && track ? record(track, destination!.stream.getAudioTracks()[0] ?? null) : null;
     const t0 = audioCtx.currentTime + 0.15;
     source.start(t0);
-    recorder?.start();
+    // the recording starts with the music: an audio clock that takes a moment to get going (a device
+    // waking up) would otherwise hold the first frame longer in the film than on the soundtrack
+    let recording = !recorder;
     const frameMs = 1000 / FILM.fps;
     await new Promise<void>((resolve) => {
       let last = -1;
       const tick = () => {
         if (signal.aborted) return resolve();
-        const t = Math.max(0, audioCtx.currentTime - t0);
+        const now = audioCtx.currentTime;
+        if (!recording) {
+          if (now < t0) return void setTimeout(tick, frameMs / 2);
+          recorder!.start();
+          recording = true;
+        }
+        const t = Math.max(0, now - t0);
         if (t >= plan.duration) {
           paintFrame(ctx, plan.duration - 1e-3, plan, size.width, size.height, assets, card);
           track?.requestFrame?.();

@@ -95,7 +95,8 @@ interface Bounds {
 
 function itemBounds(item: PlanItem, period: number, photo: number): Bounds {
   const { minSeconds, maxSeconds, clipMaxSeconds } = FILM.shots;
-  const min = Math.max(2, 2 * Math.ceil(minSeconds / (2 * period)));
+  // whole beats (cuts on any beat), never shorter than FILM.shots.minSeconds
+  const min = Math.max(2, Math.ceil(minSeconds / period - 1e-9));
   const photoMax = Math.max(min, even(maxSeconds / period));
   if (item.kind === 'image') return { min, ideal: Math.min(photoMax, Math.max(min, photo)), max: photoMax };
   // a clip: its own length (less a little for the transitions), at most FILM.shots.clipMaxSeconds
@@ -162,8 +163,10 @@ export function planFilm(input: PlanInput): FilmPlan {
   const dropped: string[] = [];
   const sum = (key: keyof Bounds) => items.reduce((s, x) => s + x.b[key], 0);
 
-  // where it ends: on a bar near the length chosen — a phrase's end (16 beats) wins unless it is far —
-  // with room for the items (those that don't fit go; too few end it sooner)
+  // where it ends: on a bar near the length chosen — a phrase's end (16 beats) wins unless it is far;
+  // a song shorter than that: its last bar. Too few items to fill it: sooner, where they all fit
+  // comfortably (up to half again their ideal lengths, rather than every photo held for long); more
+  // items than it holds: the least wanted go
   const minEnd = cards.title + cards.end + 2;
   const candidates: number[] = [];
   for (let j = 4; j <= last; j += 4) if (j >= minEnd) candidates.push(j);
@@ -172,15 +175,18 @@ export function planFilm(input: PlanInput): FilmPlan {
     const t = F[j]!;
     return Math.abs(t - length) * (t > length ? 1.25 : 1) + (j % 16 ? PHRASE_PREFERENCE : 0);
   };
+  const cheapest = (list: number[]) => list.reduce((best, j) => (cost(j) < cost(best) ? j : best));
   const capacity = (j: number) => j - cards.title - cards.end;
-  // the items fill the film comfortably up to half again their ideal lengths (few photos: a shorter
-  // film, rather than every photo held for long); more items than the film holds: the extra ones go
   const comfortable = items.reduce(
     (s, x) => s + Math.min(x.b.max, Math.max(x.b.ideal, even(x.b.ideal * 1.5))),
     0,
   );
-  const byCost = [...candidates].sort((a, b) => cost(a) - cost(b));
-  let end = byCost.find((j) => capacity(j) <= comfortable) ?? candidates[0]!;
+  let end = F[last]! < length ? candidates.at(-1)! : cheapest(candidates);
+  if (capacity(end) > comfortable) {
+    const need = sum('min');
+    const fits = candidates.filter((j) => capacity(j) >= need && capacity(j) <= comfortable);
+    end = fits.length ? cheapest(fits) : (candidates.find((j) => capacity(j) >= need) ?? end);
+  }
 
   // too many items for it: the lowest priority ones go
   while (items.length > 1 && sum('min') > capacity(end)) {

@@ -371,6 +371,12 @@ describe('the edit', () => {
     expect(few.duration).toBeLessThan(40);
     expect(few.shots.filter((s) => s.kind === 'item')).toHaveLength(3);
     expect((few.beats.length - 1) % 4).toBe(0);
+    // at any tempo, a few photos all stay
+    for (const bpm of [72, 100, 140, 175]) {
+      const slow = planFilm({ ...grid(bpm, 200), length: 30, items: items(3) });
+      expect(slow.dropped).toEqual([]);
+      expect(slow.shots.filter((s) => s.kind === 'item')).toHaveLength(3);
+    }
     const pinnedLast = items(60, (i) => (i === 59 ? { priority: 99 } : {}));
     const many = planFilm({ ...grid(120, 200), length: 30, items: pinnedLast });
     expect(many.dropped.length).toBeGreaterThan(0);
@@ -381,7 +387,8 @@ describe('the edit', () => {
 
   it('keeps within a short song, starts on a downbeat after the start, and plays without music', () => {
     const short = planFilm({ ...grid(120, 12), length: 30, items: items(10) });
-    expect(short.duration).toBeLessThanOrEqual(12);
+    // all of it, to its last bar
+    expect(short.duration).toBeCloseTo(12, 6);
     const late = planFilm({
       beats: evenBeats(120, 120, 0.25),
       downbeat: 2,
