@@ -67,6 +67,10 @@ and deletes the face data automatically after the retention period.
 
 - `seating_guide` (Premium): each guest's table guide (`/e/<slug>/table?g=…`), telling guests their table
   (the second WhatsApp template, the host's own WhatsApp, marked by hand) and the table cards to print.
+  The guide opens in the guest's language (`?lang=`, else their language on the guest list, else the
+  invitation's) and switches among the invitation's languages; the table number goes out in the guest's
+  language when the template is approved in it (the invitation's otherwise), and so does the host's own
+  WhatsApp message. The entrance station and the printed cards stay in Hebrew or English.
   Off: the guide answers "not available", the notices API refuses (403 `feature_off`), the buttons are
   gone (the seating screen offers the package instead).
 - `checkin` (VIP): the entrance stations (`/e/<slug>/station?t=…`), the entrance QR on the guide and the

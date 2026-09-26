@@ -4,11 +4,12 @@ import type { InvitationDocument, Locale } from '@/features/invitations/contract
 import { hostsLine } from '@/features/invitations/lib/text';
 import {
   cloudApiConfigured,
+  missingTemplate,
   postTemplate,
   type SendResult,
   type TemplateSend,
 } from '@/features/whatsapp/cloud-api';
-import { templateChain, valuesLocale } from '@/features/whatsapp/languages';
+import { templateChain, valuesLocale, type TemplateLanguage } from '@/features/whatsapp/languages';
 import { configuredTemplateLanguages, retryWait, type ProcessResult } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
 import { eventDayDb, type ClaimedNotice, type EventDayDb } from './db';
@@ -16,7 +17,9 @@ import { eventDayDb, type ClaimedNotice, type EventDayDb } from './db';
 /**
  * Telling guests their table from the system's WhatsApp number: the table number's own Meta template
  * (INVITES_WHATSAPP_TABLE_TEMPLATE, docs/whatsapp-setup.md) with the guest's name, the hosts, the
- * table, and a button to the guest's map (/e/<slug>/table?g=<their personal link's token>). Queued and
+ * table, and a button to the guest's map (/e/<slug>/table?g=<their personal link's token>) — in the
+ * guest's language when the template is approved in it (INVITES_WHATSAPP_TEMPLATE_LANGS, the same list
+ * as the invitation's template), else in the invitation's (whatsapp/languages.ts). Queued and
  * sent like the invitations (features/whatsapp/sender.ts): claimed in batches, a temporary failure
  * waits and tries again (3 tries), a failure refunds its credit, nothing is ever sent twice. Until the
  * template is approved the host sends from their own WhatsApp and prints table cards.
@@ -32,25 +35,45 @@ export const tableText = (number: number, label: string | null) =>
   label ? `${number} · ${label}` : String(number);
 
 /**
- * What the template says for this notice, in one of the languages it is approved in
- * (INVITES_WHATSAPP_TEMPLATE_LANGS, as the invitation's template): the invitation's default when
- * approved in it.
+ * What the template says for this notice in one of its languages (the first of the guest's chain when
+ * not given): the hosts in that language, and a button whose map opens in it when the invitation has it.
  */
 export function noticeMessage(
   m: ClaimedNotice,
   doc: InvitationDocument,
-  lang = templateChain(null, doc, configuredTemplateLanguages())[0]!,
+  lang: TemplateLanguage = templateChain(m.guestLanguage, doc, configuredTemplateLanguages())[0]!,
 ): TemplateSend {
   const env = serverEnv();
-  const docLocale: Locale = valuesLocale(lang.locale, doc);
+  const page: Locale = valuesLocale(lang.locale, doc);
+  const query = [`g=${m.guestToken ?? ''}`, page !== doc.defaultLocale ? `lang=${page}` : null]
+    .filter(Boolean)
+    .join('&');
   return {
     to: m.toPhone,
     template: env.INVITES_WHATSAPP_TABLE_TEMPLATE,
     lang: lang.code,
-    body: [m.guestName ?? '', hostsLine(doc.hosts, docLocale), tableText(m.tableNumber, m.tableLabel)],
-    button: `${m.slug}/table?g=${m.guestToken ?? ''}`,
+    body: [m.guestName ?? '', hostsLine(doc.hosts, page), tableText(m.tableNumber, m.tableLabel)],
+    button: `${m.slug}/table?${query}`,
     ref: m.id,
   };
+}
+
+/**
+ * Sends one notice in the guest's language — or, when Meta has no approved template in it (132001),
+ * in the next language of the chain: the invitation's default, its other languages, the first approved.
+ */
+async function sendInLanguage(
+  m: ClaimedNotice,
+  doc: InvitationDocument,
+  send: (m: TemplateSend) => Promise<SendResult>,
+): Promise<SendResult> {
+  const chain = templateChain(m.guestLanguage, doc, configuredTemplateLanguages());
+  let outcome: SendResult = { ok: false, error: 'no template language', retryable: false };
+  for (const lang of chain) {
+    outcome = await send(noticeMessage(m, doc, lang));
+    if (!missingTemplate(outcome)) break;
+  }
+  return outcome;
 }
 
 const CONCURRENCY = 5;
@@ -74,7 +97,7 @@ export async function processNoticeQueue(
           result.failed++;
           return;
         }
-        const outcome = await send(noticeMessage(m, migrateDocument(m.document)));
+        const outcome = await sendInLanguage(m, migrateDocument(m.document), send);
         if (outcome.ok) {
           await db.noticeResult(m.id, outcome.id, null);
           result.sent++;

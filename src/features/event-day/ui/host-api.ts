@@ -1,6 +1,7 @@
 'use client';
 
 import { hostApi } from '@/features/invitations/app/api';
+import type { Locale } from '@/features/invitations/contracts/types';
 import type { NoticeRow, Party, SeatingChange, Totals } from '../model';
 import type { DayView, NotifyOutcome } from '../server/host-api';
 
@@ -15,8 +16,11 @@ export interface NoticesState {
   credits: number;
   unlimited: boolean;
   slug: string;
-  /** the wa.me message's values, in the invitation's own language */
-  own: { locale: 'he' | 'en'; hosts: string };
+  /**
+   * the wa.me message's values: the invitation's default language, its languages and the hosts in
+   * each (the message is in the guest's language — event-day/messages.ts)
+   */
+  own: { locale: Locale; locales: Locale[]; hosts: Partial<Record<Locale, string>> };
   base: string;
 }
 

@@ -132,6 +132,8 @@ export interface NoticeRow {
   phone: string | null;
   /** its personal link's token (the guide's address), when it is on the guest list */
   token: string | null;
+  /** the language the host set for the guest (null or absent: the invitation's default) */
+  language?: string | null;
   /** can the system's WhatsApp number reach it */
   reach: 'ok' | 'landline' | 'opted_out' | 'none';
   table: { id: string; number: number; label: string | null } | null;

@@ -9,6 +9,8 @@ import {
   type FeatureInput,
   type Package,
 } from '@/features/flags/features';
+import type { Locale } from '@/features/invitations/contracts/types';
+import { isLocale } from '@/features/invitations/lib/locales';
 import { hostsLine } from '@/features/invitations/lib/text';
 import type { ProcessResult } from '@/features/whatsapp/sender';
 import type { RealtimeInfo } from '@/lib/live/types';
@@ -451,9 +453,9 @@ export interface NoticesView {
 }
 
 /**
- * GET /api/invitations/:id/seating/notices — every family with a seat to tell, and what it was told;
- * whether the system's number can send; and what a message from the host's own WhatsApp says (the
- * invitation's language, the hosts, the guides' address).
+ * GET /api/invitations/:id/seating/notices — every family with a seat to tell (with the guest's
+ * language), and what it was told; whether the system's number can send; and what a message from the
+ * host's own WhatsApp needs in each of the invitation's languages (the hosts, the guides' address).
  */
 export async function noticesState(
   userId: string,
@@ -470,14 +472,17 @@ export async function noticesState(
   ]);
   if (!state || !owned) return notFound;
   const inv = owned.invitation;
-  const locale = inv.defaultLocale === 'en' ? 'en' : 'he';
+  const locales = (inv.locales ?? []).filter(isLocale);
+  const locale: Locale = isLocale(inv.defaultLocale) ? inv.defaultLocale : (locales[0] ?? 'he');
+  const hosts: Partial<Record<Locale, string>> = {};
+  for (const l of locales.length ? locales : [locale]) hosts[l] = inv.hosts ? hostsLine(inv.hosts, l) : '';
   return ok({
     rows: state.rows,
     ready: deps.notify.ready(),
     credits: account.credits,
     unlimited: account.admin,
     slug: inv.slug,
-    own: { locale, hosts: inv.hosts ? hostsLine(inv.hosts, locale) : '' },
+    own: { locale, locales: locales.length ? locales : [locale], hosts },
     base,
   });
 }

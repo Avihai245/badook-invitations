@@ -18,7 +18,8 @@ type Rate = { ok: false; code: 'rate' };
 export interface GuideRow {
   ok: true;
   invitation: DayInvitation;
-  guest: { id: string; name: string };
+  /** language: the one the host set for the guest (null: the invitation's default) */
+  guest: { id: string; name: string; language?: string | null };
   unit: { id: string; status: Party['status']; seats: number } | null;
   table: Record<string, unknown> | null;
   arrived: number;
@@ -86,6 +87,8 @@ export interface ClaimedNotice {
   attempts?: number;
   guestName: string | null;
   guestToken: string | null;
+  /** the language the host set for the guest (null: the invitation's default) */
+  guestLanguage?: string | null;
   slug: string;
   tableNumber: number;
   tableLabel: string | null;

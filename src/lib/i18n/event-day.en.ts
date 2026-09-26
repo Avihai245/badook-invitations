@@ -281,9 +281,6 @@ export const eventDayEn: EventDayDict = {
       nobody: 'Nobody to send to: everyone was already sent, or has no mobile.',
       failed: 'Sending failed. Try again.',
     },
-    ownMessage:
-      'Hi {name}!\nYour table at {hosts}’s event: {table}.\nThe map to your table and the way from the entrance: {url}',
-    ownTable: 'table {number}',
     empty: 'No families are seated at tables yet.',
     close: 'Close',
   },

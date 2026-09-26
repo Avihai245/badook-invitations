@@ -513,6 +513,13 @@ describe('the guest’s table guide', () => {
     });
   });
 
+  it('says the guest’s language, as the host set it on the guest list: the guide opens in it', async () => {
+    expect(await guide(cohen.token)).toMatchObject({ guest: { id: cohen.id, language: null } });
+    await c.query(`update invitation_guests set preferred_language = 'ar' where id = $1`, [cohen.id]);
+    expect(await guide(cohen.token)).toMatchObject({ guest: { id: cohen.id, language: 'ar' } });
+    await c.query(`update invitation_guests set preferred_language = null where id = $1`, [cohen.id]);
+  });
+
   it('shows the plan image but not a PDF (phones don’t draw those)', async () => {
     await c.query(
       `update venue_layouts set background_path = $2, background_type = 'application/pdf', background_width = null, background_height = null where invitation_id = $1`,
@@ -564,6 +571,8 @@ describe('telling guests their table', () => {
     const r = await rows();
     const by = Object.fromEntries(r.map((x) => [x.name, x]));
     expect(by['משפחת כהן']).toMatchObject({ reach: 'ok', table: { number: 1 }, told: null, queued: false });
+    // each guest's language (the host's own WhatsApp message is written in it); null: the invitation's
+    expect(by['משפחת כהן']).toHaveProperty('language', null);
     expect(by['משפחת לוי']).toMatchObject({ reach: 'landline', table: { number: 2 } });
     expect(by['אורח מהקישור הכללי']).toMatchObject({ reach: 'none', table: null });
     // pending and not seated: nothing to tell
@@ -626,6 +635,8 @@ describe('telling guests their table', () => {
       toPhone: '+972521111111',
       attempts: 1,
       guestToken: cohen.token,
+      // the template's language follows the guest's (null: the invitation's)
+      guestLanguage: null,
       slug: 'day-db',
       tableNumber: 1,
       tableLabel: null,

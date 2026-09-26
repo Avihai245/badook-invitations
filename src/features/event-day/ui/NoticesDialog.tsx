@@ -4,8 +4,10 @@ import { Check, Link2, MessageCircle, Printer, Send } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Dialog, Hint, IconButton, Segmented, Skeleton, useToast } from '@/components/app';
 import { loginUrl } from '@/features/invitations/app/api';
-import { dictFor, fmt as format } from '@/lib/i18n/app';
+import { guestLocale } from '@/features/whatsapp/languages';
+import { fmt as format } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
+import { isolate, TABLE_MESSAGE } from '../messages';
 import type { NoticeRow } from '../model';
 import { dayApi, type NoticesState } from './host-api';
 
@@ -114,8 +116,16 @@ export function NoticesDialog({
     ? fmt(N.errors.credits, { needed: number(toSend.length), balance: number(data.credits) })
     : '';
 
-  const guideUrl = (r: NoticeRow) =>
-    data && r.token ? `${data.base}/e/${data.slug}/table?g=${encodeURIComponent(r.token)}` : null;
+  // the family's language: the guest's own when the invitation has it (whatsapp/languages.ts)
+  const languageOf = (r: NoticeRow) =>
+    data ? guestLocale(r.language, { locales: data.own.locales, defaultLocale: data.own.locale }) : null;
+  /** the guest's guide, opening in their language */
+  const guideUrl = (r: NoticeRow) => {
+    if (!data || !r.token) return null;
+    const l = languageOf(r);
+    const lang = l && l !== data.own.locale ? `&lang=${l}` : '';
+    return `${data.base}/e/${data.slug}/table?g=${encodeURIComponent(r.token)}${lang}`;
+  };
 
   const mark = async (unitIds: string[], quiet = false) => {
     if (!unitIds.length) return;
@@ -169,13 +179,20 @@ export function NoticesDialog({
     onChanged?.();
   };
 
+  /** "Send from my WhatsApp": wa.me with the message in the guest's language, then marked as told. */
   const sendOwn = (r: NoticeRow) => {
     const url = guideUrl(r);
-    if (!data || !url || !r.phone || !r.table) return;
-    const own = dictFor(data.own.locale).eventDay.notices;
+    const l = languageOf(r);
+    if (!data || !url || !l || !r.phone || !r.table) return;
+    const own = TABLE_MESSAGE[l];
     const table =
-      format(own.ownTable, { number: r.table.number }) + (r.table.label ? ` (${r.table.label})` : '');
-    const text = format(own.ownMessage, { name: r.name, hosts: data.own.hosts, table, url });
+      format(own.table, { number: r.table.number }) + (r.table.label ? ` (${isolate(r.table.label)})` : '');
+    const text = format(own.message, {
+      name: isolate(r.name),
+      hosts: isolate(data.own.hosts[l] ?? data.own.hosts[data.own.locale] ?? ''),
+      table,
+      url,
+    });
     window.open(
       `https://wa.me/${r.phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`,
       '_blank',

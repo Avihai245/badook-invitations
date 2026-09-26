@@ -26,6 +26,8 @@ const env = {
   INVITES_WHATSAPP_PHONE_NUMBER_ID: '100',
   INVITES_WHATSAPP_TABLE_TEMPLATE: 'badook_table',
   INVITES_WHATSAPP_TEMPLATE_LANG: 'he',
+  // empty: the one language above
+  INVITES_WHATSAPP_TEMPLATE_LANGS: '',
   INVITES_WHATSAPP_API_BASE: 'https://graph.test',
   INVITES_WHATSAPP_API_VERSION: 'v26.0',
 };
@@ -584,6 +586,55 @@ describe('the table number’s message', () => {
     expect(notify.tableText(7, null)).toBe('7');
   });
 
+  it('is written in the guest’s language when the template is approved in it, else the invitation’s', async () => {
+    const doc = {
+      hosts: {
+        primary: { he: 'נועה', en: 'Noa', ru: 'Ноа', ar: 'نوعا' },
+        secondary: { he: 'איתי', en: 'Itay', ru: 'Итай', ar: 'إيتاي' },
+        joiner: null,
+      },
+      locales: ['he', 'en', 'ru', 'ar'],
+      defaultLocale: 'he',
+    } as never;
+    env.INVITES_WHATSAPP_TEMPLATE_LANGS = 'he,en_US,ru';
+    try {
+      // Russian: approved — the hosts in Russian, the map opens in Russian
+      const ru = notify.noticeMessage(claimed({ guestLanguage: 'ru' }), doc);
+      expect(ru).toMatchObject({ lang: 'ru', button: 'noa-and-itay/table?g=guest-personal-token-1&lang=ru' });
+      expect(ru.body[1]).toContain('Ноа');
+      // Meta's code for English is kept as configured
+      expect(notify.noticeMessage(claimed({ guestLanguage: 'en' }), doc).lang).toBe('en_US');
+      // Arabic: not approved — the invitation's Hebrew, the map in Hebrew
+      const ar = notify.noticeMessage(claimed({ guestLanguage: 'ar' }), doc);
+      expect(ar).toMatchObject({ lang: 'he', button: 'noa-and-itay/table?g=guest-personal-token-1' });
+      expect(ar.body[1]).toContain('נועה');
+      // no language of their own: the invitation's
+      expect(notify.noticeMessage(claimed(), doc).lang).toBe('he');
+
+      // Meta says the English template doesn't exist (132001): the next language of the chain
+      const sent: string[] = [];
+      const send = vi.fn(async (m: { lang: string }) => {
+        sent.push(m.lang);
+        return m.lang === 'en_US'
+          ? ({ ok: false, error: '132001 · Template name does not exist', retryable: false } as const)
+          : ({ ok: true, id: 'wamid.he' } as const);
+      });
+      const db = {
+        claimNotices: async () => [claimed({ id: 'en', guestLanguage: 'en' })],
+        noticeResult: vi.fn(async () => null),
+        noticeRequeue: vi.fn(async () => true),
+      };
+      expect(await notify.processNoticeQueue(INV, 25, send, db as never)).toEqual({
+        sent: 1,
+        failed: 0,
+        retried: 0,
+      });
+      expect(sent).toEqual(['en_US', 'he']);
+    } finally {
+      env.INVITES_WHATSAPP_TEMPLATE_LANGS = '';
+    }
+  });
+
   it('the queue: sent, a retry later, a failure; a guest gone from the list fails at once', async () => {
     const results: [string, string | null, string | null][] = [];
     const requeued: [string, string, number][] = [];
@@ -713,6 +764,17 @@ describe('the guest’s guide page', () => {
     const [slug, hash, key] = guideRow.mock.calls[0]!;
     expect([slug, hash]).toEqual(['noa-and-itay', sha(TOKEN)]);
     expect(key).toBe(tokens.rateKey('guide', IP));
+  });
+
+  it('opens in the guest’s language when the invitation has it', async () => {
+    const invitation = { ...row.invitation, locales: ['he', 'ru'] };
+    guideRow.mockResolvedValue({ ...row, invitation, guest: { ...row.guest, language: 'ru' } });
+    expect(await guidePage('noa-and-itay', TOKEN, IP)).toMatchObject({ data: { guestLanguage: 'ru' } });
+    // a language the invitation doesn't have (or none): the guide's own choice — the invitation's
+    guideRow.mockResolvedValue({ ...row, invitation, guest: { ...row.guest, language: 'am' } });
+    expect(await guidePage('noa-and-itay', TOKEN, IP)).toMatchObject({ data: { guestLanguage: null } });
+    guideRow.mockResolvedValue(row);
+    expect(await guidePage('noa-and-itay', TOKEN, IP)).toMatchObject({ data: { guestLanguage: null } });
   });
 
   it('no table yet, no QR without checkin, nothing without seating_guide, rate-limited', async () => {

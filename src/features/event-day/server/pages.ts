@@ -1,6 +1,7 @@
 import 'server-only';
 import { featureInput, featuresFor } from '@/features/flags/server';
 import type { Locale } from '@/features/invitations/contracts/types';
+import { isLocale } from '@/features/invitations/lib/locales';
 import { eventInfo } from '@/features/live-gallery/server/pages';
 import type { EventInfo } from '@/features/live-gallery/types';
 import type { Point } from '@/features/seating/geometry';
@@ -28,6 +29,8 @@ export interface GuidePageData {
   /** the event's start (the guide says when the doors open) */
   startTime: string | null;
   guestName: string;
+  /** the language the host set for the guest, when the invitation has it: the guide opens in it */
+  guestLanguage: Locale | null;
   /** seated: at a table; waiting: coming, no table yet; declined: said they can't come */
   state: 'seated' | 'waiting' | 'declined';
   /** the people their family was given seats for */
@@ -69,13 +72,17 @@ export async function guidePage(
   const base = planBaseUrl();
   const code = features.has('checkin') ? checkinCode(token) : null;
   const status = row.unit?.status ?? 'pending';
+  const event = eventInfo(row.invitation);
+  const language = row.guest.language;
+  const guestLanguage = isLocale(language) && event.locales.includes(language) ? language : null;
   return {
     ok: true,
     data: {
       slug: row.invitation.slug,
-      event: eventInfo(row.invitation),
+      event,
       startTime: row.invitation.startTime,
       guestName: row.guest.name,
+      guestLanguage,
       state: status === 'declined' ? 'declined' : table ? 'seated' : 'waiting',
       seats: row.unit?.seats ?? 0,
       arrived: row.arrived,
@@ -122,11 +129,15 @@ export async function stationPage(
   };
 }
 
-/** The main language of the invitation behind a slug (the pages' <html lang dir>; they switch in place). */
-export async function slugLanguage(slug: string): Promise<'he' | 'en'> {
+/**
+ * The main language of the invitation behind a slug — any of the seven (the pages' <html lang dir>;
+ * a guide in the guest's language, or the station in Hebrew or English, switches in place).
+ */
+export async function slugLanguage(slug: string): Promise<Locale> {
   if (!SLUG_RE.test(slug)) return 'he';
   try {
-    return (await eventDayDb.slugLocale(slug)) === 'en' ? 'en' : 'he';
+    const found = await eventDayDb.slugLocale(slug);
+    return isLocale(found) ? found : 'he';
   } catch {
     return 'he';
   }

@@ -14,7 +14,7 @@ import {
   turnedView,
   type TableLook,
 } from '../hall';
-import { fill, useDayText } from '../guest-text';
+import { fill, useGuideText } from '../guest-text';
 import { useCompass } from './useCompass';
 
 /**
@@ -54,7 +54,7 @@ export function GuideMap({
   accent: string;
   accentInk: string;
 }) {
-  const { t, number } = useDayText();
+  const { t, number } = useGuideText();
   const m = t.guide.map;
   const reduced = usePrefersReducedMotion();
   const compass = useCompass();

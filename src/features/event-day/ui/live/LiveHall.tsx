@@ -20,6 +20,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isolate } from '../../messages';
 import {
   AreaHelp,
   Badge,
@@ -194,7 +195,7 @@ export function LiveHall({ initial, planBase }: { initial: DayView; planBase: st
     patch(body.party, body.totals);
     toast({
       variant: 'success',
-      title: fmt(E.arrive.done, { name: party.name }),
+      title: fmt(E.arrive.done, { name: isolate(party.name) }),
       action: {
         label: E.recent.undo,
         altText: E.recent.undoHint,
@@ -241,7 +242,7 @@ export function LiveHall({ initial, planBase }: { initial: DayView; planBase: st
       a?.kind === 'merge'
         ? fmt(E.merge.done, { from: a.from.table.number, into: first?.to?.number ?? '' })
         : fmt(E.move.done, {
-            name: a?.kind === 'move' ? a.party.name : (first?.name ?? ''),
+            name: isolate(a?.kind === 'move' ? a.party.name : (first?.name ?? '')),
             number: first?.to?.number ?? '',
           });
     toast({

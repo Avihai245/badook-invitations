@@ -2,15 +2,20 @@
 
 import { CircleCheck, Globe, WifiOff } from 'lucide-react';
 import { useState, type CSSProperties } from 'react';
+import type { Locale } from '@/features/invitations/contracts/types';
+import { nativeName } from '@/features/invitations/lib/locales';
+import { isolate } from '../../messages';
 import type { GuidePageData } from '../../server/pages';
-import { DayTextProvider, fill, useDayText, type GuestLocale } from '../guest-text';
+import { fill, GuideTextProvider, useGuideText } from '../guest-text';
 import { GuideMap } from './GuideMap';
 import { useOfflineSave } from './useOfflineSave';
 
 /**
  * A guest's table guide (/e/<slug>/table?g=<their personal link's token>): their table's number, big;
  * the hall's map with the way from the entrance; their entrance QR when the event checks guests in;
- * kept on the phone for the evening. No other guest's name is ever on it.
+ * kept on the phone for the evening. No other guest's name is ever on it. In the language asked for
+ * (?lang — a switch keeps it in the address), else the guest's own (set on the guest list, as their
+ * personal link), else the invitation's; any of the invitation's languages from its menu.
  */
 export function TableGuide({
   data,
@@ -18,17 +23,22 @@ export function TableGuide({
   brand,
 }: {
   data: GuidePageData;
-  lang: GuestLocale | null;
+  lang: Locale | null;
   brand: string;
 }) {
-  const initial: GuestLocale = lang && data.event.locales.includes(lang) ? lang : data.event.defaultLocale;
-  const [locale, setLocale] = useState<GuestLocale>(initial);
+  const has = (l: Locale | null | undefined): l is Locale => !!l && data.event.locales.includes(l);
+  const initial: Locale = has(lang)
+    ? lang
+    : has(data.guestLanguage)
+      ? data.guestLanguage
+      : data.event.defaultLocale;
+  const [locale, setLocale] = useState<Locale>(initial);
   return (
-    <DayTextProvider locale={locale}>
+    <GuideTextProvider locale={locale}>
       <GuideBody
         data={data}
         brand={brand}
-        other={data.event.locales.find((l) => l !== locale) ?? null}
+        others={data.event.locales.filter((l) => l !== locale)}
         onLocale={(l) => {
           setLocale(l);
           const url = new URL(window.location.href);
@@ -36,24 +46,27 @@ export function TableGuide({
           window.history.replaceState(window.history.state, '', url);
         }}
       />
-    </DayTextProvider>
+    </GuideTextProvider>
   );
 }
 
 function GuideBody({
   data,
   brand,
-  other,
+  others,
   onLocale,
 }: {
   data: GuidePageData;
   brand: string;
-  other: GuestLocale | null;
-  onLocale(l: GuestLocale): void;
+  /** the invitation's other languages */
+  others: Locale[];
+  onLocale(l: Locale): void;
 }) {
-  const { t, locale, plural } = useDayText();
+  const { t, locale, plural } = useGuideText();
   const g = t.guide;
   const title = data.event.titles[locale] || data.event.title;
+  // back to the invitation (their personal link) in the language the guide shows
+  const inviteUrl = `${data.inviteUrl}&lang=${locale}`;
   const accent = data.event.accent;
   const accentInk = data.event.accentInk;
   const offline = useOfflineSave(data.slug, data.hall.planUrl ? [data.hall.planUrl] : []);
@@ -66,21 +79,39 @@ function GuideBody({
           <p className="min-w-0 truncate text-[13px] font-semibold text-muted" lang={locale}>
             <bdi>{title}</bdi>
           </p>
-          {other ? (
+          {others.length === 1 ? (
             <button
               type="button"
-              onClick={() => onLocale(other)}
-              lang={other}
+              onClick={() => onLocale(others[0]!)}
+              lang={others[0]}
               className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-[13px] font-semibold"
             >
               <Globe aria-hidden className="size-4" />
-              {t.otherLanguage}
+              {nativeName(others[0]!)}
             </button>
+          ) : others.length > 1 ? (
+            // more languages: a menu of them, each by its own name
+            <label className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface ps-3 pe-2 text-[13px] font-semibold">
+              <Globe aria-hidden className="size-4" />
+              <select
+                aria-label={t.language}
+                value={locale}
+                onChange={(e) => onLocale(e.target.value as Locale)}
+                className="cursor-pointer appearance-none bg-transparent font-semibold outline-none"
+                data-testid="guide-language"
+              >
+                {[locale, ...others].map((l) => (
+                  <option key={l} value={l} lang={l}>
+                    {nativeName(l)}
+                  </option>
+                ))}
+              </select>
+            </label>
           ) : null}
         </header>
 
         <p className="mt-4 text-[17px] font-semibold">
-          <bdi>{fill(g.hello, { name: data.guestName })}</bdi>
+          <bdi>{fill(g.hello, { name: isolate(data.guestName) })}</bdi>
         </p>
 
         {data.state === 'seated' && data.table ? (
@@ -120,7 +151,7 @@ function GuideBody({
             <h1 className="text-[20px] font-bold">{g.declined.title}</h1>
             <p className="mt-1.5 text-[14px] text-muted">{g.declined.body}</p>
             <a
-              href={data.inviteUrl}
+              href={inviteUrl}
               className="mt-4 inline-flex h-11 items-center rounded-full px-5 text-[14px] font-semibold"
               style={{ background: accent, color: accentInk }}
             >
@@ -196,7 +227,7 @@ function GuideBody({
         <footer className="mt-8 text-center text-[12px] leading-relaxed text-muted">
           {data.state !== 'declined' ? (
             <p>
-              <a href={data.inviteUrl} className="font-semibold text-ink underline">
+              <a href={inviteUrl} className="font-semibold text-ink underline">
                 {g.changeRsvp}
               </a>
             </p>

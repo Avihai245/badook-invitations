@@ -182,7 +182,7 @@ Footer: `Enviado con Badook` · Button: `Invitación y respuesta` · דוגמא�
 |---|---|
 | Category | **Utility** (מידע על אירוע שהאורח אישר שהוא מגיע אליו; אם Meta מסווגת אותו מחדש כ-Marketing, זה עדיין עובד, במחיר של Marketing) |
 | Name | `badook_table` (או שם אחר — אותו ערך ב-`INVITES_WHATSAPP_TABLE_TEMPLATE`) |
-| Language | Hebrew (`he`) — אותה שפה כמו `INVITES_WHATSAPP_TEMPLATE_LANG` |
+| Language | Hebrew (`he`), ואחר כך כל שפה אחרת מ-`INVITES_WHATSAPP_TEMPLATE_LANGS` (ראו "בכל שפה" למטה) |
 | Header | ללא |
 | Body | ראו למטה |
 | Footer | `נשלח באמצעות Badook` |
@@ -203,7 +203,13 @@ Footer: `Enviado con Badook` · Button: `Invitación y respuesta` · דוגמא�
 | `{{3}}` | מספר השולחן (ואם יש לו שם: `12 · שולחן המשפחה`) | `12` |
 | כפתור `{{1}}` | סוף הכתובת: ההזמנה, המפה והקישור האישי | `noa-and-itay/table?g=AbCdEfGhIjKlMnOp` |
 
-באנגלית (אותו שם, שפה `en`, כשהשליחה באנגלית — `INVITES_WHATSAPP_TEMPLATE_LANG=en`):
+**בכל שפה.** ההודעה על השולחן בוחרת שפה בדיוק כמו ההזמנה (סעיף 2א): השפה של המוזמן, אם היא ב-`INVITES_WHATSAPP_TEMPLATE_LANGS`; אחרת שפת ברירת המחדל של ההזמנה, ואחריה השפה הבאה של ההזמנה שכן ברשימה. הערכים (המארחים) בשפה שנבחרה, והכפתור פותח את המפה בשפה של המוזמן (סוף הכתובת כולל אז גם `&lang=<שפה>`; זה עדיין משתנה אחד). מוזמן באמהרית, שאין לה טמפלט ב-Meta, מקבל את ההודעה בשפת ההזמנה, והמפה נפתחת לו באמהרית.
+
+אותה רשימת שפות משמשת את שני הטמפלטים, ולכן מגישים את `badook_table` בכל שפה שכבר ב-`INVITES_WHATSAPP_TEMPLATE_LANGS`. אם שפה אושרה להזמנה ועדיין לא לשולחן, Meta עונה 132001 וההודעה נשלחת מיד שוב בשפה הבאה ולא נכשלת.
+
+בכל השפות: אותו שם (`badook_table`), Category **Utility**, Header ללא, כפתור Call to action → Visit website → **Dynamic** עם `https://invitations.badooks.com/e/{{1}}`, ואותם שלושה משתנים (1 המשפחה או המוזמן, 2 המארחים, 3 מספר השולחן). "שליחה מהוואטסאפ שלי" שולחת את אותו תוכן בשפה של המוזמן, עם הקישור בגוף ההודעה (`src/features/event-day/messages.ts`).
+
+**English (`en`)**
 
 ```
 Hi {{1}},
@@ -211,7 +217,53 @@ Your table at {{2}}’s event: {{3}}.
 The map in the button shows the way from the entrance to your table 👇
 ```
 
-Footer: `Sent with Badook`. Button: `Map & table` → `https://invitations.badooks.com/e/{{1}}`.
+Footer: `Sent with Badook` · Button: `Map & table` · דוגמאות: `The Levi family`, `Noa & Itay`, `12`
+
+**Русский (`ru`)**
+
+```
+Здравствуйте, {{1}}!
+Вас ждут на празднике: {{2}}.
+Ваш стол: {{3}}.
+Карта по кнопке покажет путь от входа к вашему столу 👇
+```
+
+Footer: `Отправлено через Badook` · Button: `Карта и стол` · דוגמאות: `Семья Леви`, `Ноа & Итай`, `12`
+
+**العربية (`ar`)**
+
+```
+مرحبًا {{1}}،
+طاولتكم في حفل {{2}}: {{3}}.
+الخريطة في الزر تُظهر الطريق من المدخل إلى طاولتكم 👇
+```
+
+Footer: `أُرسلت عبر Badook` · Button: `الخريطة والطاولة` · דוגמאות: `عائلة ليفي`, `نوعا & إيتاي`, `12`
+
+**Français (`fr`)**
+
+```
+Bonjour {{1}},
+On vous attend à la fête : {{2}}.
+Votre table : {{3}}.
+Le plan du bouton montre le chemin depuis l’entrée jusqu’à votre table 👇
+```
+
+Footer: `Envoyé via Badook` · Button: `Plan et table` · דוגמאות: `Famille Lévy`, `Noa & Itay`, `12`
+
+**Español (`es`)**
+
+```
+¡Hola, {{1}}!
+Tu mesa en la celebración de {{2}}: {{3}}.
+El plano del botón muestra el camino desde la entrada hasta tu mesa 👇
+```
+
+Footer: `Enviado con Badook` · Button: `Plano y mesa` · דוגמאות: `Familia Leví`, `Noa & Itay`, `12`
+
+**אמהרית** — אין טמפלט (ל-Meta אין אמהרית); ההודעה מהוואטסאפ של המארחים כתובה גם באמהרית.
+
+> אחרי שינוי בטקסט של הטמפלט צריך אישור מחדש של Meta, וכדאי לעדכן גם את ההודעה מהוואטסאפ של המארחים (`src/features/event-day/messages.ts`), שתגיד אותו דבר.
 
 - **משתנה סביבה:** `INVITES_WHATSAPP_TABLE_TEMPLATE=badook_table` (ריק — ברירת המחדל — משאיר את השליחה מהמספר הרשמי כבויה). צריך גם את משתני החיבור מסעיף 3. אחרי השינוי: build חדש.
 - **קרדיטים:** קרדיט אחד להודעה, כמו בהזמנות, ואותו החזר על מה שלא נמסר; לא נשלח ולא מחויב מי שאין לו נייד, מספר קווי, מי שביקש הסרה, משפחה בלי שולחן, או הודעה עם אותו מספר שכבר בדרך. הסטטוסים (נמסר, נקרא, נכשל) מגיעים באותו webhook (סעיף 4), והתור נשלח ברקע כמו ההזמנות (סעיף 5).

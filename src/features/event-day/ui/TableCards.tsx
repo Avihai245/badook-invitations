@@ -70,7 +70,11 @@ export function TableCards({
           <span className="text-[12px] font-semibold text-muted">{C.table}</span>
           <span className="text-[30px] leading-none font-bold tabular-nums">{c.table.number}</span>
         </p>
-        {c.table.label ? <p className="mt-0.5 truncate text-[11.5px] text-muted">{c.table.label}</p> : null}
+        {c.table.label ? (
+          <p className="mt-0.5 truncate text-[11.5px] text-muted">
+            <bdi>{c.table.label}</bdi>
+          </p>
+        ) : null}
       </div>
       {qr && c.qr ? (
         <div

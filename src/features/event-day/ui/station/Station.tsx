@@ -8,9 +8,10 @@ import type { RealtimeInfo } from '@/lib/live/types';
 import { codeFromScan } from '../../codes';
 import { EVENT_DAY } from '../../config';
 import { knownZone } from '../../live';
+import { isolate } from '../../messages';
 import type { Party, RecentCheckin, Totals } from '../../model';
 import type { StationPageData } from '../../server/pages';
-import { DayTextProvider, fill, useDayText, type GuestLocale } from '../guest-text';
+import { DayTextProvider, fill, useDayText, type StaffLocale } from '../guest-text';
 import { stationApi, type ArriveAnswer, type PartyAnswer, type StationState } from './api';
 import { startScanner, type Scanner, type ScanError } from './scanner';
 
@@ -27,18 +28,20 @@ export function Station({
 }: {
   data: StationPageData;
   token: string;
-  lang: GuestLocale | null;
+  lang: StaffLocale | null;
 }) {
-  const initial: GuestLocale = lang && data.event.locales.includes(lang) ? lang : data.event.defaultLocale;
-  const [locale, setLocale] = useState<GuestLocale>(initial);
+  // the event staff's page: Hebrew or English — the one asked for, else the invitation's when it is
+  // one of them, else Hebrew; the other one to switch to when the invitation has more languages
+  const initial: StaffLocale = lang ?? (data.event.defaultLocale === 'en' ? 'en' : 'he');
+  const [locale, setLocale] = useState<StaffLocale>(initial);
+  const other: StaffLocale | null = data.event.locales.some((l) => l !== locale)
+    ? locale === 'he'
+      ? 'en'
+      : 'he'
+    : null;
   return (
     <DayTextProvider locale={locale}>
-      <StationBody
-        data={data}
-        token={token}
-        other={data.event.locales.find((l) => l !== locale) ?? null}
-        onLocale={setLocale}
-      />
+      <StationBody data={data} token={token} other={other} onLocale={setLocale} />
     </DayTextProvider>
   );
 }
@@ -53,12 +56,14 @@ function StationBody({
 }: {
   data: StationPageData;
   token: string;
-  other: GuestLocale | null;
-  onLocale(l: GuestLocale): void;
+  other: StaffLocale | null;
+  onLocale(l: StaffLocale): void;
 }) {
   const { t, locale, plural, number, date } = useDayText();
   const s = t.station;
-  const title = data.event.titles[locale] || data.event.title;
+  // the hosts' names in the station's language when the invitation has it, else in its own
+  const titled = data.event.titles[locale];
+  const title = titled || data.event.title;
   const [totals, setTotals] = useState<Totals>(data.totals);
   const [recent, setRecent] = useState<RecentCheckin[]>(data.recent);
   const [realtime, setRealtime] = useState<RealtimeInfo | null>(data.realtime);
@@ -240,7 +245,7 @@ function StationBody({
         <header className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[12px] font-semibold tracking-wide text-muted uppercase">{s.eyebrow}</p>
-            <h1 className="truncate text-[18px] font-bold" lang={locale}>
+            <h1 className="truncate text-[18px] font-bold" lang={titled ? locale : data.event.defaultLocale}>
               <bdi>{title}</bdi>
             </h1>
             <p
@@ -411,7 +416,7 @@ function StationBody({
                       <bdi>{r.name}</bdi> <span className="font-normal text-muted">· {number(r.count)}</span>
                     </span>
                     <span className="block text-[12px] text-muted">
-                      {fill(s.at, { time: timeOf(r.at), station: stationLabel(r.station) })}
+                      {fill(s.at, { time: timeOf(r.at), station: isolate(stationLabel(r.station)) })}
                     </span>
                   </span>
                   <button
@@ -515,7 +520,9 @@ function StationBody({
                     {party.table ? fill(s.table, { number: party.table.number }) : s.noTable}
                   </p>
                   {party.table?.label ? (
-                    <p className="truncate text-[13px] text-muted">{party.table.label}</p>
+                    <p className="truncate text-[13px] text-muted">
+                      <bdi>{party.table.label}</bdi>
+                    </p>
                   ) : null}
                 </div>
                 <p className="mt-2 text-[13px] text-muted">

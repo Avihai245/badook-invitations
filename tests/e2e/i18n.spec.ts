@@ -2,13 +2,14 @@ import { expect, test, type Page } from '@playwright/test';
 import { Client } from 'pg';
 import { stubExternalMedia } from '../support/external';
 import { TEMPLATE_IDS } from '../../src/features/invitations/templates/registry';
+import { GUIDE_TEXT } from '../../src/lib/i18n/event-day-guide';
 
 // Seven languages: a guest reads the invitation in their own language — the personal link, the cover,
 // the RSVP — in Hebrew, English and Arabic (right to left, digits never mirrored); the language menu
 // across all seven; the language picked from the browser without a reload; the host's machine
-// translation that waits for review; WhatsApp in each guest's language; and the stress test: every
-// design in Russian and Arabic with every text 40% longer, on a phone and a desktop, with no
-// horizontal scroll and no clipped text.
+// translation that waits for review; WhatsApp in each guest's language; the event day's table guide
+// and table number in the guest's language; and the stress test: every design in Russian and Arabic
+// with every text 40% longer, on a phone and a desktop, with no horizontal scroll and no clipped text.
 
 const LOCAL = !process.env.PW_BASE_URL;
 const WHATSAPP = `http://127.0.0.1:${Number(process.env.PW_WHATSAPP_PORT || 54340)}`;
@@ -486,6 +487,162 @@ test.describe('seven languages', () => {
     // Meta hasn't approved the Arabic template here (the stand-in says 132001): the invitation's Hebrew
     const [samir] = await sentTo(3);
     expect(samir).toMatchObject({ language: 'he', button: `${slug}?g=${token('سمير حداد')}` });
+  });
+
+  test('the event day speaks the guest’s language: their table guide, and their table number on WhatsApp', async ({
+    page,
+    request,
+  }, testInfo) => {
+    test.skip(!LOCAL, 'reads the database');
+    test.skip(testInfo.project.name !== 'mobile', 'one run, on the guest’s phone');
+    test.setTimeout(120_000);
+    const errors = collectErrors(page);
+    const email = `i18n-day-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
+    await signUp(page, email);
+    // a plan with the table guide, and credits for the table numbers
+    await query(
+      `insert into accounts (user_id, plan, message_credits) select id, 'business', 10 from auth.users where email = $1
+       on conflict (user_id) do update set plan = excluded.plan, message_credits = excluded.message_credits`,
+      [email],
+    );
+    const created = await createInvitation(page, ['he', 'en', 'ru', 'ar'], 'he');
+    const slug = await publishFilled(page, created.id);
+    const suffix = String(Math.floor(Math.random() * 1e6)).padStart(6, '0');
+    const families = [
+      { name: 'משפחת כהן', language: null, table: 12 },
+      { name: 'Семья Ивановых', language: 'ru', table: 12 },
+      { name: 'عائلة حداد', language: 'ar', table: 3 },
+    ].map((f, i) => ({ ...f, phone: `+9725${suffix}${i}2`, token: `i18nday${suffix}${i}abcdefghij` }));
+    for (const f of families) {
+      const [g] = await query<{ id: string }>(
+        `insert into invitation_guests (invitation_id, name, party_size, phone, token, preferred_language)
+         values ($1, $2, 2, $3, $4, $5) returning id`,
+        [created.id, f.name, f.phone, f.token, f.language],
+      );
+      await query(
+        `insert into rsvp_responses (invitation_id, attending, locale, primary_name, adults_count, children_count, edit_token_hash, guest_id)
+         values ($1, true, 'he', $2, 2, 0, $3, $4)`,
+        [created.id, f.name, `h-${Math.random()}`, g!.id],
+      );
+    }
+    // the tables, and who sits where: the seating screen's own save
+    const seated = await page.evaluate(
+      async ({ id, seats }) => {
+        const state = (
+          (await (await fetch(`/api/invitations/${id}/seating`)).json()) as {
+            state: {
+              version: number;
+              plan: Record<string, unknown> & { layout: Record<string, unknown> };
+              units: { id: string; name: string }[];
+            };
+          }
+        ).state;
+        const table = (number: number, x: number) => ({
+          id: crypto.randomUUID(),
+          number,
+          label: null,
+          shape: 'round',
+          capacity: 10,
+          x,
+          y: 4,
+          w: 1.8,
+          h: 1.8,
+          rotation: 0,
+          zones: [],
+          locked: false,
+        });
+        const tables = [table(12, 6), table(3, 12)];
+        const ids = Object.fromEntries(tables.map((t) => [t.number, t.id]));
+        const assignments: Record<string, { tableId: string; source: 'host' }> = {};
+        for (const s of seats) {
+          const unit = state.units.find((u) => u.name === s.name)!;
+          assignments[unit.id] = { tableId: ids[s.table]!, source: 'host' };
+        }
+        const entrance = { id: crypto.randomUUID(), kind: 'entrance', x: 2, y: 11, w: 2, h: 0.6 };
+        const plan = {
+          ...state.plan,
+          tables,
+          assignments,
+          layout: { ...state.plan.layout, landmarks: [{ ...entrance, rotation: 0, label: null }] },
+        };
+        const res = await fetch(`/api/invitations/${id}/seating`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ version: state.version, plan }),
+        });
+        return { status: res.status, units: state.units.map((u) => u.id) };
+      },
+      { id: created.id, seats: families },
+    );
+    expect(seated.status).toBe(200);
+
+    // the guide opens in the guest's own language — Russian left to right, Arabic right to left
+    const [cohen, ivanov, haddad] = families;
+    await page.goto(`/e/${slug}/table?g=${ivanov!.token}`);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+    await expect(page.getByTestId('guide-table')).toContainText(GUIDE_TEXT.ru.guide.yourTable);
+    await expect(page.getByTestId('guide-table-number')).toHaveText('12');
+    await expect(page.getByText('Здравствуйте, Семья Ивановых')).toBeVisible();
+    await page.goto(`/e/${slug}/table?g=${haddad!.token}`);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.getByTestId('guide-table')).toContainText(GUIDE_TEXT.ar.guide.yourTable);
+    await expect(page.getByTestId('guide-table-number')).toHaveText('3');
+    expect(await digitsLeftToRight(page, '[data-testid="guide-table"]', '3')).toBe(true);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBe(0);
+    // any of the invitation's languages from its menu; the address keeps the choice
+    await page.getByTestId('guide-language').selectOption('ru');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
+    await expect(page.getByTestId('guide-table')).toContainText(GUIDE_TEXT.ru.guide.yourTable);
+    await expect(page).toHaveURL(/lang=ru/);
+    // no language of their own: the invitation's
+    await page.goto(`/e/${slug}/table?g=${cohen!.token}`);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'he');
+
+    // the table number on WhatsApp: in the guest's language when its template is approved, else the
+    // invitation's (the stand-in refuses Arabic); the button opens the guide in their language
+    const sent = await page.evaluate(
+      async ({ id, unitIds }) => {
+        const res = await fetch(`/api/invitations/${id}/seating/notices`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'send', unitIds }),
+        });
+        return res.status;
+      },
+      { id: created.id, unitIds: seated.units },
+    );
+    expect(sent).toBe(200);
+    const sentTo = async (phone: string) =>
+      (await (await request.get(`${WHATSAPP}/__sent?to=${phone.replace(/^\+/, '')}`)).json()) as {
+        template: string;
+        language: string;
+        params: string[];
+        button: string;
+      }[];
+    await expect.poll(async () => (await sentTo(ivanov!.phone)).length, { timeout: 20_000 }).toBe(1);
+    const [ru] = await sentTo(ivanov!.phone);
+    expect(ru).toMatchObject({
+      template: 'badook_table',
+      language: 'ru',
+      params: ['Семья Ивановых', `${NAMES.ru.primary} & ${NAMES.ru.secondary}`, '12'],
+      button: `${slug}/table?g=${ivanov!.token}&lang=ru`,
+    });
+    await expect.poll(async () => (await sentTo(haddad!.phone)).length, { timeout: 20_000 }).toBe(1);
+    const [ar] = await sentTo(haddad!.phone);
+    expect(ar).toMatchObject({
+      template: 'badook_table',
+      language: 'he',
+      params: ['عائلة حداد', `${NAMES.he.primary} & ${NAMES.he.secondary}`, '3'],
+      button: `${slug}/table?g=${haddad!.token}`,
+    });
+    await expect.poll(async () => (await sentTo(cohen!.phone)).length, { timeout: 20_000 }).toBe(1);
+    expect((await sentTo(cohen!.phone))[0]).toMatchObject({ language: 'he' });
+    expect(errors).toEqual([]);
   });
 
   test('the host adds English, translates it automatically, reviews — publishing waits for the review', async ({

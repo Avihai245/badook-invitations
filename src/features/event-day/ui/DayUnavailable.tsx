@@ -1,25 +1,24 @@
 import { LinkIcon } from 'lucide-react';
+import { dirOf, type Locale } from '@/features/invitations/contracts/types';
 import { eventDayGuestEn } from '@/lib/i18n/event-day-guest.en';
 import { eventDayGuestHe } from '@/lib/i18n/event-day-guest.he';
+import { GUIDE_TEXT } from '@/lib/i18n/event-day-guide';
 
 /**
  * The event day's pages when their link opens nothing (unknown, replaced, the feature off) or the
- * network sent too many requests — in the page's language, with nothing about the event.
+ * network sent too many requests — in the page's language, with nothing about the event: a guide's in
+ * any invitation language, the station's in Hebrew or English.
  */
-export function DayUnavailable({
-  locale,
-  kind,
-}: {
-  locale: 'he' | 'en';
-  kind: 'guide' | 'station' | 'rate';
-}) {
-  const t = locale === 'en' ? eventDayGuestEn : eventDayGuestHe;
-  const text = kind === 'station' ? t.station.gone : kind === 'rate' ? t.guide.rate : t.guide.unavailable;
+export function DayUnavailable({ locale, kind }: { locale: Locale; kind: 'guide' | 'station' | 'rate' }) {
+  const staff = locale === 'en' ? eventDayGuestEn : eventDayGuestHe;
+  const guide = GUIDE_TEXT[locale].guide;
+  const text = kind === 'station' ? staff.station.gone : kind === 'rate' ? guide.rate : guide.unavailable;
+  const lang: Locale = kind === 'station' ? (locale === 'en' ? 'en' : 'he') : locale;
   return (
     <main
       className="grid min-h-dvh place-items-center bg-canvas px-6 py-10"
-      lang={locale}
-      dir={locale === 'he' ? 'rtl' : 'ltr'}
+      lang={lang}
+      dir={dirOf(lang)}
       data-testid="day-unavailable"
     >
       <div className="max-w-[420px] text-center">

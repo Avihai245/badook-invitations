@@ -84,20 +84,34 @@ const unit = (name: string, from: number | null, to: number | null, id = name) =
 
 describe('the history of changes, in words', () => {
   const say = (c: SeatingChange) => describeChange(c, ui as unknown as Ui);
+  // a family's name is isolated (FSI…PDI): in any script, it never takes the numbers after it along
+  const iso = (name: string) => `\u2068${name}\u2069`;
 
   it('a family moved, seated, or left without a table', () => {
     expect(say(change({ units: [unit('משפחת לוי', 12, 7)] }))).toEqual({
-      head: 'משפחת לוי: משולחן 12 לשולחן 7',
+      head: `${iso('משפחת לוי')}: משולחן 12 לשולחן 7`,
       lines: [],
     });
-    expect(say(change({ units: [unit('משפחת לוי', null, 7)] })).head).toBe('משפחת לוי: לשולחן 7');
-    expect(say(change({ units: [unit('משפחת לוי', 12, null)] })).head).toBe('משפחת לוי: משולחן 12 בלי שולחן');
+    expect(say(change({ units: [unit('משפחת לוי', null, 7)] })).head).toBe(`${iso('משפחת לוי')}: לשולחן 7`);
+    expect(say(change({ units: [unit('משפחת לוי', 12, null)] })).head).toBe(
+      `${iso('משפחת לוי')}: משולחן 12 בלי שולחן`,
+    );
+    // a Latin or an Arabic name in the Hebrew sentence stays whole
+    expect(say(change({ units: [unit('Emma Stone 2', 12, 7)] })).head).toBe(
+      `${iso('Emma Stone 2')}: משולחן 12 לשולחן 7`,
+    );
+    expect(say(change({ units: [unit('عائلة حداد', 12, 7)] })).head).toBe(
+      `${iso('عائلة حداد')}: משולחן 12 לשולחן 7`,
+    );
   });
 
   it('several families: how many, and each one', () => {
     const d = say(change({ units: [unit('משפחת לוי', 12, 7), unit('משפחת כהן', 12, 3)] }));
     expect(d.head).toBe('2 משפחות הועברו');
-    expect(d.lines).toEqual(['משפחת לוי: משולחן 12 לשולחן 7', 'משפחת כהן: משולחן 12 לשולחן 3']);
+    expect(d.lines).toEqual([
+      `${iso('משפחת לוי')}: משולחן 12 לשולחן 7`,
+      `${iso('משפחת כהן')}: משולחן 12 לשולחן 3`,
+    ]);
   });
 
   it('a merge names the two tables; undoing it is the families going back', () => {

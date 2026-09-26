@@ -6,6 +6,7 @@ import { Button, Checkbox, Dialog, Field, IconButton, Input, cn } from '@/compon
 import { loginUrl } from '@/features/invitations/app/api';
 import { useUi } from '@/lib/i18n/client';
 import { EVENT_DAY } from '../../config';
+import { isolate } from '../../messages';
 import { fits, liveSeats, type TableFill } from '../../live';
 import type { Party, Told } from '../../model';
 import { dayApi, type ReseatAnswer } from '../host-api';
@@ -43,7 +44,7 @@ export function ArriveDialog({
     <Dialog
       open
       onOpenChange={(o) => !o && onClose()}
-      title={fmt(a.title, { name: party.name })}
+      title={fmt(a.title, { name: isolate(party.name) })}
       description={
         party.seats
           ? fmt(t.eventDay.sheet.arrived, { arrived: number(party.arrived), seats: number(party.seats) })
@@ -282,7 +283,7 @@ export function MoveDialog({
     <Dialog
       open
       onOpenChange={(o) => !o && onClose()}
-      title={fmt(m.title, { name: party.name })}
+      title={fmt(m.title, { name: isolate(party.name) })}
       description={m.body}
       closeLabel={t.common.close}
       className="max-w-[620px]"

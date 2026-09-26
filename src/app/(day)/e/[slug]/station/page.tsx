@@ -23,8 +23,9 @@ export async function generateMetadata({ searchParams }: { searchParams: Search 
   const q = await searchParams;
   const data = await load(one(q.t));
   const page = data && data !== 'rate' ? data : null;
-  const lang =
-    one(q.lang) === 'en' ? 'en' : one(q.lang) === 'he' ? 'he' : (page?.event.defaultLocale ?? 'he');
+  // the staff's page: Hebrew or English (Station.tsx)
+  const asked = one(q.lang);
+  const lang = asked === 'en' || asked === 'he' ? asked : page?.event.defaultLocale === 'en' ? 'en' : 'he';
   const t = lang === 'en' ? eventDayGuestEn : eventDayGuestHe;
   const name = page ? page.event.titles[lang] || page.event.title : '';
   return {
