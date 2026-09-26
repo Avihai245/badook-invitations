@@ -401,10 +401,14 @@ a {
   font-size: 15px;
   letter-spacing: var(--track-wide);
   color: var(--cover-hint, #7c6a60);
-  opacity: 0;
-  /* soon after the cover itself: on a cover without a picture or a monogram this line is the largest
-     text of the first screen — the page's LCP (npm run perf:templates) */
-  animation: fadeIn 0.8s 0.3s var(--ease) forwards;
+  /* on screen with the cover, rising a little: the call to action — and on a cover without a picture
+     or a monogram the largest text of the first screen, the page's LCP (npm run perf:templates) */
+  animation: hintIn 0.9s var(--ease) both;
+}
+@keyframes hintIn {
+  from {
+    transform: translateY(8px);
+  }
 }
 :root[lang='en'] .cover-hint {
   text-transform: uppercase;
@@ -633,6 +637,9 @@ a {
   .cover,
   .cover:not(.cover-video).gone {
     transition: opacity 0.3s linear;
+  }
+  .cover-hint {
+    animation: none;
   }
   .cover::before,
   .env-back::after,

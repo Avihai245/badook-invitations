@@ -38,7 +38,14 @@ export function InvitationHtml({
         {displayFontPreloads(pair, locale).map((href) => (
           <link key={href} rel="preload" as="font" type="font/woff2" href={href} crossOrigin="anonymous" />
         ))}
-        <style dangerouslySetInnerHTML={{ __html: fontCss }} />
+        {/* A style resource (href + precedence): React writes it into the head by itself, outside the
+            page's shell — which stays small enough for the cover to arrive with the first bytes
+            (InvitationBody: a shell over ~12.8 KB streams every boundary separately, revealed later). */}
+        <style
+          href={`invitation-fonts-${template.id}-${pair.id}`}
+          precedence="invitation-fonts"
+          dangerouslySetInnerHTML={{ __html: fontCss }}
+        />
         {/* Reveal animations only when JS runs — without it everything stays visible. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.remove('no-js')" }} />
         {/* an optimized image that fails falls back to its original address (renderer/images.ts) */}

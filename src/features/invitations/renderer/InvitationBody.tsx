@@ -102,48 +102,61 @@ export function InvitationBody({
         }
       : null;
 
-  // The Suspense boundary contains any suspension while hydrating (a client chunk still loading on a
-  // slow first visit): without it React replays the root with a stale hydration cursor and regenerates
-  // the whole document (React #418), losing the pre-hydration state on <html>/<body>. The server
-  // renders everything (nothing suspends there), so the HTML is unchanged.
+  // Suspense boundaries contain any suspension while hydrating (a client chunk still loading on a
+  // slow first visit): without them React replays the root with a stale hydration cursor and
+  // regenerates the whole document (React #418), losing the pre-hydration state on <html>/<body>. The
+  // server renders everything (nothing suspends there). Two of them, the cover first: React streams a
+  // boundary that would make the page's first bytes too long (the shell and the boundaries before it
+  // over ~12.8 KB) separately, and reveals it only a moment after the first paint (≥ 300 ms, React
+  // 19.2) — moving it into place, which restarts its CSS animations. So the cover, small for most
+  // designs, comes with the shell and paints at once; the sections under it follow.
   return (
-    <Suspense fallback={null}>
-      <div className="inv" data-mode={ctx.mode}>
-        {coverOn ? (
-          <>
-            <script dangerouslySetInnerHTML={{ __html: skipCoverFromUrl ? SKIP_OR_LOCK : LOCK }} />
-            <CoverOverlay
-              locale={ctx.locale}
-              style={template.cover.style}
-              overlay={{
-                kind: template.cover.overlay.kind,
-                exit: template.cover.overlay.exit,
-                recolor: template.cover.overlay.recolor,
-                size: template.cover.overlay.size,
-                offset: template.cover.overlay.offset,
-                text: template.cover.overlay.text,
-              }}
-              sealColor={
-                template.cover.overlay.recolor
-                  ? (doc.cover.sealColor ?? template.cover.sealColors[0] ?? null)
-                  : null
-              }
-              media={ctx.coverMedia}
-              monogram={ctx.text(doc.cover.monogram)}
-              hint={ctx.text(doc.cover.hint) || ctx.t(opening ? OPENING_HINT[opening.preset] : 'cover.hint')}
-              skipLabel={ctx.t('cover.skip')}
-              skipFromUrl={skipCoverFromUrl}
-              card={
-                ctx.art.scene ? <Scene id={ctx.art.scene} place="card" date={doc.event.date} /> : undefined
-              }
-              fx={{ burst: fx.burst, colors: fx.burstColors }}
-              opening={opening}
-              scrollLabel={ctx.t('cover.scroll')}
-            />
-          </>
-        ) : (
-          <script dangerouslySetInnerHTML={{ __html: "document.documentElement.dataset.opened='1'" }} />
-        )}
+    <div className="inv" data-mode={ctx.mode}>
+      {coverOn ? (
+        <script dangerouslySetInnerHTML={{ __html: skipCoverFromUrl ? SKIP_OR_LOCK : LOCK }} />
+      ) : (
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.dataset.opened='1'" }} />
+      )}
+      {coverOn ? (
+        <Suspense fallback={null}>
+          <CoverOverlay
+            locale={ctx.locale}
+            style={template.cover.style}
+            overlay={{
+              kind: template.cover.overlay.kind,
+              exit: template.cover.overlay.exit,
+              recolor: template.cover.overlay.recolor,
+              size: template.cover.overlay.size,
+              offset: template.cover.overlay.offset,
+              text: template.cover.overlay.text,
+            }}
+            sealColor={
+              template.cover.overlay.recolor
+                ? (doc.cover.sealColor ?? template.cover.sealColors[0] ?? null)
+                : null
+            }
+            media={ctx.coverMedia}
+            monogram={ctx.text(doc.cover.monogram)}
+            hint={ctx.text(doc.cover.hint) || ctx.t(opening ? OPENING_HINT[opening.preset] : 'cover.hint')}
+            skipLabel={ctx.t('cover.skip')}
+            skipFromUrl={skipCoverFromUrl}
+            card={
+              // a drawn design's scene (a large drawing) streams after the cover: it is on the card inside
+              // the closed envelope, and the cover itself stays small enough to come with the first bytes.
+              // A cinematic opening draws no card.
+              ctx.art.scene && !opening ? (
+                <Suspense fallback={null}>
+                  <Scene id={ctx.art.scene} place="card" date={doc.event.date} />
+                </Suspense>
+              ) : undefined
+            }
+            fx={{ burst: fx.burst, colors: fx.burstColors }}
+            opening={opening}
+            scrollLabel={ctx.t('cover.scroll')}
+          />
+        </Suspense>
+      ) : null}
+      <Suspense fallback={null}>
         {live && doc.locales.length > 1 ? (
           <LiveLocale initial={ctx.locale} payload={live} music={music}>
             <InvitationSections ctx={ctx} />
@@ -164,7 +177,7 @@ export function InvitationBody({
         <ScrollEngine />
         <FitNames />
         {ctx.mode === 'live' ? <GuestLink slug={doc.share.slug} /> : null}
-      </div>
-    </Suspense>
+      </Suspense>
+    </div>
   );
 }
