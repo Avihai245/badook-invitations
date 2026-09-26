@@ -21,5 +21,9 @@
   "followUp.body": "All the details are waiting in the full invitation.",
   "followUp.cta": "View the invitation",
   "guest.sample": "Dana",
-  "cover.scroll": "Scroll to enter"
+  "cover.scroll": "Scroll to enter",
+  "cover.hint.gate": "Tap to open the gate",
+  "cover.hint.curtain": "Tap to open the curtain",
+  "cover.hint.fireworks": "Tap to light up the sky",
+  "cover.hint.gold_dust": "Tap to open"
 }

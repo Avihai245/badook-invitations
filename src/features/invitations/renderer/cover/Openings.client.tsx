@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import type { Locale } from '../../contracts/types';
+import { visibleGlyphCount } from '../../lib/text';
 import { seeded } from '../fx/motion';
 import { fireworks, goldDust } from '../fx/sparks';
 import type { Opening } from './opening';
@@ -150,6 +151,8 @@ export function CinematicCover({
     '--co-light': opening.light,
     '--co-deep': opening.deep,
     '--co-gold': opening.gold,
+    // a longer monogram (a name and an age: "DANA 30") sets smaller on the medal and the crest
+    '--co-glyphs': Math.max(3, visibleGlyphCount(monogram)),
   } as CSSProperties;
   const mono = monogram ? <span className="co-mono">{monogram}</span> : null;
 

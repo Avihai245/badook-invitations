@@ -169,7 +169,9 @@ export default async function RenderPage({ params, searchParams }: { params: Par
     ? (openingParam as OpeningPreset)
     : doc.cover.opening;
   const env = serverEnv();
-  const rendered = { ...doc, sections, music, cover: { ...doc.cover, opening } };
+  // another opening than the document's: its own call to action, not the template's seeded one
+  const hint = opening && opening !== 'envelope' && opening !== doc.cover.opening ? null : doc.cover.hint;
+  const rendered = { ...doc, sections, music, cover: { ...doc.cover, opening, hint } };
   const options: Omit<RenderOptions, 'mode'> = {
     brand: env.INVITES_BRAND_NAME,
     cinematic: one(sp.cinematic) !== '0',

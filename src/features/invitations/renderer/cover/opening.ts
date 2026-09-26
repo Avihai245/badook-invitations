@@ -28,19 +28,23 @@ export interface Opening {
 
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 
-/** A default color per opening, from the palette: lacquered doors, velvet, a night sky, a dark veil. */
+/**
+ * A default color per opening, from the palette: lacquered doors, velvet, a night sky, a dark veil —
+ * all in the design's dark tone (its ink on a light design, its background on a dark one).
+ */
 function colorFor(preset: Opening['preset'], palette: Palette): string {
+  const dark = relativeLuminance(palette.ink) <= relativeLuminance(palette.bg) ? palette.ink : palette.bg;
   const deep =
     relativeLuminance(palette.accent) < 0.2 ? palette.accent : mixHex(palette.accent, '#000000', 0.35);
   switch (preset) {
     case 'gate':
-      return mixHex(palette.ink, deep, 0.5);
+      return mixHex(dark, deep, 0.5);
     case 'curtain':
       return deep;
     case 'fireworks':
-      return mixHex(palette.ink, '#0B0D1C', 0.72);
+      return mixHex(dark, '#0B0D1C', 0.72);
     case 'gold_dust':
-      return mixHex(palette.ink, '#120C08', 0.6);
+      return mixHex(dark, '#120C08', 0.6);
   }
 }
 

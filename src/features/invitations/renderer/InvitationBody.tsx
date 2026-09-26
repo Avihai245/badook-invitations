@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import type { Locale } from '../contracts/types';
+import type { DictKey } from '../i18n/dictionary';
 import type { RenderContext } from './context-core';
 import { CoverOverlay } from './cover/CoverOverlay.client';
-import { resolveOpening } from './cover/opening';
+import { resolveOpening, type Opening } from './cover/opening';
 import { FitNames } from './FitNames.client';
 import { FloatingControls, type MusicProps } from './FloatingControls.client';
 import { fxTheme } from './fx/theme';
@@ -42,6 +43,17 @@ const SKIP_OR_LOCK =
   '}';
 
 /**
+ * A cinematic opening's own call to action — when the host wrote none (the template's seeded hint
+ * speaks of its own cover: "tap to open the envelope").
+ */
+const OPENING_HINT = {
+  gate: 'cover.hint.gate',
+  curtain: 'cover.hint.curtain',
+  fireworks: 'cover.hint.fireworks',
+  gold_dust: 'cover.hint.gold_dust',
+} as const satisfies Record<Opening['preset'], DictKey>;
+
+/**
  * The single renderer body used by the public page, the preview link, the editor preview frame and
  * the kitchen sink (§5 — the same renderer everywhere). Section order = document order.
  */
@@ -70,6 +82,9 @@ export function InvitationBody({
 }) {
   const { doc, template } = ctx;
   const coverOn = showCover && doc.cover.enabled && ctx.mode === 'live';
+  const opening = coverOn
+    ? resolveOpening(template, doc, resolvePalette(template, doc), ctx.cinematic)
+    : null;
   const fx = fxTheme(template, doc);
   const nextLocale = doc.locales[(doc.locales.indexOf(ctx.locale) + 1) % doc.locales.length] as Locale;
   // the host's "video sound" option: the hero video's own sound instead of the track (HeroMedia)
@@ -115,14 +130,14 @@ export function InvitationBody({
               }
               media={ctx.coverMedia}
               monogram={ctx.text(doc.cover.monogram)}
-              hint={ctx.text(doc.cover.hint) || ctx.t('cover.hint')}
+              hint={ctx.text(doc.cover.hint) || ctx.t(opening ? OPENING_HINT[opening.preset] : 'cover.hint')}
               skipLabel={ctx.t('cover.skip')}
               skipFromUrl={skipCoverFromUrl}
               card={
                 ctx.art.scene ? <Scene id={ctx.art.scene} place="card" date={doc.event.date} /> : undefined
               }
               fx={{ burst: fx.burst, colors: fx.burstColors }}
-              opening={resolveOpening(template, doc, resolvePalette(template, doc), ctx.cinematic)}
+              opening={opening}
               scrollLabel={ctx.t('cover.scroll')}
             />
           </>

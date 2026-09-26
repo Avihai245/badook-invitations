@@ -7,7 +7,7 @@ import {
   type TemplateManifest,
 } from '@/features/invitations/contracts/types';
 import { cinematicDocument } from '@/features/invitations/dev/cinematic-demo';
-import { contrastRatio } from '@/features/invitations/lib/contrast';
+import { contrastRatio, relativeLuminance } from '@/features/invitations/lib/contrast';
 import {
   hasPresentation,
   sectionPresentation,
@@ -377,6 +377,19 @@ describe('the openings', () => {
     );
   });
 
+  it('its colors come from the design’s dark tone — on a dark design too (a night sky, not a gray one)', () => {
+    for (const id of ['sahar-bordeaux', 'neon-night', 'midnight-bloom', 'cocoa-teddy']) {
+      const m = requireTemplate(id).manifest;
+      const d = demoDocument(id);
+      for (const preset of ['gate', 'fireworks', 'gold_dust'] as const) {
+        const o = resolveOpening(m, { cover: { ...d.cover, opening: preset } }, m.tokens.palette, true)!;
+        expect(relativeLuminance(o.color), `${id} ${preset}`).toBeLessThan(
+          preset === 'fireworks' ? 0.03 : 0.1,
+        );
+      }
+    }
+  });
+
   it('the template’s opening settings apply to its own preset', () => {
     const own = {
       ...t,
@@ -402,6 +415,23 @@ describe('the openings', () => {
       motion: 'swing',
       scroll: true,
     });
+  });
+
+  it('an opening’s own call to action when the host wrote none; the host’s words when they did', () => {
+    const render = (hint: InvitationDocument['cover']['hint'], locale: 'he' | 'en') =>
+      renderToStaticMarkup(
+        <InvitationBody
+          ctx={{
+            ...ctxOf({ ...doc, cover: { ...doc.cover, opening: 'gate', hint } }, { locale }),
+            mode: 'live',
+          }}
+          showCover
+          langSwitchHref={null}
+        />,
+      );
+    expect(render(null, 'he')).toContain('aria-label="לחצו לפתיחת השער"');
+    expect(render(null, 'en')).toContain('aria-label="Tap to open the gate"');
+    expect(render({ he: 'היכנסו', en: 'Come in' }, 'en')).toContain('aria-label="Come in"');
   });
 
   it('renders each opening with the monogram as text and the hint as the button’s label', () => {
