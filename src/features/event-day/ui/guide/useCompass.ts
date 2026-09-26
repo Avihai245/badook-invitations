@@ -35,7 +35,9 @@ export function useCompass() {
   const [heading, setHeading] = useState<number | null>(null);
   const smooth = useRef<number | null>(null);
   const cleanup = useRef<(() => void) | null>(null);
-  const supported = typeof window !== 'undefined' && 'DeviceOrientationEvent' in window;
+  // known after the first render (the server's page has no window: the same first render on both)
+  const [supported, setSupported] = useState(false);
+  useEffect(() => setSupported('DeviceOrientationEvent' in window), []);
 
   const stop = useCallback(() => {
     cleanup.current?.();

@@ -42,6 +42,7 @@ import {
   HEAT,
   arrivalTimeline,
   halfEmptyAlerts,
+  knownZone,
   mergeSuggestions,
   released,
   tableFills,
@@ -65,17 +66,6 @@ type Action =
   | { kind: 'arrive'; party: Party }
   | { kind: 'move'; party: Party }
   | { kind: 'merge'; from: TableFill; into: string | null };
-
-/** A zone the browser knows (else the times are the host's own). */
-function knownZone(zone: string | null): string | undefined {
-  if (!zone) return undefined;
-  try {
-    new Intl.DateTimeFormat('en', { timeZone: zone });
-    return zone;
-  } catch {
-    return undefined;
-  }
-}
 
 type HelpKey = Exclude<keyof ReturnType<typeof useUi>['t']['eventDay']['help'], 'title'>;
 const HELP: { key: HelpKey; icon: LucideIcon }[] = [

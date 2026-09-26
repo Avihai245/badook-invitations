@@ -24,6 +24,20 @@ export function eventStartMs(
   }
 }
 
+/**
+ * A time zone the runtime knows (else undefined: the device's own). The event's times — arrivals on
+ * the host's screen and at the stations — are the venue's, the same on the server and on any phone.
+ */
+export function knownZone(zone: string | null | undefined): string | undefined {
+  if (!zone) return undefined;
+  try {
+    new Intl.DateTimeFormat('en', { timeZone: zone });
+    return zone;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Past the grace time: a family that hasn't arrived counts as not coming (its seats are free). */
 export const released = (startMs: number | null, now: number): boolean =>
   startMs !== null && now >= startMs + EVENT_DAY.graceMinutes * 60_000;

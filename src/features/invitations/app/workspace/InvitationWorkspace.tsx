@@ -153,7 +153,9 @@ export function InvitationWorkspace({
                   <bdi>{name}</bdi>
                 </p>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
-                  <span>
+                  {/* the server's and the browser's Intl may punctuate a long date differently ("Thursday, 17
+                      June" / "Thursday 17 June"): either is right, and it mustn't fail the page's hydration */}
+                  <span suppressHydrationWarning>
                     {date(item.date, {
                       weekday: 'long',
                       day: 'numeric',

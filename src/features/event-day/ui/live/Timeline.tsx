@@ -1,13 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useUi } from '@/lib/i18n/client';
 import type { TimelineBar } from '../../live';
+
+const H = 190;
+const LEFT = 30;
+const RIGHT = 8;
+const TOP = 10;
+const BOTTOM = 24;
 
 /**
  * Arrivals over time: one column per 5 minutes (a single series — no legend box; the title names it),
  * thin columns with a rounded top growing from one baseline, hairline gridlines, a tooltip on each
- * column (and on keyboard focus), and the same numbers as a table for screen readers.
+ * column (and on keyboard focus), and the same numbers as a table for screen readers. Drawn at the
+ * width it has (a phone's text is as big as a desktop's).
  */
 export function Timeline({
   bars,
@@ -22,17 +29,25 @@ export function Timeline({
   const { t, fmt, number, date } = useUi();
   const tl = t.eventDay.timeline;
   const [hover, setHover] = useState<number | null>(null);
+  const figure = useRef<HTMLElement>(null);
+  const [W, setW] = useState(640);
+  useEffect(() => {
+    const el = figure.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const measure = () => el.clientWidth && setW(el.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [bars.length]);
+
   if (!bars.length) return <p className="py-6 text-center text-[13px] text-muted">{tl.empty}</p>;
   const max = Math.max(1, ...bars.map((b) => b.people));
   // clean ticks: 0, a round top
   const step = max <= 5 ? 1 : max <= 10 ? 2 : max <= 25 ? 5 : max <= 50 ? 10 : 25;
   const top = Math.ceil(max / step) * step;
-  const W = 640;
-  const H = 180;
-  const left = 30;
-  const bottom = 22;
-  const plotW = W - left - 8;
-  const plotH = H - bottom - 8;
+  const plotW = W - LEFT - RIGHT;
+  const plotH = H - TOP - BOTTOM;
   const slot = plotW / bars.length;
   const barW = Math.min(24, Math.max(3, slot - 2));
   const time = (ms: number) => date(ms, { hour: '2-digit', minute: '2-digit', timeZone });
@@ -43,31 +58,39 @@ export function Timeline({
       people: number(b.people),
       parties: number(b.parties),
     });
-  const labelEvery = Math.max(1, Math.ceil(bars.length / 6));
+  // a time under every few columns: as many as fit
+  const labelEvery = Math.max(1, Math.ceil(bars.length / Math.max(1, Math.floor(plotW / 56))));
   const ticks = Array.from({ length: Math.floor(top / step) + 1 }, (_, i) => i * step);
   const tip = hover !== null ? bars[hover] : null;
   // the tooltip over its column, kept inside the chart at both ends
-  const tipAt = hover !== null ? ((left + hover * slot + slot / 2) / W) * 100 : 0;
+  const tipAt = hover !== null ? ((LEFT + hover * slot + slot / 2) / W) * 100 : 0;
   return (
-    <figure className="relative m-0">
+    <figure ref={figure} className="relative m-0">
       <figcaption className="text-[12.5px] text-muted">{tl.caption}</figcaption>
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 block h-auto w-full" role="img" aria-label={tl.title}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        height={H}
+        className="mt-2 block w-full"
+        role="img"
+        aria-label={tl.title}
+        style={{ direction: 'ltr' }}
+      >
         {ticks.map((v) => {
-          const y = 8 + plotH - (v / top) * plotH;
+          const y = TOP + plotH - (v / top) * plotH;
           return (
             <g key={v}>
               <line
-                x1={left}
-                x2={W - 8}
+                x1={LEFT}
+                x2={W - RIGHT}
                 y1={y}
                 y2={y}
                 stroke={v === 0 ? '#d6d3d1' : '#e7e5e4'}
                 strokeWidth={1}
               />
               <text
-                x={left - 6}
+                x={LEFT - 6}
                 y={y}
-                fontSize={10}
+                fontSize={11}
                 textAnchor="end"
                 dominantBaseline="central"
                 fill="#78716c"
@@ -79,8 +102,8 @@ export function Timeline({
         })}
         {bars.map((b, i) => {
           const hgt = (b.people / top) * plotH;
-          const x = left + i * slot + (slot - barW) / 2;
-          const y = 8 + plotH - hgt;
+          const x = LEFT + i * slot + (slot - barW) / 2;
+          const y = TOP + plotH - hgt;
           const r = Math.min(4, barW / 2, hgt);
           return (
             <g
@@ -95,18 +118,18 @@ export function Timeline({
               className="outline-none"
             >
               {/* the hit area: the whole column's slot */}
-              <rect x={left + i * slot} y={8} width={slot} height={plotH} fill="transparent" />
+              <rect x={LEFT + i * slot} y={TOP} width={slot} height={plotH} fill="transparent" />
               {b.people > 0 ? (
                 <path
-                  d={`M ${x} ${8 + plotH} V ${y + r} Q ${x} ${y} ${x + r} ${y} H ${x + barW - r} Q ${x + barW} ${y} ${x + barW} ${y + r} V ${8 + plotH} Z`}
+                  d={`M ${x} ${TOP + plotH} V ${y + r} Q ${x} ${y} ${x + r} ${y} H ${x + barW - r} Q ${x + barW} ${y} ${x + barW} ${y + r} V ${TOP + plotH} Z`}
                   fill={hover === i ? '#15803d' : '#22c55e'}
                 />
               ) : null}
               {i % labelEvery === 0 ? (
                 <text
-                  x={left + i * slot + slot / 2}
-                  y={H - 6}
-                  fontSize={10}
+                  x={LEFT + i * slot + slot / 2}
+                  y={H - 7}
+                  fontSize={11}
                   textAnchor="middle"
                   fill="#78716c"
                 >

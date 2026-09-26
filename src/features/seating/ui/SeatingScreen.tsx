@@ -162,9 +162,15 @@ export function SeatingScreen({
     isStored: save.isStored,
     onServerChange: save.reload,
   });
-  /** a change to who sits where or to the tables' numbers (asked first when it moves told families) */
-  const edit = (fn: (p: Plan) => Plan, key: string | null = null) =>
-    dayTools.guard(fn, () => update(fn, key));
+  /**
+   * a change to who sits where or to the tables' numbers (asked first when it moves told families);
+   * `then` once it is made
+   */
+  const edit = (fn: (p: Plan) => Plan, key: string | null = null, then?: () => void) =>
+    dayTools.guard(fn, () => {
+      update(fn, key);
+      then?.();
+    });
   /** undo / redo, the same way */
   const step = (fn: typeof undo) => {
     const next = fn(history);
@@ -297,15 +303,19 @@ export function SeatingScreen({
   const removeSelected = (ids: readonly string[]) => {
     if (!ids.length) return;
     const first = plan.tables.find((x) => ids.includes(x.id));
-    edit((p) => removeItems(p, new Set(ids)));
     setSelection([]);
-    toast({
-      title:
-        ids.length === 1 && first
-          ? fmt(s.toasts.removed.one, { number: first.number })
-          : plural(s.toasts.removed, ids.length),
-      action: { label: s.toasts.undo, altText: s.toasts.undo, onClick: () => stepRef.current(undo) },
-    });
+    edit(
+      (p) => removeItems(p, new Set(ids)),
+      null,
+      () =>
+        toast({
+          title:
+            ids.length === 1 && first
+              ? fmt(s.toasts.removed.one, { number: first.number })
+              : plural(s.toasts.removed, ids.length),
+          action: { label: s.toasts.undo, altText: s.toasts.undo, onClick: () => stepRef.current(undo) },
+        }),
+    );
   };
   const nudge = (ids: readonly string[], dx: number, dy: number) => {
     const moves = new Map<string, Point>();
@@ -683,10 +693,13 @@ export function SeatingScreen({
             <Button
               size="sm"
               variant="secondary"
-              onClick={() => {
-                edit((p) => unassign(p, stats.declinedSeated));
-                toast({ title: plural(s.toasts.declinedFreed, stats.declinedSeated.length) });
-              }}
+              onClick={() =>
+                edit(
+                  (p) => unassign(p, stats.declinedSeated),
+                  null,
+                  () => toast({ title: plural(s.toasts.declinedFreed, stats.declinedSeated.length) }),
+                )
+              }
             >
               {s.warnings.declinedFix}
             </Button>

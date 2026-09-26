@@ -92,6 +92,8 @@ export async function guidePage(
 export interface StationPageData {
   slug: string;
   event: DayEvent;
+  /** the event's time zone (the arrivals' times are the venue's) */
+  timezone: string | null;
   totals: Totals;
   recent: RecentCheckin[];
   realtime: RealtimeInfo | null;
@@ -112,6 +114,7 @@ export async function stationPage(
   return {
     slug: open.invitation.slug,
     event: eventInfo(open.invitation),
+    timezone: open.invitation.timezone,
     totals: open.totals,
     recent: open.recent,
     realtime: realtimeInfo(open.channel),

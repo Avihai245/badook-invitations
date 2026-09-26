@@ -4,7 +4,6 @@ import { Check, Link2, MessageCircle, Printer, Send } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Dialog, Hint, IconButton, Segmented, Skeleton, useToast } from '@/components/app';
 import { loginUrl } from '@/features/invitations/app/api';
-import { whatsappCapable } from '@/features/invitations/lib/guest-import';
 import { dictFor, fmt as format } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import type { NoticeRow } from '../model';
@@ -34,6 +33,11 @@ const sendable = (r: NoticeRow) => {
   const s = noticeState(r);
   return (s === 'unsent' || s === 'update') && r.reach === 'ok' && !!r.token;
 };
+/**
+ * a phone WhatsApp reaches (the host's own WhatsApp too — a landline never has it; the database's
+ * whatsapp_capable() decided `reach`)
+ */
+const mobile = (r: NoticeRow) => !!r.phone && (r.reach === 'ok' || r.reach === 'opted_out');
 /** a family whose current number the host can mark as told */
 const markable = (r: NoticeRow) => {
   const s = noticeState(r);
@@ -205,8 +209,7 @@ export function NoticesDialog({
     return null;
   };
 
-  const reachNote = (r: NoticeRow) =>
-    !r.token ? N.row.noLink : !r.phone || !whatsappCapable(r.phone) ? N.row.noPhone : null;
+  const reachNote = (r: NoticeRow) => (!r.token ? N.row.noLink : !mobile(r) ? N.row.noPhone : null);
 
   const title = only ? plural(t.eventDay.notified.manual, only.length, { n: number(only.length) }) : N.title;
   return (
@@ -310,7 +313,7 @@ export function NoticesDialog({
             {shown.map((r) => {
               const note = reachNote(r);
               const url = guideUrl(r);
-              const own = !!r.table && !!url && whatsappCapable(r.phone);
+              const own = !!r.table && !!url && mobile(r);
               return (
                 <li
                   key={r.unitId}

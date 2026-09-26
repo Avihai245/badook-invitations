@@ -281,7 +281,17 @@ test.describe('responses dashboard', () => {
       rate: expect.any(Number),
       files: expect.any(Number),
     };
-    expect(await first.json()).toEqual({ sent: 1, failed: 0, purged, overdue, seed: 'current', gallery });
+    // …and the event day's: arrivals erased 30 days after their event, undone ones after a day
+    const eventDay = { checkins: expect.any(Number), undone: expect.any(Number) };
+    expect(await first.json()).toEqual({
+      sent: 1,
+      failed: 0,
+      purged,
+      overdue,
+      seed: 'current',
+      gallery,
+      eventDay,
+    });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
       sent: 0,
@@ -290,6 +300,7 @@ test.describe('responses dashboard', () => {
       overdue,
       seed: 'current',
       gallery,
+      eventDay,
     });
   });
 });

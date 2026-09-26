@@ -7,6 +7,7 @@ import { useLiveRefresh } from '@/lib/live/client';
 import type { RealtimeInfo } from '@/lib/live/types';
 import { codeFromScan } from '../../codes';
 import { EVENT_DAY } from '../../config';
+import { knownZone } from '../../live';
 import type { Party, RecentCheckin, Totals } from '../../model';
 import type { StationPageData } from '../../server/pages';
 import { DayTextProvider, fill, useDayText, type GuestLocale } from '../guest-text';
@@ -229,7 +230,8 @@ function StationBody({
     );
 
   const pct = totals.expected ? Math.min(100, Math.round((totals.arrived / totals.expected) * 100)) : 0;
-  const timeOf = (at: string) => date(at, { hour: '2-digit', minute: '2-digit' });
+  const zone = knownZone(data.timezone);
+  const timeOf = (at: string) => date(at, { hour: '2-digit', minute: '2-digit', timeZone: zone });
   const stationLabel = (name: string) => (name === 'host' ? s.host : name);
 
   return (
