@@ -11,6 +11,7 @@ import type {
   TemplateManifest,
 } from '../contracts/types';
 import { firstGrapheme, suggestSlug } from '../lib/text';
+import { withCultureCopy } from './culture-copy';
 import { COUPLE_EVENTS, SEED_COPY } from './seed-copy';
 
 export interface WizardInput {
@@ -24,6 +25,11 @@ export interface WizardInput {
   timezone: string;
   slug?: string;
 }
+
+/** The languages most Israeli invitations are written in — their venues get a Waze button. */
+const ISRAELI_LOCALES: readonly Locale[] = ['he', 'ar', 'ru', 'am'];
+/** The hosts' names a slug is made of: a Latin-script language's, else Hebrew's or Russian's (transliterated). */
+const SLUG_LOCALES: readonly Locale[] = ['en', 'he', 'fr', 'es', 'ru'];
 
 /** Closest event type whose seed copy a template can borrow (§3 seedDocument comment). */
 const FALLBACKS: Partial<Record<EventType, EventType[]>> = {
@@ -104,7 +110,10 @@ export function seedDocument(
   input: WizardInput,
 ): InvitationDocument {
   const { locales } = input;
-  const { defaults: d, exact } = resolveEventDefaults(templateDefaults, input.eventType);
+  const resolved = resolveEventDefaults(templateDefaults, input.eventType);
+  const { exact } = resolved;
+  // the languages the pack doesn't write get the culture's own wording (templates/culture-copy.ts)
+  const d = withCultureCopy(resolved.defaults, input.eventType, locales);
   // §10.3: a save-the-date shows the hero, the date reveal, a short note and the footer; the rest of
   // the template's sections are there, switched off, for the host to add
   const saveTheDate = input.eventType === 'save_the_date';
@@ -138,7 +147,9 @@ export function seedDocument(
   const extras: Section[] = d.extraSections.map((x, i) => ({
     id: `${x.kind.replace(/_/g, '-')}${d.extraSections.findIndex((y) => y.kind === x.kind) === i ? '' : `-${i + 1}`}`,
     type: 'text',
-    enabled: !saveTheDate,
+    // a template's own extra ("a book instead of a card") without a word in the chosen languages waits,
+    // hidden, for the host to write it
+    enabled: !saveTheDate && locales.some((l) => !!x.body[l]?.trim()),
     data: {
       kind: x.kind,
       title: pick(x.title, locales),
@@ -231,7 +242,8 @@ export function seedDocument(
             startTime: input.startTime,
             endTime,
             showMap: true,
-            buttons: { maps: true, waze: locales.includes('he'), calendar: true },
+            // Waze: the event is most likely in Israel (an invitation in Hebrew, Arabic, Russian or Amharic)
+            buttons: { maps: true, waze: locales.some((l) => ISRAELI_LOCALES.includes(l)), calendar: true },
           })),
         },
       },
@@ -338,10 +350,10 @@ export function seedDocument(
     }
   }
 
-  const names = [
-    input.hosts.primary.en ?? input.hosts.primary.he ?? '',
-    input.hosts.secondary?.en ?? input.hosts.secondary?.he ?? '',
-  ];
+  // the slug from the names in a Latin-script language first, else transliterated (lib/text)
+  const nameIn = (value: L10n | null | undefined) =>
+    SLUG_LOCALES.map((l) => value?.[l]?.trim()).find(Boolean) ?? '';
+  const names = [nameIn(input.hosts.primary), nameIn(input.hosts.secondary)];
   return {
     schemaVersion: 2,
     templateId: template.id,

@@ -1,7 +1,14 @@
-import type { HHmm, ISODate, InvitationDocument, Locale, Venue } from '../contracts/types';
+import { LOCALES, type HHmm, type ISODate, type InvitationDocument, type Locale, type Venue } from '../contracts/types';
+import { LOCALE_INFO } from './locales';
 
-/** Single place mapping invitation locales to Intl locales (en-US ordering can be offered later). */
-export const INTL_LOCALE: Record<Locale, string> = { he: 'he-IL', en: 'en-GB' };
+/**
+ * Single place mapping invitation locales to Intl locales (lib/locales.ts): he-IL, en-GB, ru-RU,
+ * ar-IL with Latin digits, fr-FR, es-ES, am-ET (en-US ordering can be offered later).
+ */
+export const INTL_LOCALE = Object.fromEntries(LOCALES.map((l) => [l, LOCALE_INFO[l].intl])) as Record<
+  Locale,
+  string
+>;
 
 export const LONG_DATE: Intl.DateTimeFormatOptions = {
   weekday: 'long',
@@ -32,11 +39,15 @@ export function formatEventDate(doc: Pick<InvitationDocument, 'event'>, locale: 
   return formatDate(doc.event.date, locale, LONG_DATE);
 }
 
+/** The host's choice, else the language's own clock (he ru fr es 24h · en ar am 12h). */
 export function resolveTimeFormat(locale: Locale, timeFormat: '24h' | '12h' | null): '24h' | '12h' {
-  return timeFormat ?? (locale === 'he' ? '24h' : '12h');
+  return timeFormat ?? LOCALE_INFO[locale].clock;
 }
 
-/** `19:30` / `7:30 PM` (Hebrew 12h uses the Intl day-period words). */
+/**
+ * `19:30` / `7:30 PM` / `7:30 م` / `7:30 ከሰዓት` — 12h in the other languages uses Intl's day-period
+ * words. Always Latin digits.
+ */
 export function formatTime(hhmm: HHmm, locale: Locale, timeFormat: '24h' | '12h' | null): string {
   if (resolveTimeFormat(locale, timeFormat) === '24h') return hhmm;
   const [h, m] = hhmm.split(':').map(Number) as [number, number];

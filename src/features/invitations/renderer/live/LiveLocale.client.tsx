@@ -30,7 +30,16 @@ function loadSections(): Promise<Sections> {
   return chunk;
 }
 
-const SAMPLE: Record<Locale, string> = { he: 'אבגדהוזחטיכלמנ', en: 'AaBbCcDdEeFfGg' };
+/** A few letters of each script: `document.fonts.load` fetches the unicode-range faces they fall in. */
+const SAMPLE: Record<Locale, string> = {
+  he: 'אבגדהוזחטיכלמנ',
+  en: 'AaBbCcDdEeFfGg',
+  ru: 'АаБбВвГгДдЕеЖж',
+  ar: 'ابتثجحخدذرزسشص',
+  fr: 'AaBbCcÉéÈèÀàÇç',
+  es: 'AaBbCcÑñÁáÉéÍí',
+  am: 'ሀለሐመሠረሰሸቀበተቸኀነ',
+};
 const FONT_VARS = ['--f-display', '--f-heading', '--f-body', '--f-ui'];
 
 /** Starts the download of a locale's fonts (their unicode-range subsets load only when text needs them). */

@@ -6,9 +6,13 @@ import {
 } from './src/features/invitations/renderer/image-config';
 
 // the regular face of each family's Hebrew and Latin subsets (~1.7MB) — what og-image.tsx loads
+// + the Cyrillic, Arabic and Ethiopic subsets of the families that have them (the other languages)
 const FONT_FILES = [
   './node_modules/@fontsource/*/files/*-hebrew-400-normal.woff',
   './node_modules/@fontsource/*/files/*-latin-400-normal.woff',
+  './node_modules/@fontsource/*/files/*-cyrillic-400-normal.woff',
+  './node_modules/@fontsource/*/files/*-arabic-400-normal.woff',
+  './node_modules/@fontsource/*/files/*-ethiopic-400-normal.woff',
 ];
 
 /**
@@ -98,7 +102,8 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         {
           source: '/i/:slug',
-          has: [{ type: 'query', key: 'lang', value: '(?<lang>he|en)' }],
+          // the invitation languages (contracts/types.ts LOCALES)
+          has: [{ type: 'query', key: 'lang', value: '(?<lang>he|en|ru|ar|fr|es|am)' }],
           destination: '/i/:slug/:lang',
         },
         { source: '/i/:slug', destination: '/i/:slug/default' },

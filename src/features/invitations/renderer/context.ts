@@ -1,14 +1,18 @@
 import type { InvitationDocument, Locale, TemplateManifest } from '../contracts/types';
-import { formatHebrewDate } from '../lib/hebrew-date';
+import { formatHebrewDate, showsHebrewDate } from '../lib/hebrew-date';
 import { createRenderContext, type RenderContext, type RenderOptions } from './context-core';
 
 export type { RenderContext, RenderMode, RenderOptions } from './context-core';
 
-/** The Hebrew date line for `locale` (null when the host turned it off). */
+/**
+ * The Hebrew date line for `locale` — null when the host turned it off, or off for this language
+ * (`event.hebrewDateLocales`: Hebrew and English unless the host chose otherwise).
+ */
 export function hebrewDateFor(doc: Pick<InvitationDocument, 'event'>, locale: Locale): string | null {
-  return doc.event.hebrewDate === 'off'
-    ? null
-    : formatHebrewDate(doc.event.date, doc.event.hebrewDate, locale);
+  const mode = doc.event.hebrewDate;
+  return mode !== 'off' && showsHebrewDate(doc.event, locale)
+    ? formatHebrewDate(doc.event.date, mode, locale)
+    : null;
 }
 
 /** The render context, Hebrew date included (see `createRenderContext`). */

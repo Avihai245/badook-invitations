@@ -30,11 +30,37 @@ export const editorHe = {
   previewLanguage: 'שפת התצוגה',
   fieldLanguage: 'שפת השדה',
   missingTranslation: 'חסר תרגום',
-  languageShort: { he: 'עב', en: 'EN' },
-  languageFull: { he: 'עברית', en: 'English' },
+  /** each language's tab, in its own script */
+  languageShort: { he: 'עב', en: 'EN', ru: 'RU', ar: 'ع', fr: 'FR', es: 'ES', am: 'አማ' },
+  /** by their own names (pickers) */
+  languageFull: {
+    he: 'עברית',
+    en: 'English',
+    ru: 'Русский',
+    ar: 'العربية',
+    fr: 'Français',
+    es: 'Español',
+    am: 'አማርኛ',
+  },
   /** in running text: "חסר תרגום לאנגלית" */
-  languageIn: { he: 'עברית', en: 'אנגלית' },
-  copyFrom: { he: 'העתקה מהעברית', en: 'העתקה מהאנגלית' },
+  languageIn: {
+    he: 'עברית',
+    en: 'אנגלית',
+    ru: 'רוסית',
+    ar: 'ערבית',
+    fr: 'צרפתית',
+    es: 'ספרדית',
+    am: 'אמהרית',
+  },
+  copyFrom: {
+    he: 'העתקה מהעברית',
+    en: 'העתקה מהאנגלית',
+    ru: 'העתקה מהרוסית',
+    ar: 'העתקה מהערבית',
+    fr: 'העתקה מהצרפתית',
+    es: 'העתקה מהספרדית',
+    am: 'העתקה מהאמהרית',
+  },
   unpublishedChanges: 'יש שינויים שלא פורסמו',
   /** a premium design on a plan without premium designs (the top bar's badge) */
   premium: {
@@ -216,7 +242,15 @@ export const editorHe = {
     greetingHelp: 'מי שנכנס מהקישור האישי שלו (מרשימת המוזמנים) יראה ברכה עם השם שלו.',
     greetingText: 'נוסח הברכה',
     greetingTextHelp: '{guest} יוחלף בשם המוזמן. בתצוגה המקדימה מופיע שם לדוגמה.',
-    greetingDefault: { he: '{guest}, שמחים להזמין אותך!', en: 'Dear {guest}, you’re invited!' },
+    greetingDefault: {
+      he: '{guest}, שמחים להזמין אותך!',
+      en: 'Dear {guest}, you’re invited!',
+      ru: '{guest}, мы рады пригласить вас!',
+      ar: '{guest}، يسعدنا دعوتكم!',
+      fr: '{guest}, nous avons le plaisir de vous inviter\u202f!',
+      es: '{guest}, ¡nos encantaría contar contigo!',
+      am: '{guest}፣ ስንጋብዝዎ ደስ ይለናል!',
+    },
     captionsHelp: 'כבוי — הכתוביות של יוטיוב או Vimeo מוסתרות. טקסט שצרוב בתוך הסרטון עצמו לא ניתן להסתרה.',
     heroOptions: 'רקעים של העיצוב',
     target: 'סופרים עד',

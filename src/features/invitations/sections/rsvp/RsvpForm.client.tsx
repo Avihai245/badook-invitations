@@ -6,15 +6,22 @@ import type { DietaryKey, Locale, RsvpResult, RsvpSubmission } from '../../contr
 import { burstFrom } from '../../renderer/fx/burst';
 import { motionAllowed } from '../../renderer/fx/motion';
 import type { BurstKind } from '../../renderer/fx/theme';
-import { t } from '../../i18n/dictionary';
+import { formatEntry } from '../../i18n/format';
 import { Icon } from '../../ui/Icon';
 import { CalendarMenu, type CalendarLinks } from '../venues/CalendarMenu.client';
-import { RSVP_NOTES } from './notes';
+import type { RsvpNotes } from './notes';
+import type { RsvpKey, RsvpStrings } from './strings';
 
 /** Everything the form needs, already localized on the server. */
 export interface RsvpFormConfig {
   slug: string;
   locale: Locale;
+  /** the Intl locale of the page's language (plural forms) */
+  intl: string;
+  /** the form's system strings in the page's language (sections/rsvp/strings.ts) */
+  strings: RsvpStrings;
+  /** where the reply goes (+ the privacy policy), and the sample invitations' note */
+  notes: RsvpNotes;
   askChildren: boolean;
   maxAdults: number;
   maxChildren: number;
@@ -160,6 +167,9 @@ function Field({
 
 export function RsvpForm({ config }: { config: RsvpFormConfig }) {
   const L = config.locale;
+  /** a system string of the form, in the page's language (`_l` keeps the call sites of the dictionary) */
+  const t = (_l: Locale, key: RsvpKey, vars?: Record<string, string | number>) =>
+    formatEntry(config.strings[key], config.intl, vars);
   const uid = useId();
   const fid = (path: string) => `${uid}-${path}`;
   const renderedAt = useRef(0);
@@ -497,7 +507,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
         <h3>{attending ? config.successMessage : config.declineMessage}</h3>
         {demo ? (
           <p className="demo-note" style={NOTE_STYLE}>
-            {RSVP_NOTES[L].demo}
+            {config.notes.demo}
           </p>
         ) : null}
         {attending && config.calendar ? (
@@ -960,14 +970,14 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
               {status === 'error' ? t(L, 'rsvp.error.network') : ''}
             </p>
             <p className="privacy-note" style={{ ...NOTE_STYLE, marginTop: 14 }}>
-              {RSVP_NOTES[L].privacy}{' '}
+              {config.notes.privacy}{' '}
               <a
                 href="/privacy"
                 target="_blank"
                 rel="noopener"
                 style={{ color: 'inherit', textDecoration: 'underline' }}
               >
-                {RSVP_NOTES[L].privacyLink}
+                {config.notes.privacyLink}
               </a>
             </p>
           </div>

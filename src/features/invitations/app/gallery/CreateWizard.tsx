@@ -8,7 +8,6 @@ import {
   Dialog,
   Field,
   Input,
-  Segmented,
   Select,
   Skeleton,
   cn,
@@ -16,9 +15,10 @@ import {
 } from '@/components/app';
 import type { AppDict } from '@/lib/i18n/app.he';
 import { useUi } from '@/lib/i18n/client';
-import type { EventType, L10n, Locale } from '../../contracts/types';
+import { dirOf, type EventType, type L10n, type Locale } from '../../contracts/types';
 import { CAPS } from '../../contracts/validate';
 import { requireTemplate } from '../../templates/registry';
+import { NATIVE_NAMES, isFreeLocale } from '../../lib/locales';
 import { browserTimezone, DEFAULT_TIMEZONE, timezoneOptions } from '../../lib/timezones';
 import { COUPLE_EVENTS } from '../../templates/seed-copy';
 import { EVENT_ICONS } from '../event-icons';
@@ -38,7 +38,6 @@ const PARENTS_MAX = 40;
 type NameKey = 'primary' | 'secondary' | 'parents';
 type Names = Record<NameKey, string>;
 const NO_NAMES: Names = { primary: '', secondary: '', parents: '' };
-type Languages = Locale | 'both';
 
 interface NameField {
   key: NameKey;
@@ -76,15 +75,25 @@ function nameFields(type: EventType, f: AppDict['wizard']['fields']): NameField[
 
 /**
  * New-invitation wizard (§9B.3-C): a 560px dialog in 3 steps — event type → names, date and time →
- * languages (+ the names in the other language) — then POST /api/invitations and on to the editor.
+ * languages (any of the template's; + the names in each other language) — then POST /api/invitations
+ * and on to the editor. `moreLanguages`: the host may use languages beyond Hebrew and English (the
+ * `languages` feature) — without it only those two are offered.
  */
-export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () => void }) {
+export function CreateWizard({
+  seed,
+  onClose,
+  moreLanguages = true,
+}: {
+  seed: WizardSeed;
+  onClose: () => void;
+  moreLanguages?: boolean;
+}) {
   const { t, fmt, locale: ui } = useUi();
   const w = t.wizard;
   const router = useRouter();
   const { manifest } = requireTemplate(seed.templateId);
   const types = manifest.categories;
-  const supported = manifest.supportsLocales;
+  const supported = manifest.supportsLocales.filter((l) => moreLanguages || isFreeLocale(l));
   /** the language of the names typed in step 2 */
   const first: Locale = supported.includes(ui) ? ui : supported[0]!;
 
@@ -98,7 +107,8 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
   const [startTime, setStartTime] = useState('');
   // §7.2: Asia/Jerusalem for Hebrew, otherwise the browser's zone.
   const [timezone, setTimezone] = useState(() => (ui === 'he' ? DEFAULT_TIMEZONE : browserTimezone()));
-  const [languages, setLanguages] = useState<Languages>(first);
+  /** the chosen languages, in the order they were picked */
+  const [chosen, setChosen] = useState<Locale[]>([first]);
   const [defaultLocale, setDefaultLocale] = useState<Locale>(first);
   const [attempted, setAttempted] = useState({ 2: false, 3: false });
   const [creating, setCreating] = useState(false);
@@ -118,8 +128,16 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
 
   const fields = nameFields(eventType, w.fields);
   const couple = COUPLE_EVENTS.includes(eventType);
-  const locales: Locale[] =
-    languages === 'both' ? [defaultLocale, ...supported.filter((l) => l !== defaultLocale)] : [languages];
+  // the default first (it opens first and leads the switcher), then the others as picked
+  const locales: Locale[] = [defaultLocale, ...chosen.filter((l) => l !== defaultLocale)];
+  const toggleLanguage = (l: Locale) =>
+    setChosen((list) => {
+      if (!list.includes(l)) return [...list, l];
+      if (list.length === 1) return list;
+      const next = list.filter((x) => x !== l);
+      if (l === defaultLocale) setDefaultLocale(next[0]!);
+      return next;
+    });
   const others = locales.filter((l) => l !== first);
   const zones = useMemo(() => (step === 2 ? timezoneOptions([timezone]) : []), [step, timezone]);
 
@@ -225,7 +243,7 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
               onChange={(e) => setName(l, f.key, e.target.value)}
               maxLength={f.max}
               lang={l}
-              dir={l === 'he' ? 'rtl' : 'ltr'}
+              dir={dirOf(l)}
               autoComplete="off"
             />
           </Field>
@@ -391,54 +409,49 @@ export function CreateWizard({ seed, onClose }: { seed: WizardSeed; onClose: () 
 
             {step === 3 ? (
               <div className="flex flex-col gap-5">
+                <p className="-mt-2 text-[13px] leading-snug text-muted">{w.languages.hint}</p>
                 <div
-                  role="radiogroup"
+                  role="group"
                   aria-labelledby={headingId}
-                  onKeyDown={rovingKeyDown}
-                  className={cn('grid gap-2', supported.length > 1 ? 'grid-cols-3' : 'grid-cols-1')}
+                  className={cn('grid gap-2', supported.length > 1 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1')}
                 >
-                  {[...supported, ...(supported.length > 1 ? (['both'] as const) : [])].map((option) => {
-                    const on = option === languages;
+                  {supported.map((l) => {
+                    const on = chosen.includes(l);
                     return (
                       <button
-                        key={option}
+                        key={l}
                         type="button"
-                        role="radio"
+                        role="checkbox"
                         aria-checked={on}
-                        tabIndex={on ? 0 : -1}
-                        data-roving-item=""
-                        onClick={() => {
-                          setLanguages(option);
-                          if (option !== 'both') setDefaultLocale(option);
-                        }}
+                        data-language={l}
+                        onClick={() => toggleLanguage(l)}
                         className={cn(
-                          'flex min-h-16 flex-col items-center justify-center gap-1 rounded-card border px-3 py-3 text-center',
+                          'flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-card border px-3 py-2.5 text-center',
                           'transition-[background-color,border-color] duration-150 motion-reduce:transition-none',
                           on
                             ? 'border-ink bg-subtle ring-1 ring-ink'
                             : 'border-line bg-surface hover:bg-subtle',
                         )}
                       >
-                        <span
-                          className="text-[15px] font-semibold"
-                          lang={option === 'both' ? undefined : option}
-                        >
-                          {w.languages[option]}
+                        <span className="text-[15px] font-semibold" lang={l} dir={dirOf(l)}>
+                          {NATIVE_NAMES[l]}
                         </span>
-                        {option === 'both' ? (
-                          <span className="text-[12px] leading-snug text-muted">{w.languages.bothHint}</span>
+                        {NATIVE_NAMES[l] !== t.editor.languageIn[l] ? (
+                          <span className="text-[12px] leading-snug text-muted">{t.editor.languageIn[l]}</span>
                         ) : null}
                       </button>
                     );
                   })}
                 </div>
-                {languages === 'both' ? (
-                  <Field label={w.languages.default}>
-                    <Segmented<Locale>
-                      value={defaultLocale}
-                      onValueChange={setDefaultLocale}
-                      options={supported.map((l) => ({ value: l, label: w.languages[l] }))}
-                    />
+                {chosen.length > 1 ? (
+                  <Field label={w.languages.default} help={w.languages.defaultHelp}>
+                    <Select value={defaultLocale} onChange={(e) => setDefaultLocale(e.target.value as Locale)}>
+                      {chosen.map((l) => (
+                        <option key={l} value={l} lang={l}>
+                          {NATIVE_NAMES[l]}
+                        </option>
+                      ))}
+                    </Select>
                   </Field>
                 ) : null}
                 {others.map((l) => (

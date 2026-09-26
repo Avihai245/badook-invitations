@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { DietaryKey } from '@/features/invitations/contracts/types';
+import { NATIVE_NAMES } from '@/features/invitations/lib/locales';
 import {
   csvCell,
   dietaryCounts,
@@ -189,7 +190,7 @@ describe('CSV', () => {
       other_allergy: 'אלרגיה אחרת',
       kids_meal: 'מנת ילדים',
     },
-    localeName: { he: 'עברית', en: 'English' },
+    localeName: NATIVE_NAMES,
   };
   const csv = responsesCsv(LIST, {
     labels,

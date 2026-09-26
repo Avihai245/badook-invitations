@@ -25,5 +25,9 @@
   "cover.hint.gate": "לחצו לפתיחת השער",
   "cover.hint.curtain": "לחצו לפתיחת המסך",
   "cover.hint.fireworks": "לחצו להדלקת הזיקוקים",
-  "cover.hint.gold_dust": "לחצו לפתיחה"
+  "cover.hint.gold_dust": "לחצו לפתיחה",
+  "locale.menu": "שפה",
+  "missing.metaTitle": "ההזמנה לא זמינה",
+  "missing.title": "ההזמנה לא זמינה כרגע",
+  "missing.body": "ייתכן שהיא עוד לא פורסמה, או שהקישור לא מלא. כדאי לבדוק את הקישור מול מי ששלח אותו, או לנסות שוב מאוחר יותר."
 }

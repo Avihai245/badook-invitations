@@ -1,6 +1,7 @@
 import 'server-only';
 import { migrateDocument } from '@/features/invitations/contracts/migrate';
-import type { EventType, InvitationDocument, Locale } from '@/features/invitations/contracts/types';
+import type { InvitationDocument, Locale } from '@/features/invitations/contracts/types';
+import { EVENT_PHRASE } from '@/features/invitations/lib/event-phrases';
 import { formatDate } from '@/features/invitations/lib/dates';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { serverEnv } from '@/lib/env';
@@ -21,35 +22,8 @@ async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
   return data as T;
 }
 
-/** Template parameter {{3}}: the event, with its preposition ("…מזמינים אותך לחתונה"). */
-export const EVENT_PHRASE: Record<Locale, Record<EventType, string>> = {
-  he: {
-    wedding: 'לחתונה',
-    engagement: 'למסיבת האירוסין',
-    henna: 'לחינה',
-    bar_mitzvah: 'לבר המצווה',
-    bat_mitzvah: 'לבת המצווה',
-    brit: 'לברית',
-    baby_shower: 'לבייבי שאוור',
-    birthday: 'ליום ההולדת',
-    save_the_date: 'לשמור את התאריך',
-    corporate: 'לאירוע',
-    other: 'לאירוע',
-  },
-  en: {
-    wedding: 'to the wedding',
-    engagement: 'to the engagement party',
-    henna: 'to the henna',
-    bar_mitzvah: 'to the bar mitzvah',
-    bat_mitzvah: 'to the bat mitzvah',
-    brit: 'to the brit',
-    baby_shower: 'to the baby shower',
-    birthday: 'to the birthday party',
-    save_the_date: 'to save the date',
-    corporate: 'to the event',
-    other: 'to the event',
-  },
-};
+/** Template parameter {{3}}: the event, with its preposition, per language (lib/event-phrases). */
+export { EVENT_PHRASE } from '@/features/invitations/lib/event-phrases';
 
 interface Claimed {
   id: string;

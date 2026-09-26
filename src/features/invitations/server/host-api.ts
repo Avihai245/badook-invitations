@@ -15,9 +15,11 @@ import {
   SLUG_RE,
   TimezoneSchema,
 } from '../contracts/schemas';
-import type { L10n, Locale } from '../contracts/types';
+import { LOCALES, type L10n, type Locale } from '../contracts/types';
 import { validateDocument } from '../contracts/validate';
+import type { Feature } from '@/features/flags/features';
 import { findFontPair } from '../fonts/library';
+import { paidLocales } from '../lib/locales';
 import { graphemes } from '../lib/text';
 import { followUpDocument, followUpSlug, saveTheDateSlug } from '../templates/follow-up';
 import { COUPLE_EVENTS } from '../templates/seed-copy';
@@ -55,6 +57,28 @@ export interface HostDeps {
   now(): number;
   /** the host's plan limits (absent: nothing is limited) */
   entitlements?(): Promise<Entitlements>;
+  /**
+   * What an event may use (features/flags) — or, with null, a new event of this host. Absent:
+   * everything (tests, scripts).
+   */
+  features?(invitationId: string | null): Promise<ReadonlySet<Feature>>;
+}
+
+/**
+ * 402 `languages` when the document has languages beyond Hebrew and English and the event may not use
+ * them (the `languages` feature: switched off for this deployment or by the host). `allowed`: the
+ * languages it may keep anyway (a draft that already had them).
+ */
+async function languagesRefused(
+  locales: readonly Locale[],
+  invitationId: string | null,
+  deps: HostDeps,
+  allowed: readonly Locale[] = [],
+): Promise<ApiResult | null> {
+  const paid = paidLocales(locales).filter((l) => !allowed.includes(l));
+  if (!paid.length || !deps.features) return null;
+  if ((await deps.features(invitationId)).has('languages')) return null;
+  return fail(402, 'languages', { locales: paid });
 }
 
 /** 402 when the plan has no room for one more active invitation. */
@@ -82,7 +106,7 @@ async function refusedOverLimit(err: unknown, deps: HostDeps): Promise<ApiResult
 export const CreateInvitationSchema = z.strictObject({
   templateId: z.string().min(1),
   eventType: EventTypeSchema,
-  locales: z.array(LocaleSchema).min(1).max(2),
+  locales: z.array(LocaleSchema).min(1).max(LOCALES.length),
   defaultLocale: LocaleSchema,
   hosts: z.strictObject({
     primary: L10nSchema,
@@ -130,6 +154,8 @@ export async function createInvitation(userId: string, raw: unknown, deps: HostD
   if (input.paletteId && !preset) bad.push('paletteId');
   if (input.fontPairId && !findFontPair(manifest, input.fontPairId)) bad.push('fontPairId');
   if (bad.length) return fail(400, 'invalid', { issues: bad });
+  const refused = await languagesRefused(locales, null, deps);
+  if (refused) return refused;
   const limited = await noRoom(deps);
   if (limited) return limited;
 
@@ -246,6 +272,14 @@ export async function saveDraft(
   // any known schema version (an editor still open on the previous release saves v1): stored as the latest
   const draft = safeMigrateDocument(parsed.data.draft);
   if (!draft.success) return fail(422, 'invalid', { issues: draft.issues.slice(0, 20).map((i) => i.path) });
+  // a language beyond Hebrew and English needs the `languages` feature — unless the draft had it
+  // already (switched off since: the host can still edit and remove it)
+  if (paidLocales(draft.data.locales).length && (await languagesRefused(draft.data.locales, id, deps))) {
+    const stored = await deps.db.get(id, userId);
+    if (!stored) return fail(404, 'not_found');
+    const refused = await languagesRefused(draft.data.locales, id, deps, stored.draft.locales);
+    if (refused) return refused;
+  }
   const result = await deps.db.saveDraft(id, userId, draft.data, parsed.data.updatedAt);
   if (!result) return fail(404, 'not_found');
   if (!result.ok) return fail(409, 'conflict', { updatedAt: result.updatedAt, draft: result.draft });
@@ -278,6 +312,8 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
   // (share.slug is checked here too — the schema's slug format rule.)
   const { errors, warnings } = validateDocument(draft, entry.manifest, { mode: 'publish', now: deps.now() });
   if (errors.length) return fail(422, 'invalid', { issues: errors, warnings });
+  const refused = await languagesRefused(draft.locales, id, deps);
+  if (refused) return refused;
   if (deps.entitlements) {
     const e = await deps.entitlements();
     if (isPremiumTemplate(entry.manifest) && !e.premiumTemplates) return fail(402, 'premium_template');

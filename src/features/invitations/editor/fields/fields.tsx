@@ -29,7 +29,7 @@ import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { HHMM_RE } from '../../contracts/schemas';
 import type { InvitationDocument, L10n, Locale, Section } from '../../contracts/types';
-import { dirOf } from '../../contracts/types';
+import { LOCALES, dirOf } from '../../contracts/types';
 import type { Issue } from '../../contracts/validate';
 import { cappedLength } from '../../lib/l10n';
 import { getAt } from '../paths';
@@ -78,7 +78,8 @@ export function issueText(
 export function issuesAt(issues: readonly Issue[], path: string): Issue[] {
   return issues.filter(
     (i) =>
-      i.path === path || (i.path.startsWith(`${path}.`) && /^(he|en)$/.test(i.path.slice(path.length + 1))),
+      i.path === path ||
+      (i.path.startsWith(`${path}.`) && (LOCALES as readonly string[]).includes(i.path.slice(path.length + 1))),
   );
 }
 

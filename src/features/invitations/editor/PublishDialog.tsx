@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Dialog, Field, Hint, Input, cn, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { SLUG_RE } from '../contracts/schemas';
+import { LOCALES } from '../contracts/types';
 import { validateDocument, type Issue } from '../contracts/validate';
 import { hostApi } from '../app/api';
 import { HelpFor } from '../app/HelpFor';
@@ -33,6 +34,9 @@ type PublishResponse =
  * Publish (§7.7, §9B.3-F): the address with a live availability check, blocking errors and warnings
  * (each row jumps to its field), the WhatsApp card, then publish → the link to share.
  */
+/** A language at the end of an issue's path ('…label.ru'): the field itself is what to focus. */
+const LOCALE_SUFFIX = new RegExp(`\\.(${LOCALES.join('|')})$`);
+
 export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: () => Promise<boolean> }) {
   const { doc, template, meta, setMeta, publicBaseUrl, select, setShowIssues } = useEditor();
   const { t, locale: ui, plural, date } = useUi();
@@ -83,7 +87,7 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
     if (!target) return;
     setShowIssues(true);
     onClose();
-    select(target, issue.path.replace(/\.(he|en)$/, ''));
+    select(target, issue.path.replace(LOCALE_SUFFIX, ''));
   };
 
   const publish = async () => {

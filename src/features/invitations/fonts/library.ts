@@ -1,4 +1,4 @@
-import type { FontPair, Locale, TemplateManifest } from '../contracts/types';
+import type { FontPair, TemplateManifest } from '../contracts/types';
 import library from './library.json';
 
 /**
@@ -8,7 +8,8 @@ import library from './library.json';
  * scripts/build-fonts.mjs self-hosts their families like the templates' (library.json is read there too).
  */
 export interface LibraryFontPair extends FontPair {
-  name: Record<Locale, string>;
+  /** in the host app's languages */
+  name: Record<'he' | 'en', string>;
 }
 
 export const LIBRARY_PAIR_PREFIX = 'lib-';

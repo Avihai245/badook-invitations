@@ -51,10 +51,13 @@ export function TemplateGallery({
   bases,
   fontCss,
   devPreviews = null,
+  moreLanguages = true,
 }: {
   bases: AssetBases;
   fontCss: string;
   devPreviews?: DevPreviews | null;
+  /** the host may use languages beyond Hebrew and English (feature `languages`) */
+  moreLanguages?: boolean;
 }) {
   const { t, locale, plural, number } = useUi();
   const videos = usePreviewVideos();
@@ -186,7 +189,9 @@ export function TemplateGallery({
           }}
         />
       ) : null}
-      {wizard ? <CreateWizard seed={wizard} onClose={() => setWizard(null)} /> : null}
+      {wizard ? (
+        <CreateWizard seed={wizard} onClose={() => setWizard(null)} moreLanguages={moreLanguages} />
+      ) : null}
     </div>
   );
 }

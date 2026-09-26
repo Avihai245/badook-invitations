@@ -445,6 +445,8 @@ export const InvitationDocumentSchema = z.strictObject({
     startTime: HHmmSchema,
     endTime: HHmmSchema.nullable(),
     hebrewDate: z.enum(['off', 'day', 'eve']),
+    // added with the languages beyond Hebrew and English: absent → Hebrew and English show it
+    hebrewDateLocales: z.array(LocaleSchema).max(LOCALES.length).nullable().optional(),
     timeFormat: z.enum(['24h', '12h']).nullable(),
     rsvpDeadline: ISODateSchema.nullable(),
   }),

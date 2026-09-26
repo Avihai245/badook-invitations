@@ -5,6 +5,7 @@ import { loadDashboard } from '@/features/invitations/server/responses';
 import { getUi } from '@/lib/i18n/server';
 import { invitationsEnabled } from '@/lib/feature';
 import { getSessionUser } from '@/lib/supabase/session';
+import { NATIVE_NAMES } from '@/features/invitations/lib/locales';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -31,7 +32,7 @@ export async function GET(_request: Request, { params }: Params) {
       yes: r.yes,
       no: r.no,
       diet: r.diet as Record<DietaryKey, string>,
-      localeName: { he: t.common.hebrew, en: t.common.english },
+      localeName: NATIVE_NAMES,
     },
     questions: data.rawQuestions,
     uiLocale: ui,

@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState, type CSSProperties } from 'react';
-import type { Locale } from '../../contracts/types';
-import { t } from '../../i18n/dictionary';
+import { formatEntry, type Entry } from '../../i18n/format';
 import { countdownParts, countdownPhase } from '../../lib/countdown';
 
-const UNITS = ['days', 'hours', 'minutes', 'seconds'] as const;
+export const COUNTDOWN_UNITS = ['days', 'hours', 'minutes', 'seconds'] as const;
+const UNITS = COUNTDOWN_UNITS;
+/** The units' names with their plural forms, in the page's language (`countdownLabels`). */
+export type CountdownLabels = Record<(typeof COUNTDOWN_UNITS)[number], Entry>;
 
 /**
  * One digit that rolls when it changes (invitation.css `.cd-d`): the old one drops out while the new
@@ -43,12 +45,15 @@ function Digit({ ch }: { ch: string }) {
 export function Countdown({
   targetMs,
   initialNow,
-  locale,
+  intl,
+  labels,
   afterText,
 }: {
   targetMs: number;
   initialNow: number;
-  locale: Locale;
+  /** the Intl locale of the page's language: which plural form each number takes */
+  intl: string;
+  labels: CountdownLabels;
   afterText: string;
 }) {
   const [now, setNow] = useState(initialNow);
@@ -79,7 +84,7 @@ export function Countdown({
               ))}
             </div>
             <div className="cd-lbl" suppressHydrationWarning>
-              {t(locale, `countdown.${u}`, { n: parts[u] })}
+              {formatEntry(labels[u], intl, { n: parts[u] })}
             </div>
           </div>
         );

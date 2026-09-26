@@ -1,9 +1,12 @@
 import type { SectionOf } from '../../contracts/types';
-import { endOfDayUtc } from '../../lib/dates';
+import { dictEntries } from '../../i18n/dictionary';
+import { INTL_LOCALE, endOfDayUtc } from '../../lib/dates';
 import { Decoration, SecHead, editPath, iv, type SectionViewProps } from '../shared';
 import { calendarLabels, calendarLinks, firstVenue } from '../../renderer/calendar-event';
 import { fxTheme } from '../../renderer/fx/theme';
+import { RSVP_NOTES } from './notes';
 import { RsvpForm, type RsvpFormConfig } from './RsvpForm.client';
+import { RSVP_KEYS } from './strings';
 
 export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) {
   const d = section.data;
@@ -20,6 +23,9 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
   const config: RsvpFormConfig = {
     slug: doc.share.slug,
     locale: ctx.locale,
+    intl: INTL_LOCALE[ctx.locale],
+    strings: dictEntries(ctx.locale, RSVP_KEYS),
+    notes: RSVP_NOTES[ctx.locale],
     askChildren: d.askChildren,
     maxAdults: d.maxAdults,
     maxChildren: d.askChildren ? d.maxChildren : 0,

@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import { accountFeatures, deploymentFeatures } from '@/features/flags/server';
 import { TemplateGallery, type DevPreviews } from '@/features/invitations/app/gallery/TemplateGallery';
 import { GALLERY_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { devRoutesEnabled } from '@/lib/dev-routes';
 import { serverEnv } from '@/lib/env';
 import { getUi } from '@/lib/i18n/server';
+import { getSessionUser } from '@/lib/supabase/session';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getUi();
@@ -30,9 +32,13 @@ export default async function NewInvitationPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const env = serverEnv();
-  const { previews } = await searchParams;
+  const [{ previews }, user] = await Promise.all([searchParams, getSessionUser()]);
+  // languages beyond Hebrew and English (feature `languages`): the host's plan, or — before signing
+  // in — what this deployment offers
+  const moreLanguages = (user ? await accountFeatures(user) : deploymentFeatures()).has('languages');
   return (
     <TemplateGallery
+      moreLanguages={moreLanguages}
       bases={assetBasesFromEnv({
         supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
         templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,

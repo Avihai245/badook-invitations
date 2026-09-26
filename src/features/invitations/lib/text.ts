@@ -66,14 +66,59 @@ function transliterateHebrew(word: string): string {
     .join('');
 }
 
-/** "Noa", "Itay" → "noa-and-itay"; Hebrew names are transliterated; always matches the slug rule. */
+// Russian → Latin (the common passport-style spelling), only to suggest a slug.
+const RU: Record<string, string> = {
+  а: 'a',
+  б: 'b',
+  в: 'v',
+  г: 'g',
+  д: 'd',
+  е: 'e',
+  ё: 'e',
+  ж: 'zh',
+  з: 'z',
+  и: 'i',
+  й: 'y',
+  к: 'k',
+  л: 'l',
+  м: 'm',
+  н: 'n',
+  о: 'o',
+  п: 'p',
+  р: 'r',
+  с: 's',
+  т: 't',
+  у: 'u',
+  ф: 'f',
+  х: 'kh',
+  ц: 'ts',
+  ч: 'ch',
+  ш: 'sh',
+  щ: 'shch',
+  ъ: '',
+  ы: 'y',
+  ь: '',
+  э: 'e',
+  ю: 'yu',
+  я: 'ya',
+};
+
+const transliterateCyrillic = (word: string) =>
+  [...word.toLowerCase()].map((c) => RU[c] ?? c).join('');
+
+/**
+ * "Noa", "Itay" → "noa-and-itay"; Hebrew and Russian names are transliterated; always matches the
+ * slug rule (names in other scripts leave a short one, which the caller replaces).
+ */
 export function suggestSlug(names: readonly string[]): string {
   const parts = names
     .map((n) =>
       n
         .trim()
         .split(/\s+/)
-        .map((w) => (/[֐-׿]/.test(w) ? transliterateHebrew(w) : w))
+        .map((w) =>
+          /[֐-׿]/.test(w) ? transliterateHebrew(w) : /[Ѐ-ӿ]/.test(w) ? transliterateCyrillic(w) : w,
+        )
         .join('-'),
     )
     .map((n) =>

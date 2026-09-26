@@ -45,9 +45,10 @@ import {
   useToast,
 } from '@/components/app';
 import { UpgradeDialog, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
-import { dictFor, fmt as format } from '@/lib/i18n/app';
+import { fmt as format } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { hostApi, loginUrl } from '../api';
+import { GUEST_MESSAGE } from '../../lib/event-phrases';
 import { whatsappCapable } from '../../lib/guest-import';
 import {
   formatIls,
@@ -182,7 +183,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
   /** "Send from my WhatsApp": wa.me with the message in the invitation's language, then marked as sent. */
   const sendOwn = (x: GuestRecord) => {
     if (!x.phone) return;
-    const text = fmt(dictFor(data.own.locale).guests.ownMessage, {
+    const text = fmt(GUEST_MESSAGE[data.own.locale], {
       name: x.name,
       hosts: data.own.hosts,
       event: data.own.event,

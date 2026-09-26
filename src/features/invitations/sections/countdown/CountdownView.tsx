@@ -3,6 +3,7 @@ import { countdownPhase } from '../../lib/countdown';
 import { eventRange, zonedTimeToUtc } from '../../lib/dates';
 import { SecHead, editPath, type SectionViewProps } from '../shared';
 import { Countdown } from './Countdown.client';
+import { countdownProps } from './labels';
 
 export function CountdownView({ section, ctx }: SectionViewProps<SectionOf<'countdown'>>) {
   const d = section.data;
@@ -21,7 +22,7 @@ export function CountdownView({ section, ctx }: SectionViewProps<SectionOf<'coun
           <Countdown
             targetMs={target}
             initialNow={ctx.now}
-            locale={ctx.locale}
+            {...countdownProps(ctx.locale)}
             afterText={ctx.text(d.afterEvent)}
           />
         </div>

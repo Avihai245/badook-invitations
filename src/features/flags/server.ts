@@ -1,10 +1,17 @@
 import 'server-only';
-import { isAdminEmail } from '@/features/billing/server/account';
+import { isAdminEmail, loadAccount } from '@/features/billing/server/account';
 import { effectivePlan, isPlanId, type AccountPlanState } from '@/features/billing/plans';
 import { serverEnv, type ServerEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import type { FlagDeps } from './api';
-import { FEATURES, effectiveFeatures, readOverrides, type Feature, type FeatureInput } from './features';
+import {
+  FEATURES,
+  NO_OVERRIDES,
+  effectiveFeatures,
+  readOverrides,
+  type Feature,
+  type FeatureInput,
+} from './features';
 
 /**
  * What this deployment offers: every feature but those switched off here (INVITES_FEATURES_OFF), the
@@ -60,6 +67,20 @@ export async function featureInput(
 export async function featuresFor(invitationId: string): Promise<Set<Feature>> {
   const input = await featureInput(invitationId);
   return input ? effectiveFeatures(input) : new Set();
+}
+
+/**
+ * What a new event of this user may use (the wizard, before the event exists): their plan in force
+ * and this deployment, without an event's own choices.
+ */
+export async function accountFeatures(user: { id: string; email?: string | null }): Promise<Set<Feature>> {
+  const account = await loadAccount({ id: user.id, email: user.email ?? undefined });
+  return effectiveFeatures({
+    plan: account.effective,
+    admin: account.admin,
+    overrides: NO_OVERRIDES,
+    available: deploymentFeatures(),
+  });
 }
 
 export const flagDeps: FlagDeps = {

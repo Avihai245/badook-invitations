@@ -2,8 +2,11 @@ import 'server-only';
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { entitlementsFor } from '@/features/billing/server/account';
+import type { Feature } from '@/features/flags/features';
+import { accountFeatures, featuresFor } from '@/features/flags/server';
 import { invitationsEnabled } from '@/lib/feature';
 import { getSessionUser } from '@/lib/supabase/session';
+import { LOCALES } from '../contracts/types';
 import { getTemplate } from '../templates/registry';
 import type { ApiResult, HostDeps } from './host-api';
 import { hostDb } from './host-db';
@@ -21,7 +24,7 @@ const json = (status: number, body: unknown) => NextResponse.json(body, { status
  */
 function revalidate(slug: string) {
   revalidatePath(`/i/${slug}`);
-  for (const lang of ['he', 'en', 'default']) revalidatePath(`/i/${slug}/${lang}`);
+  for (const lang of [...LOCALES, 'default']) revalidatePath(`/i/${slug}/${lang}`);
 }
 
 export const hostDeps: HostDeps = { db: hostDb, template: getTemplate, revalidate, now: () => Date.now() };
@@ -53,7 +56,18 @@ export async function hostRoute(
   try {
     // the plan's limits, read only by the handlers that need them
     let entitlements: ReturnType<typeof entitlementsFor> | null = null;
-    const deps: HostDeps = { ...hostDeps, entitlements: () => (entitlements ??= entitlementsFor(user)) };
+    const features = new Map<string, Promise<ReadonlySet<Feature>>>();
+    const deps: HostDeps = {
+      ...hostDeps,
+      entitlements: () => (entitlements ??= entitlementsFor(user)),
+      // an event's features (or, for a new one, the host's plan's), read once per request
+      features: (id) => {
+        const key = id ?? '';
+        let pending = features.get(key);
+        if (!pending) features.set(key, (pending = id ? featuresFor(id) : accountFeatures(user)));
+        return pending;
+      },
+    };
     const result = await handler(user.id, body, deps);
     return json(result.status, result.body);
   } catch (err) {

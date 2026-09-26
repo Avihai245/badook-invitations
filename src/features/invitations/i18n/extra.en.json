@@ -25,5 +25,9 @@
   "cover.hint.gate": "Tap to open the gate",
   "cover.hint.curtain": "Tap to open the curtain",
   "cover.hint.fireworks": "Tap to light up the sky",
-  "cover.hint.gold_dust": "Tap to open"
+  "cover.hint.gold_dust": "Tap to open",
+  "locale.menu": "Language",
+  "missing.metaTitle": "Invitation not available",
+  "missing.title": "This invitation isn’t available right now",
+  "missing.body": "It may not be published yet, or the link may be incomplete. Check the link with whoever sent it, or try again later."
 }

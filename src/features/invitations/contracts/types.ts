@@ -5,10 +5,13 @@
  */
 
 // ---------- i18n ----------
-export type Locale = 'he' | 'en'; // extensible later: 'ar' | 'ru' | 'fr' ...
-export const LOCALES = ['he', 'en'] as const satisfies readonly Locale[];
-export const RTL_LOCALES: readonly Locale[] = ['he'];
+/** Hebrew, English, Russian, Arabic, French, Spanish, Amharic (lib/locales.ts: names, scripts, formats). */
+export type Locale = 'he' | 'en' | 'ru' | 'ar' | 'fr' | 'es' | 'am';
+export const LOCALES = ['he', 'en', 'ru', 'ar', 'fr', 'es', 'am'] as const satisfies readonly Locale[];
+export const RTL_LOCALES: readonly Locale[] = ['he', 'ar'];
 export const dirOf = (l: Locale) => (RTL_LOCALES.includes(l) ? 'rtl' : 'ltr');
+/** The languages every event may use; the others need the `languages` feature (features/flags). */
+export const FREE_LOCALES = ['he', 'en'] as const satisfies readonly Locale[];
 /** User-authored text. Must contain every locale listed in document.locales (validated on publish). */
 export type L10n = Partial<Record<Locale, string>>;
 
@@ -62,7 +65,12 @@ export interface InvitationDocument {
     startTime: HHmm;
     endTime: HHmm | null; // if < startTime → next day
     hebrewDate: 'off' | 'day' | 'eve'; // 'eve' → "אור ל…" (Hebrew date after sunset)
-    timeFormat: '24h' | '12h' | null; // null → locale default (he 24h, en 12h)
+    /**
+     * The languages that show the Hebrew date (while `hebrewDate` isn't off). Absent / null → Hebrew and
+     * English, as before languages beyond them existed; the others opt in.
+     */
+    hebrewDateLocales?: Locale[] | null;
+    timeFormat: '24h' | '12h' | null; // null → locale default (lib/locales.ts: he ru fr es 24h · en ar am 12h)
     rsvpDeadline: ISODate | null;
   };
   theme: { fontPairId: string; palette: Partial<Palette> | null }; // only template.editablePaletteKeys

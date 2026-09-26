@@ -1,16 +1,20 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { t } from '@/features/invitations/i18n/dictionary';
+import { dictEntries, t } from '@/features/invitations/i18n/dictionary';
 import { setGuest } from '@/features/invitations/renderer/guest.client';
 import { RSVP_NOTES } from '@/features/invitations/sections/rsvp/notes';
 import { RsvpForm, type RsvpFormConfig } from '@/features/invitations/sections/rsvp/RsvpForm.client';
+import { RSVP_KEYS } from '@/features/invitations/sections/rsvp/strings';
 
 // The guest's side of the RSVP form: where a reply is remembered, the site's samples, the privacy note.
 
 const config = (slug: string): RsvpFormConfig => ({
   slug,
   locale: 'he',
+  intl: 'he-IL',
+  strings: dictEntries('he', RSVP_KEYS),
+  notes: RSVP_NOTES.he,
   askChildren: false,
   maxAdults: 2,
   maxChildren: 0,

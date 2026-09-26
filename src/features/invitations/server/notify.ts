@@ -5,6 +5,7 @@ import { migrateDocument } from '../contracts/migrate';
 import type { InvitationDocument } from '../contracts/types';
 import { digestEmail, replyEmail, type ReplySummary } from '../lib/notify-email';
 import type { NotifyMode } from '../lib/responses';
+import { hostLanguageOf } from '../lib/locales';
 import { hostsLine } from '../lib/text';
 import { sendEmail } from './email';
 
@@ -25,12 +26,13 @@ export async function notifyReply(saved: {
   if (error) throw new Error(`rsvp_notification_target: ${error.message}`);
   const target = data as { id: string; email: string | null; mode: NotifyMode } | null;
   if (!target?.email || target.mode !== 'each') return;
-  const locale = saved.doc.defaultLocale;
+  // the email in the host's language; the names as the invitation writes them
+  const locale = hostLanguageOf(saved.doc);
   await sendEmail({
     to: target.email,
     ...replyEmail({
       locale,
-      title: hostsLine(saved.doc.hosts, locale),
+      title: hostsLine(saved.doc.hosts, saved.doc.defaultLocale),
       reply: saved.reply,
       dashboardUrl: dashboardUrl(target.id),
       brand: serverEnv().INVITES_BRAND_NAME,
@@ -61,12 +63,12 @@ export async function sendDigests(now: Date): Promise<{ sent: number; failed: nu
       failed++;
       continue;
     }
-    const locale = doc.defaultLocale;
+    const locale = hostLanguageOf(doc);
     const ok = await sendEmail({
       to: item.email,
       ...digestEmail({
         locale,
-        title: hostsLine(doc.hosts, locale),
+        title: hostsLine(doc.hosts, doc.defaultLocale),
         replies: item.responses.map((r) => ({ ...r, message: null })),
         dashboardUrl: dashboardUrl(item.id),
         brand: serverEnv().INVITES_BRAND_NAME,

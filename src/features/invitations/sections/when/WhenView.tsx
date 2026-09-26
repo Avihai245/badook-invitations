@@ -4,6 +4,7 @@ import { eventRange, formatDate } from '../../lib/dates';
 import { calendarLabels, calendarLinks, firstVenue } from '../../renderer/calendar-event';
 import { Icon } from '../../ui/Icon';
 import { Countdown } from '../countdown/Countdown.client';
+import { countdownProps } from '../countdown/labels';
 import { SecHead, editPath, iv, type SectionViewProps } from '../shared';
 import { CalendarMenu } from '../venues/CalendarMenu.client';
 
@@ -44,7 +45,7 @@ export function WhenView({ section, ctx }: SectionViewProps<SectionOf<'when'>>) 
           </p>
         ) : null}
         {counting ? (
-          <Countdown targetMs={start} initialNow={ctx.now} locale={ctx.locale} afterText="" />
+          <Countdown targetMs={start} initialNow={ctx.now} {...countdownProps(ctx.locale)} afterText="" />
         ) : null}
         {note ? (
           <p className="wh-note reveal" style={iv(i++)} data-edit-path={path && `${path}.note`}>
