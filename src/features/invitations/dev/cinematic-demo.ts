@@ -201,7 +201,12 @@ export function cinematicDocument(
           type: 'custom',
           enabled: true,
           layout: 'stack',
-          media: picture('cine-candles.jpg', 0.5, 0.55, t({ he: 'נרות על שולחן ארוך', en: 'Candles on a long table' })),
+          media: picture(
+            'cine-candles.jpg',
+            0.5,
+            0.55,
+            t({ he: 'נרות על שולחן ארוך', en: 'Candles on a long table' }),
+          ),
           animation: motion('rise', { scroll: 'ken_burns' }),
           data: {
             title: t({ he: 'ערב אחד, לכל החיים', en: 'One evening, for a lifetime' }),

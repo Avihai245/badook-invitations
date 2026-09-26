@@ -898,7 +898,11 @@ a {
   width: 50.3%;
   overflow: hidden;
   background:
-    radial-gradient(130% 55% at 50% 40%, color-mix(in srgb, var(--co-light) 55%, transparent), transparent 72%),
+    radial-gradient(
+      130% 55% at 50% 40%,
+      color-mix(in srgb, var(--co-light) 55%, transparent),
+      transparent 72%
+    ),
     repeating-linear-gradient(90deg, rgb(0 0 0 / 0.05) 0 1px, transparent 1px 7px),
     linear-gradient(180deg, var(--co-color), var(--co-deep));
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.3);
@@ -1057,7 +1061,13 @@ a {
   height: max(15vh, 96px);
   background:
     linear-gradient(180deg, rgb(0 0 0 / 0.35), transparent 70%),
-    repeating-linear-gradient(90deg, var(--co-deep) 0 3px, var(--co-color) 3px 22px, var(--co-light) 22px 30px, var(--co-color) 30px 44px);
+    repeating-linear-gradient(
+      90deg,
+      var(--co-deep) 0 3px,
+      var(--co-color) 3px 22px,
+      var(--co-light) 22px 30px,
+      var(--co-color) 30px 44px
+    );
   border-bottom: 3px solid var(--co-gold);
   box-shadow: 0 10px 24px rgb(0 0 0 / 0.35);
   transition: transform 0.45s var(--ease-out);
@@ -4792,31 +4802,65 @@ footer.sec {
   @supports (animation-timeline: view()) {
     /* scroll-driven: each block comes in as it enters the screen, scrubbed by the scroll (0.3px per ms
        of the preset's duration; its delay and the stagger shift where it starts) */
-    :root:not(.no-js):not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-enter]:not([data-enter='none']) .reveal {
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal {
       opacity: 1;
       transform: none;
       transition: none;
       animation: cineEnter linear both;
       animation-timing-function: var(--en-ease, var(--ease-out));
       animation-timeline: view();
-      animation-range:
-        cover calc(var(--en-off, 0px) + var(--i, 0) * var(--en-step, 24px))
-        cover calc(var(--en-off, 0px) + var(--i, 0) * var(--en-step, 24px) + var(--en-len, 270px));
+      animation-range: cover calc(var(--en-off, 0px) + var(--i, 0) * var(--en-step, 24px)) cover
+        calc(var(--en-off, 0px) + var(--i, 0) * var(--en-step, 24px) + var(--en-len, 270px));
+    }
+    /* …but a block too near the end of the page to finish that way (no scroll left: the engine marks
+       it) comes in on time, once in view */
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal[data-en-time] {
+      opacity: 0;
+      transform: var(--en-from);
+      animation: none;
+      transition:
+        opacity var(--en-dur, 900ms) var(--ease),
+        transform var(--en-dur, 900ms) var(--en-ease, var(--ease-out));
+      transition-delay: calc(var(--en-delay, 0ms) + var(--i, 0) * var(--en-stagger, 80ms));
+    }
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal[data-en-time].in {
+      opacity: 1;
+      transform: none;
     }
     :root:not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-scroll~='parallax'] .cine-layer,
-    :root:not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-scroll~='parallax'] .cine-figure > :is(.cine-img, .cine-video) {
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-scroll~='parallax']
+      .cine-figure
+      > :is(.cine-img, .cine-video) {
       animation: cineParallax linear both;
       animation-timeline: --cine;
       animation-range: cover 0% cover 100%;
     }
-    :root:not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-scroll~='ken_burns'] :is(.cine-img, .cine-video) {
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-scroll~='ken_burns']
+      :is(.cine-img, .cine-video) {
       animation: cineKenBurns linear both;
       animation-timeline: --cine;
       animation-range: cover 0% cover 100%;
     }
     /* a parallax figure drifts and zooms at once: two animations on the same transform can't — the
        drift wins, the zoom plays on the picture's still (the video keeps the drift) */
-    :root:not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-scroll~='parallax'][data-scroll~='ken_burns'] .cine-figure > .cine-img {
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-scroll~='parallax'][data-scroll~='ken_burns']
+      .cine-figure
+      > .cine-img {
       animation: cineParallax linear both;
       animation-timeline: --cine;
       animation-range: cover 0% cover 100%;
@@ -4824,7 +4868,10 @@ footer.sec {
   }
   @supports not (animation-timeline: view()) {
     /* elsewhere: once, as each block comes into view (ScrollEngine adds `.in`), in the preset's time */
-    :root:not(.no-js):not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-enter]:not([data-enter='none']) .reveal {
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal {
       opacity: 0;
       transform: var(--en-from);
       transition:
@@ -4832,15 +4879,24 @@ footer.sec {
         transform var(--en-dur, 900ms) var(--en-ease, var(--ease-out));
       transition-delay: calc(var(--en-delay, 0ms) + var(--i, 0) * var(--en-stagger, 80ms));
     }
-    :root:not(.no-js):not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-enter]:not([data-enter='none']) .reveal.in {
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal.in {
       opacity: 1;
       transform: none;
     }
     /* Ken Burns in time: a slow zoom once the section is in view (the parallax: the engine's frames) */
-    :root:not([data-motion='none']) .inv:not([data-mode='editor']) .cine.in[data-scroll~='ken_burns'] :is(.cine-img, .cine-video) {
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine.in[data-scroll~='ken_burns']
+      :is(.cine-img, .cine-video) {
       animation: cineKenBurns 16s var(--ease-out) both;
     }
-    :root:not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-scroll~='parallax'] :is(.cine-layer, .cine-figure > .cine-img, .cine-figure > .cine-video) {
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-scroll~='parallax']
+      :is(.cine-layer, .cine-figure > .cine-img, .cine-figure > .cine-video) {
       will-change: transform;
     }
   }

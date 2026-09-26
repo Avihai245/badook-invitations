@@ -127,12 +127,15 @@ export function motionAttributes(config: MotionConfig): {
   }
   if (config.scroll.length) {
     attrs['data-scroll'] = config.scroll.join(' ');
-    if (config.scroll.includes('parallax')) vars['--px-depth'] = String(round(PARALLAX_DEPTH * config.intensity, 1));
-    if (config.scroll.includes('ken_burns')) vars['--kb-zoom'] = String(round(1 + KEN_BURNS_ZOOM * config.intensity, 3));
+    if (config.scroll.includes('parallax'))
+      vars['--px-depth'] = String(round(PARALLAX_DEPTH * config.intensity, 1));
+    if (config.scroll.includes('ken_burns'))
+      vars['--kb-zoom'] = String(round(1 + KEN_BURNS_ZOOM * config.intensity, 3));
   }
   if (config.text !== 'none') {
     attrs['data-tr'] = config.text;
-    vars['--tr-step'] = `${Math.max(12, Math.round((config.text === 'letters' ? 0.45 : 1) * config.stagger))}ms`;
+    vars['--tr-step'] =
+      `${Math.max(12, Math.round((config.text === 'letters' ? 0.45 : 1) * config.stagger))}ms`;
   }
   return { attrs, vars };
 }

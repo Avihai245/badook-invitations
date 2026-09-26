@@ -57,13 +57,23 @@ export function WhereView({ section, ctx }: SectionViewProps<SectionOf<'where'>>
         ) : null}
         <div className="actions reveal" style={iv(6)}>
           {v.buttons.maps && located ? (
-            <a className="btn btn-outline" href={googleMapsUrl(mapsTarget)} target="_blank" rel="noopener noreferrer">
+            <a
+              className="btn btn-outline"
+              href={googleMapsUrl(mapsTarget)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Icon name="navigation" size={18} />
               {ctx.t('venue.openInMaps')}
             </a>
           ) : null}
           {v.buttons.waze && located ? (
-            <a className="btn btn-outline" href={wazeUrl(mapsTarget)} target="_blank" rel="noopener noreferrer">
+            <a
+              className="btn btn-outline"
+              href={wazeUrl(mapsTarget)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Icon name="navigation" size={18} />
               {ctx.t('venue.openInWaze')}
             </a>

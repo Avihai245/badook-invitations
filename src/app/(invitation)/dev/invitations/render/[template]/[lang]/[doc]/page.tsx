@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation';
 import {
+  DEFAULT_SECTION_ANIMATION,
+  ENTER_PRESETS,
   OPENING_PRESETS,
+  type EnterPreset,
   type Locale,
   type OpeningPreset,
   type Section,
@@ -41,6 +44,8 @@ export const dynamic = 'force-dynamic';
  *   videoSound=1           the hero video's sound instead of a track (the host's "video sound" option)
  *   opening=gate|curtain|fireworks|gold_dust|envelope   the host's cinematic opening (cover.opening)
  *   cinematic=0            the event without the `cinematic` feature: the plain rendering
+ *   motion=<enter preset>  every section comes in with that preset (rise, zoom, tilt…) — the scroll-
+ *                          driven entrances on any document
  * Document `cinematic` (every v2 layout and motion) reads its pictures from /dev/media.
  */
 export default async function RenderPage({ params, searchParams }: { params: Params; searchParams: Search }) {
@@ -123,6 +128,14 @@ export default async function RenderPage({ params, searchParams }: { params: Par
           }
         : s,
     );
+  const motionParam = one(sp.motion);
+  if ((ENTER_PRESETS as readonly string[]).includes(motionParam ?? '')) {
+    const preset = motionParam as EnterPreset;
+    sections = sections.map((s): Section => ({
+      ...s,
+      animation: { ...DEFAULT_SECTION_ANIMATION, enter: { ...DEFAULT_SECTION_ANIMATION.enter, preset } },
+    }));
+  }
   const nowParam = one(sp.now);
   const now = nowParam && !Number.isNaN(Date.parse(nowParam)) ? Date.parse(nowParam) : undefined;
   const mode = one(sp.mode) === 'preview' ? 'preview' : 'live';

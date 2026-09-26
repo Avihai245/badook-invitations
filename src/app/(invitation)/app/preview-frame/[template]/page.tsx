@@ -41,7 +41,12 @@ export default async function PreviewFramePage({
     const other = doc.locales.find((l) => l !== locale);
     const query = (l: Locale) =>
       `?${new URLSearchParams({ invitation, ...(version ? { version } : {}), lang: l }).toString()}`;
-    standalone = { doc, locale, langHref: other ? query(other) : null, cinematic: await cinematicFor(inv.id) };
+    standalone = {
+      doc,
+      locale,
+      langHref: other ? query(other) : null,
+      cinematic: await cinematicFor(inv.id),
+    };
   }
   return (
     <PreviewFrame

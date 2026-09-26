@@ -375,7 +375,8 @@ function* assetRefs(doc: InvitationDocument): Generator<{
     if (media) {
       const at = `sections.${i}.media`;
       yield { path: `${at}.src`, ref: media.src, field: 'section.media', section, unused };
-      if (media.poster) yield { path: `${at}.poster`, ref: media.poster, field: 'section.media', section, unused };
+      if (media.poster)
+        yield { path: `${at}.poster`, ref: media.poster, field: 'section.media', section, unused };
     }
   }
 }
@@ -645,7 +646,11 @@ export function validateDocument(
     // ── v2 presentation ──
     const layout = s.type === 'hero' ? 'full_bleed' : (s.layout ?? 'stack');
     const media = s.type === 'hero' ? null : (s.media ?? null);
-    if (s.type !== 'hero' && layout !== 'stack' && (!media || (layout === 'video_bg' && media.kind !== 'video')))
+    if (
+      s.type !== 'hero' &&
+      layout !== 'stack' &&
+      (!media || (layout === 'video_bg' && media.kind !== 'video'))
+    )
       add({
         path: `sections.${i}.${media ? 'media' : 'layout'}`,
         code: 'layout_media',

@@ -10,7 +10,8 @@ export const REVEALED = '.reveal:not(.in), .divider:not(.in), .deco:not(.in), .c
 
 const graphemes =
   typeof Intl !== 'undefined' && 'Segmenter' in Intl
-    ? (text: string) => [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((s) => s.segment)
+    ? (text: string) =>
+        [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((s) => s.segment)
     : (text: string) => [...text];
 
 const RTL_CHAR = /[֐-ࣿיִ-﷿ﹰ-﻿]/u;
@@ -95,7 +96,9 @@ interface TextRun {
  *   data or reduced motion — the still stays), played muted and inline, paused away from the screen
  *   and in a hidden tab;
  * - the parallax where scroll-driven animations are missing: the layer's transform written once per
- *   frame while its section is on screen, from geometry measured outside the scroll handler.
+ *   frame while its section is on screen, from geometry measured outside the scroll handler;
+ * - near the end of the page, where there is no scroll left to finish a scroll-driven entrance, the
+ *   blocks come in on time instead (`data-en-time`).
  *
  * With reduced motion or <html data-motion="none"> nothing moves: the CSS shows every final state and
  * the engine only reveals, never splits text, plays video or moves layers. New nodes (a language
@@ -200,7 +203,8 @@ export function ScrollEngine() {
         });
         pieces = tops.length;
       }
-      const step = Number.parseFloat(section ? getComputedStyle(section).getPropertyValue('--tr-step') : '') || 60;
+      const step =
+        Number.parseFloat(section ? getComputedStyle(section).getPropertyValue('--tr-step') : '') || 60;
       const run = { el, fx, pieces, step: mode === 'lines' ? step * 2.5 : step };
       runs.set(el, run);
       textIn.observe(el);
@@ -341,28 +345,72 @@ export function ScrollEngine() {
       if (frame) cancelAnimationFrame(frame);
     });
 
+    // ── the page's end, where a scroll-driven entrance would stop half-way ──
+    // A block comes in over a stretch of scroll once it is on screen (--en-off, its stagger and
+    // --en-len): one nearer than that to the end of the page could never finish — there is no page
+    // left to scroll. Those come in on time instead, once in view (`data-en-time`, as in the
+    // fallback). Measured from the layout (offsets: the entrance's own transform left out) whenever
+    // the page's size changes — never while it scrolls.
+    let endFrame = 0;
+    const settleEnd = () => {
+      endFrame = 0;
+      const pageEnd = document.documentElement.scrollHeight;
+      document
+        .querySelectorAll<HTMLElement>('.cine[data-enter]:not([data-enter="none"])')
+        .forEach((section) => {
+          const style = getComputedStyle(section);
+          const px = (name: string) => Number.parseFloat(style.getPropertyValue(name)) || 0;
+          const top = section.getBoundingClientRect().top + window.scrollY;
+          section.querySelectorAll<HTMLElement>('.reveal').forEach((el) => {
+            let y = 0;
+            let n: HTMLElement | null = el;
+            for (; n && n !== section; n = n.offsetParent as HTMLElement | null) y += n.offsetTop;
+            if (n !== section) return;
+            const i = Number.parseFloat(el.style.getPropertyValue('--i')) || 0;
+            const travel = px('--en-off') + i * px('--en-step') + (px('--en-len') || 270);
+            el.toggleAttribute('data-en-time', pageEnd - (top + y) < travel + 4);
+          });
+        });
+    };
+    const checkEnd = () => {
+      if (!endFrame) endFrame = requestAnimationFrame(settleEnd);
+    };
+    const endResize = new ResizeObserver(checkEnd);
+    const ending = scrollDriven && moving();
+    if (ending) {
+      const main = document.querySelector('.inv > main');
+      if (main) endResize.observe(main);
+    }
+    cleanups.push(() => {
+      endResize.disconnect();
+      if (endFrame) cancelAnimationFrame(endFrame);
+    });
+
     // ── (re)scan: every node the page adds ──
     const scan = () => {
+      if (ending) checkEnd();
       document.querySelectorAll(REVEALED).forEach((el) => reveal.observe(el));
       const instant = inv?.dataset.instant !== undefined;
-      document
-        .querySelectorAll<HTMLElement>(`.cine[data-tr] :is(${TEXT_REVEAL_TARGETS})`)
-        .forEach((el) => {
-          if (el.dataset.trDone !== undefined || runs.has(el)) return;
-          // the language switch shows what is on screen as it is — no reveal again
-          if (instant && el.getBoundingClientRect().top < window.innerHeight) {
-            el.dataset.trDone = '';
-            return;
-          }
-          textNear.observe(el);
-        });
+      document.querySelectorAll<HTMLElement>(`.cine[data-tr] :is(${TEXT_REVEAL_TARGETS})`).forEach((el) => {
+        if (el.dataset.trDone !== undefined || runs.has(el)) return;
+        // the language switch shows what is on screen as it is — no reveal again
+        if (instant && el.getBoundingClientRect().top < window.innerHeight) {
+          el.dataset.trDone = '';
+          return;
+        }
+        textNear.observe(el);
+      });
       const play = moving() && !saveData() && !reducedData();
       document.querySelectorAll<HTMLVideoElement>('video.cine-video[data-src]').forEach((v) => {
         if (videos.has(v) || !play) return;
         videos.add(v);
         videoIo.observe(v);
       });
-      for (const v of videos) if (!v.isConnected) (videos.delete(v), onScreen.delete(v));
+      for (const v of videos) {
+        if (v.isConnected) continue;
+        videos.delete(v);
+        onScreen.delete(v);
+      }
       if (!scrollDriven && moving()) {
         document.querySelectorAll<HTMLElement>('.cine[data-scroll~="parallax"]').forEach((section) => {
           const layer =
@@ -374,8 +422,12 @@ export function ScrollEngine() {
           layers.set(section, { section, layer, frame: frameEl, top: 0, height: 0, depth });
           parallaxIo.observe(section);
         });
-        for (const [section, l] of layers)
-          if (!section.isConnected) (layers.delete(section), visible.delete(l), parallaxIo.unobserve(section));
+        for (const [section, l] of layers) {
+          if (section.isConnected) continue;
+          layers.delete(section);
+          visible.delete(l);
+          parallaxIo.unobserve(section);
+        }
       }
     };
     scan();

@@ -42,7 +42,10 @@ const files = await page.evaluate(async () => {
       : color.replace('rgb(', 'rgba(').replace(')', ',0)');
     const grad = g.createRadialGradient(x, y, 0, x, y, r);
     grad.addColorStop(0, color);
-    grad.addColorStop(0.45, color.startsWith('rgba') ? color.replace(/,([^,]*)\)$/, (_, a) => `,${a * 0.45})`) : color);
+    grad.addColorStop(
+      0.45,
+      color.startsWith('rgba') ? color.replace(/,([^,]*)\)$/, (_, a) => `,${a * 0.45})`) : color,
+    );
     grad.addColorStop(1, clear);
     g.globalCompositeOperation = 'lighter';
     g.fillStyle = grad;
@@ -53,7 +56,10 @@ const files = await page.evaluate(async () => {
     g.beginPath();
     g.moveTo(0, h);
     for (let x = 0; x <= w; x += 8)
-      g.lineTo(x, base + Math.sin(x / (w / 3) + phase) * amp + Math.sin(x / (w / 11) + phase * 2) * amp * 0.25);
+      g.lineTo(
+        x,
+        base + Math.sin(x / (w / 3) + phase) * amp + Math.sin(x / (w / 11) + phase * 2) * amp * 0.25,
+      );
     g.lineTo(w, h);
     g.closePath();
     g.fillStyle = color;
@@ -135,7 +141,15 @@ const files = await page.evaluate(async () => {
       const y = rnd() * 1500;
       const r = 30 + rnd() * 110;
       const warm = rnd() > 0.3;
-      glow(g, x, y, r, warm ? `rgba(255,${190 + rnd() * 50},${120 + rnd() * 60},${0.25 + rnd() * 0.35})` : `rgba(180,200,255,${0.2 + rnd() * 0.25})`);
+      glow(
+        g,
+        x,
+        y,
+        r,
+        warm
+          ? `rgba(255,${190 + rnd() * 50},${120 + rnd() * 60},${0.25 + rnd() * 0.35})`
+          : `rgba(180,200,255,${0.2 + rnd() * 0.25})`,
+      );
     }
     grain(g, 1200, 1500, 8);
     out['cine-bokeh.jpg'] = await toB64(await jpeg(c));
@@ -174,7 +188,8 @@ const files = await page.evaluate(async () => {
       g.fill();
     }
     // string lights
-    for (let i = 0; i < 40; i++) glow(g, 120 + i * 40, 640 + Math.sin(i / 3) * 18, 18, 'rgba(255,220,150,.9)');
+    for (let i = 0; i < 40; i++)
+      glow(g, 120 + i * 40, 640 + Math.sin(i / 3) * 18, 18, 'rgba(255,220,150,.9)');
     hills(g, 1800, 1300, 1150, 14, '#0C0F18', 0.2);
     grain(g, 1800, 1300, 8);
     out['cine-venue.jpg'] = await toB64(await jpeg(c));
@@ -232,7 +247,13 @@ const files = await page.evaluate(async () => {
       for (const l of lights) {
         // a loop: every light returns to where it started after 4s
         const k = Math.sin(t * Math.PI * 2);
-        glow(g, l.x + l.dx * k, l.y + l.dy * Math.sin(t * Math.PI * 2 + l.r), l.r, `rgba(255,205,140,${l.a})`);
+        glow(
+          g,
+          l.x + l.dx * k,
+          l.y + l.dy * Math.sin(t * Math.PI * 2 + l.r),
+          l.r,
+          `rgba(255,205,140,${l.a})`,
+        );
       }
     };
     draw(0);

@@ -144,7 +144,11 @@ const RadiusValue = z.number().min(0).max(64);
 export const ThemeOverridesSchema = z.strictObject({
   palette: PartialPaletteSchema.optional(),
   radius: z
-    .strictObject({ card: RadiusValue.optional(), button: RadiusValue.optional(), media: RadiusValue.optional() })
+    .strictObject({
+      card: RadiusValue.optional(),
+      button: RadiusValue.optional(),
+      media: RadiusValue.optional(),
+    })
     .optional(),
   typography: z
     .strictObject({

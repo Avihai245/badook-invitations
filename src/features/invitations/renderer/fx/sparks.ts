@@ -193,7 +193,10 @@ export function fireworks(colors: readonly string[], shells?: number): number {
       color: '#FFF4D6',
       drag: 0.4,
       gravity: 60,
-      burst: { colors: [colors[i % colors.length]!, colors[(i + 1) % colors.length]!, '#FFFFFF'], count: per },
+      burst: {
+        colors: [colors[i % colors.length]!, colors[(i + 1) % colors.length]!, '#FFFFFF'],
+        count: per,
+      },
     });
   }
   run();

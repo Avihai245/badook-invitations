@@ -27,7 +27,9 @@ export function WhenView({ section, ctx }: SectionViewProps<SectionOf<'when'>>) 
       <div className="wrap">
         {title ? <SecHead title={title} path={path} /> : null}
         <p className="wh-date reveal" style={iv(i++)}>
-          {d.showWeekday ? <span className="wh-weekday">{formatDate(date, ctx.locale, { weekday: 'long' })}</span> : null}
+          {d.showWeekday ? (
+            <span className="wh-weekday">{formatDate(date, ctx.locale, { weekday: 'long' })}</span>
+          ) : null}
           <span className="wh-day">{formatDate(date, ctx.locale, { day: 'numeric' })}</span>
           <span className="wh-month">{formatDate(date, ctx.locale, { month: 'long', year: 'numeric' })}</span>
         </p>

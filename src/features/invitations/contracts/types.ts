@@ -132,16 +132,7 @@ export interface SectionMedia extends Media {
  * transform/opacity presets — `slide_start` comes from the reading side, `tilt` lifts in tipped back.
  */
 export type EnterPreset =
-  | 'auto'
-  | 'none'
-  | 'fade'
-  | 'rise'
-  | 'sink'
-  | 'zoom'
-  | 'zoom_out'
-  | 'slide_start'
-  | 'slide_end'
-  | 'tilt';
+  'auto' | 'none' | 'fade' | 'rise' | 'sink' | 'zoom' | 'zoom_out' | 'slide_start' | 'slide_end' | 'tilt';
 export const ENTER_PRESETS = [
   'auto',
   'none',
@@ -161,7 +152,12 @@ export const SCROLL_EFFECTS = ['none', 'parallax', 'ken_burns'] as const satisfi
 export type TextReveal = 'none' | 'letters' | 'words' | 'lines';
 export const TEXT_REVEALS = ['none', 'letters', 'words', 'lines'] as const satisfies readonly TextReveal[];
 export type MotionEasing = 'smooth' | 'spring' | 'gentle' | 'linear';
-export const MOTION_EASINGS = ['smooth', 'spring', 'gentle', 'linear'] as const satisfies readonly MotionEasing[];
+export const MOTION_EASINGS = [
+  'smooth',
+  'spring',
+  'gentle',
+  'linear',
+] as const satisfies readonly MotionEasing[];
 
 /**
  * A section's motion, declaratively (renderer/motion/engine.ts reads it). Where the browser has

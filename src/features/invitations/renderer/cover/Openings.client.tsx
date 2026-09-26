@@ -233,7 +233,14 @@ export function CinematicCover({
         {opening.scroll && scrollLabel ? (
           <span className="co-scroll" aria-hidden="true">
             {scrollLabel}
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.4">
+            <svg
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.4"
+            >
               <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>

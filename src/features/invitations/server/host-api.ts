@@ -245,8 +245,7 @@ export async function saveDraft(
   if (!parsed.success) return fail(400, 'invalid');
   // any known schema version (an editor still open on the previous release saves v1): stored as the latest
   const draft = safeMigrateDocument(parsed.data.draft);
-  if (!draft.success)
-    return fail(422, 'invalid', { issues: draft.issues.slice(0, 20).map((i) => i.path) });
+  if (!draft.success) return fail(422, 'invalid', { issues: draft.issues.slice(0, 20).map((i) => i.path) });
   const result = await deps.db.saveDraft(id, userId, draft.data, parsed.data.updatedAt);
   if (!result) return fail(404, 'not_found');
   if (!result.ok) return fail(409, 'conflict', { updatedAt: result.updatedAt, draft: result.draft });

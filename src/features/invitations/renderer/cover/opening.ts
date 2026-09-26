@@ -30,7 +30,8 @@ const HEX = /^#[0-9A-Fa-f]{6}$/;
 
 /** A default color per opening, from the palette: lacquered doors, velvet, a night sky, a dark veil. */
 function colorFor(preset: Opening['preset'], palette: Palette): string {
-  const deep = relativeLuminance(palette.accent) < 0.2 ? palette.accent : mixHex(palette.accent, '#000000', 0.35);
+  const deep =
+    relativeLuminance(palette.accent) < 0.2 ? palette.accent : mixHex(palette.accent, '#000000', 0.35);
   switch (preset) {
     case 'gate':
       return mixHex(palette.ink, deep, 0.5);
