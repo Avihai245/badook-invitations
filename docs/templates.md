@@ -81,3 +81,32 @@ keeps its centre calm for the names.
 | מתחת לים / Ocean Friends (`ocean-friends`) | Under-the-sea picture books, ages 1–6 — a smiling whale, fish, a jellyfish and a treasure chest | birthday, baby_shower, brit | |
 | חללית / Rocket Launch (`rocket-launch`) | Space adventure, ages 4–9 — a rocket lifting off, an astronaut, planets and a starfield | birthday, bar_mitzvah | ✓ |
 | חד־קרן / Unicorn Dream (`unicorn-dream`) | The pastel “unicorn and rainbow” party trend, ages 3–9 — candy colours, glitter and clouds | birthday, bat_mitzvah | ✓ |
+
+## What a manifest can add since schema v2: tokens, motion intensity, a cinematic opening
+
+Every field below is optional and defaults to the design as it is, so none of the manifests above had to
+change to keep its look.
+
+- `tokens.typography` — per type role (`display`: names and titles, `heading`: subtitles and labels,
+  `body`, `caption`): `size` and `lineHeight` as multiples of the base scale (§9A.2 of the master prompt),
+  `letterSpacing` in em added to Latin text (Hebrew is never letter-spaced). They become the CSS
+  variables `--ty-<role>`, `--lh-<role>` and `--ls-<role>`.
+- `tokens.spacing` — `section` (the 56px / 80px section padding), `gutter` (24px) and `block` (the gaps
+  inside a section), as multiples → `--sp-<key>`.
+- `tokens.radius.media` — the corners of a section's framed picture (absent: `radius.card`).
+- `tokens.overlay` — the scrim under text on a section's photo or video: `color` (null: the hero's
+  `overlayColor`) and `opacity` (null: 0.42).
+- `motion.intensity` — 0 to 2 (default 1): multiplies every travel of the motion engine (the reveal
+  distance, the parallax depth, the Ken Burns zoom). `motion.preset: 'none'` still turns motion off.
+- `cover.opening` — a cinematic opening instead of the cover style's own:
+  `{ "preset": "gate" | "curtain" | "fireworks" | "gold_dust" | "envelope", "trigger"?: "tap" | "scroll",
+  "motion"?: "swing" | "slide" | "part" | "rise", "color"?: "#rrggbb" | null }`. Guests see it only when
+  the event has the `cinematic` feature. The host's choice (`cover.opening` in the document) wins; the
+  template's trigger, motion and colour apply only when the host picked the same preset.
+
+A document can override the same tokens for one section (`themeOverrides`: palette, radius, typography,
+spacing — a band in its own colours, larger titles in one section) and give each section its own media,
+layout and motion (master prompt §3). To check a template: `/dev/invitations/render/<id>/he/cinematic`
+shows every layout and motion (`?opening=gate|curtain|fireworks|gold_dust`, `?cinematic=0` for the plain
+rendering, `?motion=rise` for entrances on any document), and `npm run perf:templates -- --tpl <id>`
+measures its demo against the performance budget.
