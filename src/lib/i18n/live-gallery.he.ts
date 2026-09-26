@@ -167,6 +167,14 @@ export const liveGalleryHe = {
       rejected: 'נדחה',
       uploading: 'בהעלאה',
     },
+    /** the same, short enough for a small tile */
+    statusShort: {
+      pending: 'ממתין',
+      published: 'בגלריה',
+      hidden: 'מוסתר',
+      rejected: 'נדחה',
+      uploading: 'בהעלאה',
+    },
     reasons: {
       ok: 'עבר את הבדיקות',
       approval: 'ממתין לאישור שלכם',

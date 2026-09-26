@@ -153,6 +153,8 @@ export const GALLERY = {
     blockedRetryMs: 60_000,
     /** times the server may say a file isn't in storage after it was sent, before the item gives up */
     maxMismatches: 5,
+    /** while the browser says it is offline, the queue looks again this often */
+    offlineRecheckMs: 5_000,
   },
 
   feed: {

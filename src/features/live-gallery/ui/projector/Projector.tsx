@@ -286,6 +286,7 @@ function SlideView({ slide, leaving, onEnded }: { slide: Slide; leaving: boolean
             : 'absolute inset-0 grid place-items-center p-[4vmin] motion-safe:animate-[projector-drift_9000ms_ease-out_both]'
         }
       >
+        {/* sized by the screen, not in percentages: a grid cell grows to a big photo's own size */}
         {item.kind === 'video' && item.video ? (
           <video
             src={item.video}
@@ -294,13 +295,13 @@ function SlideView({ slide, leaving, onEnded }: { slide: Slide; leaving: boolean
             muted
             playsInline
             onEnded={onEnded}
-            className="max-h-full max-w-full rounded-[1vmin] shadow-[0_2vmin_6vmin_rgba(0,0,0,0.6)]"
+            className="max-h-[92vh] max-w-[92vw] rounded-[1vmin] shadow-[0_2vmin_6vmin_rgba(0,0,0,0.6)]"
           />
         ) : src ? (
           <img
             src={src}
             alt=""
-            className={`max-h-full max-w-full object-contain shadow-[0_2vmin_6vmin_rgba(0,0,0,0.6)] ${fresh ? 'rounded-[0.6vmin] outline-[1.2vmin] outline-white' : 'rounded-[0.6vmin]'}`}
+            className={`max-h-[92vh] max-w-[92vw] object-contain shadow-[0_2vmin_6vmin_rgba(0,0,0,0.6)] ${fresh ? 'rounded-[0.6vmin] outline-[1.2vmin] outline-white' : 'rounded-[0.6vmin]'}`}
           />
         ) : null}
       </div>

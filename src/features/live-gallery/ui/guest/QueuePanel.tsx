@@ -119,6 +119,7 @@ export function QueuePanel({
             <QueueRow
               key={item.localId}
               item={item}
+              offline={!snapshot.online}
               thumbnail={thumbnail}
               onRetry={onRetry}
               onRemove={onRemove}
@@ -132,11 +133,14 @@ export function QueuePanel({
 
 function QueueRow({
   item,
+  offline,
   thumbnail,
   onRetry,
   onRemove,
 }: {
   item: QueueItem;
+  /** the phone has no connection: what isn't sent waits for it */
+  offline: boolean;
   thumbnail(localId: string): Promise<Blob | null>;
   onRetry(): void;
   onRemove(localId: string): void;
@@ -183,8 +187,10 @@ function QueueRow({
         : r.status === 'pending'
           ? 'text-warning'
           : 'text-muted';
-    if (item.stage === 'visible') label = `${label} · ${fmt(t.item.sending, { percent: pct })}`;
-  } else if (waiting) label = t.item.waiting;
+    if (item.stage === 'visible')
+      label = `${label} · ${offline ? t.item.offline : fmt(t.item.sending, { percent: pct })}`;
+  } else if (offline) label = t.item.offline;
+  else if (waiting) label = t.item.waiting;
   else if (item.stage === 'queued') label = t.item.queued;
   else label = fmt(t.item.sending, { percent: pct });
 
@@ -208,7 +214,7 @@ function QueueRow({
       {item.stage === 'done' && item.result?.status === 'published' ? (
         <CircleCheck aria-hidden className="size-5 shrink-0 text-success" />
       ) : null}
-      {waiting ? (
+      {waiting && !offline ? (
         <button
           type="button"
           onClick={onRetry}

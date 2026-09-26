@@ -306,7 +306,7 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
         <KpiCard
           label={L.kpi.photos}
           value={number(counts.images)}
-          sub={fmt(L.kpi.size, { size: formatBytes(counts.bytes, locale) })}
+          sub={counts.bytes ? fmt(L.kpi.size, { size: formatBytes(counts.bytes, locale) }) : undefined}
           icon={<Images />}
         />
         <KpiCard label={L.kpi.videos} value={number(counts.videos)} icon={<Video />} />

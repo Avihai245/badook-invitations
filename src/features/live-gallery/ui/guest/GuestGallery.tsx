@@ -474,6 +474,7 @@ function GalleryBody({
                     maxLength={GALLERY.limits.nameLength}
                     onChange={(e) => onName(e.target.value)}
                     placeholder={t.upload.namePlaceholder}
+                    dir="auto"
                     autoComplete="name"
                     aria-describedby="gallery-name-help"
                     className="mt-1.5 h-11 w-full rounded-[10px] border border-line bg-surface px-3 text-[15px] focus:border-ink focus:shadow-ring focus:outline-hidden"

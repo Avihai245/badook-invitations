@@ -323,7 +323,12 @@ export class Uploader {
     try {
       for (;;) {
         if (this.stopped || this.passive) break;
-        if (typeof navigator !== 'undefined' && navigator.onLine === false) break;
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+          // offline: the browser's `online` event starts it again — and a look now and then, in case
+          // that event never comes (some phones miss it after sleeping)
+          this.timer = setTimeout(() => this.kick(), GALLERY.queue.offlineRecheckMs);
+          break;
+        }
         const action = nextAction([...this.items.values()], Date.now(), { blocked: !!this.blocked });
         if (action.type === 'idle') break;
         if (action.type === 'wait') {

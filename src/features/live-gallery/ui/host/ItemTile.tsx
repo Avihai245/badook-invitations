@@ -78,7 +78,9 @@ export function ItemTile({
         type="button"
         onClick={onOpen}
         className="block aspect-square w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        aria-label={who ? `${kind} · ${who}` : kind}
+        aria-label={[kind, who, item.status !== 'published' ? g.status[item.status] : null]
+          .filter(Boolean)
+          .join(' · ')}
       >
         {item.thumb ? (
           <img src={item.thumb} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
@@ -100,7 +102,7 @@ export function ItemTile({
           variant={item.status === 'pending' ? 'warning' : item.status === 'rejected' ? 'danger' : 'neutral'}
           className="pointer-events-none absolute start-1.5 top-1.5 max-w-[calc(100%-44px)] truncate shadow-sm"
         >
-          {t.liveGallery.items.status[item.status]}
+          {g.statusShort[item.status]}
         </Badge>
       ) : null}
       <label

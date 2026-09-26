@@ -65,6 +65,7 @@ export const galleryGuestHe = {
     duplicate: 'כבר בגלריה',
     failed: 'לא עלה',
     waiting: 'ינסה שוב בעוד רגע',
+    offline: 'ממתין לחיבור',
     retry: 'ניסיון חוזר',
     remove: 'הסרה מהרשימה',
     photo: 'תמונה',

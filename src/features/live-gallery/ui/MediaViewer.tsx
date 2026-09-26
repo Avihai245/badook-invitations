@@ -171,7 +171,7 @@ export function MediaViewer<T extends ViewerItem>({
               controls
               playsInline
               preload="metadata"
-              className="max-h-full max-w-full rounded-[6px] bg-black"
+              className="max-h-[calc(100svh-150px)] max-w-full rounded-[6px] bg-black"
             />
           ) : src ? (
             <div key={item.id} className="relative grid max-h-full max-w-full place-items-center">

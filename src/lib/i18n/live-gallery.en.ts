@@ -44,8 +44,8 @@ export const liveGalleryEn: LiveGalleryDict = {
     label: 'The gallery in numbers',
     photos: 'Photos',
     videos: 'Videos',
-    pending: 'Awaiting approval',
-    uploaders: 'Phones that uploaded',
+    pending: 'To approve',
+    uploaders: 'Uploaders',
     size: '{size} in total',
   },
   share: {
@@ -169,6 +169,13 @@ export const liveGalleryEn: LiveGalleryDict = {
     status: {
       pending: 'Awaiting approval',
       published: 'In the gallery',
+      hidden: 'Hidden',
+      rejected: 'Rejected',
+      uploading: 'Uploading',
+    },
+    statusShort: {
+      pending: 'Waiting',
+      published: 'In gallery',
       hidden: 'Hidden',
       rejected: 'Rejected',
       uploading: 'Uploading',

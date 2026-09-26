@@ -13,5 +13,5 @@ export function formatBytes(bytes: number, locale: 'he' | 'en'): string {
     new Intl.NumberFormat(intl(locale), { maximumFractionDigits: digits }).format(n);
   if (bytes >= 1024 ** 3) return `${nf(bytes / 1024 ** 3, 1)} GB`;
   if (bytes >= 1024 ** 2) return `${nf(bytes / 1024 ** 2, bytes >= 100 * 1024 ** 2 ? 0 : 1)} MB`;
-  return `${nf(Math.max(1, Math.round(bytes / 1024)), 0)} KB`;
+  return `${nf(bytes > 0 ? Math.max(1, Math.round(bytes / 1024)) : 0, 0)} KB`;
 }

@@ -66,6 +66,7 @@ export const galleryGuestEn: GalleryGuestDict = {
     duplicate: 'Already in the gallery',
     failed: 'Not uploaded',
     waiting: 'Retrying shortly',
+    offline: 'Waiting for a connection',
     retry: 'Try again',
     remove: 'Remove from the list',
     photo: 'Photo',
