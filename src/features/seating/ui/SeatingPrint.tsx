@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { Button, Checkbox, Hint, Segmented } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { guestRows, tableRows } from '../export';
-import { contentBounds, planSize } from '../geometry';
+import { contentBounds, itemsBounds, planSize } from '../geometry';
 import type { SeatingState } from '../model';
 import { occupancy, unitsById } from '../plan';
 import { LandmarkGlyph, TableGlyph } from './glyphs';
@@ -42,9 +42,10 @@ export function SeatingPrint({
   const taken = useMemo(() => occupancy(plan, byId), [plan, byId]);
   const guests = useMemo(() => guestRows(plan, units, locale), [plan, units, locale]);
   const tables = useMemo(() => tableRows(plan, units, locale), [plan, units, locale]);
-  const box = contentBounds(plan);
   const size = planSize(plan.layout);
   const bg = plan.layout.background;
+  // the plan whole; without one, just the tables and marks
+  const box = (size ? null : itemsBounds(plan)) ?? contentBounds(plan);
   const planUrl = bg && bg.type !== 'application/pdf' && planBase ? `${planBase}/${bg.path}` : null;
   const columns = (paper === 'A3' ? 1 : 0) + (orientation === 'landscape' ? 3 : 2);
   const pad = 1;

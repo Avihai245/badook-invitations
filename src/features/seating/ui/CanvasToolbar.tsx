@@ -13,7 +13,7 @@ import {
   Plus,
   Redo2,
   RectangleHorizontal,
-  Scan,
+  Focus,
   Sparkles,
   Square,
   Undo2,
@@ -65,14 +65,15 @@ export function CanvasToolbar({
   const s = t.seating;
   const tb = s.toolbar;
   const pill =
-    'inline-flex h-9 items-center gap-1.5 rounded-btn bg-primary px-3 text-[13px] font-semibold text-primary-ink shadow-sm hover:bg-primary-hover [&_svg]:size-4';
+    'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-btn bg-primary px-2.5 text-[13px] font-semibold text-primary-ink shadow-sm hover:bg-primary-hover sm:px-3 [&_svg]:size-4';
   const soft =
-    'inline-flex h-9 items-center gap-1.5 rounded-btn border border-line bg-surface px-3 text-[13px] font-semibold text-ink shadow-sm hover:bg-subtle [&_svg]:size-4';
+    'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-btn border border-line bg-surface px-2.5 text-[13px] font-semibold text-ink shadow-sm hover:bg-subtle sm:px-3 [&_svg]:size-4';
   return (
     <div
       role="toolbar"
       aria-label={tb.label}
-      className="flex flex-wrap items-center gap-1.5 border-b border-line bg-surface/95 px-2 py-1.5 backdrop-blur"
+      // phones: one row that scrolls sideways rather than two rows over the map
+      className="flex items-center gap-1 overflow-x-auto border-b border-line bg-surface/95 px-2 py-1.5 backdrop-blur [scrollbar-width:none] sm:flex-wrap sm:gap-1.5 [&::-webkit-scrollbar]:hidden"
     >
       <Menu
         align="start"
@@ -124,7 +125,7 @@ export function CanvasToolbar({
         <ZoomIn />
       </IconButton>
       <IconButton label={tb.fit} tooltip onClick={onFit}>
-        <Scan />
+        <Focus />
       </IconButton>
       <IconButton label={tb.snap} tooltip aria-pressed={snap} onClick={() => onSnap(!snap)}>
         <Grid3x3 />
@@ -133,15 +134,17 @@ export function CanvasToolbar({
         <MapIcon />
       </IconButton>
       <div className="ms-auto flex items-center gap-0.5">
+        {/* phones have it beside "map | guests" (and the bar on top in full screen) */}
         <IconButton
           label={full ? s.actions.exitFullScreen : s.actions.fullScreen}
           tooltip
           onClick={() => onFull(!full)}
-          data-testid="full-screen"
+          className="max-sm:hidden"
+          data-testid={full ? undefined : 'full-screen'}
         >
           {full ? <Minimize /> : <Maximize />}
         </IconButton>
-        <SeatingHelp className="size-9" />
+        <SeatingHelp className={full ? 'size-9' : 'size-9 max-sm:hidden'} />
       </div>
     </div>
   );
@@ -163,6 +166,7 @@ export function SeatingHelp({ className }: { className?: string }) {
         { icon: <Hand />, ...h.move },
         { icon: <Undo2 className="icon-dir" />, ...h.undo },
         { icon: <Minus />, ...h.zoom },
+        { icon: <Maximize />, ...h.full },
         { icon: <Grid3x3 />, ...h.snap },
         { icon: <MapIcon />, ...h.plan },
         { icon: <MousePointerClick />, ...h.assign },

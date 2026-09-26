@@ -108,6 +108,9 @@ export type SolverIssue =
   | { code: 'too_big_together'; units: string[]; seats: number }
   /** a table with people at it, below the minimum fill */
   | { code: 'underfilled'; table: string; seated: number; capacity: number }
+  /** "group": a table where categories sit together; "mix": a table that is mostly one category */
+  | { code: 'mixed'; table: string; categories: string[] }
+  | { code: 'unmixed'; table: string; category: string }
   /** units whose wish about a zone isn't met */
   | { code: 'preference'; zone: 'stage' | 'dance' | 'exit'; near: boolean; units: string[] };
 
@@ -538,6 +541,16 @@ export function solve(input: SolverInput, onProgress?: (p: SolverProgress) => vo
         issues.push({ code: 'underfilled', table: input.tables[t]!.id, seated: o, capacity: cap[t]! });
     }
     categoryPart += tableCost(t) - (o < want ? W.fill * (want - o) : 0);
+    if (!catPeople[t]) continue;
+    const present = categories.filter((_, c) => catCount[t * C + c]! > 0);
+    if (mode === 'group' && present.length > 1)
+      issues.push({ code: 'mixed', table: input.tables[t]!.id, categories: present });
+    if (mode === 'mix' && C > 1) {
+      let top = 0;
+      for (let c = 1; c < C; c++) if (catCount[t * C + c]! > catCount[t * C + top]!) top = c;
+      if (catCount[t * C + top]! > Math.ceil(o / 2))
+        issues.push({ code: 'unmixed', table: input.tables[t]!.id, category: categories[top]! });
+    }
   }
   let prefPart = 0;
   const unmet = new Map<string, string[]>();

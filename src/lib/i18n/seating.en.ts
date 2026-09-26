@@ -26,6 +26,7 @@ export const seatingEn: SeatingDict = {
     tables: { one: '1 table · {seats} seats', other: '{n} tables · {seats} seats' },
     unseated: { one: '1 family without a table yet', other: '{n} families without a table yet' },
     allSeated: 'Everyone coming has a seat',
+    none: 'Nobody has confirmed yet',
   },
   save: {
     saving: 'Saving…',
@@ -104,6 +105,10 @@ export const seatingEn: SeatingDict = {
       zoom: {
         label: 'Zoom and show everything',
         text: 'The mouse wheel or two fingers zoom. “Show everything” fits the whole hall on the screen.',
+      },
+      full: {
+        label: 'Full screen',
+        text: 'The map and the guests on the whole screen, without the rest of the page — handy on a phone. Esc leaves it.',
       },
       snap: {
         label: 'Snap to grid',
@@ -327,6 +332,8 @@ export const seatingEn: SeatingDict = {
     scoreHint: 'Penalty points for what didn’t work out. 0 is perfect; what matters more weighs more.',
     seated: { one: '1 person seated', other: '{n} people seated' },
     perfect: 'Everything worked out: all rules and wishes are kept.',
+    nearlyPerfect:
+      'All rules and wishes are kept. The score shows small compromises, like a table a bit far from the stage or not quite full.',
     issuesTitle: 'What didn’t work out',
     lockTip: 'Like a table? Pick it on the map, tap “Lock table”, then “Rearrange” — it stays as it is.',
     issues: {
@@ -342,6 +349,8 @@ export const seatingEn: SeatingDict = {
       tooBigTogether:
         '{names} must sit together, but they’re {seats} — more than any table. Each sits separately.',
       underfilled: 'Table {table}: only {seated} of {capacity} seats.',
+      mixed: 'Table {table}: {categories} together.',
+      unmixed: 'Table {table}: mostly {category}.',
       near: 'Not near {zone}: {names}',
       far: 'Close to {zone}: {names}',
       zones: { stage: 'the stage', dance: 'the dance floor', exit: 'the exit' },

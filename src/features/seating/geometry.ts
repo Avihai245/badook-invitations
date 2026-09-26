@@ -165,6 +165,14 @@ export function contentBounds(plan: Pick<Plan, 'layout' | 'tables'>): Rect {
   return box;
 }
 
+/** The tables and landmarks with some room around them (null: there are none) — a print without a plan. */
+export function itemsBounds(plan: Pick<Plan, 'layout' | 'tables'>, margin = 1.5): Rect | null {
+  let box: Rect | null = null;
+  for (const t of plan.tables) box = union(box, bounds(t));
+  for (const m of plan.layout.landmarks) box = union(box, bounds(m));
+  return box && { x: box.x - margin, y: box.y - margin, w: box.w + 2 * margin, h: box.h + 2 * margin };
+}
+
 export const snap = (v: number, grid: number) => (grid > 0 ? Math.round(v / grid) * grid : v);
 export const snapPoint = (p: Point, grid: number): Point => ({
   x: round2(snap(p.x, grid)),

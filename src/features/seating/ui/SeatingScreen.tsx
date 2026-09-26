@@ -1,6 +1,6 @@
 'use client';
 
-import { CircleAlert, FileSpreadsheet, LoaderCircle, Printer, Sparkles } from 'lucide-react';
+import { CircleAlert, FileSpreadsheet, LoaderCircle, Maximize, Printer, Sparkles } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Hint, PageHeader, Segmented, cn, useToast } from '@/components/app';
 import { hostApi } from '@/features/invitations/app/api';
@@ -136,6 +136,7 @@ export function SeatingScreen({
   const [progress, setProgress] = useState<SolverProgress | null>(null);
   const [autoError, setAutoError] = useState<string | null>(null);
   const [result, setResult] = useState<SolverResult | null>(null);
+  const [runs, setRuns] = useState(0);
   const cancelRun = useRef<(() => void) | null>(null);
   const controls = useRef<CanvasControls>(null);
 
@@ -167,18 +168,28 @@ export function SeatingScreen({
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // full screen: Esc leaves it; the page behind doesn't scroll
+  // Esc steps back: out of calibrating, then the picked table's panel, then full screen (a dialog
+  // handles its own Esc)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || dialog || isTyping(e.target)) return;
+      if (calibrating) setCalibrating(false);
+      else if (selection.length) setSelection([]);
+      else if (full) setFull(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [dialog, calibrating, selection.length, full]);
+
+  // full screen: the page behind doesn't scroll
   useEffect(() => {
     if (!full) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !dialog && setFull(false);
-    window.addEventListener('keydown', onKey);
     const overflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = 'hidden';
     return () => {
-      window.removeEventListener('keydown', onKey);
       document.documentElement.style.overflow = overflow;
     };
-  }, [full, dialog]);
+  }, [full]);
 
   // a venue's PDF plan becomes an image the first time (the server has no PDF renderer)
   const convertingRef = useRef(false);
@@ -226,25 +237,16 @@ export function SeatingScreen({
     setSelection(ids);
     setTableError(null);
   };
+  // (a click is a discrete event: the plan it sees is the latest one)
   const addTableAt = (shape: TableShape) => {
-    const at = controls.current?.center() ?? null;
-    let created = '';
-    update((p) => {
-      const r = addTable(p, shape, at);
-      created = r.id;
-      return r.plan;
-    });
-    queueMicrotask(() => created && select([created]));
+    const r = addTable(plan, shape, controls.current?.center() ?? null);
+    update(() => r.plan);
+    select([r.id]);
   };
   const addLandmarkAt = (kind: LandmarkKind) => {
-    const at = controls.current?.center() ?? null;
-    let created = '';
-    update((p) => {
-      const r = addLandmark(p, kind, at);
-      created = r.id;
-      return r.plan;
-    });
-    queueMicrotask(() => created && select([created]));
+    const r = addLandmark(plan, kind, controls.current?.center() ?? null);
+    update(() => r.plan);
+    select([r.id]);
   };
   const patchTable = (tableId: string, patch: TablePatch) => {
     const r = updateTable(plan, byId, tableId, patch);
@@ -421,6 +423,7 @@ export function SeatingScreen({
         cancelRun.current = null;
         update((p) => applySolution(p, units, r));
         setResult(r);
+        setRuns((n) => n + 1);
         setDialog(null);
         setTab('map');
       },
@@ -545,8 +548,14 @@ export function SeatingScreen({
         <span className="text-muted">
           {plural(s.summary.tables, plan.tables.length, { seats: number(stats.seats) })}
         </span>
-        <span className={stats.unseatedUnits ? 'text-warning' : 'text-success'}>
-          {stats.unseatedUnits ? plural(s.summary.unseated, stats.unseatedUnits) : s.summary.allSeated}
+        <span
+          className={stats.unseatedUnits ? 'text-warning' : stats.confirmed ? 'text-success' : 'text-muted'}
+        >
+          {stats.unseatedUnits
+            ? plural(s.summary.unseated, stats.unseatedUnits)
+            : stats.confirmed
+              ? s.summary.allSeated
+              : s.summary.none}
         </span>
         <span
           role="status"
@@ -617,18 +626,32 @@ export function SeatingScreen({
         ) : null}
       </div>
 
-      {/* phones: the map or the list */}
-      <div className="mt-3 lg:hidden">
-        <Segmented
-          label={s.mobileTabs.label}
-          value={tab}
-          onValueChange={setTab}
-          options={[
-            { value: 'map', label: s.mobileTabs.map },
-            { value: 'guests', label: `${s.mobileTabs.guests} (${number(stats.unseatedUnits)})` },
-          ]}
-          fullWidth
-        />
+      {/* phones: the map or the list — and the whole screen for them */}
+      <div className="mt-3 flex items-center gap-2 lg:hidden">
+        <div className="min-w-0 flex-1">
+          <Segmented
+            label={s.mobileTabs.label}
+            value={tab}
+            onValueChange={setTab}
+            options={[
+              { value: 'map', label: s.mobileTabs.map },
+              { value: 'guests', label: `${s.mobileTabs.guests} (${number(stats.unseatedUnits)})` },
+            ]}
+            fullWidth
+          />
+        </div>
+        <Hint text={s.actions.fullScreenHint}>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<Maximize />}
+            onClick={() => setFull(true)}
+            className="sm:hidden"
+            data-testid="full-screen-phone"
+          >
+            {s.actions.fullScreen}
+          </Button>
+        </Hint>
       </div>
 
       <div
@@ -738,6 +761,7 @@ export function SeatingScreen({
               {result && !calibrating ? (
                 <AutoResult
                   result={result}
+                  run={runs}
                   names={names}
                   numbers={numbers}
                   onRerun={() => run()}
@@ -758,13 +782,10 @@ export function SeatingScreen({
                   error={tableError}
                   onPatch={(patch) => patchTable(selectedTable.id, patch)}
                   onDuplicate={() => {
-                    let created = '';
-                    update((p) => {
-                      const r = duplicateTable(p, selectedTable.id);
-                      created = r?.id ?? '';
-                      return r?.plan ?? p;
-                    });
-                    queueMicrotask(() => created && select([created]));
+                    const r = duplicateTable(plan, selectedTable.id);
+                    if (!r) return;
+                    update(() => r.plan);
+                    select([r.id]);
                   }}
                   onRemove={() => removeSelected([selectedTable.id])}
                   onAddGuests={() => setDialog({ kind: 'add', tableId: selectedTable.id })}

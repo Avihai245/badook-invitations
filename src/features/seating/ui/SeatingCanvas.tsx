@@ -128,6 +128,15 @@ export function SeatingCanvas({
     }
   }, [size, fit]);
 
+  // a new plan, or a new scale: everything in view again
+  const planKey = `${plan.layout.background?.path ?? ''}|${plan.layout.metersPerPixel ?? ''}`;
+  const shownPlan = useRef(planKey);
+  useEffect(() => {
+    if (shownPlan.current === planKey) return;
+    shownPlan.current = planKey;
+    fit();
+  }, [planKey, fit]);
+
   useImperativeHandle(
     controls,
     () => ({
@@ -266,6 +275,12 @@ export function SeatingCanvas({
     }
   };
 
+  // Tab onto a table picks it (a mouse press picks it in onPointerDown — its focus is left alone, or it
+  // would undo a Shift-click)
+  const focusPicks = (el: SVGGElement, id: string) => {
+    if (el.matches(':focus-visible') && !selected.has(id)) onSelect([id]);
+  };
+
   const onKeyDown = (e: ReactKeyboardEvent<SVGGElement>, id: string, isTable: boolean) => {
     const ids = selected.has(id) ? selection : [id];
     const step = (snap ? plan.layout.gridM : 0.1) * (e.shiftKey ? 5 : 1);
@@ -384,7 +399,7 @@ export function SeatingCanvas({
                 aria-label={f(s.canvas.landmarkAria, { label })}
                 aria-pressed={selected.has(m.id)}
                 className="outline-none focus-visible:[&>g>rect]:stroke-[#2563eb]"
-                onFocus={() => !selected.has(m.id) && onSelect([m.id])}
+                onFocus={(e) => focusPicks(e.currentTarget, m.id)}
                 onKeyDown={(e) => onKeyDown(e, m.id, false)}
               >
                 <LandmarkGlyph
@@ -418,7 +433,7 @@ export function SeatingCanvas({
                   }) + (over ? s.canvas.overAria : '')
                 }
                 className="outline-none"
-                onFocus={() => !selected.has(table.id) && onSelect([table.id])}
+                onFocus={(e) => focusPicks(e.currentTarget, table.id)}
                 onKeyDown={(e) => onKeyDown(e, table.id, true)}
               >
                 <TableGlyph

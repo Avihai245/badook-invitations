@@ -199,6 +199,10 @@ export function describeIssue(
       return fmt(i.conflict, { names: list(issue.units) });
     case 'too_big_together':
       return fmt(i.tooBigTogether, { names: list(issue.units), seats: issue.seats });
+    case 'mixed':
+      return fmt(i.mixed, { table: numbers.get(issue.table) ?? '?', categories: join(issue.categories) });
+    case 'unmixed':
+      return fmt(i.unmixed, { table: numbers.get(issue.table) ?? '?', category: issue.category });
     case 'underfilled':
       return fmt(i.underfilled, {
         table: numbers.get(issue.table) ?? '?',
@@ -218,6 +222,8 @@ const RANK: Record<SolverIssue['code'], number> = {
   rule: 3,
   underfilled: 5,
   preference: 6,
+  mixed: 7,
+  unmixed: 7,
 };
 
 /**
@@ -226,6 +232,7 @@ const RANK: Record<SolverIssue['code'], number> = {
  */
 export function AutoResult({
   result,
+  run,
   names,
   numbers,
   onRerun,
@@ -233,6 +240,8 @@ export function AutoResult({
   onClose,
 }: {
   result: SolverResult;
+  /** how many arrangements were made so far (a new one is a new result) */
+  run: number;
   names: ReadonlyMap<string, string>;
   numbers: ReadonlyMap<string, number>;
   onRerun(): void;
@@ -259,6 +268,7 @@ export function AutoResult({
     <section
       aria-label={a.resultTitle}
       data-testid="auto-result"
+      data-run={run}
       className="absolute inset-x-2 top-2 z-10 max-h-[60%] overflow-hidden rounded-card border border-line bg-surface shadow-lg sm:inset-x-auto sm:end-3 sm:top-3 sm:w-[360px]"
     >
       <div className="flex items-start gap-2 border-b border-line p-3">
@@ -288,7 +298,7 @@ export function AutoResult({
       </div>
       <div className="max-h-[calc(60vh-120px)] overflow-y-auto p-3">
         {issues.length === 0 ? (
-          <p className="text-[13px] text-success">{a.perfect}</p>
+          <p className="text-[13px] text-success">{result.score === 0 ? a.perfect : a.nearlyPerfect}</p>
         ) : (
           <>
             <button

@@ -193,6 +193,29 @@ describe('the automatic seating', () => {
     expect(mixed.breakdown.categories).toBe(0);
   });
 
+  it('says in words where categories had to share a table ("group") or where one filled it ("mix")', () => {
+    const grouped = solve(
+      input({
+        tables: [table('t1', 4)],
+        units: [unit('a', 2, { category: 'work' }), unit('b', 2, { category: 'army' })],
+        options: { categories: 'group', minFill: 0, seed: 1, effort: 0.2 },
+      }),
+    );
+    expect(grouped.issues).toEqual([{ code: 'mixed', table: 't1', categories: ['army', 'work'] }]);
+    const mixed = solve(
+      input({
+        tables: [table('t1', 4), table('t2', 1)],
+        units: [
+          unit('a', 2, { category: 'work' }),
+          unit('b', 2, { category: 'work' }),
+          unit('c', 1, { category: 'army' }),
+        ],
+        options: { categories: 'mix', minFill: 0, seed: 1, effort: 0.2 },
+      }),
+    );
+    expect(mixed.issues).toContainEqual({ code: 'unmixed', table: 't1', category: 'work' });
+  });
+
   it('balance: tables are filled to the minimum rather than left with two people', () => {
     const w = input({
       tables: [table('t1', 10), table('t2', 10), table('t3', 10)],
