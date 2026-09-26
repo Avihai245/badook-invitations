@@ -44,6 +44,7 @@ import { useUi } from '@/lib/i18n/client';
 import { hostApi, loginUrl } from '../api';
 import { publishHref } from '../workspace/paths';
 import type { DietaryKey } from '../../contracts/types';
+import { isLocale } from '../../lib/locales';
 import {
   NOTIFY_MODES,
   attendeeName,
@@ -722,7 +723,7 @@ function ResponseDrawer({
           ) : null}
 
           <p className="text-[13px] text-muted">
-            {d.language}: {x.locale === 'he' ? t.common.hebrew : t.common.english}
+            {d.language}: {isLocale(x.locale) ? t.editor.languageFull[x.locale] : x.locale}
           </p>
         </div>
       </Drawer>

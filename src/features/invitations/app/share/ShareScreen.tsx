@@ -104,7 +104,8 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
                   onValueChange={setLang}
                   options={data.locales.map((l) => ({
                     value: l.locale,
-                    label: l.locale === 'he' ? t.common.hebrew : t.common.english,
+                    label: t.editor.languageShort[l.locale],
+                    ariaLabel: t.editor.languageFull[l.locale],
                   }))}
                 />
               ) : null

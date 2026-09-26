@@ -101,8 +101,8 @@ The reference product is done-for-you (designers hand-build each invitation in a
 
 ```ts
 // ---------- i18n ----------
-export type Locale = 'he' | 'en';                 // extensible later: 'ar' | 'ru' | 'fr' ...
-export const RTL_LOCALES: readonly Locale[] = ['he'];
+export type Locale = 'he' | 'en' | 'ru' | 'ar' | 'fr' | 'es' | 'am'; // Hebrew and English are free; the rest need `languages`
+export const RTL_LOCALES: readonly Locale[] = ['he', 'ar'];
 export const dirOf = (l: Locale) => (RTL_LOCALES.includes(l) ? 'rtl' : 'ltr');
 /** User-authored text. Must contain every locale listed in document.locales (validated on publish). */
 export type L10n = Partial<Record<Locale, string>>;
@@ -134,7 +134,8 @@ export interface InvitationDocument {
     startTime: HHmm;
     endTime: HHmm | null;         // if < startTime → next day
     hebrewDate: 'off' | 'day' | 'eve';  // 'eve' → "אור ל…" (Hebrew date after sunset)
-    timeFormat: '24h' | '12h' | null;   // null → locale default (he 24h, en 12h)
+    hebrewDateLocales?: Locale[] | null; // the languages that show it (absent → he and en)
+    timeFormat: '24h' | '12h' | null;   // null → locale default (he, ru, fr, es 24h; en, ar, am 12h)
     rsvpDeadline: ISODate | null;
   };
   theme: { fontPairId: string; palette: Partial<Palette> | null };  // only template.editablePaletteKeys
@@ -535,9 +536,10 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
 ## 7. Editor UX (host side)
 
 1. **Template gallery**: filter by event type; cards show a phone-framed looping preview; "Live demo" opens `/i/demo-<template>?open=1`.
-2. **Wizard (3 steps)**: event type → hosts + date + time + timezone (default from browser, `Asia/Jerusalem` for HE) → languages (HE / EN / both + default). Creates a draft seeded from `templates/<id>/defaults/<eventType>` in the chosen locales — **the host starts from a complete, beautiful invitation**, never an empty page.
+2. **Wizard (3 steps)**: event type → hosts + date + time + timezone (default from browser, `Asia/Jerusalem` for HE) → languages (any of the seven — beyond Hebrew and English only with the `languages` feature — + the default). Creates a draft seeded from `templates/<id>/defaults/<eventType>` in the chosen locales — **the host starts from a complete, beautiful invitation**, never an empty page.
 3. **Editor layout**: desktop 3 columns — (a) section list: toggle, drag-reorder (`@dnd-kit`, hero/footer locked), add from catalog, duplicate, delete custom; (b) form for the selected section/global settings (Event, Cover, Design, Music, Languages, Share); (c) live preview in a 390×844 phone frame (scaled), with "Replay opening" and locale toggle. Mobile: tabs Edit / Preview.
-4. **Localized fields**: when 2 locales are active, each `L10n` field shows `עב | EN` tabs with a dot for missing translations; the input's `dir` follows the tab. Optional "Copy from other language" helper.
+4. **Localized fields**: when several locales are active, each `L10n` field shows a tab per language (`עב | EN | RU | ع …`) with a dot for missing translations; the input's `dir` follows the tab. Optional "Copy from other language" helper. A machine translation waiting for review shows under its field with "Approve".
+4a. **Languages panel**: the invitation's languages in the order of its language menu (move up/down, remove), the language it opens in, what is missing or waiting per language, "Translate into <language>" (feature `translate_ai`: one AI call per language, names and places never sent, a per-invitation glossary kept as it is) and the side-by-side review (original | translation: approve one or all; a changed original sends its translation back to review). Publishing waits while a language has machine text the host hasn't approved; the host's own words count as approved. Which languages show the Hebrew date is chosen in the Event panel.
 5. **Design panel**: palette preset swatches (`palettePresets`) + fine-tune of editable keys with contrast check (warn below 4.5:1 for text on bg), font pair select, cover: monogram/ticket-text input (live counter vs `maxGlyphs`, per locale) + seal color swatches (when `recolor`) + "Replay opening" button, hero: pick one of `hero.options` or upload (focal-point picker, overlay slider), music track picker + custom upload (with rights checkbox).
 6. **Autosave** draft (debounce 800ms, optimistic, conflict-safe via `updated_at`), "Unpublished changes" badge, undo/redo (in-memory, 50 steps).
 7. **Publish**: run full validation → list blocking errors (click to jump to field) and warnings → publish → share screen: copy link, WhatsApp share (`https://wa.me/?text=<encoded message + link>`), QR (PNG/SVG download), preview of the OG card.
@@ -554,8 +556,11 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
 - Horizontal sequences (timeline, countdown cells, stepper) naturally flow right-to-left in RTL — correct by design; the stepper keeps `−` on the start side and `+` on the end side.
 - Wrap mixed-direction user text in `<bdi>`; phones/emails/times/URLs in `dir="ltr"` spans.
 - System strings only from dictionaries (§10.4). Zero hard-coded UI strings in components.
-- Every template must declare Hebrew-capable fonts; a template without them cannot be used with `he`.
-- Dates: Gregorian via `Intl`; Hebrew date via `@hebcal/core`; western digits; he → 24h, en → 12h by default.
+- Every template must declare Hebrew-capable fonts; a template without them cannot be used with `he`. Every other script has a face in every role — the pair's own, a Cyrillic stand-in, or the Arabic / Ethiopic face of the design's style (docs/fonts.md) — declared behind `unicode-range`, so a page loads only the scripts it shows.
+- Seven locales: `he`, `en`, `ru`, `ar`, `fr`, `es`, `am` (Intl: he-IL, en-GB, ru-RU, ar-IL-u-nu-latn, fr-FR, es-ES, am-ET). `he` and `ar` are RTL. Plurals follow `Intl.PluralRules` (Russian one/few/many, Arabic zero…many).
+- Dates: Gregorian via `Intl`; Hebrew date via `@hebcal/core` in every language (by default only in he and en; `event.hebrewDateLocales`); western digits in every language, Arabic included; he, ru, fr, es → 24h, en, ar, am → 12h by default; the week starts on the locale's day.
+- The cached page never varies by request headers: a visit without `?lang=` gets the default language and the browser then switches in place — the guest's choice in this visit (sessionStorage), `?lang=`, then `navigator.languages` — with no flash on the cover (every language's cover text is in the page). A personal link opens in the guest's language (`invitation_guests.preferred_language`), and every message to that guest is written in it.
+- Translations run longer than Hebrew: every section holds 40% longer text on a phone and a desktop with no horizontal scroll and no clipped text (`tests/e2e/i18n.spec.ts`).
 
 ---
 

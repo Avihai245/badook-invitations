@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { loadAccount } from '@/features/billing/server/account';
 import { deploymentFeatures, featuresFor } from '@/features/flags/server';
 import { Editor } from '@/features/invitations/editor/Editor';
-import { fontFaceCss, libraryDisplayFamilies, templateFontFamilies } from '@/features/invitations/fonts';
+import { fontFaceCss, libraryDisplayFamilies, pageFontFaces } from '@/features/invitations/fonts';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { hostDb } from '@/features/invitations/server/host-db';
@@ -48,12 +48,12 @@ export default async function EditInvitationPage({ params }: { params: Params })
     inv.status === 'published' && JSON.stringify(inv.draft) !== JSON.stringify(inv.published);
   return (
     <>
-      {/* The font pair cards render the hosts' names in every pair of the template, and each font
-          library pair's name in its display faces. */}
+      {/* The font pair cards render the hosts' names in every pair of the template — in each script of
+          the invitation's languages — and each font library pair's name in its display faces. */}
       <style
         dangerouslySetInnerHTML={{
           __html: [
-            fontFaceCss(templateFontFamilies(entry.manifest)),
+            fontFaceCss(pageFontFaces(entry.manifest, undefined, inv.draft.locales)),
             fontFaceCss(libraryDisplayFamilies(), [400]),
           ].join('\n'),
         }}

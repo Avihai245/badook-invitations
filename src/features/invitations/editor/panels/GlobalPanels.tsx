@@ -17,8 +17,16 @@ import {
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { HEX_COLOR_RE } from '../../contracts/schemas';
-import type { EventType, InvitationDocument, Locale, Palette } from '../../contracts/types';
+import {
+  dirOf,
+  type EventType,
+  type InvitationDocument,
+  type Locale,
+  type Palette,
+} from '../../contracts/types';
+import { fontStack } from '../../fonts';
 import { contrastRatio } from '../../lib/contrast';
+import { LOCALE_INFO } from '../../lib/locales';
 import { visibleGlyphCount } from '../../lib/text';
 import { timezoneOptions } from '../../lib/timezones';
 import { templateFileUrl, withStartAt } from '../../renderer/assets';
@@ -286,6 +294,8 @@ function FontsPanel() {
   const { t } = useUi();
   const e = t.editor;
   const sample = (l: Locale) => hostsText(doc, l) || (l === 'he' ? 'נועה & איתי' : 'Noa & Itay');
+  // the invitation's languages in other scripts (Cyrillic, Arabic, Ethiopic): their faces for the pair
+  const others = doc.locales.filter((l) => !['hebrew', 'latin'].includes(LOCALE_INFO[l].script));
   return (
     <PanelCard>
       <FieldFrame path="theme.fontPairId" label={e.names.fonts}>
@@ -321,6 +331,19 @@ function FontsPanel() {
                   >
                     {sample('en')}
                   </span>
+                  {others.map((l) =>
+                    hostsText(doc, l) ? (
+                      <span
+                        key={l}
+                        lang={l}
+                        dir={dirOf(l)}
+                        className="truncate text-[22px] leading-tight"
+                        style={{ fontFamily: fontStack(pair, 'display', l) }}
+                      >
+                        {hostsText(doc, l)}
+                      </span>
+                    ) : null,
+                  )}
                 </span>
                 <span
                   className="flex shrink-0 flex-col items-end gap-1 text-[11px] leading-snug text-muted"

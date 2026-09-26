@@ -26,6 +26,21 @@ before it.
 
 Changing a package is one line in `PACKAGE_FEATURES` (`src/features/flags/features.ts`).
 
+## Languages (`languages`, `translate_ai`)
+
+An invitation can be in any of seven languages — Hebrew, English, Russian, Arabic, French, Spanish and
+Amharic. Hebrew and English are free for every event; the other five need `languages` (in Basic, so on
+unless this deployment or the host switched it off). The server refuses a draft save or a publish that
+adds one of them without the feature (`402 languages`), and the editor doesn't offer them.
+
+`translate_ai` fills a language's missing texts with a machine translation (one call to the AI model
+per language, names and places never sent, the invitation's glossary kept as it is). The texts go into
+the draft and wait for the host: the side-by-side review approves them one by one or all at once, and
+publishing waits (`422 translations_unreviewed`) while a language has machine text the host hasn't
+approved — or whose original changed since. What the host writes counts as approved. Without the
+feature (or without an AI model) the same review screen is where hosts translate by hand. A host has
+30 machine runs a day (`TRANSLATE_LIMITS`).
+
 ## Per event
 
 `invitations.features` keeps an event's own choices: `{ "off": [...], "grant": [...] }`. Switched off wins

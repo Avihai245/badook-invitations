@@ -10,6 +10,8 @@ allow embedding in websites and in images (the link previews) and commercial use
 | `@fontsource/alef` | OFL-1.1 |
 | `@fontsource/allura` | OFL-1.1 |
 | `@fontsource/amatic-sc` | OFL-1.1 |
+| `@fontsource/amiri` | OFL-1.1 |
+| `@fontsource/aref-ruqaa` | OFL-1.1 |
 | `@fontsource/artifika` | OFL-1.1 |
 | `@fontsource/assistant` | OFL-1.1 |
 | `@fontsource/atma` | OFL-1.1 |
@@ -19,6 +21,7 @@ allow embedding in websites and in images (the link previews) and commercial use
 | `@fontsource/big-shoulders-display` | OFL-1.1 |
 | `@fontsource/bodoni-moda` | OFL-1.1 |
 | `@fontsource/bona-nova` | OFL-1.1 |
+| `@fontsource/cairo` | OFL-1.1 |
 | `@fontsource/caveat` | OFL-1.1 |
 | `@fontsource/cinzel` | OFL-1.1 |
 | `@fontsource/cinzel-decorative` | OFL-1.1 |
@@ -46,6 +49,10 @@ allow embedding in websites and in images (the link previews) and commercial use
 | `@fontsource/marcellus` | OFL-1.1 |
 | `@fontsource/miriam-libre` | OFL-1.1 |
 | `@fontsource/monoton` | OFL-1.1 |
+| `@fontsource/noto-kufi-arabic` | OFL-1.1 |
+| `@fontsource/noto-naskh-arabic` | OFL-1.1 |
+| `@fontsource/noto-sans-ethiopic` | OFL-1.1 |
+| `@fontsource/noto-serif-ethiopic` | OFL-1.1 |
 | `@fontsource/noto-serif-hebrew` | OFL-1.1 |
 | `@fontsource/nunito` | OFL-1.1 |
 | `@fontsource/oswald` | OFL-1.1 |
@@ -68,6 +75,28 @@ allow embedding in websites and in images (the link previews) and commercial use
 | `@fontsource/varela-round` | OFL-1.1 |
 | `@fontsource/yeseva-one` | OFL-1.1 |
 | `@fontsource/young-serif` | OFL-1.1 |
+
+## Scripts beyond Hebrew and Latin
+
+An invitation can be in Russian, Arabic and Amharic too; every design writes them
+(`src/features/invitations/fonts/scripts.json`, read by `scripts/build-fonts.mjs` and `fonts/index.ts`):
+
+- **Cyrillic** — the pair's own Latin family when it has Cyrillic letters (Playfair Display, Lora, EB
+  Garamond, Cormorant Garamond, Great Vibes, Inter, Jost, Rubik…); otherwise a Cyrillic-capable family in
+  the same spirit (`cyrillic` in scripts.json: Allura → Great Vibes, Cinzel → Cormorant Garamond, DM Serif
+  Display → Playfair Display, Josefin Sans → Jost…).
+- **Arabic** — by the style of the pair's Latin family (`classes`): script designs set names in Aref Ruqaa
+  and text in Noto Naskh Arabic; serif designs Amiri and Noto Naskh Arabic; sans designs Noto Kufi Arabic;
+  playful designs Cairo.
+- **Ethiopic** (Amharic) — Noto Serif Ethiopic for script and serif designs, Noto Sans Ethiopic for sans
+  and playful ones.
+
+A page declares only the faces its languages need, each behind its script's `unicode-range`, so a
+Hebrew + English invitation downloads exactly what it did before; a Russian name inside Hebrew text keeps
+a designed face. `npm run templates:validate` checks every supported script has a face in every role of
+every font pair. A new Latin family needs a `classes` entry (and a `cyrillic` stand-in when it has no
+Cyrillic letters). The link-preview image draws Arabic in its presentation forms (the image renderer has
+no Arabic shaper), in Amiri or Noto Kufi Arabic when the design's face lacks them (Aref Ruqaa, Cairo).
 
 **OFL-1.1** (SIL Open Font License 1.1): free to use, embed and bundle, including commercially; the fonts
 may not be sold on their own. **Apache-2.0**: free to use, including commercially, with the licence and

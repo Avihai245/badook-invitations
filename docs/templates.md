@@ -110,3 +110,22 @@ layout and motion (master prompt §3). To check a template: `/dev/invitations/re
 shows every layout and motion (`?opening=gate|curtain|fireworks|gold_dust`, `?cinematic=0` for the plain
 rendering, `?motion=rise` for entrances on any document), and `npm run perf:templates -- --tpl <id>`
 measures its demo against the performance budget.
+
+## Seven languages: what every design supports
+
+Every design supports all seven invitation languages — Hebrew, English, Russian, Arabic, French, Spanish
+and Amharic (`supportsLocales` in each manifest). The pack itself writes its copy in Hebrew and English
+(names, presets, the starter texts of `defaults.json`: `npm run templates:validate` checks those two);
+the other five get the culture copy of `templates/culture-copy.ts` when an invitation is created in them
+or a language is added — the event's own greetings and phrases in each language (a wedding's "Mazal
+tov" is "Поздравляем!", "مبروك!", "Félicitations !", "¡Enhorabuena!", "እንኳን ደስ አላችሁ!"), never a
+word-for-word copy of the Hebrew. A design's own starter text that has no generic wording (a custom
+extra section) stays off in those languages until the host writes it.
+
+Fonts: each script is set in the design's own faces where they write it, else in a face of the same
+style (docs/fonts.md), and the validator checks every font pair has a face for every supported script.
+Layout: translations run longer than Hebrew — every section must hold 40% longer text on a phone and a
+desktop without a horizontal scroll or clipped text. The kitchen sink's `world` document is the demo in
+all seven languages and `longer` is that one with every text 40% longer
+(`/dev/invitations/render/<id>/ru/longer`); `tests/e2e/i18n.spec.ts` checks every design in Russian and
+Arabic that way.
