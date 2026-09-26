@@ -268,9 +268,39 @@ describe('the composer (no AI)', () => {
       en: 'Our son is here!',
     });
     // a language the bank doesn't have keeps the invitation's own text
-    expect(headlineCopy('wedding', 'classic', ['he', 'ru' as never])).toEqual({
+    expect(headlineCopy('wedding', 'classic', ['he', 'de' as never])).toEqual({
       eyebrow: null,
       closing: null,
+    });
+  });
+
+  it('has its headline copy in all seven languages of the invitations, for every event and tone', () => {
+    const seven = ['he', 'en', 'ru', 'ar', 'fr', 'es', 'am'] as never[];
+    const events = [
+      'wedding',
+      'engagement',
+      'henna',
+      'save_the_date',
+      'bar_mitzvah',
+      'bat_mitzvah',
+      'brit',
+      'baby_shower',
+      'birthday',
+      'corporate',
+      'other',
+    ] as const;
+    for (const event of events)
+      for (const tone of ['classic', 'warm', 'playful'] as const) {
+        const { eyebrow, closing } = headlineCopy(event, tone, seven);
+        for (const line of [eyebrow, closing]) {
+          expect(line, `${event} ${tone}`).not.toBeNull();
+          expect(Object.keys(line!).sort()).toEqual(['am', 'ar', 'en', 'es', 'fr', 'he', 'ru']);
+          for (const text of Object.values(line!)) expect(text!.trim().length).toBeGreaterThan(1);
+        }
+      }
+    expect(headlineCopy('engagement', 'warm', seven).eyebrow).toMatchObject({
+      ru: 'Мы обручились!',
+      am: 'ታጭተናል!',
     });
   });
 });

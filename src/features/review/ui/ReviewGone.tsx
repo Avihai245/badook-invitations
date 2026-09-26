@@ -1,11 +1,11 @@
-import { reviewGuestEn } from '@/lib/i18n/review-guest.en';
-import { reviewGuestHe } from '@/lib/i18n/review-guest.he';
+import type { Locale } from '@/features/invitations/contracts/types';
+import { reviewText } from '../text';
 
 export type ReviewGoneState = 'expired' | 'revoked' | 'unavailable' | 'rate';
 
 /** A review link with nothing to show: expired, revoked, replaced or unknown, or too many requests. */
-export function ReviewGone({ state, locale }: { state: ReviewGoneState; locale: 'he' | 'en' }) {
-  const g = (locale === 'en' ? reviewGuestEn : reviewGuestHe).gone[state];
+export function ReviewGone({ state, locale }: { state: ReviewGoneState; locale: Locale }) {
+  const g = reviewText(locale).gone[state];
   return (
     <div className="rv-ui">
       <main className="rv-gone" data-testid="review-gone" data-state={state}>

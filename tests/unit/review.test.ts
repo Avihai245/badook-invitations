@@ -683,3 +683,37 @@ describe('pins and the host’s email', () => {
     expect(await sendReviewDigests()).toEqual({ sent: 0, failed: 0 });
   });
 });
+
+// ─── the family's page in every language ───────────────────────────────────────────────────────
+
+describe('the review page’s words', () => {
+  /** Every leaf's path, and the {placeholders} of each. */
+  function leaves(value: unknown, path = ''): Map<string, string[]> {
+    const out = new Map<string, string[]>();
+    if (typeof value === 'string') out.set(path, [...value.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!).sort());
+    else if (value && typeof value === 'object')
+      for (const [k, v] of Object.entries(value))
+        for (const [p, names] of leaves(v, path ? `${path}.${k}` : k)) out.set(p, names);
+    return out;
+  }
+
+  it('exist in the seven languages, with every line and placeholder of the Hebrew', async () => {
+    const { REVIEW_TEXT, reviewText } = await import('@/features/review/text');
+    expect(Object.keys(REVIEW_TEXT).sort()).toEqual(['am', 'ar', 'en', 'es', 'fr', 'he', 'ru']);
+    // the plural forms beyond one/other are the language's own (Russian, Arabic, French, Spanish)
+    const core = (m: Map<string, string[]>) =>
+      new Map([...m].filter(([p]) => !/^list\.(zero|two|few|many)$/.test(p)));
+    const he = core(leaves(REVIEW_TEXT.he));
+    for (const [locale, dict] of Object.entries(REVIEW_TEXT)) {
+      const got = core(leaves(dict));
+      expect([...got.keys()].sort(), locale).toEqual([...he.keys()].sort());
+      // the one-form may say "one" in words (הערה אחת); every other line keeps its placeholders
+      for (const [path, names] of he)
+        if (path !== 'list.one') expect(got.get(path), `${locale} ${path}`).toEqual(names);
+    }
+    // Russian and Arabic count like themselves; a language without a dictionary reads English
+    expect(REVIEW_TEXT.ru!.list).toMatchObject({ one: '{n} комментарий', few: '{n} комментария' });
+    expect(REVIEW_TEXT.ar!.list).toMatchObject({ two: 'تعليقان', many: '{n} تعليقًا' });
+    expect(reviewText('de')).toBe(REVIEW_TEXT.en);
+  });
+});

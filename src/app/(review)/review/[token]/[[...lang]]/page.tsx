@@ -4,11 +4,10 @@ import { pageTitle } from '@/features/invitations/renderer/calendar-event';
 import { buildRenderContext } from '@/features/invitations/renderer/context';
 import { goneLocale, loadReview, reviewLocale } from '@/features/review/server/page';
 import { ReviewGone } from '@/features/review/ui/ReviewGone';
+import { reviewText } from '@/features/review/text';
 import { ReviewScreen } from '@/features/review/ui/ReviewScreen';
 import { serverEnv } from '@/lib/env';
 import { fill } from '@/lib/i18n/guest';
-import { reviewGuestEn } from '@/lib/i18n/review-guest.en';
-import { reviewGuestHe } from '@/lib/i18n/review-guest.he';
 
 type Params = Promise<{ token: string; lang?: string[] }>;
 
@@ -28,11 +27,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { token, lang } = await params;
   const opened = await loadReview(token);
   if (opened?.status !== 'ok') {
-    const t = goneLocale(lang) === 'en' ? reviewGuestEn : reviewGuestHe;
-    return { title: t.metaTitlePlain, robots: ROBOTS };
+    return { title: reviewText(goneLocale(lang)).metaTitlePlain, robots: ROBOTS };
   }
   const locale = reviewLocale(opened.state.draft, lang);
-  const t = locale === 'en' ? reviewGuestEn : reviewGuestHe;
+  const t = reviewText(locale);
   const env = serverEnv();
   const name = pageTitle(
     buildRenderContext(opened.state.draft, opened.state.template, locale, {

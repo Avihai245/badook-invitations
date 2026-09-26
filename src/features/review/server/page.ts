@@ -1,7 +1,7 @@
 import 'server-only';
 import { headers } from 'next/headers';
 import { cache } from 'react';
-import type { InvitationDocument, Locale } from '@/features/invitations/contracts/types';
+import { LOCALES, type InvitationDocument, type Locale } from '@/features/invitations/contracts/types';
 import { ipFromHeaders } from '@/lib/client-ip';
 import { reviewGuestDeps } from './deps';
 import { openReview } from './guest-api';
@@ -20,5 +20,8 @@ export function reviewLocale(doc: InvitationDocument, lang: string[] | undefined
   return asked && (doc.locales as readonly string[]).includes(asked) ? (asked as Locale) : doc.defaultLocale;
 }
 
-/** The language of the page when there is no draft to show (Hebrew unless English was asked for). */
-export const goneLocale = (lang: string[] | undefined): 'he' | 'en' => (lang?.[0] === 'en' ? 'en' : 'he');
+/** The language of the page when there is no draft to show: the address's, else Hebrew. */
+export const goneLocale = (lang: string[] | undefined): Locale => {
+  const asked = lang?.[0];
+  return asked && (LOCALES as readonly string[]).includes(asked) ? (asked as Locale) : 'he';
+};

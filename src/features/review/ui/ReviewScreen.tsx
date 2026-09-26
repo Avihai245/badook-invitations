@@ -30,11 +30,11 @@ import {
   themeMode,
   themeVars,
 } from '@/features/invitations/renderer/theme';
-import { reviewGuestEn } from '@/lib/i18n/review-guest.en';
-import { reviewGuestHe, type ReviewGuestDict } from '@/lib/i18n/review-guest.he';
+import type { ReviewGuestDict } from '@/lib/i18n/review-guest.he';
 import { fill, localeText, type LocaleText } from '@/lib/i18n/guest';
 import { useLiveRefresh } from '@/lib/live/client';
 import { REVIEW } from '../config';
+import { reviewText } from '../text';
 import { pinsOf, type ReviewComment, type ReviewState } from '../model';
 import { PIN_CSS, PinLayer, spotAt } from './PinLayer';
 import { ReviewGone, type ReviewGoneState } from './ReviewGone';
@@ -180,7 +180,8 @@ export function ReviewScreen({
   const template = state.template;
   const locale: Locale = lang && doc.locales.includes(lang) ? lang : doc.defaultLocale;
   const t: Text = useMemo(
-    () => localeText(locale === 'en' ? 'en' : 'he', locale === 'en' ? reviewGuestEn : reviewGuestHe),
+    // the draft's language: its dictionary (features/review/text), its plurals, numbers and dates
+    () => localeText(locale, reviewText(locale)),
     [locale],
   );
   const x = t.t;

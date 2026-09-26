@@ -1,6 +1,9 @@
+import type { PluralEntry } from './guest';
+
 /**
  * The family's review page (/review/<token>) — the draft of an invitation with comment pins, opened
  * without an account — Hebrew. A dictionary of its own: the family's phones download only these.
+ * Every language of the invitations has one (review-guest.<locale>.ts, chosen by features/review/text).
  */
 export const reviewGuestHe = {
   otherLanguage: 'English',
@@ -12,7 +15,8 @@ export const reviewGuestHe = {
   toolbar: 'כלי העיון',
   add: 'הוספת הערה',
   addHint: 'בוחרים מקום בהזמנה וכותבים מה כדאי לשנות',
-  list: { one: 'הערה אחת', other: '{n} הערות' },
+  // a language's plural forms (Intl.PluralRules: Russian has few/many, Arabic zero…many)
+  list: { one: 'הערה אחת', other: '{n} הערות' } as PluralEntry,
   listEmpty: 'הערות',
   picking: 'לחצו על המקום בהזמנה שעליו תרצו להעיר',
   pickingKeyboard: 'אפשר גם לבחור חלק מהרשימה בטופס',
