@@ -1408,7 +1408,7 @@ do $$
 declare
   f text;
 begin
-  -- helpers: only the functions above run them
+  -- helpers: only the functions above run them (the server never calls them directly)
   foreach f in array array[
     'public.checkin_code(text)',
     'public.event_day_invitation_json(public.invitations)',
@@ -1429,7 +1429,7 @@ begin
     'public.seating_live_seats(int, int, boolean)',
     'public.seating_live_need(uuid, uuid[], boolean)'
   ] loop
-    execute format('revoke all on function %s from public, anon, authenticated', f);
+    execute format('revoke all on function %s from public, anon, authenticated, service_role', f);
   end loop;
   -- what the server calls
   foreach f in array array[
