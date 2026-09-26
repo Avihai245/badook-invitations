@@ -1,0 +1,235 @@
+{
+  "id": "superhero-pow",
+  "version": 2,
+  "name": {
+    "he": "גיבורי־על",
+    "en": "Superhero POW"
+  },
+  "description": {
+    "he": "עמוד קומיקס בלילה — מסגרות שחורות עבות, נקודות רסטר, ירח מלא וגיבור בגלימה שעף מולו, זרקור מעל קו הרקיע של העיר, ובועות POW! ו־BOOM! שקופצות. מסיבה עם כוחות־על.",
+    "en": "A comic-book page at night — bold panel borders, halftone dots, a full moon with a caped hero flying across it, a searchlight over the city skyline, and POW! and BOOM! bursts that pop. A party with superpowers."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "bar_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/superhero-pow/preview.webp",
+  "previewVideo": "/templates/superhero-pow/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FFF8E7",
+      "surface": "#FFFFFF",
+      "ink": "#151A33",
+      "inkMuted": "#555D7D",
+      "accent": "#D61F27",
+      "accentInk": "#FFFFFF",
+      "line": "#EADFC2",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 6,
+      "button": 8
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "red",
+      "name": {
+        "he": "אדום גיבורים",
+        "en": "Hero red"
+      },
+      "palette": {
+        "accent": "#D61F27"
+      }
+    },
+    {
+      "id": "blue",
+      "name": {
+        "he": "כחול על",
+        "en": "Super blue"
+      },
+      "palette": {
+        "accent": "#1F55D0"
+      }
+    },
+    {
+      "id": "purple",
+      "name": {
+        "he": "סגול מסתורי",
+        "en": "Mystery purple"
+      },
+      "palette": {
+        "accent": "#7A35D6"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "comic",
+      "display": {
+        "latin": "Titan One",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Shantell Sans",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "action",
+      "display": {
+        "latin": "Righteous",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "video",
+    "poster": "/templates/superhero-pow/cover-poster.webp",
+    "posterDesktop": "/templates/superhero-pow/cover-poster-desktop.webp",
+    "openVideo": "/templates/superhero-pow/cover-open.mp4",
+    "openVideoDesktop": "/templates/superhero-pow/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/superhero-pow/emblem-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#D61F27",
+      "#1F55D0",
+      "#F5B400"
+    ],
+    "monogramFont": {
+      "latin": "Titan One",
+      "hebrew": "Suez One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "עיר של גיבורי־על בלילה",
+          "en": "A superhero city at night"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#081033",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "superhero-pow-theme",
+    "tracks": [
+      {
+        "id": "superhero-pow-theme",
+        "title": "Save the Day (orchestral action)",
+        "url": "/templates/superhero-pow/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 60,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/superhero-pow/hero.mp4",
+    "hero-poster": "/templates/superhero-pow/hero-poster.webp",
+    "hero-desktop": "/templates/superhero-pow/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/superhero-pow/hero-desktop-poster.webp",
+    "halftone-band": "/templates/superhero-pow/halftone-band.webp",
+    "skyline-panorama": "/templates/superhero-pow/skyline-panorama.webp",
+    "pow": "/templates/superhero-pow/pow.webp",
+    "boom": "/templates/superhero-pow/boom.webp",
+    "emblem": "/templates/superhero-pow/emblem.webp"
+  },
+  "decorations": {
+    "afterHero": "template:halftone-band",
+    "betweenVenues": "template:skyline-panorama",
+    "afterTimeline": "template:pow",
+    "beforeRsvp": "template:boom",
+    "footer": "template:emblem"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

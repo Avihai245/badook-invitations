@@ -42,7 +42,31 @@ const COUPLE: DemoPeople = {
  * Designs made for one age or crowd show a person who fits them — a toddler's third birthday, a
  * grandmother's eightieth — instead of the event type's sample: by template id, then event type.
  */
-const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = {};
+const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = {
+  // T2: sports & action — a kid of the design's age for its birthdays; its bar/bat mitzvahs keep the
+  // event's own Jonathan and Tamar
+  'hoop-stars': {
+    birthday: { primary: { he: 'אלון', en: 'Alon' }, monogram: { he: 'אלון 10', en: 'ALON 10' } },
+    bar_mitzvah: PEOPLE.bar_mitzvah,
+    bat_mitzvah: PEOPLE.bat_mitzvah,
+  },
+  'superhero-pow': {
+    birthday: { primary: { he: 'רועי', en: 'Roy' }, monogram: { he: 'רועי 8', en: 'ROY 8' } },
+    bar_mitzvah: PEOPLE.bar_mitzvah,
+  },
+  'circus-top': {
+    birthday: { primary: { he: 'שירה', en: 'Shira' }, monogram: { he: 'שירה 5', en: 'SHIRA 5' } },
+  },
+  'grand-prix': {
+    birthday: { primary: { he: 'עומר', en: 'Omer' }, monogram: { he: 'עומר 9', en: 'OMER 9' } },
+    bar_mitzvah: PEOPLE.bar_mitzvah,
+  },
+  'skate-graffiti': {
+    bar_mitzvah: PEOPLE.bar_mitzvah,
+    bat_mitzvah: PEOPLE.bat_mitzvah,
+    birthday: { primary: { he: 'נדב', en: 'Nadav' }, monogram: { he: 'נדב 14', en: 'NADAV 14' } },
+  },
+};
 
 /**
  * Who a demo of this event type is for: the design's own sample person when it has one, else a

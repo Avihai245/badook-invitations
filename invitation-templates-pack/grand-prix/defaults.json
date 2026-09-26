@@ -1,0 +1,291 @@
+{
+  "templateId": "grand-prix",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו כדי להתניע",
+        "en": "Tap to start your engine"
+      },
+      "eyebrow": {
+        "he": "מתניעים מנועים! חוגגים יום הולדת עם",
+        "en": "Start your engines! A birthday with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהרמזורים כבים",
+          "en": "Until lights out"
+        },
+        "afterEvent": {
+          "he": "איזה מרוץ! תודה שבאתם",
+          "en": "What a race! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד הקפה סביב השמש",
+          "en": "Another lap around the sun"
+        },
+        "body": {
+          "he": "ב־{date} עולים למסלול לחגוג עם {primary}.\nמרוצים, פיצה, עוגה והרבה חברים — ואתם על קו הזינוק.",
+          "en": "On {date} we hit the track to celebrate {primary}.\nRaces, pizza, cake and lots of friends — and you’re on the starting grid."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסלול",
+          "en": "The track"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "נכנסים לפיטס",
+            "en": "Pit lane opens"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "המרוץ הגדול",
+            "en": "The big race"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "עצירת פיטס: פיצה",
+            "en": "Pit stop: pizza"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה על הפודיום",
+            "en": "Cake on the podium"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "צוות המרוץ",
+            "en": "Race team gear"
+          },
+          "body": {
+            "he": "בואו בחולצת הקבוצה, עם כובע מצחייה או סרבל מרוצים — ובנעלי ספורט, כמובן.",
+            "en": "Come in your team shirt, a cap or racing overalls — and sneakers, of course."
+          },
+          "illustration": "template:race-car"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "עולים לקו הזינוק?",
+          "en": "Joining the starting grid?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה במרוץ",
+          "en": "Great! See you at the race"
+        },
+        "declineMessage": {
+          "he": "חבל! ננצח גם בשבילכם",
+          "en": "Too bad! We’ll win one for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על המסלול!",
+        "en": "See you on the track!"
+      }
+    },
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "לחצו כדי להתניע",
+        "en": "Tap to start your engine"
+      },
+      "eyebrow": {
+        "he": "מתניעים מנועים לבר המצווה של",
+        "en": "Start your engines — the Bar Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהרמזורים כבים",
+          "en": "Until lights out"
+        },
+        "afterEvent": {
+          "he": "איזה מרוץ! מזל טוב ותודה שבאתם",
+          "en": "What a race! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הקפה מספר שלוש־עשרה",
+          "en": "Lap thirteen"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה — ואחר כך יוצאים למסלול.\nבואו לחגוג איתנו את המרוץ הכי חשוב של העונה.",
+          "en": "On {date}, {primary} is called to the Torah — and then we hit the track.\nCome celebrate the biggest race of the season with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בית הכנסת",
+          "en": "Synagogue"
+        },
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "חימום מנועים",
+            "en": "Engines warm up"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "עצירת פיטס: ארוחה",
+            "en": "Pit stop: dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "רחבה",
+            "en": "Dance floor"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "הקפת ניצחון: קינוחים",
+            "en": "Victory lap: dessert"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "צוות המרוץ",
+            "en": "Race team gear"
+          },
+          "body": {
+            "he": "בואו בחולצה של הקבוצה האהובה — או סתם משהו חגיגי ונוח לרחבה.",
+            "en": "Wear your favourite team’s shirt — or just something festive and comfy for the dance floor."
+          },
+          "illustration": "template:race-car"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "עולים לקו הזינוק?",
+          "en": "Joining the starting grid?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the Bar Mitzvah boy"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה במרוץ",
+          "en": "Great! See you at the race"
+        },
+        "declineMessage": {
+          "he": "חבל! נקדיש לכם הקפה",
+          "en": "Too bad! We’ll run a lap for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על המסלול!",
+        "en": "Mazal tov — see you on the track!"
+      }
+    }
+  }
+}

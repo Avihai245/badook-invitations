@@ -46,6 +46,12 @@ describe('template pack', () => {
       'martini-olive',
       'majolica',
       'white-city',
+      // T2: sports & action
+      'hoop-stars',
+      'superhero-pow',
+      'circus-top',
+      'grand-prix',
+      'skate-graffiti',
     ]);
   });
 
@@ -66,6 +72,8 @@ describe('template pack', () => {
       'jet-set',
       'bukhara',
       'white-city',
+      // T2: sports & action
+      'skate-graffiti',
     ]);
   });
 

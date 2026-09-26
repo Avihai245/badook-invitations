@@ -1,0 +1,438 @@
+{
+  "templateId": "hoop-stars",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו על הכרטיס",
+        "en": "Tap your ticket"
+      },
+      "eyebrow": {
+        "he": "עולים לפרקט! חוגגים יום הולדת עם",
+        "en": "Game on! Celebrating a birthday with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הקפצת הפתיחה",
+          "en": "Until tip-off"
+        },
+        "afterEvent": {
+          "he": "סל על הבאזר! תודה שבאתם",
+          "en": "A buzzer-beater! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד שנה, עוד שלשה",
+          "en": "Another year, another three"
+        },
+        "body": {
+          "he": "ב־{date} עולים לפרקט לחגוג עם {primary}.\nזריקות לסל, פיצה, עוגה והרבה חברים — ואתם בחמישייה הפותחת.",
+          "en": "On {date} we take the court to celebrate {primary}.\nHoops, pizza, cake and lots of friends — and you’re in the starting five."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המגרש",
+          "en": "The court"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "חימום",
+            "en": "Warm-up"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "תחרות שלשות",
+            "en": "Three-point contest"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "טיים־אאוט: פיצה",
+            "en": "Time-out: pizza"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ונרות",
+            "en": "Cake & candles"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "גופייה של הקבוצה",
+            "en": "Your team jersey"
+          },
+          "body": {
+            "he": "בואו עם הגופייה של הקבוצה האהובה ונעלי ספורט — הולך להיות משחק אמיתי!",
+            "en": "Wear your favourite team’s jersey and sneakers — there’s a real game on!"
+          },
+          "illustration": "template:jersey"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "נכנסים לחמישייה?",
+          "en": "Joining the starting five?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "סל נקי! נתראה על הפרקט",
+          "en": "Nothing but net! See you on the court"
+        },
+        "declineMessage": {
+          "he": "חבל! נקלע סל בשבילכם",
+          "en": "Too bad! We’ll sink one for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על הפרקט!",
+        "en": "See you on the court!"
+      }
+    },
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "לחצו על הכרטיס",
+        "en": "Tap your ticket"
+      },
+      "eyebrow": {
+        "he": "עולים לפרקט לכבוד בר המצווה של",
+        "en": "Taking the court for the Bar Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הקפצת הפתיחה",
+          "en": "Until tip-off"
+        },
+        "afterEvent": {
+          "he": "איזה משחק! מזל טוב ותודה שבאתם",
+          "en": "What a game! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלוש־עשרה — סל נקי",
+          "en": "Thirteen — nothing but net"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה — ואחר כך עולים לפרקט.\nבואו לחגוג איתנו את המשחק הכי חשוב של העונה.",
+          "en": "On {date}, {primary} is called to the Torah — and then we take the court.\nCome celebrate the biggest game of the season with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בית הכנסת",
+          "en": "Synagogue"
+        },
+        {
+          "he": "האולם",
+          "en": "The arena"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "חימום",
+            "en": "Warm-up"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "טיים־אאוט: ארוחה",
+            "en": "Time-out: dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "הרחבה נפתחת",
+            "en": "Dance floor opens"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "רבע אחרון: קינוחים",
+            "en": "Last quarter: dessert"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "גופיית הכדורסל שלכם",
+            "en": "Your basketball jersey"
+          },
+          "body": {
+            "he": "בואו עם הגופייה של הקבוצה האהובה — או סתם משהו נוח לרחבה.",
+            "en": "Wear your favourite team’s jersey — or anything comfy for the dance floor."
+          },
+          "illustration": "template:jersey"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "עולים איתנו לפרקט?",
+          "en": "Joining us on the court?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the Bar Mitzvah boy"
+        },
+        "successMessage": {
+          "he": "סל נקי! נתראה באולם",
+          "en": "Nothing but net! See you at the arena"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם מקום ביציע",
+          "en": "Too bad! We’ll save you a courtside seat"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הפרקט!",
+        "en": "Mazal tov — see you on the court!"
+      }
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "לחצו על הכרטיס",
+        "en": "Tap your ticket"
+      },
+      "eyebrow": {
+        "he": "עולים לפרקט לכבוד בת המצווה של",
+        "en": "Taking the court for the Bat Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הקפצת הפתיחה",
+          "en": "Until tip-off"
+        },
+        "afterEvent": {
+          "he": "איזה משחק! מזל טוב ותודה שבאתם",
+          "en": "What a game! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שתים־עשרה — סל נקי",
+          "en": "Twelve — nothing but net"
+        },
+        "body": {
+          "he": "ב־{date} {primary} חוגגת בת מצווה — ואנחנו עולים לפרקט.\nבואו לחגוג איתנו את המשחק הכי חשוב של העונה.",
+          "en": "On {date}, {primary} celebrates her Bat Mitzvah — and we’re taking the court.\nCome celebrate the biggest game of the season with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "האולם",
+          "en": "The arena"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "חימום",
+            "en": "Warm-up"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות ומצגת",
+            "en": "Blessings & slideshow"
+          },
+          "icon": "camera"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "טיים־אאוט: ארוחה",
+            "en": "Time-out: dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "הרחבה נפתחת",
+            "en": "Dance floor opens"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "רבע אחרון: קינוחים",
+            "en": "Last quarter: dessert"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "גופיית הכדורסל שלכם",
+            "en": "Your basketball jersey"
+          },
+          "body": {
+            "he": "בואו עם הגופייה של הקבוצה האהובה — או סתם משהו נוח לרחבה.",
+            "en": "Wear your favourite team’s jersey — or anything comfy for the dance floor."
+          },
+          "illustration": "template:jersey"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "עולים איתנו לפרקט?",
+          "en": "Joining us on the court?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A blessing for the Bat Mitzvah girl"
+        },
+        "successMessage": {
+          "he": "סל נקי! נתראה באולם",
+          "en": "Nothing but net! See you at the arena"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם מקום ביציע",
+          "en": "Too bad! We’ll save you a courtside seat"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הפרקט!",
+        "en": "Mazal tov — see you on the court!"
+      }
+    }
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "templateId": "superhero-pow",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו על הסמל",
+        "en": "Tap the emblem"
+      },
+      "eyebrow": {
+        "he": "קריאה לכל גיבורי העל! יום ההולדת של",
+        "en": "Calling all heroes! It’s the birthday of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהגיבורים נוחתים",
+          "en": "Until the heroes land"
+        },
+        "afterEvent": {
+          "he": "המשימה הושלמה! תודה שבאתם",
+          "en": "Mission accomplished! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "לכל גיבור יש יום הולדת",
+          "en": "Every hero has a birthday"
+        },
+        "body": {
+          "he": "ב־{date} חוגגים ל־{primary} יום הולדת — ואתם מוזמנים להצטרף לצוות!\nמשימות, כוחות־על, עוגה והמון אקשן.",
+          "en": "On {date} we celebrate {primary}’s birthday — and you’re invited to join the team!\nMissions, superpowers, cake and lots of action."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המטה",
+          "en": "Hero HQ"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "הגיבורים מגיעים",
+            "en": "Heroes arrive"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "אימון כוחות־על",
+            "en": "Superpower training"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "ארוחת גיבורים",
+            "en": "Hero snacks"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ונרות",
+            "en": "Cake & candles"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "בגדי גיבורי־על",
+            "en": "Superhero outfits"
+          },
+          "body": {
+            "he": "בואו עם גלימה, מסכה או תחפושת של הגיבור האהוב — כוחות־על מומלצים.",
+            "en": "Come in a cape, a mask or your favourite hero’s costume — superpowers recommended."
+          },
+          "illustration": "template:emblem"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים לצוות?",
+          "en": "Joining the team?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "בום! נתראה במטה",
+          "en": "Boom! See you at hero HQ"
+        },
+        "declineMessage": {
+          "he": "חבל! נציל את העולם גם בשבילכם",
+          "en": "Too bad! We’ll save the world for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה במשימה!",
+        "en": "See you on the mission!"
+      }
+    },
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "לחצו על הסמל",
+        "en": "Tap the emblem"
+      },
+      "eyebrow": {
+        "he": "קריאה לכל הגיבורים — בר המצווה של",
+        "en": "Calling all heroes — the Bar Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהגיבור שלנו נוחת",
+          "en": "Until our hero lands"
+        },
+        "afterEvent": {
+          "he": "המשימה הושלמה! מזל טוב ותודה שבאתם",
+          "en": "Mission accomplished! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלוש־עשרה, עם כוחות־על",
+          "en": "Thirteen, with superpowers"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה ומקבל את הכוח הכי גדול שיש — להיות בר מצווה.\nבואו לחגוג איתנו ולהצטרף לצוות.",
+          "en": "On {date}, {primary} is called to the Torah and gets the greatest power of all — becoming a Bar Mitzvah.\nCome celebrate and join the team."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בית הכנסת",
+          "en": "Synagogue"
+        },
+        {
+          "he": "המטה",
+          "en": "Hero HQ"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת גיבורים",
+            "en": "Heroes’ dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "רחבה",
+            "en": "Dance floor"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "הפתעה!",
+            "en": "Surprise!"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "גלימות יתקבלו בברכה",
+            "en": "Capes welcome"
+          },
+          "body": {
+            "he": "גלימות ומסכות יתקבלו בברכה — או סתם משהו חגיגי ונוח לרחבה.",
+            "en": "Capes and masks are welcome — or just something festive and comfy for the dance floor."
+          },
+          "illustration": "template:emblem"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים לצוות?",
+          "en": "Joining the team?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the Bar Mitzvah boy"
+        },
+        "successMessage": {
+          "he": "בום! נתראה במטה",
+          "en": "Boom! See you at hero HQ"
+        },
+        "declineMessage": {
+          "he": "חבל! נציל את העולם גם בשבילכם",
+          "en": "Too bad! We’ll save the world for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה במשימה!",
+        "en": "Mazal tov — see you on the mission!"
+      }
+    }
+  }
+}

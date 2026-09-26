@@ -61,6 +61,17 @@ import whiteCityDefaults from '@pack/white-city/defaults.json';
 import whiteCityManifest from '@pack/white-city/manifest.json';
 import { TemplateDefaultsSchema, TemplateManifestSchema } from '../contracts/schemas';
 import type { TemplateDefaults, TemplateManifest } from '../contracts/types';
+// T2: sports & action
+import hoopStarsDefaults from '@pack/hoop-stars/defaults.json';
+import hoopStarsManifest from '@pack/hoop-stars/manifest.json';
+import superheroDefaults from '@pack/superhero-pow/defaults.json';
+import superheroManifest from '@pack/superhero-pow/manifest.json';
+import circusDefaults from '@pack/circus-top/defaults.json';
+import circusManifest from '@pack/circus-top/manifest.json';
+import grandPrixDefaults from '@pack/grand-prix/defaults.json';
+import grandPrixManifest from '@pack/grand-prix/manifest.json';
+import skateDefaults from '@pack/skate-graffiti/defaults.json';
+import skateManifest from '@pack/skate-graffiti/manifest.json';
 
 export interface TemplateEntry {
   manifest: TemplateManifest;
@@ -100,6 +111,12 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: martiniManifest, defaults: martiniDefaults },
   { manifest: majolicaManifest, defaults: majolicaDefaults },
   { manifest: whiteCityManifest, defaults: whiteCityDefaults },
+  // T2: sports & action
+  { manifest: hoopStarsManifest, defaults: hoopStarsDefaults },
+  { manifest: superheroManifest, defaults: superheroDefaults },
+  { manifest: circusManifest, defaults: circusDefaults },
+  { manifest: grandPrixManifest, defaults: grandPrixDefaults },
+  { manifest: skateManifest, defaults: skateDefaults },
 ];
 
 function loadTemplates(): Map<string, TemplateEntry> {

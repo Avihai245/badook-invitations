@@ -1,0 +1,236 @@
+{
+  "id": "skate-graffiti",
+  "version": 2,
+  "name": {
+    "he": "סקייטפארק",
+    "en": "Skate Park"
+  },
+  "description": {
+    "he": "העיר בין ערביים — קיר בטון עם התאריך בגרפיטי של אותיות בועה, טפטופי ספריי ותגיות, רמפה עם סקייטבורד באוויר, זוג סניקרס שתלוי על חוט החשמל ושמיים סגולים־כתומים. לבני ולבנות העשרה.",
+    "en": "The city at dusk — a concrete wall with the date in graffiti bubble letters, spray drips and tags, a ramp with a skateboard in mid-air, sneakers hanging from the power line and a violet-orange sky. Made for teens."
+  },
+  "tier": "premium",
+  "categories": [
+    "bar_mitzvah",
+    "bat_mitzvah",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/skate-graffiti/preview.webp",
+  "previewVideo": "/templates/skate-graffiti/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#17151C",
+      "surface": "#221F2A",
+      "ink": "#F4F1F8",
+      "inkMuted": "#ADA6BC",
+      "accent": "#C8F53C",
+      "accentInk": "#17151C",
+      "line": "#332E3E",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 18,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "lime",
+      "name": {
+        "he": "ליים חשמלי",
+        "en": "Electric lime"
+      },
+      "palette": {
+        "accent": "#C8F53C"
+      }
+    },
+    {
+      "id": "pink",
+      "name": {
+        "he": "ורוד ספריי",
+        "en": "Spray pink"
+      },
+      "palette": {
+        "accent": "#FF4FA3"
+      }
+    },
+    {
+      "id": "cyan",
+      "name": {
+        "he": "טורקיז ניאון",
+        "en": "Neon cyan"
+      },
+      "palette": {
+        "accent": "#35D6FF"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "street",
+      "display": {
+        "latin": "Righteous",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "heading": {
+        "latin": "Space Mono",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "poster",
+      "display": {
+        "latin": "Bebas Neue",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/skate-graffiti/cover-poster.webp",
+    "posterDesktop": "/templates/skate-graffiti/cover-poster-desktop.webp",
+    "openVideo": "/templates/skate-graffiti/cover-open.mp4",
+    "openVideoDesktop": "/templates/skate-graffiti/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/skate-graffiti/sticker-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#17151C",
+        "effect": "print",
+        "maxGlyphs": 8
+      }
+    },
+    "sealColors": [
+      "#C8F53C",
+      "#FF4FA3",
+      "#35D6FF"
+    ],
+    "monogramFont": {
+      "latin": "Righteous",
+      "hebrew": "Playpen Sans Hebrew"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "סקייטפארק בשקיעה",
+          "en": "A skatepark at dusk"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#12091F",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "skate-graffiti-theme",
+    "tracks": [
+      {
+        "id": "skate-graffiti-theme",
+        "title": "Kickflip (lo-fi hip-hop)",
+        "url": "/templates/skate-graffiti/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 60,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/skate-graffiti/hero.mp4",
+    "hero-poster": "/templates/skate-graffiti/hero-poster.webp",
+    "hero-desktop": "/templates/skate-graffiti/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/skate-graffiti/hero-desktop-poster.webp",
+    "spray-band": "/templates/skate-graffiti/spray-band.webp",
+    "city-panorama": "/templates/skate-graffiti/city-panorama.webp",
+    "skateboard": "/templates/skate-graffiti/skateboard.webp",
+    "spray-can": "/templates/skate-graffiti/spray-can.webp",
+    "sneakers": "/templates/skate-graffiti/sneakers.webp"
+  },
+  "decorations": {
+    "afterHero": "template:spray-band",
+    "betweenVenues": "template:city-panorama",
+    "afterTimeline": "template:skateboard",
+    "beforeRsvp": "template:spray-can",
+    "footer": "template:sneakers"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}
