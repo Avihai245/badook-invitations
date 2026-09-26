@@ -3,6 +3,7 @@ import { serviceDb } from '@/lib/supabase/server';
 import { migrateDocument } from '../contracts/migrate';
 import type { EventType, InvitationDocument, L10n, Locale, Palette } from '../contracts/types';
 import type { NotifyMode, ResponseRecord } from '../lib/responses';
+import { VERSIONS, type HistoryEntry, type SaveReason } from '../lib/versions';
 import { syncSeedOnce } from './seed-sync';
 
 /**
@@ -54,9 +55,21 @@ export interface OwnerInvitation {
 }
 
 export type SaveDraftResult =
-  | { ok: true; updatedAt: string }
+  | {
+      ok: true;
+      updatedAt: string;
+      /** a copy of the draft it replaced went into the history */
+      kept?: boolean;
+      /** the review link's channel (the family's open review pages are told the draft changed) */
+      reviewChannel?: string | null;
+    }
   | { ok: false; code: 'conflict'; updatedAt: string; draft: InvitationDocument }
   | null;
+
+export interface HistoryDocument {
+  entry: HistoryEntry;
+  document: InvitationDocument;
+}
 
 export type SetSlugResult =
   { ok: true; slug: string; updatedAt: string } | { ok: false; code: 'taken' | 'invalid' } | null;
@@ -119,12 +132,18 @@ export const hostDb = {
     });
   },
 
+  /**
+   * Autosave, with the history: a copy of the draft it replaces is kept at most once per stretch of
+   * editing (lib/versions.ts).
+   */
   saveDraft: (id: string, ownerId: string, draft: InvitationDocument, expectedUpdatedAt: string) =>
-    rpc<SaveDraftResult>('save_invitation_draft', {
+    rpc<SaveDraftResult>('save_invitation_draft_tracked', {
       p_id: id,
       p_owner_id: ownerId,
       p_draft: draft,
       p_expected_updated_at: expectedUpdatedAt,
+      p_every_seconds: VERSIONS.saveEverySeconds,
+      p_max_saves: VERSIONS.maxSaves,
     }),
 
   slugAvailable: (slug: string, id: string | null) =>
@@ -153,6 +172,56 @@ export const hostDb = {
 
   restore: (id: string, ownerId: string, version: number) =>
     rpc<boolean>('restore_invitation_version', { p_id: id, p_owner_id: ownerId, p_version: version }),
+
+  // ── the history: publishes and saves (supabase/migrations/*_studio.sql) ──
+
+  history: (id: string, ownerId: string) =>
+    isUuid(id)
+      ? rpc<HistoryEntry[]>('owner_invitation_history', {
+          p_id: id,
+          p_owner_id: ownerId,
+          p_limit: VERSIONS.historyLimit,
+        })
+      : Promise.resolve([] as HistoryEntry[]),
+
+  async entry(id: string, ownerId: string, entryId: number): Promise<HistoryDocument | null> {
+    if (!isUuid(id)) return null;
+    const raw = await rpc<(HistoryEntry & { document: unknown }) | null>('owner_invitation_entry', {
+      p_id: id,
+      p_owner_id: ownerId,
+      p_entry_id: entryId,
+    });
+    if (!raw) return null;
+    const { document, ...entry } = raw;
+    return {
+      entry: { ...entry, templateId: (document as { templateId?: string })?.templateId ?? null },
+      document: migrateDocument(document),
+    };
+  },
+
+  async restoreEntry(
+    id: string,
+    ownerId: string,
+    entryId: number,
+  ): Promise<{ draft: InvitationDocument; updatedAt: string; reviewChannel: string | null } | null> {
+    if (!isUuid(id)) return null;
+    const raw = await rpc<{ draft: unknown; updatedAt: string; reviewChannel: string | null } | null>(
+      'restore_invitation_entry',
+      { p_id: id, p_owner_id: ownerId, p_entry_id: entryId, p_max_saves: VERSIONS.maxSaves },
+    );
+    return raw ? { ...raw, draft: migrateDocument(raw.draft) } : null;
+  },
+
+  /** A copy of the draft kept on purpose (before a design concept replaces the design). */
+  snapshot: (id: string, ownerId: string, reason: Exclude<SaveReason, 'autosave'>) =>
+    isUuid(id)
+      ? rpc<{ ok: true; id: number | null } | null>('snapshot_invitation_draft', {
+          p_id: id,
+          p_owner_id: ownerId,
+          p_reason: reason,
+          p_max_saves: VERSIONS.maxSaves,
+        })
+      : Promise.resolve(null),
 
   duplicate: (id: string, ownerId: string) =>
     rpc<{ id: string; slug: string } | null>('duplicate_invitation', { p_id: id, p_owner_id: ownerId }),

@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { entitlementsFor, isAdminEmail } from '@/features/billing/server/account';
 import { invitationsEnabled } from '@/lib/feature';
+import { broadcastRefresh } from '@/lib/live/broadcast';
 import { getSessionUser } from '@/lib/supabase/session';
 import { getTemplate } from '../templates/registry';
 import { cinematicFor } from './cinematic';
@@ -25,7 +26,13 @@ function revalidate(slug: string) {
   for (const lang of ['he', 'en', 'default']) revalidatePath(`/i/${slug}/${lang}`);
 }
 
-export const hostDeps: HostDeps = { db: hostDb, template: getTemplate, revalidate, now: () => Date.now() };
+export const hostDeps: HostDeps = {
+  db: hostDb,
+  template: getTemplate,
+  revalidate,
+  now: () => Date.now(),
+  broadcast: (channel, kind) => broadcastRefresh(channel, kind, fetch, 'invitations'),
+};
 
 /**
  * Wraps a host API route: feature flag, JSON-only bodies (a cross-site form can't post here; with the

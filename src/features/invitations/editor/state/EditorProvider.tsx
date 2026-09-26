@@ -20,6 +20,7 @@ import type {
 } from '../../contracts/types';
 import { validateDocument, type ValidationResult } from '../../contracts/validate';
 import { resolveAsset, type AssetBases } from '../../renderer/assets';
+import { getTemplate } from '../../templates/registry';
 import { commit, createHistory, redo, replacePresent, undo, type History } from '../history';
 import { setAt } from '../paths';
 
@@ -131,8 +132,8 @@ export function useEditor(): EditorContextValue {
 export function EditorProvider({
   initialDoc,
   initialMeta,
-  template,
-  defaults,
+  template: initialTemplate,
+  defaults: initialDefaults,
   bases,
   publicBaseUrl,
   initialLocale,
@@ -151,6 +152,11 @@ export function EditorProvider({
 }) {
   const [history, dispatch] = useReducer(reducer, initialDoc, createHistory);
   const doc = history.present;
+  // The design is the document's: a design concept (features/art-direction) or a restored version may
+  // move the invitation to another template — and undo moves it back.
+  const own = doc.templateId === initialTemplate.id ? null : getTemplate(doc.templateId);
+  const template = own?.manifest ?? initialTemplate;
+  const defaults = own?.defaults ?? initialDefaults;
   const [meta, setMetaState] = useState(initialMeta);
   const [locale, setLocaleState] = useState<Locale>(
     initialDoc.locales.includes(initialLocale) ? initialLocale : initialDoc.defaultLocale,

@@ -8,6 +8,7 @@ import { Button, Dialog, IconButton, cn, useDir, useToast } from '@/components/a
 import { useUi } from '@/lib/i18n/client';
 import type { InvitationDocument } from '../contracts/types';
 import { loginUrl } from '../app/api';
+import { fontFaceCss, templateFontFamilies } from '../fonts';
 import { Canvas, type Device } from './Canvas';
 import { OPEN_PUBLISH_EVENT } from './events';
 import { PreviewControlsProvider } from './fields/fields';
@@ -166,8 +167,17 @@ export function EditorShell({
 
   const conflict = autosave.conflict;
 
+  // another design than the page was opened with (a concept, a restored version): its font faces for
+  // the font pair cards (the page declared the first design's)
+  const designFonts = useMemo(
+    () =>
+      editor.template.id === initialDoc.templateId ? '' : fontFaceCss(templateFontFamilies(editor.template)),
+    [editor.template, initialDoc.templateId],
+  );
+
   return (
     <PreviewControlsProvider value={controls}>
+      {designFonts ? <style dangerouslySetInnerHTML={{ __html: designFonts }} /> : null}
       <div className="flex h-dvh flex-col bg-canvas">
         <Topbar
           status={autosave.status}
@@ -233,6 +243,7 @@ export function EditorShell({
         {versions ? (
           <VersionsDrawer
             onClose={() => setVersions(false)}
+            flush={autosave.flush}
             onRestored={(draft, updatedAt) => {
               autosave.rebase(draft, updatedAt);
               apply(() => draft, null);

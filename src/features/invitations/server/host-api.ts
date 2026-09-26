@@ -29,6 +29,7 @@ import { isPremiumTemplate } from '../templates/tier';
 export { isPremiumTemplate };
 import type { HostDb } from './host-db';
 import { NOTIFY_MODES } from '../lib/responses';
+import { VERSIONS } from '../lib/versions';
 
 export type ApiResult<T = unknown> = { status: number; body: T };
 const ok = <T>(body: T, status = 200): ApiResult<T> => ({ status, body });
@@ -63,6 +64,11 @@ export interface HostDeps {
   cinematic?(invitationId: string): Promise<boolean>;
   /** the signed-in user is one of the platform's admins (unlisted designs are theirs to use) */
   admin?: boolean;
+  /**
+   * "Something changed" to a Realtime channel's open pages (lib/live) — the family's review pages
+   * when the draft changes. Absent: nobody is told.
+   */
+  broadcast?(channel: string, kind: string): Promise<unknown>;
 }
 
 /** 402 when the plan has no room for one more active invitation. */
@@ -266,9 +272,20 @@ export async function saveDraft(
     if (introduced.length)
       return fail(403, 'feature_off', { feature: 'cinematic', issues: introduced.slice(0, 20) });
   }
+  // A design concept may move the invitation to another template (features/art-direction): one this
+  // deployment has — an unlisted one only for the admins, unless the invitation is on it already.
+  const entry = deps.template(draft.data.templateId);
+  if (!entry) return fail(422, 'invalid', { issues: ['templateId'] });
+  if (!entry.manifest.listed && deps.admin === false) {
+    const stored = await deps.db.get(id, userId);
+    if (!stored) return fail(404, 'not_found');
+    if (stored.templateId !== entry.manifest.id) return fail(422, 'invalid', { issues: ['templateId'] });
+  }
   const result = await deps.db.saveDraft(id, userId, draft.data, parsed.data.updatedAt);
   if (!result) return fail(404, 'not_found');
   if (!result.ok) return fail(409, 'conflict', { updatedAt: result.updatedAt, draft: result.draft });
+  // the family's open review pages show the new draft
+  if (result.reviewChannel) await deps.broadcast?.(result.reviewChannel, 'draft');
   return ok({ ok: true, updatedAt: result.updatedAt });
 }
 
@@ -349,6 +366,63 @@ export async function restoreVersion(
   const inv = await deps.db.get(id, userId);
   if (!inv) return fail(404, 'not_found');
   return ok({ ok: true, draft: inv.draft, updatedAt: inv.updatedAt });
+}
+
+// ─── the history: every publish and the draft's saves (Phase 5C) ─────────────────────────────────
+
+/** GET /api/invitations/:id/history — publishes and saves, newest first, with the keeping rules. */
+export async function listHistory(userId: string, id: string, deps: HostDeps): Promise<ApiResult> {
+  const inv = await deps.db.get(id, userId);
+  if (!inv) return fail(404, 'not_found');
+  return ok({
+    ok: true,
+    entries: await deps.db.history(id, userId),
+    keep: { days: VERSIONS.keepSavesDays, max: VERSIONS.maxSaves },
+  });
+}
+
+/** GET /api/invitations/:id/history/:entry — one entry with its document (preview, what changed). */
+export async function getEntry(
+  userId: string,
+  id: string,
+  entryId: number,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  if (!Number.isSafeInteger(entryId) || entryId < 1) return fail(400, 'invalid');
+  const found = await deps.db.entry(id, userId, entryId);
+  return found ? ok({ ok: true, entry: found.entry, document: found.document }) : fail(404, 'not_found');
+}
+
+/**
+ * POST /api/invitations/:id/history/:entry/restore — the entry becomes the draft; the draft it
+ * replaces is kept in the history first (the restore can be undone). → { draft, updatedAt }
+ */
+export async function restoreEntry(
+  userId: string,
+  id: string,
+  entryId: number,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  if (!Number.isSafeInteger(entryId) || entryId < 1) return fail(400, 'invalid');
+  const restored = await deps.db.restoreEntry(id, userId, entryId);
+  if (!restored) return fail(404, 'not_found');
+  if (restored.reviewChannel) await deps.broadcast?.(restored.reviewChannel, 'draft');
+  return ok({ ok: true, draft: restored.draft, updatedAt: restored.updatedAt });
+}
+
+export const SnapshotSchema = z.strictObject({ reason: z.enum(['concept', 'restore']) });
+
+/** POST /api/invitations/:id/snapshot { reason } — the draft kept before a design concept replaces it. */
+export async function snapshotDraft(
+  userId: string,
+  id: string,
+  raw: unknown,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  const parsed = SnapshotSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const kept = await deps.db.snapshot(id, userId, parsed.data.reason);
+  return kept ? ok({ ok: true, kept: kept.id !== null }) : fail(404, 'not_found');
 }
 
 // ─── duplicate / archive ─────────────────────────────────────────────────────────────────────────
