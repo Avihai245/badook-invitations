@@ -7,7 +7,9 @@
  */
 import {
   DEFAULT_SECTION_ANIMATION,
+  LOCALES,
   type EnterPreset,
+  type EventType,
   type InvitationDocument,
   type L10n,
   type OpeningPreset,
@@ -21,6 +23,7 @@ import {
   type ThemeOverrides,
   type ThemeTokens,
 } from '../contracts/types';
+import { withCultureCopy } from '../templates/culture-copy';
 import { updateAt } from './paths';
 
 // ─── which layouts a section may take ────────────────────────────────────────────────────────────
@@ -319,9 +322,14 @@ export function applySectionPalette(
 
 // ─── the cover's opening ─────────────────────────────────────────────────────────────────────────
 
-/** Every cover hint the template seeds (all its event types): the ones that speak of its own cover. */
+/**
+ * Every cover hint the template seeds (all its event types, in every language — the ones the pack
+ * doesn't write as the culture copy seeds them): the ones that speak of its own cover.
+ */
 export function seededHints(defaults: TemplateDefaults): L10n[] {
-  return Object.values(defaults.defaults).flatMap((d) => (d ? [d.coverHint] : []));
+  return Object.entries(defaults.defaults).flatMap(([eventType, d]) =>
+    d ? [withCultureCopy(d, eventType as EventType, LOCALES).coverHint] : [],
+  );
 }
 
 /**

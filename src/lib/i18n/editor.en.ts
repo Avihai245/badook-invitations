@@ -347,7 +347,6 @@ export const editorEn: EditorDict = {
         playful: 'Playful',
         bold: 'Bold',
       },
-      sample: { he: 'נשמח לחגוג איתכם', en: 'We’d love you to join us' },
       apply: 'Use these fonts: {name}',
     },
     featureOff: 'Cinematic design is off for this event, so the change wasn’t saved.',

@@ -351,6 +351,17 @@ export function PhotoPaletteCard() {
 const CATEGORIES = (generatedFaces as { families: Record<string, { category?: string }> }).families;
 const categoryOf = (family: string) => CATEGORIES[family]?.category ?? null;
 
+/** A font's specimen in each invitation language, in its own script: sample names and a line. */
+const SPECIMEN: Record<Locale, { names: string; line: string }> = {
+  he: { names: 'נועה & איתי', line: 'נשמח לחגוג איתכם' },
+  en: { names: 'Noa & Itay', line: 'We’d love you to join us' },
+  ru: { names: 'Ноа и Итай', line: 'Будем рады отпраздновать с вами' },
+  ar: { names: 'نوعا وإيتاي', line: 'يسعدنا أن تحتفلوا معنا' },
+  fr: { names: 'Noa et Itay', line: 'Nous serions ravis de fêter avec vous' },
+  es: { names: 'Noa e Itay', line: 'Nos encantaría celebrarlo contigo' },
+  am: { names: 'ኖዓ እና ኢታይ', line: 'ከእርስዎ ጋር ብናከብር ደስ ይለናል' },
+};
+
 /**
  * Three font pairs for this invitation (lib/font-suggest.ts: its event type and colors), each a live
  * specimen — the names in the display face and a line in the text face — in every language of the
@@ -372,8 +383,8 @@ export function FontSuggestions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- palette is derived from these
     [template, doc.eventType, palette.bg, palette.accent, doc.theme.fontPairId],
   );
-  const sample = (l: Locale) => hostsText(doc, l) || (l === 'he' ? 'נועה & איתי' : 'Noa & Itay');
-  const line = (l: Locale) => (f.sample as Partial<Record<Locale, string>>)[l] ?? f.sample.en;
+  const sample = (l: Locale) => hostsText(doc, l) || SPECIMEN[l].names;
+  const line = (l: Locale) => SPECIMEN[l].line;
   return (
     <PanelCard
       title={

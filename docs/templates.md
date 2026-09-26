@@ -167,7 +167,10 @@ the other five get the culture copy of `templates/culture-copy.ts` when an invit
 or a language is added — the event's own greetings and phrases in each language (a wedding's "Mazal
 tov" is "Поздравляем!", "مبروك!", "Félicitations !", "¡Enhorabuena!", "እንኳን ደስ አላችሁ!"), never a
 word-for-word copy of the Hebrew. A design's own starter text that has no generic wording (a custom
-extra section) stays off in those languages until the host writes it.
+extra section) stays off in those languages until the host writes it. The schema-v2 copy of a design
+(`quote`, `when`, `parents`, `custom` in `defaults.json`) has no culture copy: a design that brings its
+own writes it in all seven languages — Lumière's verses and titles do, in each language's established
+Bible translation — and the pack's text always wins over the culture copy.
 
 Fonts: each script is set in the design's own faces where they write it, else in a face of the same
 style (docs/fonts.md), and the validator checks every font pair has a face for every supported script.

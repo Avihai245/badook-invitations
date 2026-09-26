@@ -352,7 +352,6 @@ export const editorHe = {
         playful: 'שמח',
         bold: 'בולט',
       },
-      sample: { he: 'נשמח לחגוג איתכם', en: 'We’d love you to join us' },
       apply: 'בחירת הגופנים: {name}',
     },
     /** a save the server refused: the event has no cinematic feature */

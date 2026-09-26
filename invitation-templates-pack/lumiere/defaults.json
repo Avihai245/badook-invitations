@@ -52,10 +52,37 @@
       },
       "closingLine": { "he": "באהבה, ומחכים לראותכם", "en": "With love — we cannot wait to see you" },
       "quote": {
-        "text": { "he": "אני לדודי ודודי לי", "en": "I am my beloved’s, and my beloved is mine" },
-        "attribution": { "he": "שיר השירים", "en": "Song of Songs" }
+        "text": {
+          "he": "אני לדודי ודודי לי",
+          "en": "I am my beloved’s, and my beloved is mine",
+          "ru": "Я принадлежу возлюбленному моему, а возлюбленный мой — мне",
+          "ar": "أنا لحبيبي وحبيبي لي",
+          "fr": "Je suis à mon bien-aimé, et mon bien-aimé est à moi",
+          "es": "Yo soy de mi amado, y mi amado es mío",
+          "am": "እኔ ለውዴ ነኝ፥ ውዴም ለእኔ ነው"
+        },
+        "attribution": {
+          "he": "שיר השירים",
+          "en": "Song of Songs",
+          "ru": "Песнь песней",
+          "ar": "نشيد الأنشاد",
+          "fr": "Cantique des cantiques",
+          "es": "Cantar de los Cantares",
+          "am": "መኃልየ መኃልይ"
+        }
       },
-      "when": { "title": { "he": "היום שלנו", "en": "Our day" }, "note": null }
+      "when": {
+        "title": {
+          "he": "היום שלנו",
+          "en": "Our day",
+          "ru": "Наш день",
+          "ar": "يومنا",
+          "fr": "Notre jour",
+          "es": "Nuestro día",
+          "am": "ቀናችን"
+        },
+        "note": null
+      }
     },
     "engagement": {
       "coverHint": { "he": "לחצו כדי לפתוח", "en": "Tap to open" },
@@ -95,10 +122,37 @@
       },
       "closingLine": { "he": "באהבה, ומחכים לראותכם", "en": "With love — we cannot wait to see you" },
       "quote": {
-        "text": { "he": "שימני כחותם על לבך", "en": "Set me as a seal upon your heart" },
-        "attribution": { "he": "שיר השירים", "en": "Song of Songs" }
+        "text": {
+          "he": "שימני כחותם על לבך",
+          "en": "Set me as a seal upon your heart",
+          "ru": "Положи меня, как печать, на сердце твоё",
+          "ar": "اجعلني كخاتم على قلبك",
+          "fr": "Mets-moi comme un sceau sur ton cœur",
+          "es": "Ponme como un sello sobre tu corazón",
+          "am": "እንደ ማኅተም በልብህ አኑረኝ"
+        },
+        "attribution": {
+          "he": "שיר השירים",
+          "en": "Song of Songs",
+          "ru": "Песнь песней",
+          "ar": "نشيد الأنشاد",
+          "fr": "Cantique des cantiques",
+          "es": "Cantar de los Cantares",
+          "am": "መኃልየ መኃልይ"
+        }
       },
-      "when": { "title": { "he": "חוגגים", "en": "Let us celebrate" }, "note": null }
+      "when": {
+        "title": {
+          "he": "חוגגים",
+          "en": "Let us celebrate",
+          "ru": "Празднуем вместе",
+          "ar": "لنحتفل معًا",
+          "fr": "Célébrons ensemble",
+          "es": "Celebremos juntos",
+          "am": "አብረን እናክብር"
+        },
+        "note": null
+      }
     },
     "bar_mitzvah": {
       "coverHint": { "he": "לחצו כדי לפתוח", "en": "Tap to open" },
@@ -139,10 +193,37 @@
       },
       "closingLine": { "he": "מחכים לחגוג איתכם", "en": "We look forward to celebrating with you" },
       "quote": {
-        "text": { "he": "בכל דרכיך דעהו, והוא יישר אורחותיך", "en": "In all your ways know Him, and He will make your paths straight" },
-        "attribution": { "he": "משלי ג׳, ו׳", "en": "Proverbs 3:6" }
+        "text": {
+          "he": "בכל דרכיך דעהו, והוא יישר אורחותיך",
+          "en": "In all your ways know Him, and He will make your paths straight",
+          "ru": "Во всех путях твоих познавай Его, и Он направит стези твои",
+          "ar": "في كل طرقك اعرفه، وهو يقوّم سبلك",
+          "fr": "Dans toutes tes voies reconnais-le, et il aplanira tes sentiers",
+          "es": "Reconócelo en todos tus caminos, y él enderezará tus veredas",
+          "am": "በመንገድህ ሁሉ እርሱን እወቅ፥ እርሱም ጎዳናህን ያቃናል"
+        },
+        "attribution": {
+          "he": "משלי ג׳, ו׳",
+          "en": "Proverbs 3:6",
+          "ru": "Притчи 3:6",
+          "ar": "سفر الأمثال 3: 6",
+          "fr": "Proverbes 3:6",
+          "es": "Proverbios 3:6",
+          "am": "መጽሐፈ ምሳሌ 3፥6"
+        }
       },
-      "when": { "title": { "he": "היום הגדול", "en": "The big day" }, "note": null }
+      "when": {
+        "title": {
+          "he": "היום הגדול",
+          "en": "The big day",
+          "ru": "Главный день",
+          "ar": "اليوم الكبير",
+          "fr": "Le grand jour",
+          "es": "El gran día",
+          "am": "ታላቁ ቀን"
+        },
+        "note": null
+      }
     },
     "bat_mitzvah": {
       "coverHint": { "he": "לחצו כדי לפתוח", "en": "Tap to open" },
@@ -183,10 +264,37 @@
       },
       "closingLine": { "he": "מחכים לחגוג איתכם", "en": "We look forward to celebrating with you" },
       "quote": {
-        "text": { "he": "רבות בנות עשו חיל, ואת עלית על כולנה", "en": "Many women have done valiantly, but you surpass them all" },
-        "attribution": { "he": "משלי ל״א, כ״ט", "en": "Proverbs 31:29" }
+        "text": {
+          "he": "רבות בנות עשו חיל, ואת עלית על כולנה",
+          "en": "Many women have done valiantly, but you surpass them all",
+          "ru": "Много было жён добродетельных, но ты превзошла всех их",
+          "ar": "بنات كثيرات عملن فضلًا، أما أنتِ ففقتِ عليهن جميعًا",
+          "fr": "Plusieurs filles ont une conduite vertueuse, mais toi, tu les surpasses toutes",
+          "es": "Muchas mujeres hicieron el bien, mas tú sobrepasas a todas",
+          "am": "ብዙዎች ሴቶች ልጆች በጎነትን አደረጉ፥ አንቺ ግን ከሁሉ በለጥሽ"
+        },
+        "attribution": {
+          "he": "משלי ל״א, כ״ט",
+          "en": "Proverbs 31:29",
+          "ru": "Притчи 31:29",
+          "ar": "سفر الأمثال 31: 29",
+          "fr": "Proverbes 31:29",
+          "es": "Proverbios 31:29",
+          "am": "መጽሐፈ ምሳሌ 31፥29"
+        }
       },
-      "when": { "title": { "he": "היום הגדול", "en": "The big day" }, "note": null }
+      "when": {
+        "title": {
+          "he": "היום הגדול",
+          "en": "The big day",
+          "ru": "Главный день",
+          "ar": "اليوم الكبير",
+          "fr": "Le grand jour",
+          "es": "El gran día",
+          "am": "ታላቁ ቀን"
+        },
+        "note": null
+      }
     }
   }
 }

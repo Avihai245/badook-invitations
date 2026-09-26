@@ -12,7 +12,7 @@
   "tier": "premium",
   "listed": false,
   "categories": ["wedding", "engagement", "bar_mitzvah", "bat_mitzvah", "save_the_date"],
-  "supportsLocales": ["he", "en"],
+  "supportsLocales": ["he", "en", "ru", "ar", "fr", "es", "am"],
   "previewImage": "/templates/lumiere/preview.webp",
   "previewVideo": null,
   "tokens": {

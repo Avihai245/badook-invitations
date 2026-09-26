@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { EVENT_TYPES, LOCALES, RTL_LOCALES, type Locale } from '@/features/invitations/contracts/types';
+import {
+  EVENT_TYPES,
+  LOCALES,
+  RTL_LOCALES,
+  type EventType,
+  type Locale,
+} from '@/features/invitations/contracts/types';
 import { validateDocument } from '@/features/invitations/contracts/validate';
 import {
   DICTIONARY_LOCALES,
@@ -22,18 +28,21 @@ import {
   paidLocales,
   scriptsOf,
 } from '@/features/invitations/lib/locales';
+import { seededHints, setOpening } from '@/features/invitations/editor/presentation';
 import { chooseLocale } from '@/features/invitations/renderer/live/detect';
 import { countdownProps } from '@/features/invitations/sections/countdown/labels';
 import { RSVP_NOTES } from '@/features/invitations/sections/rsvp/notes';
 import { RSVP_KEYS } from '@/features/invitations/sections/rsvp/strings';
 import { CULTURE_COPY } from '@/features/invitations/templates/culture-copy';
 import { demoPeople } from '@/features/invitations/templates/demo-people';
-import { TEMPLATES } from '@/features/invitations/templates/registry';
+import { requireTemplate, TEMPLATES } from '@/features/invitations/templates/registry';
 import { SEED_COPY } from '@/features/invitations/templates/seed-copy';
 import { seedDocument } from '@/features/invitations/templates/seed-document';
 import { templateLanguages, templateChain } from '@/features/whatsapp/languages';
 import { fillTemplate, TEMPLATE_TEXT } from '@/features/whatsapp/template-text';
 import { GALLERY_GUEST } from '@/lib/i18n/gallery-guest';
+import { GUIDE_TEXT } from '@/lib/i18n/event-day-guide';
+import { TABLE_MESSAGE } from '@/features/event-day/messages';
 
 const NEW_LOCALES = ['ru', 'ar', 'fr', 'es', 'am'] as const satisfies readonly Locale[];
 const isPlural = (v: unknown): v is PluralEntry =>
@@ -263,6 +272,107 @@ describe('the gallery’s guest pages', () => {
         else expect(String(value).trim(), `${l} ${path}`).not.toBe('');
       };
       walk(GALLERY_GUEST[l], l);
+    }
+  });
+});
+
+describe('the table guide and the table message', () => {
+  const shape = (value: unknown, path = ''): string[] =>
+    value && typeof value === 'object' && !isPlural(value)
+      ? Object.entries(value).flatMap(([k, v]) => shape(v, path ? `${path}.${k}` : k))
+      : [path];
+  /** every string of a dictionary, by its path (a plural entry's forms as path.category) */
+  const strings = (value: unknown, path = '', out = new Map<string, string>()) => {
+    if (typeof value === 'string') out.set(path, value);
+    else if (value && typeof value === 'object')
+      for (const [k, v] of Object.entries(value)) strings(v, path ? `${path}.${k}` : k, out);
+    return out;
+  };
+
+  it('the guide speaks every language: the Hebrew keys, the same placeholders, each language’s plurals', () => {
+    const keys = shape(GUIDE_TEXT.he).sort();
+    const he = strings(GUIDE_TEXT.he);
+    for (const l of LOCALES) {
+      expect(shape(GUIDE_TEXT[l]).sort(), l).toEqual(keys);
+      for (const [path, text] of strings(GUIDE_TEXT[l])) {
+        expect(text.trim(), `${l} ${path}`).not.toBe('');
+        const form = /\.(zero|one|two|few|many|other)$/.exec(path)?.[1];
+        const base = placeholders(he.get(form ? path.replace(/\.\w+$/, '.other') : path) ?? '');
+        // a plural's "other" form has the Hebrew one's placeholders; its other forms may leave the
+        // number out ("один стол"), but never bring one of their own
+        if (form && form !== 'other')
+          expect(base, `${l} ${path}`).toEqual(expect.arrayContaining(placeholders(text)));
+        else expect(placeholders(text), `${l} ${path}`).toEqual(base);
+      }
+      const walk = (value: unknown, path: string) => {
+        if (isPlural(value))
+          for (const c of categories(l))
+            expect(value[c as keyof PluralEntry], `${l} ${path} ${c}`).toBeTruthy();
+        else if (value && typeof value === 'object')
+          for (const [k, v] of Object.entries(value)) walk(v, `${path}.${k}`);
+      };
+      walk(GUIDE_TEXT[l], l);
+    }
+  });
+
+  it('the table message from the host’s own WhatsApp: every language, the same values', () => {
+    for (const l of LOCALES) {
+      expect(placeholders(TABLE_MESSAGE[l].message), l).toEqual(['hosts', 'name', 'table', 'url']);
+      expect(placeholders(TABLE_MESSAGE[l].table), l).toEqual(['number']);
+    }
+  });
+});
+
+describe('Lumière and the cinematic editor in every language', () => {
+  const lumiere = requireTemplate('lumiere');
+  const seed = (eventType: EventType, locales: Locale[]) => {
+    const people = demoPeople(eventType, 'lumiere');
+    return seedDocument(lumiere.manifest, lumiere.defaults, {
+      eventType,
+      locales,
+      defaultLocale: locales[0]!,
+      hosts: {
+        primary: people.primary,
+        secondary: people.secondary ?? null,
+        parents: people.parents ?? null,
+      },
+      date: '2031-06-17',
+      startTime: '19:30',
+      endTime: '23:30',
+      timezone: 'Asia/Jerusalem',
+      slug: 'lumiere-check',
+    });
+  };
+
+  it('Lumière supports the seven languages and writes its verses and titles in each, for every event', () => {
+    expect(lumiere.manifest.supportsLocales).toEqual([...LOCALES]);
+    for (const eventType of Object.keys(lumiere.defaults.defaults) as EventType[]) {
+      const doc = seed(eventType, [...LOCALES]);
+      const { errors } = validateDocument(doc, lumiere.manifest, {
+        mode: 'publish',
+        now: Date.parse('2026-09-26'),
+      });
+      const missing = errors.filter(
+        (e) =>
+          (e.code === 'missing_translation' || e.code === 'required') &&
+          e.field !== 'venue.name' &&
+          e.field !== 'venue.address',
+      );
+      expect(
+        missing.map((e) => e.path),
+        eventType,
+      ).toEqual([]);
+      const quote = doc.sections.find((s) => s.type === 'quote');
+      expect(quote?.type === 'quote' && quote.data.attribution?.am, eventType).toBeTruthy();
+    }
+  });
+
+  it('the hint the design seeded makes way for the chosen opening’s own call to action, in any language', () => {
+    const hints = seededHints(lumiere.defaults);
+    for (const l of NEW_LOCALES) {
+      const doc = seed('wedding', ['he', l]);
+      expect(doc.cover.hint?.[l], l).toBeTruthy();
+      expect(setOpening(doc, 'gold_dust', hints).cover.hint, l).toBeNull();
     }
   });
 });
