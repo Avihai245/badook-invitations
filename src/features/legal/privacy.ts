@@ -88,7 +88,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
                 'Meta (WhatsApp Business Platform) — when a host sends invitations on WhatsApp: the guest’s phone number, name and the invitation’s link;',
                 'PayPlus — processing payments and issuing invoices;',
                 'Resend — sending emails;',
-                'Anthropic — answering questions in the support assistant (the text of the question only);',
+                'Anthropic — answering questions in the support assistant (the text of the question only), and, when the host’s plan includes it, the automatic check of photos uploaded to an event’s live gallery (a small thumbnail of the photo only);',
                 'Google (Maps), YouTube and Vimeo — maps and videos shown in invitations and on the site.',
               ],
             },
@@ -118,6 +118,25 @@ export function privacyDoc(c: LegalContext): LegalDoc {
                 'The do-not-send list: as long as our WhatsApp number sends invitations, so the request keeps being honoured. Its owner can ask to be removed from it through the contact form.',
               ],
             },
+          ],
+        },
+        {
+          id: 'gallery',
+          heading: '7A. The live gallery: photos and videos guests upload',
+          body: [
+            'A host whose plan includes it can open a live gallery for an event: guests open a link or scan a QR code the host shares and upload photos and videos from their phone, without an account. The host may add an access code and a time window for uploads. The uploads are collected for the host, like a guest list (section 1).',
+            {
+              list: [
+                'What is kept: the photos and videos themselves (the original file, plus a smaller copy and a thumbnail the guest’s phone makes), their size, dimensions, length, and the time they were taken as the file records it. Location (GPS) details are removed from JPEG photos before they are uploaded; other files (such as HEIC photos and videos) are kept as the phone made them and may include the location it recorded. A name the guest chooses to add is shown with their uploads. So that guests can see and delete their own uploads, their device keeps a random identifier, which we keep only as a one-way hash, separate for each event.',
+                'Automatic checks: the guest’s phone checks each photo for blur, darkness and duplicates. When the host’s plan includes the automatic content check, the photo’s small thumbnail only (no names or other details) is sent to Anthropic, which returns scores for inappropriate content and for quality. A suspicious upload waits for the host’s approval.',
+                'Who sees them: anyone with the gallery’s link (and its access code, if set) sees the published photos and videos, and so does the event’s screen at the venue if the host uses one. The host sees everything, including uploads waiting for approval or rejected and the checks’ results, and can download all the files. The host decides what is published and is responsible for how they share and use the photos.',
+                'Storage: private storage (Supabase, European Union). Pages receive links to the files that expire after a few hours.',
+                'Deleting: a guest can delete their own upload from the same device at any time; the host can delete any photo or video, or the whole gallery. The files are then removed from storage, usually within minutes.',
+                'How long: until the host deletes them, the gallery, the invitation or the account (then as in section 7). Uploads that were never finished are erased after two days, and the records of deleted items after 30 days.',
+                'The gallery does not use face recognition.',
+              ],
+            },
+            'A guest who wants a photo of them removed can ask the host, or contact us (section 8).',
           ],
         },
         {
@@ -249,7 +268,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'Meta (WhatsApp Business Platform): כשמארח שולח הזמנות בוואטסאפ, מועברים מספר הטלפון של המוזמן, השם שלו והקישור להזמנה;',
               'PayPlus: סליקת תשלומים והפקת חשבוניות;',
               'Resend: שליחת מיילים;',
-              'Anthropic: מענה לשאלות בעוזר התמיכה (רק טקסט השאלה);',
+              'Anthropic: מענה לשאלות בעוזר התמיכה (רק טקסט השאלה), וכשהחבילה של המארח כוללת את זה, הבדיקה האוטומטית של תמונות שמועלות לגלריה החיה של אירוע (רק תמונה ממוזערת של התמונה);',
               'Google (מפות), YouTube ו־Vimeo: מפות וסרטונים שמוצגים בהזמנות ובאתר.',
             ],
           },
@@ -279,6 +298,25 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'רשימת ״לא לשלוח״: כל עוד המספר שלנו בוואטסאפ שולח הזמנות, כדי שהבקשה תמשיך להיות מכובדת. בעל המספר יכול לבקש להסיר אותו מהרשימה בטופס יצירת הקשר.',
             ],
           },
+        ],
+      },
+      {
+        id: 'gallery',
+        heading: '7א. הגלריה החיה: תמונות וסרטונים שאורחים מעלים',
+        body: [
+          'מארח שהחבילה שלו כוללת את זה יכול לפתוח לאירוע גלריה חיה: האורחים פותחים קישור או סורקים קוד QR שהמארח משתף, ומעלים מהטלפון תמונות וסרטונים, בלי להירשם. המארח יכול להוסיף קוד גישה ולקבוע חלון זמן להעלאות. ההעלאות נאספות עבור המארח, כמו רשימת המוזמנים (סעיף 1).',
+          {
+            list: [
+              'מה נשמר: התמונות והסרטונים עצמם (הקובץ המקורי, ועותק מוקטן ותמונה ממוזערת שהטלפון של האורח מכין), הגודל, המידות, האורך ומועד הצילום כפי שהקובץ רושם אותו. מתמונות JPEG מוסרים פרטי המיקום (GPS) עוד לפני ההעלאה; קבצים אחרים (למשל תמונות HEIC וסרטונים) נשמרים כפי שהטלפון יצר אותם, ועשויים לכלול את המיקום שהוא רשם. שם שהאורח בוחר להוסיף מוצג ליד מה שהעלה. כדי שאורחים יוכלו לראות ולמחוק את מה שהעלו, נשמר במכשיר שלהם מזהה אקראי, ואצלנו הוא נשמר רק כגיבוב חד־כיווני, נפרד לכל אירוע.',
+              'בדיקות אוטומטיות: הטלפון של האורח בודק כל תמונה (חדות, חושך וכפילויות). כשהחבילה של המארח כוללת בדיקת תוכן אוטומטית, רק התמונה הממוזערת (בלי שמות ובלי פרטים אחרים) נשלחת ל־Anthropic, שמחזירה ציון לתוכן לא הולם ולאיכות. העלאה חשודה ממתינה לאישור המארח.',
+              'מי רואה: כל מי שיש לו את הקישור לגלריה (ואת קוד הגישה, אם נקבע) רואה את התמונות והסרטונים שפורסמו, וכך גם מסך האירוע באולם, אם המארח משתמש בו. המארח רואה הכל, גם העלאות שממתינות לאישור או שנדחו ואת תוצאות הבדיקות, ויכול להוריד את כל הקבצים. המארח מחליט מה מתפרסם, והוא אחראי לאופן שבו הוא משתף את התמונות ומשתמש בהן.',
+              'אחסון: באחסון פרטי (Supabase, באיחוד האירופי). העמודים מקבלים קישורים לקבצים שתוקפם פג אחרי כמה שעות.',
+              'מחיקה: אורח יכול למחוק בכל רגע, מאותו מכשיר, את מה שהעלה; המארח יכול למחוק כל תמונה או סרטון, או את הגלריה כולה. הקבצים נמחקים אז מהאחסון, בדרך כלל תוך דקות.',
+              'כמה זמן: עד שהמארח מוחק אותם, את הגלריה, את ההזמנה או את החשבון (ואז כמו בסעיף 7). העלאות שלא הושלמו נמחקות אחרי יומיים, והרישומים של פריטים שנמחקו אחרי 30 יום.',
+              'הגלריה לא משתמשת בזיהוי פנים.',
+            ],
+          },
+          'אורח שרוצה שתמונה שלו תוסר יכול לבקש זאת מהמארח, או לפנות אלינו (סעיף 8).',
         ],
       },
       {
