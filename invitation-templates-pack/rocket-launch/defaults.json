@@ -1,0 +1,275 @@
+{
+  "templateId": "rocket-launch",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לשיגור",
+        "en": "Tap to launch"
+      },
+      "eyebrow": {
+        "he": "3… 2… 1… שיגור! חוגגים עם",
+        "en": "3… 2… 1… Liftoff! Celebrating"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור לשיגור",
+          "en": "Countdown to launch"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until liftoff"
+        },
+        "afterEvent": {
+          "he": "נחיתה מוצלחת! תודה שבאתם",
+          "en": "Safe landing! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "משימה: יום הולדת",
+          "en": "Mission: birthday"
+        },
+        "body": {
+          "he": "החללית מתודלקת, האסטרונאוטים מוכנים והכוכבים כבר נוצצים.\nב־{date} ממריאים יחד לחגוג!",
+          "en": "The rocket is fuelled, the astronauts are ready and the stars are already shining.\nOn {date} we blast off to celebrate together!"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בסיס השיגור",
+          "en": "Launch pad"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "הגעה לבסיס",
+            "en": "Crew check-in"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "משימה בחלל",
+            "en": "Space mission"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "ארוחת אסטרונאוטים",
+            "en": "Astronaut dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ושירה",
+            "en": "Cake & singing"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress code"
+          },
+          "subtitle": {
+            "he": "צוות החללית",
+            "en": "Rocket crew"
+          },
+          "body": {
+            "he": "מוזמנים לבוא בתחפושת של אסטרונאוט, חייזר או כוכב — או סתם במשהו נוח לריקודים.",
+            "en": "Come dressed as an astronaut, an alien or a star — or just in something comfy for dancing."
+          },
+          "illustration": "template:astronaut"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למשימה?",
+          "en": "Joining the mission?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה בבסיס השיגור",
+          "en": "Awesome! See you at the launch pad"
+        },
+        "declineMessage": {
+          "he": "חבל! נשלח לכם גלויה מהחלל",
+          "en": "Too bad! We’ll send you a postcard from space"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בחלל!",
+        "en": "See you in space!"
+      }
+    },
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "לחצו לשיגור",
+        "en": "Tap to launch"
+      },
+      "eyebrow": {
+        "he": "ממריאים לבר המצווה של",
+        "en": "Blasting off to the Bar Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until liftoff"
+        },
+        "afterEvent": {
+          "he": "נחיתה מוצלחת! מזל טוב ותודה שבאתם",
+          "en": "Safe landing! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "השמיים הם לא הגבול",
+          "en": "The sky is not the limit"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה — ומשם רק ממריאים.\nבואו לחגוג איתנו צעד גדול בדרך לכוכבים.",
+          "en": "On {date}, {primary} is called to the Torah — and from there, it’s straight up.\nCome celebrate one giant step with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בית הכנסת",
+          "en": "Synagogue"
+        },
+        {
+          "he": "המסיבה",
+          "en": "The celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחה על החללית",
+            "en": "Dinner on board"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ריקודים בין הכוכבים",
+            "en": "Dancing in the stars"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "קינוחים",
+            "en": "Dessert"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למשימה?",
+          "en": "Joining the mission?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the Bar Mitzvah boy"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה בשיגור",
+          "en": "Awesome! See you at the launch"
+        },
+        "declineMessage": {
+          "he": "חבל! נחגוג גם בשבילכם",
+          "en": "Too bad! We’ll celebrate for you too"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה בין הכוכבים!",
+        "en": "Mazal tov — see you among the stars!"
+      }
+    }
+  }
+}

@@ -354,6 +354,36 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'skyline',
     ornament: 'bauhaus',
   }),
+  // T1: little ones
+  'safari-pals': drawn('safari-pals', ['#FFF4DF', '#FDE8C6', '#F8D7A4'], {
+    bg: ['#F6E3C1', '#EDD3A6', '#E0BF88'],
+    paper: ['#FFFAF0', '#F7EBD3', '#EAD6B2'],
+    hint: '#6B563F',
+    panorama: 'hills',
+    ornament: 'lion',
+  }),
+  'dig-it': drawn('dig-it', ['#D6ECF8', '#EAF3F2', '#FBEFD6'], {
+    bg: ['#FFD54A', '#FFC93A', '#F2B31F'],
+    paper: ['#FFFDF7', '#F4EBD8', '#E6D8BC'],
+    hint: '#3F3212',
+    panorama: 'skyline',
+    ornament: 'digger',
+    ticket: { paper: '#FFFDF7', edge: 'rgba(38,34,28,.35)' },
+  }),
+  'ocean-friends': drawn('ocean-friends', ['#C9F0F3', '#A3E0E8', '#6FC6D6'], {
+    bg: ['#C3EBF0', '#A9E0E8', '#8ED2DF'],
+    paper: ['#FFFFFF', '#F0FAFA', '#DCEFF1'],
+    hint: '#1E4A63',
+    panorama: 'waves',
+    ornament: 'whale',
+  }),
+  'rocket-launch': drawn('rocket-launch', ['#1C2260', '#141A4A', '#0B0F2E'], {
+    bg: ['#1C2150', '#151A42', '#0E1233'],
+    paper: ['#262C66', '#1F2557', '#181D49'],
+    hint: 'rgba(255,255,255,.84)',
+    panorama: 'stars',
+    ornament: 'rocket',
+  }),
 };
 
 /**
