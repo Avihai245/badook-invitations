@@ -92,7 +92,7 @@ export function normalizeFaces(raw: readonly RawFace[], imageWidth: number, imag
 export function matchPhotos(
   descriptor: readonly number[],
   faces: readonly { itemId: string; descriptor: readonly number[] | null }[],
-  threshold = FACES.match.search,
+  threshold: number = FACES.match.search,
 ): { itemId: string; distance: number }[] {
   const best = new Map<string, number>();
   for (const f of faces) {
@@ -118,27 +118,4 @@ export function faceWindow(eventDate: string | null, now: number): { open: boole
   const until = addDays(eventDate, FACES.retentionDays);
   const today = new Date(now).toISOString().slice(0, 10);
   return { open: today <= until, until };
-}
-
-/**
- * Where a photo may be cropped without losing a face: the smallest box holding every face (fractions),
- * with a margin — or null without faces. The highlights film keeps its frame around it.
- */
-export function faceFrame(boxes: readonly Box[], margin = 0.06): Box | null {
-  if (!boxes.length) return null;
-  let x0 = 1;
-  let y0 = 1;
-  let x1 = 0;
-  let y1 = 0;
-  for (const [x, y, w, h] of boxes) {
-    x0 = Math.min(x0, x);
-    y0 = Math.min(y0, y);
-    x1 = Math.max(x1, x + w);
-    y1 = Math.max(y1, y + h);
-  }
-  x0 = Math.max(0, x0 - margin);
-  y0 = Math.max(0, y0 - margin);
-  x1 = Math.min(1, x1 + margin);
-  y1 = Math.min(1, y1 + margin);
-  return [x0, y0, x1 - x0, y1 - y0];
 }
