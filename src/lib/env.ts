@@ -84,7 +84,11 @@ const ServerEnvSchema = z.object({
   INVITES_WHATSAPP_APP_SECRET: z.string().default(''),
   INVITES_WHATSAPP_VERIFY_TOKEN: z.string().default(''),
   INVITES_WHATSAPP_TEMPLATE: z.string().trim().min(1).default('badook_invitation'),
-  INVITES_WHATSAPP_TEMPLATE_LANG: z.string().trim().min(2).default('he'),
+  // the languages the template is approved in, as Meta's codes ("he,en,ru,ar"; default he,en): each
+  // guest gets theirs, else the invitation's (features/whatsapp/languages.ts)
+  INVITES_WHATSAPP_TEMPLATE_LANGS: z.string().trim().optional(),
+  // the older single language (used only when INVITES_WHATSAPP_TEMPLATE_LANGS isn't set)
+  INVITES_WHATSAPP_TEMPLATE_LANG: z.string().trim().optional(),
   INVITES_WHATSAPP_API_VERSION: z.string().trim().min(2).default('v26.0'),
   INVITES_WHATSAPP_API_BASE: z
     .url()

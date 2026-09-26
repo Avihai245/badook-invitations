@@ -97,7 +97,9 @@ export const guestsEn: typeof guestsHe = {
     sendOwn: 'Opens your own WhatsApp with a ready message and the personal link — just press send.',
     markSent: 'Sent it yourself? Mark it as sent so the status is right.',
     unmarkSent: 'Puts a guest you marked as sent by mistake back to "not sent".',
-    edit: "Change a guest's name, phone, email, party size or group.",
+    edit: "Change a guest's name, phone, email, party size, group or language.",
+    language:
+      "Each guest's language: their personal link opens in it, and the WhatsApp invitation is written in it. Choose it here, in the guest's details, or with a “Language” column in the file.",
     delete: "Removes the guest from the list; their personal link stops working. A reply they've sent stays.",
     greeting:
       "Opens the editor at the opening section, where you write the personal greeting — the line with the guest's name shown when they open their personal link.",
@@ -140,7 +142,16 @@ export const guestsEn: typeof guestsHe = {
     party: 'Invited',
     status: 'Status',
     reply: 'Reply',
+    language: 'Language',
     actions: 'Actions',
+  },
+  language: {
+    label: 'Language',
+    default: 'Same as the invitation ({language})',
+    of: 'Language of {name}',
+    bulk: 'Language',
+    changed: { one: 'Language updated', other: 'Language updated for {n} guests' },
+    missing: "The invitation isn't written in {language} — they'll get it in {fallback}",
   },
   filters: {
     label: 'Filter guests',
@@ -168,7 +179,7 @@ export const guestsEn: typeof guestsHe = {
     title: 'Upload a guest list',
     drop: 'Drop an Excel (xlsx) or CSV file here, or click to choose one',
     formats:
-      'Columns the system reads: name or full name (or first + last name), phone, email (optional), party size and group (optional). A title row is optional.',
+      'Columns the system reads: name or full name (or first + last name), phone, email (optional), party size, group and language (optional). A title row is optional.',
     reading: 'Reading the file…',
     badFile: "We couldn't read the file. Save it as xlsx or CSV and try again.",
     oldExcel:
@@ -189,6 +200,7 @@ export const guestsEn: typeof guestsHe = {
       duplicate_phone: 'The phone appears twice in the file',
       bad_email: 'Invalid email — imported without it',
       bad_party_size: 'Invalid party size — imported without it',
+      bad_language: 'Unknown language — imported without it',
     },
     truncated:
       "The file has more than {max} rows: the first {max} are imported, the {n} rows after them aren't.",
@@ -213,6 +225,7 @@ export const guestsEn: typeof guestsHe = {
       email: 'Email',
       partySize: 'Party size',
       group: 'Group',
+      language: 'Language',
     },
   },
   form: {
@@ -225,6 +238,9 @@ export const guestsEn: typeof guestsHe = {
     group: 'Group',
     optional: 'optional',
     groupHint: 'e.g. family, friends, work',
+    language: 'Language',
+    languageHint:
+      'The invitation opens in this language, and WhatsApp messages to this guest are written in it.',
     save: 'Save',
     duplicate: 'This number is already on the list',
     duplicateOf: 'A guest with this phone is already on the list: {name}',
@@ -256,6 +272,7 @@ export const guestsEn: typeof guestsHe = {
     email: 'Email',
     party: 'Party size',
     group: 'Group',
+    language: 'Language',
     status: 'Delivery',
     opened: 'Opened',
     reply: 'Reply',
@@ -266,9 +283,9 @@ export const guestsEn: typeof guestsHe = {
     no: 'No',
   },
   sample: [
-    ['Full name', 'Phone', 'Email', 'Party size', 'Group'],
-    ['Dana Levi', '050-1234567', 'dana@example.com', '2', 'Family'],
-    ['Yossi Cohen', '052-7654321', '', '1', 'Friends'],
+    ['Full name', 'Phone', 'Email', 'Party size', 'Group', 'Language'],
+    ['Dana Levi', '050-1234567', 'dana@example.com', '2', 'Family', 'English'],
+    ['Yossi Cohen', '052-7654321', '', '1', 'Friends', 'Русский'],
   ],
   whatsapp: {
     title: 'Send the invitation on WhatsApp',
@@ -294,7 +311,10 @@ export const guestsEn: typeof guestsHe = {
     },
     resend: 'Also send it again to those who already have it ({n}) — each message is paid',
     preview: 'The message',
+    previewIn: 'The message in {language}',
     previewButton: 'Invitation & RSVP',
+    byLanguage: { one: '{language}: 1 message', other: '{language}: {n} messages' },
+    fallback: "There's no approved WhatsApp message in {language} yet: those guests get it in {fallback}.",
     cost: 'Cost',
     perMessage: "{price} per message, VAT included (WhatsApp's marketing-message rate for Israel)",
     total: { one: '1 message × {price} = {total}', other: '{n} messages × {price} = {total}' },

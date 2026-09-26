@@ -1,10 +1,14 @@
 import { parsePhoneNumberFromString } from 'libphonenumber-js/min';
+import type { Locale } from '../contracts/types';
+import { parseLanguage } from './language-names';
 
 /**
  * A host's guest list from a spreadsheet (Excel .xlsx or CSV): the columns are recognized by their
- * titles in Hebrew or English (שם / שם מלא / שם פרטי + שם משפחה, טלפון / נייד, מייל, כמות, קבוצה…) —
- * or, without a title row, by what the cells look like (phones, emails, the text column = names).
- * Isomorphic: the browser previews the file; the server validates the rows again before saving.
+ * titles in Hebrew or English (שם / שם מלא / שם פרטי + שם משפחה, טלפון / נייד, מייל, כמות, קבוצה,
+ * שפה…) — or, without a title row, by what the cells look like (phones, emails, the text column =
+ * names). A "language" column takes codes (ru, AR) or names in any of the invitation languages
+ * (Русский, العربية, English, רוסית). Isomorphic: the browser previews the file; the server validates
+ * the rows again before saving.
  */
 
 export type Cell = string | number | boolean | Date | null | undefined;
@@ -16,12 +20,16 @@ export interface GuestInput {
   email: string | null;
   partySize: number | null;
   group: string | null;
+  /** the language they read the invitation in (null: the invitation's default) */
+  language: Locale | null;
 }
 
-export type ColumnKey = 'name' | 'firstName' | 'lastName' | 'phone' | 'email' | 'partySize' | 'group';
+export type ColumnKey =
+  'name' | 'firstName' | 'lastName' | 'phone' | 'email' | 'partySize' | 'group' | 'language';
 export type ColumnMapping = Partial<Record<ColumnKey, number>>;
 
-export type ImportIssueCode = 'no_name' | 'bad_phone' | 'bad_email' | 'bad_party_size' | 'duplicate_phone';
+export type ImportIssueCode =
+  'no_name' | 'bad_phone' | 'bad_email' | 'bad_party_size' | 'duplicate_phone' | 'bad_language';
 export interface ImportIssue {
   /** 1-based row number in the file (as the spreadsheet shows it) */
   row: number;
@@ -124,6 +132,21 @@ const SYNONYMS: Record<ColumnKey, readonly string[]> = {
     'pax',
   ],
   group: ['קבוצה', 'צד', 'קטגוריה', 'שייכות', 'קרבה', 'group', 'side', 'category', 'tag', 'label'],
+  language: [
+    'שפה',
+    'שפת ההזמנה',
+    'שפה מועדפת',
+    'language',
+    'lang',
+    'preferred language',
+    'invitation language',
+    'язык',
+    'اللغة',
+    'لغة',
+    'langue',
+    'idioma',
+    'ቋንቋ',
+  ],
 };
 
 /** Titles that are the names in one list and a head count in another: the column's cells decide. */
@@ -310,9 +333,12 @@ export function readGuestRows(sheet: readonly (readonly Cell[])[]): ImportPrevie
       if (Number.isInteger(n) && n >= 1 && n <= 99) partySize = n;
       else issues.push({ row: line, code: 'bad_party_size', value: sizeText });
     }
+    const languageText = at(cells, 'language');
+    const language = parseLanguage(languageText);
+    if (languageText && !language) issues.push({ row: line, code: 'bad_language', value: languageText });
     if (phone) phones.add(phone);
     const group = at(cells, 'group').slice(0, 60) || null;
-    guests.push({ name, phone, email, partySize, group });
+    guests.push({ name, phone, email, partySize, group, language });
   }
   return { guests, issues, mapping, header, rows: data.length, truncated: all.length - data.length };
 }

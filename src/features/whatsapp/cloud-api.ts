@@ -4,9 +4,10 @@ import { serverEnv } from '@/lib/env';
 
 /**
  * WhatsApp Business Platform — Cloud API (graph.facebook.com), from the system's official number.
- * One fixed, Meta-approved MARKETING template (INVITES_WHATSAPP_TEMPLATE, e.g. "badook_invitation"):
+ * One fixed, Meta-approved MARKETING template (INVITES_WHATSAPP_TEMPLATE, e.g. "badook_invitation"),
+ * approved in each language of INVITES_WHATSAPP_TEMPLATE_LANGS (template-text.ts):
  *   body     שלום {{1}}! {{2}} מזמינים אותך {{3}} ב־{{4}}. …
- *   button   URL  https://<public address>/i/{{1}}   ← "<slug>?g=<guest token>"
+ *   button   URL  https://<public address>/i/{{1}}   ← "<slug>?g=<guest token>&lang=<language>"
  * The body is positional: 1 = the guest's name, 2 = the hosts, 3 = the event ("לחתונה"),
  * 4 = the date. See docs/whatsapp-setup.md for the template to submit.
  */
@@ -14,6 +15,8 @@ import { serverEnv } from '@/lib/env';
 export interface TemplateMessage {
   /** E.164 (+9725…) — the API wants it without the plus */
   to: string;
+  /** the template's language, as Meta's code ("he", "en_US"…) */
+  language: string;
   guestName: string;
   hosts: string;
   event: string;
@@ -29,6 +32,10 @@ export interface TemplateMessage {
  * dropped connection) never is — Meta may have sent it already: it fails as 'timeout'.
  */
 export type SendResult = { ok: true; id: string } | { ok: false; error: string; retryable: boolean };
+
+/** Meta's answer when the template isn't approved in the language asked for. */
+export const MISSING_TEMPLATE = 132001;
+export const missingTemplate = (r: SendResult) => !r.ok && r.error.startsWith(`${MISSING_TEMPLATE}`);
 
 /** Meta's "slow down" answers and its own hiccups (API, WABA and pair rate limits, maintenance). */
 const RETRY_LATER = new Set([4, 80007, 130429, 131016, 131048, 131056, 131057]);
@@ -69,7 +76,7 @@ export async function sendTemplate(m: TemplateMessage, fetchImpl: typeof fetch =
     biz_opaque_callback_data: m.ref,
     template: {
       name: env.INVITES_WHATSAPP_TEMPLATE,
-      language: { code: env.INVITES_WHATSAPP_TEMPLATE_LANG },
+      language: { code: m.language },
       components: [
         { type: 'body', parameters: [param(m.guestName), param(m.hosts), param(m.event), param(m.date)] },
         { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: m.linkSuffix }] },

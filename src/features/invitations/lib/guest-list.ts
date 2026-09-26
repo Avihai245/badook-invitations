@@ -1,3 +1,4 @@
+import type { InvitationDocument } from '../contracts/types';
 import { whatsappCapable } from './guest-import';
 import { formatPhone } from './phone';
 import { matchesGuestFilter, wasSent, type GuestFilter, type GuestLike } from './guest-status';
@@ -60,6 +61,21 @@ export function formatIls(value: number, locale: 'he' | 'en'): string {
     style: 'currency',
     currency: 'ILS',
   }).format(value);
+}
+
+/**
+ * A guest's personal link: the invitation with their token — and their language when it's one of the
+ * invitation's other languages, so it opens in it (the cached page of that language; no switch).
+ */
+export function guestLink(
+  base: string,
+  slug: string,
+  guest: { token: string; language?: string | null },
+  doc: Pick<InvitationDocument, 'locales' | 'defaultLocale'>,
+): string {
+  const lang = guest.language;
+  const own = !!lang && lang !== doc.defaultLocale && (doc.locales as readonly string[]).includes(lang);
+  return `${base}/i/${slug}?g=${guest.token}${own ? `&lang=${lang}` : ''}`;
 }
 
 /** A guest's phone for the host: Israeli numbers as dialled (050-123-4567, 03-555-1234), others international. */

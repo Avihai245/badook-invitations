@@ -19,8 +19,15 @@ describe('guest list import', () => {
     ]);
     expect(r.header).toBe(true);
     expect(r.guests).toEqual([
-      { name: 'דנה לוי', phone: '+972501234567', email: 'dana@example.com', partySize: 2, group: 'כלה' },
-      { name: 'משה', phone: '+972527654321', email: null, partySize: null, group: 'חתן' },
+      {
+        name: 'דנה לוי',
+        phone: '+972501234567',
+        email: 'dana@example.com',
+        partySize: 2,
+        group: 'כלה',
+        language: null,
+      },
+      { name: 'משה', phone: '+972527654321', email: null, partySize: null, group: 'חתן', language: null },
     ]);
     expect(r.issues).toEqual([]);
   });
@@ -69,8 +76,47 @@ describe('guest list import', () => {
       ['שם', 'מייל', 'כמות'],
       ['דנה', 'not-an-email', '300'],
     ]);
-    expect(lax.guests).toEqual([{ name: 'דנה', phone: null, email: null, partySize: null, group: null }]);
+    expect(lax.guests).toEqual([
+      { name: 'דנה', phone: null, email: null, partySize: null, group: null, language: null },
+    ]);
     expect(lax.issues.map((i) => i.code)).toEqual(['bad_email', 'bad_party_size']);
+  });
+
+  it('reads a language column: codes and names in any of the seven languages', () => {
+    const r = readGuestRows([
+      ['שם', 'טלפון', 'שפה'],
+      ['אולגה', '0501110001', 'Русский'],
+      ['סמיר', '0501110002', 'العربية'],
+      ['Emma', '0501110003', 'English'],
+      ['ז׳אן', '0501110004', 'FR'],
+      ['לוסיה', '0501110005', 'es-ES'],
+      ['אבבה', '0501110006', 'אמהרית'],
+      ['דנה', '0501110007', ''],
+      ['הנס', '0501110008', 'Deutsch'],
+      ['Rina', '0501110009', ' עברית '],
+    ]);
+    expect(r.mapping.language).toBe(2);
+    expect(r.guests.map((g) => [g.name, g.language])).toEqual([
+      ['אולגה', 'ru'],
+      ['סמיר', 'ar'],
+      ['Emma', 'en'],
+      ['ז׳אן', 'fr'],
+      ['לוסיה', 'es'],
+      ['אבבה', 'am'],
+      ['דנה', null],
+      // a language that isn't one of ours: the guest is imported without it
+      ['הנס', null],
+      ['Rina', 'he'],
+    ]);
+    expect(r.issues).toEqual([{ row: 9, code: 'bad_language', value: 'Deutsch' }]);
+    // the title in other languages, too
+    for (const title of ['Language', 'Язык', 'اللغة', 'Langue', 'Idioma', 'ቋንቋ'])
+      expect(
+        readGuestRows([
+          ['Name', title],
+          ['Dana', 'ru'],
+        ]).guests[0]?.language,
+      ).toBe('ru');
   });
 
   it('normalizes the ways spreadsheets keep Israeli phones', () => {

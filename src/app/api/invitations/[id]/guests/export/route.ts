@@ -1,5 +1,7 @@
 import { csvCell } from '@/features/invitations/lib/guest-import';
+import { guestLink } from '@/features/invitations/lib/guest-list';
 import { displayPhone, guestState } from '@/features/invitations/lib/guest-status';
+import { nativeName } from '@/features/invitations/lib/locales';
 import { guestsDb } from '@/features/invitations/server/guests';
 import { hostDb, isUuid } from '@/features/invitations/server/host-db';
 import { invitationsEnabled } from '@/lib/feature';
@@ -13,7 +15,8 @@ const NO_STORE = { 'cache-control': 'no-store' };
 
 /**
  * GET /api/invitations/:id/guests/export — the guest list as CSV for Excel (UTF-8 with a BOM): each
- * guest's details, where they stand and their personal link.
+ * guest's details (their language by its own name, which an import reads back), where they stand and
+ * their personal link.
  */
 export async function GET(_request: Request, { params }: Params) {
   if (!invitationsEnabled()) return new Response('Not found', { status: 404, headers: NO_STORE });
@@ -37,6 +40,7 @@ export async function GET(_request: Request, { params }: Params) {
     c.email,
     c.party,
     c.group,
+    c.language,
     c.status,
     c.opened,
     c.reply,
@@ -52,12 +56,13 @@ export async function GET(_request: Request, { params }: Params) {
       x.email ?? '',
       x.partySize ?? '',
       x.group ?? '',
+      x.language ? nativeName(x.language) : '',
       x.sendChannel === 'manual' && x.sendStatus === 'sent' ? g.status.manual : g.status[x.sendStatus],
       x.openedAt || x.response ? c.yes : c.no,
       state === 'attending' ? g.status.attending : state === 'declined' ? g.status.declined : '',
       x.response?.attending ? x.response.adults : '',
       x.response?.attending ? x.response.children : '',
-      `${base}/i/${inv.slug}?g=${x.token}`,
+      guestLink(base, inv.slug, x, inv.published ?? inv.draft),
     ];
   });
   const csv = '﻿' + [header, ...rows].map((r) => r.map((v) => csvCell(v)).join(',')).join('\r\n');

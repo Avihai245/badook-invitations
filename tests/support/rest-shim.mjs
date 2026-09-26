@@ -114,6 +114,15 @@ const FUNCTIONS = new Set([
   'gallery_trash_claim',
   'gallery_trash_done',
   'gallery_maintenance',
+  // seven languages (supabase/migrations/*_guest_languages.sql, *_translations.sql)
+  'set_guests_language',
+  'translations_list',
+  'translations_save',
+  'translations_set_status',
+  'translations_mark_stale',
+  'translations_discard',
+  'translation_glossary_set',
+  'translation_run_begin',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';

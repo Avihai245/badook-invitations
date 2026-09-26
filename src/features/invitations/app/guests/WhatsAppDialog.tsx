@@ -3,11 +3,14 @@
 import { CheckCircle2, Clock, Coins, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { Button, Checkbox, cn, Dialog, useToast } from '@/components/app';
+import { Button, Checkbox, cn, Dialog, Segmented, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
+import { guestLocale, templateChain } from '@/features/whatsapp/languages';
 import { fillTemplate, TEMPLATE_TEXT } from '@/features/whatsapp/template-text';
+import { RTL_LOCALES, type Locale } from '../../contracts/types';
 import { hostApi, loginUrl } from '../api';
 import { formatIls, whatsappReach } from '../../lib/guest-list';
+import { nativeName } from '../../lib/locales';
 import { wasSent } from '../../lib/guest-status';
 import type { GuestRecord, GuestsPageData } from '../../server/guests';
 
@@ -44,11 +47,31 @@ function planFor(base: readonly GuestRecord[], resend: boolean): Plan {
 }
 
 /**
+ * The recipients by the language their message is written in (the sender's choice: the guest's own
+ * language when the template is approved in it, else the invitation's — features/whatsapp/languages),
+ * in the order the template's languages are configured; and the languages guests wanted but get
+ * another one instead.
+ */
+function byLanguage(recipients: readonly GuestRecord[], data: GuestsPageData) {
+  const doc = { locales: data.locales, defaultLocale: data.locale };
+  const groups = new Map<Locale, GuestRecord[]>();
+  const fallbacks = new Map<string, { wanted: Locale; got: Locale }>();
+  for (const x of recipients) {
+    const got = templateChain(x.language, doc, data.whatsapp.langs)[0]?.locale ?? data.locale;
+    groups.set(got, [...(groups.get(got) ?? []), x]);
+    const wanted = guestLocale(x.language, doc);
+    if (wanted !== got) fallbacks.set(`${wanted}>${got}`, { wanted, got });
+  }
+  return { groups: [...groups], fallbacks: [...fallbacks.values()] };
+}
+
+/**
  * Send the invitation from the system's WhatsApp number: who gets it (guests who already have it are
  * left out unless the host asks to send again; landlines and guests who asked to stop never get it),
- * the message as they'll see it, what it costs (Meta's marketing rate per message, for what is really
- * sent), the host's confirmation that their guests expect it — then the queue is sent batch by batch
- * with a progress line. Messages WhatsApp asked us to hold back are retried by the scheduled job.
+ * how many messages go out in each language and each message as they'll see it, what it costs
+ * (Meta's marketing rate per message, for what is really sent), the host's confirmation that their
+ * guests expect it — then the queue is sent batch by batch with a progress line. Messages WhatsApp
+ * asked us to hold back are retried by the scheduled job.
  */
 export function WhatsAppDialog({
   data,
@@ -89,13 +112,23 @@ export function WhatsAppDialog({
   const ils = (v: number) => formatIls(v, locale);
   const total = Math.round(n * data.whatsapp.priceIls * 100) / 100;
   const short = data.unlimited ? 0 : Math.max(0, n - data.credits, missing?.n === n ? missing.short : 0);
-  const template = TEMPLATE_TEXT[data.whatsapp.lang];
-  const sample = recipients[0]?.name ?? guests[0]?.name ?? '';
+  const { groups, fallbacks } = byLanguage(recipients, data);
+  const [previewLang, setPreviewLang] = useState<Locale | null>(null);
+  // the preview's language: the one chosen, else the first the messages go out in
+  const fallbackLang =
+    templateChain(null, { locales: data.locales, defaultLocale: data.locale }, data.whatsapp.langs)[0]
+      ?.locale ?? data.locale;
+  const lang =
+    previewLang && groups.some(([l]) => l === previewLang) ? previewLang : (groups[0]?.[0] ?? fallbackLang);
+  const template = TEMPLATE_TEXT[lang];
+  const values = data.whatsapp.values[lang];
+  const sample =
+    groups.find(([l]) => l === lang)?.[1][0]?.name ?? recipients[0]?.name ?? guests[0]?.name ?? '';
   const message = fillTemplate(template.body, [
     sample,
-    data.whatsapp.hosts,
-    data.whatsapp.event,
-    data.whatsapp.date,
+    values?.hosts ?? '',
+    values?.event ?? '',
+    values?.date ?? '',
   ]);
 
   // why "send" can't be pressed, said next to it
@@ -317,13 +350,56 @@ export function WhatsAppDialog({
                 label={fmt(w.resend, { n: number(plan.received) })}
               />
             ) : null}
+            {groups.length > 1 || fallbacks.length ? (
+              <ul
+                className="mt-2 flex flex-col gap-0.5 border-t border-line pt-2"
+                data-testid="whatsapp-languages"
+              >
+                {groups.map(([l, list]) => (
+                  <li key={l}>
+                    ·{' '}
+                    {plural(w.byLanguage, list.length, {
+                      n: number(list.length),
+                      language: nativeName(l),
+                    })}
+                  </li>
+                ))}
+                {fallbacks.map(({ wanted, got }) => (
+                  <li key={`${wanted}-${got}`} className="text-muted">
+                    ·{' '}
+                    {fmt(w.fallback, {
+                      language: t.editor.languageIn[wanted],
+                      fallback: t.editor.languageIn[got],
+                    })}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
 
           <div>
-            <p className="mb-1.5 text-[13px] font-semibold">{w.preview}</p>
+            <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[13px] font-semibold">
+                {groups.length > 1 ? fmt(w.previewIn, { language: t.editor.languageIn[lang] }) : w.preview}
+              </p>
+              {groups.length > 1 ? (
+                <Segmented<Locale>
+                  label={w.preview}
+                  value={lang}
+                  onValueChange={setPreviewLang}
+                  options={groups.map(([l]) => ({
+                    value: l,
+                    label: t.editor.languageShort[l],
+                    ariaLabel: nativeName(l),
+                  }))}
+                />
+              ) : null}
+            </div>
             <div
               className="rounded-[14px] bg-[#e7ddd3] p-3"
-              dir={data.whatsapp.lang === 'he' ? 'rtl' : 'ltr'}
+              dir={RTL_LOCALES.includes(lang) ? 'rtl' : 'ltr'}
+              lang={lang}
+              data-testid="whatsapp-preview"
             >
               <div className="max-w-[340px] rounded-[10px] bg-white px-3 pt-2.5 pb-2 shadow-sm">
                 <p className="text-[13.5px] leading-[1.5] whitespace-pre-line text-[#111b21]">{message}</p>

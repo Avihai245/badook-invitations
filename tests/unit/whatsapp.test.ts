@@ -12,6 +12,7 @@ beforeAll(() => {
 
 const message = {
   to: '+972501234567',
+  language: 'he',
   guestName: 'דנה\nלוי',
   hosts: 'נועה & איתי',
   event: 'לחתונה',
@@ -210,28 +211,83 @@ describe('WhatsApp Cloud API client', () => {
 });
 
 describe('the invitation message', () => {
+  const claimed = (doc: unknown, guestLanguage: string | null = null) => ({
+    id: 'm1',
+    invitationId: 'i1',
+    toPhone: '+972501234567',
+    guestName: 'דנה לוי',
+    guestToken: 'AAAAAAAAAAAAAAAA',
+    guestLanguage,
+    slug: 'noa-and-itay',
+    document: doc,
+  });
+
   it('fills the template in its language from the invitation, with the personal link', async () => {
     const { templateMessage } = await import('@/features/whatsapp/sender');
     const { FIXTURES } = await import('@/features/invitations/templates/demo');
-    const doc = Object.values(FIXTURES)[0]!;
-    const m = templateMessage(
-      {
-        id: 'm1',
-        invitationId: 'i1',
-        toPhone: '+972501234567',
-        guestName: 'דנה לוי',
-        guestToken: 'AAAAAAAAAAAAAAAA',
-        slug: 'noa-and-itay',
-        document: doc,
-      },
-      doc,
-    );
+    const doc = FIXTURES['wedding-he-en'];
+    const m = templateMessage(claimed(doc), doc, { locale: 'he', code: 'he' });
     expect(m.to).toBe('+972501234567');
+    expect(m.language).toBe('he');
     expect(m.guestName).toBe('דנה לוי');
     expect(m.linkSuffix).toBe('noa-and-itay?g=AAAAAAAAAAAAAAAA');
     expect(m.event).toMatch(/^ל/);
     expect(m.hosts.length).toBeGreaterThan(0);
     expect(m.date).toMatch(/\d{4}/);
+    // in English: English values, and the link opens the English page
+    const en = templateMessage(claimed(doc), doc, { locale: 'en', code: 'en_US' });
+    expect(en).toMatchObject({ language: 'en_US', linkSuffix: 'noa-and-itay?g=AAAAAAAAAAAAAAAA&lang=en' });
+    expect(en.event).toMatch(/^to /);
+    expect(en.hosts).toMatch(/[A-Za-z]/);
+  });
+
+  it('writes to each guest in their language — or the next approved one when Meta has none', async () => {
+    vi.stubEnv('INVITES_WHATSAPP_TEMPLATE_LANGS', 'he,en,ru,ar');
+    vi.resetModules();
+    const rpc = vi.fn();
+    vi.doMock('@/lib/supabase/server', () => ({ serviceDb: () => ({ rpc }) }));
+    const { processQueue } = await import('@/features/whatsapp/sender');
+    const { worldDocument } = await import('@/features/invitations/dev/longer-demo');
+    const doc = worldDocument('sahar-bordeaux');
+    rpc.mockImplementation(async (fn: string) =>
+      fn === 'whatsapp_claim'
+        ? {
+            data: [
+              { ...claimed(doc, 'ru'), id: 'ru-guest' },
+              { ...claimed(doc, 'ar'), id: 'ar-guest' },
+              { ...claimed(doc, 'am'), id: 'am-guest' },
+              { ...claimed(doc, null), id: 'default-guest' },
+            ],
+            error: null,
+          }
+        : { data: true, error: null },
+    );
+    const sent: { ref: string; language: string; linkSuffix: string; event: string }[] = [];
+    // Meta approved everything but Arabic
+    const send = vi.fn(async (m: { ref: string; language: string; linkSuffix: string; event: string }) => {
+      sent.push(m);
+      return m.language === 'ar'
+        ? ({
+            ok: false,
+            error: '132001 · template name does not exist in the translation',
+            retryable: false,
+          } as const)
+        : ({ ok: true, id: `wamid.${m.ref}` } as const);
+    });
+    expect(await processQueue('i1', 10, send as never)).toEqual({ sent: 4, failed: 0, retried: 0 });
+    const by = (ref: string) => sent.filter((m) => m.ref === ref).map((m) => m.language);
+    expect(by('ru-guest')).toEqual(['ru']);
+    // Arabic isn't approved: the invitation's default (Hebrew) instead
+    expect(by('ar-guest')).toEqual(['ar', 'he']);
+    // no Amharic template configured at all: straight to the default
+    expect(by('am-guest')).toEqual(['he']);
+    expect(by('default-guest')).toEqual(['he']);
+    const ru = sent.find((m) => m.ref === 'ru-guest')!;
+    expect(ru.linkSuffix).toBe('noa-and-itay?g=AAAAAAAAAAAAAAAA&lang=ru');
+    expect(ru.event).toMatch(/[а-я]/);
+    vi.unstubAllEnvs();
+    vi.doUnmock('@/lib/supabase/server');
+    vi.resetModules();
   });
 
   it('the preview text is the approved template, filled in order', async () => {

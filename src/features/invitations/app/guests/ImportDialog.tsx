@@ -6,6 +6,7 @@ import { useRef, useState, type DragEvent } from 'react';
 import { Button, Dialog, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { guestPhone } from '../../lib/guest-list';
+import { nativeName } from '../../lib/locales';
 import { hostApi, loginUrl } from '../api';
 import {
   csvCell,
@@ -250,6 +251,11 @@ export function ImportDialog({
                       <td className="px-3 py-2 text-muted max-sm:hidden" dir="ltr">
                         {guest.email ?? ''}
                       </td>
+                      {preview.mapping.language !== undefined ? (
+                        <td className="px-3 py-2 text-muted" lang={guest.language ?? undefined}>
+                          {guest.language ? nativeName(guest.language) : ''}
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>

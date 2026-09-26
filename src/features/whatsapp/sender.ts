@@ -6,7 +6,8 @@ import { formatDate } from '@/features/invitations/lib/dates';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
-import { sendTemplate, type SendResult, type TemplateMessage } from './cloud-api';
+import { missingTemplate, sendTemplate, type SendResult, type TemplateMessage } from './cloud-api';
+import { templateChain, templateLanguages, valuesLocale, type TemplateLanguage } from './languages';
 
 /**
  * Sends the queued WhatsApp invitations (supabase/migrations/*_guests_accounts_messaging.sql and
@@ -33,19 +34,25 @@ interface Claimed {
   attempts?: number;
   guestName: string | null;
   guestToken: string | null;
+  /** the language the host set for the guest (null: the invitation's default) */
+  guestLanguage?: string | null;
   slug: string;
   document: unknown;
 }
 
-/** What the template says for this guest, in the template's language. */
-export function templateMessage(m: Claimed, doc: InvitationDocument): TemplateMessage {
-  const lang = serverEnv().INVITES_WHATSAPP_TEMPLATE_LANG.slice(0, 2);
-  const locale: Locale = lang === 'en' ? 'en' : 'he';
-  const docLocale = doc.locales.includes(locale) ? locale : doc.defaultLocale;
+/** The template's languages here (INVITES_WHATSAPP_TEMPLATE_LANGS). */
+export function configuredTemplateLanguages(): TemplateLanguage[] {
+  const env = serverEnv();
+  return templateLanguages(env.INVITES_WHATSAPP_TEMPLATE_LANGS, env.INVITES_WHATSAPP_TEMPLATE_LANG);
+}
+
+/** The template's values in a language: the hosts, the event with its preposition, the date. */
+export function templateValues(
+  doc: InvitationDocument,
+  locale: Locale,
+): { hosts: string; event: string; date: string } {
   return {
-    to: m.toPhone,
-    guestName: m.guestName ?? '',
-    hosts: hostsLine(doc.hosts, docLocale),
+    hosts: hostsLine(doc.hosts, valuesLocale(locale, doc)),
     event: EVENT_PHRASE[locale][doc.eventType],
     date: formatDate(doc.event.date, locale, {
       weekday: 'long',
@@ -53,9 +60,51 @@ export function templateMessage(m: Claimed, doc: InvitationDocument): TemplateMe
       month: 'long',
       year: 'numeric',
     }),
-    linkSuffix: m.guestToken ? `${m.slug}?g=${m.guestToken}` : m.slug,
+  };
+}
+
+/**
+ * What the template says for this guest in one of its languages. The button's link opens the
+ * invitation in that language when the invitation has it.
+ */
+export function templateMessage(
+  m: Claimed,
+  doc: InvitationDocument,
+  lang: TemplateLanguage,
+): TemplateMessage {
+  const page = valuesLocale(lang.locale, doc);
+  const query = [
+    m.guestToken ? `g=${m.guestToken}` : null,
+    page !== doc.defaultLocale ? `lang=${page}` : null,
+  ]
+    .filter(Boolean)
+    .join('&');
+  return {
+    to: m.toPhone,
+    language: lang.code,
+    guestName: m.guestName ?? '',
+    ...templateValues(doc, lang.locale),
+    linkSuffix: query ? `${m.slug}?${query}` : m.slug,
     ref: m.id,
   };
+}
+
+/**
+ * Sends one claimed message in the guest's language — or, when Meta has no approved template in it,
+ * in the next language of the chain (languages.ts).
+ */
+async function sendInLanguage(
+  m: Claimed,
+  doc: InvitationDocument,
+  send: (m: TemplateMessage) => Promise<SendResult>,
+): Promise<SendResult> {
+  const chain = templateChain(m.guestLanguage, doc, configuredTemplateLanguages());
+  let outcome: SendResult = { ok: false, error: 'no template language', retryable: false };
+  for (const lang of chain) {
+    outcome = await send(templateMessage(m, doc, lang));
+    if (!missingTemplate(outcome)) break;
+  }
+  return outcome;
 }
 
 export interface ProcessResult {
@@ -83,7 +132,7 @@ export async function processQueue(
     await Promise.all(
       claimed.slice(i, i + CONCURRENCY).map(async (m) => {
         const doc = migrateDocument(m.document);
-        const outcome = await send(templateMessage(m, doc));
+        const outcome = await sendInLanguage(m, doc, send);
         if (outcome.ok) {
           await rpc('whatsapp_result', { p_message_id: m.id, p_wa_id: outcome.id, p_error: null });
           result.sent++;

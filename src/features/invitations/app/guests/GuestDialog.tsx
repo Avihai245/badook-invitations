@@ -1,24 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Dialog, Field, Input, useToast } from '@/components/app';
+import { Button, Dialog, Field, Input, Select, useToast } from '@/components/app';
 import { upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
 import { useUi } from '@/lib/i18n/client';
+import type { Locale } from '../../contracts/types';
 import { hostApi, loginUrl } from '../api';
 import { normalizeGuestPhone, whatsappCapable } from '../../lib/guest-import';
 import { guestPhone } from '../../lib/guest-list';
+import { nativeName } from '../../lib/locales';
 import type { GuestRecord } from '../../server/guests';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 /**
- * Add one guest, or edit one: name (required), phone, email, party size and group (optional). A phone
- * another guest already has is refused, never merged into them; past the plan's list size the upgrade
- * dialog takes over.
+ * Add one guest, or edit one: name (required), phone, email, party size, group and — when the
+ * invitation has several languages — the language they read it in (optional). A phone another guest
+ * already has is refused, never merged into them; past the plan's list size the upgrade dialog takes
+ * over.
  */
 export function GuestDialog({
   id,
   guest,
+  locales,
+  defaultLocale,
   onClose,
   onSaved,
   onLimit,
@@ -26,6 +31,9 @@ export function GuestDialog({
   id: string;
   /** null = a new guest */
   guest: GuestRecord | null;
+  /** the invitation's languages, and the one a guest without a language of their own gets */
+  locales: readonly Locale[];
+  defaultLocale: Locale;
   onClose: () => void;
   onSaved: (guest: GuestRecord | null) => void;
   /** the plan's guest list is full */
@@ -40,6 +48,11 @@ export function GuestDialog({
   const [email, setEmail] = useState(guest?.email ?? '');
   const [party, setParty] = useState(guest?.partySize ? String(guest.partySize) : '');
   const [group, setGroup] = useState(guest?.group ?? '');
+  const [language, setLanguage] = useState<Locale | ''>(guest?.language ?? '');
+  const choices = [
+    ...locales,
+    ...(guest?.language && !locales.includes(guest.language) ? [guest.language] : []),
+  ];
   const [errors, setErrors] = useState<Partial<Record<'name' | 'phone' | 'email' | 'party', string>>>({});
   const [saving, setSaving] = useState(false);
   const e164 = phone.trim() ? normalizeGuestPhone(phone) : null;
@@ -59,6 +72,7 @@ export function GuestDialog({
       email: email.trim() || null,
       partySize: size,
       group: group.trim() || null,
+      language: language || null,
     };
     setSaving(true);
     const res = await hostApi<{ guest?: GuestRecord | { id: string; name: string }; code?: string }>(
@@ -142,6 +156,22 @@ export function GuestDialog({
         <Field label={f.group} help={f.groupHint}>
           <Input value={group} onChange={(e) => setGroup(e.target.value)} maxLength={60} />
         </Field>
+        {choices.length > 1 ? (
+          <Field label={f.language} help={f.languageHint} className="sm:col-span-2">
+            <Select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as Locale | '')}
+              data-testid="guest-language"
+            >
+              <option value="">{fmt(g.language.default, { language: nativeName(defaultLocale) })}</option>
+              {choices.map((l) => (
+                <option key={l} value={l} lang={l}>
+                  {nativeName(l)}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        ) : null}
         <button type="submit" hidden />
       </form>
     </Dialog>

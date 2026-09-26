@@ -6,9 +6,9 @@ import { loadAccount } from '@/features/billing/server/account';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import { getSessionUser } from '@/lib/supabase/session';
-import type { EventType, Locale } from '../contracts/types';
-import { EVENT_PHRASE } from '@/features/whatsapp/sender';
-import { formatDate, formatEventDate } from '../lib/dates';
+import { configuredTemplateLanguages, templateValues } from '@/features/whatsapp/sender';
+import { LOCALES, type EventType, type Locale } from '../contracts/types';
+import { formatEventDate } from '../lib/dates';
 import { MAX_IMPORT_ROWS, NAME_MAX, normalizeGuestPhone } from '../lib/guest-import';
 import { hostsLine } from '../lib/text';
 import type { ApiResult } from './host-api';
@@ -27,6 +27,8 @@ export interface GuestRecord {
   email: string | null;
   partySize: number | null;
   group: string | null;
+  /** the language the host set for them (null: the invitation's default) */
+  language: Locale | null;
   token: string;
   sendStatus: 'none' | 'queued' | 'sent' | 'delivered' | 'read' | 'failed';
   sendChannel: 'whatsapp' | 'manual' | null;
@@ -83,8 +85,20 @@ export const guestsDb = {
     rpc<number | null>('delete_guests', { p_id: id, p_owner_id: ownerId, p_guest_ids: ids }),
   markSent: (id: string, ownerId: string, ids: string[], sent: boolean) =>
     rpc<number | null>('mark_guests_sent', { p_id: id, p_owner_id: ownerId, p_guest_ids: ids, p_sent: sent }),
+  setLanguage: (id: string, ownerId: string, ids: string[], language: Locale | null) =>
+    rpc<number | null>('set_guests_language', {
+      p_id: id,
+      p_owner_id: ownerId,
+      p_guest_ids: ids,
+      p_language: language,
+    }),
   open: (slug: string, token: string) =>
-    rpc<{ name: string; phone: string | null; partySize: number | null } | null>('guest_open', {
+    rpc<{
+      name: string;
+      phone: string | null;
+      partySize: number | null;
+      language: Locale | null;
+    } | null>('guest_open', {
       p_slug: slug,
       p_token: token,
     }),
@@ -103,12 +117,14 @@ const fail = (status: number, code: string, extra: Record<string, unknown> = {})
   body: { ok: false, code, ...extra },
 });
 
+const LanguageSchema = z.enum(LOCALES).nullable();
 const GuestInputSchema = z.strictObject({
   name: z.string().trim().min(1).max(NAME_MAX),
   phone: z.string().trim().max(40).nullable().optional(),
   email: z.string().trim().max(254).nullable().optional(),
   partySize: z.number().int().min(1).max(99).nullable().optional(),
   group: z.string().trim().max(60).nullable().optional(),
+  language: LanguageSchema.optional(),
 });
 export const ImportGuestsSchema = z.strictObject({
   guests: z.array(GuestInputSchema).min(1).max(MAX_IMPORT_ROWS),
@@ -119,6 +135,10 @@ const MarkSchema = z.strictObject({
   ids: z.array(z.string().refine(isUuid)).min(1).max(MAX_IMPORT_ROWS),
   sent: z.boolean(),
 });
+const LanguageChangeSchema = z.strictObject({
+  ids: z.array(z.string().refine(isUuid)).min(1).max(MAX_IMPORT_ROWS),
+  language: LanguageSchema,
+});
 
 export interface CleanGuest {
   name: string;
@@ -126,6 +146,7 @@ export interface CleanGuest {
   email: string | null;
   partySize: number | null;
   group: string | null;
+  language: Locale | null;
 }
 
 /** Server-side check of one row (the browser already previewed it): phone to E.164, email shape. */
@@ -134,7 +155,14 @@ function clean(g: z.infer<typeof GuestInputSchema>): CleanGuest | { error: 'bad_
   if (g.phone && !phone) return { error: 'bad_phone' };
   const email = g.email ? g.email.toLowerCase() : null;
   if (email && !EMAIL_RE.test(email)) return { error: 'bad_email' };
-  return { name: g.name, phone, email, partySize: g.partySize ?? null, group: g.group || null };
+  return {
+    name: g.name,
+    phone,
+    email,
+    partySize: g.partySize ?? null,
+    group: g.group || null,
+    language: g.language ?? null,
+  };
 }
 
 /** The account of the signed-in user (hostRoute already verified the session; the call is cached). */
@@ -228,7 +256,22 @@ export async function updateGuest(
   const result = await guestsDb.update(id, userId, guestId, c);
   if (!result) return fail(404, 'not_found');
   if (!result.ok) return fail(409, result.code);
+  // the language is its own call (update_guest keeps its signature): only when the form sent one
+  if (parsed.data.language !== undefined && result.guest.language !== c.language) {
+    await guestsDb.setLanguage(id, userId, [guestId], c.language);
+    return ok({ ...result, guest: { ...result.guest, language: c.language } });
+  }
   return ok(result);
+}
+
+/** POST /api/invitations/:id/guests/language — { ids, language }: the language some guests read in. */
+export async function setGuestsLanguage(userId: string, id: string, raw: unknown): Promise<ApiResult> {
+  if (!isUuid(id)) return fail(404, 'not_found');
+  const parsed = LanguageChangeSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const n = await guestsDb.setLanguage(id, userId, parsed.data.ids, parsed.data.language);
+  if (n === null) return fail(404, 'not_found');
+  return ok({ ok: true, updated: n });
 }
 
 export async function deleteGuests(userId: string, id: string, raw: unknown): Promise<ApiResult> {
@@ -259,6 +302,13 @@ export async function openGuestLink(slug: string, token: string): Promise<ApiRes
 
 // ─── the guests page ─────────────────────────────────────────────────────────────────────────────
 
+/** A message's values in one language: the hosts, the event with its preposition, the date. */
+export interface MessageValues {
+  hosts: string;
+  event: string;
+  date: string;
+}
+
 export interface GuestsPageData {
   id: string;
   slug: string;
@@ -267,8 +317,10 @@ export interface GuestsPageData {
   title: string;
   dateLine: string;
   eventType: EventType;
-  /** the invitation's own language (messages to guests are written in it) */
+  /** the invitation's default language (a guest without one of their own reads it) */
   locale: Locale;
+  /** the invitation's languages — what a guest's language can be */
+  locales: Locale[];
   publicBaseUrl: string;
   guests: GuestRecord[];
   /** the greeting line with {guest} as the guest will see it, or null when there is none */
@@ -278,17 +330,16 @@ export interface GuestsPageData {
   credits: number;
   /** the platform's admins send without credits */
   unlimited: boolean;
-  /** "send from my WhatsApp": the message's values in the invitation's own language */
-  own: { locale: Locale; hosts: string; event: string; date: string };
+  /** "send from my WhatsApp": the message's values in each of the invitation's languages */
+  own: Partial<Record<Locale, MessageValues>>;
   whatsapp: {
     configured: boolean;
     priceIls: number;
     priceUsd: number;
-    /** the template's language and its values for this invitation (the dialog's preview) */
-    lang: Locale;
-    hosts: string;
-    event: string;
-    date: string;
+    /** the languages the template is approved in (Meta's codes), best first */
+    langs: { locale: Locale; code: string }[];
+    /** the template's values for this invitation in each of those languages (the dialog's previews) */
+    values: Partial<Record<Locale, MessageValues>>;
   };
 }
 
@@ -317,8 +368,7 @@ export async function loadGuestsPage(
   const greeting =
     hero?.type === 'hero' && hero.data.greeting ? (hero.data.greeting[locale] ?? '').trim() : '';
   const env = serverEnv();
-  const lang: Locale = env.INVITES_WHATSAPP_TEMPLATE_LANG.startsWith('en') ? 'en' : 'he';
-  const docLang = doc.locales.includes(lang) ? lang : doc.defaultLocale;
+  const langs = configuredTemplateLanguages();
   return {
     id: inv.id,
     slug: inv.slug,
@@ -327,6 +377,7 @@ export async function loadGuestsPage(
     dateLine: formatEventDate(doc, locale),
     eventType: inv.eventType,
     locale: doc.defaultLocale,
+    locales: [...doc.locales],
     publicBaseUrl: publicBaseUrl ?? env.INVITES_PUBLIC_BASE_URL,
     guests,
     greeting: greeting || null,
@@ -334,30 +385,13 @@ export async function loadGuestsPage(
     maxGuests: account.limits.guestsPerInvitation,
     credits: account.credits,
     unlimited: account.admin,
-    own: {
-      locale: doc.defaultLocale,
-      hosts: hostsLine(doc.hosts, doc.defaultLocale),
-      event: EVENT_PHRASE[doc.defaultLocale][doc.eventType],
-      date: formatDate(doc.event.date, doc.defaultLocale, {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }),
-    },
+    own: Object.fromEntries(doc.locales.map((l) => [l, templateValues(doc, l)])),
     whatsapp: {
       configured: whatsappConfigured(),
       priceUsd: env.INVITES_WHATSAPP_PRICE_USD,
       priceIls: messagePriceIls(env.INVITES_WHATSAPP_PRICE_USD, env.INVITES_USD_TO_ILS),
-      lang,
-      hosts: hostsLine(doc.hosts, docLang),
-      event: EVENT_PHRASE[lang][doc.eventType],
-      date: formatDate(doc.event.date, lang, {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }),
+      langs,
+      values: Object.fromEntries(langs.map((l) => [l.locale, templateValues(doc, l.locale)])),
     },
   };
 }

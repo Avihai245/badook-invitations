@@ -8,6 +8,7 @@ import {
   Eye,
   FileSpreadsheet,
   Filter,
+  Languages,
   Link2,
   MailCheck,
   MessageCircle,
@@ -45,13 +46,17 @@ import {
   useToast,
 } from '@/components/app';
 import { UpgradeDialog, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
+import { guestLocale } from '@/features/whatsapp/languages';
 import { fmt as format } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
+import type { Locale } from '../../contracts/types';
 import { hostApi, loginUrl } from '../api';
 import { GUEST_MESSAGE } from '../../lib/event-phrases';
 import { whatsappCapable } from '../../lib/guest-import';
+import { nativeName } from '../../lib/locales';
 import {
   formatIls,
+  guestLink,
   guestPhone,
   LIST_FILTERS,
   matchesListFilter,
@@ -140,7 +145,10 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
     () => guests.filter((x) => matchesListFilter(x, filter) && matchesGuestSearch(x, query)),
     [guests, filter, query],
   );
-  const linkOf = (x: GuestRecord) => `${data.publicBaseUrl}/i/${data.slug}?g=${x.token}`;
+  const languages = { locales: data.locales, defaultLocale: data.locale };
+  const linkOf = (x: GuestRecord) => guestLink(data.publicBaseUrl, data.slug, x, languages);
+  // a language per guest: shown once the invitation has several languages (or a guest has one)
+  const showLanguage = data.locales.length > 1 || guests.some((x) => x.language);
 
   // "send on WhatsApp to all guests": who is left, what it costs, or why it can't start
   const reachable = guests.filter((x) => whatsappReach(x) === 'ok');
@@ -180,14 +188,16 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
     refresh();
   };
 
-  /** "Send from my WhatsApp": wa.me with the message in the invitation's language, then marked as sent. */
+  /** "Send from my WhatsApp": wa.me with the message in the guest's language, then marked as sent. */
   const sendOwn = (x: GuestRecord) => {
     if (!x.phone) return;
-    const text = fmt(GUEST_MESSAGE[data.own.locale], {
+    const l = guestLocale(x.language, languages);
+    const values = data.own[l] ?? data.own[data.locale];
+    const text = fmt(GUEST_MESSAGE[l], {
       name: x.name,
-      hosts: data.own.hosts,
-      event: data.own.event,
-      date: data.own.date,
+      hosts: values?.hosts ?? '',
+      event: values?.event ?? '',
+      date: values?.date ?? '',
       url: linkOf(x),
     });
     window.open(
@@ -196,6 +206,19 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
       'noopener',
     );
     if (x.sendStatus === 'none' || x.sendStatus === 'failed') void mark([x.id], true, true);
+  };
+
+  /** The language some guests read the invitation in (null: the invitation's default). */
+  const setLanguage = async (ids: string[], language: Locale | null) => {
+    const res = await hostApi<{ updated: number }>(`/api/invitations/${data.id}/guests/language`, {
+      method: 'POST',
+      body: { ids, language },
+    });
+    if (res.status === 401) return window.location.assign(loginUrl());
+    if (!res.ok) return toast({ title: g.toast.error, variant: 'danger' });
+    setGuests((list) => list.map((x) => (ids.includes(x.id) ? { ...x, language } : x)));
+    toast({ title: plural(g.language.changed, ids.length, { n: number(ids.length) }), variant: 'success' });
+    refresh();
   };
 
   const remove = async (ids: string[]) => {
@@ -255,6 +278,41 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
             data-guest-detail=""
           >
             {detail.text}
+          </span>
+        ) : null}
+      </span>
+    );
+  };
+  /** The guest's language, changed in place (the invitation's languages; the default first). */
+  const languageOf = (x: GuestRecord) => {
+    const foreign = x.language && !data.locales.includes(x.language) ? x.language : null;
+    return (
+      <span className="inline-flex flex-col items-start gap-0.5" onClick={(e) => e.stopPropagation()}>
+        <select
+          aria-label={fmt(g.language.of, { name: x.name })}
+          value={x.language ?? ''}
+          onChange={(e) => void setLanguage([x.id], (e.target.value || null) as Locale | null)}
+          data-guest-language={x.id}
+          className="h-8 max-w-[180px] cursor-pointer rounded-btn border border-line bg-surface ps-2 pe-1 text-[12.5px] text-ink hover:border-line-strong focus-visible:outline-2 focus-visible:outline-brand"
+        >
+          <option value="">{fmt(g.language.default, { language: nativeName(data.locale) })}</option>
+          {data.locales.map((l) => (
+            <option key={l} value={l} lang={l}>
+              {nativeName(l)}
+            </option>
+          ))}
+          {foreign ? (
+            <option value={foreign} lang={foreign}>
+              {nativeName(foreign)}
+            </option>
+          ) : null}
+        </select>
+        {foreign ? (
+          <span className="max-w-[200px] text-[11.5px] text-warning">
+            {fmt(g.language.missing, {
+              language: t.editor.languageIn[foreign],
+              fallback: t.editor.languageIn[data.locale],
+            })}
           </span>
         ) : null}
       </span>
@@ -364,6 +422,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
       numeric: true,
       cell: (x) => (x.partySize ? number(x.partySize) : '—'),
     },
+    ...(showLanguage ? [{ key: 'language', header: g.columns.language, cell: languageOf }] : []),
     { key: 'status', header: g.columns.status, cell: statusOf },
     { key: 'reply', header: g.columns.reply, cell: replyOf },
     {
@@ -388,6 +447,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
     { icon: <MailCheck />, label: g.actions.markSent, text: h.markSent },
     { icon: <X />, label: g.actions.unmarkSent, text: h.unmarkSent },
     { icon: <PencilLine />, label: g.actions.edit, text: h.edit },
+    { icon: <Languages />, label: g.language.label, text: h.language },
     { icon: <Trash2 />, label: g.actions.delete, text: h.delete },
     { icon: <PartyPopper />, label: g.greeting.edit, text: h.greeting },
     { icon: <Download />, label: g.actions.export, text: h.export },
@@ -534,6 +594,25 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
                   >
                     {g.actions.markSent}
                   </Button>
+                  {showLanguage ? (
+                    <Menu
+                      trigger={
+                        <Button size="sm" variant="secondary" icon={<Languages />}>
+                          {g.language.bulk}
+                        </Button>
+                      }
+                      items={[
+                        {
+                          label: fmt(g.language.default, { language: nativeName(data.locale) }),
+                          onSelect: () => void setLanguage([...selected], null),
+                        },
+                        ...data.locales.map((l) => ({
+                          label: nativeName(l),
+                          onSelect: () => void setLanguage([...selected], l),
+                        })),
+                      ]}
+                    />
+                  ) : null}
                   <Button
                     size="sm"
                     variant="secondary"
@@ -581,6 +660,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
                           {statusOf(x)}
                           {x.response ? replyOf(x) : null}
                         </div>
+                        {showLanguage ? <div className="mt-1.5">{languageOf(x)}</div> : null}
                       </div>
                       {actionsOf(x)}
                     </li>
@@ -612,6 +692,8 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
         <GuestDialog
           id={data.id}
           guest={dialog.kind === 'edit' ? dialog.guest : null}
+          locales={data.locales}
+          defaultLocale={data.locale}
           onClose={() => setDialog(null)}
           onLimit={(reason) => setDialog({ kind: 'upgrade', reason })}
           onSaved={(saved) => {
