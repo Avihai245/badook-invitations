@@ -518,7 +518,7 @@ export const helpEn: typeof helpHe = {
     items: {
       add: {
         label: 'Add a language',
-        text: 'Makes the invitation bilingual. The design’s texts are translated for you; you complete the names and the other details.',
+        text: 'Adds another language to the invitation (up to seven). The design’s texts are already written in it; you complete the names and the other details — yourself, or with “Translate into…” when the plan includes automatic translation.',
       },
       remove: {
         label: 'Remove a language',
@@ -526,10 +526,10 @@ export const helpEn: typeof helpHe = {
       },
       default: {
         label: 'The language that opens first',
-        text: 'Which language the invitation opens in. Guests switch to the other one with a tap.',
+        text: 'The language the invitation opens in when the guest’s phone speaks none of its languages (a personal link opens in the guest’s language). Guests switch languages from the language menu.',
       },
       tabs: {
-        label: 'עב | EN next to each field',
+        label: 'The language tabs next to each field',
         text: 'Switch languages in any field. An orange dot on a language: its translation is missing.',
       },
     },
