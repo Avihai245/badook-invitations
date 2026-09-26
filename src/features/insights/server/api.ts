@@ -63,7 +63,7 @@ export interface BeaconRequest {
   dnt: boolean;
 }
 
-/** 204: taken (or quietly left out: privacy signals, crawlers). */
+/** 204: taken (or quietly left out: privacy signals, crawlers, pages the insights don't count). */
 const TAKEN: ApiResult = { status: 204, body: {} };
 
 /** POST /api/insights — one page load's state. */
@@ -73,12 +73,14 @@ export async function beacon(raw: unknown, req: BeaconRequest, deps: BeaconDeps)
   const parsed = BeaconSchema.safeParse(raw);
   if (!parsed.success) return fail(400, 'invalid');
   const { slug, visit, ...state } = parsed.data as BeaconState;
+  // not an invitation the insights count (the site's sample invitations, one taken down): nothing is
+  // recorded, and the page can't tell
   const invitation = await deps.db.invitation(slug);
-  if (!invitation) return fail(404, 'not_found');
+  if (!invitation) return TAKEN;
   if (!(await deps.analytics(invitation.id))) return fail(403, 'feature_off', { feature: 'analytics' });
   const day = dayIn(deps.now(), invitation.timezone ?? 'Asia/Jerusalem');
   const result = await deps.db.hit(invitation.id, visit, day, state, deps.rateKey(req.ip));
-  if (!result) return fail(404, 'not_found');
+  if (!result) return TAKEN;
   if (!result.ok) return result.code === 'rate' ? fail(429, 'rate') : fail(409, result.code ?? 'conflict');
   return TAKEN;
 }

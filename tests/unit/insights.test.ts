@@ -198,7 +198,10 @@ describe('the beacon', () => {
   it('refuses a bad payload, an unknown invitation, the flag off, and past the rate limit', async () => {
     const w = beaconWorld();
     expect((await beacon({ ...state(), depth: 33 }, req(), w.deps)).status).toBe(400);
-    expect((await beacon(state(), req(), beaconWorld({ slug: false }).deps)).status).toBe(404);
+    // a page the insights don't count (the site's samples): quietly taken, nothing recorded
+    const sample = beaconWorld({ slug: false });
+    expect((await beacon(state(), req(), sample.deps)).status).toBe(204);
+    expect(sample.hits).toHaveLength(0);
     const off = beaconWorld({ analytics: false });
     expect(await beacon(state(), req(), off.deps)).toMatchObject({
       status: 403,

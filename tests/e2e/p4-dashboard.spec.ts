@@ -283,6 +283,10 @@ test.describe('responses dashboard', () => {
     };
     // …and the event day's: arrivals erased 30 days after their event, undone ones after a day
     const eventDay = { checkins: expect.any(Number), undone: expect.any(Number) };
+    // …and the insights' page loads after a week; face search's data 30 days after the event and
+    // wherever the feature is off
+    const insights = { visits: expect.any(Number) };
+    const faces = { expired: expect.any(Number), withoutFeature: expect.any(Number) };
     expect(await first.json()).toEqual({
       sent: 1,
       failed: 0,
@@ -291,6 +295,8 @@ test.describe('responses dashboard', () => {
       seed: 'current',
       gallery,
       eventDay,
+      insights,
+      faces,
     });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
@@ -301,6 +307,8 @@ test.describe('responses dashboard', () => {
       seed: 'current',
       gallery,
       eventDay,
+      insights,
+      faces,
     });
   });
 });
