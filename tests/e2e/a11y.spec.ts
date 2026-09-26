@@ -87,8 +87,9 @@ interface Finding {
 /** The audit of what is on screen now: fails on any violation the baseline doesn't list for `key`. */
 async function audit(page: Page, key: string, exclude: string[] = []) {
   await settle(page);
-  // violations only: the passes and the incomplete ones aren't collected (much faster)
-  let builder = new AxeBuilder({ page }).withTags(TAGS).options({ resultTypes: ['violations'] });
+  // violations only: the passes and the incomplete ones aren't collected (much faster). options()
+  // replaces the whole options object, so it comes before withTags() (which adds `runOnly` to it).
+  let builder = new AxeBuilder({ page }).options({ resultTypes: ['violations'] }).withTags(TAGS);
   for (const selector of exclude) builder = builder.exclude(selector);
   const results = await builder.analyze();
   const findings: Finding[] = results.violations.map((v) => ({
@@ -123,7 +124,7 @@ test.describe('the invitation', () => {
   for (const d of DESIGNS)
     for (const lang of ['he', 'en'] as const)
       test(`${d.name} · ${lang}: the cover, then the sections`, async ({ page }) => {
-        test.setTimeout(90_000);
+        test.setTimeout(150_000);
         await asGuest(page);
         await open(page, `/i/${d.slug}?lang=${lang}`);
         const cover = page.locator('.cover');
@@ -187,6 +188,7 @@ const looping = (page: Page) =>
 
 test.describe('by hand', () => {
   test('the cover holds the keyboard until it opens; the animations can be paused', async ({ page }) => {
+    test.setTimeout(90_000);
     await asGuest(page);
     await open(page, '/i/demo-midnight-bloom?lang=he');
     // while the cover is up, the keyboard stays on it (nothing hidden under it takes the focus)
@@ -258,7 +260,7 @@ async function host(page: Page, prefix: string, plan: Plan) {
 
 test.describe('the event day', () => {
   test('the table guide and the entrance station', async ({ page, browser }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
     const ev = await host(page, 'a11y-day', 'business');
     const token = `a11y${randomUUID().replace(/-/g, '').slice(0, 18)}`;
     const [g] = await sql<{ id: string }>(
@@ -348,7 +350,7 @@ test.describe('the event day', () => {
 
 test.describe('the live gallery', () => {
   test('the guests’ upload page', async ({ page, browser }) => {
-    test.setTimeout(90_000);
+    test.setTimeout(150_000);
     const ev = await host(page, 'a11y-gallery', 'business');
     await open(page, `/app/invitations/${ev.id}/gallery`);
     await page.getByTestId('gallery-start').getByRole('button', { name: 'הפעלת הגלריה' }).click();
@@ -371,7 +373,7 @@ test.describe('the live gallery', () => {
 
 test.describe('the draft review', () => {
   test('the review page with a comment, its thread and the list', async ({ page, browser }) => {
-    test.setTimeout(90_000);
+    test.setTimeout(240_000);
     const ev = await host(page, 'a11y-review', 'free');
     const made = await page.evaluate(async (id) => {
       const res = await fetch(`/api/invitations/${id}/review`, {

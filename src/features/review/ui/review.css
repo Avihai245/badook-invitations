@@ -37,7 +37,8 @@
   z-index: 45;
   top: calc(12px + env(safe-area-inset-top));
   inset-inline-start: 12px;
-  max-width: calc(100vw - 96px);
+  /* clear of the language pill across the top (up to ~100px wide, 16px from the edge) */
+  max-width: calc(100vw - 136px);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -103,6 +104,10 @@
 }
 .rv-toolbar > * {
   pointer-events: auto;
+}
+/* no music button in the corner (a draft without music): the toolbar takes the whole width */
+body:not(:has(.fab-music)) .rv-toolbar {
+  inset-inline-end: 12px;
 }
 .rv-btn {
   display: inline-flex;

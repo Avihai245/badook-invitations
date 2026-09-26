@@ -161,6 +161,11 @@ for (const ui of ['he', 'en'] as const)
     await fam.keyboard.press('Escape');
     await settle(fam);
     await fam.screenshot({ path: `${SHOTS}/phone-${ui}-review-page.png` });
+    // a save of the draft (an edit), for the versions drawer
+    const got = await api(page, `/api/invitations/${id}`);
+    const draft = got.body!.draft as { sections: { data: Record<string, unknown> }[] };
+    draft.sections[0]!.data.eyebrow = { he: 'בשעה טובה', en: 'With great joy' };
+    await api(page, `/api/invitations/${id}`, 'PATCH', { draft, updatedAt: got.body!.updatedAt });
     await page.reload();
     await hydrated(page);
     if (phone) {
@@ -175,7 +180,13 @@ for (const ui of ['he', 'en'] as const)
     // versions
     if (!phone) {
       await page.getByRole('button', { name: ui === 'he' ? 'גרסאות' : 'Versions', exact: true }).click();
-      await expect(page.getByTestId('history-list')).toBeVisible();
+      await expect(page.getByTestId('history-list')).toBeVisible({ timeout: 20_000 });
+      await page
+        .getByTestId('history-entry')
+        .first()
+        .getByRole('button', { name: ui === 'he' ? 'מה ישתנה בשחזור' : 'What restoring changes' })
+        .click();
+      await expect(page.getByTestId('history-changes')).toBeVisible({ timeout: 20_000 });
       await shot(page, `${ui}-versions`);
       await page.keyboard.press('Escape');
     }

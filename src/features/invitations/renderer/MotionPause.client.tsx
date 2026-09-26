@@ -39,9 +39,11 @@ export function MotionPause({ labels, className }: { labels: MotionLabels; class
     if (!paused) return;
     const root = document.documentElement;
     const { animations, videos } = held.current;
+    // held through the API: one the page paused itself for now (the particles off screen) would
+    // otherwise run again when the page lets it go, while the guest's pause still holds
     const hold = (list: Animation[]) => {
       for (const a of list)
-        if (endless(a) && a.playState === 'running') {
+        if (endless(a) && (a.playState === 'running' || a.playState === 'paused') && !animations.has(a)) {
           a.pause();
           animations.add(a);
         }
@@ -77,11 +79,14 @@ export function MotionPause({ labels, className }: { labels: MotionLabels; class
   }, [paused]);
 
   if (!shown) return null;
+  const label = paused ? labels.play : labels.pause;
   return (
     <button
       type="button"
       className={className}
-      aria-label={paused ? labels.play : labels.pause}
+      aria-label={label}
+      // an icon alone: the words on hover too
+      title={label}
       data-paused={paused ? '' : undefined}
       data-testid="motion-pause"
       onClick={() => setPaused((p) => !p)}
