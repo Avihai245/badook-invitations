@@ -27,11 +27,23 @@ function Whale({ u }: { u: Url }) {
     <g>
       {/* the tail rising from its back end, flukes spread */}
       <path d="M78 124C52 116 38 92 40 64l18-2c0 22 10 40 30 50z" fill={u('whale')} />
-      <path d="M48 64C36 44 16 38 2 44c12 12 28 20 46 22 14-14 32-22 50-20-10-12-32-14-50 18z" fill={u('whale')} />
+      <path
+        d="M48 64C36 44 16 38 2 44c12 12 28 20 46 22 14-14 32-22 50-20-10-12-32-14-50 18z"
+        fill={u('whale')}
+      />
       {/* body, belly and its grooves */}
-      <path d="M62 116C62 66 112 34 176 34c64 0 110 32 110 76 0 38-46 58-114 58-62 0-100-22-110-52z" fill={u('whale')} />
+      <path
+        d="M62 116C62 66 112 34 176 34c64 0 110 32 110 76 0 38-46 58-114 58-62 0-100-22-110-52z"
+        fill={u('whale')}
+      />
       <path d="M92 148c34 18 132 22 178-12-8 22-50 34-98 34-38 0-66-8-80-22z" fill={BELLY} />
-      <path d="M130 158c30 6 70 6 104-2M142 150c26 4 60 4 88-2" stroke="#A9CBF0" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+      <path
+        d="M130 158c30 6 70 6 104-2M142 150c26 4 60 4 88-2"
+        stroke="#A9CBF0"
+        strokeWidth="2.4"
+        fill="none"
+        strokeLinecap="round"
+      />
       {/* flipper, spots on the back */}
       <path d="M176 138c8 20 30 28 46 22-6-14-24-26-46-22z" fill={WHALE_DEEP} />
       <circle cx="150" cy="60" r="7" fill="#fff" opacity=".22" />
@@ -65,8 +77,18 @@ function Jellyfish({ u }: { u: Url }) {
           />
         ))}
       </g>
-      <path d="M8 54C8 24 28 6 50 6s42 18 42 48c-8 6-16 2-22 6-6-6-14-4-20 0-6-4-14-6-20 0-6-4-14 0-22-6z" fill={u('jelly')} />
-      <path d="M24 26c6-8 16-12 26-12" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" opacity=".55" />
+      <path
+        d="M8 54C8 24 28 6 50 6s42 18 42 48c-8 6-16 2-22 6-6-6-14-4-20 0-6-4-14-6-20 0-6-4-14 0-22-6z"
+        fill={u('jelly')}
+      />
+      <path
+        d="M24 26c6-8 16-12 26-12"
+        stroke="#fff"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+        opacity=".55"
+      />
       <circle cx="38" cy="38" r="4" fill={INK} />
       <circle cx="62" cy="38" r="4" fill={INK} />
       <path d="M44 46c3 3 9 3 12 0" stroke={INK} strokeWidth="2.4" fill="none" strokeLinecap="round" />
@@ -82,7 +104,13 @@ function Fish({ fill, stripe = '#fff' }: { fill: string; stripe?: string }) {
     <g>
       <path d="M60 25L78 9l-3 16 3 16z" style={{ fill }} />
       <path d="M8 25C8 12 24 4 40 4c16 0 26 10 28 21-2 11-12 21-28 21C24 46 8 38 8 25z" style={{ fill }} />
-      <path d="M40 6c-6 12-6 26 0 38M50 8c-5 11-5 23 0 34" stroke={stripe} strokeWidth="4" fill="none" opacity=".75" />
+      <path
+        d="M40 6c-6 12-6 26 0 38M50 8c-5 11-5 23 0 34"
+        stroke={stripe}
+        strokeWidth="4"
+        fill="none"
+        opacity=".75"
+      />
       <circle cx="21" cy="21" r="4.6" fill={INK} />
       <circle cx="22.4" cy="19.6" r="1.5" fill="#fff" />
       <path d="M13 31c3 2 7 2 9 0" stroke={INK} strokeWidth="2" fill="none" strokeLinecap="round" />
@@ -116,7 +144,14 @@ function Chest({ u }: { u: Url }) {
           <circle cx={x} cy={y} r="6.4" fill="none" stroke="#E0A92E" strokeWidth="2" />
         </g>
       ))}
-      <path d="M118 74c10 14 12 30 6 44" stroke="#FFF6EE" strokeWidth="5" strokeDasharray="0 7" strokeLinecap="round" fill="none" />
+      <path
+        d="M118 74c10 14 12 30 6 44"
+        stroke="#FFF6EE"
+        strokeWidth="5"
+        strokeDasharray="0 7"
+        strokeLinecap="round"
+        fill="none"
+      />
       {/* the box with gold bands and a lock */}
       <rect x="18" y="74" width="134" height="62" rx="8" fill="#9A5B2E" />
       <path d="M18 88h134M18 124h134" stroke="#7A4420" strokeWidth="3" opacity=".6" />
@@ -181,7 +216,12 @@ function Starfish() {
   const pts = Array.from({ length: 10 }, (_, i) => polar(0, 0, i % 2 ? 11 : 27, i * 36 - 90).join(' '));
   return (
     <g>
-      <path d={`M${pts.join('L')}Z`} style={{ fill: ACCENT, stroke: ACCENT }} strokeWidth="7" strokeLinejoin="round" />
+      <path
+        d={`M${pts.join('L')}Z`}
+        style={{ fill: ACCENT, stroke: ACCENT }}
+        strokeWidth="7"
+        strokeLinejoin="round"
+      />
       {[0, 72, 144, 216, 288].map((a) => {
         const [x, y] = polar(0, 0, 13, a - 90);
         return <circle key={a} cx={x} cy={y} r="2.2" fill="#fff" opacity=".7" />;
@@ -194,7 +234,12 @@ function Starfish() {
 function Crab() {
   return (
     <g>
-      <path d="M22 44l-14 14M28 50l-10 14M78 44l14 14M72 50l10 14" stroke="#E0503A" strokeWidth="5" strokeLinecap="round" />
+      <path
+        d="M22 44l-14 14M28 50l-10 14M78 44l14 14M72 50l10 14"
+        stroke="#E0503A"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
       <path d="M26 30L12 16M74 30l14-14" stroke="#E0503A" strokeWidth="5" strokeLinecap="round" />
       <path d="M4 16c0-8 12-12 16-4l-6 6zM96 16c0-8-12-12-16-4l6 6z" fill="#F2634B" />
       <ellipse cx="50" cy="44" rx="30" ry="20" fill="#F2634B" />
@@ -229,7 +274,16 @@ function Bubbles({ delay = '0s', count = 5 }: { delay?: string; count?: number }
         const x = 20 + (i % 2 ? 7 : -6);
         return (
           <g key={i} data-anim="twinkle" style={{ animationDelay: `${-i * 0.5}s` }}>
-            <circle cx={x} cy={y} r={r} fill="#fff" fillOpacity=".25" stroke="#fff" strokeWidth="2" strokeOpacity=".85" />
+            <circle
+              cx={x}
+              cy={y}
+              r={r}
+              fill="#fff"
+              fillOpacity=".25"
+              stroke="#fff"
+              strokeWidth="2"
+              strokeOpacity=".85"
+            />
             <circle cx={r1(x - r * 0.35)} cy={r1(y - r * 0.35)} r={r1(r * 0.28)} fill="#fff" opacity=".9" />
           </g>
         );
@@ -243,9 +297,9 @@ export default function OceanFriends({ place }: SceneProps) {
   const card = place === 'card';
   const poster = place === 'poster';
   const sand = card ? '26cqh' : '17cqh';
-  /** beside the text column on wide heroes, pushed off-screen on narrow ones */
+  /** on one side of the text column, `gap` from the centre: in view on wide heroes, off-screen on narrow ones */
   const beside = (side: 'left' | 'right', gap: number): CSSProperties =>
-    side === 'left' ? { left: `calc(50cqw + ${cm(gap)})` } : { right: `calc(50cqw + ${cm(gap)})` };
+    side === 'left' ? { right: `calc(50cqw + ${cm(gap)})` } : { left: `calc(50cqw + ${cm(gap)})` };
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -301,7 +355,13 @@ export default function OceanFriends({ place }: SceneProps) {
         style={{ left: 0, top: 0, width: '100%', height: cm(3) }}
       >
         <path d={`M0 18${'q25 -10 50 0t50 0'.repeat(12)}V0H0Z`} fill="#fff" opacity=".45" />
-        <path d={`M0 26${'q25 -8 50 0t50 0'.repeat(12)}`} stroke="#fff" strokeWidth="3" fill="none" opacity=".6" />
+        <path
+          d={`M0 26${'q25 -8 50 0t50 0'.repeat(12)}`}
+          stroke="#fff"
+          strokeWidth="3"
+          fill="none"
+          opacity=".6"
+        />
       </Piece>
       {/* the whale blows a column of bubbles */}
       <Piece
@@ -344,7 +404,11 @@ export default function OceanFriends({ place }: SceneProps) {
       <Piece
         vb={[0, 0, 80, 50]}
         anim="drift"
-        style={{ right: card ? cm(22) : cm(26), top: card ? cm(24) : poster ? cm(30) : cm(40), width: cm(card ? 7 : 9) }}
+        style={{
+          right: card ? cm(22) : cm(26),
+          top: card ? cm(24) : poster ? cm(30) : cm(40),
+          width: cm(card ? 7 : 9),
+        }}
       >
         <Fish fill={ACCENT} />
       </Piece>
@@ -364,21 +428,27 @@ export default function OceanFriends({ place }: SceneProps) {
       <Piece
         vb={[0, 0, 80, 50]}
         anim="drift"
-        style={{ ...beside('right', 52), top: '50%', width: cm(10), scale: '-1 1' }}
+        style={{ ...beside('left', 52), top: '50%', width: cm(10), scale: '-1 1' }}
       >
         <Fish fill={ACCENT} />
       </Piece>
       <Piece
         vb={[0, 0, 80, 50]}
         anim="drift"
-        style={{ ...beside('right', 64), top: '61%', width: cm(7), scale: '-1 1', animationDirection: 'alternate-reverse' }}
+        style={{
+          ...beside('left', 64),
+          top: '61%',
+          width: cm(7),
+          scale: '-1 1',
+          animationDirection: 'alternate-reverse',
+        }}
       >
         <Fish fill="#7FD6C8" />
       </Piece>
-      <Piece vb={[0, 0, 80, 50]} anim="drift" style={{ ...beside('left', 52), top: '40%', width: cm(8) }}>
+      <Piece vb={[0, 0, 80, 50]} anim="drift" style={{ ...beside('right', 50), top: '62%', width: cm(8) }}>
         <Fish fill="#FFC94A" />
       </Piece>
-      <Piece vb={[0, 0, 40, 120]} style={{ ...beside('left', 64), top: '47%', width: cm(6) }}>
+      <Piece vb={[0, 0, 40, 120]} style={{ ...beside('right', 64), top: '47%', width: cm(6) }}>
         <Bubbles delay="-2s" />
       </Piece>
       {/* the sand, with ripples */}
@@ -408,7 +478,10 @@ export default function OceanFriends({ place }: SceneProps) {
         <Seaweed tall={250} />
       </Piece>
       {/* on the sand: coral, shells, a starfish, a crab and the treasure */}
-      <Piece vb={[0, 0, 120, 120]} style={{ left: cm(card ? 12 : 14), bottom: `calc(${sand} - ${cm(3)})`, width: cm(card ? 12 : 17) }}>
+      <Piece
+        vb={[0, 0, 120, 120]}
+        style={{ left: cm(card ? 12 : 14), bottom: `calc(${sand} - ${cm(3)})`, width: cm(card ? 12 : 17) }}
+      >
         <Coral />
       </Piece>
       <Piece
@@ -419,26 +492,61 @@ export default function OceanFriends({ place }: SceneProps) {
           <Chest u={url} />
         </g>
       </Piece>
-      <Piece vb={[-30, -30, 60, 60]} style={{ left: cm(card ? 30 : 32), bottom: card ? '6cqh' : '4cqh', width: cm(card ? 7 : 9), rotate: '-12deg' }}>
+      <Piece
+        vb={[-30, -30, 60, 60]}
+        style={{
+          left: cm(card ? 30 : 32),
+          bottom: card ? '6cqh' : '4cqh',
+          width: cm(card ? 7 : 9),
+          rotate: '-12deg',
+        }}
+      >
         <Starfish />
       </Piece>
-      <Piece vb={[0, 0, 50, 44]} style={{ left: cm(card ? 6 : 8), bottom: card ? '5cqh' : '3cqh', width: cm(card ? 6 : 8), rotate: '10deg' }}>
+      <Piece
+        vb={[0, 0, 50, 44]}
+        style={{
+          left: cm(card ? 6 : 8),
+          bottom: card ? '5cqh' : '3cqh',
+          width: cm(card ? 6 : 8),
+          rotate: '10deg',
+        }}
+      >
         <Shell />
       </Piece>
-      <Piece vb={[0, 0, 50, 44]} style={{ right: cm(card ? 6 : 6), bottom: card ? '4cqh' : '2cqh', width: cm(card ? 5 : 6), rotate: '-14deg' }}>
+      <Piece
+        vb={[0, 0, 50, 44]}
+        style={{
+          right: cm(card ? 6 : 6),
+          bottom: card ? '4cqh' : '2cqh',
+          width: cm(card ? 5 : 6),
+          rotate: '-14deg',
+        }}
+      >
         <Shell />
       </Piece>
       <Piece
         vb={[0, 0, 100, 70]}
         anim="drift"
-        style={{ left: '50%', bottom: card ? '5cqh' : '3cqh', width: cm(card ? 10 : 13), translate: '-40% 0' }}
+        style={{
+          left: '50%',
+          bottom: card ? '5cqh' : '3cqh',
+          width: cm(card ? 10 : 13),
+          translate: '-40% 0',
+        }}
       >
         <Crab />
       </Piece>
-      <Piece vb={[0, 0, 40, 120]} style={{ right: cm(card ? 26 : 30), bottom: `calc(${sand} + ${cm(2)})`, width: cm(card ? 4 : 5) }}>
+      <Piece
+        vb={[0, 0, 40, 120]}
+        style={{ right: cm(card ? 26 : 30), bottom: `calc(${sand} + ${cm(2)})`, width: cm(card ? 4 : 5) }}
+      >
         <Bubbles delay="-3s" count={4} />
       </Piece>
-      <Piece vb={[0, 0, 40, 120]} style={{ left: cm(card ? 4 : 5), bottom: `calc(${sand} + ${cm(12)})`, width: cm(card ? 4 : 5) }}>
+      <Piece
+        vb={[0, 0, 40, 120]}
+        style={{ left: cm(card ? 4 : 5), bottom: `calc(${sand} + ${cm(12)})`, width: cm(card ? 4 : 5) }}
+      >
         <Bubbles delay="-0.5s" count={4} />
       </Piece>
     </>

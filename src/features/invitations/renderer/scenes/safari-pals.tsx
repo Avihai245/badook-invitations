@@ -27,7 +27,13 @@ function LionCub({ u }: { u: Url }) {
   return (
     <g>
       {/* tail with its tuft */}
-      <path d="M140 198c28 4 44-12 40-40" stroke={MANE_DEEP} strokeWidth="7" fill="none" strokeLinecap="round" />
+      <path
+        d="M140 198c28 4 44-12 40-40"
+        stroke={MANE_DEEP}
+        strokeWidth="7"
+        fill="none"
+        strokeLinecap="round"
+      />
       <path d="M180 166c-9-5-11-17-3-25 9 4 11 17 3 25z" fill={MANE} />
       {/* body, haunches, front legs and paws */}
       <path d="M56 208c-8-46 14-86 44-86s52 40 44 86z" fill={u('fur')} />
@@ -95,9 +101,18 @@ function BabyElephant({ u }: { u: Url }) {
       {/* back legs and tail */}
       <rect x="160" y="238" width="26" height="54" rx="12" fill={GRAY_DEEP} />
       <rect x="196" y="236" width="24" height="54" rx="12" fill={GRAY_DEEP} />
-      <path d="M226 206c10 2 14 12 10 20" stroke={GRAY_DEEP} strokeWidth="5" fill="none" strokeLinecap="round" />
+      <path
+        d="M226 206c10 2 14 12 10 20"
+        stroke={GRAY_DEEP}
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
       {/* body */}
-      <path d="M82 236c0-50 38-82 86-82s70 30 70 70c0 26-14 40-36 40H108c-16 0-26-10-26-28z" fill={u('hide')} />
+      <path
+        d="M82 236c0-50 38-82 86-82s70 30 70 70c0 26-14 40-36 40H108c-16 0-26-10-26-28z"
+        fill={u('hide')}
+      />
       {/* front legs with toenails */}
       <rect x="92" y="236" width="28" height="60" rx="13" fill={GRAY} />
       <rect x="128" y="238" width="26" height="58" rx="12" fill={GRAY} />
@@ -106,7 +121,13 @@ function BabyElephant({ u }: { u: Url }) {
       ))}
       {/* head with a tuft, ear, trunk */}
       <circle cx="92" cy="180" r="50" fill={u('hide')} />
-      <path d="M84 131c-2-8 2-14 6-16M92 131c0-8 4-13 9-14" stroke={GRAY_DEEP} strokeWidth="2.6" fill="none" strokeLinecap="round" />
+      <path
+        d="M84 131c-2-8 2-14 6-16M92 131c0-8 4-13 9-14"
+        stroke={GRAY_DEEP}
+        strokeWidth="2.6"
+        fill="none"
+        strokeLinecap="round"
+      />
       <path d="M112 138c34-14 66 6 64 42-2 32-28 50-56 42-14-4-18-18-16-36z" fill={GRAY_DEEP} />
       <path d="M118 150c24-8 46 6 44 32-2 22-20 34-40 28-8-3-10-12-9-24z" fill={PINK} />
       <path
@@ -116,7 +137,13 @@ function BabyElephant({ u }: { u: Url }) {
         fill="none"
         strokeLinecap="round"
       />
-      <path d="M36 168c-4 0-8 3-8 7M34 184c-4 1-7 4-7 7" stroke={GRAY_DEEP} strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path
+        d="M36 168c-4 0-8 3-8 7M34 184c-4 1-7 4-7 7"
+        stroke={GRAY_DEEP}
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+      />
       <circle cx="80" cy="170" r="6" fill={INK} />
       <circle cx="82" cy="168" r="2" fill="#fff" />
       <path d="M71 162l-4-4M76 159l-2-5" stroke={INK} strokeWidth="2" strokeLinecap="round" />
@@ -144,8 +171,21 @@ function Giraffe({ u }: { u: Url }) {
     <g>
       {/* neck, its mane along the top and patches */}
       <path d="M252 240C220 196 176 150 124 128l-18-50c54 10 110 52 146 100z" fill={u('giraffe')} />
-      <path d="M252 170C220 128 176 94 120 80" stroke="#B8692A" strokeWidth="8" fill="none" strokeLinecap="round" />
-      <path d="M252 176C220 134 176 100 120 86" stroke="#C9772F" strokeWidth="4" fill="none" strokeLinecap="round" strokeDasharray="1 5" />
+      <path
+        d="M252 170C220 128 176 94 120 80"
+        stroke="#B8692A"
+        strokeWidth="8"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M252 176C220 134 176 100 120 86"
+        stroke="#C9772F"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray="1 5"
+      />
       {PATCHES.map(([x, y, s], i) => (
         <path
           key={i}
@@ -160,9 +200,18 @@ function Giraffe({ u }: { u: Url }) {
       <circle cx="101" cy="10" r="6.5" fill="#8E5427" />
       <path d="M46 58c-20-8-32 0-34 6 10 6 24 6 36 0z" fill={GIRAFFE} />
       <path d="M118 52c18-10 32-4 36 2-8 8-24 10-36 6z" fill={GIRAFFE} />
-      <path d="M44 60c-10-2-18 0-24 4M120 56c10-4 18-4 26-1" stroke={SPOT} strokeWidth="3" strokeLinecap="round" opacity=".6" />
+      <path
+        d="M44 60c-10-2-18 0-24 4M120 56c10-4 18-4 26-1"
+        stroke={SPOT}
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity=".6"
+      />
       {/* head: forehead and long, soft muzzle */}
-      <path d="M50 52c12-18 52-20 66-2 8 12 6 32 2 48l-4 22c-4 16-18 26-32 26s-30-10-32-26l-4-28c-2-16-2-30 4-40z" fill={u('giraffe')} />
+      <path
+        d="M50 52c12-18 52-20 66-2 8 12 6 32 2 48l-4 22c-4 16-18 26-32 26s-30-10-32-26l-4-28c-2-16-2-30 4-40z"
+        fill={u('giraffe')}
+      />
       <path d="M52 116c0-16 14-24 32-24s32 8 32 24-14 32-32 32-32-16-32-32z" fill="#FBE3B0" />
       <circle cx="74" cy="118" r="3.6" fill="#8E5427" />
       <circle cx="94" cy="118" r="3.6" fill="#8E5427" />
@@ -171,7 +220,12 @@ function Giraffe({ u }: { u: Url }) {
       <circle cx="102" cy="74" r="7.4" fill={INK} />
       <circle cx="70.5" cy="71" r="2.5" fill="#fff" />
       <circle cx="104.5" cy="71" r="2.5" fill="#fff" />
-      <path d="M59 66l-5-4M63 61l-3-5M111 66l5-4M107 61l3-5" stroke={INK} strokeWidth="2" strokeLinecap="round" />
+      <path
+        d="M59 66l-5-4M63 61l-3-5M111 66l5-4M107 61l3-5"
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
       <circle cx="85" cy="50" r="7" fill={SPOT} opacity=".8" />
       <ellipse cx="56" cy="96" rx="7" ry="4.5" fill={BLUSH} opacity=".4" />
       <ellipse cx="114" cy="96" rx="7" ry="4.5" fill={BLUSH} opacity=".4" />
@@ -189,14 +243,22 @@ function Frond({ deg, len, tone, rib }: { deg: number; len: number; tone: string
     const t = i / (n + 1);
     const x = 2 * (1 - t) * t * cx + t * t * ex;
     const y = 2 * (1 - t) * t * cy + t * t * ey;
-    const a = (Math.atan2(2 * (1 - t) * cy + 2 * t * (ey - cy), 2 * (1 - t) * cx + 2 * t * (ex - cx)) * 180) / Math.PI;
+    const a =
+      (Math.atan2(2 * (1 - t) * cy + 2 * t * (ey - cy), 2 * (1 - t) * cx + 2 * t * (ex - cx)) * 180) /
+      Math.PI;
     const l = 10 + 44 * Math.sin(Math.PI * (0.12 + 0.8 * t));
     leaves.push(leafPath(r1(x), r1(y), a + 48, l, 4.6, 14), leafPath(r1(x), r1(y), a - 40, l * 0.9, 4.6, 10));
   }
   return (
     <g>
       <path d={leaves.join('')} fill={tone} />
-      <path d={`M0 0Q${cx} ${cy} ${ex} ${ey}`} stroke={rib} strokeWidth="3.6" fill="none" strokeLinecap="round" />
+      <path
+        d={`M0 0Q${cx} ${cy} ${ex} ${ey}`}
+        stroke={rib}
+        strokeWidth="3.6"
+        fill="none"
+        strokeLinecap="round"
+      />
     </g>
   );
 }
@@ -317,10 +379,7 @@ export default function SafariPals({ place }: SceneProps) {
           );
         })}
       </Piece>
-      <Piece
-        vb={[-60, -60, 120, 120]}
-        style={{ left: '50%', top: sunY, width: sun, translate: '-50% -50%' }}
-      >
+      <Piece vb={[-60, -60, 120, 120]} style={{ left: '50%', top: sunY, width: sun, translate: '-50% -50%' }}>
         <circle r="56" fill={url('sun')} />
         <path
           d="M-26-6q8-9 16 0M10-6q8-9 16 0M-12 12q12 12 24 0"
@@ -343,9 +402,23 @@ export default function SafariPals({ place }: SceneProps) {
           translate: '-50% 0',
         }}
       >
-        <path d="M40 86c-20 0-24-26-4-30 2-20 28-26 40-12 8-16 36-14 38 6 18-2 24 22 6 36z" fill="#fff" opacity=".92" />
-        <path d="M204 70c-12 0-15-16-3-19 1-12 18-16 25-7 6-10 22-8 23 4 11-1 15 14 4 22z" fill="#fff" opacity=".85" />
-        <path d="M232 20q6-6 12 0q6-6 12 0M262 8q4-4 8 0q4-4 8 0" stroke="#8C6A48" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        <path
+          d="M40 86c-20 0-24-26-4-30 2-20 28-26 40-12 8-16 36-14 38 6 18-2 24 22 6 36z"
+          fill="#fff"
+          opacity=".92"
+        />
+        <path
+          d="M204 70c-12 0-15-16-3-19 1-12 18-16 25-7 6-10 22-8 23 4 11-1 15 14 4 22z"
+          fill="#fff"
+          opacity=".85"
+        />
+        <path
+          d="M232 20q6-6 12 0q6-6 12 0M262 8q4-4 8 0q4-4 8 0"
+          stroke="#8C6A48"
+          strokeWidth="2.4"
+          fill="none"
+          strokeLinecap="round"
+        />
       </Piece>
       {/* savanna hills with a far acacia */}
       <Piece

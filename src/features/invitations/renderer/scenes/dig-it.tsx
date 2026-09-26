@@ -110,7 +110,10 @@ function Mast() {
 function Excavator({ u }: { u: Url }) {
   return (
     <g>
-      <g data-anim="sweep" style={{ transformOrigin: '168px 156px', animationDirection: 'alternate-reverse' }}>
+      <g
+        data-anim="sweep"
+        style={{ transformOrigin: '168px 156px', animationDirection: 'alternate-reverse' }}
+      >
         {/* boom (a curved beam), its ram, the stick */}
         <path d="M156 160C166 116 192 80 230 58l14 18c-32 18-54 48-62 88z" style={{ fill: MACHINE }} />
         <path d="M184 150l26-52" stroke="#D9DEE2" strokeWidth="6" strokeLinecap="round" />
@@ -135,7 +138,10 @@ function Excavator({ u }: { u: Url }) {
         </g>
       ))}
       {/* house with its rounded counterweight, exhaust and puffs */}
-      <path d="M40 150h140c8 0 14 6 14 14v22c0 8-6 14-14 14H40c-14 0-26-12-26-25s12-25 26-25z" style={{ fill: MACHINE }} />
+      <path
+        d="M40 150h140c8 0 14 6 14 14v22c0 8-6 14-14 14H40c-14 0-26-12-26-25s12-25 26-25z"
+        style={{ fill: MACHINE }}
+      />
       <path d="M40 150c-14 0-26 12-26 25s12 25 26 25z" style={{ fill: MACHINE_DEEP }} />
       <rect x="54" y="122" width="10" height="30" rx="3" fill={STEEL} />
       <g data-anim="float" style={{ animationDuration: '2.4s' }}>
@@ -246,11 +252,23 @@ export default function DigIt({ place, date }: SceneProps) {
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
-          <pattern id={ref('hazard')} width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <pattern
+            id={ref('hazard')}
+            width="16"
+            height="16"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
             <rect width="16" height="16" fill={HAZARD} />
             <rect width="8" height="16" fill={INK} />
           </pattern>
-          <pattern id={ref('tape')} width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(-40)">
+          <pattern
+            id={ref('tape')}
+            width="18"
+            height="18"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(-40)"
+          >
             <rect width="18" height="18" fill={HAZARD} />
             <rect width="9" height="18" fill={INK} />
           </pattern>
@@ -265,7 +283,8 @@ export default function DigIt({ place, date }: SceneProps) {
       </svg>
       <Layer
         style={{
-          background: 'radial-gradient(90cqw 40cqh at 50% 100%, rgba(255,225,160,.55), rgba(255,225,160,0) 70%)',
+          background:
+            'radial-gradient(90cqw 40cqh at 50% 100%, rgba(255,225,160,.55), rgba(255,225,160,0) 70%)',
         }}
       />
       {/* clouds drifting behind the crane */}
@@ -275,7 +294,11 @@ export default function DigIt({ place, date }: SceneProps) {
         style={{ right: cm(-2), top: card ? cm(12) : cm(19), width: cm(card ? 30 : 46), opacity: 0.95 }}
       >
         <path d="M60 100c-26 0-30-34-6-40 2-26 36-34 52-14 12-20 46-18 48 8 24-2 30 30 8 46z" fill="#fff" />
-        <path d="M262 70c-16 0-20-22-4-26 2-16 24-22 34-9 8-13 30-11 31 5 15-1 20 20 5 30z" fill="#fff" opacity=".85" />
+        <path
+          d="M262 70c-16 0-20-22-4-26 2-16 24-22 34-9 8-13 30-11 31 5 15-1 20 20 5 30z"
+          fill="#fff"
+          opacity=".85"
+        />
       </Piece>
       {/* a far building in scaffolding on the horizon, behind the truck */}
       <Piece

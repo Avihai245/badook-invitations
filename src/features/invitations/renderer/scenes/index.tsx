@@ -26,6 +26,7 @@ import SafariPals from './safari-pals';
 import DigIt from './dig-it';
 import OceanFriends from './ocean-friends';
 import RocketLaunch from './rocket-launch';
+import UnicornDream from './unicorn-dream';
 
 export type { SceneId } from './ids';
 export type { ScenePlace } from './kit';
@@ -56,6 +57,7 @@ const SCENES: Record<SceneId, ComponentType<SceneProps>> = {
   'dig-it': DigIt,
   'ocean-friends': OceanFriends,
   'rocket-launch': RocketLaunch,
+  'unicorn-dream': UnicornDream,
 };
 
 const ROOT: CSSProperties = {

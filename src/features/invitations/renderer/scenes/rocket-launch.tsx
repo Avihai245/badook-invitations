@@ -45,10 +45,22 @@ function Stars() {
   return (
     <g fill="#fff">
       {groups.map((d, i) => (
-        <path key={i} d={d.join('')} data-anim="twinkle" style={{ animationDelay: `${-i * 0.9}s` }} opacity={0.9 - i * 0.15} />
+        <path
+          key={i}
+          d={d.join('')}
+          data-anim="twinkle"
+          style={{ animationDelay: `${-i * 0.9}s` }}
+          opacity={0.9 - i * 0.15}
+        />
       ))}
       {sparkles.map(([x, y, s], i) => (
-        <path key={i} d={sparkle(x, y, s)} fill="#FFF6C8" data-anim="twinkle" style={{ animationDelay: `${-i * 0.7}s` }} />
+        <path
+          key={i}
+          d={sparkle(x, y, s)}
+          fill="#FFF6C8"
+          data-anim="twinkle"
+          style={{ animationDelay: `${-i * 0.7}s` }}
+        />
       ))}
     </g>
   );
@@ -70,7 +82,14 @@ function Moon({ u }: { u: Url }) {
       ].map(([x, y, r], i) => (
         <g key={i}>
           <circle cx={x} cy={y} r={r} fill={CRATER} />
-          <path d={`M${x! - r!} ${y}a${r} ${r} 0 0 0 ${r! * 2} 0`} fill="none" stroke="#fff" strokeWidth="2.4" opacity=".55" transform={`rotate(200 ${x} ${y})`} />
+          <path
+            d={`M${x! - r!} ${y}a${r} ${r} 0 0 0 ${r! * 2} 0`}
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2.4"
+            opacity=".55"
+            transform={`rotate(200 ${x} ${y})`}
+          />
         </g>
       ))}
       {/* the orbit and the planet riding it: the group turns on its box's centre — the moon's, as an
@@ -91,7 +110,13 @@ function RingedPlanet({ u }: { u: Url }) {
     <g transform="rotate(-16)">
       <path d="M-86 0a86 20 0 0 1 172 0" fill="none" stroke="#FFE08A" strokeWidth="9" opacity=".75" />
       <circle r="42" fill={u('planet')} />
-      <path d="M-40-12c20 6 60 6 80 0M-42 8c24 6 60 6 84 0" stroke="#F06A5C" strokeWidth="6" fill="none" opacity=".55" />
+      <path
+        d="M-40-12c20 6 60 6 80 0M-42 8c24 6 60 6 84 0"
+        stroke="#F06A5C"
+        strokeWidth="6"
+        fill="none"
+        opacity=".55"
+      />
       <circle cx="-14" cy="-18" r="9" fill="#fff" opacity=".22" />
       <path d="M86 0a86 20 0 0 1-172 0" fill="none" stroke="#FFE08A" strokeWidth="9" />
       <path d="M78 6a78 15 0 0 1-156 0" fill="none" stroke="#FFF4C4" strokeWidth="2" opacity=".6" />
@@ -106,8 +131,14 @@ function Astronaut({ u }: { u: Url }) {
       {/* backpack */}
       <rect x="38" y="62" width="74" height="70" rx="16" fill={SUIT_SHADE} />
       {/* legs and boots */}
-      <path d="M52 124h20v26c0 6-4 10-10 10s-10-4-10-10zM80 124h20v24c0 6-4 10-10 10s-10-4-10-10z" fill={SUIT} />
-      <path d="M52 146h20v6c0 6-4 10-10 10s-10-4-10-10zM80 144h20v6c0 6-4 10-10 10s-10-4-10-10z" fill="#AEB3CB" />
+      <path
+        d="M52 124h20v26c0 6-4 10-10 10s-10-4-10-10zM80 124h20v24c0 6-4 10-10 10s-10-4-10-10z"
+        fill={SUIT}
+      />
+      <path
+        d="M52 146h20v6c0 6-4 10-10 10s-10-4-10-10zM80 144h20v6c0 6-4 10-10 10s-10-4-10-10z"
+        fill="#AEB3CB"
+      />
       {/* body, arms (one waving), gloves */}
       <rect x="46" y="76" width="60" height="58" rx="22" fill={SUIT} />
       <path d="M50 88C34 80 26 62 28 44" stroke={SUIT} strokeWidth="16" fill="none" strokeLinecap="round" />
@@ -123,7 +154,14 @@ function Astronaut({ u }: { u: Url }) {
       <circle cx="76" cy="46" r="38" fill={SUIT} />
       <circle cx="76" cy="46" r="38" fill="none" stroke={SUIT_SHADE} strokeWidth="3" />
       <rect x="48" y="26" width="56" height="42" rx="21" fill={u('visor')} />
-      <path d="M58 36c6-6 16-8 24-6" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" opacity=".7" />
+      <path
+        d="M58 36c6-6 16-8 24-6"
+        stroke="#fff"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+        opacity=".7"
+      />
       <circle cx="92" cy="56" r="3" fill="#fff" opacity=".5" />
       <path d="M76 8V0" stroke={SUIT_SHADE} strokeWidth="3" strokeLinecap="round" />
       <circle cx="76" cy="0" r="4" style={{ fill: ACCENT }} />
@@ -154,11 +192,25 @@ function Rocket({ u }: { u: Url }) {
       <path d="M54 170h12v40H54z" style={{ fill: ACCENT }} />
       {/* nose cone */}
       <path d="M60 4c24 18 34 46 34 74H26c0-28 10-56 34-74z" style={{ fill: ACCENT }} />
-      <path d="M60 4c-10 10-18 24-22 40" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" opacity=".45" />
+      <path
+        d="M60 4c-10 10-18 24-22 40"
+        stroke="#fff"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+        opacity=".45"
+      />
       {/* porthole */}
       <circle cx="60" cy="130" r="23" fill="#C9CFE8" />
       <circle cx="60" cy="130" r="17" fill={u('glass')} />
-      <path d="M50 124c3-6 9-9 15-8" stroke="#fff" strokeWidth="3.4" fill="none" strokeLinecap="round" opacity=".8" />
+      <path
+        d="M50 124c3-6 9-9 15-8"
+        stroke="#fff"
+        strokeWidth="3.4"
+        fill="none"
+        strokeLinecap="round"
+        opacity=".8"
+      />
       {[104, 110, 116, 150, 156, 162].map((y, i) => (
         <circle key={i} cx={i < 3 ? 32 : 88} cy={y} r="1.8" fill="#AEB3CB" />
       ))}
@@ -181,7 +233,11 @@ function Smoke() {
   return (
     <g>
       {puffs.map(([x, y, r], i) => (
-        <g key={i} data-anim="float" style={{ animationDelay: `${-i * 0.8}s`, animationDuration: `${3 + (i % 3)}s` }}>
+        <g
+          key={i}
+          data-anim="float"
+          style={{ animationDelay: `${-i * 0.8}s`, animationDuration: `${3 + (i % 3)}s` }}
+        >
           <circle cx={x} cy={y} r={r} fill={i % 2 ? '#E9E5FA' : '#F6F4FF'} />
         </g>
       ))}
@@ -204,10 +260,22 @@ function World() {
       ].map(([x, y, rx, ry], i) => (
         <g key={i}>
           <ellipse cx={x} cy={y} rx={rx} ry={ry} fill="#2F2670" />
-          <path d={`M${x! - rx!} ${y}a${rx} ${ry} 0 0 0 ${rx! * 2} 0`} fill="none" stroke="#6B5FC0" strokeWidth="3" opacity=".7" />
+          <path
+            d={`M${x! - rx!} ${y}a${rx} ${ry} 0 0 0 ${rx! * 2} 0`}
+            fill="none"
+            stroke="#6B5FC0"
+            strokeWidth="3"
+            opacity=".7"
+          />
         </g>
       ))}
-      <path d="M-40 260C60 120 360 70 600 70s540 50 640 190" fill="none" stroke="#8A7BE0" strokeWidth="4" opacity=".6" />
+      <path
+        d="M-40 260C60 120 360 70 600 70s540 50 640 190"
+        fill="none"
+        stroke="#8A7BE0"
+        strokeWidth="4"
+        opacity=".6"
+      />
     </g>
   );
 }
@@ -216,9 +284,9 @@ export default function RocketLaunch({ place }: SceneProps) {
   const { ref, url } = useIds();
   const card = place === 'card';
   const poster = place === 'poster';
-  /** beside the text column on wide heroes, pushed off-screen on narrow ones */
+  /** on one side of the text column, `gap` from the centre: in view on wide heroes, off-screen on narrow ones */
   const beside = (side: 'left' | 'right', gap: number): CSSProperties =>
-    side === 'left' ? { left: `calc(50cqw + ${cm(gap)})` } : { right: `calc(50cqw + ${cm(gap)})` };
+    side === 'left' ? { right: `calc(50cqw + ${cm(gap)})` } : { left: `calc(50cqw + ${cm(gap)})` };
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -290,9 +358,10 @@ export default function RocketLaunch({ place }: SceneProps) {
       <Piece
         vb={[-140, -140, 280, 280]}
         style={{
-          right: card ? cm(-12) : cm(-16),
-          top: card ? cm(-12) : poster ? cm(-18) : cm(-14),
+          left: card ? `calc(100% - ${cm(9)})` : `calc(100% - ${cmh(18)})`,
+          top: card ? cm(9) : cmh(18),
           width: card ? cm(38) : cmh(62),
+          translate: '-50% -50%',
         }}
       >
         <Moon u={url} />
@@ -300,21 +369,29 @@ export default function RocketLaunch({ place }: SceneProps) {
       <Piece
         vb={[-100, -64, 200, 128]}
         anim="float"
-        style={{ left: cm(card ? 3 : 2), top: card ? cm(6) : poster ? cm(9) : cm(14), width: card ? cm(22) : cmh(34) }}
+        style={{
+          left: cm(card ? 3 : 2),
+          top: card ? cm(6) : poster ? cm(9) : cm(14),
+          width: card ? cm(22) : cmh(34),
+        }}
       >
         <g filter={url('glow')}>
           <RingedPlanet u={url} />
         </g>
       </Piece>
       {/* small planets beside the names on wide heroes */}
-      <Piece vb={[-20, -20, 40, 40]} anim="float" style={{ ...beside('left', 56), top: '46%', width: cm(7) }}>
+      <Piece
+        vb={[-20, -20, 40, 40]}
+        anim="float"
+        style={{ ...beside('right', 56), top: '46%', width: cm(7) }}
+      >
         <circle r="16" fill="#4FD1C5" />
         <path d="M-14-4c8 4 20 4 28 0" stroke="#2BA89D" strokeWidth="4" fill="none" />
       </Piece>
       <Piece
         vb={[-20, -20, 40, 40]}
         anim="float"
-        style={{ ...beside('right', 58), top: '40%', width: cm(5), animationDelay: '-2s' }}
+        style={{ ...beside('left', 58), top: '40%', width: cm(5), animationDelay: '-2s' }}
       >
         <circle r="16" fill="#FFD166" />
         <circle cx="-5" cy="-5" r="4" fill="#fff" opacity=".35" />
@@ -354,7 +431,7 @@ export default function RocketLaunch({ place }: SceneProps) {
         style={{
           right: cm(card ? 11 : 14),
           bottom: card ? '15cqh' : '11cqh',
-          width: card ? cm(10) : cmh(15),
+          width: card ? cm(10) : cmh(18),
           rotate: '8deg',
           animationDuration: '3s',
         }}

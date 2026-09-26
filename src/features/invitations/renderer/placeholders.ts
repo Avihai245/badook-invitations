@@ -384,6 +384,13 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'stars',
     ornament: 'rocket',
   }),
+  'unicorn-dream': drawn('unicorn-dream', ['#E8DCFA', '#FADCEB', '#FFE7D8'], {
+    bg: ['#FBE3EF', '#F4D3E8', '#E9C3E1'],
+    paper: ['#FFFFFF', '#FDF1F7', '#F4DDEB'],
+    hint: '#6E4A7A',
+    panorama: 'swags',
+    ornament: 'unicorn',
+  }),
 };
 
 /**

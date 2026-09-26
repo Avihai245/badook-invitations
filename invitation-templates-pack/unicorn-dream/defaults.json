@@ -1,0 +1,271 @@
+{
+  "templateId": "unicorn-dream",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לקצת קסם",
+        "en": "Tap for a little magic"
+      },
+      "eyebrow": {
+        "he": "בואו לחגוג בארץ הקסם עם",
+        "en": "Join the magical party of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהקסם מתחיל",
+          "en": "Until the magic begins"
+        },
+        "afterEvent": {
+          "he": "היה קסום! תודה שבאתם",
+          "en": "It was magical! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "יום הולדת קסום",
+          "en": "A magical birthday"
+        },
+        "body": {
+          "he": "קשת בענן, עננים ורודים וחד־קרן אחד שמחכה רק לכם.\nב־{date} חוגגים — עם עוגה, נצנצים והמון קסם.",
+          "en": "A rainbow, pink clouds and a unicorn waiting just for you.\nOn {date} we celebrate — with cake, glitter and lots of magic."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "מגיעים לארץ הקסם",
+            "en": "Into Magic Land"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "סדנת כתרים ונצנצים",
+            "en": "Crowns & glitter"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "ארוחה קסומה",
+            "en": "Magical dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ומשאלות",
+            "en": "Cake & wishes"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress code"
+          },
+          "subtitle": {
+            "he": "נצנצים וקשת בענן",
+            "en": "Glitter & rainbows"
+          },
+          "body": {
+            "he": "כל מה שנוצץ, צבעוני או ורוד — ואפשר גם כנפיים או קרן של חד־קרן.",
+            "en": "Anything sparkly, colourful or pink — wings and unicorn horns welcome."
+          },
+          "illustration": "template:unicorn"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לקסם?",
+          "en": "Coming for the magic?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "יש! נתראה בארץ הקסם",
+          "en": "Yay! See you in Magic Land"
+        },
+        "declineMessage": {
+          "he": "חבל! נשלח לכם קצת נצנצים",
+          "en": "Too bad! We’ll send you some sparkle"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "באהבה ובהמון נצנצים",
+        "en": "With love and lots of sparkle"
+      }
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בואו לחגוג איתנו את בת המצווה של",
+        "en": "Join us for the Bat Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהקסם מתחיל",
+          "en": "Until the magic begins"
+        },
+        "afterEvent": {
+          "he": "היה קסום! מזל טוב ותודה שבאתם",
+          "en": "It was magical! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "חלום שמתגשם",
+          "en": "A dream come true"
+        },
+        "body": {
+          "he": "ב־{date} {primary} חוגגת בת מצווה — ואנחנו רוצים את כל האנשים האהובים לצידה.\nבואו לחגוג איתנו ערב של קסם, מוזיקה ושמחה.",
+          "en": "On {date}, {primary} celebrates her Bat Mitzvah — and we want all her favourite people there.\nCome celebrate an evening of magic, music and joy with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "טקס הדלקת נרות",
+            "en": "Candle lighting"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "קינוחים",
+            "en": "Dessert"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "באים לחגוג?",
+          "en": "Coming to celebrate?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A blessing for the Bat Mitzvah girl"
+        },
+        "successMessage": {
+          "he": "יש! נתראה במסיבה",
+          "en": "Yay! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! נרים כוסית לכבודכם",
+          "en": "Too bad! We’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה, המשפחה",
+        "en": "With love, the family"
+      }
+    }
+  }
+}

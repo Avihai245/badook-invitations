@@ -167,6 +167,15 @@ export const ORNAMENT_PATHS = {
     'M9.6 16.5 9.2 18h5.6l-.4-1.5',
     'M10.3 18.3c0 1.7.7 2.7 1.7 3.6 1-.9 1.7-1.9 1.7-3.6',
   ],
+  unicorn: [
+    'M12 2.6 15.8 20H8.2z',
+    'M9.3 15.2l5.6-1.6M10.2 10.9l3.9-1.2M11.1 6.8l1.9-.6',
+    'M6.8 20.5h10.4',
+    'M5 6.2Q5 8 6.8 8Q5 8 5 9.8Q5 8 3.2 8Q5 8 5 6.2Z',
+    'M19.2 3.4Q19.2 4.7 20.5 4.7Q19.2 4.7 19.2 6Q19.2 4.7 17.9 4.7Q19.2 4.7 19.2 3.4Z',
+    dot(18.9, 11.2, 0.5),
+    dot(4.6, 14.2, 0.45),
+  ],
 } satisfies Record<string, readonly Shape[]>;
 
 export type OrnamentIconName = keyof typeof ORNAMENT_PATHS;

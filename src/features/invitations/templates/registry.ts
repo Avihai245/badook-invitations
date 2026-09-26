@@ -68,6 +68,8 @@ import oceanDefaults from '@pack/ocean-friends/defaults.json';
 import oceanManifest from '@pack/ocean-friends/manifest.json';
 import rocketDefaults from '@pack/rocket-launch/defaults.json';
 import rocketManifest from '@pack/rocket-launch/manifest.json';
+import unicornDefaults from '@pack/unicorn-dream/defaults.json';
+import unicornManifest from '@pack/unicorn-dream/manifest.json';
 import { TemplateDefaultsSchema, TemplateManifestSchema } from '../contracts/schemas';
 import type { TemplateDefaults, TemplateManifest } from '../contracts/types';
 
@@ -114,6 +116,7 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: digItManifest, defaults: digItDefaults },
   { manifest: oceanManifest, defaults: oceanDefaults },
   { manifest: rocketManifest, defaults: rocketDefaults },
+  { manifest: unicornManifest, defaults: unicornDefaults },
 ];
 
 function loadTemplates(): Map<string, TemplateEntry> {
