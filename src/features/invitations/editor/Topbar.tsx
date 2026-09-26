@@ -11,6 +11,7 @@ import {
   History,
   LoaderCircle,
   MessageCircleQuestion,
+  MessageSquareText,
   Monitor,
   MoreHorizontal,
   Redo2,
@@ -20,8 +21,9 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Popover } from 'radix-ui';
-import { Badge, Button, IconButton, Menu, Segmented, cn, useDir } from '@/components/app';
+import { Badge, Button, Hint, IconButton, Menu, Segmented, cn, useDir } from '@/components/app';
 import { HelpFor } from '@/features/invitations/app/HelpFor';
+import { useReview } from '@/features/review/ui/host/ReviewProvider';
 import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import type { Locale } from '../contracts/types';
@@ -39,6 +41,7 @@ export function Topbar({
   onPublish,
   onVersions,
   onPreview,
+  onComments,
 }: {
   status: SaveStatus;
   device: Device;
@@ -46,9 +49,15 @@ export function Topbar({
   onPublish: () => void;
   onVersions: () => void;
   onPreview: () => void;
+  /** the family's review (features/review) — absent when the event doesn't have it */
+  onComments?: () => void;
 }) {
   const { doc, meta, locale, setLocale, undo, redo, canUndo, canRedo } = useEditor();
-  const { t, locale: ui } = useUi();
+  const { t, locale: ui, plural } = useUi();
+  const openComments = useReview()?.openCount ?? 0;
+  const commentsLabel = openComments
+    ? `${t.studio.review.button}, ${plural(t.studio.review.railBadge, openComments)}`
+    : t.studio.review.button;
   const e = t.editor;
   const names =
     hostsText(doc, doc.locales.includes(ui) ? ui : doc.defaultLocale) || t.eventTypes[doc.eventType];
@@ -111,7 +120,7 @@ export function Topbar({
       </div>
 
       <div className="ms-auto flex shrink-0 items-center gap-1.5 lg:ms-0 lg:gap-2">
-        <HelpFor area="editor" />
+        <HelpFor area="editor" hide={onComments ? [] : ['comments']} />
         <IconButton
           label={e.undo}
           tooltip
@@ -146,6 +155,28 @@ export function Topbar({
           <IconButton label={e.versions} tooltip onClick={onVersions}>
             <History />
           </IconButton>
+          {onComments ? (
+            <Hint text={t.studio.review.buttonHint}>
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={<MessageSquareText />}
+                onClick={onComments}
+                aria-label={commentsLabel}
+                data-testid="review-button"
+              >
+                {t.studio.review.button}
+                {openComments ? (
+                  <span
+                    aria-hidden
+                    className="-me-1 inline-grid h-5 min-w-5 place-items-center rounded-full bg-[#b42318] px-1 text-[11px] font-bold text-white"
+                  >
+                    {openComments}
+                  </span>
+                ) : null}
+              </Button>
+            </Hint>
+          ) : null}
           <Button variant="secondary" size="sm" icon={<Eye />} onClick={onPreview}>
             {e.preview}
           </Button>
@@ -161,6 +192,9 @@ export function Topbar({
               { label: e.preview, icon: <Eye />, onSelect: onPreview },
               { label: e.redo, icon: <Redo2 className="icon-dir" />, onSelect: redo, disabled: !canRedo },
               { label: e.versions, icon: <History />, onSelect: onVersions },
+              ...(onComments
+                ? [{ label: commentsLabel, icon: <MessageSquareText />, onSelect: onComments }]
+                : []),
               { label: t.support.open, icon: <MessageCircleQuestion />, onSelect: () => openSupport() },
             ]}
           />

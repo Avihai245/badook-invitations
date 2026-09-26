@@ -74,7 +74,19 @@ export interface EditorFeatures {
   premiumTemplates: boolean;
   /** the event has the `cinematic` feature (features/flags): the preview shows the v2 presentation */
   cinematic?: boolean;
+  /** the family's review link with comment pins (feature `draft_review`) */
+  draftReview?: StudioAccess;
+  /** "design it for me": three design concepts from the event's photos (feature `art_direction`) */
+  artDirection?: StudioAccess;
+  /** the invitation read aloud to guests (feature `voice`) */
+  voice?: StudioAccess;
 }
+
+/**
+ * A studio capability for this event (Phase 5C): on, or not in the owner's plan (the editor offers
+ * the upgrade); absent — switched off, or not offered here — it isn't shown at all.
+ */
+export type StudioAccess = 'on' | 'plan';
 const ALL_FEATURES: EditorFeatures = { removeBranding: true, premiumTemplates: true };
 
 export interface EditorContextValue {

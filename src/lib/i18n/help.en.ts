@@ -203,8 +203,12 @@ export const helpEn: typeof helpHe = {
         text: 'Under the preview: the saved draft full screen, to check it as a guest would.',
       },
       versions: {
-        label: 'Versions',
-        text: 'Every publish is kept as a version. You can restore an earlier one.',
+        label: 'Versions and saves',
+        text: 'Every publish is kept, and the draft is saved as you work. See what changed and restore any of them.',
+      },
+      comments: {
+        label: 'Comments',
+        text: 'A link to the draft your family can comment on without an account, and their comments: here, on the preview and next to the sections.',
       },
       preview: { label: 'Preview', text: 'The invitation full screen, as guests will see it.' },
       publish: {
@@ -244,6 +248,10 @@ export const helpEn: typeof helpHe = {
       issues: {
         label: 'A yellow / red dot',
         text: 'Yellow: something in the section to check, like an empty field or a missing translation. Red (after trying to publish): something that must be fixed before publishing.',
+      },
+      comments: {
+        label: 'A red number',
+        text: 'How many open comments your family left on the section on the review link. “Comments” at the top opens them.',
       },
       menu: {
         label: 'A section’s ⋯ menu',

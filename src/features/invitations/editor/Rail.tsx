@@ -59,6 +59,7 @@ import {
 import { Popover } from 'radix-ui';
 import { useDeferredValue, useId, useMemo, useState } from 'react';
 import { Switch, cn, rovingKeyDown, useDir } from '@/components/app';
+import { useReview } from '@/features/review/ui/host/ReviewProvider';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import type { Section, V2_SECTION_TYPES } from '../contracts/types';
@@ -139,6 +140,7 @@ const COMPACT_SR = 'lg:max-xl:sr-only';
 /** The editor's rail (§9B.3-D): tabs Sections · Design · Settings; the section list reorders by drag. */
 export function Rail({ onNavigate }: { onNavigate?: () => void }) {
   const { railTab, setRailTab } = useEditor();
+  const review = useReview();
   const { t } = useUi();
   const r = t.editor.rail;
   const id = useId();
@@ -179,7 +181,11 @@ export function Rail({ onNavigate }: { onNavigate?: () => void }) {
             </button>
           );
         })}
-        <HelpFor area="rail" className="size-8 shrink-0 lg:max-xl:size-9" />
+        <HelpFor
+          area="rail"
+          hide={review?.access === 'on' ? [] : ['comments']}
+          className="size-8 shrink-0 lg:max-xl:size-9"
+        />
       </div>
       <div
         role="tabpanel"
@@ -247,27 +253,42 @@ function RowButton({
   selected,
   onClick,
   flagged,
+  comments = 0,
 }: {
   icon: LucideIcon;
   name: string;
   selected: boolean;
   onClick: () => void;
   flagged?: IssueMark;
+  /** the family's open comments on it (features/review) */
+  comments?: number;
 }) {
-  const { t } = useUi();
+  const { t, plural } = useUi();
   const r = t.editor.rail;
+  const commentsText = comments ? plural(t.studio.review.railBadge, comments) : '';
   return (
     <button
       type="button"
       aria-current={selected || undefined}
       onClick={onClick}
       // the dot's meaning, as the row's description (its name stays the section's name)
-      title={flagged ? `${name} · ${flagged === 'error' ? r.issueError : r.issueWarning}` : name}
+      title={[name, flagged && (flagged === 'error' ? r.issueError : r.issueWarning), commentsText]
+        .filter(Boolean)
+        .join(' · ')}
       data-issue={flagged}
       className="relative flex h-full min-w-0 flex-1 items-center gap-2 text-start outline-offset-[-2px] lg:max-xl:flex-none lg:max-xl:justify-center lg:max-xl:px-3"
     >
       <Icon aria-hidden size={16} strokeWidth={1.75} className="shrink-0 text-muted" />
       <span className={cn('truncate', COMPACT_SR)}>{name}</span>
+      {comments ? (
+        <span
+          data-testid="rail-comments"
+          className="ms-auto inline-grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full bg-[#b42318] px-1 text-[11px] leading-none font-bold text-white lg:max-xl:absolute lg:max-xl:start-1.5 lg:max-xl:top-1"
+        >
+          <span aria-hidden>{comments}</span>
+          <span className="sr-only">{commentsText}</span>
+        </span>
+      ) : null}
       {flagged ? (
         <span
           aria-hidden
@@ -287,12 +308,14 @@ function LockedRow({
   selected,
   onSelect,
   flagged,
+  comments,
 }: {
   icon: LucideIcon;
   name: string;
   selected: boolean;
   onSelect: () => void;
   flagged?: IssueMark;
+  comments?: number;
 }) {
   const { t } = useUi();
   return (
@@ -304,7 +327,14 @@ function LockedRow({
         strokeWidth={1.75}
         className={cn('shrink-0 text-faint', COMPACT_HIDE)}
       />
-      <RowButton icon={icon} name={name} selected={selected} onClick={onSelect} flagged={flagged} />
+      <RowButton
+        icon={icon}
+        name={name}
+        selected={selected}
+        onClick={onSelect}
+        flagged={flagged}
+        comments={comments}
+      />
     </RowShell>
   );
 }
@@ -316,6 +346,7 @@ function SortableRow({
   onSelect,
   onToggle,
   flagged,
+  comments,
 }: {
   section: Section;
   name: string;
@@ -323,6 +354,7 @@ function SortableRow({
   onSelect: () => void;
   onToggle: (on: boolean) => void;
   flagged?: IssueMark;
+  comments?: number;
 }) {
   const { t } = useUi();
   const r = t.editor.rail;
@@ -357,6 +389,7 @@ function SortableRow({
         selected={selected}
         onClick={onSelect}
         flagged={flagged}
+        comments={comments}
       />
       <Switch
         label={fmt(r.toggle, { name })}
@@ -375,6 +408,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
   const { t, locale } = useUi();
   const e = t.editor;
   const dir = useDir();
+  const openComments = useReview()?.openBySection;
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -444,6 +478,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
           selected={isSelected(hero.id)}
           onSelect={() => go(() => select({ kind: 'section', id: hero.id }))}
           flagged={flagged.get(hero.id)}
+          comments={openComments?.get(hero.id)}
         />
       ) : null}
       <DndContext
@@ -474,6 +509,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
                   )
                 }
                 flagged={flagged.get(s.id)}
+                comments={openComments?.get(s.id)}
               />
             );
           })}
@@ -486,6 +522,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
           selected={isSelected(footer.id)}
           onSelect={() => go(() => select({ kind: 'section', id: footer.id }))}
           flagged={flagged.get(footer.id)}
+          comments={openComments?.get(footer.id)}
         />
       ) : null}
     </ul>

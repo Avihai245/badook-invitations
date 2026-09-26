@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Dialog as RadixDialog } from 'radix-ui';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Dialog, IconButton, cn, useDir, useToast } from '@/components/app';
+import { ReviewDrawer } from '@/features/review/ui/host/ReviewDrawer';
+import { useReview } from '@/features/review/ui/host/ReviewProvider';
 import { useUi } from '@/lib/i18n/client';
 import type { InvitationDocument } from '../contracts/types';
 import { loginUrl } from '../app/api';
@@ -53,11 +55,15 @@ export function EditorShell({
     onUnauthorized: () => router.push(loginUrl()),
   });
 
+  const review = useReview();
   const frame = useRef<HTMLIFrameElement>(null);
   const channel = usePreviewChannel(frame, {
     doc,
     locale,
     cinematic: editor.features.cinematic ?? true,
+    // the family's comments as numbered pins; a click on one opens it in the comments drawer
+    pins: review?.previewPins ?? null,
+    onPin: (id) => review?.openDrawer(id),
     onSelect: (path) => {
       const m = /^sections\.(\d+)/.exec(path);
       const section = m ? doc.sections[Number(m[1])] : undefined;
@@ -186,6 +192,7 @@ export function EditorShell({
           onPublish={() => setPublishing(true)}
           onVersions={() => setVersions(true)}
           onPreview={openPreview}
+          onComments={review?.access ? () => review.openDrawer() : undefined}
         />
         {autosave.status === 'offline' ? (
           <div
@@ -247,6 +254,19 @@ export function EditorShell({
             onRestored={(draft, updatedAt) => {
               autosave.rebase(draft, updatedAt);
               apply(() => draft, null);
+            }}
+          />
+        ) : null}
+        {review?.drawer ? (
+          <ReviewDrawer
+            onShow={(comment) => {
+              // its section in the form, the preview scrolled to its pin (on a phone: the preview)
+              review.closeDrawer();
+              review.setActive(comment.id);
+              review.setShowPins(true);
+              select({ kind: 'section', id: comment.sectionId });
+              setMobileView('preview');
+              channel.revealPin(comment.id);
             }}
           />
         ) : null}

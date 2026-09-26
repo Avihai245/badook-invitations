@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { loadAccount } from '@/features/billing/server/account';
+import { whyOff, type Feature } from '@/features/flags/features';
+import { featureInput } from '@/features/flags/server';
 import { Editor } from '@/features/invitations/editor/Editor';
+import type { StudioAccess } from '@/features/invitations/editor/state/EditorProvider';
 import { fontFaceCss, libraryDisplayFamilies, templateFontFamilies } from '@/features/invitations/fonts';
 import { FONT_LIBRARY } from '@/features/invitations/fonts/library';
 import { hostsLine } from '@/features/invitations/lib/text';
@@ -33,14 +36,21 @@ export default async function EditInvitationPage({ params }: { params: Params })
   const entry = getTemplate(inv.templateId);
   if (!entry) notFound();
   const env = serverEnv();
-  const [uiLocale, account, publicBaseUrl, cinematic] = await Promise.all([
+  const [uiLocale, account, publicBaseUrl, cinematic, input] = await Promise.all([
     getUiLocale(),
     loadAccount(user),
     // the address the host sees and copies (the site's own domain, not a placeholder)
     requestBaseUrl(),
     // the preview shows what the event's guests will see (feature `cinematic`)
     cinematicFor(inv.id),
+    // the studio's capabilities (Phase 5C): on, or offered as an upgrade; unreadable — not shown
+    featureInput(inv.id).catch(() => null),
   ]);
+  const studio = (feature: Feature): StudioAccess | undefined => {
+    if (!input) return undefined;
+    const why = whyOff(feature, input);
+    return why === null ? 'on' : why === 'plan' ? 'plan' : undefined;
+  };
   const unpublishedChanges =
     inv.status === 'published' && JSON.stringify(inv.draft) !== JSON.stringify(inv.published);
   return (
@@ -79,6 +89,9 @@ export default async function EditInvitationPage({ params }: { params: Params })
           removeBranding: account.limits.removeBranding,
           premiumTemplates: account.limits.premiumTemplates,
           cinematic,
+          draftReview: studio('draft_review'),
+          artDirection: studio('art_direction'),
+          voice: studio('voice'),
         }}
       />
     </>

@@ -177,7 +177,6 @@ export const studioHe = {
   // ─── the family's review link ───────────────────────────────────────────────────────────────
   review: {
     button: 'הערות',
-    buttonCount: { one: 'הערות (הערה פתוחה אחת)', other: 'הערות ({n} פתוחות)' },
     buttonHint: 'קישור לעיון המשפחה בטיוטה, וההערות שהם משאירים',
     title: 'עיון המשפחה',
     description:

@@ -175,7 +175,6 @@ export const studioEn: StudioDict = {
   },
   review: {
     button: 'Comments',
-    buttonCount: { one: 'Comments (1 open)', other: 'Comments ({n} open)' },
     buttonHint: 'A link for your family to review the draft, and the comments they leave',
     title: 'Family review',
     description:

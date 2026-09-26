@@ -1,3 +1,4 @@
+import type { LabeledPin } from '@/features/review/model';
 import type { InvitationDocument, Locale } from '../../contracts/types';
 
 /**
@@ -21,12 +22,18 @@ export type ParentToFrame =
    */
   | { type: 'play'; path: string; ms: number }
   /** the editor (re)attached its listener: answer with 'ready' (a 'ready' sent before that was lost) */
-  | { type: 'ping' };
+  | { type: 'ping' }
+  /** the family's comment pins to draw (features/review; none: no layer), `label`: the layer's name */
+  | { type: 'pins'; pins: LabeledPin[]; label: string }
+  /** scroll to a comment's pin (the host asked to see it on the preview) */
+  | { type: 'revealPin'; id: string };
 
 export type FrameToParent =
   | { type: 'ready' }
   /** the host clicked an element with data-edit-path */
-  | { type: 'select'; path: string };
+  | { type: 'select'; path: string }
+  /** the host clicked a comment's pin */
+  | { type: 'pin'; id: string };
 
 export type Envelope<T> = T & { channel: typeof PREVIEW_CHANNEL };
 

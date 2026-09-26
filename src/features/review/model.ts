@@ -79,6 +79,11 @@ export interface Pin {
   active?: boolean;
 }
 
+/** A pin with its name for screen readers (what the editor posts to its preview frame). */
+export interface LabeledPin extends Pin {
+  label: string;
+}
+
 export const pinsOf = (comments: readonly ReviewComment[], active: string | null = null): Pin[] =>
   comments.map((c) => ({
     id: c.id,
