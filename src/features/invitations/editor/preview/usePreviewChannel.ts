@@ -13,18 +13,21 @@ export function usePreviewChannel(
   {
     doc,
     locale,
+    cinematic = true,
     onSelect,
     debounceMs = 150,
   }: {
     doc: InvitationDocument | null;
     locale: Locale;
+    /** the event has the `cinematic` feature: the preview shows what its guests will see */
+    cinematic?: boolean;
     onSelect?: (path: string) => void;
     debounceMs?: number;
   },
 ) {
   const ready = useRef(false);
-  const latest = useRef({ doc, locale });
-  latest.current = { doc, locale };
+  const latest = useRef({ doc, locale, cinematic });
+  latest.current = { doc, locale, cinematic };
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
 
@@ -37,8 +40,8 @@ export function usePreviewChannel(
   );
 
   const sendDoc = useCallback(() => {
-    const { doc: d, locale: l } = latest.current;
-    if (d) send({ type: 'doc', doc: d, locale: l });
+    const { doc: d, locale: l, cinematic: c } = latest.current;
+    if (d) send({ type: 'doc', doc: d, locale: l, cinematic: c });
   }, [send]);
 
   useEffect(() => {
@@ -74,7 +77,7 @@ export function usePreviewChannel(
     if (!ready.current) return;
     const t = window.setTimeout(sendDoc, debounceMs);
     return () => window.clearTimeout(t);
-  }, [doc, locale, debounceMs, sendDoc]);
+  }, [doc, locale, cinematic, debounceMs, sendDoc]);
 
   return {
     highlight: useCallback(

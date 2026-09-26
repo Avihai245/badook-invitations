@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import type { Locale } from '../contracts/types';
 import type { RenderContext } from './context-core';
 import { CoverOverlay } from './cover/CoverOverlay.client';
+import { resolveOpening } from './cover/opening';
 import { FitNames } from './FitNames.client';
 import { FloatingControls, type MusicProps } from './FloatingControls.client';
 import { fxTheme } from './fx/theme';
@@ -11,6 +12,7 @@ import { LiveLocale } from './live/LiveLocale.client';
 import type { LivePayload } from './live/payload';
 import { ScrollEngine } from './motion/ScrollEngine.client';
 import { Scene } from './scenes';
+import { resolvePalette } from './theme';
 
 /**
  * A tap on the cover before React has taken over (its scripts still loading on a slow connection)
@@ -120,6 +122,8 @@ export function InvitationBody({
                 ctx.art.scene ? <Scene id={ctx.art.scene} place="card" date={doc.event.date} /> : undefined
               }
               fx={{ burst: fx.burst, colors: fx.burstColors }}
+              opening={resolveOpening(template, doc, resolvePalette(template, doc), ctx.cinematic)}
+              scrollLabel={ctx.t('cover.scroll')}
             />
           </>
         ) : (

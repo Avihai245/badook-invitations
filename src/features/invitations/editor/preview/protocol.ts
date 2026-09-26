@@ -7,7 +7,8 @@ import type { InvitationDocument, Locale } from '../../contracts/types';
 export const PREVIEW_CHANNEL = 'badook-preview';
 
 export type ParentToFrame =
-  | { type: 'doc'; doc: InvitationDocument; locale: Locale }
+  /** `cinematic`: the event has the feature (the v2 presentation shows; else the plain rendering) */
+  | { type: 'doc'; doc: InvitationDocument; locale: Locale; cinematic?: boolean }
   /** outline the node for this path (a field got focus), with a small label chip; null clears */
   | { type: 'highlight'; path: string | null; label?: string }
   /** scroll the node for this path into view (a section was selected), without outlining it */

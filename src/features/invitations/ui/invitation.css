@@ -802,6 +802,428 @@ a {
   }
 }
 
+/* ============ 3c. CINEMATIC OPENINGS (v2 — renderer/cover/Openings.client.tsx) ============
+   A gate of two doors, a theatre curtain, fireworks over a night sky, a veil of gold dust. Colors:
+   --co-color (the doors / curtain / sky) with --co-light, --co-deep and --co-gold (cover/opening.ts).
+   The gate and the curtain follow a scroll or a swipe a little first (--co-peek 0…1). */
+.cover.co {
+  background: none;
+}
+.cover.co::before,
+.cover.co::after {
+  display: none;
+}
+.co .cover-tap {
+  overflow: hidden;
+  perspective: 1800px;
+}
+.co .cover-hint {
+  z-index: 3;
+  bottom: max(14vh, 84px);
+  color: rgb(255 255 255 / 0.88);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.45);
+}
+.co .cover-skip {
+  z-index: 4;
+  color: rgb(255 255 255 / 0.92);
+  background: rgb(0 0 0 / 0.28);
+}
+.co-scroll {
+  position: absolute;
+  z-index: 3;
+  bottom: max(6vh, 30px);
+  inset-inline: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--f-ui);
+  font-size: 13px;
+  letter-spacing: var(--track-wide);
+  color: rgb(255 255 255 / 0.82);
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.45);
+  opacity: 0;
+  animation: fadeIn 0.8s 1.6s var(--ease) forwards;
+}
+:root[lang='en'] .co-scroll {
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.co-scroll svg {
+  animation: bob 2.2s ease-in-out infinite;
+}
+.co-mono {
+  font-family: var(--f-monogram);
+  line-height: 1;
+  white-space: nowrap;
+}
+.co.opening :is(.cover-hint, .co-scroll) {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+/* light spilling through as the doors / the curtain open */
+.co-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    38% 62% at 50% 50%,
+    rgb(255 246 222 / 0.95),
+    color-mix(in srgb, var(--co-gold) 45%, rgb(255 226 170 / 0.55)) 42%,
+    transparent 76%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+.co.opening .co-glow {
+  animation: coGlow 1.9s ease-out forwards;
+}
+@keyframes coGlow {
+  0% {
+    opacity: 0;
+  }
+  28% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── gate: two lacquered doors with gold moldings, a medallion across the seam ── */
+.co-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.3%;
+  overflow: hidden;
+  background:
+    radial-gradient(130% 55% at 50% 40%, color-mix(in srgb, var(--co-light) 55%, transparent), transparent 72%),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.05) 0 1px, transparent 1px 7px),
+    linear-gradient(180deg, var(--co-color), var(--co-deep));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.3);
+  backface-visibility: hidden;
+  transition: transform 0.45s var(--ease-out);
+}
+.co-door.l {
+  left: 0;
+  transform-origin: 0 50%;
+  transform: rotateY(calc(var(--co-peek, 0) * 28deg));
+}
+.co-door.r {
+  right: 0;
+  transform-origin: 100% 50%;
+  transform: rotateY(calc(var(--co-peek, 0) * -28deg));
+}
+.co[data-motion='slide'] .co-door.l {
+  transform: translateX(calc(var(--co-peek, 0) * -18%));
+}
+.co[data-motion='slide'] .co-door.r {
+  transform: translateX(calc(var(--co-peek, 0) * 18%));
+}
+/* the door darkens as it turns away from the light */
+.co-door::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 1.7s ease;
+}
+.co-panel {
+  position: absolute;
+  border: 1.5px solid color-mix(in srgb, var(--co-gold) 72%, transparent);
+  box-shadow:
+    inset 0 0 0 6px color-mix(in srgb, var(--co-deep) 35%, transparent),
+    inset 0 0 0 7.5px color-mix(in srgb, var(--co-gold) 32%, transparent);
+}
+.co-door.l .co-panel.top {
+  inset: 7% 11% 46% 15%;
+  border-top-right-radius: 100% 34%;
+}
+.co-door.r .co-panel.top {
+  inset: 7% 15% 46% 11%;
+  border-top-left-radius: 100% 34%;
+}
+.co-door.l .co-panel.bottom {
+  inset: 60% 11% 6% 15%;
+}
+.co-door.r .co-panel.bottom {
+  inset: 60% 15% 6% 11%;
+}
+.co-ring {
+  position: absolute;
+  top: 62%;
+  width: 16px;
+  height: 24px;
+  border: 2.5px solid var(--co-gold);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.35);
+}
+.co-door.l .co-ring {
+  right: 8%;
+}
+.co-door.r .co-ring {
+  left: 8%;
+}
+.co-medal {
+  --m: min(36vw, 150px);
+  position: absolute;
+  top: 50%;
+  width: var(--m);
+  height: var(--m);
+  margin-top: calc(var(--m) / -2);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(
+    circle at 36% 30%,
+    #fff4cc,
+    var(--co-gold) 46%,
+    color-mix(in srgb, var(--co-gold) 55%, #4a300c)
+  );
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--co-gold) 38%, transparent),
+    inset 0 -6px 14px rgb(0 0 0 / 0.25);
+}
+.co-door.l .co-medal {
+  right: calc(var(--m) / -2);
+}
+.co-door.r .co-medal {
+  left: calc(var(--m) / -2);
+}
+.co-medal .co-mono {
+  font-size: calc(var(--m) * 0.3);
+  color: color-mix(in srgb, var(--co-deep) 80%, #1a0e02);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.4);
+}
+.co.opening[data-opening='gate'] .co-door {
+  transition: transform 1.75s cubic-bezier(0.55, 0.04, 0.24, 1);
+}
+.co.opening[data-opening='gate'] .co-door.l {
+  transform: rotateY(104deg);
+}
+.co.opening[data-opening='gate'] .co-door.r {
+  transform: rotateY(-104deg);
+}
+.co.opening[data-opening='gate'][data-motion='slide'] .co-door.l {
+  transform: translateX(-101%);
+}
+.co.opening[data-opening='gate'][data-motion='slide'] .co-door.r {
+  transform: translateX(101%);
+}
+.co.opening[data-opening='gate']:not([data-motion='slide']) .co-door::after {
+  opacity: 0.5;
+}
+
+/* ── curtain: velvet drapes under a scalloped valance with the monogram in a gold crest ── */
+.co-drape {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 51%;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.38), transparent 24%, transparent 72%, rgb(0 0 0 / 0.3)),
+    repeating-linear-gradient(
+      90deg,
+      var(--co-deep) 0,
+      var(--co-color) 2.4%,
+      var(--co-light) 4.2%,
+      var(--co-color) 6%,
+      var(--co-deep) 8.5%
+    );
+  box-shadow: inset 0 0 50px rgb(0 0 0 / 0.35);
+  transition: transform 0.45s var(--ease-out);
+}
+.co-drape.l {
+  left: 0;
+  transform-origin: 0 0;
+  transform: scaleX(calc(1 - var(--co-peek, 0) * 0.2));
+}
+.co-drape.r {
+  right: 0;
+  transform-origin: 100% 0;
+  transform: scaleX(calc(1 - var(--co-peek, 0) * 0.2));
+}
+.co[data-motion='rise'] .co-drape {
+  transform: translateY(calc(var(--co-peek, 0) * -12%));
+}
+.co-valance {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(15vh, 96px);
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.35), transparent 70%),
+    repeating-linear-gradient(90deg, var(--co-deep) 0 3px, var(--co-color) 3px 22px, var(--co-light) 22px 30px, var(--co-color) 30px 44px);
+  border-bottom: 3px solid var(--co-gold);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.35);
+  transition: transform 0.45s var(--ease-out);
+}
+/* the fringe: a row of gold scallops under the valance */
+.co-valance::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 14px;
+  background: radial-gradient(circle at 50% 0, var(--co-gold) 55%, transparent 58%) 0 0 / 22px 14px repeat-x;
+}
+.co-crest {
+  position: absolute;
+  left: 50%;
+  bottom: -46px;
+  translate: -50% 0;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(
+    circle at 36% 30%,
+    #fff4cc,
+    var(--co-gold) 46%,
+    color-mix(in srgb, var(--co-gold) 55%, #4a300c)
+  );
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--co-gold) 40%, transparent),
+    0 10px 24px rgb(0 0 0 / 0.4);
+}
+.co-crest .co-mono {
+  font-size: 28px;
+  color: color-mix(in srgb, var(--co-deep) 80%, #1a0e02);
+}
+.co.opening[data-opening='curtain'] :is(.co-drape, .co-valance) {
+  transition: transform 1.7s cubic-bezier(0.6, 0.02, 0.28, 1);
+}
+.co.opening[data-opening='curtain']:not([data-motion='rise']) .co-drape {
+  transform: scaleX(0.1);
+}
+.co.opening[data-opening='curtain'][data-motion='rise'] :is(.co-drape, .co-valance) {
+  transform: translateY(-112%);
+}
+
+/* ── fireworks: a night sky with twinkling stars; the shells are drawn on a canvas (fx/sparks.ts) ── */
+.co[data-opening='fireworks'] {
+  background: radial-gradient(
+    130% 75% at 50% 100%,
+    color-mix(in srgb, var(--co-color) 60%, #3b2146),
+    var(--co-color) 58%,
+    color-mix(in srgb, var(--co-color) 70%, #000)
+  );
+}
+.co-stars,
+.co-motes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.co-stars i,
+.co-motes i {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  animation: coTwinkle var(--d) ease-in-out var(--dl) infinite;
+}
+.co-stars i {
+  background: #fff;
+  box-shadow: 0 0 6px rgb(255 255 255 / 0.8);
+}
+@keyframes coTwinkle {
+  50% {
+    opacity: 0.25;
+    transform: scale(0.6);
+  }
+}
+.co-center {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+}
+.co[data-opening='fireworks'] .co-mono {
+  font-size: clamp(54px, 17vw, 104px);
+  color: #fff6de;
+  text-shadow:
+    0 0 18px color-mix(in srgb, var(--co-gold) 85%, transparent),
+    0 0 46px color-mix(in srgb, var(--co-gold) 55%, transparent);
+}
+.co.opening[data-opening='fireworks'] .co-mono {
+  transform: scale(1.18);
+  opacity: 0;
+  transition:
+    transform 1.3s var(--ease-out),
+    opacity 0.9s ease 0.3s;
+}
+
+/* ── gold dust: a deep veil, gold motes, a foil monogram; the dust blows away (fx/sparks.ts) ── */
+.co-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    95% 70% at 50% 46%,
+    color-mix(in srgb, var(--co-color) 55%, #4a3620),
+    var(--co-color) 56%,
+    var(--co-deep)
+  );
+}
+.co-motes i {
+  background: radial-gradient(circle, #fff4d2, var(--co-gold) 60%, transparent 72%);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--co-gold) 70%, transparent);
+}
+.co[data-opening='gold_dust'] .co-mono {
+  font-size: clamp(56px, 18vw, 110px);
+  background: linear-gradient(100deg, #8a6420, #f6e3a6 34%, #c9962e 55%, #fff4d2 72%, #a77b28);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgb(0 0 0 / 0.35));
+}
+.co.opening .co-motes i {
+  animation: none;
+  opacity: 0;
+  transform: translate(var(--gx), var(--gy)) scale(0.4);
+  transition:
+    transform 1.5s var(--ease-out),
+    opacity 1.2s ease;
+}
+.co.opening[data-opening='gold_dust'] .co-mono {
+  opacity: 0;
+  transform: scale(1.14);
+  transition:
+    transform 1.2s var(--ease-out),
+    opacity 0.8s ease 0.2s;
+}
+.co.opening[data-opening='gold_dust'] .co-veil {
+  opacity: 0;
+  transition: opacity 1.3s ease 0.15s;
+}
+/* the canvas of the openings' light: over the cover and the page, never in the way */
+.fx-sparks {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 56;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .co :is(.co-door, .co-drape, .co-valance, .co-mono, .co-veil, .co-stars i, .co-motes i, .co-scroll svg) {
+    animation: none !important;
+    transition: none !important;
+  }
+  .co-glow,
+  .fx-sparks {
+    display: none;
+  }
+}
+
 /* ============ 4. FLOATING CONTROLS ============ */
 .fab {
   position: fixed;
