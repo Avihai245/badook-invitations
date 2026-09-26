@@ -203,7 +203,7 @@ export const helpEn: typeof helpHe = {
         text: 'Under the preview: the saved draft full screen, to check it as a guest would.',
       },
       versions: {
-        label: 'Versions and saves',
+        label: 'Versions',
         text: 'Every publish is kept, and the draft is saved as you work. See what changed and restore any of them.',
       },
       comments: {
