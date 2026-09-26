@@ -241,7 +241,12 @@ export type Section =
   | Base<'when', { title: L10n | null; showWeekday: boolean; showHebrewDate: boolean; showTime: boolean; countdown: boolean; showCalendar: boolean; note: L10n | null }>
   | Base<'where', { venue: Venue; note: L10n | null }>    // one place told big; counts as a venue (calendar, .ics)
   | Base<'quote', { text: L10n; attribution: L10n | null }>
-  | Base<'custom', { title: L10n | null; subtitle: L10n | null; body: L10n; cta: { label: L10n; url: string } | null }>;  // text over / beside media; no text = a picture band
+  | Base<'custom', { title: L10n | null; subtitle: L10n | null; body: L10n; cta: { label: L10n; url: string } | null }>  // text over / beside media; no text = a picture band
+  // the event's live gallery (feature live_gallery; ≤1, added only while the event has it): before and during the
+  // event (3 h before the start → 6 h after the end, the event's zone) a button — and on wide screens a QR code —
+  // to /e/<slug>/upload keeping the guest's personal link; after it, "see the album". The phase is chosen in the
+  // browser (the ISR HTML is the same for everyone); without a gallery (or the feature) it renders nothing.
+  | Base<'live_gallery', { title: L10n | null; body: L10n | null; afterTitle: L10n | null; afterBody: L10n | null; showQr: boolean }>;
 
 export interface Venue {
   id: string;

@@ -1,11 +1,12 @@
 import 'server-only';
 import { planPrices } from '@/features/billing/server/account';
+import { deploymentFeatures } from '@/features/flags/server';
 import { serverEnv } from '@/lib/env';
 import type { UiLocale } from '@/lib/i18n/app';
 import type { LegalContext } from './types';
 
 /** When the policies were last revised (update with any change to their text). */
-export const LEGAL_UPDATED = '2026-09-26';
+export const LEGAL_UPDATED = '2026-09-27';
 
 /** The operator's details for the policies, from the deployment's settings. */
 export function legalContext(locale: UiLocale): LegalContext {
@@ -34,5 +35,6 @@ export function legalContext(locale: UiLocale): LegalContext {
       year: 'numeric',
       timeZone: 'UTC',
     }).format(new Date(`${LEGAL_UPDATED}T00:00:00Z`)),
+    faceSearch: deploymentFeatures(env).has('face_albums'),
   };
 }

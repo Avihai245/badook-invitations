@@ -139,7 +139,7 @@ export const galleryGuestEn: GalleryGuestDict = {
       title: 'Before you start',
       what: 'To find you, your phone turns the face in your selfie into a series of 128 numbers — a “face code” — and compares it with the face codes of the gallery’s photos.',
       where:
-        'Your selfie never leaves your phone and isn’t kept. Only the face code is sent, once, for the search — and we don’t keep or log it.',
+        'Your selfie never leaves your phone and isn’t kept. Only the face code is sent, once for each search — and we don’t keep or log it. On your phone it stays in this tab until you close it or choose “Forget me”.',
       gallery:
         'To make search possible, the faces in the gallery’s photos become face codes too — with no names and without cutting faces out of photos. All of the event’s face codes are deleted 30 days after the event, or sooner if the hosts turn search off.',
       model: 'The first time, your phone downloads the face recognition tool from our site (about {mb} MB).',

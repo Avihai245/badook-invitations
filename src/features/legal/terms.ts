@@ -47,6 +47,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
                 'Send invitations only to people who know you and expect to hear from you about the event. Before sending on WhatsApp you confirm this; every message lets the recipient block or stop receiving messages.',
                 'Do not use the Service for advertising, spam or any message that is not an invitation to your event, and follow WhatsApp’s policies.',
                 'You are responsible for what you ask your guests and for how you use their replies.',
+                'Turn on face search (“the photos I’m in”) only where it suits your event: each guest who uses it agrees for themselves (the Service asks them), and it must not be used to identify or follow anyone.',
               ],
             },
           ],
@@ -57,6 +58,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
           body: [
             'Texts, photos, videos, songs and links you add remain yours. You give us a limited licence to store, process and display them as needed to provide the Service (for example, to show the invitation to your guests), for as long as they are in the Service.',
             'You confirm you have the rights to everything you upload or link to — including music and videos — and that it does not infringe anyone’s rights or the law, and is not offensive, discriminatory, violent or misleading. We may remove content or suspend an account that breaks these terms or the law, and will usually tell you first.',
+            'The same goes for a highlights film you make of your gallery: the photos and videos in it belong to the guests who took them, and its music — the invitation’s song or one you pick — may carry rights of its own. Share the film only where you may.',
           ],
         },
         {
@@ -181,6 +183,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
               'שלחו הזמנות רק למי שמכיר אתכם ומצפה לשמוע מכם על האירוע. לפני שליחה בוואטסאפ תתבקשו לאשר זאת, ובכל הודעה יש למקבל אפשרות לחסום או להפסיק לקבל הודעות.',
               'אין להשתמש בשירות לפרסום, לספאם או לכל הודעה שאינה הזמנה לאירוע שלכם, ויש לפעול לפי המדיניות של וואטסאפ.',
               'אתם אחראים למה שאתם שואלים את האורחים ולשימוש שאתם עושים בתשובות שלהם.',
+              'הפעילו חיפוש לפי פנים (״התמונות שאני בהן״) רק היכן שהוא מתאים לאירוע שלכם: כל אורח שמשתמש בו מסכים בעצמו (השירות שואל אותו), ואסור להשתמש בו כדי לזהות מישהו או לעקוב אחריו.',
             ],
           },
         ],
@@ -191,6 +194,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
         body: [
           'טקסטים, תמונות, סרטונים, שירים וקישורים שאתם מוסיפים נשארים שלכם. אתם נותנים לנו רישיון מוגבל לשמור, לעבד ולהציג אותם כפי שנחוץ כדי לתת את השירות (למשל, כדי להציג את ההזמנה לאורחים), כל עוד הם בשירות.',
           'אתם מאשרים שיש לכם את הזכויות בכל מה שאתם מעלים או מקשרים אליו, כולל מוזיקה וסרטונים, שהוא אינו פוגע בזכויות של אחרים או בחוק, ואינו פוגעני, מפלה, אלים או מטעה. אנחנו רשאים להסיר תוכן או להשעות חשבון שמפר את התנאים או את החוק, ובדרך כלל נודיע לכם קודם.',
+          'כך גם בסרט רגעים שאתם יוצרים מהגלריה: התמונות והסרטונים שבו שייכים לאורחים שצילמו אותם, ולמוזיקה שלו — השיר של ההזמנה או שיר שבחרתם — עשויות להיות זכויות משלה. שתפו את הסרט רק היכן שמותר לכם.',
         ],
       },
       {
