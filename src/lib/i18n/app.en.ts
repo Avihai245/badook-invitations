@@ -422,6 +422,7 @@ export const en: AppDict = {
     playPreview: 'Play the {name} preview',
     noResults: 'No designs for this event type yet.',
     premium: 'Premium',
+    unlisted: 'Not in the public gallery',
     preview: {
       title: '{name}',
       palettes: 'Colors',

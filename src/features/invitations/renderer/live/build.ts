@@ -1,7 +1,7 @@
 import type { InvitationDocument, Locale, TemplateManifest } from '../../contracts/types';
 import { pageTitle } from '../calendar-event';
 import { buildRenderContext, type RenderOptions } from '../context';
-import { themeVars } from '../theme';
+import { themedDoc, themeVars } from '../theme';
 import type { LivePayload } from './payload';
 
 /**
@@ -20,7 +20,7 @@ export function buildLivePayload(
     const ctx = buildRenderContext(doc, template, locale, { ...options, mode: 'live' });
     locales[locale] = {
       hebrewDate: ctx.hebrewDate,
-      vars: themeVars(template, doc, locale),
+      vars: themeVars(template, themedDoc(doc, options.cinematic ?? true), locale),
       title: pageTitle(ctx),
       ...links(locale),
       labels: { switch: ctx.t('locale.switch'), play: ctx.t('music.play'), pause: ctx.t('music.pause') },

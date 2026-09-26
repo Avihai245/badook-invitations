@@ -15,7 +15,7 @@ import type { BurstKind } from '../fx/theme';
 import type { CoverMedia } from './media';
 import { Monogram } from './Monogram';
 import type { Opening } from './opening';
-import { CinematicCover } from './Openings.client';
+import { CinematicCover, type CoverBackdrop } from './Openings.client';
 import { announceOpen, reducedMotion, useOpening, type Phase, type PhaseProps } from './phase';
 import { SealArt, TagArt, TicketArt } from './SealArt';
 
@@ -41,6 +41,8 @@ export interface CoverOverlayProps {
   opening?: Opening | null;
   /** its "scroll to enter" cue */
   scrollLabel?: string;
+  /** a photo-led opening's picture: the hero's still (Openings.client.tsx) */
+  backdrop?: CoverBackdrop | null;
 }
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;

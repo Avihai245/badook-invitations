@@ -17,6 +17,21 @@ export interface CinematicCoverProps extends PhaseProps {
   scrollLabel?: string;
   /** the template's burst colors (renderer/fx/theme.ts): the fireworks' */
   fx?: { colors: string[] } | null;
+  /**
+   * A photo-led opening (`opening.backdrop`): the hero's picture under the night sky or the veil —
+   * the same image set as the hero's, so the page fetches it once and the hand-off is seamless.
+   */
+  backdrop?: CoverBackdrop | null;
+}
+
+/** The hero's still as the cover shows it (renderer/images.ts imageSet at 100vw + its focal point). */
+export interface CoverBackdrop {
+  src: string;
+  srcSet?: string;
+  sizes?: string;
+  fallback?: string;
+  /** CSS object-position */
+  position: string;
 }
 
 /** How far a wheel / a swipe goes before the doors or the curtain open by themselves. */
@@ -40,6 +55,7 @@ export function CinematicCover({
   skipLabel,
   scrollLabel,
   fx,
+  backdrop = null,
   phase,
   setPhase,
   showSkip,
@@ -48,6 +64,7 @@ export function CinematicCover({
 }: CinematicCoverProps) {
   const root = useRef<HTMLDivElement>(null);
   const { preset } = opening;
+  const photo = opening.backdrop ? backdrop : null;
 
   const open = useOpening((skip: boolean) => {
     announceOpen();
@@ -222,6 +239,7 @@ export function CinematicCover({
       data-opening={preset}
       data-motion={opening.motion ?? undefined}
       data-scroll={opening.scroll ? '' : undefined}
+      data-backdrop={photo ? '' : undefined}
       style={style}
     >
       <button
@@ -236,6 +254,24 @@ export function CinematicCover({
           }
         }}
       >
+        {photo ? (
+          // the invitation's first picture, at the scale the hero's settle starts from (invitation.css)
+          <img
+            className="co-photo"
+            src={photo.src}
+            srcSet={photo.srcSet}
+            sizes={photo.sizes}
+            data-fallback={photo.fallback}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
+            draggable={false}
+            style={{ objectPosition: photo.position }}
+            // the error fallback (images.ts) may swap it for the original before React hydrates
+            suppressHydrationWarning
+          />
+        ) : null}
         {art}
         <span className="cover-hint" aria-hidden="true">
           {hint}

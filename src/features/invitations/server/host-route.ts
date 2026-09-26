@@ -1,10 +1,11 @@
 import 'server-only';
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
-import { entitlementsFor } from '@/features/billing/server/account';
+import { entitlementsFor, isAdminEmail } from '@/features/billing/server/account';
 import { invitationsEnabled } from '@/lib/feature';
 import { getSessionUser } from '@/lib/supabase/session';
 import { getTemplate } from '../templates/registry';
+import { cinematicFor } from './cinematic';
 import type { ApiResult, HostDeps } from './host-api';
 import { hostDb } from './host-db';
 
@@ -53,7 +54,12 @@ export async function hostRoute(
   try {
     // the plan's limits, read only by the handlers that need them
     let entitlements: ReturnType<typeof entitlementsFor> | null = null;
-    const deps: HostDeps = { ...hostDeps, entitlements: () => (entitlements ??= entitlementsFor(user)) };
+    const deps: HostDeps = {
+      ...hostDeps,
+      entitlements: () => (entitlements ??= entitlementsFor(user)),
+      cinematic: cinematicFor,
+      admin: isAdminEmail(user.email),
+    };
     const result = await handler(user.id, body, deps);
     return json(result.status, result.body);
   } catch (err) {

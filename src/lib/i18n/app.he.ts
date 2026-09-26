@@ -411,6 +411,8 @@ export const he = {
     playPreview: 'הצגת התצוגה המקדימה של {name}',
     noResults: 'אין עיצובים לסוג האירוע הזה עדיין.',
     premium: 'פרימיום',
+    /** an unlisted design, shown to the platform's admins only */
+    unlisted: 'לא בגלריה הציבורית',
     preview: {
       title: '{name}',
       palettes: 'צבעים',
