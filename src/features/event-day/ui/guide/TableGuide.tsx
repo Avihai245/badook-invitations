@@ -4,8 +4,8 @@ import { CircleCheck, Globe, WifiOff } from 'lucide-react';
 import { useState, type CSSProperties } from 'react';
 import type { Locale } from '@/features/invitations/contracts/types';
 import { nativeName } from '@/features/invitations/lib/locales';
-import { isolate } from '../../messages';
 import type { GuidePageData } from '../../server/pages';
+import { withName } from '../named';
 import { fill, GuideTextProvider, useGuideText } from '../guest-text';
 import { GuideMap } from './GuideMap';
 import { useOfflineSave } from './useOfflineSave';
@@ -111,7 +111,7 @@ function GuideBody({
         </header>
 
         <p className="mt-4 text-[17px] font-semibold">
-          <bdi>{fill(g.hello, { name: isolate(data.guestName) })}</bdi>
+          {withName((name) => fill(g.hello, { name }), data.guestName)}
         </p>
 
         {data.state === 'seated' && data.table ? (

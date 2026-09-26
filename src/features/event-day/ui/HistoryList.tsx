@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Badge, Button, Checkbox, Dialog, Hint, useToast } from '@/components/app';
 import { loginUrl } from '@/features/invitations/app/api';
 import { useUi } from '@/lib/i18n/client';
-import { isolate } from '../messages';
 import type { SeatingChange, Told } from '../model';
 import type { NotifyOutcome } from '../server/host-api';
 import { dayApi } from './host-api';
@@ -22,10 +21,10 @@ export function describeChange(
   const moved = c.units.filter((u) => (u.from?.id ?? null) !== (u.to?.id ?? null));
   const unitLine = (u: SeatingChange['units'][number]) =>
     !u.to
-      ? fmt(h.unseated, { name: isolate(u.name), from: u.from?.number ?? '' })
+      ? fmt(h.unseated, { name: u.name, from: u.from?.number ?? '' })
       : !u.from
-        ? fmt(h.seated, { name: isolate(u.name), to: u.to.number })
-        : plural(h.move, 1, { name: isolate(u.name), from: u.from.number, to: u.to.number });
+        ? fmt(h.seated, { name: u.name, to: u.to.number })
+        : plural(h.move, 1, { name: u.name, from: u.from.number, to: u.to.number });
   const lines = [
     ...moved.map(unitLine),
     ...c.tables.map((tb) => fmt(h.renumber, { from: tb.from, to: tb.to })),

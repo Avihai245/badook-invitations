@@ -8,9 +8,9 @@ import type { RealtimeInfo } from '@/lib/live/types';
 import { codeFromScan } from '../../codes';
 import { EVENT_DAY } from '../../config';
 import { knownZone } from '../../live';
-import { isolate } from '../../messages';
 import type { Party, RecentCheckin, Totals } from '../../model';
 import type { StationPageData } from '../../server/pages';
+import { withName } from '../named';
 import { DayTextProvider, fill, useDayText, type StaffLocale } from '../guest-text';
 import { stationApi, type ArriveAnswer, type PartyAnswer, type StationState } from './api';
 import { startScanner, type Scanner, type ScanError } from './scanner';
@@ -416,7 +416,10 @@ function StationBody({
                       <bdi>{r.name}</bdi> <span className="font-normal text-muted">· {number(r.count)}</span>
                     </span>
                     <span className="block text-[12px] text-muted">
-                      {fill(s.at, { time: timeOf(r.at), station: isolate(stationLabel(r.station)) })}
+                      {withName(
+                        (station) => fill(s.at, { time: timeOf(r.at), station }),
+                        stationLabel(r.station),
+                      )}
                     </span>
                   </span>
                   <button

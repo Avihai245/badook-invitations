@@ -583,7 +583,9 @@ test.describe('seven languages', () => {
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
     await expect(page.getByTestId('guide-table')).toContainText(GUIDE_TEXT.ru.guide.yourTable);
     await expect(page.getByTestId('guide-table-number')).toHaveText('12');
+    // their name kept whole in any script
     await expect(page.getByText('Здравствуйте, Семья Ивановых')).toBeVisible();
+    await expect(page.locator('bdi', { hasText: 'Семья Ивановых' })).toHaveCount(1);
     await page.goto(`/e/${slug}/table?g=${haddad!.token}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');

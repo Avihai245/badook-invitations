@@ -1,6 +1,8 @@
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import type { NoticeRow, SeatingChange } from '@/features/event-day/model';
 import { describeChange } from '@/features/event-day/ui/HistoryList';
+import { withName } from '@/features/event-day/ui/named';
 import { noticeState } from '@/features/event-day/ui/NoticesDialog';
 import { movedIds } from '@/features/event-day/ui/useNotifyOutcome';
 import { dictFor, fmt, plural } from '@/lib/i18n/app';
@@ -82,36 +84,36 @@ const unit = (name: string, from: number | null, to: number | null, id = name) =
   to: to === null ? null : { id: `t${to}`, number: to },
 });
 
+describe('a family’s name in a sentence', () => {
+  it('stays whole in any script (a <bdi>), and the sentence’s text is the plain one', () => {
+    const moved = (name: string) => fmt('{name} עברו לשולחן {number}', { name, number: 7 });
+    expect(renderToStaticMarkup(withName(moved, 'Семья Ивановых'))).toBe(
+      '<bdi>Семья Ивановых</bdi> עברו לשולחן 7',
+    );
+    expect(renderToStaticMarkup(withName((name) => fmt('Move {name}?', { name }), 'عائلة حداد'))).toBe(
+      'Move <bdi>عائلة حداد</bdi>?',
+    );
+    // no name in the sentence: the sentence itself
+    expect(withName(() => 'Moved', 'x')).toBe('Moved');
+  });
+});
+
 describe('the history of changes, in words', () => {
   const say = (c: SeatingChange) => describeChange(c, ui as unknown as Ui);
-  // a family's name is isolated (FSI…PDI): in any script, it never takes the numbers after it along
-  const iso = (name: string) => `\u2068${name}\u2069`;
 
   it('a family moved, seated, or left without a table', () => {
     expect(say(change({ units: [unit('משפחת לוי', 12, 7)] }))).toEqual({
-      head: `${iso('משפחת לוי')}: משולחן 12 לשולחן 7`,
+      head: 'משפחת לוי: משולחן 12 לשולחן 7',
       lines: [],
     });
-    expect(say(change({ units: [unit('משפחת לוי', null, 7)] })).head).toBe(`${iso('משפחת לוי')}: לשולחן 7`);
-    expect(say(change({ units: [unit('משפחת לוי', 12, null)] })).head).toBe(
-      `${iso('משפחת לוי')}: משולחן 12 בלי שולחן`,
-    );
-    // a Latin or an Arabic name in the Hebrew sentence stays whole
-    expect(say(change({ units: [unit('Emma Stone 2', 12, 7)] })).head).toBe(
-      `${iso('Emma Stone 2')}: משולחן 12 לשולחן 7`,
-    );
-    expect(say(change({ units: [unit('عائلة حداد', 12, 7)] })).head).toBe(
-      `${iso('عائلة حداد')}: משולחן 12 לשולחן 7`,
-    );
+    expect(say(change({ units: [unit('משפחת לוי', null, 7)] })).head).toBe('משפחת לוי: לשולחן 7');
+    expect(say(change({ units: [unit('משפחת לוי', 12, null)] })).head).toBe('משפחת לוי: משולחן 12 בלי שולחן');
   });
 
   it('several families: how many, and each one', () => {
     const d = say(change({ units: [unit('משפחת לוי', 12, 7), unit('משפחת כהן', 12, 3)] }));
     expect(d.head).toBe('2 משפחות הועברו');
-    expect(d.lines).toEqual([
-      `${iso('משפחת לוי')}: משולחן 12 לשולחן 7`,
-      `${iso('משפחת כהן')}: משולחן 12 לשולחן 3`,
-    ]);
+    expect(d.lines).toEqual(['משפחת לוי: משולחן 12 לשולחן 7', 'משפחת כהן: משולחן 12 לשולחן 3']);
   });
 
   it('a merge names the two tables; undoing it is the families going back', () => {

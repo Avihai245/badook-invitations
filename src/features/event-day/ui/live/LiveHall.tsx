@@ -20,7 +20,6 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { isolate } from '../../messages';
 import {
   AreaHelp,
   Badge,
@@ -52,6 +51,7 @@ import {
 import type { Party, SeatingChange, Totals } from '../../model';
 import type { DayView, NotifyOutcome } from '../../server/host-api';
 import { HistoryList } from '../HistoryList';
+import { withName } from '../named';
 import { dayApi, type ReseatAnswer } from '../host-api';
 import { NoticesDialog } from '../NoticesDialog';
 import { useNotifyOutcome } from '../useNotifyOutcome';
@@ -195,7 +195,7 @@ export function LiveHall({ initial, planBase }: { initial: DayView; planBase: st
     patch(body.party, body.totals);
     toast({
       variant: 'success',
-      title: fmt(E.arrive.done, { name: isolate(party.name) }),
+      title: withName((name) => fmt(E.arrive.done, { name }), party.name),
       action: {
         label: E.recent.undo,
         altText: E.recent.undoHint,
@@ -241,10 +241,10 @@ export function LiveHall({ initial, planBase }: { initial: DayView; planBase: st
     const title =
       a?.kind === 'merge'
         ? fmt(E.merge.done, { from: a.from.table.number, into: first?.to?.number ?? '' })
-        : fmt(E.move.done, {
-            name: isolate(a?.kind === 'move' ? a.party.name : (first?.name ?? '')),
-            number: first?.to?.number ?? '',
-          });
+        : withName(
+            (name) => fmt(E.move.done, { name, number: first?.to?.number ?? '' }),
+            a?.kind === 'move' ? a.party.name : (first?.name ?? ''),
+          );
     toast({
       variant: 'success',
       title,

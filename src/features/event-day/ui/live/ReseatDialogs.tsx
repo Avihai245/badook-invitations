@@ -6,10 +6,10 @@ import { Button, Checkbox, Dialog, Field, IconButton, Input, cn } from '@/compon
 import { loginUrl } from '@/features/invitations/app/api';
 import { useUi } from '@/lib/i18n/client';
 import { EVENT_DAY } from '../../config';
-import { isolate } from '../../messages';
 import { fits, liveSeats, type TableFill } from '../../live';
 import type { Party, Told } from '../../model';
 import { dayApi, type ReseatAnswer } from '../host-api';
+import { withName } from '../named';
 
 /** What a family's move or a table's merge needs from the screen around it. */
 export interface ReseatContext {
@@ -44,7 +44,7 @@ export function ArriveDialog({
     <Dialog
       open
       onOpenChange={(o) => !o && onClose()}
-      title={fmt(a.title, { name: isolate(party.name) })}
+      title={withName((name) => fmt(a.title, { name }), party.name)}
       description={
         party.seats
           ? fmt(t.eventDay.sheet.arrived, { arrived: number(party.arrived), seats: number(party.seats) })
@@ -283,7 +283,7 @@ export function MoveDialog({
     <Dialog
       open
       onOpenChange={(o) => !o && onClose()}
-      title={fmt(m.title, { name: isolate(party.name) })}
+      title={withName((name) => fmt(m.title, { name }), party.name)}
       description={m.body}
       closeLabel={t.common.close}
       className="max-w-[620px]"
