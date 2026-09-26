@@ -51,7 +51,8 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
       labels: calendarLabels(ctx),
       links: calendarLinks(ctx, firstVenue(ctx)),
     },
-    submitMode: ctx.mode === 'live' && ctx.icsViaRoute ? 'api' : 'simulate',
+    // the review link's draft sends nothing (and says so)
+    submitMode: ctx.review ? 'review' : ctx.mode === 'live' && ctx.icsViaRoute ? 'api' : 'simulate',
     celebrate: (() => {
       const fx = fxTheme(ctx.template, doc);
       return fx.burst ? { kind: fx.burst, colors: fx.burstColors } : null;

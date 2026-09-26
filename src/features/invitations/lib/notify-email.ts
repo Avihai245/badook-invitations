@@ -142,3 +142,6 @@ export function digestEmail(opts: {
     ].join('\n'),
   };
 }
+
+/** The emails' frame and escaping, for the other host emails (the draft review's). */
+export { layout as emailLayout, escape as escapeHtml };

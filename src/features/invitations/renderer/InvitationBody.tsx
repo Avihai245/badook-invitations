@@ -194,7 +194,8 @@ export function InvitationBody({
         )}
         <ScrollEngine />
         <FitNames />
-        {ctx.mode === 'live' ? <GuestLink slug={doc.share.slug} /> : null}
+        {/* a guest's personal link — never on the review link's draft (nobody is identified there) */}
+        {ctx.mode === 'live' && !ctx.review ? <GuestLink slug={doc.share.slug} /> : null}
       </Suspense>
     </div>
   );

@@ -61,6 +61,11 @@ export interface RenderContext {
    * v2 section types as plain sections).
    */
   cinematic: boolean;
+  /**
+   * The draft on the family's review link (features/review): its sections carry their paths (the
+   * comment pins find them), the RSVP form sends nothing, and nobody is identified or counted.
+   */
+  review: boolean;
 }
 
 export interface RenderOptions {
@@ -77,6 +82,8 @@ export interface RenderOptions {
   followUp?: { slug: string; locales: Locale[] } | null;
   /** the event has the `cinematic` feature (default true: the public page asks features/flags) */
   cinematic?: boolean;
+  /** the draft on the family's review link (see RenderContext.review) */
+  review?: boolean;
 }
 
 /**
@@ -131,5 +138,6 @@ export function createRenderContext(
         }
       : null,
     cinematic: options.cinematic ?? true,
+    review: options.review ?? false,
   };
 }

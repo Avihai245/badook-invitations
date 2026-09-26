@@ -5,6 +5,7 @@ import { processNoticeQueue } from '@/features/event-day/server/notify';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
+import { studioHousekeeping } from '@/features/review/server/housekeeping';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { processQueue } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
@@ -21,7 +22,8 @@ export type JobName = 'daily' | 'whatsapp';
 
 /**
  * The daily run: the hosts' RSVP summaries, the purge, the billing checks, the templates sync, the
- * live gallery's housekeeping and the event day's (arrivals past their keeping time).
+ * live gallery's housekeeping, the event day's (arrivals past their keeping time) and the studio's
+ * (old saves of drafts, review comments past their time, the review summaries).
  */
 export async function runDaily(now: Date) {
   const digests = await sendDigests(now);
@@ -40,7 +42,11 @@ export async function runDaily(now: Date) {
   const eventDay = await eventDayHousekeeping().catch(
     (err) => (console.error('event day housekeeping failed', err), null),
   );
-  return { ...digests, purged: (purged as number | null) ?? null, overdue, seed, gallery, eventDay };
+  // the studio's: the draft's old saves, review comments past their time, the review summaries
+  const studio = await studioHousekeeping().catch(
+    (err) => (console.error('studio housekeeping failed', err), null),
+  );
+  return { ...digests, purged: (purged as number | null) ?? null, overdue, seed, gallery, eventDay, studio };
 }
 
 /**

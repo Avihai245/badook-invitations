@@ -280,6 +280,18 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     use: Check,
     again: RotateCcw,
   },
+  review: {
+    create: Link2,
+    share: Copy,
+    expiry: CalendarClock,
+    rotate: RotateCcw,
+    revoke: Ban,
+    notify: Bell,
+    pins: MessageSquareText,
+    reply: MessageCircle,
+    handled: CircleCheck,
+    remove: Trash2,
+  },
   history: {
     filter: ListFilter,
     entry: History,
