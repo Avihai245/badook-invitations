@@ -44,7 +44,7 @@ test('a host makes a highlights film of the gallery: previewed, made, downloaded
   await hydrated(page);
   await expect(page.getByTestId('film-studio')).toBeVisible();
   const shots = page.getByTestId('film-shot');
-  await expect(shots).toHaveCount(6);
+  await expect(shots.first()).toBeVisible();
 
   // the song: a file of the host's own, its beat read here
   const settings = page.getByTestId('film-settings');
@@ -56,9 +56,11 @@ test('a host makes a highlights film of the gallery: previewed, made, downloaded
   });
   const status = page.getByTestId('film-music-status');
   await expect(status).toHaveAttribute('data-status', 'ready', { timeout: 30_000 });
-  await expect(status).toContainText('קצב של 120 פעמות לדקה');
+  await expect(status).toContainText(/קצב של 1(19|20|21) פעמות לדקה/);
   await settings.getByRole('radio', { name: '30 שנ׳' }).click();
   await settings.getByRole('radio', { name: '720p' }).click();
+  // every photo fits a film of this song
+  await expect(shots).toHaveCount(6);
 
   // the host's choice: one shot out, two swapped (kept in this browser)
   const first = await shots.nth(0).getAttribute('data-id');

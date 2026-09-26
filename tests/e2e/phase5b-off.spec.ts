@@ -78,9 +78,11 @@ test('without the package the film and face search are offered, not given; their
   expect(hostFaces).toMatchObject({ status: 403, body: { code: 'feature_off', reason: 'plan' } });
   await phone.close();
 
-  // VIP, but the host hasn't turned face search on: still nothing for guests
-  const vip = await newHost(page, 'off-vip', 'business');
-  const vipLink = await galleryOn(page, vip.id);
+  // VIP, but the host hasn't turned face search on: still nothing for guests (another host: their own browser)
+  const vipContext = await browser.newContext();
+  const vipPage = await vipContext.newPage();
+  const vip = await newHost(vipPage, 'off-vip', 'business');
+  const vipLink = await galleryOn(vipPage, vip.id);
   const phone2 = await browser.newContext(PHONE);
   const guest2 = await phone2.newPage();
   await guest2.goto(vipLink);
@@ -95,18 +97,19 @@ test('without the package the film and face search are offered, not given; their
   await phone2.close();
   // the host switches the film off: the studio offers it back, its API refuses
   expect(
-    (await api(page, `/api/invitations/${vip.id}/features`, 'PATCH', { feature: 'auto_reel', off: true }))
+    (await api(vipPage, `/api/invitations/${vip.id}/features`, 'PATCH', { feature: 'auto_reel', off: true }))
       .status,
   ).toBe(200);
-  await open(page, `/app/invitations/${vip.id}/gallery/film`);
-  await expect(page.getByTestId('film-turn-on')).toBeVisible();
+  await open(vipPage, `/app/invitations/${vip.id}/gallery/film`);
+  await expect(vipPage.getByTestId('film-turn-on')).toBeVisible();
   expect(
-    await api(page, `/api/invitations/${vip.id}/gallery/film`, 'POST', {
+    await api(vipPage, `/api/invitations/${vip.id}/gallery/film`, 'POST', {
       step: 'done',
       id: randomUUID(),
       show: true,
     }),
   ).toMatchObject({ status: 403, body: { code: 'feature_off', reason: 'switched_off' } });
+  await vipContext.close();
 });
 
 test('without the gallery the section isn’t in the catalog and a draft can’t bring one; without insights nothing is measured', async ({
@@ -119,8 +122,9 @@ test('without the gallery the section isn’t in the catalog and a draft can’t
   const frame = page.frameLocator('iframe[title="תצוגה מקדימה של ההזמנה"]');
   await expect(frame.locator('h1.names')).toContainText('נועה', { timeout: 30_000 });
   await page.getByRole('button', { name: 'הוספת סקשן' }).click();
-  await expect(page.getByRole('button', { name: /^טקסט ותמונה/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /^גלריית האורחים/ })).toHaveCount(0);
+  const catalog = page.getByRole('dialog', { name: 'איזה סקשן להוסיף?' });
+  await expect(catalog.getByRole('button', { name: /^טקסט ותמונה/ })).toBeVisible();
+  await expect(catalog.getByRole('button', { name: /^גלריית האורחים/ })).toHaveCount(0);
   await page.keyboard.press('Escape');
   // the server refuses a draft that brings one (the stored draft comes back with a stale save's 409)
   const probe = JSON.parse(readFileSync('docs/invitations/fixtures/example-wedding-he-en.json', 'utf8'));

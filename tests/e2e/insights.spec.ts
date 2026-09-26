@@ -60,11 +60,18 @@ test('a guest’s visit is counted once in the funnel, without cookies; a “do 
 
   // the guest, from their personal link
   const phone = await browser.newContext(PHONE);
-  const guest = await phone.newPage();
-  const beacons: string[] = [];
-  guest.on('request', (r) => {
-    if (new URL(r.url()).pathname === '/api/insights') beacons.push(r.postData() ?? '');
+  // what each beacon carries, as the page hands it to the browser
+  await phone.addInitScript(() => {
+    const send = navigator.sendBeacon.bind(navigator);
+    const kept: string[] = [];
+    (window as unknown as { __beacons: string[] }).__beacons = kept;
+    navigator.sendBeacon = (url: string | URL, data?: BodyInit | null) => {
+      if (String(url).includes('/api/insights') && data instanceof Blob)
+        void data.text().then((t) => kept.push(t));
+      return send(url, data);
+    };
   });
+  const guest = await phone.newPage();
   await guest.goto(`/i/${host.slug}/he?g=${token}`);
   await guest.locator('.cover-tap').click();
   await expect(guest.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
@@ -101,6 +108,7 @@ test('a guest’s visit is counted once in the funnel, without cookies; a “do 
       by_device: { phone: { visits: 1, sent: 1 } },
     });
   // what went: the page load's state only — no address, no browser, no name
+  const beacons = await guest.evaluate(() => (window as unknown as { __beacons: string[] }).__beacons);
   expect(beacons.length).toBeGreaterThan(0);
   const last = JSON.parse(beacons.at(-1)!) as Record<string, unknown>;
   expect(Object.keys(last).sort()).toEqual(BEACON_KEYS);

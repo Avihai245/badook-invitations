@@ -32,13 +32,15 @@ test('the gallery section: added once from the catalog, then before, during and 
   await open(page, `/app/invitations/${host.id}/edit`);
   const frame = page.frameLocator('iframe[title="תצוגה מקדימה של ההזמנה"]');
   await expect(frame.locator('h1.names')).toContainText('נועה', { timeout: 30_000 });
+  const catalog = page.getByRole('dialog', { name: 'איזה סקשן להוסיף?' });
   await page.getByRole('button', { name: 'הוספת סקשן' }).click();
-  await page.getByRole('button', { name: /^גלריית האורחים/ }).click();
+  await catalog.getByRole('button', { name: /^גלריית האורחים/ }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'גלריית האורחים' })).toBeVisible();
   await expect(frame.locator('.lg-card')).toBeVisible();
   await saved(page);
   await page.getByRole('button', { name: 'הוספת סקשן' }).click();
-  await expect(page.getByRole('button', { name: /^גלריית האורחים/ })).toHaveCount(0);
+  await expect(catalog.getByRole('button', { name: /^טקסט ותמונה/ })).toBeVisible();
+  await expect(catalog.getByRole('button', { name: /^גלריית האורחים/ })).toHaveCount(0);
   await page.keyboard.press('Escape');
   const [stored] = await sql<{ n: number }>(
     `select count(*)::int as n from invitations i, jsonb_array_elements(i.draft->'sections') s
@@ -72,7 +74,7 @@ test('the gallery section: added once from the catalog, then before, during and 
   // before (now: the event is next June)
   const before = await at(null);
   await expect(before.card).toHaveAttribute('data-phase', 'before');
-  await expect(before.card.locator('h2')).toHaveText('התמונות שלכם מהאירוע');
+  await expect(before.card.locator('h2')).toHaveText('צלמו ושתפו');
   const cta = before.card.locator('a.lg-cta');
   await expect(cta).toHaveText('לגלריה של האירוע');
   const href = new URL((await cta.getAttribute('href'))!, 'http://x');
@@ -95,7 +97,7 @@ test('the gallery section: added once from the catalog, then before, during and 
   // after: the album — and on a computer, its QR code
   const after = await at('2027-06-20T09:00:00Z', 1280);
   await expect(after.card).toHaveAttribute('data-phase', 'after');
-  await expect(after.card.locator('h2')).toHaveText('האלבום מוכן');
+  await expect(after.card.locator('h2')).toHaveText('האלבום מהאירוע');
   await expect(after.card.locator('a.lg-cta')).toHaveText('לאלבום');
   await expect(after.card.locator('.lg-qr svg')).toBeVisible({ timeout: 10_000 });
   await expect(after.card.locator('.lg-qr figcaption')).toHaveText('סרקו כדי לראות בטלפון');
