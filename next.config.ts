@@ -112,6 +112,12 @@ const nextConfig: NextConfig = {
         source: '/fonts/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
+      {
+        // The face search's model (scripts/copy-face-models.mjs), versioned by path the same way: a
+        // phone downloads it once, when someone first uses "the photos I'm in".
+        source: '/face-models/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
     ];
   },
 };
