@@ -43,9 +43,18 @@ export function PreviewFrame({
    * "Open in a new tab": a saved draft (or published version) rendered full-page like the public
    * invitation — cover included, the language switch as links — instead of waiting for the editor.
    */
-  standalone?: { doc: InvitationDocument; locale: Locale; langHref: string | null } | null;
+  standalone?: {
+    doc: InvitationDocument;
+    locale: Locale;
+    langHref: string | null;
+    cinematic?: boolean;
+  } | null;
 }) {
-  const [state, setState] = useState<{ doc: InvitationDocument; locale: Locale } | null>(standalone);
+  const [state, setState] = useState<{
+    doc: InvitationDocument;
+    locale: Locale;
+    cinematic?: boolean;
+  } | null>(standalone);
   const [replay, setReplay] = useState(0);
   const highlight = useRef<{ path: string | null; label?: string }>({ path: null });
 
@@ -102,7 +111,8 @@ export function PreviewFrame({
           : null;
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         el?.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
-      } else if (msg.type === 'doc') setState({ doc: msg.doc, locale: msg.locale });
+      } else if (msg.type === 'doc')
+        setState({ doc: msg.doc, locale: msg.locale, cinematic: msg.cinematic ?? true });
       else if (msg.type === 'highlight') {
         highlight.current = { path: msg.path, label: msg.label };
         applyHighlight(true);
@@ -160,6 +170,7 @@ export function PreviewFrame({
             brand,
             bases,
             publicBaseUrl,
+            cinematic: state.cinematic ?? true,
           })
         : null,
     [state, template, replay, brand, bases, publicBaseUrl],
@@ -221,6 +232,7 @@ function StandalonePreview({
   doc,
   locale,
   langHref,
+  cinematic = true,
   template,
   brand,
   bases,
@@ -229,14 +241,15 @@ function StandalonePreview({
   doc: InvitationDocument;
   locale: Locale;
   langHref: string | null;
+  cinematic?: boolean;
   template: TemplateManifest;
   brand: string;
   bases: AssetBases;
   publicBaseUrl: string;
 }) {
   const ctx = useMemo(
-    () => buildRenderContext(doc, template, locale, { mode: 'live', brand, bases, publicBaseUrl }),
-    [doc, template, locale, brand, bases, publicBaseUrl],
+    () => buildRenderContext(doc, template, locale, { mode: 'live', brand, bases, publicBaseUrl, cinematic }),
+    [doc, template, locale, brand, bases, publicBaseUrl, cinematic],
   );
   useLayoutEffect(() => {
     const root = document.documentElement;

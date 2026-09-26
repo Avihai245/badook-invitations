@@ -1,0 +1,60 @@
+# The invitations' performance budget (scripts/perf-templates.ts): every template's demo and the
+# cinematic showcase on a phone with 4G network throttling and a 4x slower CPU — LCP < 2.5 s,
+# CLS < 0.1, a scroll at ≥ 55 fps. Run by hand, or on pull requests that change how invitations
+# render. The report (JSON + Markdown) is kept as the run's artifact. A runner is slower than a laptop:
+# a page that misses a budget is measured twice before it fails the run.
+name: Invitation performance budget
+
+on:
+  workflow_dispatch:
+    inputs:
+      templates:
+        description: Template ids, comma-separated (empty = all)
+        required: false
+        default: ''
+      docs:
+        description: Pages per template (demo, cinematic)
+        required: false
+        default: demo,cinematic
+  pull_request:
+    paths:
+      - src/features/invitations/renderer/**
+      - src/features/invitations/sections/**
+      - src/features/invitations/ui/**
+      - src/features/invitations/templates/**
+      - src/features/invitations/contracts/**
+      - scripts/perf-templates.ts
+
+permissions:
+  contents: read
+
+concurrency:
+  group: perf-templates-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  perf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Measure every template
+        env:
+          TEMPLATES: ${{ inputs.templates }}
+          DOCS: ${{ inputs.docs || 'demo,cinematic' }}
+        run: npm run perf:templates -- --tpl "$TEMPLATES" --docs "$DOCS"
+      - name: Summary
+        if: always()
+        run: cat test-results/perf/templates.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf-templates
+          path: test-results/perf/

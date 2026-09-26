@@ -14,6 +14,9 @@ import { burstFrom } from '../fx/burst';
 import type { BurstKind } from '../fx/theme';
 import type { CoverMedia } from './media';
 import { Monogram } from './Monogram';
+import type { Opening } from './opening';
+import { CinematicCover } from './Openings.client';
+import { announceOpen, reducedMotion, useOpening, type Phase, type PhaseProps } from './phase';
 import { SealArt, TagArt, TicketArt } from './SealArt';
 
 type Overlay = TemplateManifest['cover']['overlay'];
@@ -34,12 +37,13 @@ export interface CoverOverlayProps {
   card?: ReactNode;
   /** the template's opening burst (renderer/fx/theme.ts) — null: none */
   fx?: { burst: BurstKind | null; colors: string[] } | null;
+  /** a cinematic opening (gate, curtain, fireworks, gold dust — cover/opening.ts) instead of the style's own */
+  opening?: Opening | null;
+  /** its "scroll to enter" cue */
+  scrollLabel?: string;
 }
 
-type Phase = 'idle' | 'opening' | 'gone' | 'removed';
-
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
-const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 /** landscape screens get the desktop pair, or the 9:16 media over a blurred copy of itself */
 const WIDE = '(min-width: 1024px) and (min-aspect-ratio: 1/1)';
 
@@ -107,6 +111,18 @@ export function CoverOverlay(props: CoverOverlayProps) {
   }, []);
 
   if (phase === 'removed') return null;
+  if (props.opening)
+    return (
+      <CinematicCover
+        {...props}
+        opening={props.opening}
+        phase={phase}
+        setPhase={setPhase}
+        showSkip={showSkip}
+        finish={finish}
+        later={later}
+      />
+    );
   return videoCover ? (
     <VideoCover
       {...props}
@@ -126,39 +142,6 @@ export function CoverOverlay(props: CoverOverlayProps) {
       later={later}
     />
   );
-}
-
-interface PhaseProps {
-  phase: Phase;
-  setPhase: (p: Phase) => void;
-  showSkip: boolean;
-  finish: (fadeMs: number) => void;
-  later: (fn: () => void, ms: number) => void;
-}
-
-/** Everything the gesture must start synchronously (iOS): the music listens to this event. */
-const announceOpen = () => window.dispatchEvent(new CustomEvent('invitation:open'));
-
-/**
- * Opening happens once: `open` runs at most one time (a tap, the Skip button, or a tap that came
- * before React took over — InvitationBody's early-tap script leaves `data-pending-open` for that).
- */
-function useOpening(open: (skip: boolean) => void): (skip: boolean) => void {
-  const began = useRef(false);
-  const once = useCallback(
-    (skip: boolean) => {
-      if (began.current) return;
-      began.current = true;
-      delete document.documentElement.dataset.pendingOpen;
-      open(skip);
-    },
-    [open],
-  );
-  useEffect(() => {
-    const pending = document.documentElement.dataset.pendingOpen;
-    if (pending) once(pending === 'skip');
-  }, [once]);
-  return once;
 }
 
 // ─── video-first ──────────────────────────────────────────────────────────────────────────────

@@ -8,13 +8,19 @@
 /* ============ 1. TOKENS ============
    Set inline on <html>: --inv-bg --inv-surface --inv-ink --inv-ink-muted --inv-accent --inv-accent-ink
    --inv-line --inv-hero-text --inv-heading --inv-accent-text --inv-danger --inv-seal --inv-field --inv-popover
-   --hero-overlay --r-card --r-btn --f-display --f-heading --f-body --f-ui --f-monogram (+ cover/placeholder vars) */
+   --hero-overlay --r-card --r-btn --r-media --f-display --f-heading --f-body --f-ui --f-monogram --scrim
+   --scrim-a --motion-intensity (+ cover/placeholder vars). Tokens v2, only when a template sets them
+   (renderer/theme.ts): --ty-<role> (size ×), --lh-<role> (line height ×), --ls-<role> (Latin tracking +)
+   for display · heading · body · caption, and --sp-section · --sp-gutter · --sp-block (spacing ×). A
+   section's own tokens (themeOverrides) are the same variables on its .cine wrapper. */
 :root {
   --r-input: 10px;
   --col: 560px;
-  --gutter: 24px;
+  --gutter-base: 24px;
   /* each section's top and bottom padding — two of them separate neighbouring sections */
-  --sec-pad: 56px;
+  --sec-pad-base: 56px;
+  --body-size: 17px;
+  --body-lh: 1.75;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* motion: an expo-out for entrances; springs (a gentle overshoot) where things land — the
      cubic-bezier is the fallback of browsers without linear() (see the @supports below) */
@@ -88,17 +94,30 @@
 }
 :root[lang='en'] {
   --display-scale: 1;
-  --track: 0.04em;
-  --track-wide: 0.14em;
+  --body-size: 19px;
+  --body-lh: 1.6;
+}
+/* derived where a section may change a token (its .cine wrapper), not only on <html> */
+:root,
+.cine {
+  --gutter: calc(var(--gutter-base) * var(--sp-gutter, 1));
+  --sec-pad: calc(var(--sec-pad-base) * var(--sp-section, 1));
+  --block: var(--sp-block, 1);
+}
+:root[lang='en'],
+:root[lang='en'] .cine {
+  /* Latin tracking of headings (Hebrew is never letter-spaced, §9A.2) */
+  --track: calc(0.04em + var(--ls-heading, 0em));
+  --track-wide: calc(0.14em + var(--ls-heading, 0em));
 }
 @media (min-width: 768px) {
   :root {
-    --sec-pad: 80px;
+    --sec-pad-base: 80px;
   }
 }
 @media (max-width: 359px) {
   :root {
-    --gutter: 20px;
+    --gutter-base: 20px;
   }
 }
 
@@ -119,14 +138,17 @@ body {
   background: var(--inv-bg);
   color: var(--inv-ink);
   font-family: var(--f-body);
-  font-size: 17px;
-  line-height: 1.75;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
-:root[lang='en'] body {
-  font-size: 19px;
-  line-height: 1.6;
+body,
+.cine {
+  font-size: calc(var(--body-size) * var(--ty-body, 1));
+  line-height: calc(var(--body-lh) * var(--lh-body, 1));
+}
+:root[lang='en'] body,
+:root[lang='en'] .cine {
+  letter-spacing: var(--ls-body, normal);
 }
 :root[data-cover-skipped] .cover {
   display: none;
@@ -379,8 +401,14 @@ a {
   font-size: 15px;
   letter-spacing: var(--track-wide);
   color: var(--cover-hint, #7c6a60);
-  opacity: 0;
-  animation: fadeIn 0.8s 1.2s var(--ease) forwards;
+  /* on screen with the cover, rising a little: the call to action — and on a cover without a picture
+     or a monogram the largest text of the first screen, the page's LCP (npm run perf:templates) */
+  animation: hintIn 0.9s var(--ease) both;
+}
+@keyframes hintIn {
+  from {
+    transform: translateY(8px);
+  }
 }
 :root[lang='en'] .cover-hint {
   text-transform: uppercase;
@@ -610,6 +638,9 @@ a {
   .cover:not(.cover-video).gone {
     transition: opacity 0.3s linear;
   }
+  .cover-hint {
+    animation: none;
+  }
   .cover::before,
   .env-back::after,
   .seal::before,
@@ -777,6 +808,440 @@ a {
   .cover-video,
   .cv-overlay .half {
     transition: opacity 0.3s linear;
+  }
+}
+
+/* ============ 3c. CINEMATIC OPENINGS (v2 — renderer/cover/Openings.client.tsx) ============
+   A gate of two doors, a theatre curtain, fireworks over a night sky, a veil of gold dust. Colors:
+   --co-color (the doors / curtain / sky) with --co-light, --co-deep and --co-gold (cover/opening.ts).
+   The gate and the curtain follow a scroll or a swipe a little first (--co-peek 0…1). */
+.cover.co {
+  background: none;
+}
+.cover.co::before,
+.cover.co::after {
+  display: none;
+}
+.co .cover-tap {
+  overflow: hidden;
+  perspective: 1800px;
+}
+.co .cover-hint {
+  z-index: 3;
+  bottom: max(14vh, 84px);
+  color: rgb(255 255 255 / 0.88);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.45);
+}
+.co .cover-skip {
+  z-index: 4;
+  color: rgb(255 255 255 / 0.92);
+  background: rgb(0 0 0 / 0.28);
+}
+.co-scroll {
+  position: absolute;
+  z-index: 3;
+  bottom: max(6vh, 30px);
+  inset-inline: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--f-ui);
+  font-size: 13px;
+  letter-spacing: var(--track-wide);
+  color: rgb(255 255 255 / 0.82);
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.45);
+  opacity: 0;
+  animation: fadeIn 0.8s 1.6s var(--ease) forwards;
+}
+:root[lang='en'] .co-scroll {
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.co-scroll svg {
+  animation: bob 2.2s ease-in-out infinite;
+}
+.co-mono {
+  font-family: var(--f-monogram);
+  line-height: 1;
+  white-space: nowrap;
+}
+.co.opening :is(.cover-hint, .co-scroll) {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+/* light spilling through as the doors / the curtain open */
+.co-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    38% 62% at 50% 50%,
+    rgb(255 246 222 / 0.95),
+    color-mix(in srgb, var(--co-gold) 45%, rgb(255 226 170 / 0.55)) 42%,
+    transparent 76%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+.co.opening .co-glow {
+  animation: coGlow 1.9s ease-out forwards;
+}
+@keyframes coGlow {
+  0% {
+    opacity: 0;
+  }
+  28% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── gate: two lacquered doors with gold moldings, a medallion across the seam ── */
+.co-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.3%;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      130% 55% at 50% 40%,
+      color-mix(in srgb, var(--co-light) 55%, transparent),
+      transparent 72%
+    ),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.05) 0 1px, transparent 1px 7px),
+    linear-gradient(180deg, var(--co-color), var(--co-deep));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.3);
+  backface-visibility: hidden;
+  transition: transform 0.45s var(--ease-out);
+}
+.co-door.l {
+  left: 0;
+  transform-origin: 0 50%;
+  transform: rotateY(calc(var(--co-peek, 0) * 28deg));
+}
+.co-door.r {
+  right: 0;
+  transform-origin: 100% 50%;
+  transform: rotateY(calc(var(--co-peek, 0) * -28deg));
+}
+.co[data-motion='slide'] .co-door.l {
+  transform: translateX(calc(var(--co-peek, 0) * -18%));
+}
+.co[data-motion='slide'] .co-door.r {
+  transform: translateX(calc(var(--co-peek, 0) * 18%));
+}
+/* the door darkens as it turns away from the light */
+.co-door::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 1.7s ease;
+}
+.co-panel {
+  position: absolute;
+  border: 1.5px solid color-mix(in srgb, var(--co-gold) 72%, transparent);
+  box-shadow:
+    inset 0 0 0 6px color-mix(in srgb, var(--co-deep) 35%, transparent),
+    inset 0 0 0 7.5px color-mix(in srgb, var(--co-gold) 32%, transparent);
+}
+.co-door.l .co-panel.top {
+  inset: 7% 11% 46% 15%;
+  border-top-right-radius: 100% 34%;
+}
+.co-door.r .co-panel.top {
+  inset: 7% 15% 46% 11%;
+  border-top-left-radius: 100% 34%;
+}
+.co-door.l .co-panel.bottom {
+  inset: 60% 11% 6% 15%;
+}
+.co-door.r .co-panel.bottom {
+  inset: 60% 15% 6% 11%;
+}
+.co-ring {
+  position: absolute;
+  top: 62%;
+  width: 16px;
+  height: 24px;
+  border: 2.5px solid var(--co-gold);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.35);
+}
+.co-door.l .co-ring {
+  right: 8%;
+}
+.co-door.r .co-ring {
+  left: 8%;
+}
+.co-medal {
+  --m: min(36vw, 150px);
+  position: absolute;
+  top: 50%;
+  width: var(--m);
+  height: var(--m);
+  margin-top: calc(var(--m) / -2);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(
+    circle at 36% 30%,
+    #fff4cc,
+    var(--co-gold) 46%,
+    color-mix(in srgb, var(--co-gold) 55%, #4a300c)
+  );
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--co-gold) 38%, transparent),
+    inset 0 -6px 14px rgb(0 0 0 / 0.25);
+}
+.co-door.l .co-medal {
+  right: calc(var(--m) / -2);
+}
+.co-door.r .co-medal {
+  left: calc(var(--m) / -2);
+}
+.co-medal .co-mono {
+  font-size: calc(var(--m) * 0.3 * min(1, 3.4 / var(--co-glyphs, 3)));
+  color: color-mix(in srgb, var(--co-deep) 80%, #1a0e02);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.4);
+}
+.co.opening[data-opening='gate'] .co-door {
+  transition: transform 1.75s cubic-bezier(0.55, 0.04, 0.24, 1);
+}
+.co.opening[data-opening='gate'] .co-door.l {
+  transform: rotateY(104deg);
+}
+.co.opening[data-opening='gate'] .co-door.r {
+  transform: rotateY(-104deg);
+}
+.co.opening[data-opening='gate'][data-motion='slide'] .co-door.l {
+  transform: translateX(-101%);
+}
+.co.opening[data-opening='gate'][data-motion='slide'] .co-door.r {
+  transform: translateX(101%);
+}
+.co.opening[data-opening='gate']:not([data-motion='slide']) .co-door::after {
+  opacity: 0.5;
+}
+
+/* ── curtain: velvet drapes under a scalloped valance with the monogram in a gold crest ── */
+.co-drape {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 51%;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.38), transparent 24%, transparent 72%, rgb(0 0 0 / 0.3)),
+    repeating-linear-gradient(
+      90deg,
+      var(--co-deep) 0,
+      var(--co-color) 2.4%,
+      var(--co-light) 4.2%,
+      var(--co-color) 6%,
+      var(--co-deep) 8.5%
+    );
+  box-shadow: inset 0 0 50px rgb(0 0 0 / 0.35);
+  transition: transform 0.45s var(--ease-out);
+}
+.co-drape.l {
+  left: 0;
+  transform-origin: 0 0;
+  transform: scaleX(calc(1 - var(--co-peek, 0) * 0.2));
+}
+.co-drape.r {
+  right: 0;
+  transform-origin: 100% 0;
+  transform: scaleX(calc(1 - var(--co-peek, 0) * 0.2));
+}
+.co[data-motion='rise'] .co-drape {
+  transform: translateY(calc(var(--co-peek, 0) * -12%));
+}
+.co-valance {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(15vh, 96px);
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.35), transparent 70%),
+    repeating-linear-gradient(
+      90deg,
+      var(--co-deep) 0 3px,
+      var(--co-color) 3px 22px,
+      var(--co-light) 22px 30px,
+      var(--co-color) 30px 44px
+    );
+  border-bottom: 3px solid var(--co-gold);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.35);
+  transition: transform 0.45s var(--ease-out);
+}
+/* the fringe: a row of gold scallops under the valance */
+.co-valance::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 14px;
+  background: radial-gradient(circle at 50% 0, var(--co-gold) 55%, transparent 58%) 0 0 / 22px 14px repeat-x;
+}
+.co-crest {
+  position: absolute;
+  /* over the fringe (the valance's ::after, painted after it) */
+  z-index: 1;
+  left: 50%;
+  bottom: -46px;
+  translate: -50% 0;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(
+    circle at 36% 30%,
+    #fff4cc,
+    var(--co-gold) 46%,
+    color-mix(in srgb, var(--co-gold) 55%, #4a300c)
+  );
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--co-gold) 40%, transparent),
+    0 10px 24px rgb(0 0 0 / 0.4);
+}
+.co-crest .co-mono {
+  font-size: calc(28px * min(1, 3.4 / var(--co-glyphs, 3)));
+  color: color-mix(in srgb, var(--co-deep) 80%, #1a0e02);
+}
+.co.opening[data-opening='curtain'] :is(.co-drape, .co-valance) {
+  transition: transform 1.7s cubic-bezier(0.6, 0.02, 0.28, 1);
+}
+.co.opening[data-opening='curtain']:not([data-motion='rise']) .co-drape {
+  transform: scaleX(0.1);
+}
+.co.opening[data-opening='curtain'][data-motion='rise'] :is(.co-drape, .co-valance) {
+  transform: translateY(-112%);
+}
+
+/* ── fireworks: a night sky with twinkling stars; the shells are drawn on a canvas (fx/sparks.ts) ── */
+.co[data-opening='fireworks'] {
+  background: radial-gradient(
+    130% 75% at 50% 100%,
+    color-mix(in srgb, var(--co-color) 60%, #3b2146),
+    var(--co-color) 58%,
+    color-mix(in srgb, var(--co-color) 70%, #000)
+  );
+}
+.co-stars,
+.co-motes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.co-stars i,
+.co-motes i {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  animation: coTwinkle var(--d) ease-in-out var(--dl) infinite;
+}
+.co-stars i {
+  background: #fff;
+  box-shadow: 0 0 6px rgb(255 255 255 / 0.8);
+}
+@keyframes coTwinkle {
+  50% {
+    opacity: 0.25;
+    transform: scale(0.6);
+  }
+}
+.co-center {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+}
+.co[data-opening='fireworks'] .co-mono {
+  font-size: calc(clamp(54px, 17vw, 104px) * min(1, 5 / var(--co-glyphs, 3)));
+  color: #fff6de;
+  text-shadow:
+    0 0 18px color-mix(in srgb, var(--co-gold) 85%, transparent),
+    0 0 46px color-mix(in srgb, var(--co-gold) 55%, transparent);
+}
+.co.opening[data-opening='fireworks'] .co-mono {
+  transform: scale(1.18);
+  opacity: 0;
+  transition:
+    transform 1.3s var(--ease-out),
+    opacity 0.9s ease 0.3s;
+}
+
+/* ── gold dust: a deep veil, gold motes, a foil monogram; the dust blows away (fx/sparks.ts) ── */
+.co-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    95% 70% at 50% 46%,
+    color-mix(in srgb, var(--co-color) 55%, #4a3620),
+    var(--co-color) 56%,
+    var(--co-deep)
+  );
+}
+.co-motes i {
+  background: radial-gradient(circle, #fff4d2, var(--co-gold) 60%, transparent 72%);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--co-gold) 70%, transparent);
+}
+.co[data-opening='gold_dust'] .co-mono {
+  font-size: calc(clamp(56px, 18vw, 110px) * min(1, 5 / var(--co-glyphs, 3)));
+  background: linear-gradient(100deg, #8a6420, #f6e3a6 34%, #c9962e 55%, #fff4d2 72%, #a77b28);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgb(0 0 0 / 0.35));
+}
+.co.opening .co-motes i {
+  animation: none;
+  opacity: 0;
+  transform: translate(var(--gx), var(--gy)) scale(0.4);
+  transition:
+    transform 1.5s var(--ease-out),
+    opacity 1.2s ease;
+}
+.co.opening[data-opening='gold_dust'] .co-mono {
+  opacity: 0;
+  transform: scale(1.14);
+  transition:
+    transform 1.2s var(--ease-out),
+    opacity 0.8s ease 0.2s;
+}
+.co.opening[data-opening='gold_dust'] .co-veil {
+  opacity: 0;
+  transition: opacity 1.3s ease 0.15s;
+}
+/* the canvas of the openings' light: over the cover and the page, never in the way */
+.fx-sparks {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 56;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .co :is(.co-door, .co-drape, .co-valance, .co-mono, .co-veil, .co-stars i, .co-motes i, .co-scroll svg) {
+    animation: none !important;
+    transition: none !important;
+  }
+  .co-glow,
+  .fx-sparks {
+    display: none;
   }
 }
 
@@ -1275,21 +1740,21 @@ html[data-framed] body::-webkit-scrollbar {
 .eyebrow {
   font-family: var(--f-heading);
   font-style: italic;
-  font-size: 19px;
+  font-size: calc(19px * var(--ty-heading, 1));
   letter-spacing: var(--track);
   opacity: 0.95;
 }
 :root[lang='he'] .eyebrow {
   font-style: normal;
   font-weight: 300;
-  font-size: 20px;
+  font-size: calc(20px * var(--ty-heading, 1));
 }
 .names {
   font-family: var(--f-display);
   font-weight: 400;
-  line-height: 1.02;
+  line-height: calc(1.02 * var(--lh-display, 1));
   margin: 18px 0 20px;
-  font-size: calc(clamp(64px, 19vw, 112px) * var(--display-scale));
+  font-size: calc(clamp(64px, 19vw, 112px) * var(--display-scale) * var(--ty-display, 1));
 }
 .names .n {
   display: block;
@@ -1301,7 +1766,7 @@ html[data-framed] body::-webkit-scrollbar {
   );
 }
 .names.custom {
-  font-size: calc(clamp(48px, 14vw, 88px) * var(--display-scale));
+  font-size: calc(clamp(48px, 14vw, 88px) * var(--display-scale) * var(--ty-display, 1));
 }
 .names .j {
   display: block;
@@ -1330,12 +1795,12 @@ html[data-framed] body::-webkit-scrollbar {
 .hero-date {
   font-variant-numeric: lining-nums;
   font-family: var(--f-heading);
-  font-size: 18px;
+  font-size: calc(18px * var(--ty-heading, 1));
   letter-spacing: var(--track-wide);
   font-weight: 500;
 }
 :root[lang='he'] .hero-date {
-  font-size: 18px;
+  font-size: calc(18px * var(--ty-heading, 1));
   font-weight: 400;
 }
 .hdate {
@@ -1987,26 +2452,29 @@ html[data-framed] body::-webkit-scrollbar {
   font-family: var(--f-display);
   color: var(--inv-heading);
   font-weight: 400;
-  line-height: 1.1;
+  line-height: calc(1.1 * var(--lh-display, 1));
   text-wrap: balance;
-  font-size: calc(clamp(42px, 11vw, 56px) * var(--display-scale));
+  font-size: calc(clamp(42px, 11vw, 56px) * var(--display-scale) * var(--ty-display, 1));
 }
 :root[lang='he'] .sec-title {
-  font-size: clamp(34px, 9vw, 46px);
+  font-size: calc(clamp(34px, 9vw, 46px) * var(--ty-display, 1));
+}
+:root[lang='en'] :is(.sec-title, .names, .f-names) {
+  letter-spacing: var(--ls-display, normal);
 }
 .sec-sub {
   font-family: var(--f-heading);
-  font-size: 18px;
+  font-size: calc(18px * var(--ty-heading, 1));
   letter-spacing: var(--track-wide);
   color: var(--inv-ink-muted);
   margin-top: 8px;
 }
 :root[lang='en'] .sec-sub {
-  font-size: 17px;
-  letter-spacing: 0.12em;
+  font-size: calc(17px * var(--ty-heading, 1));
+  letter-spacing: calc(0.12em + var(--ls-heading, 0em));
 }
 .sec-body {
-  margin: 28px auto 0;
+  margin: calc(28px * var(--block)) auto 0;
   max-width: 36ch;
   white-space: pre-line;
   color: var(--inv-ink);
@@ -2067,13 +2535,13 @@ html[data-framed] body::-webkit-scrollbar {
 }
 .illus {
   display: block;
-  margin: 32px auto 0;
+  margin: calc(32px * var(--block)) auto 0;
   color: var(--inv-ink-muted);
   opacity: 0.85;
 }
 .illus-img {
   display: block;
-  margin: 32px auto 0;
+  margin: calc(32px * var(--block)) auto 0;
   max-width: min(72%, 280px);
   height: auto;
 }
@@ -2357,7 +2825,7 @@ html[data-framed] body::-webkit-scrollbar {
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   max-width: 360px;
-  margin: 32px auto 0;
+  margin: calc(32px * var(--block)) auto 0;
 }
 .cd-cell {
   border: 1px solid var(--inv-line);
@@ -2375,15 +2843,15 @@ html[data-framed] body::-webkit-scrollbar {
 }
 .cd-lbl {
   font-family: var(--f-ui);
-  font-size: 12px;
+  font-size: calc(12px * var(--ty-caption, 1));
   color: var(--inv-ink-muted);
   margin-top: 6px;
   letter-spacing: var(--track);
 }
 :root[lang='en'] .cd-lbl {
   text-transform: uppercase;
-  font-size: 10.5px;
-  letter-spacing: 0.12em;
+  font-size: calc(10.5px * var(--ty-caption, 1));
+  letter-spacing: calc(0.12em + var(--ls-caption, 0em));
 }
 /* a digit that changes rolls: the old one drops out, the new one comes down into place
    (Countdown.client.tsx; the clip box reaches a little above and below the line without taking room) */
@@ -2443,7 +2911,7 @@ html[data-framed] body::-webkit-scrollbar {
 }
 .v-name {
   font-family: var(--f-heading);
-  font-size: 26px;
+  font-size: calc(26px * var(--ty-heading, 1));
   font-weight: 500;
   letter-spacing: var(--track);
   color: var(--inv-ink);
@@ -2528,7 +2996,7 @@ html[data-framed] body::-webkit-scrollbar {
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: calc(20px * var(--block));
 }
 .btn {
   position: relative;
@@ -2694,7 +3162,7 @@ svg.deco {
 }
 .tl {
   list-style: none;
-  margin: 36px auto 0;
+  margin: calc(36px * var(--block)) auto 0;
   max-width: 340px;
   position: relative;
   text-align: start;
@@ -2731,7 +3199,7 @@ svg.deco {
 .pill {
   display: inline-block;
   font-family: var(--f-ui);
-  font-size: 12px;
+  font-size: calc(12px * var(--ty-caption, 1));
   font-weight: 600;
   background: var(--inv-accent);
   color: var(--inv-accent-ink);
@@ -2742,7 +3210,7 @@ svg.deco {
 .tl .lbl {
   display: block;
   font-family: var(--f-heading);
-  font-size: 19px;
+  font-size: calc(19px * var(--ty-heading, 1));
   margin-top: 4px;
   letter-spacing: var(--track);
 }
@@ -2886,7 +3354,7 @@ svg.deco {
 }
 /* the reference sets this inline, so it also wins over the Hebrew .sec-title clamp */
 :root .card .sec-title {
-  font-size: calc(40px * var(--display-scale));
+  font-size: calc(40px * var(--display-scale) * var(--ty-display, 1));
 }
 .card .sec-body {
   margin-top: 14px;
@@ -3346,7 +3814,7 @@ body.lb-open {
 
 /* faq */
 .faq {
-  margin: 32px auto 0;
+  margin: calc(32px * var(--block)) auto 0;
   text-align: start;
   border-top: 1px solid var(--inv-line);
 }
@@ -3362,7 +3830,7 @@ body.lb-open {
   gap: 16px;
   padding: 18px 4px;
   font-family: var(--f-heading);
-  font-size: 19px;
+  font-size: calc(19px * var(--ty-heading, 1));
   font-weight: 500;
 }
 .faq summary::-webkit-details-marker {
@@ -3883,7 +4351,7 @@ footer.sec {
   padding-bottom: 64px;
 }
 .f-names {
-  --f-names-size: calc(48px * var(--display-scale));
+  --f-names-size: calc(48px * var(--display-scale) * var(--ty-display, 1));
   font-family: var(--f-display);
   color: var(--inv-heading);
   font-size: min(
@@ -3894,7 +4362,7 @@ footer.sec {
   margin-top: 18px;
 }
 :root[lang='he'] .f-names {
-  --f-names-size: 40px;
+  --f-names-size: calc(40px * var(--ty-display, 1));
 }
 .f-date {
   font-variant-numeric: lining-nums;
@@ -3904,7 +4372,7 @@ footer.sec {
 }
 .f-parents {
   font-family: var(--f-ui);
-  font-size: 14px;
+  font-size: calc(14px * var(--ty-caption, 1));
   color: var(--inv-ink-muted);
   margin-top: 18px;
 }
@@ -3912,14 +4380,14 @@ footer.sec {
   font-family: var(--f-heading);
   font-style: italic;
   margin-top: 18px;
-  font-size: 19px;
+  font-size: calc(19px * var(--ty-heading, 1));
 }
 :root[lang='he'] .f-close {
   font-style: normal;
 }
 .credit {
   font-family: var(--f-ui);
-  font-size: 12px;
+  font-size: calc(12px * var(--ty-caption, 1));
   color: var(--inv-ink-muted);
   margin-top: 40px;
   opacity: 0.8;
@@ -3979,6 +4447,579 @@ footer.sec {
   pointer-events: none;
 }
 
+/* ============ 6b. CINEMATIC PRESENTATION (schema v2 — feature `cinematic`) ============
+   renderer/cinematic/CineSection.tsx wraps a section that has media, a layout, motion or tokens of its
+   own: <div class="cine" data-layout data-on-media data-palette data-enter data-scroll data-tr>. The
+   Scroll Timeline Engine (renderer/motion/engine.ts → these attributes and their variables;
+   ScrollEngine.client.tsx → `.in`, videos, text reveals, the parallax fallback) drives it: scroll-driven
+   animations where the browser has them, once-per-view transitions elsewhere — transform and opacity
+   only, nothing at all with reduced motion or <html data-motion="none">. */
+.cine {
+  position: relative;
+  isolation: isolate;
+  /* the section's passage through the screen: its media's parallax / Ken Burns and its entrances */
+  view-timeline: --cine block;
+  /* re-derived here: a section with its own accent gets its own tints */
+  --accent-08: color-mix(in srgb, var(--inv-accent) 8%, transparent);
+  --accent-12: color-mix(in srgb, var(--inv-accent) 12%, transparent);
+  --accent-35: color-mix(in srgb, var(--inv-accent) 35%, transparent);
+  --en-from: none;
+}
+:root[dir='ltr'] {
+  --dir-x: 1;
+}
+:root[dir='rtl'] {
+  --dir-x: -1;
+}
+/* colors of its own: a band in its own background */
+.cine[data-palette] {
+  background: var(--inv-bg);
+  color: var(--inv-ink);
+}
+.cine[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* ── media ── */
+.cine-img,
+.cine-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cine-video {
+  position: absolute;
+  inset: 0;
+  /* over its still, shown once it really plays (the engine marks it) */
+  opacity: 0;
+  transition: opacity 0.9s var(--ease);
+}
+.cine-video[data-playing] {
+  opacity: 1;
+}
+.cine-figure {
+  position: relative;
+  overflow: clip;
+  container-type: size;
+  margin: 0;
+  background: color-mix(in srgb, var(--inv-ink) 6%, var(--inv-bg));
+}
+.cine-figure.reveal {
+  /* a big picture never blurs in (a costly paint): it rises and fades like the rest */
+  filter: none;
+}
+
+/* stack: the picture framed above the section's text, in the column */
+.cine[data-layout='stack'] > .cine-figure {
+  width: min(var(--col), calc(100% - 2 * var(--gutter)));
+  aspect-ratio: 4 / 5;
+  margin: var(--sec-pad) auto 0;
+  border-radius: var(--r-media);
+}
+.cine[data-layout='stack'] > .cine-figure + .sec {
+  padding-top: calc(var(--sec-pad) * 0.55);
+}
+
+/* split: beside the text on wide screens (start = the reading side), above / below it on a phone */
+.cine[data-layout^='split'] {
+  display: grid;
+}
+.cine[data-layout^='split'] > .cine-figure {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+}
+.cine[data-layout='split_end'] > .cine-figure {
+  order: 2;
+}
+@media (min-width: 900px) {
+  .cine[data-layout^='split'] {
+    grid-template-columns: minmax(0, 640px) minmax(0, 640px);
+    justify-content: center;
+    min-height: min(92svh, 900px);
+  }
+  .cine[data-layout^='split'] > .cine-figure {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 560px;
+  }
+  .cine[data-layout^='split'] > .cine-body {
+    display: grid;
+    align-content: center;
+  }
+}
+
+/* full-bleed / parallax / video background: the media behind the text, edge to edge, under a scrim */
+.cine[data-on-media] {
+  display: grid;
+  align-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: clip;
+  /* the text's palette over the media: the hero's text color, lines and glass surfaces in its tone */
+  --inv-ink: var(--inv-hero-text);
+  --inv-heading: var(--inv-hero-text);
+  --inv-accent-text: var(--inv-hero-text);
+  --inv-ink-muted: color-mix(in srgb, var(--inv-hero-text) 84%, transparent);
+  --inv-line: color-mix(in srgb, var(--inv-hero-text) 36%, transparent);
+  --inv-surface: color-mix(in srgb, var(--scrim) 46%, transparent);
+  --inv-bg: color-mix(in srgb, var(--scrim) 34%, transparent);
+  --inv-field: color-mix(in srgb, var(--scrim) 55%, transparent);
+  --inv-popover: color-mix(in srgb, var(--scrim) 92%, #000);
+  --accent-08: color-mix(in srgb, var(--inv-hero-text) 10%, transparent);
+  --accent-12: color-mix(in srgb, var(--inv-hero-text) 16%, transparent);
+  --cine-shadow:
+    0 1px 3px color-mix(in srgb, var(--scrim) 45%, transparent),
+    0 2px 22px color-mix(in srgb, var(--scrim) 55%, transparent);
+  color: var(--inv-ink);
+}
+.cine[data-on-media] > .sec {
+  text-shadow: var(--cine-shadow);
+}
+.cine[data-on-media] :is(.btn, .card, .form, .cd-cell, input, textarea, select, .dd-menu) {
+  text-shadow: none;
+}
+/* a band of media is its own boundary: no divider line or line-art over the picture */
+.cine[data-on-media] > :is(.divider, .deco) {
+  display: none;
+}
+.cine-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: clip;
+  container-type: size;
+  pointer-events: none;
+}
+.cine-layer {
+  position: absolute;
+  inset: 0;
+}
+.cine-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--scrim) calc(var(--scrim-a, 0.42) * 72%), transparent),
+    color-mix(in srgb, var(--scrim) calc(var(--scrim-a, 0.42) * 100%), transparent) 48%,
+    color-mix(in srgb, var(--scrim) calc(var(--scrim-a, 0.42) * 88%), transparent)
+  );
+}
+/* parallax: the media reaches past the section by its travel, so no edge ever shows */
+.cine[data-scroll~='parallax'] .cine-layer {
+  inset: calc(var(--px-depth, 9) * -1%) 0;
+}
+.cine[data-scroll~='parallax'] .cine-figure > :is(.cine-img, .cine-video) {
+  /* a picture doesn't stretch between insets: its height is set (else, lazy, it never loads) */
+  position: absolute;
+  top: calc(var(--px-depth, 9) * -1%);
+  left: 0;
+  height: calc(100% + var(--px-depth, 9) * 2%);
+}
+.cine[data-scroll~='ken_burns'] :is(.cine-img, .cine-video) {
+  transform-origin: var(--fx, 50%) var(--fy, 50%);
+}
+
+/* ── the new section types ── */
+.pa .wrap > :first-child,
+.wh .wrap > :first-child,
+.qt .wrap > :first-child {
+  margin-top: 0;
+}
+.pa-list {
+  display: grid;
+  gap: calc(22px * var(--block));
+  margin-top: calc(28px * var(--block));
+}
+.pa-list.pair {
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.pa-list.pair .pa-item + .pa-item {
+  border-inline-start: 1px solid var(--inv-line);
+}
+.pa-item {
+  padding: 2px 12px;
+}
+.pa-label {
+  font-family: var(--f-ui);
+  font-size: calc(13px * var(--ty-caption, 1));
+  color: var(--inv-ink-muted);
+  letter-spacing: var(--track);
+}
+:root[lang='en'] .pa-label {
+  text-transform: uppercase;
+  font-size: calc(11.5px * var(--ty-caption, 1));
+  letter-spacing: calc(0.16em + var(--ls-caption, 0em));
+}
+.pa-names {
+  font-family: var(--f-heading);
+  font-size: calc(21px * var(--ty-heading, 1));
+  line-height: 1.35;
+  margin-top: 6px;
+  color: var(--inv-ink);
+  text-wrap: balance;
+}
+.pa-one {
+  margin-top: calc(24px * var(--block));
+}
+.pa-note {
+  color: var(--inv-ink-muted);
+  margin: calc(22px * var(--block)) auto 0;
+  max-width: 36ch;
+  white-space: pre-line;
+}
+.wh-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: calc(26px * var(--block));
+  color: var(--inv-heading);
+  font-variant-numeric: lining-nums;
+}
+.wh-weekday,
+.wh-month {
+  font-family: var(--f-heading);
+  font-size: calc(20px * var(--ty-heading, 1));
+  letter-spacing: var(--track-wide);
+  color: var(--inv-ink);
+}
+:root[lang='en'] :is(.wh-weekday, .wh-month) {
+  text-transform: uppercase;
+  font-size: calc(15px * var(--ty-heading, 1));
+}
+.wh-day {
+  font-family: var(--f-display);
+  font-size: calc(clamp(96px, 30vw, 156px) * var(--display-scale) * var(--ty-display, 1));
+  line-height: calc(1 * var(--lh-display, 1));
+  margin: 4px 0 2px;
+}
+.wh-hdate {
+  font-family: var(--f-heading);
+  font-size: calc(18px * var(--ty-heading, 1));
+  color: var(--inv-ink-muted);
+  margin-top: calc(10px * var(--block));
+}
+.wh-time {
+  margin-top: calc(14px * var(--block));
+}
+.wh-note,
+.wr-note {
+  color: var(--inv-ink-muted);
+  margin: calc(20px * var(--block)) auto 0;
+  max-width: 36ch;
+  white-space: pre-line;
+}
+.wr-note {
+  font-family: var(--f-ui);
+  font-size: 15px;
+}
+.wr .v-name {
+  margin-top: calc(18px * var(--block));
+  font-size: calc(30px * var(--ty-heading, 1));
+}
+.qt-figure {
+  margin: 0;
+}
+.qt-mark {
+  display: block;
+  width: 46px;
+  height: 34px;
+  margin: 0 auto calc(16px * var(--block));
+  fill: var(--inv-accent-text);
+  opacity: 0.55;
+}
+:root[dir='rtl'] .qt-mark {
+  scale: -1 1;
+}
+.q-text {
+  font-family: var(--f-heading);
+  font-size: calc(clamp(24px, 6.6vw, 34px) * var(--ty-heading, 1));
+  line-height: calc(1.42 * var(--lh-heading, 1));
+  color: var(--inv-heading);
+  text-wrap: balance;
+  white-space: pre-line;
+  margin: 0 auto;
+  max-width: 30ch;
+}
+:root[lang='en'] .q-text {
+  font-style: italic;
+}
+.q-by {
+  font-family: var(--f-heading);
+  font-size: calc(16px * var(--ty-heading, 1));
+  letter-spacing: var(--track-wide);
+  color: var(--inv-ink-muted);
+  margin-top: calc(18px * var(--block));
+}
+
+/* ── the engine: enter presets ── (their "from" state; the end is the element's own) */
+.cine[data-enter='fade'] {
+  --en-from: none;
+}
+.cine[data-enter='rise'] {
+  --en-from: translate3d(0, var(--en-dist, 40px), 0);
+}
+.cine[data-enter='sink'] {
+  --en-from: translate3d(0, calc(var(--en-dist, 40px) * -1), 0);
+}
+.cine[data-enter='zoom'] {
+  --en-from: scale(var(--en-zoom-in, 0.92));
+}
+.cine[data-enter='zoom_out'] {
+  --en-from: scale(var(--en-zoom-out, 1.08));
+}
+.cine[data-enter='slide_start'] {
+  --en-from: translate3d(calc(var(--en-dist, 40px) * var(--dir-x) * -1.5), 0, 0);
+}
+.cine[data-enter='slide_end'] {
+  --en-from: translate3d(calc(var(--en-dist, 40px) * var(--dir-x) * 1.5), 0, 0);
+}
+.cine[data-enter='tilt'] {
+  --en-from: perspective(900px) translate3d(0, var(--en-dist, 40px), 0) rotateX(var(--en-tilt, 12deg));
+}
+.cine[data-enter='tilt'] .reveal {
+  transform-origin: 50% 100%;
+}
+@keyframes cineEnter {
+  from {
+    opacity: 0;
+    transform: var(--en-from);
+  }
+}
+@keyframes cineParallax {
+  from {
+    transform: translate3d(0, calc(var(--px-depth, 9) * -1cqh), 0);
+  }
+  to {
+    transform: translate3d(0, calc(var(--px-depth, 9) * 1cqh), 0);
+  }
+}
+@keyframes cineKenBurns {
+  to {
+    transform: scale(var(--kb-zoom, 1.14));
+  }
+}
+/* the preset replaces the template's reveal of the section's blocks (a preset of `none`: all shown) */
+:root .cine[data-enter] .reveal {
+  filter: none;
+}
+.cine[data-enter='none'] .reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* scroll-driven: each block comes in as it enters the screen, scrubbed by the scroll (0.3px per ms
+       of the preset's duration; its delay and the stagger shift where it starts) */
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+      animation: cineEnter linear both;
+      animation-timing-function: var(--en-ease, var(--ease-out));
+      animation-timeline: view();
+      animation-range: cover calc(var(--en-off, 0px) + var(--i, 0) * var(--en-step, 24px)) cover
+        calc(var(--en-off, 0px) + var(--i, 0) * var(--en-step, 24px) + var(--en-len, 270px));
+    }
+    /* …but a block too near the end of the page to finish that way (no scroll left: the engine marks
+       it) comes in on time, once in view */
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal[data-en-time] {
+      opacity: 0;
+      transform: var(--en-from);
+      animation: none;
+      transition:
+        opacity var(--en-dur, 900ms) var(--ease),
+        transform var(--en-dur, 900ms) var(--en-ease, var(--ease-out));
+      transition-delay: calc(var(--en-delay, 0ms) + var(--i, 0) * var(--en-stagger, 80ms));
+    }
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal[data-en-time].in {
+      opacity: 1;
+      transform: none;
+    }
+    :root:not([data-motion='none']) .inv:not([data-mode='editor']) .cine[data-scroll~='parallax'] .cine-layer,
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-scroll~='parallax']
+      .cine-figure
+      > :is(.cine-img, .cine-video) {
+      animation: cineParallax linear both;
+      animation-timeline: --cine;
+      animation-range: cover 0% cover 100%;
+    }
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-scroll~='ken_burns']
+      :is(.cine-img, .cine-video) {
+      animation: cineKenBurns linear both;
+      animation-timeline: --cine;
+      animation-range: cover 0% cover 100%;
+    }
+    /* a parallax figure drifts and zooms at once: two animations on the same transform can't — the
+       drift wins, the zoom plays on the picture's still (the video keeps the drift) */
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-scroll~='parallax'][data-scroll~='ken_burns']
+      .cine-figure
+      > .cine-img {
+      animation: cineParallax linear both;
+      animation-timeline: --cine;
+      animation-range: cover 0% cover 100%;
+    }
+  }
+  @supports not (animation-timeline: view()) {
+    /* elsewhere: once, as each block comes into view (ScrollEngine adds `.in`), in the preset's time */
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal {
+      opacity: 0;
+      transform: var(--en-from);
+      transition:
+        opacity var(--en-dur, 900ms) var(--ease),
+        transform var(--en-dur, 900ms) var(--en-ease, var(--ease-out));
+      transition-delay: calc(var(--en-delay, 0ms) + var(--i, 0) * var(--en-stagger, 80ms));
+    }
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter]:not([data-enter='none'])
+      .reveal.in {
+      opacity: 1;
+      transform: none;
+    }
+    /* Ken Burns in time: a slow zoom once the section is in view (the parallax: the engine's frames) */
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine.in[data-scroll~='ken_burns']
+      :is(.cine-img, .cine-video) {
+      animation: cineKenBurns 16s var(--ease-out) both;
+    }
+    :root:not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-scroll~='parallax']
+      :is(.cine-layer, .cine-figure > .cine-img, .cine-figure > .cine-video) {
+      will-change: transform;
+    }
+  }
+}
+
+/* the hero with motion of its own: its drift (`parallax`, the default), a Ken Burns zoom, or none */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    :root[data-opened]:not([data-locale-switched]) .cine[data-hero-scroll='none'] > .hero .hero-media {
+      animation: heroSettle 2.8s var(--ease-out) both;
+      animation-timeline: auto;
+    }
+    :root[data-opened] .cine[data-hero-scroll='ken_burns'] > .hero .hero-media {
+      transform-origin: 50% 45%;
+      animation:
+        heroSettle 2.8s var(--ease-out) both,
+        cineKenBurns linear both;
+      animation-timeline: auto, scroll(root);
+      animation-range:
+        normal,
+        0 100svh;
+    }
+    :root[data-locale-switched] .cine[data-hero-scroll='ken_burns'] > .hero .hero-media {
+      animation-name: none, cineKenBurns;
+    }
+  }
+}
+
+/* ── text reveal (letters · words · lines): the text stays in the DOM, read once; a copy of it in
+   pieces, hidden from assistive technology, plays over it, then goes (ScrollEngine.client.tsx) ── */
+.tr-on {
+  position: relative;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none !important;
+}
+.tr-fx {
+  position: absolute;
+  inset: 0;
+  padding: inherit;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: var(--cine-shadow, none);
+  pointer-events: none;
+  user-select: none;
+}
+.tr-w {
+  display: inline-block;
+}
+.tr-p {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 0.4em, 0);
+  transition:
+    opacity 0.7s var(--ease),
+    transform 0.95s var(--spring);
+  transition-delay: calc(var(--k, 0) * var(--tr-step, 60ms));
+}
+.tr-letters .tr-p {
+  transform: translate3d(0, 0.55em, 0) scale(0.9);
+}
+.tr-lines .tr-p {
+  transform: translate3d(0, 0.7em, 0);
+  transition-duration: 0.8s, 1.1s;
+}
+.tr-play .tr-p {
+  opacity: 1;
+  transform: none;
+}
+/* the block itself stands still while its text plays */
+:root .cine[data-tr] .reveal.tr-on {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ── no motion: every element in its final state at once ── */
+@media (prefers-reduced-motion: reduce) {
+  .cine .reveal,
+  .cine-layer,
+  .cine-figure > *,
+  .cine-img,
+  .cine-video {
+    animation: none !important;
+    transition: none !important;
+  }
+  .cine-layer,
+  .cine-img,
+  .cine-video {
+    transform: none !important;
+  }
+  .tr-fx {
+    display: none;
+  }
+  .tr-on {
+    -webkit-text-fill-color: currentColor;
+  }
+}
+:root[data-motion='none'] :is(.cine .reveal, .cine-layer, .cine-img, .cine-video) {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1;
+}
+:root[data-motion='none'] .cine-video:not([data-playing]) {
+  opacity: 0;
+}
+[data-mode='editor'] :is(.cine .reveal, .cine-layer, .cine-img) {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1;
+}
+
 /* ============ 7b. PRINT ============
    A printed invitation is its final state: no cover, controls or particles, everything revealed. */
 @media print {
@@ -3987,8 +5028,16 @@ footer.sec {
   .frame-cue,
   .fx-amb,
   .fx-burst,
-  .n-shine {
+  .n-shine,
+  .cine-video,
+  .tr-fx {
     display: none !important;
+  }
+  .tr-on {
+    -webkit-text-fill-color: currentColor;
+  }
+  .cine[data-on-media] {
+    min-height: auto;
   }
   body.locked {
     overflow: visible;

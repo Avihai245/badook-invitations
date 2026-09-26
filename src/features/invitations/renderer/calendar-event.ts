@@ -59,10 +59,18 @@ export function eventCalendarEvent(ctx: RenderContext): CalendarEvent {
   };
 }
 
-/** The first venue of the enabled venues section, if any. */
+/** Every venue the invitation shows: the enabled venues sections' items, then the `where` sections' places. */
+export function shownVenues(doc: RenderContext['doc']): Venue[] {
+  const venues = doc.sections.flatMap((s) => (s.enabled && s.type === 'venues' ? s.data.items : []));
+  const places = doc.sections.flatMap((s) => (s.enabled && s.type === 'where' ? [s.data.venue] : []));
+  return [...venues, ...places];
+}
+
+/** The first venue of the enabled venues section, if any (else a `where` section's place). */
 export function firstVenue(ctx: RenderContext): Venue | null {
   const section = ctx.doc.sections.find((s) => s.type === 'venues' && s.enabled);
-  return section?.type === 'venues' ? (section.data.items[0] ?? null) : null;
+  if (section?.type === 'venues') return section.data.items[0] ?? null;
+  return shownVenues(ctx.doc)[0] ?? null;
 }
 
 /**

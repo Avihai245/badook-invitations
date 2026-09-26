@@ -20,5 +20,10 @@
   "followUp.title": "ההזמנה כבר כאן",
   "followUp.body": "כל הפרטים מחכים לכם בהזמנה המלאה.",
   "followUp.cta": "לצפייה בהזמנה",
-  "guest.sample": "דנה"
+  "guest.sample": "דנה",
+  "cover.scroll": "גללו להיכנס",
+  "cover.hint.gate": "לחצו לפתיחת השער",
+  "cover.hint.curtain": "לחצו לפתיחת המסך",
+  "cover.hint.fireworks": "לחצו להדלקת הזיקוקים",
+  "cover.hint.gold_dust": "לחצו לפתיחה"
 }

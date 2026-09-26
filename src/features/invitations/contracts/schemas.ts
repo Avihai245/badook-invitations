@@ -7,22 +7,34 @@ import { z } from 'zod';
 import {
   AMBIENT_KINDS,
   DECORATION_SLOTS,
+  DEFAULT_SECTION_ANIMATION,
   DIETARY_KEYS,
+  ENTER_PRESETS,
   EVENT_TYPES,
   LOCALES,
+  MOTION_EASINGS,
+  OPENING_PRESETS,
   PALETTE_KEYS,
+  SCROLL_EFFECTS,
+  SECTION_LAYOUTS,
   SECTION_TYPES,
   TEMPLATE_TIERS,
+  TEXT_REVEALS,
   TIMELINE_ICONS,
   type EventDefaults,
   type InvitationDocument,
   type Media,
+  type OpeningConfig,
   type RsvpConfig,
   type RsvpResult,
   type RsvpSubmission,
   type Section,
+  type SectionAnimation,
+  type SectionMedia,
   type TemplateDefaults,
   type TemplateManifest,
+  type ThemeOverrides,
+  type TypographyTokens,
   type Venue,
 } from './types';
 
@@ -83,6 +95,92 @@ export const MediaSchema = z.strictObject({
   focalPoint: z.strictObject({ x: unit, y: unit }),
 });
 
+const PaletteShape = {
+  bg: HexColorSchema,
+  surface: HexColorSchema,
+  ink: HexColorSchema,
+  inkMuted: HexColorSchema,
+  accent: HexColorSchema,
+  accentInk: HexColorSchema,
+  line: HexColorSchema,
+  heroText: HexColorSchema,
+};
+export const PaletteSchema = z.strictObject(PaletteShape);
+export const PartialPaletteSchema = PaletteSchema.partial();
+
+// ---------- v2: cinematic presentation ----------
+export const SectionLayoutSchema = z.enum(SECTION_LAYOUTS);
+export const OpeningPresetSchema = z.enum(OPENING_PRESETS);
+
+export const SectionMediaSchema = MediaSchema.extend({
+  alt: L10nSchema.nullable().optional(),
+  overlay: z.number().min(0).max(0.85).nullable().optional(),
+});
+
+const A = DEFAULT_SECTION_ANIMATION;
+/** Missing fields take DEFAULT_SECTION_ANIMATION's values (`{ enter: { preset: 'zoom' } }` is enough). */
+export const SectionAnimationSchema = z.strictObject({
+  enter: z
+    .strictObject({
+      preset: z.enum(ENTER_PRESETS).default(A.enter.preset),
+      duration: z.number().int().min(150).max(4000).default(A.enter.duration),
+      delay: z.number().int().min(0).max(3000).default(A.enter.delay),
+      distance: z.number().min(0).max(240).default(A.enter.distance),
+      easing: z.enum(MOTION_EASINGS).default(A.enter.easing),
+    })
+    .prefault({}),
+  scroll: z.enum(SCROLL_EFFECTS).default(A.scroll),
+  text: z.enum(TEXT_REVEALS).default(A.text),
+  stagger: z.number().int().min(0).max(600).default(A.stagger),
+  intensity: z.number().min(0).max(2).default(A.intensity),
+});
+
+const TypeRoleOverrideSchema = z.strictObject({
+  size: z.number().min(0.5).max(2).optional(),
+  lineHeight: z.number().min(0.7).max(1.6).optional(),
+  letterSpacing: z.number().min(-0.05).max(0.3).optional(),
+});
+const RadiusValue = z.number().min(0).max(64);
+export const ThemeOverridesSchema = z.strictObject({
+  palette: PartialPaletteSchema.optional(),
+  radius: z
+    .strictObject({
+      card: RadiusValue.optional(),
+      button: RadiusValue.optional(),
+      media: RadiusValue.optional(),
+    })
+    .optional(),
+  typography: z
+    .strictObject({
+      display: TypeRoleOverrideSchema.optional(),
+      heading: TypeRoleOverrideSchema.optional(),
+      body: TypeRoleOverrideSchema.optional(),
+      caption: TypeRoleOverrideSchema.optional(),
+    })
+    .optional(),
+  spacing: z
+    .strictObject({
+      section: z.number().min(0).max(3).optional(),
+      gutter: z.number().min(0.5).max(2).optional(),
+      block: z.number().min(0).max(3).optional(),
+    })
+    .optional(),
+});
+
+/** The v2 presentation fields of a section (all optional — without them it renders as in v1). */
+const PRESENTATION = {
+  media: SectionMediaSchema.nullable().optional(),
+  layout: SectionLayoutSchema.optional(),
+  animation: SectionAnimationSchema.nullable().optional(),
+  themeOverrides: ThemeOverridesSchema.nullable().optional(),
+};
+/** The hero's media is data.media and it always fills the screen. */
+const HERO_PRESENTATION = {
+  ...PRESENTATION,
+  media: z.null().optional(),
+  layout: z.literal('full_bleed').optional(),
+};
+
 export const VenueSchema = z.strictObject({
   id: z.string().min(1),
   label: L10nSchema,
@@ -135,13 +233,18 @@ export const RsvpConfigSchema = z.strictObject({
   closedMessage: L10nSchema,
 });
 
-const section = <T extends string, D extends z.ZodType>(type: T, data: D) =>
+const section = <T extends string, D extends z.ZodType, P extends z.ZodRawShape = typeof PRESENTATION>(
+  type: T,
+  data: D,
+  presentation: P = PRESENTATION as unknown as P,
+) =>
   z.strictObject({
     id: z.string().min(1),
     type: z.literal(type),
     enabled: z.boolean(),
     variant: z.string().min(1).optional(),
     data,
+    ...presentation,
   });
 
 export const HeroSectionSchema = section(
@@ -161,6 +264,7 @@ export const HeroSectionSchema = section(
     // added after v1: the line greeting a guest by name on their personal link ({guest}); null = none
     greeting: L10nSchema.nullable().default(null),
   }),
+  HERO_PRESENTATION,
 );
 
 export const CountdownSectionSchema = section(
@@ -261,6 +365,49 @@ export const FooterSectionSchema = section(
   }),
 );
 
+// ── v2 section types ──
+export const ParentsSectionSchema = section(
+  'parents',
+  z.strictObject({
+    title: L10nSchema.nullable(),
+    items: z.array(z.strictObject({ id: z.string().min(1), label: L10nSchema, names: L10nSchema })),
+    note: L10nSchema.nullable(),
+  }),
+);
+
+export const WhenSectionSchema = section(
+  'when',
+  z.strictObject({
+    title: L10nSchema.nullable(),
+    showWeekday: z.boolean(),
+    showHebrewDate: z.boolean(),
+    showTime: z.boolean(),
+    countdown: z.boolean(),
+    showCalendar: z.boolean(),
+    note: L10nSchema.nullable(),
+  }),
+);
+
+export const WhereSectionSchema = section(
+  'where',
+  z.strictObject({ venue: VenueSchema, note: L10nSchema.nullable() }),
+);
+
+export const QuoteSectionSchema = section(
+  'quote',
+  z.strictObject({ text: L10nSchema, attribution: L10nSchema.nullable() }),
+);
+
+export const CustomSectionSchema = section(
+  'custom',
+  z.strictObject({
+    title: L10nSchema.nullable(),
+    subtitle: L10nSchema.nullable(),
+    body: L10nSchema,
+    cta: z.strictObject({ label: L10nSchema, url: z.string().min(1) }).nullable(),
+  }),
+);
+
 export const SectionSchema = z.discriminatedUnion('type', [
   HeroSectionSchema,
   CountdownSectionSchema,
@@ -273,23 +420,15 @@ export const SectionSchema = z.discriminatedUnion('type', [
   RevealSectionSchema,
   RsvpSectionSchema,
   FooterSectionSchema,
+  ParentsSectionSchema,
+  WhenSectionSchema,
+  WhereSectionSchema,
+  QuoteSectionSchema,
+  CustomSectionSchema,
 ]);
 
-const PaletteShape = {
-  bg: HexColorSchema,
-  surface: HexColorSchema,
-  ink: HexColorSchema,
-  inkMuted: HexColorSchema,
-  accent: HexColorSchema,
-  accentInk: HexColorSchema,
-  line: HexColorSchema,
-  heroText: HexColorSchema,
-};
-export const PaletteSchema = z.strictObject(PaletteShape);
-export const PartialPaletteSchema = PaletteSchema.partial();
-
 export const InvitationDocumentSchema = z.strictObject({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   templateId: z.string().min(1),
   eventType: EventTypeSchema,
   locales: z.array(LocaleSchema).min(1),
@@ -315,6 +454,8 @@ export const InvitationDocumentSchema = z.strictObject({
     monogram: L10nSchema.nullable(),
     sealColor: HexColorSchema.nullable(),
     hint: L10nSchema.nullable(),
+    // v2: the host's opening (feature `cinematic`); absent / null → the template's
+    opening: OpeningPresetSchema.nullable().optional(),
   }),
   music: z.strictObject({
     enabled: z.boolean(),
@@ -344,6 +485,30 @@ export const FontPairSchema = z.strictObject({
   ui: z.strictObject({ latin: z.string().min(1), hebrew: z.string().min(1) }),
 });
 
+// ---------- template: tokens v2 & the opening (each defaults to the design's own values) ----------
+const TypeRoleSchema = z.strictObject({
+  size: z.number().min(0.5).max(2).default(1),
+  lineHeight: z.number().min(0.7).max(1.6).default(1),
+  letterSpacing: z.number().min(-0.05).max(0.3).default(0),
+});
+export const TypographySchema = z.strictObject({
+  display: TypeRoleSchema.prefault({}),
+  heading: TypeRoleSchema.prefault({}),
+  body: TypeRoleSchema.prefault({}),
+  caption: TypeRoleSchema.prefault({}),
+});
+export const SpacingSchema = z.strictObject({
+  section: z.number().min(0).max(3).default(1),
+  gutter: z.number().min(0.5).max(2).default(1),
+  block: z.number().min(0).max(3).default(1),
+});
+export const OpeningConfigSchema = z.strictObject({
+  preset: OpeningPresetSchema,
+  trigger: z.enum(['tap', 'scroll']).optional(),
+  motion: z.enum(['swing', 'slide', 'part', 'rise']).optional(),
+  color: HexColorSchema.nullable().optional(),
+});
+
 export const TemplateManifestSchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9-]+$/),
   version: z.number().int().min(1),
@@ -358,8 +523,22 @@ export const TemplateManifestSchema = z.strictObject({
   tokens: z.strictObject({
     palette: PaletteSchema,
     editablePaletteKeys: z.array(PaletteKeySchema),
-    radius: z.strictObject({ card: z.number().min(0), button: z.number().min(0) }),
+    radius: z.strictObject({
+      card: z.number().min(0),
+      button: z.number().min(0),
+      // added in v2: a section's framed picture (absent → card)
+      media: z.number().min(0).optional(),
+    }),
     divider: z.enum(['gradient_line', 'none']),
+    // added in v2 (tokens v2): absent → the design's own scale, spacing and scrim
+    typography: TypographySchema.prefault({}),
+    spacing: SpacingSchema.prefault({}),
+    overlay: z
+      .strictObject({
+        color: HexColorSchema.nullable().default(null),
+        opacity: z.number().min(0).max(0.85).nullable().default(null),
+      })
+      .prefault({}),
   }),
   palettePresets: z.array(
     z.strictObject({ id: z.string().min(1), name: L10nSchema, palette: PartialPaletteSchema }),
@@ -388,6 +567,8 @@ export const TemplateManifestSchema = z.strictObject({
     }),
     sealColors: z.array(HexColorSchema),
     monogramFont: z.strictObject({ latin: z.string().min(1), hebrew: z.string().min(1) }),
+    // added in v2: a cinematic opening instead of the style's own (feature `cinematic`)
+    opening: OpeningConfigSchema.nullable().default(null),
   }),
   hero: z.strictObject({
     options: z
@@ -422,6 +603,8 @@ export const TemplateManifestSchema = z.strictObject({
     stagger: z.number().min(0),
     // added after v2: optional — without it the renderer picks the template's particles by id
     ambient: z.enum(AMBIENT_KINDS).optional(),
+    // added in v2 (tokens v2): × every travel of the motion engine
+    intensity: z.number().min(0).max(2).default(1),
   }),
   assets: z.record(z.string().regex(/^[A-Za-z0-9._-]+$/), TemplatePathSchema),
   decorations: z.partialRecord(z.enum(DECORATION_SLOTS), AssetRefSchema.nullable()),
@@ -543,6 +726,11 @@ type MutuallyAssignable<A, B> = [A] extends [B] ? ([B] extends [A] ? true : fals
 type Assert<T extends true> = T;
 export type _ContractChecks = [
   Assert<MutuallyAssignable<z.infer<typeof MediaSchema>, Media>>,
+  Assert<MutuallyAssignable<z.infer<typeof SectionMediaSchema>, SectionMedia>>,
+  Assert<MutuallyAssignable<z.infer<typeof SectionAnimationSchema>, SectionAnimation>>,
+  Assert<MutuallyAssignable<z.infer<typeof ThemeOverridesSchema>, ThemeOverrides>>,
+  Assert<MutuallyAssignable<z.infer<typeof TypographySchema>, TypographyTokens>>,
+  Assert<MutuallyAssignable<z.infer<typeof OpeningConfigSchema>, OpeningConfig>>,
   Assert<MutuallyAssignable<z.infer<typeof VenueSchema>, Venue>>,
   Assert<MutuallyAssignable<z.infer<typeof RsvpConfigSchema>, RsvpConfig>>,
   Assert<MutuallyAssignable<z.infer<typeof SectionSchema>, Section>>,

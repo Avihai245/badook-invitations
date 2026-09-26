@@ -13,7 +13,7 @@ import { cappedLength } from '../lib/l10n';
 import { visibleGlyphCount } from '../lib/text';
 import { isHttpsUrl } from '../lib/urls';
 import { parseVideoLink } from '../lib/video-links';
-import { InvitationDocumentSchema } from './schemas';
+import { safeMigrateDocument } from './migrate';
 import type { AssetRef, InvitationDocument, L10n, Locale, Palette, Section, TemplateManifest } from './types';
 
 export type IssueSeverity = 'error' | 'warning';
@@ -44,7 +44,11 @@ export type IssueCode =
   | 'deadline_after_event' // params.deadline, params.date
   | 'venue_date_differs' // params.venueDate, params.date
   | 'contrast_low' // params.ratio, params.min
-  | 'empty_section';
+  | 'empty_section'
+  // v2 (cinematic presentation)
+  | 'layout_media' // params.layout: the layout needs media (video_bg: a video) — it renders as stack
+  | 'media_link' // a section's video must be a file (an upload), not a YouTube / Vimeo link
+  | 'media_poster'; // a section's video has no still (shown until it plays, and when saving data)
 
 /** Stable keys the editor maps to field labels. */
 export type FieldKey =
@@ -105,7 +109,22 @@ export type FieldKey =
   | 'rsvp.successMessage'
   | 'rsvp.declineMessage'
   | 'rsvp.closedMessage'
-  | 'footer.closingLine';
+  | 'footer.closingLine'
+  // v2
+  | 'section.media'
+  | 'section.themeOverrides'
+  | 'media.alt'
+  | 'parents.items'
+  | 'parents.label'
+  | 'parents.names'
+  | 'parents.note'
+  | 'when.note'
+  | 'where.note'
+  | 'quote.text'
+  | 'quote.attribution'
+  | 'custom.body'
+  | 'custom.ctaLabel'
+  | 'custom.ctaUrl';
 
 export interface Issue {
   /** dotted document path, e.g. 'sections.3.data.items.1.label' */
@@ -134,13 +153,23 @@ export const CAPS = {
   subtitle: 60,
   body: 600,
   timelineLabel: 22,
+  // v2 section types
+  quote: 240,
+  note: 200,
+  parentsNames: 80,
 } as const;
 
 export const MAX_VENUES = 4;
 
 /** Texts with an automatic fallback per language (see `pageTitle` / `pageDescription`). */
-const OPTIONAL_TEXTS = new Set<FieldKey>(['share.ogTitle', 'share.ogDescription']);
+const OPTIONAL_TEXTS = new Set<FieldKey>(['share.ogTitle', 'share.ogDescription', 'media.alt']);
 const MIN_TEXT_CONTRAST = 4.5;
+/** Text / background pairs whose contrast a palette override is checked for. */
+const CONTRAST_PAIRS: [keyof Palette, keyof Palette][] = [
+  ['ink', 'bg'],
+  ['inkMuted', 'bg'],
+  ['accentInk', 'accent'],
+];
 
 interface L10nField {
   path: string;
@@ -261,7 +290,49 @@ export function* l10nFields(doc: InvitationDocument): Generator<L10nField> {
       case 'footer':
         yield f('closingLine', section.data.closingLine, 'footer.closingLine');
         break;
+      case 'parents':
+        yield f('title', section.data.title, 'section.title', CAPS.title);
+        for (const [k, item] of section.data.items.entries()) {
+          yield f(`items.${k}.label`, item.label, 'parents.label', CAPS.title);
+          yield f(`items.${k}.names`, item.names, 'parents.names', CAPS.parentsNames);
+        }
+        yield f('note', section.data.note, 'parents.note', CAPS.note);
+        break;
+      case 'when':
+        yield f('title', section.data.title, 'section.title', CAPS.title);
+        yield f('note', section.data.note, 'when.note', CAPS.note);
+        break;
+      case 'where': {
+        const v = section.data.venue;
+        yield f('venue.label', v.label, 'venue.label', CAPS.title);
+        yield f('venue.name', v.name, 'venue.name');
+        yield f('venue.address', v.address, 'venue.address');
+        yield f('note', section.data.note, 'where.note', CAPS.note);
+        break;
+      }
+      case 'quote':
+        yield f('text', section.data.text, 'quote.text', CAPS.quote);
+        yield f('attribution', section.data.attribution, 'quote.attribution', CAPS.subtitle);
+        break;
+      case 'custom': {
+        const d = section.data;
+        yield f('title', d.title, 'section.title', CAPS.title);
+        yield f('subtitle', d.subtitle, 'section.subtitle', CAPS.subtitle);
+        // a title alone, or a picture band, is a whole section: its text is checked once it has one
+        if (Object.values(d.body).some((v) => v?.trim())) yield f('body', d.body, 'custom.body', CAPS.body);
+        if (d.cta) yield f('cta.label', d.cta.label, 'custom.ctaLabel');
+        break;
+      }
     }
+    // v2: a content picture's description (optional: without it the picture is decorative)
+    if (section.media?.alt)
+      yield {
+        path: `sections.${i}.media.alt`,
+        value: section.media.alt,
+        field: 'media.alt',
+        section,
+        unused: !section.enabled,
+      };
   }
 }
 
@@ -299,6 +370,14 @@ function* assetRefs(doc: InvitationDocument): Generator<{
       for (const [k, img] of section.data.images.entries())
         yield { path: `${base}.images.${k}.src`, ref: img.src, field: 'gallery.image', section, unused };
     }
+    // v2: a section's own picture or video (and its still)
+    const media = section.media;
+    if (media) {
+      const at = `sections.${i}.media`;
+      yield { path: `${at}.src`, ref: media.src, field: 'section.media', section, unused };
+      if (media.poster)
+        yield { path: `${at}.poster`, ref: media.poster, field: 'section.media', section, unused };
+    }
   }
 }
 
@@ -331,18 +410,14 @@ export function validateDocument(
   { mode, now = Date.now() }: ValidateOptions,
 ): ValidationResult {
   const issues: Issue[] = [];
-  const parsed = InvitationDocumentSchema.safeParse(input);
+  // any known schema version (v1 is migrated first): the rules apply to the latest shape
+  const parsed = safeMigrateDocument(input);
   if (!parsed.success) {
-    for (const zi of parsed.error.issues)
-      issues.push({
-        path: zi.path.map(String).join('.'),
-        code: 'invalid',
-        severity: 'error',
-        params: { message: zi.message },
-      });
+    for (const zi of parsed.issues)
+      issues.push({ path: zi.path, code: 'invalid', severity: 'error', params: { message: zi.message } });
     return split(issues);
   }
-  const doc = parsed.data as InvitationDocument;
+  const doc = parsed.data;
   const add = (issue: Issue) => issues.push(issue);
   const contentSeverity: IssueSeverity = mode === 'publish' ? 'error' : 'warning';
 
@@ -520,6 +595,20 @@ export function validateDocument(
       case 'faq':
         if (!s.data.items.length) emptyList('items', 'faq.items');
         break;
+      case 'custom':
+        if (s.data.cta && !isHttpsUrl(s.data.cta.url))
+          add({
+            path: `${base}.cta.url`,
+            code: 'invalid_url',
+            severity,
+            field: 'custom.ctaUrl',
+            sectionId: s.id,
+          });
+        break;
+      case 'parents':
+        // no names at all: the section falls back to hosts.parents; without those either it is empty
+        if (!s.data.items.length && !doc.hosts.parents) emptyList('items', 'parents.items');
+        break;
       case 'gifts':
         if (!s.data.links.length) emptyList('links', 'gifts.links');
         for (const [k, link] of s.data.links.entries()) {
@@ -553,6 +642,57 @@ export function validateDocument(
         break;
       default:
         break;
+    }
+    // ── v2 presentation ──
+    const layout = s.type === 'hero' ? 'full_bleed' : (s.layout ?? 'stack');
+    const media = s.type === 'hero' ? null : (s.media ?? null);
+    if (
+      s.type !== 'hero' &&
+      layout !== 'stack' &&
+      (!media || (layout === 'video_bg' && media.kind !== 'video'))
+    )
+      add({
+        path: `sections.${i}.${media ? 'media' : 'layout'}`,
+        code: 'layout_media',
+        severity: 'warning',
+        field: 'section.media',
+        sectionId: s.id,
+        params: { layout },
+      });
+    if (media?.kind === 'video') {
+      if (parseVideoLink(media.src))
+        add({
+          path: `sections.${i}.media.src`,
+          code: 'media_link',
+          severity,
+          field: 'section.media',
+          sectionId: s.id,
+        });
+      else if (!media.poster)
+        add({
+          path: `sections.${i}.media.poster`,
+          code: 'media_poster',
+          severity: 'warning',
+          field: 'section.media',
+          sectionId: s.id,
+        });
+    }
+    const own = s.themeOverrides?.palette;
+    if (own && Object.keys(own).length) {
+      const palette: Palette = { ...template.tokens.palette, ...doc.theme.palette, ...own };
+      for (const [fg, bg] of CONTRAST_PAIRS) {
+        if (!(fg in own) && !(bg in own)) continue;
+        const ratio = contrastRatio(palette[fg], palette[bg]);
+        if (ratio < MIN_TEXT_CONTRAST)
+          add({
+            path: `sections.${i}.themeOverrides.palette.${fg in own ? fg : bg}`,
+            code: 'contrast_low',
+            severity: 'warning',
+            field: 'section.themeOverrides',
+            sectionId: s.id,
+            params: { ratio: Math.round(ratio * 100) / 100, min: MIN_TEXT_CONTRAST },
+          });
+      }
     }
   }
 
@@ -633,12 +773,7 @@ export function validateDocument(
   const overrides = doc.theme.palette ?? {};
   if (Object.keys(overrides).length) {
     const palette: Palette = { ...template.tokens.palette, ...overrides };
-    const pairs: [keyof Palette, keyof Palette][] = [
-      ['ink', 'bg'],
-      ['inkMuted', 'bg'],
-      ['accentInk', 'accent'],
-    ];
-    for (const [fg, bg] of pairs) {
+    for (const [fg, bg] of CONTRAST_PAIRS) {
       if (!(fg in overrides) && !(bg in overrides)) continue;
       const ratio = contrastRatio(palette[fg], palette[bg]);
       if (ratio < MIN_TEXT_CONTRAST)

@@ -10,6 +10,7 @@ import {
 } from '@/features/invitations/renderer/context';
 import { InvitationBody } from '@/features/invitations/renderer/InvitationBody';
 import { buildLivePayload } from '@/features/invitations/renderer/live/build';
+import { cinematicForPage } from '@/features/invitations/server/cinematic';
 import { OG_SIZE, ogVersion } from '@/features/invitations/server/og-image';
 import {
   getPublishedInvitation,
@@ -28,9 +29,10 @@ export async function generateStaticParams(): Promise<{ slug: string; lang: stri
   return [];
 }
 
-function renderOptions(invitation: PublishedInvitation): Omit<RenderOptions, 'mode'> {
+function renderOptions(invitation: PublishedInvitation, cinematic: boolean): Omit<RenderOptions, 'mode'> {
   const env = serverEnv();
   return {
+    cinematic,
     followUp: invitation.followUp,
     brand: env.INVITES_BRAND_NAME,
     publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
@@ -42,9 +44,9 @@ function renderOptions(invitation: PublishedInvitation): Omit<RenderOptions, 'mo
   };
 }
 
-function context(invitation: PublishedInvitation, locale: Locale): RenderContext {
+function context(invitation: PublishedInvitation, locale: Locale, cinematic = false): RenderContext {
   return buildRenderContext(invitation.doc, invitation.entry.manifest, locale, {
-    ...renderOptions(invitation),
+    ...renderOptions(invitation, cinematic),
     mode: 'live',
   });
 }
@@ -118,12 +120,14 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   const locale = invitation && resolveLocale(invitation.doc, lang);
   if (!invitation || !locale) notFound();
   const next = otherLocale(invitation.doc, locale);
+  // the event's `cinematic` feature: its v2 presentation, or the plain rendering (features/flags)
+  const cinematic = await cinematicForPage(invitation.id, invitation.doc, invitation.entry.manifest);
   // the pill's plain link keeps the cover skipped; with JS the language switches in place (LiveLocale)
   const link = (l: Locale) => `/i/${slug}?lang=${l}&open=1`;
   const live = buildLivePayload(
     invitation.doc,
     invitation.entry.manifest,
-    renderOptions(invitation),
+    renderOptions(invitation, cinematic),
     (l) => ({
       url: `/i/${slug}?lang=${l}`,
       href: link(l),
@@ -131,7 +135,7 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   );
   return (
     <InvitationBody
-      ctx={context(invitation, locale)}
+      ctx={context(invitation, locale, cinematic)}
       showCover
       skipCoverFromUrl
       langSwitchHref={next ? link(next) : null}

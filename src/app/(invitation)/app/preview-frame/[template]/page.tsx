@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import type { Locale } from '@/features/invitations/contracts/types';
 import { PreviewFrame } from '@/features/invitations/editor/preview/PreviewFrame.client';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
+import { cinematicFor } from '@/features/invitations/server/cinematic';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { getTemplate } from '@/features/invitations/templates/registry';
 import { serverEnv } from '@/lib/env';
@@ -40,7 +41,12 @@ export default async function PreviewFramePage({
     const other = doc.locales.find((l) => l !== locale);
     const query = (l: Locale) =>
       `?${new URLSearchParams({ invitation, ...(version ? { version } : {}), lang: l }).toString()}`;
-    standalone = { doc, locale, langHref: other ? query(other) : null };
+    standalone = {
+      doc,
+      locale,
+      langHref: other ? query(other) : null,
+      cinematic: await cinematicFor(inv.id),
+    };
   }
   return (
     <PreviewFrame

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { fontFaceCss, templateFontFamilies } from '@/features/invitations/fonts';
 import { FrameScrollCue } from '@/features/invitations/renderer/FrameScrollCue.client';
+import { IMAGE_FALLBACK } from '@/features/invitations/renderer/images';
 import { getTemplate } from '@/features/invitations/templates/registry';
 import '@/features/invitations/ui/invitation.css';
 import { assertInvitationsEnabled } from '@/lib/feature';
@@ -43,6 +44,8 @@ export default async function PreviewFrameLayout({
     >
       <head>
         <style dangerouslySetInnerHTML={{ __html: fontFaceCss(templateFontFamilies(entry.manifest)) }} />
+        {/* an optimized image that fails falls back to its original address (renderer/images.ts) */}
+        <script dangerouslySetInnerHTML={{ __html: IMAGE_FALLBACK }} />
       </head>
       <body suppressHydrationWarning>
         {children}

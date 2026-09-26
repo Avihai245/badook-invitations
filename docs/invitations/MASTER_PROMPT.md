@@ -117,7 +117,7 @@ export type AssetRef = string;  // 'template:<key>' | 'upload:<storage path>' | 
 
 // ---------- document ----------
 export interface InvitationDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;               // v1 (the §10 examples, older drafts) is migrated on read and on save — below
   templateId: string;
   eventType: EventType;
   locales: Locale[];              // order = switcher order
@@ -143,6 +143,7 @@ export interface InvitationDocument {
     monogram: L10n | null;        // overlay text; ≤ template.cover.overlay.text.maxGlyphs visible glyphs (e.g. 'N&I', 'נ&א', 'DANA 30')
     sealColor: string | null;     // must be in template.cover.sealColors when overlay.recolor
     hint: L10n | null;
+    opening?: OpeningPreset | null;  // v2: the host's cinematic opening; absent / null → the template's cover.opening
   };
   music: { enabled: boolean; trackId: string | null; customUrl: AssetRef | null; volume: number; startAtSec: number };
   share: { slug: string; ogTitle: L10n | null; ogDescription: L10n | null; ogImage: AssetRef | null; noindex: boolean };
@@ -151,7 +152,47 @@ export interface InvitationDocument {
 
 export interface Media { kind: 'image' | 'video'; src: AssetRef; poster: AssetRef | null; focalPoint: { x: number; y: number } }
 
-interface Base<T extends string, D> { id: string; type: T; enabled: boolean; variant?: string; data: D }
+// ---------- v2: cinematic presentation (feature `cinematic`; all optional — without them v1 rendering) ----------
+/** stack = the classic column (the media framed above the text) · full_bleed = media behind the text, edge to
+ *  edge, under a scrim · split_start / split_end = beside the text on wide screens (start = the reading side:
+ *  right in Hebrew), above / below it on a phone · parallax = full-bleed, the media drifting slower than the page
+ *  · video_bg = full-bleed looping muted video over its poster. A layout that needs media renders as stack without it. */
+export type SectionLayout = 'stack' | 'full_bleed' | 'split_start' | 'split_end' | 'parallax' | 'video_bg';
+export interface SectionMedia extends Media {  // an upload (or template asset) — never a YouTube / Vimeo link
+  alt?: L10n | null;              // what a content picture shows (stack / split); backgrounds are decorative
+  overlay?: number | null;        // scrim under text, 0..0.85; null → template.tokens.overlay
+}
+export type EnterPreset = 'auto' | 'none' | 'fade' | 'rise' | 'sink' | 'zoom' | 'zoom_out' | 'slide_start' | 'slide_end' | 'tilt';
+export interface SectionAnimation {   // missing fields take DEFAULT_SECTION_ANIMATION's (the schema fills them)
+  enter: { preset: EnterPreset;     // 'auto' = the template's own reveal (§9A.6)
+           duration: number;        // ms 150..4000 (900) — as scroll distance where scroll-driven: 0.3px per ms
+           delay: number;           // ms 0..3000 (0)
+           distance: number;        // px 0..240 (40), × intensity
+           easing: 'smooth' | 'spring' | 'gentle' | 'linear' };
+  scroll: 'none' | 'parallax' | 'ken_burns';        // what the media does while the section scrolls by
+  text: 'none' | 'letters' | 'words' | 'lines';     // titles / texts / quotes revealed piece by piece (real text stays in the DOM)
+  stagger: number;                // ms between blocks / letters / words, 0..600 (80)
+  intensity: number;              // 0..2 (1), × template.motion.intensity
+}
+export interface ThemeOverrides {    // a section's own tokens — only what it changes
+  palette?: Partial<Palette>;     // any key (a band of its own colors); contrast is checked (warning)
+  radius?: { card?: number; button?: number; media?: number };
+  typography?: Partial<Record<'display' | 'heading' | 'body' | 'caption', Partial<{ size: number; lineHeight: number; letterSpacing: number }>>>;
+  spacing?: Partial<{ section: number; gutter: number; block: number }>;
+}
+export type OpeningPreset = 'envelope' | 'gate' | 'curtain' | 'fireworks' | 'gold_dust';   // envelope = the template's own cover
+export interface OpeningConfig {
+  preset: OpeningPreset;
+  trigger?: 'tap' | 'scroll';     // scroll: scrolling / swiping opens it too, with a "scroll to enter" cue (gate, curtain default)
+  motion?: 'swing' | 'slide' | 'part' | 'rise';   // gate: swing | slide · curtain: part | rise
+  color?: string | null;          // doors / curtain / sky; null → from the palette
+}
+
+interface Base<T extends string, D> {
+  id: string; type: T; enabled: boolean; variant?: string; data: D;
+  // v2 (the hero: media stays data.media — its own `media` is null and `layout` 'full_bleed'; it takes animation and themeOverrides)
+  media?: SectionMedia | null; layout?: SectionLayout; animation?: SectionAnimation | null; themeOverrides?: ThemeOverrides | null;
+}
 
 export type Section =
   | Base<'hero', {
@@ -186,7 +227,13 @@ export type Section =
     }>
   | Base<'reveal', { title: L10n; mechanic: 'scratch' | 'tap' | 'spin'; prompt: L10n; showCalendarButton: boolean }>
   | Base<'rsvp', RsvpConfig>
-  | Base<'footer', { showHosts: boolean; showDate: boolean; showParents: boolean; closingLine: L10n | null; showCredit: boolean }>;
+  | Base<'footer', { showHosts: boolean; showDate: boolean; showParents: boolean; closingLine: L10n | null; showCredit: boolean }>
+  // v2 section types (they render without the feature too — plainly, without their media)
+  | Base<'parents', { title: L10n | null; items: { id: string; label: L10n; names: L10n }[]; note: L10n | null }>   // no items → hosts.parents
+  | Base<'when', { title: L10n | null; showWeekday: boolean; showHebrewDate: boolean; showTime: boolean; countdown: boolean; showCalendar: boolean; note: L10n | null }>
+  | Base<'where', { venue: Venue; note: L10n | null }>    // one place told big; counts as a venue (calendar, .ics)
+  | Base<'quote', { text: L10n; attribution: L10n | null }>
+  | Base<'custom', { title: L10n | null; subtitle: L10n | null; body: L10n; cta: { label: L10n; url: string } | null }>;  // text over / beside media; no text = a picture band
 
 export interface Venue {
   id: string;
@@ -238,7 +285,15 @@ export interface TemplateManifest {
   categories: EventType[];
   supportsLocales: Locale[];
   previewImage: string; previewVideo: string | null;
-  tokens: { palette: Palette; editablePaletteKeys: (keyof Palette)[]; radius: { card: number; button: number }; divider: 'gradient_line' | 'none' };
+  tokens: {
+    palette: Palette; editablePaletteKeys: (keyof Palette)[];
+    radius: { card: number; button: number; media?: number };   // media (v2): a section's framed picture; absent → card
+    divider: 'gradient_line' | 'none';
+    // v2 — each defaults to the design's own values (a manifest without them keeps its look)
+    typography: Record<'display' | 'heading' | 'body' | 'caption', { size: number; lineHeight: number; letterSpacing: number }>;  // × the base scale (1, 1, 0)
+    spacing: { section: number; gutter: number; block: number };   // × 56/80px section padding, 24px gutter, in-section gaps (1)
+    overlay: { color: string | null; opacity: number | null };   // the scrim under text on media; null → hero.overlayColor / 0.42
+  };
   palettePresets: { id: string; name: L10n; palette: Partial<Palette> }[];   // keys ⊆ editablePaletteKeys; shown as swatches
   fontPairs: FontPair[];                         // [0] is default
   cover: {
@@ -258,6 +313,7 @@ export interface TemplateManifest {
     };
     sealColors: string[];
     monogramFont: { latin: string; hebrew: string };
+    opening: OpeningConfig | null;               // v2: a cinematic opening instead of the style's own (feature `cinematic`)
   };
   hero: {
     options: { id: string; name: L10n; media: Media; mediaDesktop: Media | null }[];   // [0] default; offered in the editor
@@ -270,6 +326,7 @@ export interface TemplateManifest {
     // it. Without it the renderer picks one by template id (renderer/fx/theme.ts FX_BY_TEMPLATE), else by
     // the first event type. preset 'none' turns all of them off.
     ambient?: 'none' | 'petals' | 'leaves' | 'confetti' | 'sparkles' | 'stars' | 'bubbles' | 'balloons' | 'hearts' | 'fireflies' | 'embers' | 'notes' | 'pixels';
+    intensity: number;                           // v2: × every travel of the motion engine (reveal distance, parallax, zoom), 0..2 (1)
   };
   assets: Record<string, string>;               // referenced as 'template:<key>'
   decorations: Partial<Record<'afterHero' | 'betweenVenues' | 'afterTimeline' | 'beforeRsvp' | 'footer', AssetRef | null>>;
@@ -323,9 +380,10 @@ export type RsvpResult = { ok: true; responseId: string; editToken: string } | {
 - `sections`: unique ids; `hero` first; `footer` last; ≤1 `rsvp`; if an enabled `rsvp` exists → `event.rsvpDeadline` required.
 - `theme.palette` keys ⊆ `template.tokens.editablePaletteKeys`; when `overlay.recolor`, `cover.sealColor` ∈ `template.cover.sealColors` (else must be null); hero `media.src` is the `src` (video) or `poster` (still image) `template:` key of one of `hero.options`, or an `upload:`; `theme.fontPairId` ∈ `template.fontPairs`; `template:<key>` refs exist in `template.assets`; `eventType` ∈ `template.categories`; `locales` ⊆ `template.supportsLocales`.
 - `slug`: `/^[a-z0-9-]{3,60}$/`, unique; suggest from transliterated host names.
+- v2: a section's `media.src` / `poster` refs are checked like any asset; a layout that needs media without it (or `video_bg` with a picture) → warning `layout_media` (renders as `stack`); a section video that is a YouTube / Vimeo link → `media_link` (blocking on publish); a video without a poster → warning `media_poster`; a section palette override below 4.5:1 for its text pairs → warning `contrast_low`; `custom.body` and `cta` follow the text rules once they have text (a title alone, or a picture band, is a whole section) and its `cta.url` must be https (`invalid_url`); `parents` with neither items nor `hosts.parents` → warning `empty_section`; new types' L10n fields follow the locale rules (`media.alt` optional).
 - RSVP (attending): 1 ≤ adults ≤ maxAdults; 0 ≤ children ≤ maxChildren (0 if !askChildren); adult[0] firstName+lastName required, phone required if `requirePhone`, email if `requireEmail`; other adults first+last required; children fullName + age 0–17; `none` is mutually exclusive with other dietary keys; `nut_allergy|other_allergy` → `dietaryNotes` required. Decline: fullName + (phone or email). Phones normalized to E.164 (`libphonenumber-js`, default country IL when locale `he`).
 
-Add `schemaVersion` migrations: `migrateDocument(doc) → latest`.
+Add `schemaVersion` migrations: `migrateDocument(doc) → latest` (`contracts/migrate.ts`), applied on every read (drafts, published versions, the guest's page, notifications) and on save — the host API accepts any known version and stores the latest; `safeMigrateDocument` returns issues instead of throwing. v1 → v2 only sets `schemaVersion: 2`: every v2 field is optional, so the migration is pure, lossless and idempotent, and a v1 document renders byte-for-byte as before (tested on every template's defaults, every seeded demo and the §10 fixtures). A v2 document can't be read by a release older than v2.
 
 ---
 
@@ -441,6 +499,10 @@ Routes (adapt names to the repo's conventions):
 - **Fonts**: load via `next/font` (or equivalent) with `unicode-range` so HE pages don't download Latin script fonts and vice versa; preload only the display font of the active locale; `font-display: swap`. Resolve font per element: `fontFor(role, locale)` → `pair[role].hebrew` for `he`, `.latin` otherwise. Latin names inside Hebrew text fall back via the font stack.
 - **Editor hooks**: in `mode="editor"` every editable node gets `data-edit-path="sections.3.data.items.1.label"`; clicking calls `onSelectPath(path)`. No hover outlines in `live`.
 - **Asset resolution**: `resolveAsset(ref, template, invitation)` handles `template:` / `upload:` / https.
+- **Cinematic presentation (v2, feature `cinematic`)** — `renderer/cinematic`: a section with media, a layout, motion or tokens of its own is wrapped in `<div class="cine" data-layout data-on-media data-enter data-scroll data-tr data-palette>` (`CineSection`); full-bleed layouts put the media behind the text under a scrim (`tokens.overlay`, or the section's `media.overlay` for its opacity) — the text on media is light on a dark scrim in the design's own hues (its hero overlay when dark, else its ink; the text its paper or white), even on designs whose hero has dark text over pale art, unless the section sets its own `heroText` (the scrim follows it) or the template a light `tokens.overlay.color` (the text goes dark) — split layouts beside it (CSS grid; start follows `dir`), stack above it. Focal points → `object-position`. Section `themeOverrides` become the wrapper's CSS variables (`sectionThemeVars`), so they apply to that section only. Without the feature (`RenderOptions.cinematic: false`) nothing of this renders: sections come out exactly as v1, the new types render plainly without media, the cover is the template's own. The guest's page asks the event's flags only when the document or template uses v2 (`server/cinematic.ts`); a feature change reaches a cached page within the ISR minute (or at once on the next publish).
+- **Scroll Timeline Engine** — `renderer/motion/engine.ts` (animation JSON → attributes + variables, pure) and `ScrollEngine.client.tsx` (one component per page): CSS scroll-driven animations (`animation-timeline: view()`, a `view-timeline` per section) scrub the enter presets, the parallax and the Ken Burns zoom where supported; elsewhere one IntersectionObserver adds `.in` and the presets play in time, and the parallax is written once per frame from geometry measured outside the scroll handler. Transform and opacity only. Text reveals split a title into aria-hidden pieces over the real text (read once) and remove them after playing. Background videos get their `src` only near the screen (never with Save-Data, `prefers-reduced-data` or reduced motion), play muted/looped/inline and pause off screen. Blocks too near the page's end to finish a scroll-driven entrance come in on time instead. Reduced motion or `<html data-motion="none">`: everything static.
+- **Openings (v2)** — `renderer/cover/Openings.client.tsx`: gate (doors swing / slide), curtain (parts / rises), fireworks, gold dust, besides the template's envelope; the host's `cover.opening` wins over the template's `cover.opening` (whose trigger / motion / color apply when the presets match). The monogram is real text (set smaller on the medal / crest when it is long); gate and curtain also open by scrolling or swiping ("גללו להיכנס / Scroll to enter"); without a hint from the host each opening shows its own call to action (`cover.hint.<preset>`: "Tap to open the gate"…) — the template's seeded hint speaks of its own cover, so when the host picks another opening the editor should clear `cover.hint` (or offer the opening's wording); colors default to the design's dark tone (its ink on a light design, its background on a dark one); the light is a small canvas (`fx/sparks.ts`); reduced motion → a 300ms fade.
+- **Responsive images** — `renderer/images.ts`: pictures go through Next's image optimizer (AVIF/WebP, srcset + sizes per layout) when `next.config.ts` allows their host (the Supabase Storage buckets from `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL`, and local paths); anything else, or `INVITES_IMAGE_OPTIMIZATION=off`, is a plain `<img>`, and an optimized image that fails falls back to its original (an inline capture listener). The renderer writes the optimizer's addresses itself (next/image's default-loader format, widths and qualities shared with `next.config.ts` via `renderer/image-config.ts`), so next/image stays out of the guest's bundle. The hero's picture is the only eager one besides the cover's (`fetchpriority=high`; React hoists its preload with the srcset); every section picture is lazy; videos have posters.
 - **Public bundle** must not import editor code (separate route group / dynamic imports).
 - **Utilities (unit-tested)**:
   - `formatEventDate(doc, locale)` → HE: `יום חמישי, 17 ביוני 2027` · EN: `Thursday, 17 June 2027` (`Intl.DateTimeFormat` with `he-IL` / `en-GB` by default — keep the Intl locale in one config map so `en-US` ordering can be offered later; timeZone = doc.timezone).
@@ -500,6 +562,8 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
 ## 9. Performance, accessibility, security
 
 - LCP < 2.5s on mid-range mobile/4G: preload cover poster (≤200KB AVIF/WebP) and active display font; hero video ≤4MB 720×1280 H.264 with poster; below-the-fold images lazy; map iframe only after in view (static placeholder first); no editor code in the public bundle.
+- **Performance budget gate** — `npm run perf:templates` (`scripts/perf-templates.ts`, Playwright + the DevTools protocol, no Lighthouse; `.github/workflows/perf-templates.yml`): every template's demo and the v2 showcase on a 390×844 phone with Lighthouse's mobile 4G throttling (150 ms RTT, 1.6 Mbps down, 750 Kbps up — per request 562.5 ms, ×0.9) and a 4× slower CPU must keep LCP < 2.5 s (before the first tap), CLS < 0.1 (the whole visit) and a median ≥ 55 fps of frames the compositor presents while the whole invitation is scrolled (a trace's DrawFrame events; the main thread's frame rate over the same scroll is reported beside it, as information); JSON + Markdown report in `test-results/perf/`.
+- **First paint** — the page's shell must stay under React's 12.8 KB inlining limit so the cover comes with the first bytes: the font-face rules are a style resource (`<style href precedence>`, written into the head outside the shell), the cover has a Suspense boundary of its own ahead of the sections (which stream after it, under it), a drawn design's scene on the envelope's card streams after the cover, and the cover's call to action is on screen from the first paint. A boundary past the limit is streamed and revealed ≥ 300 ms after the first paint (React 19.2), moved into place (restarting its CSS animations) and restyled with the whole page.
 - Cover works in iOS Safari, Android Chrome, and WhatsApp/Instagram in-app browsers (test `playsInline`, audio start inside the gesture, `100svh`).
 - A11y: cover is a `<button aria-label>`; keyboard operable everywhere; visible focus; AA contrast; `aria-live="polite"` for form status; all animations disabled under `prefers-reduced-motion`; music never autoplays without a gesture and is always mutable.
 - Security: RLS as in §4; server-side validation only; rate limiting; honeypot + time check (optional Cloudflare Turnstile flag); sanitize text (render as text, never HTML); signed uploads with MIME/size checks; edit tokens stored hashed (SHA-256); responses deleted with the invitation.
@@ -578,7 +642,7 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
 ### 9A.6 Motion summary
 | What | Spec |
 |---|---|
-| Cover idle | hint fades in after 1.2s · overlay pulse scale 1→1.04, 2.4s loop · the envelope / ticket floats ±4px, 6s |
+| Cover idle | hint shows with the cover, rising 8px (on a cover with no picture and no monogram it is the first screen's largest text — its LCP) · overlay pulse scale 1→1.04, 2.4s loop · the envelope / ticket floats ±4px, 6s |
 | Cover open | overlay exit in `holdMs` (crack 450ms / lift 400ms / fade 250ms) with a flash of light and a spray of sparks → video → crossfade 600ms with the template's burst (CSS fallback: flap 700ms with a glow from inside, card rises 750ms and the template's burst comes out of it at 1.25s, then the card lifts toward the guest and dissolves while the envelope falls away, fade 800ms; ticket: the stub tears off at the perforation with the burst, the ticket lifts away) |
 | Particles (`renderer/fx`) | burst: a canvas that exists ≈ 3s, ≤ 24 particles on a phone (40 elsewhere), petals / confetti / sparkles / stars / bubbles / balloons / hearts / fireflies / embers / notes / pixels in the palette's colors · hero ambient: CSS (transform/opacity), ≤ 24 on a phone, after the cover opens, paused off screen and in a hidden tab, none with Save-Data |
 | Hero text | lead 0 → names one by one (140/420/560ms, 1.35s, from `opacity 0, blur(12px), y .3em, scale .96`) with a gold-foil glint sweeping each name once (in the reading direction) → rule draws (780ms) and a spark runs along it → date 900ms → place 1.02s · the scene / photo / video settles from scale 1.12 over 2.8s · where scroll-driven animations exist, the media drifts slower than the page and the text lifts away |
@@ -590,7 +654,9 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
 | RSVP success | the badge pops, its ring and check draw, two ripples, then the message rises; a "yes" bursts in the template's particles |
 | Buttons | press in (scale .95, 80ms) and spring back; the fabs pop in after the cover opens |
 | Floating controls | fade + rise 8px, 500ms |
-| Reduced motion | everything above becomes instant — no particles, no glint, no parallax; the cover uses a 300ms fade |
+| Sections (v2) | a section's `animation`: enter presets (fade, rise, sink, zoom, zoom out, slide from the start / end, tilt) scrubbed by the scroll (0.3px per ms of duration) or played once in view; parallax (media ±9% of its box) and Ken Burns (to ×1.14) tied to the section's passage; text reveals by letters (≤ 90, else words), words (≤ 140, else lines) or lines; × intensity |
+| Openings (v2) | gate 820ms · curtain 760ms · fireworks ≈ 1.25s · gold dust 700ms, then the invitation fades in; scroll / swipe to enter follows the finger a little first |
+| Reduced motion | everything above becomes instant — no particles, no glint, no parallax, no text reveals, no background video (its poster); the cover uses a 300ms fade |
 
 ### 9A.7 Desktop (≥ 1024px)
 Same single column (560px), full-bleed hero using `mediaDesktop` (or the 9:16 media over a blurred copy), horizontal timeline, 16:9 map, same floating controls. No sidebars, no multi-column layouts: the invitation must feel like the phone experience, just wider.
@@ -2136,6 +2202,7 @@ Every template ships `manifest.json` (contract above), `defaults.json` (HE+EN se
 10. RLS tests: anonymous cannot read drafts/responses; owner A cannot read owner B's data.
 11. Design: the public page for `noa-and-itay` at 390×844 (`?open=1`) is visually equivalent to `design-reference/invitation.html` (same section order, type scale ±2px, spacing ±4px, colors exact); editor, gallery, responses and share screens at 1440×900 follow `app.html` layouts; RTL mirroring correct everywhere (steppers, switches, bars, directional icons, drawers from inline-end).
 12. Kitchen-sink: no text overflow or overlap with the longest allowed strings (20-char names, 40-char eyebrow, 22-char timeline labels) in every template and locale.
+13. v2: `migrateDocument` is pure, lossless and idempotent on every template's defaults, every demo and the fixtures, and they render the same; the showcase (`/dev/invitations/render/<id>/<lang>/cinematic`, `?opening=`, `?cinematic=0`, `?motion=`) renders every layout and opening on a phone and a desktop, statically with reduced motion, through a language switch, and plainly without the feature (`tests/e2e/cinematic.spec.ts`); `npm run perf:templates` passes.
 
 ---
 

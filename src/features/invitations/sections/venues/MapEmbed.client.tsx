@@ -7,7 +7,7 @@ import { Icon } from '../../ui/Icon';
  * A venue's map (§2.2 Venues, §7 performance): the static placeholder until it comes near the
  * viewport, then Google's key-less embed on top of it, faded in once loaded. Without `src` (editor
  * and previews), or with ?external=0 (the site's sample when its visitor turned external content
- * off), it stays the placeholder. The class list never changes after mount: RevealObserver
+ * off), it stays the placeholder. The class list never changes after mount: the ScrollEngine
  * adds `in` to it directly.
  */
 export function MapEmbed({

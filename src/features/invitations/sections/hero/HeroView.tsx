@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { AssetRef, SectionOf } from '../../contracts/types';
+import { imageSet } from '../../renderer/images';
 import { longestWordLength } from '../../lib/text';
 import { parseVideoLink } from '../../lib/video-links';
 import { Ambient } from '../../renderer/fx/Ambient.client';
@@ -65,6 +66,28 @@ function HeroPlaceholder({ art, date }: { art: PlaceholderArt; date: string }) {
   );
 }
 
+/**
+ * The hero's picture — the first section's media, the first thing on screen after the cover: where the
+ * image optimizer may serve it (renderer/images.ts), in the screen's width and a modern format. It is
+ * the invitation's only eager picture besides the cover's: React hoists a preload for it into the
+ * <head> (with its srcset), while every other picture loads lazily.
+ */
+function HeroPicture({ url, focal }: { url: string; focal: string }) {
+  const set = imageSet(url, '100vw');
+  return (
+    <img
+      src={set.src}
+      srcSet={set.srcSet}
+      sizes={set.sizes}
+      data-fallback={set.fallback}
+      alt=""
+      style={{ objectPosition: focal }}
+      fetchPriority="high"
+      suppressHydrationWarning
+    />
+  );
+}
+
 export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) {
   const d = section.data;
   const { doc } = ctx;
@@ -100,9 +123,9 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
       />
     );
   } else if (d.media.kind === 'video' && poster) {
-    media = <img src={poster} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
+    media = <HeroPicture url={poster} focal={focal} />;
   } else if (d.media.kind === 'image' && src) {
-    media = <img src={src} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
+    media = <HeroPicture url={src} focal={focal} />;
   }
   // Template media only resolves once the file is in the bucket (media-manifest.json), but an uploaded
   // or linked file can be missing (the kit fixtures point at uploads that don't exist; a host may

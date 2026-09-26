@@ -5,17 +5,17 @@
  */
 import { randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { safeMigrateDocument } from '../contracts/migrate';
 import {
   EventTypeSchema,
   HHmmSchema,
-  InvitationDocumentSchema,
   ISODateSchema,
   L10nSchema,
   LocaleSchema,
   SLUG_RE,
   TimezoneSchema,
 } from '../contracts/schemas';
-import type { InvitationDocument, L10n, Locale } from '../contracts/types';
+import type { L10n, Locale } from '../contracts/types';
 import { validateDocument } from '../contracts/validate';
 import { findFontPair } from '../fonts/library';
 import { graphemes } from '../lib/text';
@@ -243,10 +243,10 @@ export async function saveDraft(
 ): Promise<ApiResult> {
   const parsed = SaveDraftSchema.safeParse(raw);
   if (!parsed.success) return fail(400, 'invalid');
-  const draft = InvitationDocumentSchema.safeParse(parsed.data.draft);
-  if (!draft.success)
-    return fail(422, 'invalid', { issues: draft.error.issues.slice(0, 20).map((i) => i.path.join('.')) });
-  const result = await deps.db.saveDraft(id, userId, draft.data as InvitationDocument, parsed.data.updatedAt);
+  // any known schema version (an editor still open on the previous release saves v1): stored as the latest
+  const draft = safeMigrateDocument(parsed.data.draft);
+  if (!draft.success) return fail(422, 'invalid', { issues: draft.issues.slice(0, 20).map((i) => i.path) });
+  const result = await deps.db.saveDraft(id, userId, draft.data, parsed.data.updatedAt);
   if (!result) return fail(404, 'not_found');
   if (!result.ok) return fail(409, 'conflict', { updatedAt: result.updatedAt, draft: result.draft });
   return ok({ ok: true, updatedAt: result.updatedAt });

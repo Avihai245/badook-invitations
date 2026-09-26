@@ -9,14 +9,16 @@ import {
 } from '../contracts/types';
 import { FIXTURES, demoDocument, stressDocument, type FixtureId } from '../templates/demo';
 import { getTemplate, type TemplateEntry } from '../templates/registry';
+import { cinematicDocument } from './cinematic-demo';
 
-export const DEV_DOCS = ['demo', 'stress', ...(Object.keys(FIXTURES) as FixtureId[])] as const;
+export const DEV_DOCS = ['demo', 'stress', 'cinematic', ...(Object.keys(FIXTURES) as FixtureId[])] as const;
 
 export const isLocale = (v: string): v is Locale => (LOCALES as readonly string[]).includes(v);
 
 /**
  * Kitchen-sink documents: `demo` (seeded from the template defaults), `demo-<eventType>`, `stress`
- * (longest allowed strings) or one of the §10 fixtures rendered with any template.
+ * (longest allowed strings), `cinematic` (the schema-v2 showcase: every layout, motion and new section
+ * type — dev/cinematic-demo.ts) or one of the §10 fixtures rendered with any template.
  */
 export const loadDevDocument = cache(
   (templateId: string, docKey: string): { doc: InvitationDocument; entry: TemplateEntry } | null => {
@@ -29,6 +31,8 @@ export const loadDevDocument = cache(
       doc = demoDocument(templateId);
     } else if (docKey === 'stress') {
       doc = stressDocument(templateId);
+    } else if (docKey === 'cinematic') {
+      doc = cinematicDocument(templateId);
     } else if (docKey.startsWith('demo-') && (EVENT_TYPES as readonly string[]).includes(docKey.slice(5))) {
       doc = demoDocument(templateId, docKey.slice(5) as EventType);
     } else {

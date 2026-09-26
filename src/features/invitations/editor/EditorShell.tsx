@@ -56,6 +56,7 @@ export function EditorShell({
   const channel = usePreviewChannel(frame, {
     doc,
     locale,
+    cinematic: editor.features.cinematic ?? true,
     onSelect: (path) => {
       const m = /^sections\.(\d+)/.exec(path);
       const section = m ? doc.sections[Number(m[1])] : undefined;
