@@ -211,7 +211,7 @@ test.describe('design it for me', () => {
     // one is applied as one step: the design, its palette and the photos
     const chosen = templates[1]!;
     await cards.nth(1).getByTestId('studio-use').click();
-    await expect(page.getByText('העיצוב הוחל')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText('העיצוב הוחל').first()).toBeVisible({ timeout: 30_000 });
     await expect(page.locator(`iframe[src*="/app/preview-frame/${chosen}"]`)).toHaveCount(1);
     await saved(page);
     const stored = await api(page, `/api/invitations/${id}`);
@@ -266,7 +266,7 @@ test.describe('design it for me', () => {
       )
       .not.toEqual(first);
     await concepts.getByTestId('studio-use').first().click();
-    await expect(page.getByText('העיצוב הוחל')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText('העיצוב הוחל').first()).toBeVisible({ timeout: 30_000 });
   });
 
   test('from the gallery: the wizard makes the invitation on the chosen design', async ({ page }) => {

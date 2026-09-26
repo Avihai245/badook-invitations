@@ -256,12 +256,13 @@ test('the editor: its bar, rail, design and settings panels, publishing and vers
     await page.getByRole('banner').getByRole('button', { name: 'פעולות נוספות' }).click();
     await page.getByRole('menuitem', { name: 'גרסאות' }).click();
   } else await page.getByRole('banner').getByRole('button', { name: 'גרסאות' }).click();
-  const versions = page.getByRole('dialog', { name: 'גרסאות שפורסמו' });
+  // the drawer lists the draft's saves too (Phase 5C): "versions and saves", restored with "restore"
+  const versions = page.getByRole('dialog', { name: 'גרסאות ושמירות' });
   await explains(
     page,
     versions.getByTestId('area-help'),
-    'גרסאות: מה כל כפתור עושה',
-    ['באוויר', 'החזרה לטיוטה'],
+    'גרסאות ושמירות: מה כל כפתור עושה',
+    ['באוויר', 'שחזור'],
     { assistant: false },
   );
   await expect(versions).toBeVisible();
