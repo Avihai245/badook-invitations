@@ -9,13 +9,14 @@ import { editorEn } from './editor.en';
 import { seatingEn } from './seating.en';
 import { liveGalleryEn } from './live-gallery.en';
 import { eventDayEn } from './event-day.en';
+import { studioEn, studioHelpEn } from './studio.en';
 
 /** Host-app UI strings, English. Same shape as app.he.ts (checked by the type). */
 export const en: AppDict = {
   brand: 'Badook',
   guests: guestsEn,
   site: siteEn,
-  help: helpEn,
+  help: { ...helpEn, ...studioHelpEn },
   support: supportEn,
   billing: billingEn,
   accountPage: accountEn,
@@ -23,6 +24,7 @@ export const en: AppDict = {
   seating: seatingEn,
   liveGallery: liveGalleryEn,
   eventDay: eventDayEn,
+  studio: studioEn,
   common: {
     close: 'Close',
     cancel: 'Cancel',

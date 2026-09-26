@@ -14,9 +14,13 @@ const OWNER = '77777777-7777-4777-8777-777777777771';
 const OTHER = '77777777-7777-4777-8777-777777777772';
 const sha = (s: string) => createHash('sha256').update(s).digest('hex');
 
+/** JSON the functions answer (the tests look inside it freely). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type J = any;
+
 let db: { url: string; drop: () => Promise<void> };
 let c: Client;
-let doc: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+let doc: Record<string, J>;
 
 async function commit<T = unknown>(fn: string, args: unknown[]): Promise<T> {
   const params = args.map((_, i) => `$${i + 1}`).join(', ');
@@ -103,8 +107,7 @@ describe('the tracked autosave', () => {
     await age(id, '11 minutes');
     expect(await save(id, edited('19:15'))).toMatchObject({ ok: true, kept: false });
     // a stale version conflicts, with the stored draft; another owner gets nothing
-    const stale = await commit<Record<string, any>>('save_invitation_draft_tracked', [
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    const stale = await commit<Record<string, J>>('save_invitation_draft_tracked', [
       id,
       OWNER,
       JSON.stringify(edited('20:00')),
@@ -369,7 +372,7 @@ describe('the review link', () => {
   });
 
   it('family members pin comments by the link: numbered, on a section of the draft, limited', async () => {
-    const opened = await commit<Record<string, any>>('review_open', [sha(LINK.token), RATE]); // eslint-disable-line @typescript-eslint/no-explicit-any
+    const opened = await commit<Record<string, J>>('review_open', [sha(LINK.token), RATE]);
     expect(opened).toMatchObject({
       ok: true,
       channel: LINK.channel,
@@ -380,8 +383,7 @@ describe('the review link', () => {
     const hero = opened.draft.sections[0].id as string;
     const key = sha('a-browser-key');
     const first = randomUUID();
-    const added = await commit<Record<string, any>>('review_comment_add', [
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    const added = await commit<Record<string, J>>('review_comment_add', [
       sha(LINK.token),
       RATE,
       key,
@@ -408,7 +410,7 @@ describe('the review link', () => {
     // a retried request adds it once
     expect(
       (
-        await commit<Record<string, any>>('review_comment_add', [
+        await commit<Record<string, J>>('review_comment_add', [
           sha(LINK.token),
           RATE,
           key,
@@ -420,9 +422,8 @@ describe('the review link', () => {
           'y',
         ])
       ).comment.number,
-    ).toBe(1); // eslint-disable-line @typescript-eslint/no-explicit-any
-    const second = await commit<Record<string, any>>('review_comment_add', [
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    ).toBe(1);
+    const second = await commit<Record<string, J>>('review_comment_add', [
       sha(LINK.token),
       RATE,
       null,
@@ -453,8 +454,7 @@ describe('the review link', () => {
     ).toBeNull();
 
     // replies both ways; the author's key never comes back
-    const reply = await commit<Record<string, any>>('review_owner_reply', [
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    const reply = await commit<Record<string, J>>('review_owner_reply', [
       id,
       OWNER,
       first,
@@ -464,8 +464,7 @@ describe('the review link', () => {
     expect(reply.comment.replies).toEqual([
       { id: expect.any(String), by: 'host', name: null, body: 'בטח, נחליף', at: expect.any(String) },
     ]);
-    const familyReply = await commit<Record<string, any>>('review_reply_add', [
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    const familyReply = await commit<Record<string, J>>('review_reply_add', [
       sha(LINK.token),
       RATE,
       key,
@@ -504,8 +503,7 @@ describe('the review link', () => {
       ok: false,
       code: 'not_found',
     });
-    const third = await commit<Record<string, any>>('review_comment_add', [
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    const third = await commit<Record<string, J>>('review_comment_add', [
       sha(LINK.token),
       RATE,
       key,
@@ -523,8 +521,7 @@ describe('the review link', () => {
     // the host removes any; numbers are never reused
     expect(await commit('review_owner_delete', [id, OTHER, secondId])).toBe(false);
     expect(await commit('review_owner_delete', [id, OWNER, secondId])).toBe(true);
-    const fourth = await commit<Record<string, any>>('review_comment_add', [
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    const fourth = await commit<Record<string, J>>('review_comment_add', [
       sha(LINK.token),
       RATE,
       key,
@@ -579,7 +576,7 @@ describe('the review link', () => {
   });
 
   it('tells the host what is new once, and daily for the summary mode', async () => {
-    const pending = await commit<Record<string, any>>('review_notify_pending', [id]); // eslint-disable-line @typescript-eslint/no-explicit-any
+    const pending = await commit<Record<string, J>>('review_notify_pending', [id]);
     // (the daily summary: set above)
     expect(pending).toMatchObject({ id, mode: 'daily', notifiedAt: null, email: 'studio@example.com' });
     expect(pending.comments.length).toBeGreaterThan(2);

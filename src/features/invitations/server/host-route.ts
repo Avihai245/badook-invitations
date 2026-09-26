@@ -34,7 +34,14 @@ export const hostDeps: HostDeps = { db: hostDb, template: getTemplate, revalidat
  */
 export async function hostRoute(
   request: Request,
-  handler: (userId: string, body: unknown, deps: HostDeps) => Promise<ApiResult>,
+  handler: (
+    userId: string,
+    body: unknown,
+    deps: HostDeps,
+    user: { id: string; email: string | null },
+  ) => Promise<ApiResult>,
+  /** a larger body for the few routes that take one (the design studio's photos) */
+  { maxBytes = MAX_JSON_BYTES }: { maxBytes?: number } = {},
 ): Promise<Response> {
   if (!invitationsEnabled()) return json(404, { ok: false, code: 'not_found' });
   let body: unknown = undefined;
@@ -42,7 +49,7 @@ export async function hostRoute(
     if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
       return json(415, { ok: false, code: 'unsupported_media_type' });
     const text = await request.text();
-    if (text.length > MAX_JSON_BYTES) return json(413, { ok: false, code: 'too_large' });
+    if (text.length > maxBytes) return json(413, { ok: false, code: 'too_large' });
     try {
       body = text ? JSON.parse(text) : {};
     } catch {
@@ -60,7 +67,7 @@ export async function hostRoute(
       cinematic: cinematicFor,
       admin: isAdminEmail(user.email),
     };
-    const result = await handler(user.id, body, deps);
+    const result = await handler(user.id, body, deps, { id: user.id, email: user.email ?? null });
     return json(result.status, result.body);
   } catch (err) {
     console.error('[host api]', request.method, new URL(request.url).pathname, err);

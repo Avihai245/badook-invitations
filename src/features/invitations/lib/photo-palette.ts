@@ -289,7 +289,8 @@ export interface PhotoPalette {
   palette: Palette;
 }
 
-const hueDistance = (a: number, b: number) => {
+/** The angle between two hues (degrees, 0..180). */
+export const hueDistance = (a: number, b: number) => {
   const d = Math.abs(a - b) % 360;
   return d > 180 ? 360 - d : d;
 };
@@ -460,6 +461,91 @@ export function scrimForPhoto(rgba: ArrayLike<number>, width: number): number {
   };
   const a = Math.max(need(at(0.6), AA_TEXT), need(at(0.92), AA_LARGE));
   return Math.round(Math.min(0.85, Math.max(0.2, a)) * 100) / 100;
+}
+
+// ─── the focal point: where the picture's subject is ────────────────────────────────────────────
+
+/**
+ * Where a picture's subject most likely is (0..1 across and down): the point a crop keeps in frame.
+ * Each pixel is scored by what draws the eye — detail (the luminance gradient), a color that stands
+ * out from the picture's average (in OKLab) and skin tones (people are the usual subject) — with a
+ * mild pull to the middle (edges are rarely the subject); the point is the weighted center of the
+ * strongest tenth. Deterministic; a flat picture gives the middle. `rgba`: `width` wide.
+ */
+export function focalPointOf(rgba: ArrayLike<number>, width: number): { x: number; y: number } {
+  const height = Math.floor(rgba.length / 4 / width);
+  if (width < 3 || height < 3) return { x: 0.5, y: 0.5 };
+  const n = width * height;
+  const lum = new Float64Array(n);
+  const labs: Lab[] = new Array(n);
+  let mean: Lab = [0, 0, 0];
+  for (let i = 0; i < n; i++) {
+    const o = i * 4;
+    const r = rgba[o]!;
+    const g = rgba[o + 1]!;
+    const b = rgba[o + 2]!;
+    lum[i] = 0.2126 * (LINEAR[r] ?? 0) + 0.7152 * (LINEAR[g] ?? 0) + 0.0722 * (LINEAR[b] ?? 0);
+    const lab = rgbToOklab(r, g, b);
+    labs[i] = lab;
+    mean = [mean[0] + lab[0], mean[1] + lab[1], mean[2] + lab[2]];
+  }
+  mean = [mean[0] / n, mean[1] / n, mean[2] / n];
+  const score = new Float64Array(n);
+  let max = 0;
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      const i = y * width + x;
+      // Sobel on luminance: edges and texture
+      const gx =
+        lum[i - width + 1]! +
+        2 * lum[i + 1]! +
+        lum[i + width + 1]! -
+        lum[i - width - 1]! -
+        2 * lum[i - 1]! -
+        lum[i + width - 1]!;
+      const gy =
+        lum[i + width - 1]! +
+        2 * lum[i + width]! +
+        lum[i + width + 1]! -
+        lum[i - width - 1]! -
+        2 * lum[i - width]! -
+        lum[i - width + 1]!;
+      const detail = Math.min(1, Math.hypot(gx, gy) * 2);
+      const lab = labs[i]!;
+      const distinct = Math.min(1, Math.sqrt(dist2(lab, mean)) * 4);
+      // skin: warm, moderately saturated mid-tones (YCbCr's classic box, any complexion)
+      const o = i * 4;
+      const r = rgba[o]!;
+      const g = rgba[o + 1]!;
+      const b = rgba[o + 2]!;
+      const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+      const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+      const skin = cb >= 77 && cb <= 127 && cr >= 137 && cr <= 173 && r > 60 ? 1 : 0;
+      const dx = x / (width - 1) - 0.5;
+      const dy = y / (height - 1) - 0.5;
+      const center = Math.exp(-(dx * dx + dy * dy) / 0.18);
+      const s = (0.45 * detail + 0.35 * distinct + 0.4 * skin) * (0.35 + 0.65 * center);
+      score[i] = s;
+      if (s > max) max = s;
+    }
+  }
+  if (max <= 0.02) return { x: 0.5, y: 0.5 };
+  // the strongest tenth of the picture (the threshold from a sorted copy)
+  const sorted = Array.from(score).sort((a, b) => b - a);
+  const cut = sorted[Math.max(0, Math.floor(n * 0.1) - 1)] ?? 0;
+  let sx = 0;
+  let sy = 0;
+  let sw = 0;
+  for (let i = 0; i < n; i++) {
+    const s = score[i]!;
+    if (s < cut || s <= 0) continue;
+    sx += (i % width) * s;
+    sy += Math.floor(i / width) * s;
+    sw += s;
+  }
+  if (!sw) return { x: 0.5, y: 0.5 };
+  const round = (v: number) => Math.round(Math.min(0.9, Math.max(0.1, v)) * 100) / 100;
+  return { x: round(sx / sw / (width - 1)), y: round(sy / sw / (height - 1)) };
 }
 
 // ─── the browser: a picture's pixels ─────────────────────────────────────────────────────────────

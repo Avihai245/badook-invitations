@@ -271,6 +271,23 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     preview: Smartphone,
   },
   account: { save: Save, password: KeyRound, plan: CreditCard, delete: Trash2 },
+  // the studio (lib/i18n/studio.*.ts)
+  studio: {
+    photos: Images,
+    mood: Sparkles,
+    create: WandSparkles,
+    preview: Smartphone,
+    use: Check,
+    again: RotateCcw,
+  },
+  history: {
+    filter: ListFilter,
+    entry: History,
+    live: BadgeCheck,
+    changes: ListChecks,
+    view: ExternalLink,
+    restore: RotateCcw,
+  },
 };
 
 /**

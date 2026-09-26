@@ -61,7 +61,11 @@ export function isPlaceholderFile(templateId: string, path: string | null | unde
   return !!file && !MEDIA[templateId]?.[file] && !!PLACEHOLDERS[templateId]?.[file];
 }
 
-/** §5 resolveAsset: 'template:<key>' | 'upload:<path>' | https URL → URL or null (→ placeholder). */
+/**
+ * §5 resolveAsset: 'template:<key>' | 'upload:<path>' | https URL → URL or null (→ placeholder). A
+ * `blob:` address — a picture still on the host's device, shown in the design concepts' previews
+ * before anything is uploaded — is its own URL; a saved document never has one (AssetRefSchema).
+ */
 export function resolveAsset(
   ref: AssetRef | null | undefined,
   template: Pick<TemplateManifest, 'id' | 'assets'>,
@@ -70,7 +74,7 @@ export function resolveAsset(
   if (!ref) return null;
   if (ref.startsWith('template:')) return templateFileUrl(template.id, template.assets[ref.slice(9)], bases);
   if (ref.startsWith('upload:')) return bases.uploads ? `${bases.uploads}/${ref.slice(7)}` : null;
-  if (ref.startsWith('https://')) return ref;
+  if (ref.startsWith('https://') || ref.startsWith('blob:')) return ref;
   return null;
 }
 
