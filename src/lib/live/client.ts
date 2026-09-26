@@ -1,15 +1,25 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { GALLERY } from '../config';
-import type { RealtimeInfo } from '../types';
+import type { RealtimeInfo } from './types';
 
 /**
- * Live updates of a gallery page: a Supabase Realtime broadcast channel (Phoenix protocol 1.0.0 over
- * a WebSocket — a few lines instead of the whole Supabase client on guests' phones) that only says
- * "something changed"; the page then asks the API what. It reconnects by itself with growing pauses;
- * while the connection is down the page polls instead, and stops polling once it is back.
+ * Live updates of a page (the live gallery's, the entrance stations', the host's live hall): a
+ * Supabase Realtime broadcast channel (Phoenix protocol 1.0.0 over a WebSocket — a few lines instead of
+ * the whole Supabase client on guests' phones) that only says "something changed"; the page then asks
+ * its API what. It reconnects by itself with growing pauses; while the connection is down the page
+ * polls instead, and stops polling once it is back.
  */
+
+export const LIVE = {
+  /** hints closer together than this make one refresh */
+  hintThrottleMs: 1_500,
+  heartbeatMs: 25_000,
+  joinTimeoutMs: 10_000,
+  /** a hidden page lets go of its connection after this */
+  hiddenDisconnectMs: 60_000,
+  reconnectMs: [1_000, 2_000, 5_000, 10_000, 20_000, 30_000],
+} as const;
 
 export type LiveStatus = 'connecting' | 'live' | 'polling';
 
@@ -27,7 +37,7 @@ export interface LiveConnection {
 type Message = { topic?: string; event?: string; payload?: Record<string, unknown>; ref?: string | null };
 
 export function connectLive(info: RealtimeInfo, h: Handlers): LiveConnection {
-  const L = GALLERY.live;
+  const L = LIVE;
   const topic = `realtime:${info.channel}`;
   const url = `${info.url.replace(/^http/, 'ws')}/realtime/v1/websocket?apikey=${encodeURIComponent(info.key)}&vsn=1.0.0`;
   let ws: WebSocket | null = null;
@@ -180,7 +190,7 @@ export function useLiveRefresh(
     const hint = (kind: string) => {
       kinds.add(kind);
       if (pending) return;
-      const wait = Math.max(0, last + GALLERY.live.hintThrottleMs - Date.now());
+      const wait = Math.max(0, last + LIVE.hintThrottleMs - Date.now());
       pending = setTimeout(() => {
         pending = null;
         last = Date.now();
@@ -224,7 +234,7 @@ export function useLiveRefresh(
           hiddenTimer = null;
           conn?.close();
           conn = null;
-        }, GALLERY.live.hiddenDisconnectMs);
+        }, LIVE.hiddenDisconnectMs);
       }
     };
     const onOnline = () => {
