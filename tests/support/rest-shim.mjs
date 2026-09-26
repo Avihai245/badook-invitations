@@ -143,6 +143,36 @@ const FUNCTIONS = new Set([
   'seating_notice_status',
   'seating_notice_pending',
   'event_day_maintenance',
+  // the highlights film and face search (supabase/migrations/*_gallery_film_faces.sql)
+  'gallery_owner_add',
+  'gallery_owner_add_done',
+  'gallery_owner_film',
+  'gallery_face_index_upload',
+  'gallery_face_search',
+  'gallery_face_leave_out',
+  'gallery_face_forget',
+  'gallery_face_owner_state',
+  'gallery_face_owner_pending',
+  'gallery_face_owner_index',
+  'gallery_face_owner_erase',
+  'gallery_face_events',
+  'gallery_face_erase_events',
+  'gallery_face_maintenance',
+  // the gallery on the invitation and its link to guests (supabase/migrations/*_gallery_link.sql)
+  'gallery_invitation_link',
+  'gallery_notices_state',
+  'gallery_notice_queue',
+  'gallery_notice_mark',
+  'gallery_notice_result',
+  'gallery_notice_claim',
+  'gallery_notice_requeue',
+  'gallery_notice_status',
+  'gallery_notice_pending',
+  // how guests use the invitation (supabase/migrations/*_insights.sql)
+  'insight_invitation',
+  'insight_hit',
+  'insight_owner_report',
+  'insight_maintenance',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
