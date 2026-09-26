@@ -299,7 +299,7 @@ export function MakeCard({
 
       <div className="border-t border-line pt-4">
         {making.phase === 'done' ? (
-          <div className="flex flex-col gap-3" data-testid="film-result">
+          <div className="flex flex-col gap-3" data-testid="film-result" data-engine={making.result.engine}>
             <p className="text-[14px] font-bold">{R.title}</p>
             <video
               src={making.result.url}

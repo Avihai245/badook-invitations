@@ -88,6 +88,10 @@ export default defineConfig({
             INVITES_WHATSAPP_VERIFY_TOKEN: 'e2e-whatsapp-verify',
             // the table numbers' template (the event day: tests/e2e/event-day.spec.ts)
             INVITES_WHATSAPP_TABLE_TEMPLATE: 'badook_table',
+            // the gallery link's template (tests/e2e/gallery-section.spec.ts)
+            INVITES_WHATSAPP_GALLERY_TEMPLATE: 'badook_gallery',
+            // face search offered (it still waits for each host to turn it on: tests/e2e/faces.spec.ts)
+            INVITES_FACE_ALBUMS: 'on',
             INVITES_ADMIN_EMAILS: 'wa-admin-mobile@example.com,wa-admin-desktop@example.com',
             // billing through our own test payment page instead of PayPlus (tests/e2e/billing.spec.ts)
             INVITES_BILLING_TEST_MODE: 'true',
