@@ -322,8 +322,9 @@ function LinkSettings({
       : link.expiresAt
         ? fmt(r.validUntil, { date: when(link.expiresAt) })
         : r.noExpiry;
+  // one under the other: the drawer is narrow, and "valid until <a long date>" needs the width
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-3">
       <Field label={r.expiry} help={r.expiryHint}>
         <Select
           value=""
