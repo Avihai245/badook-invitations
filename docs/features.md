@@ -37,3 +37,14 @@ Grouping photos by face processes biometric data — "sensitive information" und
 Law (amendment 13). The feature stays off everywhere until `INVITES_FACE_ALBUMS=on`, which should follow a
 legal review; when on, it runs only with each guest's explicit opt-in, keeps no names, never links events,
 and deletes the face data automatically after the retention period.
+
+## The event day (`seating_guide`, `checkin`)
+
+- `seating_guide` (Premium): each guest's table guide (`/e/<slug>/table?g=…`), telling guests their table
+  (the second WhatsApp template, the host's own WhatsApp, marked by hand) and the table cards to print.
+  Off: the guide answers "not available", the notices API refuses (403 `feature_off`), the buttons are
+  gone (the seating screen offers the package instead).
+- `checkin` (VIP): the entrance stations (`/e/<slug>/station?t=…`), the entrance QR on the guide and the
+  cards, the "Event day" tab (live hall, re-seating live). Off: the stations' link opens nothing, the
+  check-in and live APIs refuse, the tab is gone (or offers the package).
+- The seating's history of changes (and undo) belongs to `seating`, which every package has.
