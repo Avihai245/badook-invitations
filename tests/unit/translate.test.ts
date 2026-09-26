@@ -213,14 +213,12 @@ describe('the machine translation call', () => {
     expect(await translateTexts(request, AI, refused as unknown as typeof fetch)).toEqual({
       status: 'refused',
     });
-    const cut = vi
-      .fn()
-      .mockResolvedValue(
-        answer(200, {
-          content: [{ type: 'text', text: '{"translations":[{"id":"t1"' }],
-          stop_reason: 'max_tokens',
-        }),
-      );
+    const cut = vi.fn().mockResolvedValue(
+      answer(200, {
+        content: [{ type: 'text', text: '{"translations":[{"id":"t1"' }],
+        stop_reason: 'max_tokens',
+      }),
+    );
     expect(await translateTexts(request, AI, cut as unknown as typeof fetch)).toEqual({
       status: 'error',
       error: 'cut short',

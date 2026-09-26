@@ -64,6 +64,8 @@ export default defineConfig({
             MOCK_WHATSAPP_PORT: String(whatsappPort),
             MOCK_WHATSAPP_TOKEN: 'e2e-whatsapp-token',
             MOCK_AI_KEY: 'e2e-anthropic-key',
+            // the WhatsApp template's languages Meta "approved" here (tests/e2e/i18n.spec.ts: Arabic isn't)
+            MOCK_WHATSAPP_LANGS: 'he,en,ru',
           },
           timeout: 30_000,
         },
@@ -89,7 +91,11 @@ export default defineConfig({
             INVITES_WHATSAPP_API_BASE: `http://127.0.0.1:${whatsappPort}`,
             INVITES_WHATSAPP_APP_SECRET: 'e2e-whatsapp-app-secret',
             INVITES_WHATSAPP_VERIFY_TOKEN: 'e2e-whatsapp-verify',
-            INVITES_ADMIN_EMAILS: 'wa-admin-mobile@example.com,wa-admin-desktop@example.com',
+            INVITES_ADMIN_EMAILS:
+              'wa-admin-mobile@example.com,wa-admin-desktop@example.com,' +
+              'i18n-admin-mobile@example.com,i18n-admin-desktop@example.com,i18n-translate-desktop@example.com',
+            // the languages the template is set up in — Arabic among them, which the stand-in refuses
+            INVITES_WHATSAPP_TEMPLATE_LANGS: 'he,en,ru,ar',
             // billing through our own test payment page instead of PayPlus (tests/e2e/billing.spec.ts)
             INVITES_BILLING_TEST_MODE: 'true',
             // the support assistant: the Anthropic API stand-in above (tests/e2e/support.spec.ts)
