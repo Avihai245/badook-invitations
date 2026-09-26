@@ -4,6 +4,7 @@ import {
   Armchair,
   ChevronLeft,
   ExternalLink,
+  Images,
   LayoutDashboard,
   ListChecks,
   Maximize2,
@@ -36,10 +37,13 @@ import { publishHref, workspaceTab, type WorkspaceTab } from './paths';
 export function InvitationWorkspace({
   item,
   seating = null,
+  galleryTab = false,
   children,
 }: {
   item: InvitationSummary;
   seating?: 'on' | 'plan' | null;
+  /** the live gallery's tab (when this deployment offers it: features/flags) */
+  galleryTab?: boolean;
   children: ReactNode;
 }) {
   const { t, locale, date, plural, number } = useUi();
@@ -81,6 +85,9 @@ export function InvitationWorkspace({
       ? [{ key: 'seating' as const, href: `${base}/seating`, icon: Armchair, label: t.seating.tab }]
       : []),
     { key: 'share', href: `${base}/share`, icon: Share2, label: w.tabs.share },
+    ...(galleryTab
+      ? [{ key: 'gallery' as const, href: `${base}/gallery`, icon: Images, label: t.liveGallery.tab }]
+      : []),
     { key: 'edit', href: `${base}/edit`, icon: PenLine, label: w.tabs.edit },
   ];
   const countOf = (key: WorkspaceTab) =>

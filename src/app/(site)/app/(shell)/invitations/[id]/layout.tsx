@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { whyOff } from '@/features/flags/features';
-import { featureInput } from '@/features/flags/server';
+import { deploymentFeatures, featureInput } from '@/features/flags/server';
 import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { InvitationWorkspace } from '@/features/invitations/app/workspace/InvitationWorkspace';
@@ -32,7 +32,11 @@ export default async function InvitationLayout({
     <>
       {/* the header's poster writes the names in the design's font */}
       <style dangerouslySetInnerHTML={{ __html: POSTER_FONT_CSS }} />
-      <InvitationWorkspace item={item} seating={seating}>
+      <InvitationWorkspace
+        item={item}
+        seating={seating}
+        galleryTab={deploymentFeatures().has('live_gallery')}
+      >
         {children}
       </InvitationWorkspace>
     </>

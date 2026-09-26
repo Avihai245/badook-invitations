@@ -1,0 +1,41 @@
+/* The live gallery's motion (guests' feed, the venue screen). Every use is motion-safe: people who
+   asked for less motion see things appear without it. */
+
+/* a photo that just arrived in the feed */
+@keyframes gallery-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+/* the venue screen: a new photo lands like a print dropped on the table */
+@keyframes projector-arrive {
+  0% {
+    opacity: 0;
+    transform: translateY(6vmin) scale(0.86) rotate(-2.5deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-0.6vmin) scale(1.015) rotate(0.4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* the venue screen: the rotation fades in and drifts slowly closer */
+@keyframes projector-drift {
+  from {
+    opacity: 0;
+    transform: scale(1);
+  }
+  12% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}

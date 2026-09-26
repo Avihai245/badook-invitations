@@ -71,6 +71,13 @@ const ServerEnvSchema = z.object({
   // questions a day for the whole site (a cost ceiling); past it the assistant answers from the guide
   INVITES_AI_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(2000),
 
+  // ── live gallery (features/live-gallery) ──
+  // the key its links are derived from (random, ≥32 chars); empty: the Supabase secret key. Changing
+  // it keeps the links already out working; the hosts' screens then offer new ones.
+  INVITES_GALLERY_SECRET: z.string().default(''),
+  // the model for the automatic check of guests' uploads (gallery_ai); empty: INVITES_AI_MODEL
+  INVITES_GALLERY_AI_MODEL: z.string().trim().default(''),
+
   // ── WhatsApp Business Platform (Cloud API) — the system's official number ──
   INVITES_WHATSAPP_TOKEN: z.string().default(''),
   INVITES_WHATSAPP_PHONE_NUMBER_ID: z.string().default(''),

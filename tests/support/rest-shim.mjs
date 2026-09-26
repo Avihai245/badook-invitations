@@ -92,6 +92,28 @@ const FUNCTIONS = new Set([
   'invitation_is_demo',
   'whatsapp_opt_out',
   'whatsapp_waiting',
+  // the live gallery (supabase/migrations/*_live_gallery.sql)
+  'gallery_owner_get',
+  'gallery_owner_create',
+  'gallery_owner_update',
+  'gallery_owner_rotate',
+  'gallery_owner_delete',
+  'gallery_owner_items',
+  'gallery_owner_moderate',
+  'gallery_owner_originals',
+  'gallery_by_token',
+  'gallery_slug_locale',
+  'gallery_reserve',
+  'gallery_item_for_uploader',
+  'gallery_complete',
+  'gallery_feed',
+  'gallery_changes',
+  'gallery_uploader_items',
+  'gallery_guest_delete',
+  'gallery_rate_hit',
+  'gallery_trash_claim',
+  'gallery_trash_done',
+  'gallery_maintenance',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
@@ -101,8 +123,10 @@ const TOKEN_TTL = 3600;
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-headers':
-    'authorization, apikey, content-type, x-client-info, x-upsert, cache-control, x-supabase-api-version',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'authorization, apikey, content-type, x-client-info, x-upsert, cache-control, x-supabase-api-version, ' +
+    'tus-resumable, upload-length, upload-metadata, upload-offset, x-signature, range',
+  'access-control-allow-methods': 'GET, POST, PUT, PATCH, HEAD, DELETE, OPTIONS',
+  'access-control-expose-headers': 'location, upload-offset, upload-length, tus-resumable, content-range',
 };
 
 function send(res, status, body) {
@@ -539,6 +563,7 @@ function storagePath(bucket, path) {
 }
 
 async function storage(req, res, rest, query) {
+  if (await privateStorage(req, res, rest, query)) return;
   let m = /^object\/upload\/sign\/([a-z0-9-]+)\/(.+)$/.exec(rest);
   if (m && req.method === 'POST') {
     if (ROLES[req.headers.apikey] !== 'service_role') return send(res, 403, { error: 'Unauthorized' });
@@ -603,7 +628,7 @@ async function storage(req, res, rest, query) {
       names.map((d) => ({
         name: d.name,
         id: d.isDirectory() ? null : randomUUID(),
-        metadata: d.isDirectory() ? null : {},
+        metadata: d.isDirectory() ? null : fileMetadata(m[1], prefix, d.name),
       })),
     );
   }
@@ -692,6 +717,385 @@ async function storage(req, res, rest, query) {
   return send(res, 404, { error: 'not found' });
 }
 
+// ─── Storage: private buckets, signed reads, resumable uploads (the live gallery) ──────────────
+// Like Supabase Storage: a private bucket's files are never public; the service role signs read URLs
+// (one or a batch; tokens that expire) and downloads files itself; a gallery file is never
+// overwritten without x-upsert; large files arrive through the tus protocol at /upload/resumable/sign
+// with the signed upload token in x-signature (created, then PATCHed in pieces; HEAD says the offset).
+
+const tusUploads = new Map(); // id → { bucket, path, length, offset, type, key, temp }
+
+async function bucketRow(id) {
+  return (await pool.query('select * from storage.buckets where id = $1', [id])).rows[0] ?? null;
+}
+
+function fileMetadata(bucket, prefix, name) {
+  try {
+    const target = storagePath(bucket, prefix ? `${prefix}/${name}` : name);
+    const { size, mtime } = statSync(target);
+    let mimetype = 'application/octet-stream';
+    try {
+      mimetype = readFileSync(`${target}.type`, 'utf8');
+    } catch {
+      // no type recorded
+    }
+    return { size, mimetype, lastModified: mtime.toISOString(), contentLength: size, httpStatusCode: 200 };
+  } catch {
+    return {};
+  }
+}
+
+function exists(bucket, path) {
+  try {
+    return statSync(storagePath(bucket, path)).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function readToken(bucket, path, expiresIn) {
+  const now = Math.floor(Date.now() / 1000);
+  return jwt({ url: `${bucket}/${path}`, iat: now, exp: now + Math.max(1, Number(expiresIn) || 60) });
+}
+
+function serveFile(req, res, target, extraHeaders = {}) {
+  const { size } = statSync(target);
+  const headers = {
+    'content-type': readFileSync(`${target}.type`, 'utf8'),
+    'cache-control': 'private, max-age=3600',
+    'accept-ranges': 'bytes',
+    ...CORS,
+    ...extraHeaders,
+  };
+  const range = /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range ?? ''));
+  if (range && (range[1] || range[2])) {
+    const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2]));
+    const end = range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+    if (start >= size || start > end) {
+      res.writeHead(416, { 'content-range': `bytes */${size}`, ...CORS });
+      return res.end();
+    }
+    res.writeHead(206, {
+      ...headers,
+      'content-range': `bytes ${start}-${end}/${size}`,
+      'content-length': end - start + 1,
+    });
+    return res.end(req.method === 'HEAD' ? undefined : readFileSync(target).subarray(start, end + 1));
+  }
+  res.writeHead(200, { ...headers, 'content-length': size });
+  return res.end(req.method === 'HEAD' ? undefined : readFileSync(target));
+}
+
+const notFoundObject = (res) =>
+  send(res, 400, { statusCode: '404', error: 'not_found', message: 'Object not found' });
+const duplicate = (res) =>
+  send(res, 400, { statusCode: '409', error: 'Duplicate', message: 'The resource already exists' });
+const badSignature = (res) =>
+  send(res, 403, { statusCode: '403', error: 'Unauthorized', message: 'invalid signature' });
+
+async function readRaw(req) {
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  return Buffer.concat(chunks);
+}
+
+/** The private-bucket and resumable routes; false for the routes of storage() below. */
+async function privateStorage(req, res, rest, query) {
+  const service = ROLES[req.headers.apikey] === 'service_role';
+  const read = req.method === 'GET' || req.method === 'HEAD';
+
+  // signed read URLs, a batch at a time (service role)
+  let m = /^object\/sign\/([a-z0-9-]+)$/.exec(rest);
+  if (m && req.method === 'POST') {
+    if (!service) return (send(res, 403, { error: 'Unauthorized' }), true);
+    const { expiresIn, paths = [] } = await readBody(req);
+    const signed = paths.map((path) =>
+      exists(m[1], path)
+        ? {
+            error: null,
+            path,
+            signedURL: `/object/sign/${m[1]}/${path}?token=${readToken(m[1], path, expiresIn)}`,
+          }
+        : {
+            error: 'Either the object does not exist or you do not have access to it',
+            path,
+            signedURL: null,
+          },
+    );
+    return (send(res, 200, signed), true);
+  }
+  // one signed URL, and reading through one
+  m = /^object\/sign\/([a-z0-9-]+)\/(.+)$/.exec(rest);
+  if (m && req.method === 'POST') {
+    if (!service) return (send(res, 403, { error: 'Unauthorized' }), true);
+    const { expiresIn } = await readBody(req);
+    if (!exists(m[1], m[2])) return (notFoundObject(res), true);
+    return (
+      send(res, 200, { signedURL: `/object/sign/${m[1]}/${m[2]}?token=${readToken(m[1], m[2], expiresIn)}` }),
+      true
+    );
+  }
+  if (m && read) {
+    const path = decodeURIComponent(m[2]);
+    const claims = verifyJwt(query.get('token'));
+    if (!claims || claims.url !== `${m[1]}/${path}`)
+      return (send(res, 400, { statusCode: '400', error: 'InvalidJWT', message: 'jwt expired' }), true);
+    if (!exists(m[1], path)) return (notFoundObject(res), true);
+    const download = query.get('download');
+    const disposition =
+      download !== null
+        ? { 'content-disposition': `attachment; filename="${download || path.split('/').pop()}"` }
+        : {};
+    return (serveFile(req, res, storagePath(m[1], path), disposition), true);
+  }
+  // a private bucket's files are never public
+  m = /^object\/public\/([a-z0-9-]+)\/(.+)$/.exec(rest);
+  if (m && read) {
+    const bucket = await bucketRow(m[1]);
+    if (bucket && !bucket.public) return (notFoundObject(res), true);
+    return false;
+  }
+  // the service role downloads a file (supabase-js download())
+  m = /^object\/(?:authenticated\/)?([a-z0-9-]+)\/(.+)$/.exec(rest);
+  if (m && read && !/^object\/(public|sign|info|list|upload)\//.test(rest)) {
+    const path = decodeURIComponent(m[2]);
+    if (!service || !exists(m[1], path)) return (notFoundObject(res), true);
+    return (serveFile(req, res, storagePath(m[1], path)), true);
+  }
+  // gallery files are written once: signing or uploading over one needs x-upsert
+  m = /^object\/upload\/sign\/(gallery-[a-z0-9-]+)\/(.+)$/.exec(rest);
+  if (
+    m &&
+    (req.method === 'POST' || req.method === 'PUT') &&
+    req.headers['x-upsert'] !== 'true' &&
+    exists(m[1], m[2])
+  )
+    return (duplicate(res), true);
+
+  // resumable uploads (tus 1.0.0) with a signed upload token
+  if (rest === 'upload/resumable/sign' && req.method === 'POST') {
+    const meta = Object.fromEntries(
+      String(req.headers['upload-metadata'] ?? '')
+        .split(',')
+        .map((pair) => pair.trim().split(' '))
+        .filter(([k]) => k)
+        .map(([k, v]) => [k, v ? Buffer.from(v, 'base64').toString() : '']),
+    );
+    const key = `${meta.bucketName}/${meta.objectName}`;
+    if (
+      !meta.bucketName ||
+      !meta.objectName ||
+      uploadTokens.get(String(req.headers['x-signature'] ?? '')) !== key
+    )
+      return (badSignature(res), true);
+    const bucket = await bucketRow(meta.bucketName);
+    const length = Number(req.headers['upload-length']);
+    if (!Number.isFinite(length) || length < 0) return (send(res, 400, { message: 'Upload-Length' }), true);
+    if (bucket?.file_size_limit && length > Number(bucket.file_size_limit))
+      return (send(res, 413, { statusCode: '413', error: 'Payload too large' }), true);
+    if (bucket?.allowed_mime_types?.length && !bucket.allowed_mime_types.includes(meta.contentType))
+      return (send(res, 415, { statusCode: '415', error: 'invalid_mime_type' }), true);
+    if (req.headers['x-upsert'] !== 'true' && exists(meta.bucketName, meta.objectName))
+      return (duplicate(res), true);
+    const id = randomBytes(18).toString('base64url');
+    const temp = join(STORAGE_DIR, '.tus', id);
+    mkdirSync(dirname(temp), { recursive: true });
+    writeFileSync(temp, Buffer.alloc(0));
+    tusUploads.set(id, {
+      bucket: meta.bucketName,
+      path: meta.objectName,
+      length,
+      offset: 0,
+      type: meta.contentType,
+      key,
+      temp,
+    });
+    res.writeHead(201, {
+      ...CORS,
+      location: `http://${req.headers.host}/storage/v1/upload/resumable/sign/${id}`,
+      'tus-resumable': '1.0.0',
+    });
+    res.end();
+    return true;
+  }
+  m = /^upload\/resumable\/sign\/([A-Za-z0-9_-]+)$/.exec(rest);
+  if (m && (req.method === 'HEAD' || req.method === 'PATCH')) {
+    const upload = tusUploads.get(m[1]);
+    if (!upload) return (send(res, 404, { message: 'Upload not found' }), true);
+    // every request carries a signed token for this file (a fresh one after the old expired is fine)
+    if (uploadTokens.get(String(req.headers['x-signature'] ?? '')) !== upload.key)
+      return (badSignature(res), true);
+    if (req.method === 'HEAD') {
+      res.writeHead(200, {
+        ...CORS,
+        'upload-offset': String(upload.offset),
+        'upload-length': String(upload.length),
+        'tus-resumable': '1.0.0',
+        'cache-control': 'no-store',
+      });
+      res.end();
+      return true;
+    }
+    const chunk = await readRaw(req);
+    if (Number(req.headers['upload-offset']) !== upload.offset)
+      return (send(res, 409, { message: 'Offset mismatch' }), true);
+    if (upload.offset + chunk.length > upload.length) return (send(res, 413, { message: 'Too long' }), true);
+    writeFileSync(upload.temp, chunk, { flag: 'a' });
+    upload.offset += chunk.length;
+    if (upload.offset === upload.length) {
+      const target = storagePath(upload.bucket, upload.path);
+      mkdirSync(dirname(target), { recursive: true });
+      writeFileSync(target, readFileSync(upload.temp));
+      writeFileSync(`${target}.type`, upload.type ?? 'application/octet-stream');
+      rmSync(upload.temp, { force: true });
+    }
+    res.writeHead(204, { ...CORS, 'upload-offset': String(upload.offset), 'tus-resumable': '1.0.0' });
+    res.end();
+    return true;
+  }
+  return false;
+}
+
+// ─── Realtime: broadcast (REST in, WebSocket out — Phoenix protocol, vsn 1.0.0) ─────────────────
+// Enough of Supabase Realtime for the live gallery: pages join `realtime:<channel>`, heartbeats are
+// answered, and POST /realtime/v1/api/broadcast (the service role) sends each message to everyone
+// on its topic. GET /realtime/v1/api/broadcast says who listens (tests).
+
+const sockets = new Set(); // { socket, topics: Set<string> }
+
+function wsSend(conn, message) {
+  const data = Buffer.from(JSON.stringify(message));
+  let head;
+  if (data.length < 126) head = Buffer.from([0x81, data.length]);
+  else if (data.length < 65536) head = Buffer.from([0x81, 126, data.length >> 8, data.length & 0xff]);
+  else {
+    head = Buffer.alloc(10);
+    head[0] = 0x81;
+    head[1] = 127;
+    head.writeBigUInt64BE(BigInt(data.length), 2);
+  }
+  try {
+    conn.socket.write(Buffer.concat([head, data]));
+  } catch {
+    // gone
+  }
+}
+
+function onSocketMessage(conn, text) {
+  let m;
+  try {
+    m = JSON.parse(text);
+  } catch {
+    return;
+  }
+  const reply = (topic, extra = {}) =>
+    wsSend(conn, {
+      topic,
+      event: 'phx_reply',
+      payload: { status: 'ok', response: {} },
+      ref: m.ref,
+      ...extra,
+    });
+  if (m.event === 'heartbeat') return reply('phoenix');
+  if (m.event === 'phx_join') {
+    conn.topics.add(m.topic);
+    return wsSend(conn, {
+      topic: m.topic,
+      event: 'phx_reply',
+      payload: { status: 'ok', response: { postgres_changes: [] } },
+      ref: m.ref,
+      join_ref: m.join_ref ?? m.ref,
+    });
+  }
+  if (m.event === 'phx_leave') {
+    conn.topics.delete(m.topic);
+    return reply(m.topic);
+  }
+}
+
+function realtimeSocket(req, socket) {
+  const url = new URL(req.url, 'http://x');
+  if (url.pathname !== '/realtime/v1/websocket' || !ROLES[url.searchParams.get('apikey')]) {
+    socket.end('HTTP/1.1 403 Forbidden\r\n\r\n');
+    return;
+  }
+  const accept = createHash('sha1')
+    .update(`${req.headers['sec-websocket-key']}258EAFA5-E914-47DA-95CA-C5AB0DC85B11`)
+    .digest('base64');
+  socket.write(
+    `HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ${accept}\r\n\r\n`,
+  );
+  const conn = { socket, topics: new Set() };
+  sockets.add(conn);
+  let buffer = Buffer.alloc(0);
+  let fragments = [];
+  socket.on('data', (chunk) => {
+    buffer = Buffer.concat([buffer, chunk]);
+    for (;;) {
+      if (buffer.length < 2) return;
+      const fin = (buffer[0] & 0x80) !== 0;
+      const opcode = buffer[0] & 0x0f;
+      let length = buffer[1] & 0x7f;
+      let at = 2;
+      if (length === 126) {
+        if (buffer.length < 4) return;
+        length = buffer.readUInt16BE(2);
+        at = 4;
+      } else if (length === 127) {
+        if (buffer.length < 10) return;
+        length = Number(buffer.readBigUInt64BE(2));
+        at = 10;
+      }
+      const masked = (buffer[1] & 0x80) !== 0;
+      const mask = masked ? buffer.subarray(at, at + 4) : null;
+      if (masked) at += 4;
+      if (buffer.length < at + length) return;
+      const payload = Buffer.from(buffer.subarray(at, at + length));
+      if (mask) for (let i = 0; i < payload.length; i++) payload[i] ^= mask[i % 4];
+      buffer = buffer.subarray(at + length);
+      if (opcode === 0x8) {
+        socket.end(Buffer.from([0x88, 0]));
+        return;
+      }
+      if (opcode === 0x9) socket.write(Buffer.concat([Buffer.from([0x8a, payload.length]), payload]));
+      if (opcode === 0x1 || opcode === 0x0) {
+        fragments.push(payload);
+        if (fin) {
+          onSocketMessage(conn, Buffer.concat(fragments).toString());
+          fragments = [];
+        }
+      }
+    }
+  });
+  const drop = () => sockets.delete(conn);
+  socket.on('close', drop);
+  socket.on('error', drop);
+}
+
+async function broadcast(req, res) {
+  if (req.method === 'GET') {
+    const topics = {};
+    for (const conn of sockets) for (const topic of conn.topics) topics[topic] = (topics[topic] ?? 0) + 1;
+    return send(res, 200, topics);
+  }
+  if (req.method !== 'POST' || ROLES[req.headers.apikey] !== 'service_role')
+    return send(res, 403, { error: 'Unauthorized' });
+  const { messages = [] } = await readBody(req);
+  for (const message of messages) {
+    const topic = `realtime:${message.topic}`;
+    for (const conn of sockets)
+      if (conn.topics.has(topic))
+        wsSend(conn, {
+          topic,
+          event: 'broadcast',
+          payload: { type: 'broadcast', event: message.event, payload: message.payload ?? {} },
+          ref: null,
+        });
+  }
+  res.writeHead(202, CORS);
+  return res.end();
+}
+
 // ─── server ─────────────────────────────────────────────────────────────────────────────────────
 
 createServer(async (req, res) => {
@@ -707,10 +1111,13 @@ createServer(async (req, res) => {
     if (m) return await auth(req, res, m[1], url.searchParams);
     m = /^\/storage\/v1\/(.+)$/.exec(url.pathname);
     if (m) return await storage(req, res, m[1], url.searchParams);
+    if (url.pathname === '/realtime/v1/api/broadcast') return await broadcast(req, res);
     send(res, 404, { message: 'not found' });
   } catch (err) {
     send(res, 500, { message: String(err?.message ?? err) });
   }
-}).listen(Number(process.env.REST_SHIM_PORT ?? 54321), '127.0.0.1', () => {
-  console.log(`rest shim on :${process.env.REST_SHIM_PORT ?? 54321}`);
-});
+})
+  .on('upgrade', realtimeSocket)
+  .listen(Number(process.env.REST_SHIM_PORT ?? 54321), '127.0.0.1', () => {
+    console.log(`rest shim on :${process.env.REST_SHIM_PORT ?? 54321}`);
+  });

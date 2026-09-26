@@ -7,6 +7,10 @@
 // The Anthropic Messages API (POST /v1/messages, streamed): answers the support assistant's questions
 // with canned text, and remembers each request (GET /__ai) so tests can check what was sent. A question
 // with "ארוכה" / "long" streams slowly (to stop it midway); one with "נפילה" / "crash" fails (overloaded).
+//
+// The live gallery's automatic check (POST /v1/messages with a photo, not streamed): answers JSON
+// scores like the real model would, and remembers each request apart (GET /__ai/gallery). A square
+// photo counts as suspicious (nsfw 0.62: held for the host), any other as fine — so tests can choose.
 import { createServer } from 'node:http';
 
 const port = Number(process.env.MOCK_WHATSAPP_PORT || 54340);
@@ -14,6 +18,7 @@ const token = process.env.MOCK_WHATSAPP_TOKEN || 'e2e-whatsapp-token';
 const aiKey = process.env.MOCK_AI_KEY || 'e2e-anthropic-key';
 const sent = [];
 const aiRequests = [];
+const galleryAiRequests = [];
 let n = 0;
 
 const ANSWERS = [
@@ -46,6 +51,10 @@ async function answerAi(req, res) {
   let raw = '';
   for await (const chunk of req) raw += chunk;
   const body = JSON.parse(raw || '{}');
+  const photo = Array.isArray(body.messages?.[0]?.content)
+    ? body.messages[0].content.find((c) => c?.type === 'image')
+    : null;
+  if (photo) return answerGalleryCheck(res, body, photo);
   aiRequests.push({ headers: { version: req.headers['anthropic-version'] ?? null }, body });
   const question = String(body.messages?.at(-1)?.content ?? '');
   if (!body.stream || !Array.isArray(body.system) || body.messages?.at(-1)?.role !== 'user')
@@ -75,6 +84,49 @@ async function answerAi(req, res) {
   res.end();
 }
 
+/** A JPEG's width and height from its frame header (SOF). */
+function jpegSize(bytes) {
+  let p = 2;
+  while (p + 9 < bytes.length && bytes[p] === 0xff) {
+    const marker = bytes[p + 1];
+    const length = bytes.readUInt16BE(p + 2);
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker))
+      return { height: bytes.readUInt16BE(p + 5), width: bytes.readUInt16BE(p + 7) };
+    p += 2 + length;
+  }
+  return null;
+}
+
+function answerGalleryCheck(res, body, photo) {
+  galleryAiRequests.push({
+    model: body.model,
+    system: body.system,
+    structured: !!body.output_config?.format,
+    mediaType: photo.source?.media_type,
+    bytes: photo.source?.data ? Buffer.from(photo.source.data, 'base64').length : 0,
+    text: body.messages[0].content.filter((c) => c.type === 'text').map((c) => c.text),
+  });
+  if (typeof body.system !== 'string' || !body.max_tokens || photo.source?.type !== 'base64')
+    return json(res, 400, {
+      type: 'error',
+      error: { type: 'invalid_request_error', message: 'bad request' },
+    });
+  const size = jpegSize(Buffer.from(photo.source.data, 'base64'));
+  const square = size && size.width === size.height;
+  const scores = square
+    ? { nsfw: 0.62, quality: 0.7, reason: 'test: a square photo counts as suspicious' }
+    : { nsfw: 0.02, quality: 0.86, reason: 'happy guests at the event' };
+  return json(res, 200, {
+    id: `msg_e2e_gallery_${galleryAiRequests.length}`,
+    type: 'message',
+    role: 'assistant',
+    model: body.model,
+    content: [{ type: 'text', text: JSON.stringify(scores) }],
+    stop_reason: 'end_turn',
+    usage: { input_tokens: 420, output_tokens: 30 },
+  });
+}
+
 const json = (res, status, body) => {
   res.writeHead(status, { 'content-type': 'application/json' });
   res.end(JSON.stringify(body));
@@ -88,6 +140,7 @@ createServer(async (req, res) => {
     return json(res, 200, to ? sent.filter((m) => m.to === to) : sent);
   }
   if (req.method === 'GET' && url.pathname === '/__ai') return json(res, 200, aiRequests);
+  if (req.method === 'GET' && url.pathname === '/__ai/gallery') return json(res, 200, galleryAiRequests);
   if (req.method === 'POST' && url.pathname === '/v1/messages') return answerAi(req, res);
   const match = url.pathname.match(/^\/v[\d.]+\/(\d+)\/messages$/);
   if (req.method !== 'POST' || !match)

@@ -6,6 +6,7 @@ import { siteHe } from './site.he';
 import { helpHe } from './help.he';
 import { supportHe } from './support.he';
 import { seatingHe } from './seating.he';
+import { liveGalleryHe } from './live-gallery.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -22,6 +23,7 @@ export const he = {
   accountPage: accountHe,
   editor: editorHe,
   seating: seatingHe,
+  liveGallery: liveGalleryHe,
   common: {
     close: 'סגירה',
     cancel: 'ביטול',
