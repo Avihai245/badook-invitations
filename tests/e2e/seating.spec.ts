@@ -471,11 +471,13 @@ test.describe('seating', () => {
     expect((await page.request.get(`/api/invitations/${id}/seating`)).status()).toBe(403);
     await open(page, `/app/invitations/${id}/seating`);
     await expect(page.getByRole('heading', { name: 'סידור השולחנות כבוי בהזמנה הזו' })).toBeVisible();
+    // switching it on reloads the page into the editor, with its tab back in the row
     await page.getByRole('button', { name: 'הפעלת סידור השולחנות' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'סידור שולחנות' })).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.locator('[data-tab="seating"]')).toBeVisible();
+    // :visible — while the reloaded page streams in, React may still hold a hidden copy of the row
+    await expect(page.locator('[data-tab="seating"]:visible')).toBeVisible();
   });
 });
 

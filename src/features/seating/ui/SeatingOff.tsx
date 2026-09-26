@@ -2,7 +2,6 @@
 
 import { Armchair, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button, EmptyState, useToast } from '@/components/app';
 import { hostApi } from '@/features/invitations/app/api';
@@ -25,7 +24,6 @@ export function SeatingOff({
 }) {
   const { t, fmt } = useUi();
   const o = t.seating.off;
-  const router = useRouter();
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
   if (reason === 'plan')
@@ -61,9 +59,15 @@ export function SeatingOff({
               method: 'PATCH',
               body: { feature: 'seating', off: false },
             });
+            if (res.ok) {
+              // A full load, not router.refresh(): the page turns into the whole editor and the tab row
+              // gains its tab, and an in-place refresh of that streamed page sometimes never landed
+              // (the notice stayed on screen). The button keeps spinning until the editor opens.
+              window.location.reload();
+              return;
+            }
             setBusy(false);
-            if (res.ok) router.refresh();
-            else toast({ variant: 'danger', title: t.common.error });
+            toast({ variant: 'danger', title: t.common.error });
           }}
         >
           {o.turnOn}
