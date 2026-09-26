@@ -14,6 +14,7 @@ import { fxTheme } from './fx/theme';
 import { imageSet } from './images';
 import { InvitationSections } from './InvitationSections';
 import { GuestLink } from './guest.client';
+import { Insights } from './Insights.client';
 import { LiveLocale } from './live/LiveLocale.client';
 import type { LivePayload } from './live/payload';
 import { ScrollEngine } from './motion/ScrollEngine.client';
@@ -243,6 +244,9 @@ export function InvitationBody({
         <FitNames />
         {/* a guest's personal link — never on the review link's draft (nobody is identified there) */}
         {ctx.mode === 'live' && !ctx.review ? <GuestLink slug={doc.share.slug} /> : null}
+        {/* how guests use the invitation (feature analytics): fetched once the page is interactive —
+            never on the review link's draft (nobody is counted there) */}
+        {ctx.mode === 'live' && ctx.insights && !ctx.review ? <Insights slug={doc.share.slug} /> : null}
       </Suspense>
     </div>
   );

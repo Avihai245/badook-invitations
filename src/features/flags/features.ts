@@ -81,18 +81,28 @@ export function packageFor(feature: Feature): Package {
 /** The plan that gives that package. */
 export const planForPackage = (p: Package): PlanId => PLAN_IDS.find((plan) => PACKAGE_OF_PLAN[plan] === p)!;
 
-/** An event's own choices: what the host switched off, what the platform granted. */
+/**
+ * Features the host must turn on themselves for their event, even when the plan has them: face search
+ * processes the faces of everyone in the gallery's photos (biometric data), so it is never on by
+ * default — the host decides, event by event.
+ */
+export const OPT_IN: readonly Feature[] = ['face_albums'];
+export const isOptIn = (f: Feature) => OPT_IN.includes(f);
+
+/** An event's own choices: what the host switched off (or, for OPT_IN, on), what the platform granted. */
 export interface FeatureOverrides {
   off: Feature[];
   grant: Feature[];
+  /** the OPT_IN features the host turned on */
+  on?: Feature[];
 }
-export const NO_OVERRIDES: FeatureOverrides = { off: [], grant: [] };
+export const NO_OVERRIDES: FeatureOverrides = { off: [], grant: [], on: [] };
 
 /** The stored overrides, keeping only known features (a removed feature is simply dropped). */
 export function readOverrides(raw: unknown): FeatureOverrides {
   const list = (v: unknown) => (Array.isArray(v) ? [...new Set(v.filter(isFeature))] : []);
   const o = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
-  return { off: list(o.off), grant: list(o.grant) };
+  return { off: list(o.off), grant: list(o.grant), on: list(o.on).filter(isOptIn) };
 }
 
 export interface FeatureInput {
@@ -104,6 +114,10 @@ export interface FeatureInput {
   available: ReadonlySet<Feature>;
 }
 
+/** The host switched it off — or, for an OPT_IN feature, hasn't turned it on. */
+const switchedOff = (f: Feature, overrides: FeatureOverrides) =>
+  overrides.off.includes(f) || (isOptIn(f) && !(overrides.on ?? []).includes(f));
+
 /** What the event may use now. */
 export function effectiveFeatures({ plan, admin, overrides, available }: FeatureInput): Set<Feature> {
   const pkg = PACKAGE_FEATURES[PACKAGE_OF_PLAN[plan]];
@@ -111,18 +125,29 @@ export function effectiveFeatures({ plan, admin, overrides, available }: Feature
     FEATURES.filter(
       (f) =>
         available.has(f) &&
-        !overrides.off.includes(f) &&
+        !switchedOff(f, overrides) &&
         (admin || overrides.grant.includes(f) || pkg.includes(f)),
     ),
   );
 }
 
-/** Why a feature is off for an event: not offered here, switched off by the host, or not in the plan. */
+/**
+ * Why a feature is off for an event: not offered here, switched off by the host (an OPT_IN feature:
+ * not turned on yet), or not in the plan.
+ */
 export function whyOff(
   feature: Feature,
   input: FeatureInput,
 ): 'unavailable' | 'switched_off' | 'plan' | null {
   if (!input.available.has(feature)) return 'unavailable';
-  if (input.overrides.off.includes(feature)) return 'switched_off';
+  // the plan first for an OPT_IN feature: turning it on wouldn't help without the package
+  if (isOptIn(feature) && !input.overrides.off.includes(feature)) {
+    const planned =
+      input.admin ||
+      input.overrides.grant.includes(feature) ||
+      PACKAGE_FEATURES[PACKAGE_OF_PLAN[input.plan]].includes(feature);
+    if (!planned) return 'plan';
+  }
+  if (switchedOff(feature, input.overrides)) return 'switched_off';
   return effectiveFeatures(input).has(feature) ? null : 'plan';
 }

@@ -94,6 +94,7 @@ export async function hostRoute(
         return pending;
       },
       cinematic: cinematicFor,
+      liveGallery: async (invitationId) => (await featuresFor(invitationId)).has('live_gallery'),
       admin: isAdminEmail(user.email),
     };
     const result = await handler(user.id, body, deps, { id: user.id, email: user.email ?? null });

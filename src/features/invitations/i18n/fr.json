@@ -108,5 +108,17 @@
   "voice.stop": "Arrêter la lecture",
   "captions.label": "Sous-titres",
   "motion.pause": "Mettre les animations en pause",
-  "motion.play": "Relancer les animations"
+  "motion.play": "Relancer les animations",
+  "liveGallery.title": "Vos photos de l’événement",
+  "liveGallery.body": "Vous avez pris des photos ? Envoyez ici vos photos et vidéos de l’événement — elles apparaîtront dans la galerie de tous.",
+  "liveGallery.afterTitle": "L’album est prêt",
+  "liveGallery.afterBody": "Toutes les photos et vidéos de l’événement, au même endroit.",
+  "liveGallery.cta.before": "Vers la galerie de l’événement",
+  "liveGallery.cta.during": "Envoyer vos photos",
+  "liveGallery.cta.after": "Voir l’album",
+  "liveGallery.soon": "Le jour de l’événement, envoyez ici même les photos que vous prenez.",
+  "liveGallery.qr": "Scannez pour envoyer depuis votre téléphone",
+  "liveGallery.qrAfter": "Scannez pour le voir sur votre téléphone",
+  "liveGallery.qrLabel": "Code QR de la galerie de l’événement",
+  "liveGallery.preview": "Le bouton mène à la galerie en direct de l’événement une fois activée"
 }

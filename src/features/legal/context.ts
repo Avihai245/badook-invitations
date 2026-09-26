@@ -1,5 +1,6 @@
 import 'server-only';
 import { planPrices } from '@/features/billing/server/account';
+import { deploymentFeatures } from '@/features/flags/server';
 import { serverEnv } from '@/lib/env';
 import type { UiLocale } from '@/lib/i18n/app';
 import type { LegalContext } from './types';
@@ -34,5 +35,6 @@ export function legalContext(locale: UiLocale): LegalContext {
       year: 'numeric',
       timeZone: 'UTC',
     }).format(new Date(`${LEGAL_UPDATED}T00:00:00Z`)),
+    faceSearch: deploymentFeatures(env).has('face_albums'),
   };
 }

@@ -63,6 +63,8 @@ export interface ItemRow {
   phash: string | null;
   name: string | null;
   guestId: string | null;
+  /** who added it: a guest, or the host (their highlights film) */
+  source?: 'guest' | 'host';
   createdAt: string;
   completedAt: string | null;
   publishedAt: string | null;
@@ -307,6 +309,49 @@ export const galleryDb = {
 
   guestByToken: (invitationId: string, token: string) =>
     rpc<string | null>('guest_by_token', { p_invitation_id: invitationId, p_token: token }),
+
+  // ── the invitation's link to its gallery (*_gallery_link.sql) ──
+  invitationLink: (invitationId: string) =>
+    rpc<{
+      enabled: boolean;
+      paused: boolean;
+      opensAt: string | null;
+      closesAt: string | null;
+      hasCode: boolean;
+      uploadTokenHash: string;
+      uploadTokenNonce: string;
+    } | null>('gallery_invitation_link', { p_invitation_id: invitationId }),
+
+  // ── the host's own items: the highlights film (*_gallery_film_faces.sql) ──
+  ownerAdd: (id: string, ownerId: string, item: ReserveItem, maxItems: number) =>
+    rpc<{ ok: true } | { ok: false; code: 'full' | 'not_found'; left?: number }>('gallery_owner_add', {
+      p_id: id,
+      p_owner_id: ownerId,
+      p_item: item,
+      p_max_items: maxItems,
+    }),
+
+  ownerAddDone: (
+    id: string,
+    ownerId: string,
+    itemId: string,
+    show: boolean,
+    sizes: { original?: number; display?: number; thumb?: number },
+  ) =>
+    rpc<ItemRow | null>('gallery_owner_add_done', {
+      p_id: id,
+      p_owner_id: ownerId,
+      p_item_id: itemId,
+      p_show: show,
+      p_sizes: sizes,
+    }),
+
+  ownerFilm: (id: string, ownerId: string, limit: number) =>
+    rpc<(ItemRow & { faces: [number, number, number, number][] | null })[] | null>('gallery_owner_film', {
+      p_id: id,
+      p_owner_id: ownerId,
+      p_limit: limit,
+    }),
 
   // ── housekeeping ──
   trashClaim: (limit: number) =>

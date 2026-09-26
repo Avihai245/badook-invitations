@@ -40,6 +40,7 @@ export default async function InvitationLayout({
         seating={seating}
         eventDay={eventDay}
         galleryTab={deploymentFeatures().has('live_gallery')}
+        insightsTab={deploymentFeatures().has('analytics')}
       >
         {children}
       </InvitationWorkspace>

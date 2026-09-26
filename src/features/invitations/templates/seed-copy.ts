@@ -386,6 +386,45 @@ export const SEED_COPY = {
     es: 'Un momento nuestro',
     am: 'የኛ ቅጽበት',
   } satisfies L10n,
+  /** The live gallery's section (feature live_gallery): before and during the event, then after it. */
+  liveGallery: {
+    title: {
+      he: 'צלמו ושתפו',
+      en: 'Snap and share',
+      ru: 'Снимайте и делитесь',
+      ar: 'صوّروا وشاركوا',
+      fr: 'Photographiez et partagez',
+      es: 'Haz fotos y compártelas',
+      am: 'ያንሱና ያጋሩ',
+    } satisfies L10n,
+    body: {
+      he: 'צילמתם באירוע? העלו לכאן את התמונות והסרטונים שלכם — כולם יראו אותם בגלריה.',
+      en: 'Taking photos at the event? Upload your photos and videos here — everyone will see them in the gallery.',
+      ru: 'Фотографируете на празднике? Загружайте сюда свои фото и видео — их увидят все в галерее.',
+      ar: 'تلتقطون صورًا في المناسبة؟ ارفعوا صوركم وفيديوهاتكم هنا — وسيراها الجميع في المعرض.',
+      fr: 'Vous prenez des photos pendant l’événement ? Envoyez ici vos photos et vidéos — tout le monde les verra dans la galerie.',
+      es: '¿Haces fotos en la celebración? Sube aquí tus fotos y vídeos: todos los verán en la galería.',
+      am: 'በዝግጅቱ ላይ ፎቶ እያነሱ ነው? ፎቶዎችዎንና ቪዲዮዎችዎን እዚህ ይስቀሉ — ሁሉም በፎቶ ማዕከሉ ያያቸዋል።',
+    } satisfies L10n,
+    afterTitle: {
+      he: 'האלבום מהאירוע',
+      en: 'The album from the event',
+      ru: 'Альбом с праздника',
+      ar: 'ألبوم المناسبة',
+      fr: 'L’album de l’événement',
+      es: 'El álbum de la celebración',
+      am: 'የዝግጅቱ አልበም',
+    } satisfies L10n,
+    afterBody: {
+      he: 'כל התמונות והסרטונים שצילמתם, במקום אחד. תודה ששיתפתם!',
+      en: 'All the photos and videos you took, in one place. Thank you for sharing!',
+      ru: 'Все фото и видео, которые вы сняли, — в одном месте. Спасибо, что поделились!',
+      ar: 'كل الصور والفيديوهات التي التقطتموها، في مكان واحد. شكرًا لمشاركتكم!',
+      fr: 'Toutes les photos et vidéos que vous avez prises, au même endroit. Merci pour le partage !',
+      es: 'Todas las fotos y vídeos de la celebración, en un solo lugar. ¡Gracias por compartir!',
+      am: 'ያነሷቸው ሁሉም ፎቶዎችና ቪዲዮዎች በአንድ ቦታ። ስላጋሩ እናመሰግናለን!',
+    } satisfies L10n,
+  },
 } as const;
 
 /** Event types that naturally have two hosts joined by "&". */

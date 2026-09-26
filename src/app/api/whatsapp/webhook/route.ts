@@ -1,6 +1,7 @@
 import { after } from 'next/server';
 import { eventDayDb } from '@/features/event-day/server/db';
 import { tick } from '@/features/jobs/jobs';
+import { galleryNoticesDb } from '@/features/live-gallery/server/notices-db';
 import { inboundOf, statusesOf, validSignature } from '@/features/whatsapp/cloud-api';
 import { isStopRequest } from '@/features/whatsapp/opt-out';
 import { whatsappDb } from '@/features/whatsapp/sender';
@@ -41,8 +42,9 @@ export async function POST(request: Request) {
   try {
     for (const s of statusesOf(payload))
       if (!(await whatsappDb.status(s.id, s.status, s.error)))
-        // not an invitation's message: a table number's (features/event-day)
-        await eventDayDb.noticeStatus(s.id, s.status, s.error);
+        // not an invitation's message: a table number's (features/event-day), or a gallery link's
+        if (!(await eventDayDb.noticeStatus(s.id, s.status, s.error)))
+          await galleryNoticesDb.status(s.id, s.status, s.error);
     for (const m of inboundOf(payload)) if (isStopRequest(m.text)) await whatsappDb.optOut(m.from, 'reply');
   } catch (err) {
     // Meta retries a failed delivery for days: answer 500 so it comes back

@@ -2,6 +2,7 @@
 docs/
 invitation-templates-pack/
 public/fonts/
+public/face-models/
 src/features/invitations/fonts/*.generated.*
 src/styles/*.generated.*
 .next*/

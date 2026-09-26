@@ -55,15 +55,27 @@ export function CalendarMenu({
         {label}
       </button>
       <div className="dd-menu" role="menu" id={menuId}>
-        <a href={links.google} target="_blank" rel="noopener noreferrer" role="menuitem">
+        <a
+          href={links.google}
+          target="_blank"
+          rel="noopener noreferrer"
+          role="menuitem"
+          data-insight="calendar"
+        >
           <Icon name="calendar-plus" size={18} />
           {labels.google}
         </a>
-        <a href={links.ics} download={links.icsFileName} role="menuitem">
+        <a href={links.ics} download={links.icsFileName} role="menuitem" data-insight="calendar">
           <Icon name="calendar-plus" size={18} />
           {labels.apple}
         </a>
-        <a href={links.outlook} target="_blank" rel="noopener noreferrer" role="menuitem">
+        <a
+          href={links.outlook}
+          target="_blank"
+          rel="noopener noreferrer"
+          role="menuitem"
+          data-insight="calendar"
+        >
           <Icon name="calendar-plus" size={18} />
           {labels.outlook}
         </a>

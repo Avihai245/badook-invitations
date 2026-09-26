@@ -121,6 +121,7 @@ export const editorHe = {
     where: 'איפה',
     quote: 'ציטוט',
     custom_media: 'טקסט ותמונה',
+    live_gallery: 'גלריית האורחים',
     palette: 'צבעים',
     fonts: 'גופנים',
     music: 'מוזיקה',
@@ -151,6 +152,7 @@ export const editorHe = {
     when: 'התאריך בגדול, עם ספירה לאחור ויומן',
     where: 'מקום אחד בגדול — מפה, Waze ויומן',
     parents: 'שמות ההורים — של כל צד',
+    live_gallery: 'כפתור וקוד QR להעלאת תמונות לגלריה החיה — ואחרי האירוע, לאלבום',
   },
   panels: {
     cover: 'המסך הראשון שהאורחים רואים — לחיצה פותחת את ההזמנה.',
@@ -170,6 +172,7 @@ export const editorHe = {
     where: 'מקום אחד בגדול — כתובת, מפה, Waze ויומן.',
     quote: 'פסוק, שיר או משפט שאתם אוהבים.',
     custom: 'כותרת וטקסט עם תמונה או וידאו משלכם.',
+    live_gallery: 'מזמין את האורחים להעלות תמונות מהאירוע לגלריה החיה, ואחרי האירוע מוביל לאלבום.',
     palette: 'ערכת צבעים מוכנה, או התאמה אישית של כל צבע.',
     fonts: 'זוג גופנים לשמות, לכותרות ולטקסט — בעברית ובאנגלית.',
     music: 'מתנגנת מהרגע שהאורחים פותחים את ההזמנה.',
@@ -360,6 +363,18 @@ export const editorHe = {
     featureOff: 'העיצוב הקולנועי כבוי לאירוע הזה, ולכן השינוי לא נשמר.',
   },
   // the v2 section types' content (their media, layout and motion: the cinematic panel)
+  /** the live gallery's section on the invitation (feature live_gallery) */
+  liveGallery: {
+    off: 'הגלריה החיה עוד לא מופעלת, ולכן האורחים לא יראו את הסקשן הזה.',
+    openTab: 'להפעלה בלשונית הגלריה',
+    before: 'לפני האירוע ובמהלכו',
+    beforeHelp: 'מזמין את האורחים להעלות תמונות. בלי טקסט משלכם מופיע טקסט מוכן.',
+    after: 'אחרי האירוע',
+    afterHelp: 'מהבוקר שאחרי האירוע הסקשן מוביל לאלבום.',
+    display: 'תצוגה',
+    showQr: 'קוד QR ליד הכפתור',
+    showQrHelp: 'במסך מחשב: אורח שקורא את ההזמנה במחשב סורק ומעלה מהטלפון.',
+  },
   v2Forms: {
     showWeekday: 'יום בשבוע',
     showHebrewDate: 'תאריך עברי',
@@ -847,6 +862,9 @@ export const editorHe = {
     'custom.body': 'טקסט',
     'custom.ctaLabel': 'טקסט הכפתור',
     'custom.ctaUrl': 'קישור הכפתור',
+    'liveGallery.body': 'טקסט',
+    'liveGallery.afterTitle': 'כותרת אחרי האירוע',
+    'liveGallery.afterBody': 'טקסט אחרי האירוע',
   },
   publishDialog: {
     title: 'פרסום ההזמנה',

@@ -127,6 +127,8 @@ export const liveGalleryEn: LiveGalleryDict = {
     approveAll: { one: 'Approve it', other: 'Approve all {n}' },
   },
   items: {
+    /** the host's own item (their highlights film) */
+    yourFilm: 'Your film',
     title: 'All photos and videos',
     filters: {
       all: 'All',
@@ -323,6 +325,18 @@ export const liveGalleryEn: LiveGalleryDict = {
       download: {
         label: 'Download all',
         text: 'Every original file in a ZIP, each named with its date and time.',
+      },
+      send: {
+        label: 'Send guests the link',
+        text: 'Sends every guest on the list the gallery link on WhatsApp — from the system’s number or from your phone — or copies a personal link.',
+      },
+      film: {
+        label: 'Highlights film',
+        text: 'A short film of the gallery, cut to the beat of the song, made in your browser. Download it, and add it to the gallery.',
+      },
+      faces: {
+        label: 'The photos I’m in',
+        text: 'Each guest finds the photos they appear in from a selfie, with explicit consent. “Prepare face search” prepares the photos on your computer; turning it off erases every face code.',
       },
     },
   },

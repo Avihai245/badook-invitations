@@ -120,5 +120,17 @@
   "voice.stop": "إيقاف القراءة",
   "captions.label": "الترجمة النصية",
   "motion.pause": "إيقاف الحركة",
-  "motion.play": "تشغيل الحركة"
+  "motion.play": "تشغيل الحركة",
+  "liveGallery.title": "صوركم من المناسبة",
+  "liveGallery.body": "التقطتم صورًا؟ ارفعوا هنا صوركم وفيديوهاتكم من المناسبة — وستظهر في معرض الجميع.",
+  "liveGallery.afterTitle": "الألبوم جاهز",
+  "liveGallery.afterBody": "كل الصور والفيديوهات من المناسبة، في مكان واحد.",
+  "liveGallery.cta.before": "إلى معرض المناسبة",
+  "liveGallery.cta.during": "ارفعوا صوركم",
+  "liveGallery.cta.after": "مشاهدة الألبوم",
+  "liveGallery.soon": "في يوم المناسبة، ارفعوا الصور التي تلتقطونها هنا مباشرة.",
+  "liveGallery.qr": "امسحوا الرمز للرفع من الهاتف",
+  "liveGallery.qrAfter": "امسحوا الرمز للمشاهدة على الهاتف",
+  "liveGallery.qrLabel": "رمز QR لمعرض المناسبة",
+  "liveGallery.preview": "يقود الزر إلى المعرض المباشر للمناسبة عند تفعيله"
 }

@@ -86,6 +86,10 @@ export interface EditorFeatures {
   artDirection?: StudioAccess;
   /** the invitation read aloud to guests (feature `voice`) */
   voice?: StudioAccess;
+  /** the event has the `live_gallery` feature: the gallery section can be added */
+  liveGallery?: boolean;
+  /** the event's live gallery is on (the gallery section's form says when it isn't) */
+  galleryOn?: boolean;
 }
 
 /**

@@ -60,6 +60,7 @@ export function WhereView({ section, ctx }: SectionViewProps<SectionOf<'where'>>
             <a
               className="btn btn-outline"
               href={googleMapsUrl(mapsTarget)}
+              data-insight="map"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -71,6 +72,7 @@ export function WhereView({ section, ctx }: SectionViewProps<SectionOf<'where'>>
             <a
               className="btn btn-outline"
               href={wazeUrl(mapsTarget)}
+              data-insight="map"
               target="_blank"
               rel="noopener noreferrer"
             >

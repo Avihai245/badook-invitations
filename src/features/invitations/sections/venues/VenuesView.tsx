@@ -51,6 +51,7 @@ export function VenuesView({ section, ctx }: SectionViewProps<SectionOf<'venues'
                     <a
                       className="btn btn-outline"
                       href={googleMapsUrl(mapsTarget)}
+                      data-insight="map"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -62,6 +63,7 @@ export function VenuesView({ section, ctx }: SectionViewProps<SectionOf<'venues'
                     <a
                       className="btn btn-outline"
                       href={wazeUrl(mapsTarget)}
+                      data-insight="map"
                       target="_blank"
                       rel="noopener noreferrer"
                     >

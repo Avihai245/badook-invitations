@@ -140,6 +140,82 @@ export const galleryGuestEs: GalleryGuestDict = {
     accessibility: 'Accesibilidad',
     made: 'Una galería en directo de {brand}',
   },
+  faces: {
+    title: 'Las fotos en las que salgo',
+    body: 'Hazte un selfi y tu móvil encontrará en la galería las fotos en las que sales.',
+    start: 'Encontrar mis fotos',
+    expiry:
+      'La búsqueda está abierta hasta el {date}. Después se borran todos los códigos faciales de la celebración.',
+    consent: {
+      title: 'Antes de empezar',
+      what: 'Para encontrarte, tu móvil convierte la cara de tu selfi en una serie de 128 números —un «código facial»— y la compara con los códigos faciales de las fotos de la galería.',
+      where:
+        'Tu selfi nunca sale de tu móvil y no se guarda. Solo se envía el código facial, una vez por búsqueda, y no lo guardamos ni lo registramos. En tu móvil se queda en esta pestaña hasta que la cierres o elijas «Olvidarme».',
+      gallery:
+        'Para que se pueda buscar, las caras de las fotos de la galería también se convierten en códigos faciales, sin nombres y sin recortar las caras de las fotos. Todos los códigos faciales de la celebración se borran 30 días después, o antes si los anfitriones desactivan la búsqueda.',
+      model:
+        'La primera vez, tu móvil descarga desde nuestro sitio la herramienta de reconocimiento facial (unos {mb} MB).',
+      forget:
+        'En cualquier momento puedes elegir «Olvidarme» o pedir no aparecer en las búsquedas de otros invitados.',
+      privacy: 'Todos los detalles en la política de privacidad',
+      agree: 'Acepto que se procese mi cara para encontrar las fotos en las que salgo',
+      agreeHelp: 'Podrás continuar cuando lo marques.',
+      continue: 'Continuar',
+      cancel: 'Cancelar',
+    },
+    selfie: {
+      title: 'Selfi',
+      body: 'Tu cara en el centro, con buena luz y sin gafas de sol.',
+      camera: 'Hacerme un selfi',
+      capture: 'Hacer la foto',
+      file: 'Elegir una foto del móvil',
+      cancel: 'Cancelar',
+      loading: 'Preparando el reconocimiento facial en tu móvil…',
+      searching: 'Te estamos buscando en la galería…',
+      noFace:
+        'No hemos encontrado ninguna cara en la foto. Inténtalo de nuevo mirando a la cámara y con buena luz.',
+      cameraDenied: 'No hay acceso a la cámara. Puedes elegir una foto en su lugar.',
+      failed: 'Algo ha fallado. Inténtalo de nuevo.',
+      unsupported:
+        'Este móvil no puede ejecutar el reconocimiento facial. Prueba con otro móvil o navegador.',
+      rate: 'Demasiadas búsquedas. Espera unos minutos e inténtalo de nuevo.',
+      expired: 'La búsqueda se ha cerrado: se borraron los códigos faciales de la celebración.',
+      off: 'La búsqueda facial está desactivada ahora mismo.',
+    },
+    album: {
+      title: 'Tus fotos',
+      count: {
+        one: 'Te encontramos en {n} foto',
+        many: 'Te encontramos en {n} de fotos',
+        other: 'Te encontramos en {n} fotos',
+      },
+      none: 'Todavía no te hemos encontrado en ninguna foto. Vuelve a intentarlo más tarde: los invitados siguen subiendo fotos.',
+      download: 'Descargar mis fotos',
+      downloading: 'Descargando… {done} de {total}',
+      downloaded: 'Descarga terminada',
+      again: 'Buscar con otro selfi',
+      forget: 'Olvidarme',
+      leave: 'No mostrarme en las búsquedas de otros',
+      missingName: 'no-descargadas.txt',
+      missingIntro: 'No hemos podido descargar estas fotos:',
+    },
+    forgetConfirm: {
+      title: '¿Olvidarte?',
+      body: 'Tu código facial se borra de este móvil y tu cara se retira ahora mismo de la búsqueda de la galería, también de las fotos que ya están en ella. No nos quedamos con nada tuyo.',
+      confirm: 'Olvidarme',
+      cancel: 'Cancelar',
+    },
+    leaveConfirm: {
+      title: '¿No aparecer en las búsquedas de otros?',
+      body: 'Tu cara se retira de las búsquedas de todos los invitados, también en las fotos que se suban a partir de ahora. Para ello se guarda tu código facial (no una foto) hasta que se borren todos los códigos faciales de la celebración, 30 días después de ella.',
+      confirm: 'No mostrarme',
+      cancel: 'Cancelar',
+    },
+    forgotten:
+      'Hecho: tu código facial se ha borrado de este móvil y tu cara se ha retirado de la búsqueda de la galería.',
+    leftOut:
+      'Hecho: no aparecerás en las búsquedas de otros invitados, tampoco en las fotos que se suban a partir de ahora.',
+  },
   projector: {
     title: 'Pantalla de la galería · {name}',
     empty: 'Aquí aparecerán las fotos de los invitados',

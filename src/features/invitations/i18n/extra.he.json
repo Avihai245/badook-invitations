@@ -34,5 +34,17 @@
   "voice.stop": "עצירת ההקראה",
   "captions.label": "כתוביות",
   "motion.pause": "עצירת האנימציות",
-  "motion.play": "הפעלת האנימציות"
+  "motion.play": "הפעלת האנימציות",
+  "liveGallery.title": "התמונות שלכם מהאירוע",
+  "liveGallery.body": "צילמתם? העלו לכאן תמונות וסרטונים מהאירוע — הם יופיעו בגלריה של כולם.",
+  "liveGallery.afterTitle": "האלבום מוכן",
+  "liveGallery.afterBody": "כל התמונות והסרטונים מהאירוע, במקום אחד.",
+  "liveGallery.cta.before": "לגלריה של האירוע",
+  "liveGallery.cta.during": "העלאת תמונות",
+  "liveGallery.cta.after": "לאלבום",
+  "liveGallery.soon": "ביום האירוע תוכלו להעלות מכאן את התמונות שצילמתם.",
+  "liveGallery.qr": "סרקו כדי להעלות מהטלפון",
+  "liveGallery.qrAfter": "סרקו כדי לראות בטלפון",
+  "liveGallery.qrLabel": "קוד QR לגלריה של האירוע",
+  "liveGallery.preview": "הכפתור יוביל לגלריה החיה של האירוע, כשהיא מופעלת"
 }

@@ -88,6 +88,7 @@ function LanguagePill({ current, options, onSwitch, onIntent }: LanguageControl)
     <a
       className="fab fab-lang"
       href={target.href}
+      data-insight="lang"
       hrefLang={target.locale}
       onPointerEnter={intent}
       onPointerDown={intent}
@@ -156,6 +157,7 @@ function LanguageMenu({ current, options, menuLabel, onSwitch, onIntent }: Langu
           <li key={o.locale}>
             <a
               href={o.href}
+              data-insight="lang"
               hrefLang={o.locale}
               lang={o.locale}
               dir={dirOf(o.locale)}

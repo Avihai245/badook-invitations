@@ -10,6 +10,8 @@ next-env.d.ts
 
 # generated at build time (scripts/build-fonts.mjs) — never commit font binaries
 public/fonts/
+# the face search's model, copied from node_modules at build time (scripts/copy-face-models.mjs)
+public/face-models/
 
 # env — only .env.example is committed; .env.production is written by amplify.yml during the build
 .env

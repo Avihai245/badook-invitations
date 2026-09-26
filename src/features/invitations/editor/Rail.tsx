@@ -24,6 +24,7 @@ import {
   CalendarClock,
   CalendarDays,
   Camera,
+  Images,
   CaseSensitive,
   Clock,
   Gift,
@@ -94,6 +95,7 @@ export const SECTION_ICONS: Record<IconKey, LucideIcon> = {
   where: MapPinned,
   quote: Quote,
   custom_media: ImagePlus,
+  live_gallery: Images,
   cover: Mail,
   hero: Image,
   countdown: Clock,
@@ -578,7 +580,7 @@ function AddSection({ onAdded }: { onAdded?: () => void }) {
   const e = t.editor;
   const dir = useDir();
   const [open, setOpen] = useState(false);
-  const entries = availableEntries(doc);
+  const entries = availableEntries(doc, { liveGallery: features.liveGallery });
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>

@@ -1,10 +1,11 @@
 'use client';
 
-import { Copy, Download, ExternalLink, MessageCircle, RefreshCw } from 'lucide-react';
+import { Copy, Download, ExternalLink, MessageCircle, RefreshCw, Send } from 'lucide-react';
 import { useState } from 'react';
 import { Button, Card, CardTitle, Dialog, Hint, Input, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import type { HostGalleryView } from '../../server/host-api';
+import { SendLinkDialog } from './SendLinkDialog';
 
 /**
  * The guests' link: copy it, open it, send it on WhatsApp, the QR code (PNG / SVG) for the tables,
@@ -22,6 +23,7 @@ export function ShareCard({
   const { toast } = useToast();
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [sending, setSending] = useState(false);
   const g = view.gallery!;
   const url = g.uploadUrl;
 
@@ -82,7 +84,19 @@ export function ShareCard({
                 </a>
               </Button>
             </Hint>
+            <Hint text={t.galleryNotify.buttonHint}>
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={<Send className="icon-dir" />}
+                onClick={() => setSending(true)}
+                data-testid="gallery-send-links"
+              >
+                {t.galleryNotify.button}
+              </Button>
+            </Hint>
           </div>
+          <SendLinkDialog id={view.id} open={sending} onOpenChange={setSending} />
           {g.qr ? (
             <div className="flex items-center gap-4">
               <div

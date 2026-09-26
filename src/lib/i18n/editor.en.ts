@@ -118,6 +118,7 @@ export const editorEn: EditorDict = {
     where: 'Where',
     quote: 'Quote',
     custom_media: 'Text & picture',
+    live_gallery: 'Guests’ gallery',
     footer: 'Closing',
     palette: 'Colors',
     fonts: 'Fonts',
@@ -149,6 +150,7 @@ export const editorEn: EditorDict = {
     when: 'The date, big — with a countdown and a calendar',
     where: 'One place, big — map, Waze and calendar',
     parents: 'The parents’ names — each side’s',
+    live_gallery: 'A button and QR code to upload photos to the live gallery — then, to the album',
   },
   panels: {
     cover: 'The first thing guests see — a tap opens the invitation.',
@@ -168,6 +170,8 @@ export const editorEn: EditorDict = {
     where: 'One place, big — address, map, Waze and calendar.',
     quote: 'A verse, a song or a line you love.',
     custom: 'A title and text with your own picture or video.',
+    live_gallery:
+      'Invites guests to upload their photos to the live gallery, and after the event leads to the album.',
     palette: 'Pick a ready palette or fine-tune every color.',
     fonts: 'A pair of fonts for names, headings and text — in Hebrew and English.',
     music: 'Plays from the moment guests open the invitation.',
@@ -352,6 +356,18 @@ export const editorEn: EditorDict = {
       apply: 'Use these fonts: {name}',
     },
     featureOff: 'Cinematic design is off for this event, so the change wasn’t saved.',
+  },
+  /** the live gallery's section on the invitation (feature live_gallery) */
+  liveGallery: {
+    off: 'The live gallery isn’t on yet, so guests won’t see this section.',
+    openTab: 'Turn it on in the Gallery tab',
+    before: 'Before and during the event',
+    beforeHelp: 'Invites guests to upload their photos. Without your own words, ready text shows.',
+    after: 'After the event',
+    afterHelp: 'From the morning after the event, the section leads to the album.',
+    display: 'Display',
+    showQr: 'QR code beside the button',
+    showQrHelp: 'On a computer screen: a guest reading there scans it and uploads from their phone.',
   },
   v2Forms: {
     showWeekday: 'Day of the week',
@@ -844,6 +860,9 @@ export const editorEn: EditorDict = {
     'custom.body': 'Text',
     'custom.ctaLabel': 'Button text',
     'custom.ctaUrl': 'Button link',
+    'liveGallery.body': 'Text',
+    'liveGallery.afterTitle': 'Title after the event',
+    'liveGallery.afterBody': 'Text after the event',
   },
   publishDialog: {
     title: 'Publish the invitation',

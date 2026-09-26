@@ -425,6 +425,18 @@ export const CustomSectionSchema = section(
   }),
 );
 
+// ── the live gallery on the invitation (feature `live_gallery`) ──
+export const LiveGallerySectionSchema = section(
+  'live_gallery',
+  z.strictObject({
+    title: L10nSchema.nullable(),
+    body: L10nSchema.nullable(),
+    afterTitle: L10nSchema.nullable(),
+    afterBody: L10nSchema.nullable(),
+    showQr: z.boolean(),
+  }),
+);
+
 export const SectionSchema = z.discriminatedUnion('type', [
   HeroSectionSchema,
   CountdownSectionSchema,
@@ -442,6 +454,7 @@ export const SectionSchema = z.discriminatedUnion('type', [
   WhereSectionSchema,
   QuoteSectionSchema,
   CustomSectionSchema,
+  LiveGallerySectionSchema,
 ]);
 
 export const InvitationDocumentSchema = z.strictObject({

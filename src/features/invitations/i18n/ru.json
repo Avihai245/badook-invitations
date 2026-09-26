@@ -112,5 +112,17 @@
   "voice.stop": "Остановить чтение",
   "captions.label": "Субтитры",
   "motion.pause": "Остановить анимацию",
-  "motion.play": "Включить анимацию"
+  "motion.play": "Включить анимацию",
+  "liveGallery.title": "Ваши фото с праздника",
+  "liveGallery.body": "Сделали снимки? Загрузите сюда фото и видео с праздника — они появятся в общей галерее.",
+  "liveGallery.afterTitle": "Альбом готов",
+  "liveGallery.afterBody": "Все фото и видео с праздника — в одном месте.",
+  "liveGallery.cta.before": "В галерею праздника",
+  "liveGallery.cta.during": "Загрузить фото",
+  "liveGallery.cta.after": "Смотреть альбом",
+  "liveGallery.soon": "В день праздника загружайте сюда снимки, которые сделаете.",
+  "liveGallery.qr": "Отсканируйте, чтобы загрузить с телефона",
+  "liveGallery.qrAfter": "Отсканируйте, чтобы смотреть на телефоне",
+  "liveGallery.qrLabel": "QR-код галереи праздника",
+  "liveGallery.preview": "Кнопка ведёт в живую галерею праздника, когда она включена"
 }

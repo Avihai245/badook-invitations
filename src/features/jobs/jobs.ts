@@ -2,9 +2,12 @@ import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
 import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
+import { facesHousekeeping } from '@/features/faces/server/deps';
+import { insightsHousekeeping } from '@/features/insights/server/deps';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
 import { translationHousekeeping } from '@/features/invitations/translate/deps';
+import { processGalleryNoticeQueue } from '@/features/live-gallery/server/notify';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
 import { studioHousekeeping } from '@/features/review/server/housekeeping';
 import { voiceDeps } from '@/features/voice/server/deps';
@@ -54,6 +57,14 @@ export async function runDaily(now: Date) {
   const studio = await studioHousekeeping().catch(
     (err) => (console.error('studio housekeeping failed', err), null),
   );
+  // the insights' page loads go after a week (the daily numbers stay with the invitation)
+  const insights = await insightsHousekeeping().catch(
+    (err) => (console.error('insights housekeeping failed', err), null),
+  );
+  // face search's promise: its data erased 30 days after the event, and wherever the feature is off
+  const faces = await facesHousekeeping().catch(
+    (err) => (console.error('face search housekeeping failed', err), null),
+  );
   return {
     ...digests,
     purged: (purged as number | null) ?? null,
@@ -63,12 +74,14 @@ export async function runDaily(now: Date) {
     eventDay,
     translations,
     studio,
+    insights,
+    faces,
   };
 }
 
 /**
  * What is still queued for WhatsApp (a host closed the page mid-send, a retry that is due): the
- * invitations, and the table numbers (features/event-day).
+ * invitations, the table numbers (features/event-day) and the gallery links (features/live-gallery).
  */
 export async function runWhatsAppQueue(budgetMs: number) {
   const total = { sent: 0, failed: 0, retried: 0 };
@@ -76,10 +89,12 @@ export async function runWhatsAppQueue(budgetMs: number) {
   for (let round = 0; round < 4 && Date.now() < until; round++) {
     const r = await processQueue(null, 50);
     const t = await processNoticeQueue(null, 50);
-    total.sent += r.sent + t.sent;
-    total.failed += r.failed + t.failed;
-    total.retried += r.retried + t.retried;
-    if (r.sent + r.failed + r.retried + t.sent + t.failed + t.retried === 0) break;
+    const g = await processGalleryNoticeQueue(null, 50);
+    total.sent += r.sent + t.sent + g.sent;
+    total.failed += r.failed + t.failed + g.failed;
+    total.retried += r.retried + t.retried + g.retried;
+    if (r.sent + r.failed + r.retried + t.sent + t.failed + t.retried + g.sent + g.failed + g.retried === 0)
+      break;
   }
   return total;
 }

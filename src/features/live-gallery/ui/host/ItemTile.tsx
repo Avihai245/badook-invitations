@@ -47,7 +47,8 @@ export function ItemTile({
   const { t } = useUi();
   const g = t.liveGallery.items;
   const kind = item.kind === 'video' ? g.video : g.photo;
-  const who = item.name ?? item.guestName;
+  const film = item.source === 'host';
+  const who = film ? g.yourFilm : (item.name ?? item.guestName);
   const menu: MenuItem[] = [
     { label: g.open, onSelect: onOpen },
     ...actionsFor(item).map((a): MenuItem => ({
@@ -95,6 +96,7 @@ export function ItemTile({
         <span className="pointer-events-none absolute start-1.5 bottom-1.5 inline-flex items-center gap-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[11px] font-semibold text-white">
           <Play aria-hidden className="size-2.5 fill-current" />
           <span dir="ltr">{length(item.durationMs)}</span>
+          {film ? <span>· {g.yourFilm}</span> : null}
         </span>
       ) : null}
       {item.status !== 'published' ? (

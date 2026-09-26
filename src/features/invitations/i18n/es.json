@@ -108,5 +108,17 @@
   "voice.stop": "Detener la lectura",
   "captions.label": "Subtítulos",
   "motion.pause": "Pausar las animaciones",
-  "motion.play": "Reanudar las animaciones"
+  "motion.play": "Reanudar las animaciones",
+  "liveGallery.title": "Tus fotos de la celebración",
+  "liveGallery.body": "¿Has hecho fotos? Sube aquí tus fotos y vídeos de la celebración y aparecerán en la galería de todos.",
+  "liveGallery.afterTitle": "El álbum está listo",
+  "liveGallery.afterBody": "Todas las fotos y vídeos de la celebración, en un solo lugar.",
+  "liveGallery.cta.before": "A la galería de la celebración",
+  "liveGallery.cta.during": "Sube tus fotos",
+  "liveGallery.cta.after": "Ver el álbum",
+  "liveGallery.soon": "El día de la celebración, sube aquí mismo las fotos que hagas.",
+  "liveGallery.qr": "Escanea para subir desde tu móvil",
+  "liveGallery.qrAfter": "Escanea para verlo en tu móvil",
+  "liveGallery.qrLabel": "Código QR de la galería de la celebración",
+  "liveGallery.preview": "El botón lleva a la galería en directo de la celebración cuando esté activada"
 }

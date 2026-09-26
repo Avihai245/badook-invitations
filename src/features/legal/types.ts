@@ -30,4 +30,6 @@ export interface LegalContext {
   prices: { pro: number; business: number };
   /** the date the policies were last revised, as the page shows it */
   updated: string;
+  /** face search ("the photos I'm in") is offered on this deployment (INVITES_FACE_ALBUMS) */
+  faceSearch: boolean;
 }

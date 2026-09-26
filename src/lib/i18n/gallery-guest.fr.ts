@@ -143,6 +143,82 @@ export const galleryGuestFr: GalleryGuestDict = {
     accessibility: 'Accessibilité',
     made: 'Une galerie en direct par {brand}',
   },
+  faces: {
+    title: 'Les photos où j’apparais',
+    body: 'Prenez un selfie : votre téléphone trouve dans la galerie les photos où vous apparaissez.',
+    start: 'Trouver les photos où j’apparais',
+    expiry:
+      'La recherche est ouverte jusqu’au {date}. Ensuite, tous les codes de visage de l’événement sont supprimés.',
+    consent: {
+      title: 'Avant de commencer',
+      what: 'Pour vous trouver, votre téléphone transforme le visage de votre selfie en une suite de 128 nombres — un « code du visage » — et la compare aux codes des visages des photos de la galerie.',
+      where:
+        'Votre selfie ne quitte jamais votre téléphone et n’est pas conservé. Seul le code du visage est envoyé, une fois par recherche — et nous ne le gardons ni ne l’enregistrons. Sur votre téléphone, il reste dans cet onglet jusqu’à ce que vous le fermiez ou choisissiez « M’oublier ».',
+      gallery:
+        'Pour rendre la recherche possible, les visages des photos de la galerie deviennent eux aussi des codes — sans noms et sans découper les visages des photos. Tous les codes de visage de l’événement sont supprimés 30 jours après l’événement, ou plus tôt si les hôtes désactivent la recherche.',
+      model:
+        'La première fois, votre téléphone télécharge l’outil de reconnaissance faciale depuis notre site (environ {mb} Mo).',
+      forget:
+        'À tout moment, vous pouvez choisir « M’oublier », ou demander à ne pas apparaître dans les recherches des autres invités.',
+      privacy: 'Tous les détails dans la politique de confidentialité',
+      agree: 'J’accepte que mon visage soit traité pour trouver les photos où j’apparais',
+      agreeHelp: 'Vous pourrez continuer une fois la case cochée.',
+      continue: 'Continuer',
+      cancel: 'Annuler',
+    },
+    selfie: {
+      title: 'Selfie',
+      body: 'Votre visage au centre, en bonne lumière, sans lunettes de soleil.',
+      camera: 'Prendre un selfie',
+      capture: 'Prendre',
+      file: 'Choisir une photo sur le téléphone',
+      cancel: 'Annuler',
+      loading: 'Préparation de la reconnaissance faciale sur votre téléphone…',
+      searching: 'Nous vous cherchons dans la galerie…',
+      noFace:
+        'Nous n’avons pas trouvé de visage sur la photo. Réessayez face à l’appareil, en bonne lumière.',
+      cameraDenied: 'Pas d’accès à l’appareil photo. Vous pouvez choisir une photo à la place.',
+      failed: 'Un problème est survenu. Réessayez.',
+      unsupported:
+        'Ce téléphone ne peut pas faire fonctionner la reconnaissance faciale. Essayez un autre téléphone ou navigateur.',
+      rate: 'Trop de recherches. Patientez quelques minutes et réessayez.',
+      expired: 'La recherche est fermée : les codes de visage de l’événement ont été supprimés.',
+      off: 'La recherche par visage est désactivée pour le moment.',
+    },
+    album: {
+      title: 'Vos photos',
+      count: {
+        one: 'Vous apparaissez sur {n} photo',
+        many: 'Vous apparaissez sur {n} de photos',
+        other: 'Vous apparaissez sur {n} photos',
+      },
+      none: 'Nous ne vous avons encore trouvé sur aucune photo. Réessayez plus tard — les invités envoient encore leurs photos.',
+      download: 'Télécharger mes photos',
+      downloading: 'Téléchargement… {done} sur {total}',
+      downloaded: 'Téléchargement terminé',
+      again: 'Chercher avec un autre selfie',
+      forget: 'M’oublier',
+      leave: 'Ne pas m’afficher dans les recherches des autres',
+      missingName: 'non-telechargees.txt',
+      missingIntro: 'Nous n’avons pas pu télécharger ces photos :',
+    },
+    forgetConfirm: {
+      title: 'Vous oublier ?',
+      body: 'Votre code du visage est effacé de ce téléphone, et votre visage est retiré tout de suite de la recherche de la galerie — y compris des photos déjà présentes. Nous ne gardons rien de vous.',
+      confirm: 'M’oublier',
+      cancel: 'Annuler',
+    },
+    leaveConfirm: {
+      title: 'Ne pas apparaître dans les recherches des autres ?',
+      body: 'Votre visage est retiré des recherches de tous les invités, y compris sur les photos envoyées à partir de maintenant. Pour cela, votre code du visage (pas une photo) est conservé jusqu’à la suppression de tous les codes de visage de l’événement, 30 jours après celui-ci.',
+      confirm: 'Ne pas m’afficher',
+      cancel: 'Annuler',
+    },
+    forgotten:
+      'C’est fait : votre code du visage a été effacé de ce téléphone et votre visage retiré de la recherche de la galerie.',
+    leftOut:
+      'C’est fait : vous n’apparaîtrez pas dans les recherches des autres invités — photos envoyées à partir de maintenant comprises.',
+  },
   projector: {
     title: 'Écran de la galerie · {name}',
     empty: 'Les photos des invités apparaîtront ici',

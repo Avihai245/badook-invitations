@@ -104,5 +104,17 @@
   "voice.stop": "ንባቡን አቁም",
   "captions.label": "የግርጌ ጽሑፍ",
   "motion.pause": "እንቅስቃሴዎቹን አቁም",
-  "motion.play": "እንቅስቃሴዎቹን አጫውት"
+  "motion.play": "እንቅስቃሴዎቹን አጫውት",
+  "liveGallery.title": "ከዝግጅቱ የእርስዎ ፎቶዎች",
+  "liveGallery.body": "ፎቶ አንስተዋል? ከዝግጅቱ ያነሷቸውን ፎቶዎችና ቪዲዮዎች እዚህ ይስቀሉ — በሁሉም ሰው የፎቶ ማዕከል ውስጥ ይታያሉ።",
+  "liveGallery.afterTitle": "አልበሙ ዝግጁ ነው",
+  "liveGallery.afterBody": "ከዝግጅቱ የተነሱ ሁሉም ፎቶዎችና ቪዲዮዎች በአንድ ቦታ።",
+  "liveGallery.cta.before": "ወደ ዝግጅቱ የፎቶ ማዕከል",
+  "liveGallery.cta.during": "ፎቶዎችዎን ይስቀሉ",
+  "liveGallery.cta.after": "አልበሙን ይመልከቱ",
+  "liveGallery.soon": "በዝግጅቱ ቀን ያነሷቸውን ፎቶዎች እዚሁ ይስቀሉ።",
+  "liveGallery.qr": "ከስልክዎ ለመስቀል ይቃኙ",
+  "liveGallery.qrAfter": "በስልክዎ ለማየት ይቃኙ",
+  "liveGallery.qrLabel": "ወደ ዝግጅቱ የፎቶ ማዕከል የሚወስድ QR ኮድ",
+  "liveGallery.preview": "ቁልፉ የቀጥታ የፎቶ ማዕከሉ ሲበራ ወደ እሱ ይወስዳል"
 }

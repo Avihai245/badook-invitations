@@ -9,6 +9,7 @@ import {
   FEATURES,
   NO_OVERRIDES,
   effectiveFeatures,
+  isOptIn,
   readOverrides,
   type Feature,
   type FeatureInput,
@@ -91,13 +92,21 @@ export async function featuresFor(invitationId: string): Promise<Set<Feature>> {
 export const flagDeps: FlagDeps = {
   input: featureInput,
   async setOff(invitationId, ownerId, feature, off) {
-    const { data, error } = await serviceDb().rpc('invitation_feature_off', {
-      p_id: invitationId,
-      p_owner: ownerId,
-      p_feature: feature,
-      p_off: off,
-    });
-    if (error) throw new Error(`invitation_feature_off: ${error.message}`);
+    // an OPT_IN feature is turned on (and off) explicitly: its own list, and the off list besides
+    const { data, error } = isOptIn(feature)
+      ? await serviceDb().rpc('invitation_feature_on', {
+          p_id: invitationId,
+          p_owner: ownerId,
+          p_feature: feature,
+          p_on: !off,
+        })
+      : await serviceDb().rpc('invitation_feature_off', {
+          p_id: invitationId,
+          p_owner: ownerId,
+          p_feature: feature,
+          p_off: off,
+        });
+    if (error) throw new Error(`invitation_feature_${isOptIn(feature) ? 'on' : 'off'}: ${error.message}`);
     return data ? readOverrides(data) : null;
   },
 };

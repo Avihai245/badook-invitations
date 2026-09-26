@@ -6,6 +6,7 @@ import { FaqView } from './faq/FaqView';
 import { FooterView } from './footer/FooterView';
 import { GiftsView } from './gifts/GiftsView';
 import { HeroView } from './hero/HeroView';
+import { LiveGalleryView } from './live-gallery/LiveGalleryView';
 import { GalleryView } from './gallery/GalleryView';
 import { ParentsView } from './parents/ParentsView';
 import { QuoteView } from './quote/QuoteView';
@@ -39,4 +40,5 @@ export const SECTION_VIEWS: { [T in SectionType]: ComponentType<SectionViewProps
   where: WhereView,
   quote: QuoteView,
   custom: CustomView,
+  live_gallery: LiveGalleryView,
 };

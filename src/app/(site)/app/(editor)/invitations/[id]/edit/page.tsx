@@ -9,6 +9,7 @@ import { fontFaceCss, libraryDisplayFamilies, pageFontFaces } from '@/features/i
 import { FONT_LIBRARY } from '@/features/invitations/fonts/library';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
+import { galleryDb } from '@/features/live-gallery/server/db';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { getTemplate } from '@/features/invitations/templates/registry';
 import { serverEnv } from '@/lib/env';
@@ -35,18 +36,20 @@ export default async function EditInvitationPage({ params }: { params: Params })
   const entry = getTemplate(inv.templateId);
   if (!entry) notFound();
   const env = serverEnv();
-  const [uiLocale, account, publicBaseUrl, input] = await Promise.all([
+  const [uiLocale, account, publicBaseUrl, input, gallery] = await Promise.all([
     getUiLocale(),
     loadAccount(user),
     // the address the host sees and copies (the site's own domain, not a placeholder)
     requestBaseUrl(),
     // the event's features: what the preview shows (`cinematic`), the languages it may add
-    // (`languages`) and the studio's capabilities (on, or offered as an upgrade). A database hiccup:
-    // what this deployment offers, and no studio cards.
+    // (`languages`), the gallery section (`live_gallery`) and the studio's capabilities (on, or offered
+    // as an upgrade). A database hiccup: what this deployment offers, and no studio cards.
     featureInput(inv.id).catch((err: unknown) => {
       console.error('editor: the event’s features are unavailable', err);
       return null;
     }),
+    // the gallery section's form says when the event's gallery isn't on yet
+    galleryDb.invitationLink(inv.id).catch(() => null),
   ]);
   const features = input ? effectiveFeatures(input) : deploymentFeatures();
   const studio = (feature: Feature): StudioAccess | undefined => {
@@ -93,6 +96,8 @@ export default async function EditInvitationPage({ params }: { params: Params })
           premiumTemplates: account.limits.premiumTemplates,
           cinematic: features.has('cinematic'),
           languages: features.has('languages'),
+          liveGallery: features.has('live_gallery'),
+          galleryOn: !!gallery?.enabled,
           draftReview: studio('draft_review'),
           artDirection: studio('art_direction'),
           // the voice card carries the event's own switch: shown also while the host has it off

@@ -135,10 +135,51 @@ export function privacyDoc(c: LegalContext): LegalDoc {
                 'Storage: private storage (Supabase, European Union). Pages receive links to the files that expire after a few hours.',
                 'Deleting: a guest can delete their own upload from the same device at any time; the host can delete any photo or video, or the whole gallery. The files are then removed from storage, usually within minutes.',
                 'How long: until the host deletes them, the gallery, the invitation or the account (then as in section 7). Uploads that were never finished are erased after two days, and the records of deleted items after 30 days.',
-                'The gallery does not use face recognition.',
+                'Sending guests the gallery’s link: when the host sends it from our WhatsApp number, we keep for each family when it was sent and the message’s delivery status, as with invitations.',
+                'The highlights film: a host can make a short film of the gallery. It is made in the host’s own browser — the photos are read there, not by our servers — and a song the host picks for it stays on their computer. If the host adds the film to the gallery, it is kept like any other upload (and shown to guests only if the host chooses).',
+                'The gallery itself does not recognize faces. Face recognition is used only by face search (section 7C), when the host turns it on and each guest who searches agrees.',
               ],
             },
             'A guest who wants a photo of them removed can ask the host, or contact us (section 8).',
+          ],
+        },
+        {
+          id: 'faces',
+          heading: '7C. “The photos I’m in”: face search in the gallery (only where it is on)',
+          body: [
+            {
+              note: c.faceSearch
+                ? 'This section applies only to events whose host turned face search on. Where it is off, no face is processed.'
+                : 'This section applies only to events whose host turned face search on. Face search is not offered on the site at this time, so no face is processed.',
+            },
+            'When a host turns it on, each guest can find the gallery’s photos they appear in, from a selfie. Faces are biometric information, so this happens only with the explicit consent of each guest who searches — a separate checkbox, unticked, before anything else — and it is off unless the host turns it on.',
+            {
+              list: [
+                'The selfie: taken or chosen on the guest’s phone and processed there only; it is never sent to us and never kept. The phone turns the face into a “face code” — a series of 128 numbers — with an open-source face recognition model that runs in the browser (downloaded from our own site the first time). Only the face code is sent, once for each search, to be compared with the gallery’s face codes in our database; we don’t store it or write it in any log. On the phone it stays in that browser tab until the tab is closed or the guest chooses “Forget me”.',
+                'The gallery’s photos: the faces in them are found on devices — the phone that uploaded a photo, or the host’s computer — and for each face only where it is in the photo and its face code are kept. No face is cut out of a photo, no name is attached, and nothing links a face to a guest’s identity.',
+                'What the guest gets: an album of the published photos they appear in, which they can download.',
+                'Leaving out: a guest can ask not to appear in other guests’ searches. The faces that match them are removed from search at once, and their face code (not a photo) is kept only so that photos added later leave them out too.',
+                '“Forget me”: removes the faces that match the guest from search at once, deletes any request of theirs to be left out, and clears the face code from their phone.',
+                'The host sees only numbers — how many photos are ready for search, how many faces, how many guests asked to be left out — never face codes or who is in which photo.',
+                'How long: all of an event’s face data is erased 30 days after the event, at once when the host turns face search off or deletes the gallery, and with the account.',
+                'Where: in our own systems only (Supabase, European Union). No face data is sent to anyone else.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'insights',
+          heading: '7D. Invitation insights: how guests use an invitation',
+          body: [
+            'A host whose plan includes it sees how guests use an invitation — totals only, never who did what.',
+            {
+              list: [
+                'What an invitation page counts: that it was opened, in which language, on what kind of device (phone, tablet or computer — worked out from the browser, whose details aren’t kept), and how the guest got there (a personal link, the shared link, the QR code, or another way); whether the cover was opened, how far down the page was read, how long the page was on screen (up to 30 minutes), and whether the guest started or sent an RSVP, added the event to a calendar, opened the map or navigation, opened the gallery, or switched language.',
+                'No cookies, and nothing is kept on the guest’s device: each time the page is opened it picks a random number, kept only in the page’s memory, so that its updates count once. Nothing at all is measured when the browser asks sites not to track (Global Privacy Control or Do Not Track).',
+                'We don’t keep IP addresses or browser details for this: an IP address is used only as a one-way hash, to limit abuse (section 7). Automated visitors are not counted.',
+                'How long: each page load’s own record is erased after 7 days; the daily totals the host sees stay with the invitation until it, or the account, is deleted.',
+              ],
+            },
           ],
         },
         {
@@ -187,6 +228,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           heading: '9. Cookies',
           body: [
             'We use essential cookies to run the site. External content on the site’s own pages (videos from YouTube in its privacy-enhanced mode, Vimeo, Google Maps) loads by default, and you can turn it off at any time. The cookie policy has the details, and the “Cookie settings” link at the bottom of the site’s pages changes your choice.',
+            'Invitation insights (section 7D) use no cookies and keep nothing on the guest’s device.',
           ],
         },
         {
@@ -347,10 +389,51 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'אחסון: באחסון פרטי (Supabase, באיחוד האירופי). העמודים מקבלים קישורים לקבצים שתוקפם פג אחרי כמה שעות.',
               'מחיקה: אורח יכול למחוק בכל רגע, מאותו מכשיר, את מה שהעלה; המארח יכול למחוק כל תמונה או סרטון, או את הגלריה כולה. הקבצים נמחקים אז מהאחסון, בדרך כלל תוך דקות.',
               'כמה זמן: עד שהמארח מוחק אותם, את הגלריה, את ההזמנה או את החשבון (ואז כמו בסעיף 7). העלאות שלא הושלמו נמחקות אחרי יומיים, והרישומים של פריטים שנמחקו אחרי 30 יום.',
-              'הגלריה לא משתמשת בזיהוי פנים.',
+              'שליחת הקישור לגלריה לאורחים: כשהמארח שולח אותו מהמספר שלנו בוואטסאפ, נשמרים לכל משפחה מתי נשלח ומצב המסירה של ההודעה, כמו בהזמנות.',
+              'סרט הרגעים: מארח יכול ליצור סרט קצר מהגלריה. הסרט נוצר בדפדפן של המארח עצמו — התמונות נקראות שם, לא בשרתים שלנו — ושיר שהמארח בוחר בשבילו נשאר במחשב שלו. אם המארח מוסיף את הסרט לגלריה, הוא נשמר כמו כל העלאה אחרת (ומוצג לאורחים רק אם המארח בוחר בכך).',
+              'הגלריה עצמה לא מזהה פנים. זיהוי פנים משמש רק בחיפוש לפי פנים (סעיף 7ג), כשהמארח מפעיל אותו וכל אורח שמחפש מסכים.',
             ],
           },
           'אורח שרוצה שתמונה שלו תוסר יכול לבקש זאת מהמארח, או לפנות אלינו (סעיף 8).',
+        ],
+      },
+      {
+        id: 'faces',
+        heading: '7ג. ״התמונות שאני בהן״: חיפוש לפי פנים בגלריה (רק היכן שהוא מופעל)',
+        body: [
+          {
+            note: c.faceSearch
+              ? 'הסעיף הזה חל רק על אירועים שהמארח שלהם הפעיל חיפוש לפי פנים. כשהחיפוש כבוי, שום פנים לא מעובדים.'
+              : 'הסעיף הזה חל רק על אירועים שהמארח שלהם הפעיל חיפוש לפי פנים. החיפוש לפי פנים לא מוצע באתר כרגע, ולכן שום פנים לא מעובדים.',
+          },
+          'כשהמארח מפעיל אותו, כל אורח יכול למצוא את התמונות בגלריה שהוא מופיע בהן, לפי סלפי. פנים הם מידע ביומטרי, ולכן זה קורה רק בהסכמה מפורשת של כל אורח שמחפש — בתיבת סימון נפרדת, לא מסומנת מראש, לפני כל דבר אחר — והחיפוש כבוי אלא אם המארח מפעיל אותו.',
+          {
+            list: [
+              'הסלפי: מצולם או נבחר בטלפון של האורח ומעובד רק שם; הוא אף פעם לא נשלח אלינו ולא נשמר. הטלפון הופך את הפנים ל״קוד פנים״ — סדרה של 128 מספרים — בעזרת מודל קוד פתוח לזיהוי פנים שרץ בדפדפן (ונטען מהאתר שלנו בפעם הראשונה). רק קוד הפנים נשלח, פעם אחת לכל חיפוש, כדי להשוות אותו לקודי הפנים של הגלריה במסד הנתונים שלנו; אנחנו לא שומרים אותו ולא רושמים אותו באף יומן. בטלפון הוא נשאר בלשונית הדפדפן עד שסוגרים אותה או בוחרים ״לשכוח אותי״.',
+              'התמונות בגלריה: הפנים שבהן נמצאים במכשירים — בטלפון שהעלה את התמונה, או במחשב של המארח — ולכל פנים נשמרים רק המיקום שלהם בתמונה וקוד הפנים. שום פנים לא נגזרים מתמונה, שום שם לא מוצמד, ושום דבר לא מקשר בין פנים לזהות של אורח.',
+              'מה האורח מקבל: אלבום של התמונות שפורסמו ושהוא מופיע בהן, שאפשר להוריד.',
+              'השמטה: אורח יכול לבקש לא להופיע בחיפושים של אורחים אחרים. הפנים שתואמים לו מוסרים מהחיפוש מיד, וקוד הפנים שלו (לא תמונה) נשמר רק כדי שגם תמונות שיתווספו אחר כך ישמיטו אותו.',
+              '״לשכוח אותי״: מסיר מיד מהחיפוש את הפנים שתואמים לאורח, מוחק בקשת השמטה שלו אם הייתה, ומוחק את קוד הפנים מהטלפון שלו.',
+              'המארח רואה רק מספרים — כמה תמונות מוכנות לחיפוש, כמה פנים, כמה אורחים ביקשו להישמט — אף פעם לא קודי פנים ולא מי מופיע באיזו תמונה.',
+              'כמה זמן: כל נתוני הפנים של אירוע נמחקים 30 יום אחרי האירוע, מיד כשהמארח מכבה את החיפוש או מוחק את הגלריה, ועם מחיקת החשבון.',
+              'איפה: רק במערכות שלנו (Supabase, באיחוד האירופי). שום נתון פנים לא נשלח לאף גורם אחר.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'insights',
+        heading: '7ד. נתוני ההזמנה: איך אורחים משתמשים בהזמנה',
+        body: [
+          'מארח שהחבילה שלו כוללת את זה רואה איך אורחים משתמשים בהזמנה — רק סיכומים, אף פעם לא מי עשה מה.',
+          {
+            list: [
+              'מה עמוד ההזמנה סופר: שהוא נפתח, באיזו שפה, באיזה סוג מכשיר (טלפון, טאבלט או מחשב — לפי הדפדפן, שפרטיו לא נשמרים), ואיך האורח הגיע (קישור אישי, הקישור המשותף, קוד ה־QR או דרך אחרת); אם המעטפה נפתחה, עד כמה נקרא העמוד, כמה זמן הוא היה על המסך (עד 30 דקות), ואם האורח התחיל או שלח אישור הגעה, הוסיף את האירוע ליומן, פתח את המפה או הניווט, פתח את הגלריה או החליף שפה.',
+              'בלי עוגיות, ושום דבר לא נשמר במכשיר של האורח: בכל פתיחה העמוד בוחר מספר אקראי שנשמר רק בזיכרון של העמוד, כדי שהעדכונים שלו ייספרו פעם אחת. כשהדפדפן מבקש מאתרים לא לעקוב (Global Privacy Control או Do Not Track) — לא נמדד כלום.',
+              'אנחנו לא שומרים לשם כך כתובות IP או פרטי דפדפן: כתובת IP משמשת רק כגיבוב חד־כיווני, להגבלת שימוש לרעה (סעיף 7). מבקרים אוטומטיים לא נספרים.',
+              'כמה זמן: הרישום של כל פתיחה נמחק אחרי 7 ימים; הסיכומים היומיים שהמארח רואה נשמרים עם ההזמנה עד שהיא, או החשבון, נמחקים.',
+            ],
+          },
         ],
       },
       {
@@ -399,6 +482,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
         heading: '9. עוגיות',
         body: [
           'אנחנו משתמשים בעוגיות חיוניות להפעלת האתר. תוכן חיצוני בעמודי האתר עצמו (סרטונים מ־YouTube במצב הפרטיות המוגברת שלו, Vimeo ומפות Google) נטען כברירת מחדל, ואפשר לכבות אותו בכל רגע. כל הפרטים במדיניות העוגיות, ובקישור ״הגדרות עוגיות״ בתחתית עמודי האתר אפשר לשנות את הבחירה.',
+          'נתוני ההזמנה (סעיף 7ד) לא משתמשים בעוגיות ולא שומרים שום דבר במכשיר של האורח.',
         ],
       },
       {
