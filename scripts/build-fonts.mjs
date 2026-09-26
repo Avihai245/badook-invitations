@@ -97,6 +97,14 @@ const APP_FAMILIES = {
   'Frank Ruhl Libre': [500, 700].map((w) => [w, 'normal']),
   Fraunces: [500, 600].map((w) => [w, 'normal']),
 };
+/**
+ * The scripts neither has, which the live gallery's guest pages (and guest names) show: after them in
+ * app.css's stacks, each downloaded only for its own letters (unicode-range).
+ */
+const APP_SCRIPT_FAMILIES = {
+  Cairo: SCRIPT_SUBSETS.arabic,
+  'Noto Sans Ethiopic': SCRIPT_SUBSETS.ethiopic,
+};
 
 const familyId = (family) => family.toLowerCase().replace(/\s+/g, '-');
 
@@ -251,6 +259,9 @@ for (const [family, variants] of Object.entries(APP_FAMILIES)) {
     family,
     variants.map(([w, s]) => `${w}:${s}`),
   );
+}
+for (const [family, subsets] of Object.entries(APP_SCRIPT_FAMILIES)) {
+  app[family] = buildFamily(family, ['400:normal', '500:normal', '600:normal', '700:normal'], subsets);
 }
 
 const json = `${JSON.stringify({ generatedBy: 'scripts/build-fonts.mjs', families }, null, 2)}\n`;

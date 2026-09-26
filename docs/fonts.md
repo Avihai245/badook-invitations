@@ -97,6 +97,8 @@ a designed face. `npm run templates:validate` checks every supported script has 
 every font pair. A new Latin family needs a `classes` entry (and a `cyrillic` stand-in when it has no
 Cyrillic letters). The link-preview image draws Arabic in its presentation forms (the image renderer has
 no Arabic shaper), in Amiri or Noto Kufi Arabic when the design's face lacks them (Aref Ruqaa, Cairo).
+The site itself (Heebo, Inter) writes Arabic in Cairo and Ethiopic in Noto Sans Ethiopic — the live
+gallery's guest pages, guests' names in the guest list — likewise behind their `unicode-range`.
 
 **OFL-1.1** (SIL Open Font License 1.1): free to use, embed and bundle, including commercially; the fonts
 may not be sold on their own. **Apache-2.0**: free to use, including commercially, with the licence and

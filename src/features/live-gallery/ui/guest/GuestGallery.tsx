@@ -376,7 +376,10 @@ function GalleryBody({
               </select>
             </label>
           ) : null}
-          <p className="text-[12.5px] font-semibold tracking-[0.08em] text-[var(--gallery-accent)] uppercase">
+          {/* on a phone, a longer language's eyebrow wraps beside the language button, not under it */}
+          <p
+            className={`text-[12.5px] font-semibold tracking-[0.08em] text-[var(--gallery-accent)] uppercase ${others.length ? 'max-sm:px-[6.25rem]' : ''}`}
+          >
             {t.eyebrow}
           </p>
           <h1 className="mt-2 font-display text-[30px] leading-[1.15] font-bold text-balance sm:text-[36px]">

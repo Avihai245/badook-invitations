@@ -45,10 +45,11 @@
   --shadow-lg: 0 24px 48px rgba(28, 25, 23, 0.14);
   --shadow-ring: 0 0 0 3px rgba(28, 25, 23, 0.08);
 
-  --font-sans: 'Heebo', 'Inter', system-ui, sans-serif;
-  --font-sans-en: 'Inter', 'Heebo', system-ui, sans-serif;
+  /* Arabic and Ethiopic letters (the gallery's guest pages, guests' names) in Cairo and Noto Sans Ethiopic */
+  --font-sans: 'Heebo', 'Inter', 'Cairo', 'Noto Sans Ethiopic', system-ui, sans-serif;
+  --font-sans-en: 'Inter', 'Heebo', 'Cairo', 'Noto Sans Ethiopic', system-ui, sans-serif;
   /* headlines of the home and sign-in pages (font-display): a serif per script */
-  --font-display: 'Frank Ruhl Libre', 'Fraunces', Georgia, serif;
+  --font-display: 'Frank Ruhl Libre', 'Fraunces', 'Cairo', 'Noto Sans Ethiopic', Georgia, serif;
 }
 
 @layer base {
@@ -66,7 +67,7 @@
   :lang(en) {
     font-family: var(--font-sans-en);
     /* the font-display utility reads the variable: English headlines in Fraunces */
-    --font-display: 'Fraunces', 'Frank Ruhl Libre', Georgia, serif;
+    --font-display: 'Fraunces', 'Frank Ruhl Libre', 'Cairo', 'Noto Sans Ethiopic', Georgia, serif;
   }
   :focus-visible {
     outline: 2px solid var(--color-focus);
