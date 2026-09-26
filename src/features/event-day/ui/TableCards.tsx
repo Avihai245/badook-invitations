@@ -75,7 +75,7 @@ export function TableCards({
       {qr && c.qr ? (
         <div
           aria-hidden
-          className="size-[24mm] shrink-0 [&>svg]:size-full"
+          className="size-[22mm] shrink-0 [&>svg]:size-full"
           // generated on the server from the family's code (no user markup)
           dangerouslySetInnerHTML={{ __html: c.qr }}
         />
@@ -139,7 +139,10 @@ export function TableCards({
         {!cards.length ? (
           <p className="text-[14px] text-muted">{C.empty}</p>
         ) : order === 'name' ? (
-          <ul className="grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3" data-testid="cards">
+          <ul
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-3"
+            data-testid="cards"
+          >
             {byName.map(card)}
           </ul>
         ) : (
@@ -149,7 +152,9 @@ export function TableCards({
                 <h2 className="mt-5 mb-2 break-after-avoid text-[16px] font-bold first:mt-0">
                   {fmt(C.tableHeading, { number: n })}
                 </h2>
-                <ul className="grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3">{list.map(card)}</ul>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-3">
+                  {list.map(card)}
+                </ul>
               </Fragment>
             ))}
           </div>

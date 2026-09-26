@@ -399,7 +399,13 @@ export function LiveHall({ initial, planBase }: { initial: DayView; planBase: st
           label={E.kpi.last}
           icon={<AlarmClock />}
           value={last ? time(last.at) : E.kpi.none}
-          sub={last ? <bdi className="block truncate">{last.party.name}</bdi> : undefined}
+          sub={
+            last ? (
+              <span className="block truncate">
+                <bdi>{last.party.name}</bdi>
+              </span>
+            ) : undefined
+          }
         />
       </div>
 

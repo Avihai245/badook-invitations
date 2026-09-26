@@ -108,6 +108,11 @@ export function NoticesDialog({
   const shown = rows.filter((r) => IN_TAB[current](noticeState(r)));
   const toSend = shown.filter(sendable);
   const toMark = shown.filter(markable);
+  // not enough credits for all of them: said before the host presses (the server refuses the same)
+  const short = !!data && !data.unlimited && data.credits < toSend.length;
+  const shortText = data
+    ? fmt(N.errors.credits, { needed: number(toSend.length), balance: number(data.credits) })
+    : '';
 
   const guideUrl = (r: NoticeRow) =>
     data && r.token ? `${data.base}/e/${data.slug}/table?g=${encodeURIComponent(r.token)}` : null;
@@ -246,12 +251,15 @@ export function NoticesDialog({
               </Button>
             </Hint>
             {data.ready ? (
-              <Hint text={fmt(N.sendAllHint, { brand: t.brand })} disabledText={N.sendNone}>
+              <Hint
+                text={fmt(N.sendAllHint, { brand: t.brand })}
+                disabledText={toSend.length ? shortText : N.sendNone}
+              >
                 <Button
                   variant="whatsapp"
                   size="sm"
                   icon={<Send className="icon-dir" />}
-                  disabled={!toSend.length}
+                  disabled={!toSend.length || short}
                   loading={busy === 'send'}
                   onClick={() => void send()}
                   data-testid="notices-send"
@@ -364,10 +372,12 @@ export function NoticesDialog({
             })}
           </ul>
           {data.ready && toSend.length ? (
-            <p className="text-end text-[12px] text-muted">
+            <p className={`text-end text-[12px] ${short ? 'font-semibold text-warning' : 'text-muted'}`}>
               {data.unlimited
                 ? N.unlimited
-                : fmt(N.cost, { n: number(toSend.length), credits: number(data.credits) })}
+                : short
+                  ? shortText
+                  : fmt(N.cost, { n: number(toSend.length), credits: number(data.credits) })}
             </p>
           ) : null}
         </div>

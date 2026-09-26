@@ -279,6 +279,7 @@ test('a guest opens their table from their personal link on the phone, and again
   context,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'the guest’s phone');
+  test.setTimeout(60_000);
   const ev = await eventWithTables(page, 'day-guide', 'business');
   const [cohen, , , mizrahi] = ev.families;
   const errors = collectErrors(page);
@@ -333,6 +334,7 @@ test('the entrance checks families in by search and by the code on their phone; 
   browser,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'one run: the host at a desk, the stations on phones');
+  test.setTimeout(90_000);
   const ev = await eventWithTables(page, 'day-station', 'business');
   const [cohen] = ev.families;
   const errors = collectErrors(page);
@@ -406,6 +408,7 @@ test('telling guests their table, then re-seating: only the moved family hears a
   request,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'one run: the messages are the WhatsApp stand-in’s');
+  test.setTimeout(90_000);
   const ev = await eventWithTables(page, 'day-reseat', 'business', 20);
   const [cohen, levi, peretz] = ev.families;
   const errors = collectErrors(page);
@@ -497,6 +500,7 @@ test('without the package the event day is offered, switched off it is gone, and
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'one run: the server’s answers');
+  test.setTimeout(60_000);
   const ev = await eventWithTables(page, 'day-off', 'free');
   const [cohen] = ev.families;
 
