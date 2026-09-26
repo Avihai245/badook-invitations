@@ -123,7 +123,7 @@ Footer: `Enviado con Badook` · Button: `Invitación y respuesta` · דוגמא�
 | `INVITES_WHATSAPP_APP_SECRET` | App settings → Basic → App secret (לאימות החתימה על ה-webhook) |
 | `INVITES_WHATSAPP_VERIFY_TOKEN` | מחרוזת אקראית ארוכה שבוחרים, ואותה מזינים גם בהגדרת ה-webhook |
 | `INVITES_WHATSAPP_TEMPLATE` | `badook_invitation` (ברירת המחדל) |
-| `INVITES_WHATSAPP_TEMPLATE_LANGS` | השפות שבהן הטמפלט אושר, בקודים של Meta ומופרדות בפסיקים (ברירת המחדל `he,en`; ראו סעיף 2א) |
+| `INVITES_WHATSAPP_TEMPLATE_LANGS` | השפות שבהן הטמפלטים אושרו, בקודים של Meta ומופרדות בפסיקים (ברירת המחדל `he,en`). אותה רשימה לטמפלט ההזמנה ולטמפלט מספר השולחן — ראו סעיפים 2א ו-8 |
 | `INVITES_WHATSAPP_TEMPLATE_LANG` | ההגדרה הישנה לשפה אחת: נקראת רק כש-`INVITES_WHATSAPP_TEMPLATE_LANGS` ריק |
 | `INVITES_WHATSAPP_PRICE_USD` | המחיר להודעת Marketing בישראל לפי מחירון Meta, בלי מע״מ (המחיר למשתמש מוסיף 18% מע״מ). ברירת המחדל `0.0353`, וכדאי לבדוק את המחירון העדכני |
 | `INVITES_USD_TO_ILS` | שער הדולר לחישוב המחיר בשקלים (ברירת מחדל `3.7`) |
