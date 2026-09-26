@@ -53,16 +53,8 @@ export function accessibilityDoc(c: LegalContext): LegalDoc {
           ],
         },
         {
-          id: 'checked',
-          heading: '3. How we checked',
-          body: [
-            `On ${c.updated} the guest’s side was checked against WCAG 2.1 AA. An automated audit (axe-core, the WCAG 2.0 and 2.1 A and AA rules) covered the opening screen and every section of several invitation designs (a classic, a photographic, two drawn and a dark one), the RSVP form with its errors and its confirmation, a save-the-date, a guest’s table guide, the entrance station, the live gallery’s upload page and the family’s review page — on a phone and on a computer, in Hebrew and in English. What it found — small text below 4.5:1 contrast: the “made with” line and the accessibility and privacy links at the foot of the invitations (drawn at reduced opacity), and the “made with” line of the table guide and of the gallery’s upload page — was fixed where it comes from, and the audit now runs with every change to the site and fails on anything new.`,
-            'A manual pass followed: the keyboard alone (focus order, a visible focus, no traps, the dialogs), what a screen reader announces (names, errors, live updates), reflow at 320 pixels and zoom to 200%, text spacing, and reduced motion. It found, and we fixed: the page under an invitation’s closed envelope could take the keyboard’s focus while hidden (now only the envelope can, until it opens); decorative loops (a background video, particles, a drawing’s sway) could not be paused (invitations now have a “pause the animations” button); the RSVP form’s plus and minus buttons were not named by their question; the countdown was read digit by digit; and closing the comment form on the family’s review page lost the focus (it now returns to “add a comment”).',
-          ],
-        },
-        {
           id: 'limits',
-          heading: '4. Known limitations',
+          heading: '3. Known limitations',
           body: [
             {
               list: [
@@ -76,15 +68,19 @@ export function accessibilityDoc(c: LegalContext): LegalDoc {
         },
         {
           id: 'contact',
-          heading: '5. Accessibility contact',
+          heading: '4. Accessibility contact',
           body: [
             `${coordinator}. You can also use the contact form. We will reply within 7 business days, and try to fix a reported problem as soon as possible or offer another way to get the service.`,
           ],
         },
         {
           id: 'updated',
-          heading: '6. Last review',
-          body: [`This statement was last reviewed and updated on ${c.updated}.`],
+          heading: '5. Last review',
+          body: [
+            `This statement was last reviewed and updated on ${c.updated}.`,
+            `How it was checked: on ${c.updated} the guest’s side was checked against WCAG 2.1 AA. An automated audit (axe-core, the WCAG 2.0 and 2.1 A and AA rules) covered the opening screen and every section of several invitation designs (a classic, a photographic, two drawn and a dark one), the RSVP form with its errors and its confirmation, a save-the-date, a guest’s table guide, the entrance station, the live gallery’s upload page and the family’s review page — on a phone and on a computer, in Hebrew and in English. What it found — small text below 4.5:1 contrast: the “made with” line and the accessibility and privacy links at the foot of the invitations (drawn at reduced opacity), and the “made with” line of the table guide and of the gallery’s upload page — was fixed where it comes from, and the audit now runs with every change to the site and fails on anything new.`,
+            'A manual pass followed: the keyboard alone (focus order, a visible focus, no traps, the dialogs), what a screen reader announces (names, errors, live updates), reflow at 320 pixels and zoom to 200%, text spacing, and reduced motion. It found, and we fixed: the page under an invitation’s closed envelope could take the keyboard’s focus while hidden (now only the envelope can, until it opens); decorative loops (a background video, particles, a drawing’s sway) could not be paused (invitations now have a “pause the animations” button); the RSVP form’s plus and minus buttons were not named by their question; the countdown was read digit by digit; and closing the comment form on the family’s review page lost the focus (it now returns to “add a comment”).',
+          ],
         },
       ],
     };
@@ -133,16 +129,8 @@ export function accessibilityDoc(c: LegalContext): LegalDoc {
         ],
       },
       {
-        id: 'checked',
-        heading: '3. איך בדקנו',
-        body: [
-          `ב־${c.updated} נבדק צד האורחים מול הנחיות WCAG 2.1 ברמה AA. בדיקה אוטומטית (axe-core, כללי WCAG 2.0 ו־2.1 ברמות A ו־AA) עברה על מסך הפתיחה ועל כל הסקשנים בכמה עיצובים של הזמנות (קלאסי, צילומי, שניים מאוירים ואחד כהה), על טופס אישור ההגעה עם השגיאות ועם האישור, על Save the Date, על מדריך השולחן של האורח, על עמדת הכניסה, על עמוד ההעלאה של הגלריה החיה ועל עמוד העיון של המשפחה — בטלפון ובמחשב, בעברית ובאנגלית. מה שנמצא — טקסט קטן בניגודיות נמוכה מ־4.5:1: שורת ״נוצר באהבה״ והקישורים להצהרת הנגישות ולפרטיות בתחתית ההזמנות (שהוצגו בשקיפות), ושורת ״נוצר באהבה״ במדריך השולחן ובעמוד ההעלאה של הגלריה — תוקן במקור, והבדיקה רצה עכשיו עם כל שינוי באתר ונכשלת על כל בעיה חדשה.`,
-          'אחריה עברנו ידנית: מקלדת בלבד (סדר הפוקוס, פוקוס גלוי, בלי מלכודות, החלונות), מה שקורא מסך מקריא (שמות, שגיאות, עדכונים חיים), התאמה לרוחב 320 פיקסלים והגדלה ל־200%, ריווח טקסט, ותנועה מופחתת. מצאנו ותיקנו: העמוד שמתחת למעטפה הסגורה של הזמנה יכול היה לקבל את הפוקוס של המקלדת בזמן שהוא מוסתר (עכשיו רק המעטפה, עד שהיא נפתחת); לולאות קישוט (סרטון רקע, חלקיקים, תנועה של איור) לא היה אפשר לעצור (עכשיו יש בהזמנות כפתור ״עצירת האנימציות״); לכפתורי הפלוס והמינוס בטופס אישור ההגעה לא היה שם של השאלה שלהם; הספירה לאחור הוקראה ספרה אחר ספרה; וסגירת טופס ההערה בעמוד העיון של המשפחה איבדה את הפוקוס (עכשיו הוא חוזר ל״הוספת הערה״).',
-        ],
-      },
-      {
         id: 'limits',
-        heading: '4. מגבלות ידועות',
+        heading: '3. מגבלות ידועות',
         body: [
           {
             list: [
@@ -156,15 +144,19 @@ export function accessibilityDoc(c: LegalContext): LegalDoc {
       },
       {
         id: 'contact',
-        heading: '5. פנייה בנושא נגישות',
+        heading: '4. פנייה בנושא נגישות',
         body: [
           `${coordinator}. אפשר גם בטופס יצירת הקשר. נשיב תוך 7 ימי עסקים, וננסה לתקן בעיה שדווחה מהר ככל האפשר או להציע דרך אחרת לקבל את השירות.`,
         ],
       },
       {
         id: 'updated',
-        heading: '6. עדכון אחרון',
-        body: [`ההצהרה נבדקה ועודכנה לאחרונה ב־${c.updated}.`],
+        heading: '5. עדכון אחרון',
+        body: [
+          `ההצהרה נבדקה ועודכנה לאחרונה ב־${c.updated}.`,
+          `איך בדקנו: ב־${c.updated} נבדק צד האורחים מול הנחיות WCAG 2.1 ברמה AA. בדיקה אוטומטית (axe-core, כללי WCAG 2.0 ו־2.1 ברמות A ו־AA) עברה על מסך הפתיחה ועל כל הסקשנים בכמה עיצובים של הזמנות (קלאסי, צילומי, שניים מאוירים ואחד כהה), על טופס אישור ההגעה עם השגיאות ועם האישור, על Save the Date, על מדריך השולחן של האורח, על עמדת הכניסה, על עמוד ההעלאה של הגלריה החיה ועל עמוד העיון של המשפחה — בטלפון ובמחשב, בעברית ובאנגלית. מה שנמצא — טקסט קטן בניגודיות נמוכה מ־4.5:1: שורת ״נוצר באהבה״ והקישורים להצהרת הנגישות ולפרטיות בתחתית ההזמנות (שהוצגו בשקיפות), ושורת ״נוצר באהבה״ במדריך השולחן ובעמוד ההעלאה של הגלריה — תוקן במקור, והבדיקה רצה עכשיו עם כל שינוי באתר ונכשלת על כל בעיה חדשה.`,
+          'אחריה עברנו ידנית: מקלדת בלבד (סדר הפוקוס, פוקוס גלוי, בלי מלכודות, החלונות), מה שקורא מסך מקריא (שמות, שגיאות, עדכונים חיים), התאמה לרוחב 320 פיקסלים והגדלה ל־200%, ריווח טקסט, ותנועה מופחתת. מצאנו ותיקנו: העמוד שמתחת למעטפה הסגורה של הזמנה יכול היה לקבל את הפוקוס של המקלדת בזמן שהוא מוסתר (עכשיו רק המעטפה, עד שהיא נפתחת); לולאות קישוט (סרטון רקע, חלקיקים, תנועה של איור) לא היה אפשר לעצור (עכשיו יש בהזמנות כפתור ״עצירת האנימציות״); לכפתורי הפלוס והמינוס בטופס אישור ההגעה לא היה שם של השאלה שלהם; הספירה לאחור הוקראה ספרה אחר ספרה; וסגירת טופס ההערה בעמוד העיון של המשפחה איבדה את הפוקוס (עכשיו הוא חוזר ל״הוספת הערה״).',
+        ],
       },
     ],
   };

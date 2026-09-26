@@ -453,21 +453,19 @@ test.describe('the invitation read aloud', () => {
     test.setTimeout(120_000);
     const { id } = await host(page, 'studio-voice', 'pro');
     const slug = await publish(page, id);
-    // the stand-in read each language, in its voice
+    // the stand-in read each language, in its voice (one after the other, in the background)
+    type Heard = { voice: string; lang: string; format: string; text: string }[];
+    const tts = async () => (await (await page.request.get(`${TTS}/__tts`)).json()) as Heard;
     await expect
       .poll(
-        async () => ((await (await page.request.get(`${TTS}/__tts`)).json()) as { text: string }[]).length,
-        {
-          timeout: 30_000,
+        async () => {
+          const list = await tts();
+          return ['he-IL-HilaNeural', 'en-US-JennyNeural'].every((v) => list.some((r) => r.voice === v));
         },
+        { timeout: 60_000 },
       )
-      .toBeGreaterThan(0);
-    const heard = (await (await page.request.get(`${TTS}/__tts`)).json()) as {
-      voice: string;
-      lang: string;
-      format: string;
-      text: string;
-    }[];
+      .toBe(true);
+    const heard = await tts();
     const he = heard.find((r) => r.text.includes('נועה'))!;
     expect(he).toMatchObject({
       voice: 'he-IL-HilaNeural',
@@ -627,8 +625,9 @@ test.describe('captions', () => {
         '1\n00:00:00,000 --> 00:00:03,000\nHello everyone\n\n2\n00:00:03,000 --> 00:00:05,000\nWelcome\n',
       ),
     });
+    // the host's screens are in Hebrew: the English track's state reads "2 captions" in Hebrew
     await expect(captions.locator('li[data-locale="en"] [data-testid="captions-state"]')).toHaveText(
-      '2 captions'.replace('2 captions', '2 כתוביות'),
+      '2 כתוביות',
     );
     await saved(page);
     const slug = await publish(page, id);
