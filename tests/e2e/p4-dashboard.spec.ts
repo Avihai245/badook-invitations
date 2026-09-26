@@ -274,7 +274,14 @@ test.describe('responses dashboard', () => {
     // …and checks the templates and demos match the code (a fresh seed does); the billing checks count
     // every account in the test database (billing.spec.ts leaves a lapsed plan), so only their shape
     const overdue = expect.any(Number);
-    expect(await first.json()).toEqual({ sent: 1, failed: 0, purged, overdue, seed: 'current' });
+    // …and the live gallery's housekeeping (other tests' galleries may leave work, so only its shape)
+    const gallery = {
+      abandoned: expect.any(Number),
+      tombstones: expect.any(Number),
+      rate: expect.any(Number),
+      files: expect.any(Number),
+    };
+    expect(await first.json()).toEqual({ sent: 1, failed: 0, purged, overdue, seed: 'current', gallery });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
       sent: 0,
@@ -282,6 +289,7 @@ test.describe('responses dashboard', () => {
       purged,
       overdue,
       seed: 'current',
+      gallery,
     });
   });
 });
