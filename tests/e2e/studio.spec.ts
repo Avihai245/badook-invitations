@@ -283,7 +283,11 @@ test.describe('design it for me', () => {
     await wizard.getByLabel('תאריך').fill('2027-09-02');
     await wizard.getByLabel('שעה').fill('19:00');
     await wizard.getByRole('button', { name: 'המשך' }).click();
-    await wizard.getByRole('radio', { name: 'עברית' }).click();
+    // the languages: Hebrew is chosen already (the host's own), one of the seven
+    await expect(wizard.getByRole('checkbox', { name: 'עברית', exact: true })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
     await wizard.getByRole('button', { name: 'המשך' }).click();
     await wizard.getByTestId('studio-file').setInputFiles(PHOTOS);
     await expect(wizard.getByText('3 מתוך 3–5 תמונות')).toBeVisible({ timeout: 20_000 });
@@ -342,7 +346,7 @@ test.describe('the family’s review link', () => {
     await expect(family.getByTestId('review-banner')).toBeVisible();
     await expect(family.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
     if (await family.locator('.cover').count()) {
-      await family.locator('.cover > button[aria-label]').click();
+      await family.locator('.cover > button.cover-tap').click();
       await expect(family.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
     }
     // tap a spot on the names

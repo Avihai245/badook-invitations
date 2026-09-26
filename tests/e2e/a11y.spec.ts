@@ -130,7 +130,7 @@ test.describe('the invitation', () => {
         const cover = page.locator('.cover');
         if (await cover.count()) {
           await audit(page, `invitation-cover-${d.name}-${lang}`);
-          await page.locator('.cover > button[aria-label]').click();
+          await page.locator('.cover > button.cover-tap').click();
           await expect(cover).toHaveCount(0, { timeout: 10_000 });
         }
         await scrollThrough(page);
@@ -142,7 +142,7 @@ test.describe('the invitation', () => {
     await open(page, '/i/noa-and-itay-save-the-date');
     if (await page.locator('.cover').count()) {
       await audit(page, 'savethedate-cover');
-      await page.locator('.cover > button[aria-label]').click();
+      await page.locator('.cover > button.cover-tap').click();
       await expect(page.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
     }
     await scrollThrough(page);
@@ -199,7 +199,7 @@ test.describe('by hand', () => {
         `tab ${i + 1} stays on the cover`,
       ).toBe(true);
     }
-    await page.locator('.cover > button[aria-label]').focus();
+    await page.locator('.cover > button.cover-tap').focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
     await expect(page.locator('main')).not.toHaveAttribute('inert');
@@ -392,7 +392,7 @@ test.describe('the draft review', () => {
       await expect(guest.getByTestId('review-banner')).toBeVisible();
       if (await guest.locator('.cover').count()) {
         await audit(guest, `review-cover-${lang}`);
-        await guest.locator('.cover > button[aria-label]').click();
+        await guest.locator('.cover > button.cover-tap').click();
         await expect(guest.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
       }
       await scrollThrough(guest);

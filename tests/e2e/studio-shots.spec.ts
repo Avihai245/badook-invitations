@@ -143,7 +143,7 @@ for (const ui of ['he', 'en'] as const)
     await fam.goto(`${new URL(url).pathname}/${ui}`);
     await expect(fam.getByTestId('review-banner')).toBeVisible();
     if (await fam.locator('.cover').count()) {
-      await fam.locator('.cover > button[aria-label]').click();
+      await fam.locator('.cover > button.cover-tap').click();
       await expect(fam.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
     }
     await fam.getByRole('button', { name: ui === 'he' ? 'הוספת הערה' : 'Add a comment' }).click();
