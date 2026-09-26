@@ -2,6 +2,7 @@ import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
 import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
+import { insightsHousekeeping } from '@/features/insights/server/deps';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
@@ -40,7 +41,19 @@ export async function runDaily(now: Date) {
   const eventDay = await eventDayHousekeeping().catch(
     (err) => (console.error('event day housekeeping failed', err), null),
   );
-  return { ...digests, purged: (purged as number | null) ?? null, overdue, seed, gallery, eventDay };
+  // the insights' page loads go after a week (the daily numbers stay with the invitation)
+  const insights = await insightsHousekeeping().catch(
+    (err) => (console.error('insights housekeeping failed', err), null),
+  );
+  return {
+    ...digests,
+    purged: (purged as number | null) ?? null,
+    overdue,
+    seed,
+    gallery,
+    eventDay,
+    insights,
+  };
 }
 
 /**

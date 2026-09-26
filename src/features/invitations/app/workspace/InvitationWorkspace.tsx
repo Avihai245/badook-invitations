@@ -2,6 +2,7 @@
 
 import {
   Armchair,
+  ChartColumn,
   ChevronLeft,
   DoorOpen,
   ExternalLink,
@@ -41,6 +42,7 @@ export function InvitationWorkspace({
   seating = null,
   eventDay = null,
   galleryTab = false,
+  insightsTab = false,
   children,
 }: {
   item: InvitationSummary;
@@ -48,6 +50,8 @@ export function InvitationWorkspace({
   eventDay?: 'on' | 'plan' | null;
   /** the live gallery's tab (when this deployment offers it: features/flags) */
   galleryTab?: boolean;
+  /** how guests use the invitation (feature analytics, when this deployment offers it) */
+  insightsTab?: boolean;
   children: ReactNode;
 }) {
   const { t, locale, date, plural, number } = useUi();
@@ -94,6 +98,9 @@ export function InvitationWorkspace({
     { key: 'share', href: `${base}/share`, icon: Share2, label: w.tabs.share },
     ...(galleryTab
       ? [{ key: 'gallery' as const, href: `${base}/gallery`, icon: Images, label: t.liveGallery.tab }]
+      : []),
+    ...(insightsTab
+      ? [{ key: 'insights' as const, href: `${base}/insights`, icon: ChartColumn, label: t.insights.tab }]
       : []),
     { key: 'edit', href: `${base}/edit`, icon: PenLine, label: w.tabs.edit },
   ];
