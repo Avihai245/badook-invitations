@@ -88,7 +88,7 @@ function revealInView() {
   if (!inv) return;
   inv.dataset.instant = '';
   const bottom = window.innerHeight;
-  inv.querySelectorAll<HTMLElement>('main .reveal:not(.in)').forEach((el) => {
+  inv.querySelectorAll<HTMLElement>('main :is(.reveal, .divider, .deco):not(.in)').forEach((el) => {
     if (el.getBoundingClientRect().top < bottom) el.classList.add('in');
   });
   requestAnimationFrame(() => requestAnimationFrame(() => delete inv.dataset.instant));

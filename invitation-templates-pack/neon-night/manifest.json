@@ -191,7 +191,8 @@
     "preset": "soft",
     "revealDistance": 60,
     "revealBlur": false,
-    "stagger": 0.06
+    "stagger": 0.06,
+    "ambient": "confetti"
   },
   "assets": {
     "hero": "/templates/neon-night/hero.mp4",

@@ -1,3 +1,4 @@
+import { hexToRgb, mixHex } from '../../lib/contrast';
 import { motionAllowed, particleBudget } from './motion';
 import { BALLOON_STRING, SHAPES, type Shape, type ShapeId } from './shapes';
 import type { BurstKind } from './theme';
@@ -48,26 +49,26 @@ const ALL: readonly [number, number] = [-180, 180];
 export const BURSTS: Record<BurstKind, Spec> = {
   petals: {
     shapes: ['petal', 'petal2', 'petal'],
-    count: [22, 34],
-    size: [12, 21],
-    speed: [240, 620],
+    count: [24, 36],
+    size: [14, 26],
+    speed: [260, 660],
     angle: UP,
     gravity: 230,
     drag: 1.7,
-    ttl: [2.9, 3.9],
+    ttl: [3, 4],
     spin: [-2.4, 2.4],
     flip: [2.6, 6.5],
     sway: 95,
   },
   leaves: {
     shapes: ['leaf', 'leaf2'],
-    count: [20, 32],
-    size: [14, 23],
-    speed: [240, 600],
+    count: [22, 34],
+    size: [15, 26],
+    speed: [260, 640],
     angle: UP,
     gravity: 250,
     drag: 1.7,
-    ttl: [2.9, 3.9],
+    ttl: [3, 4],
     spin: [-3, 3],
     flip: [2.5, 6],
     sway: 105,
@@ -75,25 +76,25 @@ export const BURSTS: Record<BurstKind, Spec> = {
   confetti: {
     shapes: ['rect', 'rect', 'circle', 'tri', 'squiggle'],
     count: [24, 40],
-    size: [8, 14],
-    speed: [420, 980],
+    size: [9, 15],
+    speed: [440, 1000],
     angle: [-160, -20],
     gravity: 760,
     drag: 2.1,
-    ttl: [2.4, 3.4],
+    ttl: [2.5, 3.5],
     spin: [-8, 8],
     flip: [8, 17],
     sway: 70,
   },
   sparkles: {
     shapes: ['sparkle', 'sparkle', 'dot'],
-    count: [20, 32],
-    size: [8, 22],
-    speed: [160, 600],
+    count: [22, 34],
+    size: [10, 24],
+    speed: [180, 640],
     angle: ALL,
     gravity: 40,
     drag: 2.6,
-    ttl: [1.3, 2.3],
+    ttl: [1.4, 2.4],
     spin: [-1.6, 1.6],
     flip: [0, 0],
     sway: 0,
@@ -102,13 +103,13 @@ export const BURSTS: Record<BurstKind, Spec> = {
   },
   stars: {
     shapes: ['star', 'sparkle', 'star', 'dot'],
-    count: [20, 32],
-    size: [9, 20],
-    speed: [200, 640],
+    count: [22, 34],
+    size: [10, 22],
+    speed: [200, 660],
     angle: ALL,
     gravity: 70,
     drag: 2.4,
-    ttl: [1.5, 2.5],
+    ttl: [1.6, 2.6],
     spin: [-3, 3],
     flip: [0, 1.5],
     sway: 0,
@@ -117,13 +118,13 @@ export const BURSTS: Record<BurstKind, Spec> = {
   },
   bubbles: {
     shapes: ['bubble'],
-    count: [16, 26],
-    size: [12, 32],
-    speed: [140, 440],
+    count: [18, 28],
+    size: [14, 34],
+    speed: [150, 460],
     angle: [-180, 0],
     gravity: -150,
     drag: 1.5,
-    ttl: [2.2, 3.3],
+    ttl: [2.3, 3.4],
     spin: [0, 0],
     flip: [0, 0],
     sway: 130,
@@ -131,40 +132,40 @@ export const BURSTS: Record<BurstKind, Spec> = {
   },
   balloons: {
     shapes: ['balloon'],
-    count: [9, 14],
-    size: [26, 42],
+    count: [10, 14],
+    size: [30, 46],
     speed: [90, 240],
     angle: [-115, -65],
     gravity: -95,
     drag: 0.45,
-    ttl: [3.6, 4.8],
+    ttl: [3.8, 5],
     spin: [-0.35, 0.35],
     flip: [0, 0],
     sway: 75,
-    spreadX: 0.34,
+    spreadX: 0.36,
   },
   hearts: {
     shapes: ['heart'],
-    count: [16, 26],
-    size: [11, 23],
-    speed: [200, 560],
+    count: [18, 28],
+    size: [13, 26],
+    speed: [220, 580],
     angle: [-170, -10],
     gravity: -70,
     drag: 2.2,
-    ttl: [2.2, 3.2],
+    ttl: [2.3, 3.3],
     spin: [-1, 1],
     flip: [0, 0],
     sway: 85,
   },
   fireflies: {
     shapes: ['dot'],
-    count: [18, 28],
-    size: [4, 9],
-    speed: [90, 400],
+    count: [20, 30],
+    size: [5, 10],
+    speed: [90, 420],
     angle: ALL,
     gravity: -55,
     drag: 1.8,
-    ttl: [1.9, 3.1],
+    ttl: [2, 3.2],
     spin: [0, 0],
     flip: [0, 0],
     sway: 60,
@@ -173,13 +174,13 @@ export const BURSTS: Record<BurstKind, Spec> = {
   },
   embers: {
     shapes: ['dot'],
-    count: [20, 32],
-    size: [2.5, 6],
-    speed: [130, 470],
+    count: [22, 34],
+    size: [3, 7],
+    speed: [140, 480],
     angle: [-150, -30],
     gravity: -130,
     drag: 1.5,
-    ttl: [1.6, 2.7],
+    ttl: [1.7, 2.8],
     spin: [0, 0],
     flip: [0, 0],
     sway: 95,
@@ -188,22 +189,22 @@ export const BURSTS: Record<BurstKind, Spec> = {
   },
   notes: {
     shapes: ['note', 'note2'],
-    count: [12, 20],
-    size: [15, 24],
-    speed: [170, 480],
+    count: [14, 22],
+    size: [16, 26],
+    speed: [180, 500],
     angle: [-160, -20],
     gravity: -85,
     drag: 2,
-    ttl: [2.3, 3.3],
+    ttl: [2.4, 3.4],
     spin: [-1, 1],
     flip: [0, 0],
     sway: 80,
   },
   pixels: {
     shapes: ['pixel', 'pixel', 'plus'],
-    count: [22, 36],
-    size: [6, 12],
-    speed: [320, 780],
+    count: [24, 36],
+    size: [7, 13],
+    speed: [340, 800],
     angle: UP,
     gravity: 640,
     drag: 2,
@@ -227,8 +228,7 @@ interface Particle {
   vf: number;
   phase: number;
   size: number;
-  color: string;
-  shape: Shape;
+  sprite: Sprite;
   age: number;
   ttl: number;
   spec: Spec;
@@ -240,36 +240,121 @@ let particles: Particle[] = [];
 let raf = 0;
 let last = 0;
 let dpr = 1;
-const paths = new Map<string, Path2D>();
-const glows = new Map<string, HTMLCanvasElement>();
 
-const path = (d: string) => {
-  let p = paths.get(d);
-  if (!p) {
-    p = new Path2D(d);
-    paths.set(d, p);
-  }
-  return p;
+/** Sprite pixels per shape unit (the 24-unit box → 96px: sharp up to ~48px on a 2× screen). */
+const PX = 4;
+interface Sprite {
+  img: HTMLCanvasElement;
+  /** margin around the 24 × h box, in shape units (a glow needs room) */
+  pad: number;
+  h: number;
+}
+const sprites = new Map<string, Sprite>();
+
+const rgba = (hex: string, a: number) => {
+  const [r, g, b] = hexToRgb(hex);
+  return `rgba(${r},${g},${b},${a})`;
 };
 
-/** A soft round glow sprite per color (drawn once, then scaled — no per-frame gradients or blurs). */
-function glowSprite(color: string): HTMLCanvasElement {
-  let g = glows.get(color);
-  if (g) return g;
-  g = document.createElement('canvas');
-  g.width = g.height = 64;
-  const c = g.getContext('2d');
-  if (c) {
-    const grad = c.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, color);
-    grad.addColorStop(0.25, color);
-    grad.addColorStop(1, 'rgba(255,255,255,0)');
-    c.globalAlpha = 0.55;
-    c.fillStyle = grad;
-    c.fillRect(0, 0, 64, 64);
+/**
+ * Each shape × color is painted once into a small offscreen canvas — shaded like the real thing (a
+ * petal lighter at its tip, a glossy balloon, a bubble's rim, a glowing sparkle) — then every frame
+ * only draws those images, turned and scaled: no gradients, paths or blurs per frame.
+ */
+function sprite(id: ShapeId, color: string, glow: boolean): Sprite {
+  const key = `${id}|${color}|${glow ? 1 : 0}`;
+  const cached = sprites.get(key);
+  if (cached) return cached;
+  const shape: Shape = SHAPES[id];
+  const h = shape.h ?? 24;
+  const pad = glow ? 16 : 2;
+  const img = document.createElement('canvas');
+  img.width = (24 + pad * 2) * PX;
+  img.height = (h + pad * 2) * PX;
+  const s: Sprite = { img, pad, h };
+  sprites.set(key, s);
+  const c = img.getContext('2d');
+  if (!c) return s;
+  c.scale(PX, PX);
+  c.translate(pad, pad);
+  const path = new Path2D(shape.d);
+  if (glow) {
+    const g = c.createRadialGradient(12, h / 2, 0, 12, h / 2, 12 + pad);
+    g.addColorStop(0, rgba(color, 0.6));
+    g.addColorStop(0.3, rgba(color, 0.22));
+    g.addColorStop(1, rgba(color, 0));
+    c.fillStyle = g;
+    c.fillRect(-pad, -pad, 24 + pad * 2, h + pad * 2);
   }
-  glows.set(color, g);
-  return g;
+  switch (id) {
+    case 'petal':
+    case 'petal2':
+    case 'leaf':
+    case 'leaf2':
+    case 'heart': {
+      const g = c.createLinearGradient(7, 2, 17, 22);
+      g.addColorStop(0, mixHex(color, '#FFFFFF', 0.4));
+      g.addColorStop(0.55, color);
+      g.addColorStop(1, mixHex(color, '#000000', 0.16));
+      c.fillStyle = g;
+      c.fill(path);
+      break;
+    }
+    case 'balloon': {
+      c.strokeStyle = 'rgba(110,100,90,.55)';
+      c.lineWidth = 0.7;
+      c.stroke(new Path2D(BALLOON_STRING));
+      const g = c.createRadialGradient(8.5, 7.5, 0.5, 12, 12, 14);
+      g.addColorStop(0, mixHex(color, '#FFFFFF', 0.6));
+      g.addColorStop(0.35, color);
+      g.addColorStop(1, mixHex(color, '#000000', 0.3));
+      c.fillStyle = g;
+      c.fill(path);
+      break;
+    }
+    case 'bubble': {
+      const g = c.createRadialGradient(12, 12, 3, 12, 12, 9.4);
+      g.addColorStop(0, rgba(color, 0.04));
+      g.addColorStop(0.72, rgba(color, 0.13));
+      g.addColorStop(1, rgba(color, 0.45));
+      c.fillStyle = g;
+      c.fill(path);
+      c.strokeStyle = rgba(color, 0.9);
+      c.lineWidth = shape.stroke ?? 1.3;
+      c.stroke(path);
+      break;
+    }
+    case 'sparkle':
+    case 'star':
+    case 'dot': {
+      const g = c.createRadialGradient(12, 12, 0, 12, 12, id === 'dot' ? 4 : 11);
+      g.addColorStop(0, '#FFFFFF');
+      g.addColorStop(0.45, mixHex(color, '#FFFFFF', 0.35));
+      g.addColorStop(1, color);
+      c.fillStyle = g;
+      c.fill(path);
+      break;
+    }
+    default:
+      if (shape.stroke) {
+        c.strokeStyle = color;
+        c.lineWidth = shape.stroke;
+        c.lineCap = 'round';
+        c.stroke(path);
+      } else {
+        c.fillStyle = color;
+        c.fill(path);
+      }
+  }
+  const detail = shape.detail;
+  if (detail) {
+    c.globalAlpha = detail.opacity;
+    c.strokeStyle = detail.color === 'light' ? '#FFFFFF' : color;
+    c.lineWidth = detail.stroke;
+    c.lineCap = 'round';
+    c.stroke(new Path2D(detail.d));
+  }
+  return s;
 }
 
 function stop() {
@@ -330,52 +415,19 @@ function draw(p: Particle, alpha: number) {
     scale *= 1 + 0.35 * e;
     alpha *= 1 - e;
   }
-  // the flutter: the shape turns over around its own axis (its height shrinks through 0)
+  // the flutter: the piece turns over around its own axis (its height shrinks through 0), and its back
+  // is a little darker
   const fy = p.spec.flip[1] > 0 ? Math.cos(p.flip) : 1;
   const cos = Math.cos(p.rot);
   const sin = Math.sin(p.rot);
   const sx = scale * dpr;
-  const sy = scale * dpr * (Math.abs(fy) < 0.08 ? 0.08 * Math.sign(fy || 1) : fy);
-  if (p.spec.glow) {
-    const g = glowSprite(p.color);
-    const r = p.size * 1.9 * (scale / (p.size / 24)) * dpr;
-    c.setTransform(1, 0, 0, 1, p.x * dpr, p.y * dpr);
-    c.globalAlpha = alpha * 0.9;
-    c.drawImage(g, -r, -r, r * 2, r * 2);
-  }
+  const sy = scale * dpr * (Math.abs(fy) < 0.06 ? 0.06 * Math.sign(fy || 1) : fy);
   c.setTransform(cos * sx, sin * sx, -sin * sy, cos * sy, p.x * dpr, p.y * dpr);
-  const h = p.shape.h ?? 24;
-  c.translate(-12, -h / 2 + (h > 24 ? 5 : 0));
-  // the back of a fluttering piece is a little darker
-  c.globalAlpha = alpha * (fy < 0 ? 0.82 : 1);
-  if (p.shape === SHAPES.balloon) {
-    c.strokeStyle = 'rgba(120,110,100,.55)';
-    c.lineWidth = 0.8;
-    c.stroke(path(BALLOON_STRING));
-  }
-  if (p.shape.stroke) {
-    c.strokeStyle = p.color;
-    c.lineWidth = p.shape.stroke;
-    c.lineCap = 'round';
-    if (p.shape === SHAPES.bubble) {
-      c.fillStyle = p.color;
-      c.globalAlpha = alpha * 0.14;
-      c.fill(path(p.shape.d));
-      c.globalAlpha = alpha;
-    }
-    c.stroke(path(p.shape.d));
-  } else {
-    c.fillStyle = p.color;
-    c.fill(path(p.shape.d));
-  }
-  const detail = p.shape.detail;
-  if (detail) {
-    c.globalAlpha = alpha * detail.opacity;
-    c.strokeStyle = detail.color === 'light' ? '#FFFFFF' : p.color;
-    c.lineWidth = detail.stroke;
-    c.lineCap = 'round';
-    c.stroke(path(detail.d));
-  }
+  c.globalAlpha = alpha * (fy < 0 ? 0.8 : 1);
+  const { img, pad, h } = p.sprite;
+  // a balloon hangs from its knot: centred on its body, not on its string
+  const top = -h / 2 - pad + (h > 24 ? 5 : 0);
+  c.drawImage(img, -12 - pad, top, 24 + pad * 2, h + pad * 2);
 }
 
 function frame(now: number) {
@@ -383,9 +435,10 @@ function frame(now: number) {
   const dt = Math.min(0.034, Math.max(0, (now - last) / 1000));
   last = now;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const h = window.innerHeight;
-  particles = particles.filter((p) => p.age < p.ttl && p.y < h + 80 && p.y > -160);
+  particles = particles.filter((p) => p.age < p.ttl && p.y < h + 80 && p.y > -200);
   for (const p of particles) {
     p.age += dt;
     if (p.age < 0) continue; // staggered launch
@@ -441,8 +494,7 @@ export function burst({ kind, colors, x, y, scale = 1 }: BurstOptions): number {
       vf: rand(spec.flip[0], spec.flip[1]),
       phase: rand(0, Math.PI * 2),
       size: rand(spec.size[0], spec.size[1]),
-      color: colors[i % colors.length]!,
-      shape: SHAPES[pick(spec.shapes)],
+      sprite: sprite(pick(spec.shapes), colors[i % colors.length]!, !!spec.glow),
       // a few leave a beat later: a burst, not a block
       age: -Math.random() * 0.12,
       ttl: rand(spec.ttl[0], spec.ttl[1]),

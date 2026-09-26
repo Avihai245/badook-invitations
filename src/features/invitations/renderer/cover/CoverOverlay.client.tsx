@@ -10,6 +10,8 @@ import {
   type ReactNode,
 } from 'react';
 import type { CoverStyle, Locale, TemplateManifest } from '../../contracts/types';
+import { burstFrom } from '../fx/burst';
+import type { BurstKind } from '../fx/theme';
 import type { CoverMedia } from './media';
 import { Monogram } from './Monogram';
 import { SealArt, TagArt, TicketArt } from './SealArt';
@@ -30,6 +32,8 @@ export interface CoverOverlayProps {
   skipFromUrl?: boolean;
   /** a scene template: its scene, drawn on the CSS cover's card (rendered by the caller) */
   card?: ReactNode;
+  /** the template's opening burst (renderer/fx/theme.ts) — null: none */
+  fx?: { burst: BurstKind | null; colors: string[] } | null;
 }
 
 type Phase = 'idle' | 'opening' | 'gone' | 'removed';
@@ -41,6 +45,19 @@ const WIDE = '(min-width: 1024px) and (min-aspect-ratio: 1/1)';
 
 /** Crossfade of the whole cover layer (§2.2.1: starts 600ms before the video ends). */
 const CROSSFADE_MS = 600;
+/** The CSS cover's fade as it goes (invitation.css `.cover.gone`: 120ms + 800ms). */
+const FADE_MS = 850;
+
+/**
+ * The opening's particles (renderer/fx/burst.ts — nothing with reduced motion): a spray of light where
+ * the seal breaks, then the template's own burst (petals, confetti, stars…) out of the card / ticket.
+ */
+function sparkFrom(el: Element | null, fx: CoverOverlayProps['fx'], at?: { x: number; y: number }) {
+  if (fx?.burst) burstFrom(el, 'sparkles', ['#FFF6DA', '#FFE3A1', ...fx.colors.slice(0, 1)], at, 0.45);
+}
+function burstOf(el: Element | null, fx: CoverOverlayProps['fx'], at?: { x: number; y: number }) {
+  if (fx?.burst) burstFrom(el, fx.burst, fx.colors, at);
+}
 /** A video that doesn't play within this is skipped (§2.2.1). */
 const STALL_MS = 1500;
 
@@ -155,6 +172,7 @@ function VideoCover({
   monogram,
   hint,
   skipLabel,
+  fx,
   phase,
   setPhase,
   showSkip,
@@ -162,6 +180,7 @@ function VideoCover({
   later,
 }: CoverOverlayProps & PhaseProps) {
   const video = useRef<HTMLVideoElement>(null);
+  const overlayRef = useRef<HTMLSpanElement>(null);
   const [playing, setPlaying] = useState(false);
   const done = useRef(false);
   const desktop = !!(media.posterDesktop && media.videoDesktop);
@@ -181,7 +200,9 @@ function VideoCover({
     if (done.current) return;
     done.current = true;
     finish(CROSSFADE_MS);
-  }, [finish]);
+    // the hand-off: the template's burst over the invitation appearing
+    burstOf(video.current, fx, { x: 0.5, y: 0.42 });
+  }, [finish, fx]);
 
   const open = useOpening((skip: boolean) => {
     announceOpen();
@@ -194,6 +215,7 @@ function VideoCover({
       return;
     }
     setPhase('opening');
+    later(() => sparkFrom(overlayRef.current, fx), 60);
     let stall = window.setTimeout(crossfade, STALL_MS);
     const clearStall = () => window.clearTimeout(stall);
     v.addEventListener('playing', () => {
@@ -310,7 +332,7 @@ function VideoCover({
         }}
       >
         {art ? (
-          <span className="cv-overlay" style={ovStyle}>
+          <span className="cv-overlay" style={ovStyle} ref={overlayRef}>
             <span className="half l">{art}</span>
             <span className="half r">{art}</span>
           </span>
@@ -338,20 +360,33 @@ function CssCover({
   hint,
   skipLabel,
   card,
+  fx,
   phase,
   setPhase,
   showSkip,
   finish,
   later,
 }: CoverOverlayProps & PhaseProps) {
+  const root = useRef<HTMLDivElement>(null);
+  const ticket = style === 'ticket' || overlay.kind === 'ticket_text';
   const open = useOpening((immediate: boolean) => {
     announceOpen();
     if (immediate || reducedMotion()) {
-      finish(immediate ? 700 : 300);
+      finish(immediate ? FADE_MS : 300);
       return;
     }
     setPhase('opening');
-    later(() => finish(700), overlay.exit === 'fade' ? 700 : 1700);
+    const el = root.current;
+    if (ticket) {
+      // the stub tears off: light and the burst from the tear, then the ticket lifts away
+      later(() => burstOf(el?.querySelector('.ticket') ?? null, fx, { x: 0.764, y: 0.5 }), 120);
+      later(() => finish(FADE_MS), 900);
+      return;
+    }
+    // the seal breaks (sparks) → the flap opens → the card rises (the burst) → the push into the card
+    later(() => sparkFrom(el?.querySelector('.seal') ?? null, fx), 60);
+    later(() => burstOf(el?.querySelector('.env-card') ?? null, fx, { x: 0.5, y: 0.3 }), 1250);
+    later(() => finish(FADE_MS), overlay.exit === 'fade' ? 700 : 1650);
   });
 
   const cls = ['cover', phase !== 'idle' ? 'opening' : '', phase === 'gone' ? 'gone' : '']
@@ -369,7 +404,13 @@ function CssCover({
     );
 
   return (
-    <div className={cls} data-style={style} data-exit={overlay.exit} data-scene={card ? '' : undefined}>
+    <div
+      ref={root}
+      className={cls}
+      data-style={style}
+      data-exit={overlay.exit}
+      data-scene={card ? '' : undefined}
+    >
       <button
         type="button"
         className="cover-tap"
@@ -382,9 +423,15 @@ function CssCover({
           }
         }}
       >
-        {style === 'ticket' || overlay.kind === 'ticket_text' ? (
+        {ticket ? (
           <span className="ticket">
-            <TicketArt text={monogram} locale={locale} ink={overlay.text.color} />
+            {/* twice, clipped at the perforation: the stub tears off as it opens */}
+            <span className="tk tk-main">
+              <TicketArt text={monogram} locale={locale} ink={overlay.text.color} />
+            </span>
+            <span className="tk tk-stub">
+              <TicketArt text={monogram} locale={locale} ink={overlay.text.color} />
+            </span>
           </span>
         ) : (
           <span className="env" aria-hidden="true">

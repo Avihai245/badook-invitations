@@ -199,7 +199,8 @@
     "preset": "soft",
     "revealDistance": 40,
     "revealBlur": true,
-    "stagger": 0.08
+    "stagger": 0.08,
+    "ambient": "petals"
   },
   "assets": {
     "hero": "/templates/sahar-bordeaux/hero.mp4",

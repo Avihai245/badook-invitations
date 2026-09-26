@@ -138,16 +138,20 @@ function paletteOf(template: Template, doc: Pick<InvitationDocument, 'theme'>): 
 }
 
 /**
- * Particle colors of one kind, from the palette: luminous tints over a dark hero (its text is light),
- * the accent's own tones over a light one; the seal colors bring a template's other hues (confetti,
- * balloons). Always 2–6 opaque hex colors.
+ * Particle colors of one kind, from the palette: for the hero's ambient layer, luminous tints over a
+ * dark hero (its text is light) and the accent's own tones over a light one; for a burst — which
+ * crosses the cover, the hero and the page — deep and light tones together, so it reads on any of
+ * them. The seal colors bring a template's other hues (confetti, balloons). Always 2–6 opaque hex
+ * colors.
  */
 export function fxColors(
   kind: BurstKind,
   palette: Pick<Palette, 'accent' | 'heroText'>,
   seals: readonly string[],
+  use: 'ambient' | 'burst' = 'ambient',
 ): string[] {
   const a = HEX.test(palette.accent) ? palette.accent : '#B08D57';
+  if (use === 'burst') return burstColors(kind, a, seals);
   const dark = HEX.test(palette.heroText) ? relativeLuminance(palette.heroText) > 0.45 : true;
   const hues = unique([a, ...seals.filter((c) => HEX.test(c))]);
   // festive mixes: the colorful ones first; a gold when the palette has few hues
@@ -193,6 +197,40 @@ export function fxColors(
   }
 }
 
+/** A mix of the palette's deep and light tones (a burst crosses light and dark backgrounds). */
+function burstColors(kind: BurstKind, a: string, seals: readonly string[]): string[] {
+  const hues = unique([a, ...seals.filter((c) => HEX.test(c))]);
+  const vivid = hues.filter((c) => chroma(c) > 40);
+  const festive = unique([...(vivid.length ? vivid : [a]), '#F2C14E', tint(a, 0.5), '#FFFFFF']).slice(0, 6);
+  switch (kind) {
+    case 'petals':
+    case 'hearts':
+      return [a, tint(a, 0.28), tint(a, 0.55), '#FFF4F0', shade(a, 0.18)];
+    case 'leaves': {
+      const greens = hues.filter((c) => {
+        const [r, g, b] = hexToRgb(c);
+        return g >= r * 0.9 && g >= b;
+      });
+      return unique([...(greens.length ? greens : ['#6F8F3A']), '#9DB35A', '#D9A93E', a]).slice(0, 5);
+    }
+    case 'confetti':
+    case 'balloons':
+    case 'pixels':
+      return festive;
+    case 'sparkles':
+    case 'fireflies':
+      return ['#FFF4D2', '#F6CF6E', '#E7A93A', tint(a, 0.45)];
+    case 'stars':
+      return ['#FFFFFF', '#F6CF6E', tint(a, 0.4), a];
+    case 'bubbles':
+      return ['#FFFFFF', tint(a, 0.45), a];
+    case 'embers':
+      return ['#FFB04A', '#FF7A2F', '#FFD58A'];
+    case 'notes':
+      return [a, shade(a, 0.2), tint(a, 0.4), '#F2C14E'];
+  }
+}
+
 export interface FxTheme {
   /** the hero's ambient particles ('none': no layer) */
   ambient: AmbientKind;
@@ -213,6 +251,6 @@ export function fxTheme(template: Template, doc: Pick<InvitationDocument, 'theme
     ambient,
     ambientColors: ambient === 'none' ? [] : fxColors(ambient, palette, seals),
     burst,
-    burstColors: burst ? fxColors(burst, palette, seals) : [],
+    burstColors: burst ? fxColors(burst, palette, seals, 'burst') : [],
   };
 }
