@@ -318,7 +318,8 @@ export function* l10nFields(doc: InvitationDocument): Generator<L10nField> {
         const d = section.data;
         yield f('title', d.title, 'section.title', CAPS.title);
         yield f('subtitle', d.subtitle, 'section.subtitle', CAPS.subtitle);
-        yield f('body', d.body, 'custom.body', CAPS.body);
+        // a title alone, or a picture band, is a whole section: its text is checked once it has one
+        if (Object.values(d.body).some((v) => v?.trim())) yield f('body', d.body, 'custom.body', CAPS.body);
         if (d.cta) yield f('cta.label', d.cta.label, 'custom.ctaLabel');
         break;
       }
