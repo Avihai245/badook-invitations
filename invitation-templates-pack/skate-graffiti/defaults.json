@@ -1,0 +1,438 @@
+{
+  "templateId": "skate-graffiti",
+  "defaults": {
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "לחצו על המדבקה",
+        "en": "Tap the sticker"
+      },
+      "eyebrow": {
+        "he": "עולים על הסקייט — בר המצווה של",
+        "en": "Drop in for the Bar Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהגלגלים מתחילים להסתובב",
+          "en": "Until the wheels start rolling"
+        },
+        "afterEvent": {
+          "he": "איזה סשן! מזל טוב ותודה שבאתם",
+          "en": "What a session! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלוש־עשרה ועל הגלגלים",
+          "en": "Thirteen and rolling"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה — ואחר כך יורדים לרמפה.\nבואו לחגוג איתנו ערב של מוזיקה, טריקים וחברים.",
+          "en": "On {date}, {primary} is called to the Torah — and then we drop in.\nCome celebrate with us: music, tricks and friends."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בית הכנסת",
+          "en": "Synagogue"
+        },
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "אוכל רחוב",
+            "en": "Street food"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "די־ג׳יי ורחבה",
+            "en": "DJ & dance floor"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "הפתעה",
+            "en": "Surprise!"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "סטייל רחוב",
+            "en": "Street style"
+          },
+          "body": {
+            "he": "סניקרס, קפוצ׳ון או חולצה של מותג סקייט — העיקר שיהיה נוח לזוז.",
+            "en": "Sneakers, a hoodie or your favourite skate tee — as long as you can move."
+          },
+          "illustration": "template:skateboard"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לסשן?",
+          "en": "Coming to the session?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the Bar Mitzvah boy"
+        },
+        "successMessage": {
+          "he": "יאללה! נתראה במסיבה",
+          "en": "Rad! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! ננחית טריק בשבילכם",
+          "en": "Too bad! We’ll land a trick for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הגלגלים!",
+        "en": "Mazal tov — see you on wheels!"
+      }
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "לחצו על המדבקה",
+        "en": "Tap the sticker"
+      },
+      "eyebrow": {
+        "he": "עולים על הסקייט — בת המצווה של",
+        "en": "Drop in for the Bat Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהגלגלים מתחילים להסתובב",
+          "en": "Until the wheels start rolling"
+        },
+        "afterEvent": {
+          "he": "איזה סשן! מזל טוב ותודה שבאתם",
+          "en": "What a session! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שתים־עשרה ועל הגלגלים",
+          "en": "Twelve and rolling"
+        },
+        "body": {
+          "he": "ב־{date} {primary} חוגגת בת מצווה — ואנחנו יורדים לרמפה.\nבואו לחגוג איתנו ערב של מוזיקה, טריקים וחברים.",
+          "en": "On {date}, {primary} celebrates her Bat Mitzvah — and we’re dropping in.\nCome celebrate with us: music, tricks and friends."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות ומצגת",
+            "en": "Blessings & slideshow"
+          },
+          "icon": "camera"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "אוכל רחוב",
+            "en": "Street food"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "די־ג׳יי ורחבה",
+            "en": "DJ & dance floor"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "הפתעה",
+            "en": "Surprise!"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "סטייל רחוב",
+            "en": "Street style"
+          },
+          "body": {
+            "he": "סניקרס, קפוצ׳ון או חולצה של מותג סקייט — העיקר שיהיה נוח לזוז.",
+            "en": "Sneakers, a hoodie or your favourite skate tee — as long as you can move."
+          },
+          "illustration": "template:skateboard"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לסשן?",
+          "en": "Coming to the session?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A blessing for the Bat Mitzvah girl"
+        },
+        "successMessage": {
+          "he": "יאללה! נתראה במסיבה",
+          "en": "Rad! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! ננחית טריק בשבילכם",
+          "en": "Too bad! We’ll land a trick for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הגלגלים!",
+        "en": "Mazal tov — see you on wheels!"
+      }
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו על המדבקה",
+        "en": "Tap the sticker"
+      },
+      "eyebrow": {
+        "he": "סשן סקייט! חוגגים יום הולדת עם",
+        "en": "Skate session! A birthday with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהגלגלים מתחילים להסתובב",
+          "en": "Until the wheels start rolling"
+        },
+        "afterEvent": {
+          "he": "איזה סשן! תודה שבאתם",
+          "en": "What a session! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד שנה על הגלגלים",
+          "en": "Another year on wheels"
+        },
+        "body": {
+          "he": "ב־{date} חוגגים עם {primary} בסקייטפארק.\nרמפות, מוזיקה, פיצה וחברים — תביאו את הקרש.",
+          "en": "On {date} we celebrate {primary} at the skatepark.\nRamps, music, pizza and friends — bring your board."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הסקייטפארק",
+          "en": "The skatepark"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "מגיעים",
+            "en": "Roll in"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "סשן ברמפות",
+            "en": "Ramp session"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:30",
+          "label": {
+            "he": "פיצה",
+            "en": "Pizza"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "19:00",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "סטייל רחוב",
+            "en": "Street style"
+          },
+          "body": {
+            "he": "סניקרס, קסדה ומגנים למי שעולה על הקרש — ובגדים שלא אכפת לכם ללכלך.",
+            "en": "Sneakers, plus a helmet and pads if you ride — and clothes you don’t mind scuffing."
+          },
+          "illustration": "template:skateboard"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לסשן?",
+          "en": "Coming to the session?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "יאללה! נתראה בפארק",
+          "en": "Rad! See you at the park"
+        },
+        "declineMessage": {
+          "he": "חבל! ננחית טריק בשבילכם",
+          "en": "Too bad! We’ll land a trick for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בפארק!",
+        "en": "See you at the park!"
+      }
+    }
+  }
+}

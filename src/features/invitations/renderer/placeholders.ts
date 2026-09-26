@@ -427,6 +427,44 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'garden',
     ornament: 'teacup',
   }),
+  // T2: sports & action
+  'hoop-stars': drawn('hoop-stars', ['#0A1030', '#111A45', '#0B1233'], {
+    bg: ['#18214F', '#10183F', '#080D26'],
+    paper: ['#1C2658', '#151E4A', '#0F163B'],
+    hint: 'rgba(255,255,255,.84)',
+    panorama: 'stars',
+    ornament: 'basketball',
+    ticket: { paper: '#151D4A', edge: 'var(--inv-accent)' },
+  }),
+  'superhero-pow': drawn('superhero-pow', ['#0C1848', '#14277A', '#0A143F'], {
+    bg: ['#2A55C8', '#1D3FA0', '#112867'],
+    paper: ['#FFF8E6', '#FCEBBE', '#F3D58A'],
+    hint: 'rgba(255,255,255,.86)',
+    panorama: 'skyline',
+    ornament: 'comic-burst',
+  }),
+  'circus-top': drawn('circus-top', ['#FFF3DD', '#FFF6E8', '#FFEBCC'], {
+    bg: ['#E8424E', '#CF2F3C', '#A31F2D'],
+    paper: ['#FFF8EA', '#FCEBD0', '#F2D6A8'],
+    hint: 'rgba(255,255,255,.9)',
+    panorama: 'swags',
+    ornament: 'big-top',
+    ticket: { paper: '#FFF3DC', edge: 'var(--inv-accent)' },
+  }),
+  'grand-prix': drawn('grand-prix', ['#8FCBFF', '#BFE2FF', '#EAF7FF'], {
+    bg: ['#4A505C', '#353A44', '#22262E'],
+    paper: ['#FFFFFF', '#F1F3F6', '#DCE1E8'],
+    hint: 'rgba(255,255,255,.86)',
+    panorama: 'hills',
+    ornament: 'checkered-flag',
+  }),
+  'skate-graffiti': drawn('skate-graffiti', ['#160E2E', '#4A2163', '#C24B6B'], {
+    bg: ['#5B2A6E', '#3D1F5C', '#1E1440'],
+    paper: ['#EDE8F2', '#DCD4E4', '#C6BCD2'],
+    hint: 'rgba(255,255,255,.86)',
+    panorama: 'doodle',
+    ornament: 'skateboard',
+  }),
 };
 
 /**

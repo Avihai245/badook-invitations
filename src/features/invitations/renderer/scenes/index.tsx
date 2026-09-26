@@ -33,6 +33,12 @@ import VineyardHarvest from './vineyard-harvest';
 import CampfireNight from './campfire-night';
 import GoldenYears from './golden-years';
 import GrandmaGarden from './grandma-garden';
+// T2: sports & action
+import HoopStars from './hoop-stars';
+import SuperheroPow from './superhero-pow';
+import CircusTop from './circus-top';
+import GrandPrix from './grand-prix';
+import SkateGraffiti from './skate-graffiti';
 
 export type { SceneId } from './ids';
 export type { ScenePlace } from './kit';
@@ -70,6 +76,12 @@ const SCENES: Record<SceneId, ComponentType<SceneProps>> = {
   'campfire-night': CampfireNight,
   'golden-years': GoldenYears,
   'grandma-garden': GrandmaGarden,
+  // T2: sports & action
+  'hoop-stars': HoopStars,
+  'superhero-pow': SuperheroPow,
+  'circus-top': CircusTop,
+  'grand-prix': GrandPrix,
+  'skate-graffiti': SkateGraffiti,
 };
 
 const ROOT: CSSProperties = {

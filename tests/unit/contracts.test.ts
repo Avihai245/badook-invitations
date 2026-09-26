@@ -58,6 +58,12 @@ describe('template pack', () => {
       'campfire-night',
       'golden-years',
       'grandma-garden',
+      // T2: sports & action
+      'hoop-stars',
+      'superhero-pow',
+      'circus-top',
+      'grand-prix',
+      'skate-graffiti',
     ]);
   });
 
@@ -84,6 +90,8 @@ describe('template pack', () => {
       // T4: grown-ups & golden years
       'vineyard-harvest',
       'golden-years',
+      // T2: sports & action
+      'skate-graffiti',
     ]);
   });
 

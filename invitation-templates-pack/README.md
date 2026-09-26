@@ -46,3 +46,8 @@ Install: the manifests and defaults are read from this folder by the app (src/fe
 | `campfire-night` | birthday, bar_mitzvah, other | standard |
 | `golden-years` | birthday, other | premium |
 | `grandma-garden` | birthday, other, baby_shower | standard |
+| `hoop-stars` | birthday, bar_mitzvah, bat_mitzvah | standard |
+| `superhero-pow` | birthday, bar_mitzvah | standard |
+| `circus-top` | birthday | standard |
+| `grand-prix` | birthday, bar_mitzvah | standard |
+| `skate-graffiti` | bar_mitzvah, bat_mitzvah, birthday | premium |

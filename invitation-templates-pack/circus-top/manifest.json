@@ -1,0 +1,230 @@
+{
+  "id": "circus-top",
+  "version": 2,
+  "name": {
+    "he": "קרקס",
+    "en": "Circus Top"
+  },
+  "description": {
+    "he": "האוהל הגדול ביום שמש — קרני שמש בסגנון וינטג׳, שרשרת דגלונים שמתנופפת, בלונים שעולים, כוכבים מנצנצים, אוהל פסים עם שוליים מסולסלים וכלב ים בכובע של מנהל הקרקס שמלהטט בכדור. יום הולדת לקטנטנים.",
+    "en": "The big top on a sunny day — vintage sunburst rays, fluttering bunting, balloons floating up, twinkling stars, a striped tent with a scalloped valance and a seal in a ringmaster’s hat juggling a ball. A birthday for little ones."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/circus-top/preview.webp",
+  "previewVideo": "/templates/circus-top/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FFF6E6",
+      "surface": "#FFFFFF",
+      "ink": "#3B1320",
+      "inkMuted": "#7A5563",
+      "accent": "#D7263D",
+      "accentInk": "#FFFFFF",
+      "line": "#F1DDBF",
+      "heroText": "#3B1320"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 20,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "red",
+      "name": {
+        "he": "אדום קרקס",
+        "en": "Big top red"
+      },
+      "palette": {
+        "accent": "#D7263D"
+      }
+    },
+    {
+      "id": "teal",
+      "name": {
+        "he": "טורקיז",
+        "en": "Teal"
+      },
+      "palette": {
+        "accent": "#0B7A7C"
+      }
+    },
+    {
+      "id": "pink",
+      "name": {
+        "he": "ורוד סוכריה",
+        "en": "Candy pink"
+      },
+      "palette": {
+        "accent": "#C92A62"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "bigtop",
+      "display": {
+        "latin": "Abril Fatface",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Nunito",
+        "hebrew": "Varela Round"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "clown",
+      "display": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "heading": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "video",
+    "poster": "/templates/circus-top/cover-poster.webp",
+    "posterDesktop": "/templates/circus-top/cover-poster-desktop.webp",
+    "openVideo": "/templates/circus-top/cover-open.mp4",
+    "openVideoDesktop": "/templates/circus-top/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#8E1B2B",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Abril Fatface",
+      "hebrew": "Suez One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "האוהל הגדול ביום שמש",
+          "en": "The big top on a sunny day"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#3B1320",
+    "overlayColor": "#FFF6E6",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "circus-top-theme",
+    "tracks": [
+      {
+        "id": "circus-top-theme",
+        "title": "Big Top Parade (brass band & calliope)",
+        "url": "/templates/circus-top/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/circus-top/hero.mp4",
+    "hero-poster": "/templates/circus-top/hero-poster.webp",
+    "hero-desktop": "/templates/circus-top/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/circus-top/hero-desktop-poster.webp",
+    "bunting-band": "/templates/circus-top/bunting-band.webp",
+    "bigtop-panorama": "/templates/circus-top/bigtop-panorama.webp",
+    "balloons": "/templates/circus-top/balloons.webp",
+    "seal": "/templates/circus-top/seal.webp",
+    "big-top": "/templates/circus-top/big-top.webp"
+  },
+  "decorations": {
+    "afterHero": "template:bunting-band",
+    "betweenVenues": "template:bigtop-panorama",
+    "afterTimeline": "template:balloons",
+    "beforeRsvp": "template:seal",
+    "footer": "template:big-top"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

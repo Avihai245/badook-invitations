@@ -32,6 +32,12 @@ export const SCENE_IDS = [
   'campfire-night',
   'golden-years',
   'grandma-garden',
+  // T2: sports & action
+  'hoop-stars',
+  'superhero-pow',
+  'circus-top',
+  'grand-prix',
+  'skate-graffiti',
 ] as const;
 
 export type SceneId = (typeof SCENE_IDS)[number];

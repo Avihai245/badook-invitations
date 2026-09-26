@@ -46,6 +46,11 @@ and takes the colour presets and the font pairs like the others. Ten are premium
 | מדורה / Campfire Night (`campfire-night`) | Outdoor-adventure illustration — camping, stargazing and a campfire for kids’ birthdays, bar mitzvahs and family weekends | birthday, bar_mitzvah, other | |
 | שנים של זהב / Golden Years (`golden-years`) | Milestone-birthday and golden-anniversary stationery — gold foil, laurels and champagne, made for older guests (large, high-contrast text, calm motion) | birthday, other | ✓ |
 | הגן של סבתא / Grandma’s Garden (`grandma-garden`) | English cottage-garden illustration — roses, lavender, a picket fence and tea for grandparents’ birthdays and family gatherings | birthday, other, baby_shower | |
+| כדורסל / Hoop Stars (`hoop-stars`) | Sports themes — a basketball arena at night: hardwood court, hoop, game clock and spotlights, for basketball lovers | birthday, bar_mitzvah, bat_mitzvah | |
+| גיבורי־על / Superhero POW (`superhero-pow`) | Comic-book pop art — halftone dots, bold panels and sound-effect bursts over a night city | birthday, bar_mitzvah | |
+| קרקס / Circus Top (`circus-top`) | Vintage circus posters, made for little ones — the big top, bunting, balloons and a juggling seal | birthday | |
+| מרוץ / Grand Prix (`grand-prix`) | Motorsport — race day with start lights, checkered flags, kerbs, a race car and the podium | birthday, bar_mitzvah | |
+| סקייטפארק / Skate Park (`skate-graffiti`) | Street culture for teens — skatepark concrete, a graffiti piece in bubble letters, sneakers on the wire | bar_mitzvah, bat_mitzvah, birthday | ✓ |
 
 Each design has: Hebrew and English names, starter texts for every event it's listed under, two font
 pairs (plus the shared font library), three colour presets, a cover, a hero scene and a gallery poster,

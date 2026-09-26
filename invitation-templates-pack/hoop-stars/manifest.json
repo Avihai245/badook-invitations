@@ -1,0 +1,232 @@
+{
+  "id": "hoop-stars",
+  "version": 2,
+  "name": {
+    "he": "כדורסל",
+    "en": "Hoop Stars"
+  },
+  "description": {
+    "he": "ערב משחק באולם — פרקט מבריק עם קווי מגרש, סל שהרשת שלו מתנדנדת, כדור קופץ, שעון משחק שמראה את התאריך, גופייה עם מספר וזרקורים שסורקים את היציע. לחובבי הכדורסל שבינינו.",
+    "en": "Game night at the arena — a polished court with painted lines, a hoop with a swinging net, a bouncing ball, a game clock showing the date, a numbered jersey and spotlights sweeping the stands. For the basketball lovers among us."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "bar_mitzvah",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/hoop-stars/preview.webp",
+  "previewVideo": "/templates/hoop-stars/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#0E1433",
+      "surface": "#172049",
+      "ink": "#F5F7FF",
+      "inkMuted": "#A9B3DA",
+      "accent": "#FF7A1A",
+      "accentInk": "#0E1433",
+      "line": "#29346B",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "ball",
+      "name": {
+        "he": "כתום כדורסל",
+        "en": "Ball orange"
+      },
+      "palette": {
+        "accent": "#FF7A1A"
+      }
+    },
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב אליפות",
+        "en": "Championship gold"
+      },
+      "palette": {
+        "accent": "#FFC53D"
+      }
+    },
+    {
+      "id": "sky",
+      "name": {
+        "he": "תכלת",
+        "en": "Sky blue"
+      },
+      "palette": {
+        "accent": "#4CC2FF"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "arena",
+      "display": {
+        "latin": "Unbounded",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "jersey",
+      "display": {
+        "latin": "Big Shoulders Display",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Big Shoulders Display",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "video",
+    "poster": "/templates/hoop-stars/cover-poster.webp",
+    "posterDesktop": "/templates/hoop-stars/cover-poster-desktop.webp",
+    "openVideo": "/templates/hoop-stars/cover-open.mp4",
+    "openVideoDesktop": "/templates/hoop-stars/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Unbounded",
+      "hebrew": "Secular One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "אולם כדורסל תחת זרקורים",
+          "en": "A basketball arena under the lights"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#070B1E",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "hoop-stars-theme",
+    "tracks": [
+      {
+        "id": "hoop-stars-theme",
+        "title": "Full Court (funk brass & sneaker squeaks)",
+        "url": "/templates/hoop-stars/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 60,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/hoop-stars/hero.mp4",
+    "hero-poster": "/templates/hoop-stars/hero-poster.webp",
+    "hero-desktop": "/templates/hoop-stars/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/hoop-stars/hero-desktop-poster.webp",
+    "court-band": "/templates/hoop-stars/court-band.webp",
+    "arena-panorama": "/templates/hoop-stars/arena-panorama.webp",
+    "ball": "/templates/hoop-stars/ball.webp",
+    "jersey": "/templates/hoop-stars/jersey.webp",
+    "hoop": "/templates/hoop-stars/hoop.webp"
+  },
+  "decorations": {
+    "afterHero": "template:court-band",
+    "betweenVenues": "template:arena-panorama",
+    "afterTimeline": "template:ball",
+    "beforeRsvp": "template:jersey",
+    "footer": "template:hoop"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

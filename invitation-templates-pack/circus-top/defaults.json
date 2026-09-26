@@ -1,0 +1,140 @@
+{
+  "templateId": "circus-top",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו על הכרטיס",
+        "en": "Tap your ticket"
+      },
+      "eyebrow": {
+        "he": "גבירותיי ורבותיי — יום ההולדת של",
+        "en": "Ladies and gentlemen — the birthday of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמופע מתחיל",
+          "en": "Until the show begins"
+        },
+        "afterEvent": {
+          "he": "איזה מופע! תודה שבאתם",
+          "en": "What a show! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "המופע הכי גדול בעיר",
+          "en": "The biggest show in town"
+        },
+        "body": {
+          "he": "ב־{date} האוהל הגדול נפתח לכבוד {primary}.\nלהטוטנים, בלונים, עוגה והפתעות — וכל הילדים מוזמנים לזירה!",
+          "en": "On {date} the big top opens for {primary}.\nJugglers, balloons, cake and surprises — and every kid is invited into the ring!"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "האוהל הגדול",
+          "en": "The big top"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "16:30",
+          "label": {
+            "he": "פתיחת שערים",
+            "en": "Gates open"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:00",
+          "label": {
+            "he": "מופע קרקס",
+            "en": "The circus show"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "17:45",
+          "label": {
+            "he": "פופקורן וכיבוד",
+            "en": "Popcorn & snacks"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "עוגה ונרות",
+            "en": "Cake & candles"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "תחפושות קרקס",
+            "en": "Circus costumes"
+          },
+          "body": {
+            "he": "ליצנים, לוליינים ואריות קטנים — תחפושת תתקבל בברכה, וגם בגדים שנוח להשתולל בהם.",
+            "en": "Clowns, acrobats and little lions — costumes are welcome, and so are clothes made for running around."
+          },
+          "illustration": "template:seal"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לקרקס?",
+          "en": "Coming to the circus?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "הופה! נתראה באוהל הגדול",
+          "en": "Hooray! See you under the big top"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם פופקורן",
+          "en": "Too bad! We’ll save you some popcorn"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה באוהל הגדול!",
+        "en": "See you under the big top!"
+      }
+    }
+  }
+}
