@@ -37,6 +37,18 @@ const ServerEnvSchema = z.object({
   INVITES_CRON_SECRET: z.string().default(''),
   // the app runs its recurring jobs by itself on its own traffic (features/jobs); off: only a scheduler
   INVITES_JOBS_FALLBACK: flag(true),
+  // feature flags (features/flags): features this deployment doesn't offer, comma-separated ids
+  INVITES_FEATURES_OFF: z
+    .string()
+    .default('')
+    .transform((v) =>
+      v
+        .split(',')
+        .map((f) => f.trim())
+        .filter(Boolean),
+    ),
+  // the face albums process biometric data: off until approved (docs/features.md)
+  INVITES_FACE_ALBUMS: flag(false),
   // comma-separated emails with the top plan and the admin tools (the platform's owners)
   INVITES_ADMIN_EMAILS: z
     .string()
