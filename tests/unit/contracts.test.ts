@@ -46,6 +46,12 @@ describe('template pack', () => {
       'martini-olive',
       'majolica',
       'white-city',
+      // T4: grown-ups & golden years
+      'tropical-tiki',
+      'vineyard-harvest',
+      'campfire-night',
+      'golden-years',
+      'grandma-garden',
     ]);
   });
 
@@ -66,6 +72,9 @@ describe('template pack', () => {
       'jet-set',
       'bukhara',
       'white-city',
+      // T4: grown-ups & golden years
+      'vineyard-harvest',
+      'golden-years',
     ]);
   });
 

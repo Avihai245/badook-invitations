@@ -1,0 +1,236 @@
+{
+  "id": "campfire-night",
+  "version": 2,
+  "name": {
+    "he": "מדורה",
+    "en": "Campfire Night"
+  },
+  "description": {
+    "he": "לילה בקרחת יער — ירח חרמש וכוכבים מנצנצים, אורנים גבוהים וינשוף על ענף, אוהל מואר, מדורה עם להבות מרצדות וניצוצות שעולים, מרשמלו על מקלות וגחליליות. הרפתקה לכל המשפחה.",
+    "en": "A night in a forest clearing — a crescent moon and twinkling stars, tall pines with an owl on a branch, a glowing tent, a campfire with dancing flames and rising sparks, marshmallows on sticks and fireflies. An adventure for the whole family."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "bar_mitzvah",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/campfire-night/preview.webp",
+  "previewVideo": "/templates/campfire-night/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#111C2E",
+      "surface": "#1A2740",
+      "ink": "#F6EEDD",
+      "inkMuted": "#A9B2C3",
+      "accent": "#F29A3A",
+      "accentInk": "#111C2E",
+      "line": "#2A3A55",
+      "heroText": "#FFF4DE"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 20,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "ember",
+      "name": {
+        "he": "גחלים",
+        "en": "Ember"
+      },
+      "palette": {
+        "accent": "#F29A3A"
+      }
+    },
+    {
+      "id": "firefly",
+      "name": {
+        "he": "גחלילית",
+        "en": "Firefly"
+      },
+      "palette": {
+        "accent": "#C9E265"
+      }
+    },
+    {
+      "id": "moonlight",
+      "name": {
+        "he": "אור ירח",
+        "en": "Moonlight"
+      },
+      "palette": {
+        "accent": "#9EC5F0"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "campfire",
+      "display": {
+        "latin": "Titan One",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Nunito",
+        "hebrew": "Varela Round"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Varela Round"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "trail",
+      "display": {
+        "latin": "Bebas Neue",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "pouch",
+    "renderer": "video",
+    "poster": "/templates/campfire-night/cover-poster.webp",
+    "posterDesktop": "/templates/campfire-night/cover-poster-desktop.webp",
+    "openVideo": "/templates/campfire-night/cover-open.mp4",
+    "openVideoDesktop": "/templates/campfire-night/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/campfire-night/badge-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": -0.02
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#D9772A",
+      "#2F6B4F",
+      "#2B4C7E"
+    ],
+    "monogramFont": {
+      "latin": "Titan One",
+      "hebrew": "Secular One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "מדורה ביער בלילה",
+          "en": "A campfire in the forest at night"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFF4DE",
+    "overlayColor": "#0A1230",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "campfire-night-theme",
+    "tracks": [
+      {
+        "id": "campfire-night-theme",
+        "title": "Songs by the Fire (acoustic guitar & harmonica)",
+        "url": "/templates/campfire-night/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/campfire-night/hero.mp4",
+    "hero-poster": "/templates/campfire-night/hero-poster.webp",
+    "hero-desktop": "/templates/campfire-night/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/campfire-night/hero-desktop-poster.webp",
+    "pine-band": "/templates/campfire-night/pine-band.webp",
+    "forest-panorama": "/templates/campfire-night/forest-panorama.webp",
+    "marshmallows": "/templates/campfire-night/marshmallows.webp",
+    "lantern": "/templates/campfire-night/lantern.webp",
+    "campfire": "/templates/campfire-night/campfire.webp"
+  },
+  "decorations": {
+    "afterHero": "template:pine-band",
+    "betweenVenues": "template:forest-panorama",
+    "afterTimeline": "template:marshmallows",
+    "beforeRsvp": "template:lantern",
+    "footer": "template:campfire"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

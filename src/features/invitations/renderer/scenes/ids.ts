@@ -20,6 +20,12 @@ export const SCENE_IDS = [
   'dino-hatch',
   'deco-gatsby',
   'white-city',
+  // T4: grown-ups & golden years
+  'tropical-tiki',
+  'vineyard-harvest',
+  'campfire-night',
+  'golden-years',
+  'grandma-garden',
 ] as const;
 
 export type SceneId = (typeof SCENE_IDS)[number];

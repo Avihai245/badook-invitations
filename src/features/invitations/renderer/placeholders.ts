@@ -354,6 +354,42 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'skyline',
     ornament: 'bauhaus',
   }),
+  // T4: grown-ups & golden years
+  'tropical-tiki': drawn('tropical-tiki', ['#1B1340', '#8A2862', '#0F2A44'], {
+    bg: ['#3A1A55', '#2A1446', '#1B0F33'],
+    paper: ['#FFF3E2', '#F4E1C6', '#E4C9A6'],
+    hint: 'rgba(255,240,225,.86)',
+    panorama: 'waves',
+    ornament: 'hibiscus',
+  }),
+  'vineyard-harvest': drawn('vineyard-harvest', ['#FAF0DA', '#F2CD95', '#A8A461'], {
+    bg: ['#EFE3CC', '#E3D2B2', '#D2BC93'],
+    paper: ['#FBF4E6', '#F0E4CD', '#E0CFAE'],
+    hint: '#5E4A3A',
+    panorama: 'vineyard',
+    ornament: 'grape-cluster',
+  }),
+  'campfire-night': drawn('campfire-night', ['#0A1230', '#1A2C55', '#0B1524'], {
+    bg: ['#1A2842', '#111C2E', '#0A1322'],
+    paper: ['#EADCC0', '#DCCAA6', '#C8B28A'],
+    hint: 'rgba(255,244,222,.86)',
+    panorama: 'stars',
+    ornament: 'campfire',
+  }),
+  'golden-years': drawn('golden-years', ['#FFFBF2', '#F7ECD8', '#EBD9B8'], {
+    bg: ['#F4E9D4', '#EADBBE', '#DCC7A0'],
+    paper: ['#FFFBF3', '#F6EDDC', '#E9DAC0'],
+    hint: '#5E4A2A',
+    panorama: 'swags',
+    ornament: 'laurel-wreath',
+  }),
+  'grandma-garden': drawn('grandma-garden', ['#E6EFF6', '#F8F1EA', '#DCE6CC'], {
+    bg: ['#F3EEF4', '#E9E2EC', '#DCD2E0'],
+    paper: ['#FFFFFF', '#F7F2EE', '#EAE1DA'],
+    hint: '#5E5058',
+    panorama: 'garden',
+    ornament: 'teacup',
+  }),
 };
 
 /**

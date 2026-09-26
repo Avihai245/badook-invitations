@@ -1,0 +1,393 @@
+{
+  "templateId": "grandma-garden",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "חוגגים 90 שנים של אהבה עם",
+        "en": "Celebrating 90 years of love with"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "סבתא {primary}",
+          "en": "Grandma {primary}"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנתכנס בגן",
+          "en": "Until we gather in the garden"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "כל הפרחים בגינה",
+          "en": "Every flower in the garden"
+        },
+        "body": {
+          "he": "סבתא שלנו גידלה גן שלם — ילדים, נכדים, חברים ושכנים, וכל מי שנכנס אי־פעם בדלת שלה.\nב־{date} כולנו חוזרים אליה לחגוג, בין הוורדים, הלבנדר וכוס תה.",
+          "en": "Our grandma grew a whole garden — children, grandchildren, friends and neighbours, and everyone who ever came through her door.\nOn {date} we’re all coming home to celebrate her, among the roses, the lavender and a cup of tea."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה בגן",
+          "en": "The garden party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "תה ועוגיות",
+            "en": "Tea & cookies"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "18:00",
+          "label": {
+            "he": "ארוחה בגן",
+            "en": "Dinner in the garden"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "19:00",
+          "label": {
+            "he": "ברכות מהנכדים",
+            "en": "Grandkids’ toasts"
+          },
+          "icon": "heart"
+        },
+        {
+          "time": "19:30",
+          "label": {
+            "he": "עוגת יום הולדת",
+            "en": "Birthday cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "הביאו איתכם זיכרון",
+            "en": "Bring a memory"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "תמונה ישנה, מתכון או סיפור קטן על סבתא — נאסוף הכול לאלבום מתנה.",
+            "en": "An old photo, a recipe or a little story about Grandma — we’re collecting them all into a gift album."
+          },
+          "illustration": "template:teacup"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "תבואו לחגוג?",
+          "en": "Will you come?"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Kindly let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לסבתא",
+          "en": "A wish for Grandma"
+        },
+        "successMessage": {
+          "he": "תודה! סבתא כבר מחכה",
+          "en": "Thank you! Grandma can’t wait"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נחגוג גם בשבילכם",
+          "en": "Thanks for letting us know — we’ll celebrate for you too"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה, מכל המשפחה",
+        "en": "With love, from all the family"
+      }
+    },
+    "other": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "מפגש משפחתי בגן עם",
+        "en": "A family garden party with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנתכנס בגן",
+          "en": "Until we gather in the garden"
+        },
+        "afterEvent": {
+          "he": "תודה שבאתם",
+          "en": "Thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "כולם מוזמנים לגן",
+          "en": "Everyone to the garden"
+        },
+        "body": {
+          "he": "תה, עוגה ביתית, ורדים ושיחות ארוכות בצל.\nב־{date} נתכנס יחד — כל המשפחה, מהקטנים ועד הגדולים.",
+          "en": "Tea, homemade cake, roses and long talks in the shade.\nOn {date} we’re gathering together — the whole family, from the youngest to the oldest."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בגן",
+          "en": "In the garden"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "16:30",
+          "label": {
+            "he": "תה ועוגה",
+            "en": "Tea & cake"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "משחקים לילדים",
+            "en": "Games for the kids"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:30",
+          "label": {
+            "he": "ארוחה בגן",
+            "en": "Dinner in the garden"
+          },
+          "icon": "dinner"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "מגיעים?",
+          "en": "Coming?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כמה מילים טובות",
+          "en": "A few kind words"
+        },
+        "successMessage": {
+          "he": "יופי! נתראה בגן",
+          "en": "Lovely! See you in the garden"
+        },
+        "declineMessage": {
+          "he": "חבל! בפעם הבאה",
+          "en": "Too bad! Next time"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בגן",
+        "en": "See you in the garden"
+      }
+    },
+    "baby_shower": {
+      "coverHint": {
+        "he": "לחצו לפתיחת המעטפה",
+        "en": "Tap to open the envelope"
+      },
+      "eyebrow": {
+        "he": "פרח חדש עומד לפרוח",
+        "en": "A new little flower is on its way"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "בייבי שאוור ל{primary}",
+          "en": "{primary}’s Baby Shower"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנתכנס בגן",
+          "en": "Until we gather in the garden"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו!",
+          "en": "Thank you for celebrating with us!"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הגן מתכונן",
+          "en": "The garden is getting ready"
+        },
+        "body": {
+          "he": "בין הוורדים ללבנדר, מתכוננים לפרח הכי קטן במשפחה.\nבואו לחגוג איתנו את {primary} ב־{date}, עם תה, עוגיות והמון אהבה.",
+          "en": "Between the roses and the lavender, we’re getting ready for the family’s littlest flower.\nJoin us to celebrate {primary} on {date}, with tea, cookies and lots of love."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "תה בגן",
+          "en": "Tea in the garden"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "11:00",
+          "label": {
+            "he": "תה ועוגיות",
+            "en": "Tea & cookies"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "12:00",
+          "label": {
+            "he": "משאלות לתינוק",
+            "en": "Wishes for baby"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "12:45",
+          "label": {
+            "he": "מתנות",
+            "en": "Gifts"
+          },
+          "icon": "gift"
+        },
+        {
+          "time": "13:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "במקום כרטיס",
+            "en": "Instead of a card"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הביאו ספר ילדים עם הקדשה אישית — נבנה לתינוק ספרייה ראשונה.",
+            "en": "Bring a children’s book with a personal note — we’re building baby’s first library."
+          },
+          "illustration": "template:watering-can"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה להורים לעתיד",
+          "en": "A note for the parents-to-be"
+        },
+        "successMessage": {
+          "he": "תודה! מחכים לראותכם",
+          "en": "Thank you! Can’t wait to see you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נתגעגע!",
+          "en": "Thanks for letting us know — you’ll be missed!"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      }
+    }
+  }
+}

@@ -1,0 +1,232 @@
+{
+  "id": "tropical-tiki",
+  "version": 2,
+  "name": {
+    "he": "טרופי",
+    "en": "Tropical Tiki"
+  },
+  "description": {
+    "he": "שקיעה טרופית מעל הים — שמש ענקית שוקעת במים, עלי דקל מתנדנדים, לפידי טיקי מהבהבים, היביסקוס, מונסטרה ואננס על החוף. מסיבה של קיץ נצחי.",
+    "en": "A tropical sunset over the sea — a huge sun sinking into the water, swaying palm fronds, flickering tiki torches, hibiscus, monstera and a pineapple on the beach. An endless-summer party."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "engagement",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/tropical-tiki/preview.webp",
+  "previewVideo": "/templates/tropical-tiki/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FBF3E8",
+      "surface": "#FFFAF3",
+      "ink": "#1D2B3A",
+      "inkMuted": "#5E6773",
+      "accent": "#C92E62",
+      "accentInk": "#FFFFFF",
+      "line": "#EEDFCB",
+      "heroText": "#FFF6EC"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 18,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "hibiscus",
+      "name": {
+        "he": "היביסקוס",
+        "en": "Hibiscus"
+      },
+      "palette": {
+        "accent": "#C92E62"
+      }
+    },
+    {
+      "id": "coral",
+      "name": {
+        "he": "אלמוג",
+        "en": "Coral"
+      },
+      "palette": {
+        "accent": "#BF4128"
+      }
+    },
+    {
+      "id": "orchid",
+      "name": {
+        "he": "סחלב",
+        "en": "Orchid"
+      },
+      "palette": {
+        "accent": "#8E36A8"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "tiki",
+      "display": {
+        "latin": "Righteous",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "lagoon",
+      "display": {
+        "latin": "Yeseva One",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "pouch",
+    "renderer": "video",
+    "poster": "/templates/tropical-tiki/cover-poster.webp",
+    "posterDesktop": "/templates/tropical-tiki/cover-poster-desktop.webp",
+    "openVideo": "/templates/tropical-tiki/cover-open.mp4",
+    "openVideoDesktop": "/templates/tropical-tiki/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "tag",
+      "image": "/templates/tropical-tiki/tag-blank.png",
+      "recolor": false,
+      "size": 0.26,
+      "offset": {
+        "x": 0,
+        "y": 0.06
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#3A2416",
+        "effect": "print",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Righteous",
+      "hebrew": "Secular One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שקיעה טרופית לאור לפידים",
+          "en": "A tropical sunset by torchlight"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFF6EC",
+    "overlayColor": "#2A0F3A",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "tropical-tiki-theme",
+    "tracks": [
+      {
+        "id": "tropical-tiki-theme",
+        "title": "Island Sunset (ukulele & steel drums)",
+        "url": "/templates/tropical-tiki/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/tropical-tiki/hero.mp4",
+    "hero-poster": "/templates/tropical-tiki/hero-poster.webp",
+    "hero-desktop": "/templates/tropical-tiki/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/tropical-tiki/hero-desktop-poster.webp",
+    "palm-band": "/templates/tropical-tiki/palm-band.webp",
+    "lagoon-panorama": "/templates/tropical-tiki/lagoon-panorama.webp",
+    "hibiscus": "/templates/tropical-tiki/hibiscus.webp",
+    "tiki-torch": "/templates/tropical-tiki/tiki-torch.webp",
+    "pineapple": "/templates/tropical-tiki/pineapple.webp"
+  },
+  "decorations": {
+    "afterHero": "template:palm-band",
+    "betweenVenues": "template:lagoon-panorama",
+    "afterTimeline": "template:hibiscus",
+    "beforeRsvp": "template:tiki-torch",
+    "footer": "template:pineapple"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

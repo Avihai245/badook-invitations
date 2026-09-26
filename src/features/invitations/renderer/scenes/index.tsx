@@ -21,6 +21,12 @@ import MidnightBloom from './midnight-bloom';
 import NeonNight from './neon-night';
 import ScribbleLove from './scribble-love';
 import WhiteCity from './white-city';
+// T4: grown-ups & golden years
+import TropicalTiki from './tropical-tiki';
+import VineyardHarvest from './vineyard-harvest';
+import CampfireNight from './campfire-night';
+import GoldenYears from './golden-years';
+import GrandmaGarden from './grandma-garden';
 
 export type { SceneId } from './ids';
 export type { ScenePlace } from './kit';
@@ -46,6 +52,12 @@ const SCENES: Record<SceneId, ComponentType<SceneProps>> = {
   'dino-hatch': DinoHatch,
   'deco-gatsby': DecoGatsby,
   'white-city': WhiteCity,
+  // T4: grown-ups & golden years
+  'tropical-tiki': TropicalTiki,
+  'vineyard-harvest': VineyardHarvest,
+  'campfire-night': CampfireNight,
+  'golden-years': GoldenYears,
+  'grandma-garden': GrandmaGarden,
 };
 
 const ROOT: CSSProperties = {

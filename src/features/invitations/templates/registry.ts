@@ -59,6 +59,17 @@ import scribbleDefaults from '@pack/scribble-love/defaults.json';
 import scribbleManifest from '@pack/scribble-love/manifest.json';
 import whiteCityDefaults from '@pack/white-city/defaults.json';
 import whiteCityManifest from '@pack/white-city/manifest.json';
+// T4: grown-ups & golden years
+import tropicalDefaults from '@pack/tropical-tiki/defaults.json';
+import tropicalManifest from '@pack/tropical-tiki/manifest.json';
+import vineyardDefaults from '@pack/vineyard-harvest/defaults.json';
+import vineyardManifest from '@pack/vineyard-harvest/manifest.json';
+import campfireDefaults from '@pack/campfire-night/defaults.json';
+import campfireManifest from '@pack/campfire-night/manifest.json';
+import goldenDefaults from '@pack/golden-years/defaults.json';
+import goldenManifest from '@pack/golden-years/manifest.json';
+import grandmaDefaults from '@pack/grandma-garden/defaults.json';
+import grandmaManifest from '@pack/grandma-garden/manifest.json';
 import { TemplateDefaultsSchema, TemplateManifestSchema } from '../contracts/schemas';
 import type { TemplateDefaults, TemplateManifest } from '../contracts/types';
 
@@ -100,6 +111,12 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: martiniManifest, defaults: martiniDefaults },
   { manifest: majolicaManifest, defaults: majolicaDefaults },
   { manifest: whiteCityManifest, defaults: whiteCityDefaults },
+  // T4: grown-ups & golden years
+  { manifest: tropicalManifest, defaults: tropicalDefaults },
+  { manifest: vineyardManifest, defaults: vineyardDefaults },
+  { manifest: campfireManifest, defaults: campfireDefaults },
+  { manifest: goldenManifest, defaults: goldenDefaults },
+  { manifest: grandmaManifest, defaults: grandmaDefaults },
 ];
 
 function loadTemplates(): Map<string, TemplateEntry> {

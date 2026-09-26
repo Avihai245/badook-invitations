@@ -1,0 +1,419 @@
+{
+  "templateId": "campfire-night",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "מדורה, מרשמלו וכוכבים לכבוד",
+        "en": "S’mores, stars & a campfire for"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנדליק את המדורה",
+          "en": "Until we light the campfire"
+        },
+        "afterEvent": {
+          "he": "איזה לילה! תודה שבאתם",
+          "en": "What a night! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "לילה אחד בטבע",
+          "en": "One night under the stars"
+        },
+        "body": {
+          "he": "ב־{date} מדליקים מדורה ויוצאים להרפתקה — עם שירים, סיפורים ומרשמלו על האש.\nתביאו חיוך, ואת כל השאר נארגן אנחנו.",
+          "en": "On {date} we light a campfire and set out on an adventure — songs, stories and marshmallows on the fire.\nBring a smile; we’ll take care of the rest."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המחנה",
+          "en": "The camp"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:30",
+          "label": {
+            "he": "מגיעים למחנה",
+            "en": "Arrive at camp"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "18:00",
+          "label": {
+            "he": "חיפוש אוצר",
+            "en": "Treasure hunt"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "19:00",
+          "label": {
+            "he": "ארוחה על האש",
+            "en": "Cookout dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "עוגה ומרשמלו",
+            "en": "Cake & marshmallows"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "מה להביא",
+            "en": "What to bring"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "בגדים נוחים, נעלי ספורט, פנס קטן ומשהו חם לערב — ליד המדורה מתקרר.",
+            "en": "Comfy clothes, sneakers, a small flashlight and something warm for later — it gets chilly by the fire."
+          },
+          "illustration": "template:lantern"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים למחנה?",
+          "en": "Coming to camp?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "יש! נתראה ליד המדורה",
+          "en": "Yay! See you by the campfire"
+        },
+        "declineMessage": {
+          "he": "חבל! נצלה מרשמלו לכבודכם",
+          "en": "Too bad! We’ll toast a marshmallow for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה ליד המדורה!",
+        "en": "See you by the fire!"
+      }
+    },
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "מסביב למדורה, לבר המצווה של",
+        "en": "By the campfire — the Bar Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנדליק את המדורה",
+          "en": "Until we light the fire"
+        },
+        "afterEvent": {
+          "he": "מזל טוב! תודה שחגגתם איתנו",
+          "en": "Mazal tov! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "יוצא לדרך",
+          "en": "Setting out on the trail"
+        },
+        "body": {
+          "he": "שלוש עשרה שנים של הרפתקאות — והדרך רק מתחילה.\nב־{date} {primary} עולה לתורה, ובערב נחגוג יחד מסביב למדורה.",
+          "en": "Thirteen years of adventures — and the trail is just beginning.\nOn {date} {primary} is called to the Torah, and in the evening we’ll celebrate together around the campfire."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בית הכנסת",
+          "en": "Synagogue"
+        },
+        {
+          "he": "המחנה",
+          "en": "The camp"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחה על האש",
+            "en": "Cookout dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "מדורה ושירים",
+            "en": "Campfire songs"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "קינוחים ומרשמלו",
+            "en": "Dessert & s’mores"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "מה להביא",
+            "en": "What to bring"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "משהו חם לערב ונעליים נוחות — חלק מהערב בחוץ, מסביב למדורה.",
+            "en": "Something warm for later and comfortable shoes — part of the evening is outdoors, around the fire."
+          },
+          "illustration": "template:lantern"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למחנה?",
+          "en": "Joining the camp?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the Bar Mitzvah boy"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה ליד המדורה",
+          "en": "Great! See you by the fire"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם מקום ליד המדורה",
+          "en": "Too bad! We’ll save you a spot by the fire"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה!",
+        "en": "Mazal tov — see you there!"
+      }
+    },
+    "other": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "סוף שבוע בטבע, מסביב למדורה עם",
+        "en": "A weekend around the campfire with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנדליק את המדורה",
+          "en": "Until we light the campfire"
+        },
+        "afterEvent": {
+          "he": "איזה סוף שבוע! תודה שבאתם",
+          "en": "What a weekend! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "כולם מסביב למדורה",
+          "en": "Everyone around the fire"
+        },
+        "body": {
+          "he": "אוהלים, שירים ליד האש וכוכבים שרואים רק בטבע.\nב־{date} יוצאים יחד — בואו עם כל המשפחה.",
+          "en": "Tents, songs by the fire and stars you only see out in nature.\nOn {date} we head out together — bring the whole family."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החניון",
+          "en": "The campsite"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "16:00",
+          "label": {
+            "he": "מקימים מחנה",
+            "en": "Pitching the tents"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "18:00",
+          "label": {
+            "he": "ארוחה על האש",
+            "en": "Cookout dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "20:00",
+          "label": {
+            "he": "מדורה ושירים",
+            "en": "Campfire songs"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "תצפית כוכבים",
+            "en": "Stargazing"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "מה להביא",
+            "en": "What to bring"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "שק שינה, פנס, בגדים חמים לערב ומצב רוח טוב. האוהלים כבר יחכו לכם.",
+            "en": "A sleeping bag, a flashlight, warm clothes for the evening and a good mood. The tents will be waiting."
+          },
+          "illustration": "template:lantern"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מגיעים?",
+          "en": "Coming?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כמה מילים טובות",
+          "en": "A few kind words"
+        },
+        "successMessage": {
+          "he": "יופי! נתראה במחנה",
+          "en": "Great! See you at camp"
+        },
+        "declineMessage": {
+          "he": "חבל! בפעם הבאה",
+          "en": "Too bad! Next time"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה ליד המדורה",
+        "en": "See you by the fire"
+      }
+    }
+  }
+}

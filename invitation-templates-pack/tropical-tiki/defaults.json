@@ -1,0 +1,406 @@
+{
+  "templateId": "tropical-tiki",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לפתיחת ההזמנה",
+        "en": "Tap to open your invitation"
+      },
+      "eyebrow": {
+        "he": "אלוהה! בואו לחגוג יום הולדת עם",
+        "en": "Aloha! Come celebrate a birthday with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהלפידים יידלקו",
+          "en": "Until the torches are lit"
+        },
+        "afterEvent": {
+          "he": "איזה ערב! תודה שחגגתם איתנו",
+          "en": "What a night! Thanks for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "טסים לאיים",
+          "en": "Off to the islands"
+        },
+        "body": {
+          "he": "ב־{date} טסים לאיים — בלי מטוס ובלי מזוודות.\nקוקטיילים, מוזיקה טובה, לפידים ושקיעה. כל מה שחסר זה אתם.",
+          "en": "On {date} we’re off to the islands — no plane, no suitcase.\nCocktails, good music, torches and a sunset. All that’s missing is you."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:00",
+          "label": {
+            "he": "קוקטייל שקיעה",
+            "en": "Sunset cocktails"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחה טרופית",
+            "en": "Island dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "מוזיקה וריקודים",
+            "en": "Music & dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "טרופי וצבעוני",
+            "en": "Tropical & colourful"
+          },
+          "body": {
+            "he": "חולצות הוואי, שמלות פרחוניות וכל מה שצבעוני — זה הערב להוציא אותם מהארון.",
+            "en": "Hawaiian shirts, floral dresses and anything bright — tonight’s the night to wear them."
+          },
+          "illustration": "template:hibiscus"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מגיעים לאי?",
+          "en": "Joining us on the island?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "אלוהה! נתראה במסיבה",
+          "en": "Aloha! See you at the party"
+        },
+        "declineMessage": {
+          "he": "חבל! נרים כוסית לכבודכם",
+          "en": "Too bad! We’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "אלוהה, ונתראה!",
+        "en": "Aloha — see you there!"
+      }
+    },
+    "engagement": {
+      "coverHint": {
+        "he": "לחצו לפתיחת ההזמנה",
+        "en": "Tap to open your invitation"
+      },
+      "eyebrow": {
+        "he": "אמרנו כן מול השקיעה — התארסנו!",
+        "en": "We said yes at sunset — we’re engaged!"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנרים כוסית יחד",
+          "en": "Until we raise a glass together"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "אהבה טרופית",
+          "en": "A tropical love story"
+        },
+        "body": {
+          "he": "כמו שקיעה מעל המים — חמה, פשוטה ויפה.\nבואו לחגוג איתנו את האירוסין ב־{date}.",
+          "en": "Like a sunset over the water — warm, simple and beautiful.\nCome celebrate our engagement with us on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "מסיבת האירוסין",
+          "en": "Engagement party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:30",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "Toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחה טרופית",
+            "en": "Island dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "מוזיקה וריקודים",
+            "en": "Music & dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "קיצי ואלגנטי",
+            "en": "Summer chic"
+          },
+          "body": {
+            "he": "פשתן, הדפסים פרחוניים וצבעים של שקיעה — ונעליים שנוח לרקוד בהן.",
+            "en": "Linen, florals and sunset colours — and shoes you can dance in."
+          },
+          "illustration": "template:hibiscus"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג המאורס",
+          "en": "A wish for the happy couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בשקיעה",
+          "en": "Thank you! See you at sunset"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נרים כוסית לכבודכם",
+          "en": "Thanks for letting us know — we’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      }
+    },
+    "other": {
+      "coverHint": {
+        "he": "לחצו לפתיחת ההזמנה",
+        "en": "Tap to open your invitation"
+      },
+      "eyebrow": {
+        "he": "מסיבת קיץ טרופית עם",
+        "en": "A tropical summer party with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמסיבה מתחילה",
+          "en": "Until the party starts"
+        },
+        "afterEvent": {
+          "he": "איזה ערב! תודה שבאתם",
+          "en": "What a night! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "קיץ, קוקטיילים ושקיעה",
+          "en": "Summer, cocktails, sunset"
+        },
+        "body": {
+          "he": "יש ערבים שנולדו בשביל מסיבה.\nב־{date} — מוזיקה, קוקטיילים ואנשים שאנחנו אוהבים.",
+          "en": "Some evenings were made for a party.\nOn {date}: music, cocktails and people we love."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קוקטייל שקיעה",
+            "en": "Sunset cocktails"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:30",
+          "label": {
+            "he": "ארוחה",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "מוזיקה",
+            "en": "Music"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "טרופי וצבעוני",
+            "en": "Tropical & colourful"
+          },
+          "body": {
+            "he": "חולצות הוואי, שמלות פרחוניות וכל מה שצבעוני.",
+            "en": "Hawaiian shirts, floral dresses and anything bright."
+          },
+          "illustration": "template:hibiscus"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מגיעים?",
+          "en": "Coming?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כמה מילים טובות",
+          "en": "A few kind words"
+        },
+        "successMessage": {
+          "he": "אלוהה! נתראה",
+          "en": "Aloha! See you there"
+        },
+        "declineMessage": {
+          "he": "חבל! בפעם הבאה",
+          "en": "Too bad! Next time"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "אלוהה!",
+        "en": "Aloha!"
+      }
+    }
+  }
+}

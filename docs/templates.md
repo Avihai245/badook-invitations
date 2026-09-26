@@ -41,6 +41,11 @@ and takes the colour presets and the font pairs like the others. Ten are premium
 | ניאון / Neon Night (`neon-night`) | Neon signage — glowing tubes for night parties and bar/bat mitzvahs | bar_mitzvah, bat_mitzvah, birthday, corporate | ✓ |
 | שרבוט / Scribble Love (`scribble-love`) | Hand-drawn / “imperfect on purpose” — notes-app collage and marker doodles | engagement, birthday, other | |
 | העיר הלבנה / White City (`white-city`) | Tel Aviv Bauhaus architecture — modernist balconies and grids | corporate, wedding, other | ✓ |
+| טרופי / Tropical Tiki (`tropical-tiki`) | Tiki-bar party graphics — a tropical sunset, palms, torches and hibiscus (the “endless summer” party trend) | birthday, engagement, other | |
+| בציר / Vineyard Harvest (`vineyard-harvest`) | Winery and harvest-table stationery — golden-hour vine rows, grapes and wine for milestone birthdays, weddings and company evenings | birthday, wedding, engagement, corporate | ✓ |
+| מדורה / Campfire Night (`campfire-night`) | Outdoor-adventure illustration — camping, stargazing and a campfire for kids’ birthdays, bar mitzvahs and family weekends | birthday, bar_mitzvah, other | |
+| שנים של זהב / Golden Years (`golden-years`) | Milestone-birthday and golden-anniversary stationery — gold foil, laurels and champagne, made for older guests (large, high-contrast text, calm motion) | birthday, other | ✓ |
+| הגן של סבתא / Grandma’s Garden (`grandma-garden`) | English cottage-garden illustration — roses, lavender, a picket fence and tea for grandparents’ birthdays and family gatherings | birthday, other, baby_shower | |
 
 Each design has: Hebrew and English names, starter texts for every event it's listed under, two font
 pairs (plus the shared font library), three colour presets, a cover, a hero scene and a gallery poster,
