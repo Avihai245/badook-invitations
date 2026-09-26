@@ -1,21 +1,38 @@
 'use client';
 
-import { Check, Link2, MessageCircle, Send } from 'lucide-react';
+import { Check, Copy, MessageCircle, Send } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Dialog, Hint, IconButton, Segmented, Skeleton, useToast } from '@/components/app';
+import { isolate } from '@/features/event-day/messages';
+import { RTL_LOCALES, type Locale } from '@/features/invitations/contracts/types';
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
-import { dictFor, fmt as format } from '@/lib/i18n/app';
+import { nativeName } from '@/features/invitations/lib/locales';
+import {
+  guestLocale,
+  templateChain,
+  valuesLocale,
+  type TemplateLanguage,
+} from '@/features/whatsapp/languages';
+import { fillTemplate, GALLERY_TEMPLATE_TEXT } from '@/features/whatsapp/template-text';
+import { fmt as format } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
-import type { GalleryNoticeRow, Skipped } from '../../server/notices-db';
+import { GALLERY_MESSAGE, guestGalleryLink } from '../../messages';
+import type { GalleryNoticeGuest, GalleryNoticeInvitation } from '../../server/notices-api';
+import type { Skipped } from '../../server/notices-db';
+
+type GalleryNoticeRow = GalleryNoticeGuest;
 
 interface NoticesState {
   rows: GalleryNoticeRow[];
   ready: boolean;
+  /** the languages the gallery's template is set up in */
+  langs: TemplateLanguage[];
   credits: number;
   unlimited: boolean;
-  /** the gallery's link for guests (each guest's adds `&g=<their token>`) */
+  /** the gallery's link for guests (each guest's adds `&g=<their token>`, and their language) */
   link: string;
-  own: { hosts: string; locale: 'he' | 'en' };
+  /** the invitation's languages and the hosts in each (the messages are in the guest's language) */
+  own: GalleryNoticeInvitation;
 }
 
 /** Where a guest stands with the gallery link. */
@@ -42,10 +59,31 @@ const markable = (r: GalleryNoticeRow) => {
 };
 
 /**
+ * The guests by the language the system's message is written in (the sender's choice: their own
+ * language when the gallery's template is approved in it, else the invitation's —
+ * features/whatsapp/languages), in the order the template's languages are configured; and the
+ * languages guests wanted but get another one instead.
+ */
+function byLanguage(recipients: readonly GalleryNoticeRow[], data: NoticesState) {
+  const doc = { locales: data.own.locales, defaultLocale: data.own.locale };
+  const groups = new Map<Locale, GalleryNoticeRow[]>();
+  const fallbacks = new Map<string, { wanted: Locale; got: Locale }>();
+  for (const r of recipients) {
+    const got = templateChain(r.language, doc, data.langs)[0]?.locale ?? data.own.locale;
+    groups.set(got, [...(groups.get(got) ?? []), r]);
+    const wanted = guestLocale(r.language, doc);
+    if (wanted !== got) fallbacks.set(`${wanted}>${got}`, { wanted, got });
+  }
+  return { groups: [...groups], fallbacks: [...fallbacks.values()] };
+}
+
+/**
  * "Send guests the gallery link": every guest of the list with their own link to the gallery (it keeps
- * their personal link: their uploads carry their name), what they got already, and three ways to send
- * it — the system's WhatsApp number (the third template; a credit each), the host's own WhatsApp (a
- * ready message, then marked as sent), or the link copied. Marking by hand for the rest.
+ * their personal link: their uploads carry their name, and opens in their language), what they got
+ * already, and three ways to send it — the system's WhatsApp number (the third template, in each
+ * guest's language when it is approved in it; a credit each — how many go out in each language, and
+ * each message as it will look), the host's own WhatsApp (a ready message in the guest's language,
+ * then marked as sent), or that message copied. Marking by hand for the rest.
  */
 export function SendLinkDialog({
   id,
@@ -100,7 +138,31 @@ export function SendLinkDialog({
   const shortText = data
     ? fmt(N.errors.credits, { needed: number(toSend.length), balance: number(data.credits) })
     : '';
-  const linkOf = (r: GalleryNoticeRow) => (data ? `${data.link}&g=${encodeURIComponent(r.token)}` : null);
+  const doc = data ? { locales: data.own.locales, defaultLocale: data.own.locale } : null;
+  /** the guest's language: their own when the invitation has it, else its default */
+  const languageOf = (r: GalleryNoticeRow): Locale | null => (doc ? guestLocale(r.language, doc) : null);
+  /** the ready message with the guest's own gallery link (opening in their language), in their language */
+  const messageOf = (r: GalleryNoticeRow) => {
+    const l = languageOf(r);
+    if (!data || !l) return null;
+    return format(GALLERY_MESSAGE[l], {
+      name: isolate(r.name),
+      hosts: isolate(data.own.hosts[l] ?? data.own.hosts[data.own.locale] ?? ''),
+      url: guestGalleryLink(data.link, r.token, l, data.own.locale),
+    });
+  };
+
+  // the system's messages by language, and the message of each language as it will look
+  const { groups, fallbacks } = data ? byLanguage(toSend, data) : { groups: [], fallbacks: [] };
+  const [previewLang, setPreviewLang] = useState<Locale | null>(null);
+  const firstLang =
+    doc && data ? (templateChain(null, doc, data.langs)[0]?.locale ?? doc.defaultLocale) : 'he';
+  const lang: Locale =
+    previewLang && groups.some(([l]) => l === previewLang) ? previewLang : (groups[0]?.[0] ?? firstLang);
+  const template = GALLERY_TEMPLATE_TEXT[lang];
+  const sample = groups.find(([l]) => l === lang)?.[1][0]?.name ?? toSend[0]?.name ?? '';
+  const preview =
+    data && doc ? fillTemplate(template.body, [sample, data.own.hosts[valuesLocale(lang, doc)] ?? '']) : '';
 
   const skippedLine = (skipped: Skipped | undefined) => {
     if (!skipped) return null;
@@ -162,11 +224,10 @@ export function SendLinkDialog({
     await load();
   };
 
+  /** "Send from my WhatsApp": wa.me with the message in the guest's language, then marked as sent. */
   const sendOwn = (r: GalleryNoticeRow) => {
-    const url = linkOf(r);
-    if (!data || !url || !r.phone) return;
-    const own = dictFor(data.own.locale).galleryNotify;
-    const text = format(own.ownMessage, { name: r.name, hosts: data.own.hosts, url });
+    const text = messageOf(r);
+    if (!text || !r.phone) return;
     window.open(
       `https://wa.me/${r.phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`,
       '_blank',
@@ -175,10 +236,11 @@ export function SendLinkDialog({
     void mark([r.guestId], true);
   };
 
+  /** The same message, copied — to send it any other way. */
   const copy = (r: GalleryNoticeRow) => {
-    const url = linkOf(r);
-    if (!url) return;
-    navigator.clipboard.writeText(url).then(
+    const text = messageOf(r);
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(
       () => toast({ variant: 'success', title: N.copied }),
       () => toast({ variant: 'danger', title: N.errors.failed }),
     );
@@ -334,8 +396,8 @@ export function SendLinkDialog({
                       </Hint>
                     ) : null}
                     <Hint text={N.copyLinkHint}>
-                      <IconButton label={N.copyLink} size="sm" onClick={() => copy(r)}>
-                        <Link2 />
+                      <IconButton label={N.copyLink} size="sm" onClick={() => copy(r)} data-copy-message="">
+                        <Copy />
                       </IconButton>
                     </Hint>
                   </div>
@@ -351,6 +413,64 @@ export function SendLinkDialog({
                   ? shortText
                   : fmt(N.cost, { n: number(toSend.length), credits: number(data.credits) })}
             </p>
+          ) : null}
+          {data.ready && toSend.length ? (
+            <div className="flex flex-col gap-2 border-t border-line pt-3">
+              {groups.length > 1 || fallbacks.length ? (
+                <ul className="flex flex-col gap-0.5 text-[12.5px]" data-testid="gallery-notices-languages">
+                  {groups.map(([l, list]) => (
+                    <li key={l}>
+                      ·{' '}
+                      {plural(N.byLanguage, list.length, {
+                        n: number(list.length),
+                        language: nativeName(l),
+                      })}
+                    </li>
+                  ))}
+                  {fallbacks.map(({ wanted, got }) => (
+                    <li key={`${wanted}-${got}`} className="text-muted">
+                      ·{' '}
+                      {fmt(N.fallback, {
+                        language: t.editor.languageIn[wanted],
+                        fallback: t.editor.languageIn[got],
+                      })}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[13px] font-semibold">
+                  {groups.length > 1 ? fmt(N.previewIn, { language: t.editor.languageIn[lang] }) : N.preview}
+                </p>
+                {groups.length > 1 ? (
+                  <Segmented<Locale>
+                    label={N.preview}
+                    value={lang}
+                    onValueChange={setPreviewLang}
+                    options={groups.map(([l]) => ({
+                      value: l,
+                      label: t.editor.languageShort[l],
+                      ariaLabel: nativeName(l),
+                    }))}
+                  />
+                ) : null}
+              </div>
+              <div
+                className="rounded-[14px] bg-[#e7ddd3] p-3"
+                dir={RTL_LOCALES.includes(lang) ? 'rtl' : 'ltr'}
+                lang={lang}
+                data-testid="gallery-notices-preview"
+              >
+                <div className="max-w-[340px] rounded-[10px] bg-white px-3 pt-2.5 pb-2 shadow-sm">
+                  <p className="text-[13.5px] leading-[1.5] whitespace-pre-line text-[#111b21]">{preview}</p>
+                  <p className="mt-1 text-[11.5px] text-[#667781]">{template.footer}</p>
+                  <div className="mt-2 border-t border-[#e9edef] pt-2 text-center text-[13.5px] font-medium text-[#027eb5]">
+                    {template.button}
+                  </div>
+                </div>
+              </div>
+              <p className="text-[12px] text-muted">{N.previewHint}</p>
+            </div>
           ) : null}
         </div>
       )}

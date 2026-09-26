@@ -1,10 +1,13 @@
 import 'server-only';
 import { z } from 'zod';
 import { packageFor, whyOff, type FeatureInput } from '@/features/flags/features';
+import type { Locale } from '@/features/invitations/contracts/types';
+import { isLocale } from '@/features/invitations/lib/locales';
+import type { TemplateLanguage } from '@/features/whatsapp/languages';
 import type { ProcessResult } from '@/features/whatsapp/sender';
 import type { GalleryDb } from './db';
 import type { ApiResult } from './guest-api';
-import type { GalleryNoticesDb, Skipped } from './notices-db';
+import type { GalleryNoticeRow, GalleryNoticesDb, Skipped } from './notices-db';
 import { linkToken } from './tokens';
 
 /**
@@ -24,12 +27,29 @@ const fail = (status: number, code: string, extra: Record<string, unknown> = {})
 const notFound = fail(404, 'not_found');
 const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
 
+/**
+ * What the messages need in each of the invitation's languages: its default language, its languages,
+ * and the hosts in each (the host's own message and the template's {{2}} say them).
+ */
+export interface GalleryNoticeInvitation {
+  locale: Locale;
+  locales: Locale[];
+  hosts: Partial<Record<Locale, string>>;
+}
+
+/** A guest of the dialog, with the language the host set for them (null: the invitation's default). */
+export type GalleryNoticeGuest = GalleryNoticeRow & { language: Locale | null };
+
 export interface GalleryNotifyDeps {
   db: Pick<GalleryNoticesDb, 'state' | 'queue' | 'mark' | 'pending'>;
   gallery: Pick<GalleryDb, 'ownerGet'>;
   featureInput(invitationId: string): Promise<(FeatureInput & { ownerId: string }) | null>;
-  /** the invitation's hosts line in its main language (the host's own WhatsApp message says it) */
-  invitation(id: string, userId: string): Promise<{ hosts: string; locale: 'he' | 'en' } | null>;
+  /** the invitation's languages and the hosts in each (null: not the owner's) */
+  invitation(id: string, userId: string): Promise<GalleryNoticeInvitation | null>;
+  /** each guest's language by their id (the guest list's) */
+  guestLanguages(id: string, userId: string): Promise<Record<string, string | null>>;
+  /** the languages the gallery's template is set up in (INVITES_WHATSAPP_TEMPLATE_LANGS) */
+  templateLanguages(): TemplateLanguage[];
   /** the system's number can send the gallery link (WhatsApp set up, the template approved) */
   ready(): boolean;
   priceUsd: number;
@@ -59,8 +79,10 @@ async function gate(
 }
 
 /**
- * GET /api/invitations/:id/gallery/notices — every guest with their own gallery link and what they got
- * already; whether the system's number can send; what a message from the host's own WhatsApp says.
+ * GET /api/invitations/:id/gallery/notices — every guest with their own gallery link, their language
+ * and what they got already; whether the system's number can send, and in which languages (the dialog
+ * counts and previews the messages by language, like the invitation's); what a message from the
+ * host's own WhatsApp needs in each of the invitation's languages.
  */
 export async function galleryNoticesState(
   userId: string,
@@ -70,24 +92,30 @@ export async function galleryNoticesState(
 ): Promise<ApiResult> {
   const refused = await gate(userId, id, deps);
   if (refused) return refused;
-  const [owned, state, account, invitation] = await Promise.all([
+  const [owned, state, account, invitation, languages] = await Promise.all([
     deps.gallery.ownerGet(id, userId),
     deps.db.state(id, userId),
     deps.account(userId),
     deps.invitation(id, userId),
+    deps.guestLanguages(id, userId),
   ]);
   if (!owned || !state || !invitation) return notFound;
   const g = owned.gallery;
   if (!g || !g.enabled) return fail(409, 'no_gallery');
   const token = linkToken('upload', id, g.uploadTokenNonce, g.uploadTokenHash);
   if (!token) return fail(409, 'no_link');
+  const rows: GalleryNoticeGuest[] = state.rows.map((r) => {
+    const language = languages[r.guestId];
+    return { ...r, language: language && isLocale(language) ? language : null };
+  });
   return ok({
-    rows: state.rows,
+    rows,
     ready: deps.ready(),
+    langs: deps.templateLanguages(),
     credits: account.credits,
     unlimited: account.admin,
     priceUsd: deps.priceUsd,
-    // each guest's link: `${link}&g=${token}`
+    // each guest's link: `${link}&g=${token}` (and `&lang=` for another language: messages.ts)
     link: `${base}/e/${owned.slug}/upload?t=${token}`,
     own: invitation,
   });

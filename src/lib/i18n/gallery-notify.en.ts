@@ -7,7 +7,7 @@ export const galleryNotifyEn: GalleryNotifyDict = {
     'Sends each guest a personal gallery link, so what they upload shows with their name — from the official WhatsApp number or from your own WhatsApp.',
   title: 'Send the gallery link',
   intro:
-    'Each guest gets their own gallery link: what they upload shows up for you with their name. Send it from the official number (a credit a message), from your own WhatsApp, or copy the link.',
+    'Each guest gets their own gallery link: what they upload shows up for you with their name. Send it from the official number (a credit a message), from your own WhatsApp, or copy a ready message with the link — each guest in their own language.',
   tabs: { all: 'Everyone', unsent: 'Not sent yet', sent: 'Got it' },
   counts: {
     one: '1 guest on the list · {sent} got the link',
@@ -35,13 +35,20 @@ export const galleryNotifyEn: GalleryNotifyDict = {
   markSentHint: 'Marks that the guest got the link (for example you sent it yourself).',
   markAll: 'Mark everyone shown as sent',
   markAllHint: 'Marks everyone shown as having the link, without sending a message.',
-  copyLink: 'Copy the personal link',
-  copyLinkHint: 'Copies the guest’s personal gallery link, to send any way you like.',
-  copied: 'Link copied',
+  copyLink: 'Copy the message with the link',
+  copyLinkHint:
+    'Copies a ready message in the guest’s language, with their personal gallery link (it opens in their language), to send any way you like.',
+  copied: 'Message and link copied',
   notReady:
-    'Sending from the official number will be available once the gallery’s message template is approved. Until then: from your own WhatsApp, or copy the link.',
+    'Sending from the official number will be available once the gallery’s message template is approved. Until then: from your own WhatsApp, or copy the message with the link.',
   noGallery: 'Turn the gallery on first — then you can send guests the link.',
   cost: '{n} messages · you have {credits} credits',
+  byLanguage: { one: '{language}: 1 message', other: '{language}: {n} messages' },
+  fallback: 'There’s no approved gallery message in {language} yet: those guests get it in {fallback}.',
+  preview: 'The message',
+  previewIn: 'The message in {language}',
+  previewHint:
+    'Each guest gets the message in their own language once WhatsApp has approved it, otherwise in the invitation’s language. The button opens the gallery in their language.',
   unlimited: 'Admin account: no credits charged',
   sent: { one: 'The link was sent to 1 guest', other: 'The link was sent to {n} guests' },
   marked: { one: '1 guest marked', other: '{n} guests marked' },
@@ -60,7 +67,5 @@ export const galleryNotifyEn: GalleryNotifyDict = {
     failed: 'Something went wrong. Try again.',
   },
   empty: 'No guests on the list yet. You can send the general link from the link card.',
-  ownMessage:
-    'Hi {name} 📸\nThe gallery of {hosts}’s event is open: upload the photos and videos you took here, and see everyone’s:\n{url}',
   close: 'Close',
 };
