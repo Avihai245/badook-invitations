@@ -195,12 +195,13 @@ export function GuestsPanel({
             options={(['all', 'unseated', 'seated'] as const).map((v) => ({ value: v, label: g.filters[v] }))}
           />
           {categories.length ? (
+            // too narrow beside the filter for its label: it takes the next row
             <Select
               aria-label={g.category}
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="h-8 min-w-0 text-[13px]"
-              wrapperClassName="min-w-[7.5rem] flex-1"
+              wrapperClassName="min-w-[8.5rem] flex-1"
             >
               <option value="">{g.allCategories}</option>
               {categories.map((c) => (
