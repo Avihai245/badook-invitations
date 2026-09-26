@@ -1,6 +1,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { safeMigrateDocument } from '@/features/invitations/contracts/migrate';
+import { getTemplate } from '@/features/invitations/templates/registry';
 import type { Feature } from '@/features/flags/features';
 import type { RealtimeInfo } from '@/lib/live/types';
 import { AUTHOR_KEY_RE, REVIEW, REVIEW_TOKEN_RE } from '../config';
@@ -81,11 +82,14 @@ export async function openReview(
   if (!row.ok) return { status: 'rate' };
   const draft = safeMigrateDocument(row.draft);
   if (!draft.success) return null;
+  const entry = getTemplate(draft.data.templateId);
+  if (!entry) return null;
   return {
     status: 'ok',
     state: {
       draft: draft.data,
       templateId: draft.data.templateId,
+      template: entry.manifest,
       updatedAt: row.updatedAt,
       expiresAt: row.expiresAt,
       comments: row.comments,

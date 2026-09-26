@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { dirOf } from '@/features/invitations/contracts/types';
 import { InvitationHtml } from '@/features/invitations/renderer/InvitationHtml';
-import { getTemplate } from '@/features/invitations/templates/registry';
 import { goneLocale, loadReview, reviewLocale } from '@/features/review/server/page';
 import '@/features/invitations/ui/invitation.css';
 import '@/features/review/ui/review.css';
@@ -28,8 +27,7 @@ export default async function ReviewLayout({ children, params }: { children: Rea
   assertInvitationsEnabled();
   const { token, lang } = await params;
   const opened = await loadReview(token);
-  const entry = opened?.status === 'ok' ? getTemplate(opened.state.templateId) : undefined;
-  if (opened?.status !== 'ok' || !entry) {
+  if (opened?.status !== 'ok') {
     const locale = goneLocale(lang);
     return (
       <html lang={locale} dir={dirOf(locale)} suppressHydrationWarning>
@@ -40,7 +38,7 @@ export default async function ReviewLayout({ children, params }: { children: Rea
   return (
     <InvitationHtml
       doc={opened.state.draft}
-      template={entry.manifest}
+      template={opened.state.template}
       locale={reviewLocale(opened.state.draft, lang)}
       cinematic={opened.state.cinematic}
     >

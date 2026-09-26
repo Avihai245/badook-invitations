@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { pageTitle } from '@/features/invitations/renderer/calendar-event';
 import { buildRenderContext } from '@/features/invitations/renderer/context';
-import { getTemplate } from '@/features/invitations/templates/registry';
 import { goneLocale, loadReview, reviewLocale } from '@/features/review/server/page';
 import { ReviewGone } from '@/features/review/ui/ReviewGone';
 import { ReviewScreen } from '@/features/review/ui/ReviewScreen';
@@ -28,8 +27,7 @@ function bases() {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { token, lang } = await params;
   const opened = await loadReview(token);
-  const entry = opened?.status === 'ok' ? getTemplate(opened.state.templateId) : undefined;
-  if (opened?.status !== 'ok' || !entry) {
+  if (opened?.status !== 'ok') {
     const t = goneLocale(lang) === 'en' ? reviewGuestEn : reviewGuestHe;
     return { title: t.metaTitlePlain, robots: ROBOTS };
   }
@@ -37,7 +35,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const t = locale === 'en' ? reviewGuestEn : reviewGuestHe;
   const env = serverEnv();
   const name = pageTitle(
-    buildRenderContext(opened.state.draft, entry.manifest, locale, {
+    buildRenderContext(opened.state.draft, opened.state.template, locale, {
       mode: 'live',
       review: true,
       brand: env.INVITES_BRAND_NAME,
@@ -58,8 +56,6 @@ export default async function ReviewPage({ params }: { params: Params }) {
   if (!opened) return <ReviewGone state="unavailable" locale={goneLocale(lang)} />;
   if (opened.status === 'rate') return <ReviewGone state="rate" locale={goneLocale(lang)} />;
   if (opened.status === 'gone') return <ReviewGone state={opened.state} locale={goneLocale(lang)} />;
-  if (!getTemplate(opened.state.templateId))
-    return <ReviewGone state="unavailable" locale={goneLocale(lang)} />;
   const env = serverEnv();
   return (
     <ReviewScreen

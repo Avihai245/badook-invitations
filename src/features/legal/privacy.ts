@@ -88,7 +88,8 @@ export function privacyDoc(c: LegalContext): LegalDoc {
                 'Meta (WhatsApp Business Platform) — when a host sends invitations on WhatsApp: the guest’s phone number, name and the invitation’s link;',
                 'PayPlus — processing payments and issuing invoices;',
                 'Resend — sending emails;',
-                'Anthropic — answering questions in the support assistant (the text of the question only), and, when the host’s plan includes it, the automatic check of photos uploaded to an event’s live gallery (a small thumbnail of the photo only);',
+                'Anthropic — answering questions in the support assistant (the text of the question only), and, when the host’s plan includes it, the automatic check of photos uploaded to an event’s live gallery (a small thumbnail of the photo only) and design suggestions from the host’s chosen photos (small copies, section 7C);',
+                'Microsoft (Azure AI Speech, European Union) — when the host’s plan includes it, reading the invitation’s own texts aloud (section 7C);',
                 'Google (Maps), YouTube and Vimeo — maps and videos shown in invitations and on the site.',
               ],
             },
@@ -151,6 +152,20 @@ export function privacyDoc(c: LegalContext): LegalDoc {
                 'Check-in: when a family arrives, the entrance station records which family arrived, how many people, the time, and the name the staff gave their station. The staff open the station from a link the host shares, without an account; there they can find the event’s guests by name or phone and see each family’s table. The entrance code on a guest’s guide (and on printed table cards) is derived from their personal link and identifies the family only to that event’s station.',
                 'Re-seating: families moved between tables (from where to where, when, and the reason the host wrote) are kept in the seating’s history, with the seating.',
                 'How long: check-ins are erased 30 days after the event’s date, and a check-in that was undone after a day.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'studio',
+          heading: '7C. Family review, design suggestions, versions, read aloud',
+          body: [
+            {
+              list: [
+                'Family review: a host can send a private link to the draft of an invitation for family members to comment on, without an account. We keep the comments, the name each person types, when they were written and the host’s replies; the name is also kept in that person’s browser so they don’t type it again, with a random key that lets them delete their own comment (we keep only a one-way hash of it). The link itself is kept only as a one-way hash; the host can set it to expire, replace it or revoke it at any time. The page sends no RSVP and counts nobody. The comments are erased 90 days after the event’s date (the host can delete them earlier), and deleted comments after 30 days.',
+                'Design suggestions (“design it for me”): the photos a host chooses are made smaller on the host’s device and, when the plan includes it, sent to Anthropic with the event type, the languages and the mood the host typed — no names or other details — to suggest three designs. Nothing is kept by us from that request, and the photos are never written to our logs. A design the host chooses uploads the photos it uses to the invitation, like any photo the host adds.',
+                'Versions: besides each published version, we keep copies of an invitation’s draft as the host edits (at most one every 10 minutes, and before a restore or a new design) so that any of them can be restored. They are kept 90 days, 60 per invitation at most; published versions are kept with the invitation.',
+                'Read aloud: when the plan includes it, the invitation’s own texts (the names, date, places and the host’s texts — never guests’ details) are sent to Microsoft (Azure AI Speech, European Union) once per language when the host publishes, and the audio it returns is stored with the invitation’s files until the texts change or the invitation or account is deleted. When a guest listens without that audio, their own device reads the text. Listening is not recorded anywhere.',
               ],
             },
           ],
@@ -284,7 +299,8 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'Meta (WhatsApp Business Platform): כשמארח שולח הזמנות בוואטסאפ, מועברים מספר הטלפון של המוזמן, השם שלו והקישור להזמנה;',
               'PayPlus: סליקת תשלומים והפקת חשבוניות;',
               'Resend: שליחת מיילים;',
-              'Anthropic: מענה לשאלות בעוזר התמיכה (רק טקסט השאלה), וכשהחבילה של המארח כוללת את זה, הבדיקה האוטומטית של תמונות שמועלות לגלריה החיה של אירוע (רק תמונה ממוזערת של התמונה);',
+              'Anthropic: מענה לשאלות בעוזר התמיכה (רק טקסט השאלה), וכשהחבילה של המארח כוללת את זה, הבדיקה האוטומטית של תמונות שמועלות לגלריה החיה של אירוע (רק תמונה ממוזערת של התמונה) והצעות עיצוב מהתמונות שהמארח בחר (עותקים מוקטנים, סעיף 7ג);',
+              'Microsoft (Azure AI Speech, באיחוד האירופי): כשהחבילה של המארח כוללת את זה, הקראת הטקסטים של ההזמנה עצמה (סעיף 7ג);',
               'Google (מפות), YouTube ו־Vimeo: מפות וסרטונים שמוצגים בהזמנות ובאתר.',
             ],
           },
@@ -347,6 +363,20 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'רישום בכניסה: כשמשפחה מגיעה, עמדת הכניסה רושמת איזו משפחה הגיעה, כמה אנשים, מתי, ואת השם שנתנו לעמדה. הצוות פותח את העמדה מקישור שהמארח משתף, בלי חשבון; בעמדה אפשר למצוא את אורחי האירוע לפי שם או טלפון ולראות את השולחן של כל משפחה. קוד הכניסה שבמדריך של האורח (ועל כרטיסי שולחן מודפסים) נגזר מהקישור האישי שלו, ומזהה את המשפחה רק בעמדה של אותו אירוע.',
               'הושבה מחדש: העברות של משפחות בין שולחנות (מאיפה לאן, מתי, והסיבה שהמארח כתב) נשמרות בהיסטוריה של סידור השולחנות, יחד עם הסידור.',
               'כמה זמן: רישומי הכניסה נמחקים 30 יום אחרי תאריך האירוע, ורישום שבוטל נמחק אחרי יום.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'studio',
+        heading: '7ג. עיון המשפחה, הצעות עיצוב, גרסאות והקראה',
+        body: [
+          {
+            list: [
+              'עיון המשפחה: מארח יכול לשלוח לבני המשפחה קישור פרטי לטיוטה של ההזמנה, כדי שיעירו עליה בלי חשבון. נשמרים ההערות, השם שכל אחד מקליד, מתי נכתבו, והתשובות של המארח; השם נשמר גם בדפדפן של אותו אדם כדי שלא יצטרך להקליד אותו שוב, עם מפתח אקראי שמאפשר לו למחוק את ההערה שלו (אנחנו שומרים רק גיבוב חד־כיווני שלו). הקישור עצמו נשמר רק כגיבוב חד־כיווני; המארח יכול לקבוע לו תפוגה, להחליף אותו או לבטל אותו בכל רגע. העמוד לא שולח אישורי הגעה ולא סופר אף אחד. ההערות נמחקות 90 יום אחרי תאריך האירוע (המארח יכול למחוק אותן קודם), והערות שנמחקו אחרי 30 יום.',
+              'הצעות עיצוב ("עצבו לי"): התמונות שהמארח בוחר מוקטנות במכשיר שלו, וכשהחבילה כוללת את זה נשלחות ל־Anthropic יחד עם סוג האירוע, השפות ומצב הרוח שהמארח הקליד (בלי שמות ובלי פרטים אחרים), כדי להציע שלושה עיצובים. אנחנו לא שומרים דבר מהבקשה הזו, והתמונות לא נכתבות ליומנים שלנו. עיצוב שהמארח בוחר מעלה להזמנה את התמונות שהוא משתמש בהן, כמו כל תמונה שהמארח מוסיף.',
+              'גרסאות: מלבד כל גרסה שפורסמה, אנחנו שומרים עותקים של טיוטת ההזמנה בזמן העריכה (לכל היותר פעם ב־10 דקות, ולפני שחזור או עיצוב חדש), כדי שאפשר יהיה לשחזר כל אחד מהם. הם נשמרים 90 יום, עד 60 להזמנה; גרסאות שפורסמו נשמרות עם ההזמנה.',
+              'הקראת ההזמנה: כשהחבילה כוללת את זה, הטקסטים של ההזמנה עצמה (השמות, התאריך, המקומות והטקסטים של המארח — לעולם לא פרטים של אורחים) נשלחים ל־Microsoft (Azure AI Speech, באיחוד האירופי) פעם אחת לכל שפה כשהמארח מפרסם, וההקראה שמתקבלת נשמרת עם הקבצים של ההזמנה עד שהטקסטים משתנים או שההזמנה או החשבון נמחקים. אורח שמאזין כשאין הקראה כזו, המכשיר שלו עצמו מקריא את הטקסט. ההאזנה לא נרשמת בשום מקום.',
             ],
           },
         ],

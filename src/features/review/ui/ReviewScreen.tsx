@@ -29,7 +29,6 @@ import {
   themeMode,
   themeVars,
 } from '@/features/invitations/renderer/theme';
-import { getTemplate } from '@/features/invitations/templates/registry';
 import { reviewGuestEn } from '@/lib/i18n/review-guest.en';
 import { reviewGuestHe, type ReviewGuestDict } from '@/lib/i18n/review-guest.he';
 import { fill, localeText, type LocaleText } from '@/lib/i18n/guest';
@@ -177,7 +176,7 @@ export function ReviewScreen({
   const [state, setState] = useState(initial);
   const [gone, setGone] = useState<Gone | null>(null);
   const doc = state.draft;
-  const template = (getTemplate(state.templateId) ?? getTemplate(initial.templateId))!.manifest;
+  const template = state.template;
   const locale: Locale = lang && doc.locales.includes(lang) ? lang : doc.defaultLocale;
   const t: Text = useMemo(
     () => localeText(locale === 'en' ? 'en' : 'he', locale === 'en' ? reviewGuestEn : reviewGuestHe),

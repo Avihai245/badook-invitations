@@ -2,7 +2,7 @@
  * The draft review's shapes (isomorphic): a comment pinned to a spot of a section of the draft, its
  * replies (the host's and the family's), and what the host's screen and the review page get.
  */
-import type { InvitationDocument } from '../invitations/contracts/types';
+import type { InvitationDocument, TemplateManifest } from '../invitations/contracts/types';
 import type { RealtimeInfo } from '@/lib/live/types';
 
 export interface ReviewReply {
@@ -59,6 +59,8 @@ export interface HostReview {
 export interface ReviewState {
   draft: InvitationDocument;
   templateId: string;
+  /** the draft's design (the page renders it without shipping every design to the family's phones) */
+  template: TemplateManifest;
   updatedAt: string;
   expiresAt: string | null;
   comments: ReviewComment[];
