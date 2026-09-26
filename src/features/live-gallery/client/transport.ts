@@ -173,6 +173,7 @@ export async function tusUpload(
   }
 
   const chunk = GALLERY.limits.resumableChunk;
+  let conflicts = 0;
   while (s.offset < blob.size) {
     const piece = blob.slice(s.offset, Math.min(blob.size, s.offset + chunk));
     const from = s.offset;
@@ -184,8 +185,10 @@ export async function tusUpload(
       (loaded) => onProgress(from + loaded),
       signal,
     );
-    if (res.status === 409) {
-      // the server has a different offset: ask it and continue from there
+    if (res.status === 409 || res.status === 423) {
+      // the server has a different offset (or is still finishing the last request): ask it and
+      // continue from there — a few times; the queue retries later if it keeps disagreeing
+      if (++conflicts > 3) throw new UploadFailure('server');
       const head = await xhr('HEAD', s.location!, base, null, undefined, signal, 30_000);
       if (head.status < 200 || head.status >= 300)
         throw new UploadFailure(classify(head.status, head.text) === 'expired' ? 'expired' : 'server');
@@ -193,6 +196,7 @@ export async function tusUpload(
       await save(s);
       continue;
     }
+    conflicts = 0;
     if (res.status < 200 || res.status >= 300) {
       const outcome = classify(res.status, res.text);
       if (outcome === 'done') return;
