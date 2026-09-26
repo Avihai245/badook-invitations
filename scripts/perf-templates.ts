@@ -4,7 +4,10 @@
  *
  *   LCP  < 2.5 s   the largest paint before the guest's first tap (the cover, as guests first see it)
  *   CLS  < 0.1     layout shifts over the whole visit: the load, the opening, a scroll to the end
- *   FPS  ≥ 55      the median frame rate while a finger scrolls through the whole invitation
+ *   FPS  ≥ 55      scroll smoothness: the median rate of frames the compositor presents while the
+ *                  whole invitation is scrolled (a trace's DrawFrame events). The main thread's frame
+ *                  rate over the same scroll (requestAnimationFrame) is reported beside it: what
+ *                  scroll-linked work there gets — reveals, main-thread animations — not the scroll
  *
  * Conditions: a 390×844 @2x phone (touch), Lighthouse's mobile network — 4G: 150 ms RTT, 1.6 Mbps
  * down, 750 Kbps up, applied per request the way DevTools and Lighthouse do (562.5 ms, ×0.9) — and a
@@ -66,9 +69,13 @@ interface Measure {
   fcpMs: number | null;
   cls: number;
   shifts: { value: number; at: number; sources: string[] }[];
+  /** frames presented while scrolling (the compositor): median, and the slowest 5% */
   fps: number | null;
   fpsP5: number | null;
   frames: number;
+  /** the main thread's frames over the same scroll (requestAnimationFrame): median rate */
+  mainFps: number | null;
+  mainFrames: number;
   longFrames: number;
   longTasks: number;
   scrolled: number;
@@ -254,6 +261,17 @@ async function measure(browser: Browser, url: string): Promise<Measure> {
       };
       requestAnimationFrame(tick);
     });
+    // the frames the compositor presents meanwhile: a trace's DrawFrame events
+    const trace: { name: string; ts: number }[] = [];
+    const onData = (e: { value: Record<string, unknown>[] }) => {
+      for (const v of e.value) trace.push({ name: String(v.name), ts: Number(v.ts) });
+    };
+    cdp.on('Tracing.dataCollected', onData);
+    const traced = new Promise<void>((r) => cdp.once('Tracing.tracingComplete', () => r()));
+    await cdp.send('Tracing.start', {
+      categories: 'disabled-by-default-devtools.timeline.frame',
+      transferMode: 'ReportEvents',
+    });
     const started = Date.now();
     for (let y = 0; y < target - 40 && Date.now() - started < 40_000;) {
       await cdp.send('Input.synthesizeScrollGesture', {
@@ -265,6 +283,9 @@ async function measure(browser: Browser, url: string): Promise<Measure> {
       });
       y = await page.evaluate(() => window.scrollY);
     }
+    await cdp.send('Tracing.end');
+    await traced;
+    cdp.off('Tracing.dataCollected', onData);
     await page.waitForTimeout(400);
     const after = await page.evaluate(() => {
       const perf = (
@@ -299,8 +320,14 @@ async function measure(browser: Browser, url: string): Promise<Measure> {
       moving.push(t! - t0!);
       scrollMs += t! - t0!;
     }
-    const mid = median(moving);
-    const slow = percentile(moving, 95);
+    const draws = trace
+      .filter((e) => e.name === 'DrawFrame')
+      .map((e) => e.ts)
+      .sort((a, b) => a - b);
+    const presented = draws.slice(1).map((t, i) => (t - draws[i]!) / 1000);
+    const mid = median(presented);
+    const slow = percentile(presented, 95);
+    const mainMid = median(moving);
     return {
       ...loadNumbers,
       cls: clsOf(after.shifts),
@@ -309,7 +336,9 @@ async function measure(browser: Browser, url: string): Promise<Measure> {
         .map((s) => ({ value: Number(s.v.toFixed(4)), at: Math.round(s.t), sources: s.sources.slice(0, 3) })),
       fps: mid ? Math.min(60, 1000 / mid) : null,
       fpsP5: slow ? Math.min(60, 1000 / slow) : null,
-      frames: moving.length,
+      frames: draws.length,
+      mainFps: mainMid ? Math.min(60, 1000 / mainMid) : null,
+      mainFrames: moving.length,
       longFrames: moving.filter((d) => d > 50).length,
       longTasks: after.longTasks,
       scrolled: after.scrolled,
@@ -379,12 +408,14 @@ function markdown(rows: Row[], meta: Record<string, string>): string {
     `${meta.when} · ${meta.browser} · phone ${PHONE.width}×${PHONE.height} @${PHONE.dpr}x (touch) · ${NETWORK.label} · CPU ${CPU_SLOWDOWN}× slower`,
     '',
     `Budgets: LCP < ${BUDGET.lcpMs / 1000} s · CLS < ${BUDGET.cls} · scroll median ≥ ${BUDGET.fps} fps. ` +
-      'LCP: before the first tap (the cover). CLS: the whole visit. Scroll: a finger through the whole invitation.',
+      'LCP: before the first tap (the cover). CLS: the whole visit. Scroll: frames the compositor presents ' +
+      'while the whole invitation is scrolled; the main thread’s frame rate over the same scroll is shown ' +
+      'beside it (information, not a budget).',
     '',
     `**${rows.filter((r) => !r.failures.length).length} of ${rows.length} pages within budget.**`,
     '',
-    '| Template | Page | LCP (s) | LCP element | FCP (s) | CLS | Scroll fps (median · p5) | Long frames | Long tasks | Scrolled (px · px/s) | KB | Requests | Result |',
-    '| --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
+    '| Template | Page | LCP (s) | LCP element | FCP (s) | CLS | Scroll fps (median · p5) | Main-thread fps | Long frames | Long tasks | Scrolled (px · px/s) | KB | Requests | Result |',
+    '| --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
     ...rows.map((r) =>
       [
         '',
@@ -395,7 +426,8 @@ function markdown(rows: Row[], meta: Record<string, string>): string {
         s(r.fcpMs),
         r.cls.toFixed(3),
         r.fps === null ? '—' : `${r.fps.toFixed(1)} · ${r.fpsP5?.toFixed(1) ?? '—'}`,
-        `${r.longFrames}/${r.frames}`,
+        r.mainFps === null ? '—' : r.mainFps.toFixed(1),
+        `${r.longFrames}/${r.mainFrames}`,
         String(r.longTasks),
         `${r.scrolled} · ${r.scrollSpeed}`,
         String(r.kb),
@@ -480,7 +512,7 @@ async function main() {
         console.log(
           `${failures.length ? 'FAIL' : 'ok  '} ${template.padEnd(22)} ${doc.padEnd(10)} LCP ${
             m.lcpMs === null ? '—' : (m.lcpMs / 1000).toFixed(2)
-          }s  CLS ${m.cls.toFixed(3)}  ${m.fps?.toFixed(1) ?? '—'} fps  ${m.kb} KB${
+          }s  CLS ${m.cls.toFixed(3)}  ${m.fps?.toFixed(1) ?? '—'} fps (main ${m.mainFps?.toFixed(1) ?? '—'})  ${m.kb} KB${
             failures.length ? `  ← ${failures.join(', ')}` : ''
           }`,
         );
