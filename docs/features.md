@@ -110,3 +110,12 @@ having speech and without captions in a language is a publish warning.
 of editing, and the draft before a restore or a design concept. Saves are kept 90 days, 60 per invitation
 at most (the daily run); publishes always. The versions drawer filters them, previews any in a new tab,
 says what restoring would change per section, and restores into the draft (one undo step).
+
+## Accessibility of the guest's path (everyone)
+
+WCAG 2.1 AA, audited by `tests/e2e/a11y.spec.ts` (axe-core over the cover and sections of several designs,
+the RSVP form, a save-the-date, the table guide, the entrance station, the gallery's upload page and the
+review page; phone and desktop, Hebrew and English; it fails on anything new). Every invitation with
+motion has a "pause the animations" button (the corner opposite the music; in the review page's toolbar),
+which stops its endless loops and background videos for the visit; with reduced motion nothing loops and
+the button isn't there. While the cover is up only it takes the keyboard's focus.
