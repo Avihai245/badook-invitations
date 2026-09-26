@@ -370,7 +370,7 @@ export default function DigIt({ place, date }: SceneProps) {
       </Piece>
       <Piece
         vb={[0, 0, 160, 176]}
-        anim="sweep"
+        anim="swing"
         style={{
           left: '50%',
           top: `calc(${jibTop} + ${cm(card ? 3 : 4.4)})`,

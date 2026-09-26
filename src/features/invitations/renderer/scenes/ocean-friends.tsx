@@ -264,10 +264,10 @@ function Shell() {
   );
 }
 
-/** A column of bubbles (viewBox 0 0 40 120); they bob and shimmer. */
+/** A column of bubbles (viewBox 0 0 40 120); they rise, shimmer and fade, and come back from below. */
 function Bubbles({ delay = '0s', count = 5 }: { delay?: string; count?: number }) {
   return (
-    <g data-anim="float" style={{ animationDelay: delay, animationDuration: '3.4s' }}>
+    <g data-anim="rise" style={{ animationDelay: delay, animationDuration: '6s' }}>
       {Array.from({ length: count }, (_, i) => {
         const r = 4 + ((i * 7) % 5);
         const y = 110 - i * 24;

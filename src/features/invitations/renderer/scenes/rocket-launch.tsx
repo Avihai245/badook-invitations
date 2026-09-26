@@ -382,7 +382,7 @@ export default function RocketLaunch({ place }: SceneProps) {
       {/* small planets beside the names on wide heroes */}
       <Piece
         vb={[-20, -20, 40, 40]}
-        anim="float"
+        anim="orbit"
         style={{ ...beside('right', 56), top: '46%', width: cm(7) }}
       >
         <circle r="16" fill="#4FD1C5" />
@@ -390,7 +390,7 @@ export default function RocketLaunch({ place }: SceneProps) {
       </Piece>
       <Piece
         vb={[-20, -20, 40, 40]}
-        anim="float"
+        anim="orbit"
         style={{ ...beside('left', 58), top: '40%', width: cm(5), animationDelay: '-2s' }}
       >
         <circle r="16" fill="#FFD166" />

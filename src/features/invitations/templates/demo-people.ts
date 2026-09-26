@@ -43,6 +43,42 @@ const COUPLE: DemoPeople = {
  * grandmother's eightieth — instead of the event type's sample: by template id, then event type.
  */
 const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = {
+  // T1: little ones
+  'safari-pals': {
+    birthday: { primary: { he: 'יואב', en: 'Yoav' }, monogram: { he: 'יואב 1', en: 'YOAV 1' } },
+    brit: {
+      primary: { he: 'הדר ועומר', en: 'Hadar & Omer' },
+      parents: { he: 'סבא וסבתא: אורית ויוסי מזרחי', en: 'Grandparents Orit & Yossi Mizrahi' },
+      monogram: { he: 'ה&ע', en: 'H&O' },
+    },
+    baby_shower: { primary: { he: 'יעל', en: 'Yael' }, monogram: { he: 'י', en: 'Y' } },
+  },
+  'dig-it': { birthday: { primary: { he: 'איתן', en: 'Etan' }, monogram: { he: 'איתן 3', en: 'ETAN 3' } } },
+  'ocean-friends': {
+    birthday: { primary: { he: 'נוי', en: 'Noy' }, monogram: { he: 'נוי 4', en: 'NOY 4' } },
+    baby_shower: { primary: { he: 'שני', en: 'Shani' }, monogram: { he: 'ש', en: 'S' } },
+    brit: {
+      primary: { he: 'רוני ועמית', en: 'Roni & Amit' },
+      parents: { he: 'סבא וסבתא: דליה ושמעון לוי', en: 'Grandparents Dalia & Shimon Levi' },
+      monogram: { he: 'ר&ע', en: 'R&A' },
+    },
+  },
+  'rocket-launch': {
+    birthday: { primary: { he: 'אורי', en: 'Ori' }, monogram: { he: 'אורי 7', en: 'ORI 7' } },
+    bar_mitzvah: {
+      primary: { he: 'איתמר', en: 'Itamar' },
+      parents: { he: 'קרן ואלון שגיא', en: 'Keren & Alon Sagi' },
+      monogram: { he: 'א', en: 'I' },
+    },
+  },
+  'unicorn-dream': {
+    birthday: { primary: { he: 'מיקה', en: 'Mika' }, monogram: { he: 'מיקה 6', en: 'MIKA 6' } },
+    bat_mitzvah: {
+      primary: { he: 'אלה', en: 'Ella' },
+      parents: { he: 'רותם ויואב ברק', en: 'Rotem & Yoav Barak' },
+      monogram: { he: 'א', en: 'E' },
+    },
+  },
   // T4: grown-ups & golden years
   'tropical-tiki': {
     birthday: { primary: { he: 'יעל', en: 'Yael' }, monogram: { he: 'יעל 35', en: 'YAEL 35' } },

@@ -302,7 +302,7 @@ function Acacia({ x, y, s }: { x: number; y: number; s: number }) {
 
 function Butterfly({ delay }: { delay: string }) {
   return (
-    <g data-anim="float" style={{ animationDelay: delay }}>
+    <g data-anim="orbit" style={{ animationDelay: delay }}>
       <path d="M20 20C10 4 0 8 2 18s12 8 18 2zM20 20c10-16 20-12 18-2s-12 8-18 2z" style={{ fill: ACCENT }} />
       <path
         d="M20 20c-6 4-10 14-4 16s6-10 4-16zM20 20c6 4 10 14 4 16s-6-10-4-16z"
@@ -460,7 +460,7 @@ export default function SafariPals({ place }: SceneProps) {
       {/* the giraffe peeks in from the other side */}
       <Piece
         vb={[0, 0, 240, 240]}
-        anim="sway"
+        anim="wiggle"
         style={{
           right: cm(-3),
           top: card ? cm(10) : poster ? cm(5) : cm(11),

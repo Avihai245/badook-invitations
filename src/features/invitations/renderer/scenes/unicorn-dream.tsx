@@ -203,7 +203,13 @@ function Sparkles() {
   return (
     <g>
       {items.map((it, i) => (
-        <path key={i} d={it.d} fill={it.fill} data-anim="twinkle" style={{ animationDelay: it.delay }} />
+        <path
+          key={i}
+          d={it.d}
+          fill={it.fill}
+          data-anim={i % 4 ? 'twinkle' : 'pop'}
+          style={{ animationDelay: it.delay, transformBox: 'fill-box' }}
+        />
       ))}
     </g>
   );
@@ -326,7 +332,7 @@ export default function UnicornDream({ place }: SceneProps) {
       </Piece>
       <Piece
         vb={[0, 0, 40, 36]}
-        anim="float"
+        anim="rise"
         style={{
           right: card ? cm(40) : cm(48),
           bottom: `calc(${bank} + ${cm(card ? 14 : 22)})`,
@@ -338,7 +344,7 @@ export default function UnicornDream({ place }: SceneProps) {
       </Piece>
       <Piece
         vb={[0, 0, 40, 36]}
-        anim="float"
+        anim="rise"
         style={{
           right: card ? cm(34) : cm(40),
           bottom: `calc(${bank} + ${cm(card ? 20 : 30)})`,
