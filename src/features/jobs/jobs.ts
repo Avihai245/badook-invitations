@@ -5,6 +5,7 @@ import { processNoticeQueue } from '@/features/event-day/server/notify';
 import { insightsHousekeeping } from '@/features/insights/server/deps';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
+import { processGalleryNoticeQueue } from '@/features/live-gallery/server/notify';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { processQueue } from '@/features/whatsapp/sender';
@@ -58,7 +59,7 @@ export async function runDaily(now: Date) {
 
 /**
  * What is still queued for WhatsApp (a host closed the page mid-send, a retry that is due): the
- * invitations, and the table numbers (features/event-day).
+ * invitations, the table numbers (features/event-day) and the gallery links (features/live-gallery).
  */
 export async function runWhatsAppQueue(budgetMs: number) {
   const total = { sent: 0, failed: 0, retried: 0 };
@@ -66,10 +67,12 @@ export async function runWhatsAppQueue(budgetMs: number) {
   for (let round = 0; round < 4 && Date.now() < until; round++) {
     const r = await processQueue(null, 50);
     const t = await processNoticeQueue(null, 50);
-    total.sent += r.sent + t.sent;
-    total.failed += r.failed + t.failed;
-    total.retried += r.retried + t.retried;
-    if (r.sent + r.failed + r.retried + t.sent + t.failed + t.retried === 0) break;
+    const g = await processGalleryNoticeQueue(null, 50);
+    total.sent += r.sent + t.sent + g.sent;
+    total.failed += r.failed + t.failed + g.failed;
+    total.retried += r.retried + t.retried + g.retried;
+    if (r.sent + r.failed + r.retried + t.sent + t.failed + t.retried + g.sent + g.failed + g.retried === 0)
+      break;
   }
   return total;
 }

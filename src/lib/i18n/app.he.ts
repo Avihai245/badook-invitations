@@ -9,6 +9,7 @@ import { seatingHe } from './seating.he';
 import { liveGalleryHe } from './live-gallery.he';
 import { eventDayHe } from './event-day.he';
 import { insightsHe } from './insights.he';
+import { galleryNotifyHe } from './gallery-notify.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -28,6 +29,7 @@ export const he = {
   liveGallery: liveGalleryHe,
   eventDay: eventDayHe,
   insights: insightsHe,
+  galleryNotify: galleryNotifyHe,
   common: {
     close: 'סגירה',
     cancel: 'ביטול',

@@ -88,6 +88,9 @@ const ServerEnvSchema = z.object({
   // the table number's template (features/event-day: a guest's table and the map to it), once Meta
   // approved it (docs/whatsapp-setup.md); empty: hosts send it from their own WhatsApp instead
   INVITES_WHATSAPP_TABLE_TEMPLATE: z.string().trim().default(''),
+  // the gallery link's template (features/live-gallery: each guest's link to upload photos and see the
+  // album), once Meta approved it (docs/whatsapp-setup.md §9); empty: hosts send it from their own WhatsApp
+  INVITES_WHATSAPP_GALLERY_TEMPLATE: z.string().trim().default(''),
   INVITES_WHATSAPP_API_VERSION: z.string().trim().min(2).default('v26.0'),
   INVITES_WHATSAPP_API_BASE: z
     .url()

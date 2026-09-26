@@ -10,6 +10,7 @@ import { seatingEn } from './seating.en';
 import { liveGalleryEn } from './live-gallery.en';
 import { eventDayEn } from './event-day.en';
 import { insightsEn } from './insights.en';
+import { galleryNotifyEn } from './gallery-notify.en';
 
 /** Host-app UI strings, English. Same shape as app.he.ts (checked by the type). */
 export const en: AppDict = {
@@ -25,6 +26,7 @@ export const en: AppDict = {
   liveGallery: liveGalleryEn,
   eventDay: eventDayEn,
   insights: insightsEn,
+  galleryNotify: galleryNotifyEn,
   common: {
     close: 'Close',
     cancel: 'Cancel',
