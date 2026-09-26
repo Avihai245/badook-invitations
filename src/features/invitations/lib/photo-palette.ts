@@ -318,11 +318,28 @@ function darkTone(swatches: readonly Swatch[]): Swatch {
 
 const clampC = (c: number, max: number) => Math.min(max, Math.max(0, c));
 
+/** What each option must still be once a design's fixed colors are kept: light paper, an evening. */
+const TRUE_TO: Record<PhotoPaletteId, (p: Palette) => boolean> = {
+  light: (p) => relativeLuminance(p.bg) > 0.45,
+  dark: (p) => relativeLuminance(p.bg) < 0.12,
+  tinted: () => true,
+};
+
+/** Two options the host couldn't tell apart (every color within a small step). */
+const alike = (a: Palette, b: Palette) =>
+  (Object.keys(a) as (keyof Palette)[]).every((k) => {
+    // the distance in OKLab (≈ 0.02 is the smallest difference an eye tells apart)
+    const [x, y] = [rgbToOklab(...hexToRgb(a[k])), rgbToOklab(...hexToRgb(b[k]))];
+    return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]) < 0.04;
+  });
+
 /**
- * Three palettes from a photo's dominant colors — light (paper tinted by its main tone, the ink from
- * its shadows, its most vivid color as the accent), dark (an evening built on its deep tones, the
- * accent lifted) and tinted (paper in its second color, a different accent) — each repaired to AA.
- * `base`: a template's palette and the keys it lets the host change; the others stay as they are.
+ * Up to three palettes from a photo's dominant colors — light (paper tinted by its main tone, the
+ * ink from its shadows, its most vivid color as the accent), dark (an evening built on its deep
+ * tones, the accent lifted) and tinted (paper in its second color, a different accent) — each
+ * repaired to AA. `base`: a template's palette and the keys it lets the host change; the others stay
+ * as they are — an option those fixed colors rule out (an evening where the cards must stay light) or
+ * make the same as another is left out. With every key free, all three.
  */
 export function photoPalettes(
   swatches: readonly Swatch[],
@@ -385,13 +402,13 @@ export function photoPalettes(
     'heroText',
   ];
   const editable = new Set(base ? base.editable : all);
-  return (
+  const options = (
     [
       ['light', light],
       ['dark', evening],
       ['tinted', tinted],
     ] as const
-  ).map(([id, wish]) => {
+  ).map(([id, wish]): PhotoPalette => {
     // the template's fixed colors stay; the editable ones come from the photo
     const merged = Object.fromEntries(
       all.map((key) => [key, editable.has(key) || !base ? wish[key] : base.palette[key]]),
@@ -408,6 +425,9 @@ export function photoPalettes(
     if (editable.has('line')) repaired.line = mixHex(repaired.ink, repaired.bg, 0.82);
     return { id, palette: repairPalette(repaired, editable) };
   });
+  return options
+    .filter((o) => TRUE_TO[o.id](o.palette))
+    .filter((o, i, kept) => !kept.slice(0, i).some((k) => alike(k.palette, o.palette)));
 }
 
 // ─── the scrim a photo needs ─────────────────────────────────────────────────────────────────────

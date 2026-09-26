@@ -141,8 +141,13 @@ describe('colors from a photo', () => {
           palette: tokens.palette,
           editable: tokens.editablePaletteKeys,
         });
-        expect(options).toHaveLength(3);
+        // the options its fixed colors allow (an evening needs a dark page), none the same as another
+        expect(options.length).toBeGreaterThanOrEqual(1);
+        expect(options.length).toBe(editable.size === KEYS.length ? 3 : options.length);
+        expect(new Set(options.map((o) => o.id)).size).toBe(options.length);
         for (const { id: option, palette } of options) {
+          if (option === 'dark') expect(relativeLuminance(palette.bg)).toBeLessThan(0.12);
+          if (option === 'light') expect(relativeLuminance(palette.bg)).toBeGreaterThan(0.45);
           for (const key of KEYS)
             if (!editable.has(key))
               expect(palette[key], `${option}.${key} is the design's`).toBe(tokens.palette[key]);

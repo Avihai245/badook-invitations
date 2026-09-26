@@ -242,12 +242,9 @@ export function PhotoPaletteCard() {
     img.onload = () => {
       try {
         const { rgba } = pixelsOf(img);
+        // a design that lets only a key or two change gets the options its fixed colors allow
         const options = photoPalettes(extractSwatches(rgba), { palette: effective, editable });
-        // a design that lets only a key or two change can make two options the same: once each
-        const unique = options.filter(
-          (o, i) => options.findIndex((x) => ALL_KEYS.every((k) => x.palette[k] === o.palette[k])) === i,
-        );
-        setReading({ status: 'ready', url, options: unique });
+        setReading(options.length ? { status: 'ready', url, options } : { status: 'failed' });
       } catch {
         setReading({ status: 'failed' });
       }

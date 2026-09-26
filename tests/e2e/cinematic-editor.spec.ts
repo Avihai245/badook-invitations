@@ -161,6 +161,10 @@ test.describe('the cinematic editor', () => {
     const box = (await focal.boundingBox())!;
     await focal.click({ position: { x: box.width * 0.3, y: box.height * 0.7 } });
     await expect(mediaCard).toBeVisible();
+    if (SHOTS) {
+      await focal.scrollIntoViewIfNeeded();
+      await shot(page, '0-media');
+    }
 
     // ── full bleed, a zoom entrance, words ──
     await layouts.getByRole('radio', { name: 'רקע מלא' }).click();
@@ -172,6 +176,16 @@ test.describe('the cinematic editor', () => {
     const previewed = frame.locator('.cine[data-layout="full_bleed"][data-enter="zoom"]');
     await expect(previewed).toHaveAttribute('data-tr', 'words', { timeout: 15_000 });
     await saved(page);
+    if (SHOTS) {
+      // its colors: a dark band
+      await page
+        .getByRole('radiogroup', { name: 'צבעי הרקע והטקסט' })
+        .getByRole('radio', { name: 'רצועה כהה' })
+        .click();
+      await page.getByTestId('section-contrast').scrollIntoViewIfNeeded();
+      await shot(page, '1b-colors');
+      await page.keyboard.press('Control+z');
+    }
 
     // ── the opening: a curtain ──
     const designPanel = async (name: string) => {
@@ -193,6 +207,10 @@ test.describe('the cinematic editor', () => {
     await expect(openings.getByRole('radio', { name: 'מסך' })).toHaveAttribute('aria-checked', 'true');
     await shot(page, '2-opening');
     await saved(page);
+    if (SHOTS) {
+      await designPanel('סגנון ותנועה');
+      await shot(page, '2b-style');
+    }
 
     // ── the invitation's colors from a photo (read on the device, nothing uploaded) ──
     await designPanel('צבעים');
@@ -202,12 +220,16 @@ test.describe('the cinematic editor', () => {
       buffer: readFileSync('tests/fixtures/media/cine-sunset.jpg'),
     });
     const options = page.getByTestId('photo-palette-options');
-    await expect(options.locator('[data-palette-option]')).toHaveCount(3);
+    // sahar-bordeaux lets the host change its background, text and accent (its cards stay light):
+    // a light and a tinted option, no evening
+    await expect(options.locator('[data-palette-option]')).toHaveCount(2);
+    await expect(options.locator('[data-palette-option="dark"]')).toHaveCount(0);
+    await expect(options.getByText('בעיצוב הזה אפשר לשנות רק', { exact: false })).toBeVisible();
     await shot(page, '3-palette');
-    const evening = options.getByRole('button', { name: 'החלת הצבעים: ערב' });
-    const bg = await evening.evaluate((el) => getComputedStyle(el).backgroundColor);
-    await evening.click();
-    await expect(page.getByText('הצבעים הוחלו — ↶ מבטל')).toBeVisible();
+    const tinted = options.getByRole('button', { name: 'החלת הצבעים: גוון' });
+    const bg = await tinted.evaluate((el) => getComputedStyle(el).backgroundColor);
+    await tinted.click();
+    await expect(page.getByText('הצבעים הוחלו — ↶ מבטל', { exact: true })).toBeVisible();
     await saved(page);
     // the fonts that fit it
     await designPanel('גופנים');
@@ -223,7 +245,7 @@ test.describe('the cinematic editor', () => {
     await expect(dialog.getByRole('heading', { name: 'ההזמנה באוויר!' })).toBeVisible({ timeout: 20_000 });
     const url = await dialog.getByRole('textbox').inputValue();
 
-    // ── the guest: the curtain, then the section over its photo, in the colors of the sunset ──
+    // ── the guest: the curtain, then the section over its photo, in colors from the sunset ──
     const guest = await page.context().newPage();
     const guestErrors = collectErrors(guest);
     await open(guest, new URL(url).pathname);
@@ -241,7 +263,7 @@ test.describe('the cinematic editor', () => {
     ]);
     expect(Math.abs(fx! - 30), `focal x ${fx}`).toBeLessThanOrEqual(2);
     expect(Math.abs(fy! - 70), `focal y ${fy}`).toBeLessThanOrEqual(2);
-    // the page's background is the evening palette's
+    // the page's background is the tinted palette's
     const pageBg = await guest.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(pageBg).toBe(bg);
     // the countdown's numbers read left to right in Hebrew too
@@ -265,6 +287,36 @@ test.describe('the cinematic editor', () => {
       await section.evaluate((el) => el.scrollIntoView({ block: 'start' }));
       await guest.waitForTimeout(1500);
       await shot(guest, '5-guest-section');
+      // the editor in English: the section's cards and the design panels
+      await page.context().addCookies([{ name: 'ui_lang', value: 'en', url: new URL(page.url()).origin }]);
+      await open(page, `/app/invitations/${id}/edit`);
+      const go = async (name: string, tab: 'Sections' | 'Design') => {
+        if (phone) {
+          await page
+            .getByRole('navigation', { name: 'Editor mode' })
+            .getByRole('button', { name: tab === 'Sections' ? 'Edit' : 'Design' })
+            .click();
+          await page
+            .getByRole('dialog', { name: 'All sections' })
+            .getByRole('button', { name, exact: true })
+            .click();
+        } else {
+          await page.getByRole('tab', { name: tab }).click();
+          await page.getByRole('button', { name, exact: true }).click();
+        }
+        await expect(page.getByRole('heading', { level: 2, name })).toBeVisible();
+      };
+      await go('A moment of ours', 'Sections');
+      await page.getByRole('radiogroup', { name: 'Layout' }).scrollIntoViewIfNeeded();
+      await shot(page, 'en-1-section');
+      await page.getByRole('radiogroup', { name: 'Entrance' }).scrollIntoViewIfNeeded();
+      await shot(page, 'en-1b-motion');
+      await go('Envelope & opening', 'Design');
+      await shot(page, 'en-2-opening');
+      await go('Style & motion', 'Design');
+      await shot(page, 'en-2b-style');
+      await go('Fonts', 'Design');
+      await shot(page, 'en-4-fonts');
     }
     expect(errors).toEqual([]);
     expect(guestErrors).toEqual([]);
@@ -335,6 +387,77 @@ test.describe('without the cinematic feature', () => {
     expect(refused.status).toBe(403);
     expect(refused.body).toMatchObject({ code: 'feature_off', feature: 'cinematic' });
     expect(refused.body.issues).toEqual(expect.arrayContaining(['cover.opening']));
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('the photographic flagship (Lumière)', () => {
+  test('unlisted: not in a host’s gallery; its demo opens in gold dust over its photo, a photo per part', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    const phone = (page.viewportSize()?.width ?? 0) < 1024;
+    const errors = collectErrors(page);
+    if (!phone) {
+      await signUp(page);
+      await open(page, '/app/invitations/new');
+      await expect(page.getByRole('heading', { name: 'בחרו עיצוב' })).toBeVisible();
+      await expect(page.getByRole('button', { name: /סהר בורדו/ })).toHaveCount(1);
+      await expect(page.getByRole('button', { name: /לומייר/ })).toHaveCount(0);
+      // and the server won't make one for a host either
+      const created = await page.evaluate(async () => {
+        const res = await fetch('/api/invitations', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            templateId: 'lumiere',
+            eventType: 'wedding',
+            locales: ['he'],
+            defaultLocale: 'he',
+            hosts: { primary: { he: 'נועה' }, secondary: { he: 'איתי' } },
+            date: '2027-06-17',
+            startTime: '19:30',
+            timezone: 'Asia/Jerusalem',
+          }),
+        });
+        return { status: res.status, body: await res.json() };
+      });
+      expect(created).toMatchObject({ status: 400, body: { issues: ['templateId'] } });
+    }
+
+    // its seeded demo (reachable by its link like every demo)
+    await open(page, '/i/demo-lumiere/he');
+    const cover = page.locator('.cover[data-opening="gold_dust"]');
+    await expect(cover).toHaveAttribute('data-backdrop', '');
+    await expect.poll(() => loaded(cover.locator('img.co-photo')), { timeout: 15_000 }).toBe(true);
+    await shot(page, '6-lumiere-cover');
+    await page.locator('.cover-tap').click();
+    await expect(page.locator('.cover')).toHaveCount(0, { timeout: 10_000 });
+    const pictures: string[] = [];
+    for (const [id, layout] of [
+      ['quote', 'full_bleed'],
+      ['story', 'split_start'],
+      ['venues', 'parallax'],
+      ['rsvp', 'full_bleed'],
+    ] as const) {
+      const section = page.locator(`.cine[data-section="${id}"]`);
+      await expect(section, id).toHaveAttribute('data-layout', layout);
+      await section.scrollIntoViewIfNeeded();
+      const img = section.locator('img.cine-img').first();
+      await expect.poll(() => loaded(img), { timeout: 15_000 }).toBe(true);
+      pictures.push(
+        await img.evaluate(
+          (el: HTMLImageElement) => new URL(el.currentSrc).searchParams.get('url') ?? el.currentSrc,
+        ),
+      );
+    }
+    // a different photo for every part
+    expect(new Set(pictures).size).toBe(pictures.length);
+    // the date is a dark band of its own
+    await expect(page.locator('.cine[data-section="when"]')).toHaveAttribute('data-theme', 'dark');
+    await page.locator('.cine[data-section="rsvp"]').evaluate((el) => el.scrollIntoView({ block: 'start' }));
+    await page.waitForTimeout(1500);
+    await shot(page, '7-lumiere-rsvp');
     expect(errors).toEqual([]);
   });
 });
