@@ -3,6 +3,7 @@ import { getEventFeatures, setEventFeature, type FlagDeps } from '@/features/fla
 import {
   FEATURES,
   NO_OVERRIDES,
+  OPT_IN,
   PACKAGE_FEATURES,
   effectiveFeatures,
   packageFor,
@@ -53,7 +54,36 @@ describe('what an event may use', () => {
     expect(effectiveFeatures(input()).has('live_gallery')).toBe(false);
     expect(effectiveFeatures(input({ plan: 'pro' })).has('live_gallery')).toBe(true);
     expect(effectiveFeatures(input({ plan: 'pro' })).has('projector')).toBe(false);
-    expect(effectiveFeatures(input({ plan: 'business' })).size).toBe(FEATURES.length);
+    // everything — but face search, which the host turns on themselves
+    expect(effectiveFeatures(input({ plan: 'business' })).size).toBe(FEATURES.length - OPT_IN.length);
+    expect(
+      effectiveFeatures(input({ plan: 'business', overrides: { off: [], grant: [], on: [...OPT_IN] } })).size,
+    ).toBe(FEATURES.length);
+  });
+
+  it('face search is never on by default: the host turns it on, and off again', () => {
+    const business = input({ plan: 'business' });
+    expect(OPT_IN).toEqual(['face_albums']);
+    expect(effectiveFeatures(business).has('face_albums')).toBe(false);
+    expect(whyOff('face_albums', business)).toBe('switched_off');
+    const on = input({ plan: 'business', overrides: { off: [], grant: [], on: ['face_albums'] } });
+    expect(whyOff('face_albums', on)).toBeNull();
+    // turned on but switched off again: off wins
+    expect(
+      whyOff(
+        'face_albums',
+        input({ plan: 'business', overrides: { off: ['face_albums'], grant: [], on: ['face_albums'] } }),
+      ),
+    ).toBe('switched_off');
+    // without the package, the package is what's missing (turning it on wouldn't help)
+    expect(whyOff('face_albums', input({ plan: 'pro' }))).toBe('plan');
+    expect(
+      whyOff('face_albums', input({ plan: 'pro', overrides: { off: [], grant: [], on: ['face_albums'] } })),
+    ).toBe('plan');
+    // admins too must turn it on
+    expect(whyOff('face_albums', input({ admin: true }))).toBe('switched_off');
+    // only OPT_IN features are kept in the "on" list
+    expect(readOverrides({ on: ['face_albums', 'seating'] }).on).toEqual(['face_albums']);
   });
 
   it('the host switches a feature off for the event; the platform grants one beyond the plan', () => {
@@ -82,8 +112,9 @@ describe('what an event may use', () => {
     expect(readOverrides({ off: ['seating', 'seating', 'nope', 3], grant: 'x' })).toEqual({
       off: ['seating'],
       grant: [],
+      on: [],
     });
-    expect(readOverrides(null)).toEqual({ off: [], grant: [] });
+    expect(readOverrides(null)).toEqual({ off: [], grant: [], on: [] });
   });
 });
 

@@ -127,6 +127,30 @@ begin
   return public.gallery_item_json(v);
 end $$;
 
+-- ─── face search: the host turns it on ───────────────────────────────────────────────────────────
+
+-- Face search is never on by default, whatever the plan (src/features/flags OPT_IN): the host turns it
+-- on for their event (p_on: added to the event's `on` list and taken off its `off` list) or off (the
+-- other way round — which erases the event's face data, by the trigger below). null when the event
+-- isn't theirs. Returns the event's overrides.
+create function public.invitation_feature_on(p_id uuid, p_owner uuid, p_feature text, p_on boolean)
+returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  v jsonb;
+begin
+  if p_feature !~ '^[a-z_]{2,40}$' then
+    raise exception 'invitation_feature_on: bad feature';
+  end if;
+  update public.invitations i
+  set features = jsonb_set(
+    jsonb_set(i.features, '{on}', public.feature_list_set(i.features -> 'on', p_feature, p_on)),
+    '{off}', public.feature_list_set(i.features -> 'off', p_feature, not p_on))
+  where i.id = p_id and i.owner_id = p_owner
+  returning i.features into v;
+  return v;
+end $$;
+
 -- ─── face search: tables ────────────────────────────────────────────────────────────────────────
 
 -- One face in one of the gallery's photos, found by a browser: where it is (fractions of the photo's
@@ -642,6 +666,7 @@ begin
   end loop;
   -- what the server calls
   foreach f in array array[
+    'public.invitation_feature_on(uuid, uuid, text, boolean)',
     'public.gallery_owner_add(uuid, uuid, jsonb, int)',
     'public.gallery_owner_add_done(uuid, uuid, uuid, boolean, jsonb)',
     'public.gallery_owner_film(uuid, uuid, int)',

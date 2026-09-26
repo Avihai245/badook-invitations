@@ -481,12 +481,31 @@ describe('face search', () => {
       0.6,
     ]);
     await commit('gallery_face_leave_out', [inv, face(12), 0.6]);
-    await commit('invitation_feature_off', [inv, OWNER, 'face_albums', true]);
+    // the host turns it on (never on by default), then off: its data goes at once
+    expect(await commit('invitation_feature_on', [inv, OTHER, 'face_albums', true])).toBeNull();
+    expect(await commit('invitation_feature_on', [inv, OWNER, 'face_albums', true])).toMatchObject({
+      on: ['face_albums'],
+      off: [],
+    });
+    expect(
+      (
+        await one<{ n: number }>(`select count(*)::int as n from gallery_faces where invitation_id = $1`, [
+          inv,
+        ])
+      ).n,
+    ).toBeGreaterThan(0);
+    expect(await commit('invitation_feature_on', [inv, OWNER, 'face_albums', false])).toMatchObject({
+      on: [],
+      off: ['face_albums'],
+    });
     for (const t of ['gallery_faces', 'gallery_face_scans', 'gallery_face_optouts'])
       expect(
         (await one<{ n: number }>(`select count(*)::int as n from ${t} where invitation_id = $1`, [inv])).n,
       ).toBe(0);
-    await commit('invitation_feature_off', [inv, OWNER, 'face_albums', false]);
+    await commit('invitation_feature_on', [inv, OWNER, 'face_albums', true]);
+    await expect(commit('invitation_feature_on', [inv, OWNER, 'Face Albums!', true])).rejects.toThrow(
+      /bad feature/,
+    );
   });
 
   it('keeps face data 30 days after the event, then erases it (and for events without the feature)', async () => {
@@ -926,6 +945,7 @@ describe('privileges', () => {
           /permission denied/,
         );
       for (const sql of [
+        `select public.invitation_feature_on('${inv}', '${OWNER}', 'face_albums', true)`,
         `select public.gallery_owner_add('${inv}', '${OWNER}', '{}'::jsonb, 1)`,
         `select public.gallery_owner_add_done('${inv}', '${OWNER}', '${randomUUID()}', true, '{}'::jsonb)`,
         `select public.gallery_owner_film('${inv}', '${OWNER}', 1)`,

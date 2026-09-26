@@ -44,7 +44,10 @@ fonts aren't part of it: they set ordinary colors and fonts.
 ## Face search — "the photos I'm in" (`face_albums`, biometric data)
 
 Faces are biometric data — "sensitive information" under the Privacy Protection Law (amendment 13). The
-feature stays off everywhere until `INVITES_FACE_ALBUMS=on`, which should follow a legal review. When on:
+feature stays off everywhere until `INVITES_FACE_ALBUMS=on`, which should follow a legal review. Even then
+it is never on by default: it is the one **opt-in** feature (`OPT_IN` in `src/features/flags/features.ts`)
+— the host turns it on for their event in the gallery tab (`invitation_feature_on`, the event's `on`
+list), and turning it off erases the event's face data at once. When on:
 
 - **Guests** (the gallery page, `/e/<slug>/upload`): "Find the photos I'm in" → an explicit consent screen
   (what is processed, that it happens on the phone, how long anything is kept, a link to the privacy

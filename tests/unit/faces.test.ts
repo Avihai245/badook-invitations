@@ -337,11 +337,12 @@ describe('guests’ face search', () => {
 });
 
 describe('the host’s face search', () => {
+  // the host turned face search on (it never is by default)
   const input = (over: Partial<FeatureInput> = {}): FeatureInput & { ownerId: string } => ({
     ownerId: OWNER,
     plan: 'business',
     admin: false,
-    overrides: NO_OVERRIDES,
+    overrides: { ...NO_OVERRIDES, on: ['face_albums'] },
     available: ALL,
     ...over,
   });

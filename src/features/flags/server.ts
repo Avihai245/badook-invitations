@@ -4,7 +4,14 @@ import { effectivePlan, isPlanId, type AccountPlanState } from '@/features/billi
 import { serverEnv, type ServerEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import type { FlagDeps } from './api';
-import { FEATURES, effectiveFeatures, readOverrides, type Feature, type FeatureInput } from './features';
+import {
+  FEATURES,
+  effectiveFeatures,
+  isOptIn,
+  readOverrides,
+  type Feature,
+  type FeatureInput,
+} from './features';
 
 /**
  * What this deployment offers: every feature but those switched off here (INVITES_FEATURES_OFF), the
@@ -65,13 +72,21 @@ export async function featuresFor(invitationId: string): Promise<Set<Feature>> {
 export const flagDeps: FlagDeps = {
   input: featureInput,
   async setOff(invitationId, ownerId, feature, off) {
-    const { data, error } = await serviceDb().rpc('invitation_feature_off', {
-      p_id: invitationId,
-      p_owner: ownerId,
-      p_feature: feature,
-      p_off: off,
-    });
-    if (error) throw new Error(`invitation_feature_off: ${error.message}`);
+    // an OPT_IN feature is turned on (and off) explicitly: its own list, and the off list besides
+    const { data, error } = isOptIn(feature)
+      ? await serviceDb().rpc('invitation_feature_on', {
+          p_id: invitationId,
+          p_owner: ownerId,
+          p_feature: feature,
+          p_on: !off,
+        })
+      : await serviceDb().rpc('invitation_feature_off', {
+          p_id: invitationId,
+          p_owner: ownerId,
+          p_feature: feature,
+          p_off: off,
+        });
+    if (error) throw new Error(`invitation_feature_${isOptIn(feature) ? 'on' : 'off'}: ${error.message}`);
     return data ? readOverrides(data) : null;
   },
 };

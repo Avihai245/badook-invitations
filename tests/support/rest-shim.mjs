@@ -144,6 +144,7 @@ const FUNCTIONS = new Set([
   'seating_notice_pending',
   'event_day_maintenance',
   // the highlights film and face search (supabase/migrations/*_gallery_film_faces.sql)
+  'invitation_feature_on',
   'gallery_owner_add',
   'gallery_owner_add_done',
   'gallery_owner_film',
