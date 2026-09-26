@@ -176,3 +176,108 @@ curl -sS https://invitations.badooks.com/api/partner/v1/discounts \
   -H "Content-Type: application/json" \
   -d '{"externalId":"be-test-1","percent":15,"until":"2026-12-31"}'
 ```
+
+## אולמות: תוכנית האולם לסידור השולחנות
+
+בעל אולם שפותח משתמשים ללקוחות שלו יכול לשלוח **פעם אחת** את תוכנית האולם, ולשייך אליה את הלקוחות. כשלקוח כזה פותח את "סידור שולחנות" באירוע שלו, המפה כבר מוכנה עם התוכנית של האולם, בקנה מידה נכון אם נשלח רוחב האולם, והוא לא צריך להתעסק בזה. הלקוח יכול להחליף את התוכנית באירוע שלו בכל רגע, בלי שזה משנה משהו באולם או אצל לקוחות אחרים.
+
+### יצירת אולם / עדכון: `PUT /api/partner/v1/venues/{venueId}`
+
+`venueId` הוא המזהה של האולם ב־Badook Events: אותיות באנגלית, ספרות ו־`. _ : ~ -`, עד 200 תווים.
+
+```json
+{
+  "name": "אולמי הגן",
+  "address": "הרצל 1, ראשון לציון",
+  "widthMeters": 36.5,
+  "floorPlan": { "url": "https://files.badook-events.example/halls/17/plan.pdf" }
+}
+```
+
+| שדה | חובה | הסבר |
+|---|---|---|
+| `name` | ביצירה | שם האולם, עד 120 תווים. |
+| `address` | לא | כתובת, עד 300 תווים. |
+| `widthMeters` | לא (מומלץ) | כמה מטרים **רוחב התוכנית כולה** (מקצה התמונה לקצה). ממנו מחושב קנה המידה, והשולחנות מוצגים על התוכנית בגודל האמיתי. בלעדיו הלקוח יכול לכייל בעצמו. |
+| `floorPlan` | לא | התוכנית: `{ "url": "https://…" }` (השרת שלנו מוריד את הקובץ), או `{ "base64": "…" }` (אפשר גם `data:…;base64,…`). |
+
+- **קבצים:** PNG, JPEG, WebP או PDF (העמוד הראשון), עד **15MB**. הסוג נקבע לפי תוכן הקובץ, לא לפי השם או `contentType`. קובץ PDF הופך לתמונה בדפדפן של הלקוח בפעם הראשונה שהוא פותח את סידור השולחנות.
+- **`url`:** רק `https`, בפורט הרגיל (443), בלי שם משתמש וסיסמה בכתובת, וכתובת ציבורית באינטרנט (לא רשת פנימית). עד 3 הפניות (redirect), וההורדה צריכה להסתיים תוך 15 שניות. כתובת חתומה לזמן קצוב (למשל מ־S3) מתאימה, כי הקובץ נשמר אצלנו מיד.
+- **קבצים גדולים:** מומלץ לשלוח `url`. `base64` מגדיל את הבקשה בשליש, ובקשה גדולה מאוד עלולה להיחסם בדרך (413).
+- **עדכון:** רק השדות שנשלחים משתנים. `null` מוחק את `address`, `widthMeters` או `floorPlan`. תוכנית חדשה מחליפה את הקודמת: אירועים שכבר התחילו לסדר עם הקודמת ממשיכים איתה, ואירועים חדשים מקבלים את החדשה. הלקוח יכול לעבור לתוכנית החדשה במסך "תוכנית האולם".
+
+תשובה: `201` לאולם חדש, `200` לאולם קיים שעודכן.
+
+```json
+{
+  "ok": true,
+  "created": true,
+  "venue": {
+    "venueId": "hall-17",
+    "name": "אולמי הגן",
+    "address": "הרצל 1, ראשון לציון",
+    "widthMeters": 36.5,
+    "floorPlan": {
+      "url": "https://….supabase.co/storage/v1/object/public/venue-plans/venues/…/….pdf",
+      "contentType": "application/pdf",
+      "width": null,
+      "height": null,
+      "bytes": 482113,
+      "updatedAt": "2026-09-26T10:00:00Z"
+    },
+    "users": 0,
+    "createdAt": "2026-09-26T10:00:00Z",
+    "updatedAt": "2026-09-26T10:00:00Z"
+  }
+}
+```
+
+`width` ו־`height` הם גודל התמונה בפיקסלים (`null` ל־PDF). `users` הוא מספר המשתמשים שמשויכים לאולם.
+
+### פרטי אולם: `GET /api/partner/v1/venues/{venueId}`
+
+התשובה: `{ "ok": true, "venue": { … } }` כמו למעלה, או `404 not_found`.
+
+### שיוך משתמש לאולם: `venueId` ב־`POST /users` וב־`PATCH /users`
+
+- ב־**`POST /api/partner/v1/users`** אפשר להוסיף `"venueId": "hall-17"`: המשתמש נפתח (או מתעדכן) ומשויך לאולם. אולם שלא קיים מחזיר `404 venue_not_found`, ושום משתמש לא נוצר. לכן שולחים קודם `PUT /venues/{venueId}`.
+- ב־**`PATCH /api/partner/v1/users`** אפשר לשלוח `venueId` (עם `email` או בלעדיו) כדי להעביר משתמש לאולם אחר, או `"venueId": null` כדי לבטל את השיוך. זה עובד גם למשתמש שמנהל את הכניסה בעצמו (`userManaged: true`).
+- בכל התשובות שבהן מופיע `user` יש גם `venueId` (או `null`).
+
+```json
+{ "externalId": "be-12345", "venueId": "hall-17" }
+```
+
+משתמש שייך לאולם אחד. שיוך חדש מחליף את הקודם.
+
+### שגיאות נוספות
+
+| קוד | `code` | מה זה אומר |
+|---|---|---|
+| 400 | `invalid` | למשל `venueId` לא תקין, אולם חדש בלי `name`, `url` שאינו `https` או שמוביל לכתובת פנימית, או `base64` פגום. `fields` מפרט אילו. |
+| 404 | `venue_not_found` | (`POST`/`PATCH /users`) אין לכם אולם עם ה־`venueId` הזה. |
+| 413 | `too_large` | הקובץ גדול מ־15MB (`max` בבתים). |
+| 415 | `unsupported_type` | הקובץ אינו PNG, JPEG, WebP או PDF. |
+| 422 | `fetch_failed` | לא הצלחנו להוריד את `url` (למשל 404 אצלכם: `status`), או שההורדה לקחה יותר מ־15 שניות. |
+
+### בדיקה מהירה (curl)
+
+```bash
+# אולם עם תוכנית מכתובת, ורוחב של 36.5 מטר
+curl -sS -X PUT https://invitations.badooks.com/api/partner/v1/venues/hall-17 \
+  -H "Authorization: Bearer $INVITES_PARTNER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"אולמי הגן","widthMeters":36.5,"floorPlan":{"url":"https://files.example.com/hall-17.png"}}'
+
+# אותו אולם, תוכנית מקובץ מקומי
+curl -sS -X PUT https://invitations.badooks.com/api/partner/v1/venues/hall-17 \
+  -H "Authorization: Bearer $INVITES_PARTNER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"floorPlan\":{\"base64\":\"$(base64 -w0 plan.png)\"}}"
+
+# שיוך לקוח לאולם
+curl -sS -X PATCH https://invitations.badooks.com/api/partner/v1/users \
+  -H "Authorization: Bearer $INVITES_PARTNER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"externalId":"be-test-1","venueId":"hall-17"}'
+```

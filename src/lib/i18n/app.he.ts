@@ -5,6 +5,7 @@ import { guestsHe } from './guests.he';
 import { siteHe } from './site.he';
 import { helpHe } from './help.he';
 import { supportHe } from './support.he';
+import { seatingHe } from './seating.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -20,6 +21,7 @@ export const he = {
   billing: billingHe,
   accountPage: accountHe,
   editor: editorHe,
+  seating: seatingHe,
   common: {
     close: 'סגירה',
     cancel: 'ביטול',
