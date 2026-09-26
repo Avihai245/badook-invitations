@@ -34,6 +34,7 @@ import type { Issue } from '../../contracts/validate';
 import { cappedLength } from '../../lib/l10n';
 import { getAt } from '../paths';
 import { useEditor } from '../state/EditorProvider';
+import { useMachineText } from '../translations';
 
 // ─── preview highlight (a focused field outlines its node in the preview) ─────────────────────────
 
@@ -210,6 +211,7 @@ export function L10nField({
   const locales = doc.locales;
   const other = locales.find((l) => l !== locale && value?.[l]?.trim());
   const error = useIssueMessage(path, label, locale);
+  const machine = useMachineText(path, locale);
   // in a hidden section nothing shows, so an empty language isn't flagged (as in validateDocument)
   const hidden = /^sections\.(\d+)\./.exec(path);
   const inHiddenSection = !!hidden && doc.sections[Number(hidden[1])]?.enabled === false;
@@ -256,6 +258,26 @@ export function L10nField({
               <Copy aria-hidden size={12} strokeWidth={1.75} />
               {e.copyFrom[other]}
             </button>
+          ) : machine ? (
+            <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-0.5" data-machine-text="">
+              <span className="font-medium text-warning">
+                {machine.state === 'stale' ? e.translations.state.stale : e.translations.state.machine}
+              </span>
+              <button
+                type="button"
+                onClick={machine.approve}
+                className="font-semibold text-ink underline-offset-2 hover:underline"
+              >
+                {e.translations.approve}
+              </button>
+              <button
+                type="button"
+                onClick={machine.review}
+                className="text-muted underline-offset-2 hover:underline"
+              >
+                {e.f.languages.review}
+              </button>
+            </span>
           ) : (
             help
           )

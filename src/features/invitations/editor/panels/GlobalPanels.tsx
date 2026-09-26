@@ -1,12 +1,11 @@
 'use client';
 
-import { Check, Copy, ExternalLink, Pause, Play, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { Check, Copy, ExternalLink, Pause, Play, RotateCcw, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Badge,
   Button,
   Checkbox,
-  Dialog,
   Field,
   Input,
   Segmented,
@@ -40,8 +39,8 @@ import {
 } from '../fields/fields';
 import { LibraryFontPairs } from '../fields/font-library';
 import { AUDIO_TYPES, ImageField, UploadTile, useUploader } from '../fields/media';
-import { addLocale, removeLocale } from '../locales';
 import { useEditor, type PanelId } from '../state/EditorProvider';
+import { HebrewDateLanguages, LanguagesPanel } from './LanguagesPanel';
 
 /**
  * A track's licence as the template pack gives it — unless it's still a placeholder ("TBD …"),
@@ -646,6 +645,7 @@ function EventPanel() {
           label={f.event.hebrewDate}
           options={(['day', 'eve', 'off'] as const).map((v) => ({ value: v, label: f.event.hebrewDates[v] }))}
         />
+        <HebrewDateLanguages />
         <SelectField
           path="event.timeFormat"
           label={f.event.timeFormat}
@@ -658,99 +658,6 @@ function EventPanel() {
         />
         <RsvpDeadlineField />
       </PanelCard>
-    </>
-  );
-}
-
-// ─── languages ─────────────────────────────────────────────────────────────────────────────────
-
-function LanguagesPanel() {
-  const { doc, template, defaults, apply, update, setLocale } = useEditor();
-  const { t } = useUi();
-  const { toast } = useToast();
-  const e = t.editor;
-  const l = e.f.languages;
-  const [removing, setRemoving] = useState<Locale | null>(null);
-  return (
-    <>
-      <PanelCard title={e.cards.active}>
-        <ul className="flex flex-col gap-2">
-          {template.supportsLocales.map((locale) => {
-            const active = doc.locales.includes(locale);
-            const name = e.languageFull[locale];
-            return (
-              <li
-                key={locale}
-                className="flex h-12 items-center gap-3 rounded-card border border-line bg-surface px-3"
-              >
-                <span lang={locale} className="flex-1 text-[14px] font-semibold">
-                  {name}
-                </span>
-                {active ? (
-                  doc.locales.length > 1 ? (
-                    <Button variant="ghost" size="sm" icon={<Trash2 />} onClick={() => setRemoving(locale)}>
-                      {fmt(l.remove, { language: e.languageIn[locale] })}
-                    </Button>
-                  ) : (
-                    <Check aria-hidden size={16} className="text-success" />
-                  )
-                ) : (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    icon={<Plus />}
-                    onClick={() => {
-                      apply((d) => addLocale(d, locale, template, defaults), null);
-                      setLocale(locale);
-                      toast({ title: fmt(l.added, { language: e.languageIn[locale] }), variant: 'success' });
-                    }}
-                  >
-                    {fmt(l.add, { language: e.languageIn[locale] })}
-                  </Button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-        {doc.locales.length > 1 ? (
-          <>
-            <Field label={l.default}>
-              <Segmented<Locale>
-                value={doc.defaultLocale}
-                onValueChange={(v) => update('defaultLocale', v, null)}
-                options={doc.locales.map((v) => ({ value: v, label: e.languageFull[v] }))}
-              />
-            </Field>
-            <p className="text-[12px] text-muted">{l.switcherNote}</p>
-          </>
-        ) : null}
-      </PanelCard>
-      {removing ? (
-        <Dialog
-          open
-          onOpenChange={(o) => !o && setRemoving(null)}
-          title={fmt(l.removeTitle, { language: e.languageIn[removing] })}
-          description={fmt(l.removeBody, { language: e.languageIn[removing] })}
-          closeLabel={t.common.close}
-          footer={
-            <>
-              <Button variant="ghost" onClick={() => setRemoving(null)}>
-                {t.common.cancel}
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => {
-                  const target = removing;
-                  apply((d) => removeLocale(d, target), null);
-                  setRemoving(null);
-                }}
-              >
-                {fmt(l.remove, { language: e.languageIn[removing] })}
-              </Button>
-            </>
-          }
-        />
-      ) : null}
     </>
   );
 }

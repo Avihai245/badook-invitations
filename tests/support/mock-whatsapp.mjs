@@ -11,14 +11,26 @@
 // The live gallery's automatic check (POST /v1/messages with a photo, not streamed): answers JSON
 // scores like the real model would, and remembers each request apart (GET /__ai/gallery). A square
 // photo counts as suspicious (nsfw 0.62: held for the host), any other as fine — so tests can choose.
+//
+// The invitation's machine translation (POST /v1/messages, not streamed, the translation prompt):
+// answers every text as "[<language code>] <text>" — placeholders and glossary words kept — and
+// remembers each request (GET /__ai/translate).
+//
+// WhatsApp templates in languages Meta hasn't approved (MOCK_WHATSAPP_LANGS, e.g. "he,en,ru"; empty:
+// all) answer error 132001, like Meta does.
 import { createServer } from 'node:http';
 
 const port = Number(process.env.MOCK_WHATSAPP_PORT || 54340);
 const token = process.env.MOCK_WHATSAPP_TOKEN || 'e2e-whatsapp-token';
 const aiKey = process.env.MOCK_AI_KEY || 'e2e-anthropic-key';
+const approvedLangs = (process.env.MOCK_WHATSAPP_LANGS || '')
+  .split(',')
+  .map((l) => l.trim())
+  .filter(Boolean);
 const sent = [];
 const aiRequests = [];
 const galleryAiRequests = [];
+const translateRequests = [];
 let n = 0;
 
 const ANSWERS = [
@@ -55,6 +67,11 @@ async function answerAi(req, res) {
     ? body.messages[0].content.find((c) => c?.type === 'image')
     : null;
   if (photo) return answerGalleryCheck(res, body, photo);
+  if (
+    typeof body.system === 'string' &&
+    body.system.startsWith('You translate the texts of a digital invitation')
+  )
+    return answerTranslation(res, body);
   aiRequests.push({ headers: { version: req.headers['anthropic-version'] ?? null }, body });
   const question = String(body.messages?.at(-1)?.content ?? '');
   if (!body.stream || !Array.isArray(body.system) || body.messages?.at(-1)?.role !== 'user')
@@ -127,6 +144,31 @@ function answerGalleryCheck(res, body, photo) {
   });
 }
 
+function answerTranslation(res, body) {
+  let task = null;
+  try {
+    task = JSON.parse(String(body.messages?.[0]?.content ?? ''));
+  } catch {
+    // not the expected request
+  }
+  translateRequests.push({ model: body.model, structured: !!body.output_config?.format, task });
+  if (!task || !Array.isArray(task.texts) || !body.max_tokens)
+    return json(res, 400, {
+      type: 'error',
+      error: { type: 'invalid_request_error', message: 'bad request' },
+    });
+  const translations = task.texts.map((t) => ({ id: t.id, text: `[${task.to.code}] ${t.text}` }));
+  return json(res, 200, {
+    id: `msg_e2e_translate_${translateRequests.length}`,
+    type: 'message',
+    role: 'assistant',
+    model: body.model,
+    content: [{ type: 'text', text: JSON.stringify({ translations }) }],
+    stop_reason: 'end_turn',
+    usage: { input_tokens: 800, output_tokens: 600 },
+  });
+}
+
 const json = (res, status, body) => {
   res.writeHead(status, { 'content-type': 'application/json' });
   res.end(JSON.stringify(body));
@@ -141,6 +183,7 @@ createServer(async (req, res) => {
   }
   if (req.method === 'GET' && url.pathname === '/__ai') return json(res, 200, aiRequests);
   if (req.method === 'GET' && url.pathname === '/__ai/gallery') return json(res, 200, galleryAiRequests);
+  if (req.method === 'GET' && url.pathname === '/__ai/translate') return json(res, 200, translateRequests);
   if (req.method === 'POST' && url.pathname === '/v1/messages') return answerAi(req, res);
   const match = url.pathname.match(/^\/v[\d.]+\/(\d+)\/messages$/);
   if (req.method !== 'POST' || !match)
@@ -153,6 +196,15 @@ createServer(async (req, res) => {
   if (body.messaging_product !== 'whatsapp' || body.type !== 'template' || !body.template?.name)
     return json(res, 400, { error: { message: 'Invalid parameter', code: 100 } });
   const to = String(body.to);
+  const language = body.template.language?.code;
+  if (approvedLangs.length && !approvedLangs.includes(language))
+    return json(res, 404, {
+      error: {
+        message: '(#132001) Template name does not exist in the translation',
+        code: 132001,
+        error_data: { details: `template name (${body.template.name}) does not exist in ${language}` },
+      },
+    });
   if (to.endsWith('9999')) return json(res, 400, { error: { message: 'Rate limit hit', code: 130429 } });
   if (to.endsWith('0000'))
     return json(res, 400, {
@@ -168,7 +220,7 @@ createServer(async (req, res) => {
     id,
     to,
     template: body.template.name,
-    language: body.template.language?.code,
+    language,
     params: (bodyPart?.parameters ?? []).map((p) => p.text),
     button: button?.parameters?.[0]?.text ?? null,
     ref: body.biz_opaque_callback_data ?? null,

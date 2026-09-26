@@ -18,6 +18,7 @@ import { Rail } from './Rail';
 import { useEditor } from './state/EditorProvider';
 import { useAutosave } from './state/useAutosave';
 import { Topbar } from './Topbar';
+import { useTranslationsFlush } from './translations';
 import { VersionsDrawer } from './VersionsDrawer';
 
 type MobileView = 'edit' | 'preview';
@@ -51,6 +52,7 @@ export function EditorShell({
     },
     onUnauthorized: () => router.push(loginUrl()),
   });
+  useTranslationsFlush(autosave.flush);
 
   const frame = useRef<HTMLIFrameElement>(null);
   const channel = usePreviewChannel(frame, {

@@ -13,17 +13,20 @@ import {
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Dialog, Field, Hint, Input, cn, useToast } from '@/components/app';
+import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { SLUG_RE } from '../contracts/schemas';
-import { LOCALES } from '../contracts/types';
+import { LOCALES, RTL_LOCALES, type Locale } from '../contracts/types';
 import { validateDocument, type Issue } from '../contracts/validate';
 import { hostApi } from '../app/api';
 import { HelpFor } from '../app/HelpFor';
 import { posterColors } from '../app/poster';
 import { formatEventDate } from '../lib/dates';
+import { nativeName } from '../lib/locales';
 import { hostsText, issueText, sectionName } from './fields/fields';
 import { issueTarget } from './issues';
 import { useEditor } from './state/EditorProvider';
+import { useTranslations } from './translations';
 
 type SlugState = 'current' | 'checking' | 'available' | 'taken' | 'invalid';
 type PublishResponse =
@@ -58,6 +61,10 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
   );
   // The slug's own format is shown next to the field, not in the list.
   const listErrors = errors.filter((i) => i.path !== 'share.slug');
+  // machine translations the host hasn't approved: publishing waits for them (as the server does)
+  const tr = useTranslations();
+  const pendingTranslations = tr?.pending() ?? [];
+  const pendingLocales = [...new Set(pendingTranslations.map((r) => r.locale))];
 
   useEffect(() => {
     if (slug === meta.slug) return setSlugState('current');
@@ -116,21 +123,31 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
       return;
     }
     setPhase('review');
+    const failed = res.body as { code?: string; locales?: Locale[] } | null;
     if (res.status === 409) setSlugState('taken');
+    else if (res.status === 422 && failed?.code === 'translations_unreviewed')
+      setError(p.blockedTranslations);
     else if (res.status === 422) setShowIssues(true);
-    else if (res.status === 402)
-      setPremium((res.body as { code?: string } | null)?.code === 'branding' ? 'branding' : 'premium');
+    else if (res.status === 402 && failed?.code === 'languages')
+      setError(fmt(p.languagesRefused, { languages: (failed.locales ?? []).map(nativeName).join(', ') }));
+    else if (res.status === 402) setPremium(failed?.code === 'branding' ? 'branding' : 'premium');
     else setError(p.failed);
   };
 
   const blocked =
-    listErrors.length > 0 || slugState === 'taken' || slugState === 'invalid' || slugState === 'checking';
+    listErrors.length > 0 ||
+    pendingTranslations.length > 0 ||
+    slugState === 'taken' ||
+    slugState === 'invalid' ||
+    slugState === 'checking';
   // why "publish" can't be pressed yet (its hint while disabled)
   const blockedReason = listErrors.length
     ? p.blocked
-    : slugState === 'checking'
-      ? p.blockedChecking
-      : p.blockedSlug;
+    : pendingTranslations.length
+      ? p.blockedTranslations
+      : slugState === 'checking'
+        ? p.blockedChecking
+        : p.blockedSlug;
   const shownDate = (iso: string) => date(iso);
   const labelOf = (issue: Issue) => {
     if (issue.code === 'empty_section' && issue.sectionId) {
@@ -253,7 +270,35 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
           <h3 id="publish-issues" className="sr-only">
             {p.title}
           </h3>
-          {listErrors.length === 0 && warnings.length === 0 ? (
+          {pendingLocales.length && tr ? (
+            <ul className="mb-3 flex flex-col gap-2" data-testid="publish-translations">
+              {pendingLocales.map((l) => {
+                const n = pendingTranslations.filter((r) => r.locale === l).length;
+                return (
+                  <li
+                    key={l}
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+                  >
+                    <TriangleAlert aria-hidden size={16} strokeWidth={1.75} className="shrink-0" />
+                    <span className="min-w-0 flex-1">
+                      {plural(p.translations, n, { n: String(n), language: e.languageIn[l] })}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        onClose();
+                        tr.review(l);
+                      }}
+                    >
+                      {p.reviewTranslations}
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
+          {listErrors.length === 0 && warnings.length === 0 && !pendingLocales.length ? (
             <p className="flex items-center gap-2 rounded-card bg-success-bg px-3 py-2.5 text-[13px] font-semibold text-success">
               <CircleCheck aria-hidden size={16} strokeWidth={1.75} />
               {p.ready}
@@ -288,7 +333,7 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
           <h3 className="mb-2 text-[13px] font-semibold">{p.card}</h3>
           <div
             className="max-w-[320px] rounded-[10px] bg-[#DCF8C6] p-1.5 shadow-sm"
-            dir={doc.defaultLocale === 'he' ? 'rtl' : 'ltr'}
+            dir={RTL_LOCALES.includes(doc.defaultLocale) ? 'rtl' : 'ltr'}
           >
             <div className="overflow-hidden rounded-[8px] bg-white/70">
               <div className="grid h-[120px] place-items-center" style={{ background: colors.background }}>

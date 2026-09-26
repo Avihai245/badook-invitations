@@ -8,6 +8,7 @@ import { invitationsEnabled } from '@/lib/feature';
 import { getSessionUser } from '@/lib/supabase/session';
 import { LOCALES } from '../contracts/types';
 import { getTemplate } from '../templates/registry';
+import { translationRows } from '../translate/deps';
 import type { ApiResult, HostDeps } from './host-api';
 import { hostDb } from './host-db';
 
@@ -27,7 +28,13 @@ function revalidate(slug: string) {
   for (const lang of [...LOCALES, 'default']) revalidatePath(`/i/${slug}/${lang}`);
 }
 
-export const hostDeps: HostDeps = { db: hostDb, template: getTemplate, revalidate, now: () => Date.now() };
+export const hostDeps: HostDeps = {
+  db: hostDb,
+  template: getTemplate,
+  revalidate,
+  now: () => Date.now(),
+  translations: translationRows,
+};
 
 /**
  * Wraps a host API route: feature flag, JSON-only bodies (a cross-site form can't post here; with the

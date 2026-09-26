@@ -118,7 +118,6 @@ const FUNCTIONS = new Set([
   'set_guests_language',
   'translations_list',
   'translations_save',
-  'translations_set_status',
   'translations_mark_stale',
   'translations_discard',
   'translation_glossary_set',

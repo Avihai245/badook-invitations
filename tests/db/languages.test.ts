@@ -190,16 +190,27 @@ describe('machine translations and their review', () => {
     expect(stored[0]!.sourceHash).toBe(hash(2));
   });
 
-  it('approves one or all of a language, and never takes an unknown status', async () => {
-    expect(await commit('translations_set_status', [inv, OWNER, 'ru', ['hosts.parents'], 'approved'])).toBe(
-      1,
-    );
-    expect(await commit('translations_set_status', [inv, OWNER, 'ru', null, 'approved'])).toBe(1);
-    expect((await list()).rows.every((r) => r.status === 'approved')).toBe(true);
-    expect(await commit('translations_set_status', [inv, OTHER, 'ru', null, 'auto'])).toBeNull();
-    await expect(commit('translations_set_status', [inv, OWNER, 'ru', null, 'stale'])).rejects.toThrow(
-      /bad status/,
-    );
+  it('records the host’s approval — with the source it was approved against; anything else is a machine run', async () => {
+    const approved = (path: string, text: string) => ({ ...machine(path, text, 5), status: 'approved' });
+    expect(
+      await commit('translations_save', [
+        inv,
+        OWNER,
+        JSON.stringify([
+          approved('hosts.parents', 'Родители!'),
+          approved('sections.hero.data.eyebrow', 'Приглашаем'),
+        ]),
+      ]),
+    ).toBe(2);
+    const rows = (await list()).rows;
+    expect(rows.every((r) => r.status === 'approved' && r.sourceHash === hash(5))).toBe(true);
+    // a status the table doesn't know is taken as a machine run
+    await commit('translations_save', [
+      inv,
+      OWNER,
+      JSON.stringify([{ ...machine('hosts.parents', 'Родители!', 5), status: 'whatever' }]),
+    ]);
+    expect((await list()).rows[0]!.status).toBe('auto');
   });
 
   it('marks the ones whose source changed as stale, and discards what no longer applies', async () => {

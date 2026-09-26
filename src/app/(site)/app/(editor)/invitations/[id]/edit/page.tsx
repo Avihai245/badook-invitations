@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { loadAccount } from '@/features/billing/server/account';
+import { deploymentFeatures, featuresFor } from '@/features/flags/server';
 import { Editor } from '@/features/invitations/editor/Editor';
 import { fontFaceCss, libraryDisplayFamilies, templateFontFamilies } from '@/features/invitations/fonts';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
-import { cinematicFor } from '@/features/invitations/server/cinematic';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { getTemplate } from '@/features/invitations/templates/registry';
 import { serverEnv } from '@/lib/env';
@@ -32,13 +32,17 @@ export default async function EditInvitationPage({ params }: { params: Params })
   const entry = getTemplate(inv.templateId);
   if (!entry) notFound();
   const env = serverEnv();
-  const [uiLocale, account, publicBaseUrl, cinematic] = await Promise.all([
+  const [uiLocale, account, publicBaseUrl, features] = await Promise.all([
     getUiLocale(),
     loadAccount(user),
     // the address the host sees and copies (the site's own domain, not a placeholder)
     requestBaseUrl(),
-    // the preview shows what the event's guests will see (feature `cinematic`)
-    cinematicFor(inv.id),
+    // the preview shows what the event's guests will see (feature `cinematic`); the languages it may
+    // add (feature `languages`). A database hiccup: what this deployment offers.
+    featuresFor(inv.id).catch((err: unknown) => {
+      console.error('editor: the event’s features are unavailable', err);
+      return deploymentFeatures();
+    }),
   ]);
   const unpublishedChanges =
     inv.status === 'published' && JSON.stringify(inv.draft) !== JSON.stringify(inv.published);
@@ -75,7 +79,8 @@ export default async function EditInvitationPage({ params }: { params: Params })
         features={{
           removeBranding: account.limits.removeBranding,
           premiumTemplates: account.limits.premiumTemplates,
-          cinematic,
+          cinematic: features.has('cinematic'),
+          languages: features.has('languages'),
         }}
       />
     </>

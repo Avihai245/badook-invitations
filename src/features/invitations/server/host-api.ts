@@ -26,6 +26,7 @@ import { COUPLE_EVENTS } from '../templates/seed-copy';
 import type { TemplateEntry } from '../templates/registry';
 import { seedDocument } from '../templates/seed-document';
 import { isPremiumTemplate } from '../templates/tier';
+import { blockedLocales, type TranslationRow } from '../translate/fields';
 
 export { isPremiumTemplate };
 import type { HostDb } from './host-db';
@@ -62,6 +63,8 @@ export interface HostDeps {
    * everything (tests, scripts).
    */
   features?(invitationId: string | null): Promise<ReadonlySet<Feature>>;
+  /** the event's machine translations (translate/): publishing waits for their review. Absent: none */
+  translations?(invitationId: string, ownerId: string): Promise<TranslationRow[]>;
 }
 
 /**
@@ -314,6 +317,11 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
   if (errors.length) return fail(422, 'invalid', { issues: errors, warnings });
   const refused = await languagesRefused(draft.locales, id, deps);
   if (refused) return refused;
+  // a language with machine text the host hasn't approved (or whose source changed since) waits
+  if (deps.translations) {
+    const locales = blockedLocales(draft, await deps.translations(id, userId));
+    if (locales.length) return fail(422, 'translations_unreviewed', { locales });
+  }
   if (deps.entitlements) {
     const e = await deps.entitlements();
     if (isPremiumTemplate(entry.manifest) && !e.premiumTemplates) return fail(402, 'premium_template');

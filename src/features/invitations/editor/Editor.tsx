@@ -5,6 +5,7 @@ import type { AssetBases } from '../renderer/assets';
 import { requireTemplate } from '../templates/registry';
 import { EditorShell } from './EditorShell';
 import { EditorProvider, type EditorFeatures, type InvitationMeta } from './state/EditorProvider';
+import { TranslationsProvider } from './translations';
 
 /** The editor page's client root: the template comes from the (client-side) registry. */
 export function Editor({
@@ -38,7 +39,9 @@ export function Editor({
       initialLocale={uiLocale}
       features={features}
     >
-      <EditorShell initialDoc={draft} initialUpdatedAt={updatedAt} />
+      <TranslationsProvider>
+        <EditorShell initialDoc={draft} initialUpdatedAt={updatedAt} />
+      </TranslationsProvider>
     </EditorProvider>
   );
 }

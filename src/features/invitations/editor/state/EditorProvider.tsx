@@ -70,6 +70,8 @@ export interface EditorFeatures {
   premiumTemplates: boolean;
   /** the event has the `cinematic` feature (features/flags): the preview shows the v2 presentation */
   cinematic?: boolean;
+  /** languages beyond Hebrew and English may be added (feature `languages`; absent: yes) */
+  languages?: boolean;
 }
 const ALL_FEATURES: EditorFeatures = { removeBranding: true, premiumTemplates: true };
 

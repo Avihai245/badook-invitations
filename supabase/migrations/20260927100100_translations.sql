@@ -88,9 +88,10 @@ begin
   );
 end $$;
 
--- Records translations (a machine run: status auto; the host's edit in the review: approved), one per
--- language and path — replacing the current one. p_rows: [{ locale, path, sourceLocale, sourceHash,
--- text, status }], at most 500. Returns how many, or null when the invitation isn't the owner's.
+-- Records translations — a machine run's (status auto), or the host's approval of what the machine
+-- wrote (status approved, with the source it was approved against) — one per language and path,
+-- replacing the current one. p_rows: [{ locale, path, sourceLocale, sourceHash, text, status }], at
+-- most 500. Returns how many, or null when the invitation isn't the owner's.
 create function public.translations_save(p_id uuid, p_owner_id uuid, p_rows jsonb) returns int
 language plpgsql security definer set search_path = '' as $$
 declare
@@ -113,29 +114,6 @@ begin
     source_hash = excluded.source_hash,
     text = excluded.text,
     status = excluded.status;
-  get diagnostics n = row_count;
-  return n;
-end $$;
-
--- The host approves translations (or sends them back to review: p_status 'auto'): the given paths of
--- one language, or all of its current ones (p_paths null). Returns how many, or null.
-create function public.translations_set_status(
-  p_id uuid, p_owner_id uuid, p_locale text, p_paths text[], p_status text
-) returns int
-language plpgsql security definer set search_path = '' as $$
-declare
-  n int;
-begin
-  if not exists (select 1 from public.invitations where id = p_id and owner_id = p_owner_id) then
-    return null;
-  end if;
-  if p_status not in ('approved', 'auto') then
-    raise exception 'translations_set_status: bad status' using errcode = 'P0001';
-  end if;
-  update public.translations set status = p_status
-  where invitation_id = p_id and locale = p_locale and deleted_at is null
-    and (p_paths is null or path = any(p_paths))
-    and status is distinct from p_status;
   get diagnostics n = row_count;
   return n;
 end $$;
@@ -230,7 +208,6 @@ begin
     'public.translation_json(public.translations)',
     'public.translations_list(uuid, uuid)',
     'public.translations_save(uuid, uuid, jsonb)',
-    'public.translations_set_status(uuid, uuid, text, text[], text)',
     'public.translations_mark_stale(uuid, uuid, uuid[])',
     'public.translations_discard(uuid, uuid, text, text[])',
     'public.translation_glossary_set(uuid, uuid, text[])',
