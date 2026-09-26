@@ -103,5 +103,10 @@
   "locale.menu": "Idioma",
   "missing.metaTitle": "Invitación no disponible",
   "missing.title": "Esta invitación no está disponible en este momento",
-  "missing.body": "Puede que aún no se haya publicado o que el enlace esté incompleto. Compruébalo con quien te lo envió o inténtalo más tarde."
+  "missing.body": "Puede que aún no se haya publicado o que el enlace esté incompleto. Compruébalo con quien te lo envió o inténtalo más tarde.",
+  "voice.listen": "Escuchar la invitación",
+  "voice.stop": "Detener la lectura",
+  "captions.label": "Subtítulos",
+  "motion.pause": "Pausar las animaciones",
+  "motion.play": "Reanudar las animaciones"
 }

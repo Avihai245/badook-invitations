@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { CaptionsTrack } from '../../renderer/CaptionsTrack.client';
+import { STILL_EVENT } from '../../renderer/MotionPause.client';
 import { videoEmbedUrl, videoStillUrl, type VideoLink } from '../../lib/video-links';
 
 /** Starts `v` when the browser hasn't; one it won't play with sound plays muted. */
@@ -44,12 +46,15 @@ export function HeroVideo({
   focal,
   sound,
   calm = false,
+  captions = null,
 }: {
   src: string;
   poster: string | null;
   focal: string;
   /** the host's volume when its sound is the music (0..1), else null */
   sound: number | null;
+  /** its captions in the page's language (WebVTT) */
+  captions?: { vtt: string; lang: string; label: string } | null;
   /** the live page: a guest who prefers less motion gets the first frame (the editor shows it playing) */
   calm?: boolean;
 }) {
@@ -91,7 +96,9 @@ export function HeroVideo({
       style={{ objectPosition: focal }}
       // the cover's early-tap script may have turned its sound on before React hydrates: keep it
       suppressHydrationWarning
-    />
+    >
+      {captions ? <CaptionsTrack {...captions} /> : null}
+    </video>
   );
 }
 
@@ -247,8 +254,17 @@ export function HeroEmbed({
       if (link.provider === 'youtube')
         post(JSON.stringify({ event: 'listening', id: 'hero', channel: 'widget' }));
     };
+    // "pause the animations" (MotionPause) stops the player too — unless its sound is the music now
+    let soundOn = false;
+    const onStill = (e: Event) => {
+      if (soundOn) return;
+      const still = (e as CustomEvent<boolean>).detail;
+      if (link.provider === 'youtube') command(still ? 'pauseVideo' : 'playVideo');
+      else command(still ? 'pause' : 'play');
+    };
     const onSound = (e: Event) => {
       const { on, volume } = (e as CustomEvent<{ on: boolean; volume: number }>).detail;
+      soundOn = on;
       if (link.provider === 'youtube') {
         command(on ? 'unMute' : 'mute');
         if (on) command('setVolume', Math.round(volume * 100));
@@ -264,11 +280,16 @@ export function HeroEmbed({
     iframe?.addEventListener('load', onLoad);
     onLoad(); // in case it loaded before this ran (a lost message is harmless)
     if (sound) window.addEventListener('hero:sound', onSound);
-    const stopTap = onFirstTap(() => command(link.provider === 'youtube' ? 'playVideo' : 'play'));
+    window.addEventListener(STILL_EVENT, onStill);
+    const stopTap = onFirstTap(() => {
+      if (!document.documentElement.dataset.still)
+        command(link.provider === 'youtube' ? 'playVideo' : 'play');
+    });
     return () => {
       window.removeEventListener('message', onMessage);
       iframe?.removeEventListener('load', onLoad);
       window.removeEventListener('hero:sound', onSound);
+      window.removeEventListener(STILL_EVENT, onStill);
       stopTap();
     };
   }, [origin, link, sound, captions, start]);

@@ -49,8 +49,11 @@ export interface RsvpFormConfig {
     links: CalendarLinks;
     labels: { google: string; apple: string; outlook: string };
   } | null;
-  /** 'simulate' in the kitchen sink (P0); 'api' posts to /api/invitations/rsvp (P1). */
-  submitMode: 'simulate' | 'api';
+  /**
+   * 'simulate' in the kitchen sink (P0); 'api' posts to /api/invitations/rsvp (P1); 'review': the
+   * draft on the family's review link — nothing is sent, and the form says so.
+   */
+  submitMode: 'simulate' | 'api' | 'review';
   /** a "yes" bursts in the template's particles (renderer/fx) — none when absent */
   celebrate?: { kind: BurstKind; colors: string[] } | null;
 }
@@ -428,8 +431,9 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       return;
     }
     setStatus('sending');
-    if (config.submitMode === 'simulate') {
+    if (config.submitMode === 'simulate' || config.submitMode === 'review') {
       await new Promise((r) => setTimeout(r, 700));
+      if (config.submitMode === 'review') setDemo(true);
       setFresh(true);
       setStatus('sent');
       return;
@@ -507,7 +511,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
         <h3>{attending ? config.successMessage : config.declineMessage}</h3>
         {demo ? (
           <p className="demo-note" style={NOTE_STYLE}>
-            {config.notes.demo}
+            {config.submitMode === 'review' ? config.notes.draft : config.notes.demo}
           </p>
         ) : null}
         {attending && config.calendar ? (
@@ -593,8 +597,9 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     </Field>
   );
 
+  // named by its question: "how many adults? — fewer, 2, more" (not two unnamed "fewer" buttons)
   const stepper = (kind: 'adults' | 'children', value: number, min: number, max: number) => (
-    <div className="stepper">
+    <div className="stepper" role="group" aria-labelledby={fid(`${kind}-q`)}>
       <button
         type="button"
         onClick={() => step(kind, -1)}
@@ -663,7 +668,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
         <>
           <div className="grp steppers">
             <div className="srow">
-              <p className="q">
+              <p className="q" id={fid('adults-q')}>
                 <Icon name="users" size={18} />
                 {t(L, 'rsvp.adults')}
               </p>
@@ -671,7 +676,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
             </div>
             {config.askChildren ? (
               <div className="srow">
-                <p className="q">
+                <p className="q" id={fid('children-q')}>
                   <Icon name="baby" size={18} />
                   {t(L, 'rsvp.children')}
                 </p>

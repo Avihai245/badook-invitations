@@ -20,15 +20,20 @@ import type {
 } from '../../contracts/types';
 import { validateDocument, type ValidationResult } from '../../contracts/validate';
 import { resolveAsset, type AssetBases } from '../../renderer/assets';
+import { getTemplate } from '../../templates/registry';
 import { commit, createHistory, redo, replacePresent, undo, type History } from '../history';
 import { setAt } from '../paths';
 
-export type PanelId = 'cover' | 'palette' | 'fonts' | 'style' | 'music' | 'event' | 'languages' | 'share';
+export type PanelId =
+  'studio' | 'cover' | 'palette' | 'fonts' | 'style' | 'music' | 'event' | 'languages' | 'share';
 export type Selection = { kind: 'section'; id: string } | { kind: 'panel'; panel: PanelId };
 export type RailTab = 'sections' | 'design' | 'settings';
 
-/** The design tab's panels (`style`: the type scale, spacing and motion — feature `cinematic`). */
-export const DESIGN_PANELS: readonly PanelId[] = ['palette', 'fonts', 'style', 'cover', 'music'];
+/**
+ * The design tab's panels (`style`: the type scale, spacing and motion — feature `cinematic`;
+ * `studio`: "design it for me" — feature `art_direction`).
+ */
+export const DESIGN_PANELS: readonly PanelId[] = ['studio', 'palette', 'fonts', 'style', 'cover', 'music'];
 /** Panels only an event with the `cinematic` feature has. */
 export const CINEMATIC_PANELS: readonly PanelId[] = ['style'];
 export const SETTINGS_PANELS: readonly PanelId[] = ['event', 'languages', 'share'];
@@ -75,7 +80,19 @@ export interface EditorFeatures {
   cinematic?: boolean;
   /** languages beyond Hebrew and English may be added (feature `languages`; absent: yes) */
   languages?: boolean;
+  /** the family's review link with comment pins (feature `draft_review`) */
+  draftReview?: StudioAccess;
+  /** "design it for me": three design concepts from the event's photos (feature `art_direction`) */
+  artDirection?: StudioAccess;
+  /** the invitation read aloud to guests (feature `voice`) */
+  voice?: StudioAccess;
 }
+
+/**
+ * A studio capability for this event (Phase 5C): on, or not in the owner's plan (the editor offers
+ * the upgrade); absent — switched off, or not offered here — it isn't shown at all.
+ */
+export type StudioAccess = 'on' | 'plan';
 const ALL_FEATURES: EditorFeatures = { removeBranding: true, premiumTemplates: true };
 
 export interface EditorContextValue {
@@ -133,8 +150,8 @@ export function useEditor(): EditorContextValue {
 export function EditorProvider({
   initialDoc,
   initialMeta,
-  template,
-  defaults,
+  template: initialTemplate,
+  defaults: initialDefaults,
   bases,
   publicBaseUrl,
   initialLocale,
@@ -153,6 +170,11 @@ export function EditorProvider({
 }) {
   const [history, dispatch] = useReducer(reducer, initialDoc, createHistory);
   const doc = history.present;
+  // The design is the document's: a design concept (features/art-direction) or a restored version may
+  // move the invitation to another template — and undo moves it back.
+  const own = doc.templateId === initialTemplate.id ? null : getTemplate(doc.templateId);
+  const template = own?.manifest ?? initialTemplate;
+  const defaults = own?.defaults ?? initialDefaults;
   const [meta, setMetaState] = useState(initialMeta);
   const [locale, setLocaleState] = useState<Locale>(
     initialDoc.locales.includes(initialLocale) ? initialLocale : initialDoc.defaultLocale,

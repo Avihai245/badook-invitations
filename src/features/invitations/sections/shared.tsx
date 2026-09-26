@@ -14,8 +14,9 @@ export interface SectionViewProps<S extends Section = Section> {
   ctx: RenderContext;
 }
 
+/** A node's document path — in the editor (select, outline) and on the review link (comment pins). */
 export const editPath = (ctx: RenderContext, section: Section, sub?: string) =>
-  ctx.mode === 'editor' ? `sections.${ctx.indexOf(section)}${sub ? `.${sub}` : ''}` : undefined;
+  ctx.mode === 'editor' || ctx.review ? `sections.${ctx.indexOf(section)}${sub ? `.${sub}` : ''}` : undefined;
 
 export function SecHead({ title, sub, path }: { title: string; sub?: string | null; path?: string }) {
   return (

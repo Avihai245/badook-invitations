@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { loadAccount } from '@/features/billing/server/account';
-import { deploymentFeatures, featuresFor } from '@/features/flags/server';
+import { effectiveFeatures, whyOff, type Feature } from '@/features/flags/features';
+import { deploymentFeatures, featureInput } from '@/features/flags/server';
 import { Editor } from '@/features/invitations/editor/Editor';
+import type { StudioAccess } from '@/features/invitations/editor/state/EditorProvider';
 import { fontFaceCss, libraryDisplayFamilies, pageFontFaces } from '@/features/invitations/fonts';
 import { FONT_LIBRARY } from '@/features/invitations/fonts/library';
 import { hostsLine } from '@/features/invitations/lib/text';
@@ -33,18 +35,25 @@ export default async function EditInvitationPage({ params }: { params: Params })
   const entry = getTemplate(inv.templateId);
   if (!entry) notFound();
   const env = serverEnv();
-  const [uiLocale, account, publicBaseUrl, features] = await Promise.all([
+  const [uiLocale, account, publicBaseUrl, input] = await Promise.all([
     getUiLocale(),
     loadAccount(user),
     // the address the host sees and copies (the site's own domain, not a placeholder)
     requestBaseUrl(),
-    // the preview shows what the event's guests will see (feature `cinematic`); the languages it may
-    // add (feature `languages`). A database hiccup: what this deployment offers.
-    featuresFor(inv.id).catch((err: unknown) => {
+    // the event's features: what the preview shows (`cinematic`), the languages it may add
+    // (`languages`) and the studio's capabilities (on, or offered as an upgrade). A database hiccup:
+    // what this deployment offers, and no studio cards.
+    featureInput(inv.id).catch((err: unknown) => {
       console.error('editor: the event’s features are unavailable', err);
-      return deploymentFeatures();
+      return null;
     }),
   ]);
+  const features = input ? effectiveFeatures(input) : deploymentFeatures();
+  const studio = (feature: Feature): StudioAccess | undefined => {
+    if (!input) return undefined;
+    const why = whyOff(feature, input);
+    return why === null ? 'on' : why === 'plan' ? 'plan' : undefined;
+  };
   const unpublishedChanges =
     inv.status === 'published' && JSON.stringify(inv.draft) !== JSON.stringify(inv.published);
   return (
@@ -84,6 +93,10 @@ export default async function EditInvitationPage({ params }: { params: Params })
           premiumTemplates: account.limits.premiumTemplates,
           cinematic: features.has('cinematic'),
           languages: features.has('languages'),
+          draftReview: studio('draft_review'),
+          artDirection: studio('art_direction'),
+          // the voice card carries the event's own switch: shown also while the host has it off
+          voice: input && whyOff('voice', input) === 'switched_off' ? 'on' : studio('voice'),
         }}
       />
     </>

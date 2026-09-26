@@ -1,9 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
+import { LISTEN_EVENT, ListenButton, MUSIC_EVENT, type ListenProps } from '@/features/voice/ui/Listen.client';
 import { dirOf, type Locale } from '../contracts/types';
 import { Icon } from '../ui/Icon';
 import { withStartAt } from './assets';
+import { MotionPause, type MotionLabels } from './MotionPause.client';
 
 export interface MusicProps {
   /** the track — or null: the hero video's own sound (the host's "video sound" option, HeroMedia) */
@@ -54,15 +56,27 @@ const plainClick = (e: MouseEvent) => !(e.metaKey || e.ctrlKey || e.shiftKey || 
 export function FloatingControls({
   language,
   music,
+  listen = null,
+  motion = null,
 }: {
   language: LanguageControl | null;
   music: MusicProps | null;
+  /** the invitation read aloud (features/voice): above the music button */
+  listen?: ListenProps | null;
+  /** "pause the animations" (WCAG 2.2.2): the corner opposite the music */
+  motion?: MotionLabels | null;
 }) {
   return (
     <>
       {language && language.options.length === 2 ? <LanguagePill {...language} /> : null}
       {language && language.options.length > 2 ? <LanguageMenu {...language} /> : null}
       {music ? <MusicButton {...music} /> : null}
+      {listen ? (
+        <span className="fab-listen-slot" data-stacked={music ? '' : undefined}>
+          <ListenButton {...listen} />
+        </span>
+      ) : null}
+      {motion ? <MotionPause labels={motion} className="fab fab-motion" /> : null}
     </>
   );
 }
@@ -252,6 +266,8 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
 
   const play = useCallback(
     (withFade: boolean) => {
+      // the invitation read aloud stops (features/voice)
+      window.dispatchEvent(new CustomEvent(MUSIC_EVENT));
       if (!videoSound) {
         const a = audio.current;
         // already playing: started by the cover's early-tap script (InvitationBody) before React took over
@@ -287,6 +303,12 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
     } else embedSound(false, target);
     setPlaying(false);
   }, [videoSound, stopFade, target]);
+
+  // "Listen" (features/voice) pauses the music.
+  useEffect(() => {
+    window.addEventListener(LISTEN_EVENT, pause);
+    return () => window.removeEventListener(LISTEN_EVENT, pause);
+  }, [pause]);
 
   // The cover's tap starts the music. Listening from the hydration commit on (a layout effect): a tap
   // React replays right after hydrating must not come before the listener.

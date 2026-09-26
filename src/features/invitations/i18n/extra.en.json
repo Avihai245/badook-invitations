@@ -29,5 +29,10 @@
   "locale.menu": "Language",
   "missing.metaTitle": "Invitation not available",
   "missing.title": "This invitation isn’t available right now",
-  "missing.body": "It may not be published yet, or the link may be incomplete. Check the link with whoever sent it, or try again later."
+  "missing.body": "It may not be published yet, or the link may be incomplete. Check the link with whoever sent it, or try again later.",
+  "voice.listen": "Listen to the invitation",
+  "voice.stop": "Stop listening",
+  "captions.label": "Captions",
+  "motion.pause": "Pause the animations",
+  "motion.play": "Play the animations"
 }

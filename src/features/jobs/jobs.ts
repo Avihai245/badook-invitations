@@ -6,6 +6,9 @@ import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
 import { translationHousekeeping } from '@/features/invitations/translate/deps';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
+import { studioHousekeeping } from '@/features/review/server/housekeeping';
+import { voiceDeps } from '@/features/voice/server/deps';
+import { processVoice } from '@/features/voice/server/voice';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { processQueue } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
@@ -22,8 +25,9 @@ export type JobName = 'daily' | 'whatsapp';
 
 /**
  * The daily run: the hosts' RSVP summaries, the purge, the billing checks, the templates sync, the
- * live gallery's housekeeping, the event day's (arrivals past their keeping time) and the machine
- * translation's (its run records).
+ * live gallery's housekeeping, the event day's (arrivals past their keeping time), the machine
+ * translation's (its run records) and the studio's (old saves of drafts, review comments past their
+ * time, the review summaries).
  */
 export async function runDaily(now: Date) {
   const digests = await sendDigests(now);
@@ -46,6 +50,10 @@ export async function runDaily(now: Date) {
   const translations = await translationHousekeeping().catch(
     (err) => (console.error('translation housekeeping failed', err), null),
   );
+  // the studio's: the draft's old saves, review comments past their time, the review summaries
+  const studio = await studioHousekeeping().catch(
+    (err) => (console.error('studio housekeeping failed', err), null),
+  );
   return {
     ...digests,
     purged: (purged as number | null) ?? null,
@@ -54,6 +62,7 @@ export async function runDaily(now: Date) {
     gallery,
     eventDay,
     translations,
+    studio,
   };
 }
 
@@ -125,6 +134,9 @@ export function tick(now = Date.now()): Promise<void> {
     try {
       if (cloudApiConfigured())
         await runJob('whatsapp', new Date(now - WHATSAPP_EVERY_MS), 120, () => runWhatsAppQueue(15_000));
+      // the invitations read aloud: what publishes queued, and retries that are due (each language is
+      // taken by one server: voice_claim)
+      await processVoice(null, voiceDeps()).catch((err) => console.error('[jobs] voice failed', err));
       await runJob('daily', dailyDue(new Date(now)), 15 * 60, () => runDaily(new Date(now)));
     } catch (err) {
       console.error('[jobs] tick failed', err);

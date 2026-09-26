@@ -54,6 +54,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/eslintrc": "^3.3.7",
     "@fontsource/abril-fatface": "5.3.0",
     "@fontsource/alef": "5.3.0",

@@ -8,6 +8,7 @@ import { supportHe } from './support.he';
 import { seatingHe } from './seating.he';
 import { liveGalleryHe } from './live-gallery.he';
 import { eventDayHe } from './event-day.he';
+import { studioHe, studioHelpHe } from './studio.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -18,7 +19,7 @@ export const he = {
   brand: 'Badook',
   guests: guestsHe,
   site: siteHe,
-  help: helpHe,
+  help: { ...helpHe, ...studioHelpHe },
   support: supportHe,
   billing: billingHe,
   accountPage: accountHe,
@@ -26,6 +27,7 @@ export const he = {
   seating: seatingHe,
   liveGallery: liveGalleryHe,
   eventDay: eventDayHe,
+  studio: studioHe,
   common: {
     close: 'סגירה',
     cancel: 'ביטול',

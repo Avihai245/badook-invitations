@@ -154,6 +154,7 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     replay: Play,
     openTab: ExternalLink,
     versions: History,
+    comments: MessageSquareText,
     preview: Eye,
     publish: Send,
     premium: Crown,
@@ -166,6 +167,7 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     toggle: ToggleRight,
     add: Plus,
     issues: CircleAlert,
+    comments: MessageSquareText,
     menu: Ellipsis,
     design: Palette,
     settings: Settings2,
@@ -271,6 +273,35 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     preview: Smartphone,
   },
   account: { save: Save, password: KeyRound, plan: CreditCard, delete: Trash2 },
+  // the studio (lib/i18n/studio.*.ts)
+  studio: {
+    photos: Images,
+    mood: Sparkles,
+    create: WandSparkles,
+    preview: Smartphone,
+    use: Check,
+    again: RotateCcw,
+  },
+  review: {
+    create: Link2,
+    share: Copy,
+    expiry: CalendarClock,
+    rotate: RotateCcw,
+    revoke: Ban,
+    notify: Bell,
+    pins: MessageSquareText,
+    reply: MessageCircle,
+    handled: CircleCheck,
+    remove: Trash2,
+  },
+  history: {
+    filter: ListFilter,
+    entry: History,
+    live: BadgeCheck,
+    changes: ListChecks,
+    view: ExternalLink,
+    restore: RotateCcw,
+  },
 };
 
 /**
@@ -281,21 +312,24 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
 export function HelpFor({
   area,
   inDialog = false,
+  hide = [],
   className,
 }: {
   area: HelpArea;
   inDialog?: boolean;
+  /** items about something this page doesn't show (a feature the event doesn't have) */
+  hide?: readonly string[];
   className?: string;
 }) {
   const { t } = useUi();
   const help = t.help[area];
   const icons = ICONS[area] as Record<string, LucideIcon>;
-  const items = Object.entries(help.items as Record<string, { label: string; text: string }>).map(
-    ([key, item]) => {
+  const items = Object.entries(help.items as Record<string, { label: string; text: string }>)
+    .filter(([key]) => !hide.includes(key))
+    .map(([key, item]) => {
       const Icon = icons[key];
       return { icon: Icon ? <Icon /> : undefined, label: item.label, text: item.text };
-    },
-  );
+    });
   return (
     <AreaHelp
       label={t.common.helpLabel}

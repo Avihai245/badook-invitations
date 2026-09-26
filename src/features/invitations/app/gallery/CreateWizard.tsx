@@ -26,11 +26,11 @@ export interface WizardSeed {
 /** the create API keeps up to 40 characters of the parents' line */
 const PARENTS_MAX = 40;
 
-type NameKey = 'primary' | 'secondary' | 'parents';
+export type NameKey = 'primary' | 'secondary' | 'parents';
 type Names = Record<NameKey, string>;
 const NO_NAMES: Names = { primary: '', secondary: '', parents: '' };
 
-interface NameField {
+export interface NameField {
   key: NameKey;
   label: string;
   hint?: string;
@@ -38,8 +38,8 @@ interface NameField {
   max: number;
 }
 
-/** §9B.3-C step 2: the name fields adapt to the event type. */
-function nameFields(type: EventType, f: AppDict['wizard']['fields']): NameField[] {
+/** §9B.3-C step 2: the name fields adapt to the event type (also "design it for me": features/art-direction). */
+export function nameFields(type: EventType, f: AppDict['wizard']['fields']): NameField[] {
   const name = (key: NameKey, label: string): NameField => ({
     key,
     label,

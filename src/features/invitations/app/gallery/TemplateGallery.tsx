@@ -3,6 +3,7 @@
 import { Crown, LayoutGrid } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { cn, PageHeader, PaletteDots, Segmented } from '@/components/app';
+import { StudioEntry } from '@/features/art-direction/ui/StudioEntry';
 import type { UiLocale } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { EVENT_TYPES, type EventType, type Locale, type TemplateManifest } from '../../contracts/types';
@@ -53,6 +54,7 @@ export function TemplateGallery({
   devPreviews = null,
   moreLanguages = true,
   admin = false,
+  studio = null,
 }: {
   bases: AssetBases;
   fontCss: string;
@@ -61,6 +63,8 @@ export function TemplateGallery({
   moreLanguages?: boolean;
   /** the platform's admins also see the unlisted designs (manifest `listed: false`), marked */
   admin?: boolean;
+  /** "design it from my photos" (feature `art_direction`): on, offered as an upgrade, or not shown */
+  studio?: { access: 'on' | 'plan'; cinematic: boolean } | null;
 }) {
   const { t, locale, plural, number } = useUi();
   const videos = usePreviewVideos();
@@ -110,6 +114,9 @@ export function TemplateGallery({
           />
         }
       />
+      {studio ? (
+        <StudioEntry access={studio.access} cinematic={studio.cinematic} moreLanguages={moreLanguages} />
+      ) : null}
       {/* phones: one row that scrolls sideways; wider screens: the chips wrap */}
       <div
         role="group"

@@ -8,6 +8,8 @@ import { defineConfig, devices } from '@playwright/test';
 const port = Number(process.env.PW_PORT || 3100);
 const shimPort = Number(process.env.PW_SHIM_PORT || 54329);
 const whatsappPort = Number(process.env.PW_WHATSAPP_PORT || 54340);
+// the text-to-speech stand-in (tests/support/mock-tts.mjs, features/voice)
+const ttsPort = Number(process.env.PW_TTS_PORT || 55041);
 const baseURL = process.env.PW_BASE_URL || `http://127.0.0.1:${port}`;
 const admin = new URL(
   process.env.TEST_DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5432/postgres',
@@ -70,6 +72,14 @@ export default defineConfig({
           timeout: 30_000,
         },
         {
+          // Azure AI Speech's text to speech stand-in (tests/e2e/studio-voice.spec.ts)
+          command: 'node tests/support/mock-tts.mjs',
+          url: `http://127.0.0.1:${ttsPort}/health`,
+          reuseExistingServer: false,
+          env: { MOCK_TTS_PORT: String(ttsPort), MOCK_TTS_KEY: 'e2e-tts-key' },
+          timeout: 30_000,
+        },
+        {
           command: `npx next start -p ${port}`,
           url: `${baseURL}/`,
           reuseExistingServer: !process.env.CI,
@@ -106,6 +116,10 @@ export default defineConfig({
             // the partner API (tests/e2e/partner.spec.ts)
             INVITES_PARTNER_API_KEY: 'e2e-partner-key-0123456789abcdef0123',
             INVITES_AI_API_BASE: `http://127.0.0.1:${whatsappPort}`,
+            // the invitation read aloud: the text-to-speech stand-in above (features/voice)
+            INVITES_TTS_AZURE_KEY: 'e2e-tts-key',
+            INVITES_TTS_AZURE_REGION: 'e2e',
+            INVITES_TTS_AZURE_ENDPOINT: `http://127.0.0.1:${ttsPort}`,
           },
           timeout: 120_000,
         },

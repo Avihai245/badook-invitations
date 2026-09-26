@@ -6,8 +6,10 @@ import { CoverOverlay } from './cover/CoverOverlay.client';
 import { variantsOf } from './cover/localized';
 import { resolveOpening, type Opening } from './cover/opening';
 import { FitNames } from './FitNames.client';
+import type { ListenProps, ListenTrack } from '@/features/voice/ui/Listen.client';
 import { FloatingControls, type MusicProps } from './FloatingControls.client';
 import { nativeName } from '../lib/locales';
+import type { MotionLabels } from './MotionPause.client';
 import { fxTheme } from './fx/theme';
 import { imageSet } from './images';
 import { InvitationSections } from './InvitationSections';
@@ -82,6 +84,7 @@ export function InvitationBody({
   skipCoverFromUrl = false,
   langHrefs,
   live = null,
+  voice = null,
 }: {
   ctx: RenderContext;
   /** false with `?open=1`, in the editor/preview frame and for OG screenshots */
@@ -101,6 +104,11 @@ export function InvitationBody({
    * instead of following `langHrefs`.
    */
   live?: LivePayload | null;
+  /**
+   * The invitation read aloud (features/voice): each language's audio or words — the page's "listen".
+   * null: the event doesn't have it.
+   */
+  voice?: Partial<Record<Locale, ListenTrack>> | null;
 }) {
   const { doc, template } = ctx;
   const coverOn = showCover && doc.cover.enabled && ctx.mode === 'live';
@@ -126,6 +134,18 @@ export function InvitationBody({
           pauseLabel: ctx.t('music.pause'),
         }
       : null;
+
+  // "pause the animations" (WCAG 2.2.2) on the guest's page; the review page has it in its toolbar
+  const motionIn = (l: Locale): MotionLabels | null =>
+    ctx.mode === 'live' && !ctx.review
+      ? { pause: translate(l, 'motion.pause'), play: translate(l, 'motion.play') }
+      : null;
+  const listenIn = (l: Locale): ListenProps | null => {
+    const track = ctx.mode === 'live' && !ctx.review ? voice?.[l] : undefined;
+    return track
+      ? { track, listenLabel: translate(l, 'voice.listen'), stopLabel: translate(l, 'voice.stop') }
+      : null;
+  };
 
   // Suspense boundaries contain any suspension while hydrating (a client chunk still loading on a
   // slow first visit): without them React replays the root with a stale hydration cursor and
@@ -187,7 +207,13 @@ export function InvitationBody({
       ) : null}
       <Suspense fallback={null}>
         {live && doc.locales.length > 1 ? (
-          <LiveLocale initial={ctx.locale} payload={live} music={music}>
+          <LiveLocale
+            initial={ctx.locale}
+            payload={live}
+            music={music}
+            listen={Object.fromEntries(doc.locales.map((l) => [l, listenIn(l)]))}
+            motion={Object.fromEntries(doc.locales.map((l) => [l, motionIn(l)]))}
+          >
             <InvitationSections ctx={ctx} />
           </LiveLocale>
         ) : (
@@ -207,13 +233,16 @@ export function InvitationBody({
                   : null
               }
               music={music}
+              listen={listenIn(ctx.locale)}
+              motion={motionIn(ctx.locale)}
             />
             <InvitationSections ctx={ctx} />
           </>
         )}
         <ScrollEngine />
         <FitNames />
-        {ctx.mode === 'live' ? <GuestLink slug={doc.share.slug} /> : null}
+        {/* a guest's personal link — never on the review link's draft (nobody is identified there) */}
+        {ctx.mode === 'live' && !ctx.review ? <GuestLink slug={doc.share.slug} /> : null}
       </Suspense>
     </div>
   );

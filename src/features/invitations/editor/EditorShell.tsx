@@ -5,9 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Dialog as RadixDialog } from 'radix-ui';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Dialog, IconButton, cn, useDir, useToast } from '@/components/app';
+import { ReviewDrawer } from '@/features/review/ui/host/ReviewDrawer';
+import { useReview } from '@/features/review/ui/host/ReviewProvider';
 import { useUi } from '@/lib/i18n/client';
 import type { InvitationDocument } from '../contracts/types';
 import { loginUrl } from '../app/api';
+import { fontFaceCss, templateFontFamilies } from '../fonts';
 import { Canvas, type Device } from './Canvas';
 import { OPEN_PUBLISH_EVENT } from './events';
 import { PreviewControlsProvider } from './fields/fields';
@@ -16,6 +19,7 @@ import { usePreviewChannel } from './preview/usePreviewChannel';
 import { PublishDialog } from './PublishDialog';
 import { Rail } from './Rail';
 import { useEditor } from './state/EditorProvider';
+import { FlushContext } from './state/flush';
 import { useAutosave } from './state/useAutosave';
 import { Topbar } from './Topbar';
 import { useTranslationsFlush } from './translations';
@@ -54,11 +58,15 @@ export function EditorShell({
   });
   useTranslationsFlush(autosave.flush);
 
+  const review = useReview();
   const frame = useRef<HTMLIFrameElement>(null);
   const channel = usePreviewChannel(frame, {
     doc,
     locale,
     cinematic: editor.features.cinematic ?? true,
+    // the family's comments as numbered pins; a click on one opens it in the comments drawer
+    pins: review?.previewPins ?? null,
+    onPin: (id) => review?.openDrawer(id),
     onSelect: (path) => {
       const m = /^sections\.(\d+)/.exec(path);
       const section = m ? doc.sections[Number(m[1])] : undefined;
@@ -168,102 +176,128 @@ export function EditorShell({
 
   const conflict = autosave.conflict;
 
+  // another design than the page was opened with (a concept, a restored version): its font faces for
+  // the font pair cards (the page declared the first design's)
+  const designFonts = useMemo(
+    () =>
+      editor.template.id === initialDoc.templateId ? '' : fontFaceCss(templateFontFamilies(editor.template)),
+    [editor.template, initialDoc.templateId],
+  );
+
   return (
-    <PreviewControlsProvider value={controls}>
-      <div className="flex h-dvh flex-col bg-canvas">
-        <Topbar
-          status={autosave.status}
-          device={device}
-          onDevice={setDevice}
-          onPublish={() => setPublishing(true)}
-          onVersions={() => setVersions(true)}
-          onPreview={openPreview}
-        />
-        {autosave.status === 'offline' ? (
-          <div
-            role="status"
-            className="flex items-center justify-center gap-2 bg-warning-bg px-4 py-2 text-[13px] text-warning"
-          >
-            <CloudOff aria-hidden size={16} strokeWidth={1.75} />
-            {e.save.offline}
-          </div>
-        ) : null}
-
-        <div className="grid min-h-0 flex-1 max-lg:pb-14 lg:grid-cols-[64px_360px_minmax(0,1fr)] xl:grid-cols-[280px_400px_minmax(0,1fr)]">
-          <div className="hidden min-h-0 border-e border-line lg:flex lg:flex-col [&_aside]:flex-1">
-            <Rail />
-          </div>
-          <FormPanel
-            className={cn(
-              'min-h-0 overflow-auto border-line bg-canvas p-5 lg:border-e',
-              mobileView !== 'edit' && 'max-lg:hidden',
-            )}
-          />
-          <Canvas
+    <FlushContext.Provider value={autosave.flush}>
+      <PreviewControlsProvider value={controls}>
+        {designFonts ? <style dangerouslySetInnerHTML={{ __html: designFonts }} /> : null}
+        <div className="flex h-dvh flex-col bg-canvas">
+          <Topbar
+            status={autosave.status}
             device={device}
-            frame={frame}
-            onReplay={channel.replay}
-            onOpenTab={openPreview}
-            className={cn('min-h-0', mobileView !== 'preview' && 'max-lg:hidden')}
+            onDevice={setDevice}
+            onPublish={() => setPublishing(true)}
+            onVersions={() => setVersions(true)}
+            onPreview={openPreview}
+            onComments={review?.access ? () => review.openDrawer() : undefined}
           />
-        </div>
+          {autosave.status === 'offline' ? (
+            <div
+              role="status"
+              className="flex items-center justify-center gap-2 bg-warning-bg px-4 py-2 text-[13px] text-warning"
+            >
+              <CloudOff aria-hidden size={16} strokeWidth={1.75} />
+              {e.save.offline}
+            </div>
+          ) : null}
 
-        <MobileTabs
-          view={mobileView}
-          onEdit={() => {
-            setMobileView('edit');
-            setRailTab('sections');
-            setSheet(true);
-          }}
-          onPreview={() => setMobileView('preview')}
-          onDesign={() => {
-            setRailTab('design');
-            setSheet(true);
-          }}
-          onPublish={() => setPublishing(true)}
-        />
-        <SectionsSheet
-          open={sheet}
-          onOpenChange={setSheet}
-          onNavigate={() => {
-            setSheet(false);
-            setMobileView('edit');
-          }}
-        />
+          <div className="grid min-h-0 flex-1 max-lg:pb-14 lg:grid-cols-[64px_360px_minmax(0,1fr)] xl:grid-cols-[280px_400px_minmax(0,1fr)]">
+            <div className="hidden min-h-0 border-e border-line lg:flex lg:flex-col [&_aside]:flex-1">
+              <Rail />
+            </div>
+            <FormPanel
+              className={cn(
+                'min-h-0 overflow-auto border-line bg-canvas p-5 lg:border-e',
+                mobileView !== 'edit' && 'max-lg:hidden',
+              )}
+            />
+            <Canvas
+              device={device}
+              frame={frame}
+              onReplay={channel.replay}
+              onOpenTab={openPreview}
+              className={cn('min-h-0', mobileView !== 'preview' && 'max-lg:hidden')}
+            />
+          </div>
 
-        {publishing ? <PublishDialog onClose={() => setPublishing(false)} flush={autosave.flush} /> : null}
-        {versions ? (
-          <VersionsDrawer
-            onClose={() => setVersions(false)}
-            onRestored={(draft, updatedAt) => {
-              autosave.rebase(draft, updatedAt);
-              apply(() => draft, null);
+          <MobileTabs
+            view={mobileView}
+            onEdit={() => {
+              setMobileView('edit');
+              setRailTab('sections');
+              setSheet(true);
+            }}
+            onPreview={() => setMobileView('preview')}
+            onDesign={() => {
+              setRailTab('design');
+              setSheet(true);
+            }}
+            onPublish={() => setPublishing(true)}
+          />
+          <SectionsSheet
+            open={sheet}
+            onOpenChange={setSheet}
+            onNavigate={() => {
+              setSheet(false);
+              setMobileView('edit');
             }}
           />
-        ) : null}
-        {conflict ? (
-          <Dialog
-            open
-            title={e.conflict.title}
-            description={e.conflict.body}
-            footer={
-              <>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    autosave.acceptTheirs(conflict);
-                    replace(conflict.draft);
-                  }}
-                >
-                  {e.conflict.theirs}
-                </Button>
-                <Button onClick={() => autosave.keepMine(conflict)}>{e.conflict.mine}</Button>
-              </>
-            }
-          />
-        ) : null}
-      </div>
-    </PreviewControlsProvider>
+
+          {publishing ? <PublishDialog onClose={() => setPublishing(false)} flush={autosave.flush} /> : null}
+          {versions ? (
+            <VersionsDrawer
+              onClose={() => setVersions(false)}
+              flush={autosave.flush}
+              onRestored={(draft, updatedAt) => {
+                autosave.rebase(draft, updatedAt);
+                apply(() => draft, null);
+              }}
+            />
+          ) : null}
+          {review?.drawer ? (
+            <ReviewDrawer
+              onShow={(comment) => {
+                // its section in the form, the preview scrolled to its pin (on a phone: the preview)
+                review.closeDrawer();
+                review.setActive(comment.id);
+                review.setShowPins(true);
+                select({ kind: 'section', id: comment.sectionId });
+                setMobileView('preview');
+                channel.revealPin(comment.id);
+              }}
+            />
+          ) : null}
+          {conflict ? (
+            <Dialog
+              open
+              title={e.conflict.title}
+              description={e.conflict.body}
+              footer={
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      autosave.acceptTheirs(conflict);
+                      replace(conflict.draft);
+                    }}
+                  >
+                    {e.conflict.theirs}
+                  </Button>
+                  <Button onClick={() => autosave.keepMine(conflict)}>{e.conflict.mine}</Button>
+                </>
+              }
+            />
+          ) : null}
+        </div>
+      </PreviewControlsProvider>
+    </FlushContext.Provider>
   );
 }
 

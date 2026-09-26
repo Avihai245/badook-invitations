@@ -1606,6 +1606,34 @@ html[data-framed] body::-webkit-scrollbar {
     visibility: visible;
   }
 }
+/* "listen" (the invitation read aloud, features/voice): above the music button, or in its place */
+.fab-listen {
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  inset-inline-end: 16px;
+}
+.fab-listen-slot[data-stacked] .fab-listen {
+  bottom: calc(72px + env(safe-area-inset-bottom));
+}
+.fab-listen[aria-pressed='true'] {
+  border-color: var(--inv-accent);
+  color: var(--inv-accent-text);
+}
+/* "pause the animations" (MotionPause, WCAG 2.2.2): the bottom corner opposite the music */
+.fab-motion {
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  inset-inline-start: 16px;
+}
+.fab-motion[data-paused] {
+  border-color: var(--inv-accent);
+  color: var(--inv-accent-text);
+}
+/* paused: the countdown keeps counting, without its roll */
+:root[data-still] .cd-dv {
+  animation: none !important;
+}
+:root[data-still] .cd-dv.out {
+  display: none;
+}
 
 /* ============ 5. HERO ============ */
 .hero {
@@ -4613,12 +4641,13 @@ footer.sec {
 :root:is(:lang(he), :lang(ar), :lang(am)) .f-close {
   font-style: normal;
 }
+/* the credit and the legal links: small print in the muted text color — at full strength, which is
+   what keeps it at 4.5:1 on the page (WCAG 1.4.3) */
 .credit {
   font-family: var(--f-ui);
   font-size: calc(12px * var(--ty-caption, 1));
   color: var(--inv-ink-muted);
   margin-top: 40px;
-  opacity: 0.8;
   letter-spacing: var(--track);
 }
 .f-legal {
@@ -4626,7 +4655,6 @@ footer.sec {
   font-size: 11.5px;
   color: var(--inv-ink-muted);
   margin-top: 40px;
-  opacity: 0.75;
 }
 .credit + .f-legal {
   margin-top: 8px;

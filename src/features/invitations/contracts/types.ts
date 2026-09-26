@@ -111,6 +111,13 @@ export interface Media {
   src: AssetRef;
   poster: AssetRef | null;
   focalPoint: { x: number; y: number };
+  /**
+   * A video's captions, WebVTT per language (lib/captions: an uploaded .vtt, a converted .srt, or
+   * typed in the editor) — the page's language's show as its <track kind="captions">.
+   */
+  captions?: L10n | null;
+  /** the host says the video has speech (it then needs captions: a publish warning); absent: not said */
+  speech?: boolean | null;
 }
 
 // ---------- v2: cinematic presentation (feature `cinematic`) ----------

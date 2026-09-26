@@ -1,5 +1,6 @@
 'use client';
 
+import { ReviewProvider } from '@/features/review/ui/host/ReviewProvider';
 import type { InvitationDocument, Locale } from '../contracts/types';
 import type { AssetBases } from '../renderer/assets';
 import { requireTemplate } from '../templates/registry';
@@ -40,7 +41,10 @@ export function Editor({
       features={features}
     >
       <TranslationsProvider>
-        <EditorShell initialDoc={draft} initialUpdatedAt={updatedAt} />
+        {/* the family's comments on the draft (features/review): the rail, the preview, the drawer */}
+        <ReviewProvider>
+          <EditorShell initialDoc={draft} initialUpdatedAt={updatedAt} />
+        </ReviewProvider>
       </TranslationsProvider>
     </EditorProvider>
   );

@@ -69,6 +69,12 @@ describe('the support assistant', () => {
       'ביטול המנוי',
       'מחיקת החשבון',
       'נגישות',
+      // the studio (Phase 5C)
+      'עצבו לי',
+      'יצירת קישור לעיון',
+      'מה ישתנה בשחזור',
+      'האזנה להזמנה',
+      'כתוביות',
     ])
       expect(prompt).toContain(topic);
     // the same for every page (so the API can cache it)

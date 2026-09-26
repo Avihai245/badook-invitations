@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { LabeledPin, Pin } from '@/features/review/model';
+import { PIN_CSS, PinLayer, placeOf } from '@/features/review/ui/PinLayer';
 import {
   LOCALES,
   dirOf,
@@ -58,6 +60,12 @@ export function PreviewFrame({
   const [play, setPlay] = useState<{ n: number; top: number; hero: boolean; ms: number } | null>(null);
   const plays = useRef(0);
   const highlight = useRef<{ path: string | null; label?: string }>({ path: null });
+  // the family's comment pins (features/review), drawn over the editor's rendering
+  const [pins, setPins] = useState<{ pins: LabeledPin[]; label: string }>({ pins: [], label: '' });
+  const docRef = useRef<InvitationDocument | null>(null);
+  docRef.current = state?.doc ?? null;
+  const pinsRef = useRef(pins.pins);
+  pinsRef.current = pins.pins;
 
   const post = useCallback((msg: FrameToParent) => {
     window.parent.postMessage({ ...msg, channel: PREVIEW_CHANNEL }, window.location.origin);
@@ -114,7 +122,19 @@ export function PreviewFrame({
         el?.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
       } else if (msg.type === 'doc')
         setState({ doc: msg.doc, locale: msg.locale, cinematic: msg.cinematic ?? true });
-      else if (msg.type === 'highlight') {
+      else if (msg.type === 'pins') setPins({ pins: msg.pins, label: msg.label });
+      else if (msg.type === 'revealPin') {
+        const doc = docRef.current;
+        const pin = pinsRef.current.find((p) => p.id === msg.id);
+        const index = doc && pin ? doc.sections.findIndex((s) => s.id === pin.sectionId && s.enabled) : -1;
+        const at = pin && index >= 0 ? placeOf(index, pin.x, pin.y) : null;
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (at)
+          window.scrollTo({
+            top: Math.max(0, at.top - window.innerHeight / 3),
+            behavior: reduce ? 'auto' : 'smooth',
+          });
+      } else if (msg.type === 'highlight') {
         highlight.current = { path: msg.path, label: msg.label };
         applyHighlight(true);
       } else if (msg.type === 'replay') {
@@ -199,6 +219,12 @@ export function PreviewFrame({
     };
   }, [post, replay, play, standalone]);
 
+  const pinIndex = useCallback(
+    (sectionId: string) => state?.doc.sections.findIndex((s) => s.id === sectionId && s.enabled) ?? -1,
+    [state?.doc],
+  );
+  const pinLabel = useCallback((p: Pin) => (p as LabeledPin).label ?? '', []);
+
   const live = replay > 0 || play !== null;
   const ctx = useMemo(
     () =>
@@ -263,6 +289,18 @@ export function PreviewFrame({
         showCover={replay > 0 && !play}
         langHrefs={null}
       />
+      {pins.pins.length && !live ? (
+        <>
+          <style dangerouslySetInnerHTML={{ __html: PIN_CSS }} />
+          <PinLayer
+            pins={pins.pins}
+            indexOf={pinIndex}
+            onPin={(id) => post({ type: 'pin', id })}
+            label={pins.label}
+            pinLabel={pinLabel}
+          />
+        </>
+      ) : null}
     </>
   );
 }

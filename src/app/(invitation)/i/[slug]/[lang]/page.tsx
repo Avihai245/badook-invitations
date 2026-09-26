@@ -19,6 +19,7 @@ import {
   resolveLocale,
   type PublishedInvitation,
 } from '@/features/invitations/server/published';
+import { voiceForPage } from '@/features/voice/server/page';
 import { serverEnv } from '@/lib/env';
 
 type Params = Promise<{ slug: string; lang: string }>;
@@ -118,7 +119,11 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   const locale = invitation && resolveLocale(invitation.doc, lang);
   if (!invitation || !locale) notFound();
   // the event's `cinematic` feature: its v2 presentation, or the plain rendering (features/flags)
-  const cinematic = await cinematicForPage(invitation.id, invitation.doc, invitation.entry.manifest);
+  const [cinematic, voice] = await Promise.all([
+    cinematicForPage(invitation.id, invitation.doc, invitation.entry.manifest),
+    // the invitation read aloud (feature `voice`): each language's audio, or its words for the device
+    voiceForPage(invitation),
+  ]);
   // the language control's plain links keep the cover skipped; with JS the language switches in place
   // (LiveLocale)
   const link = (l: Locale) => `/i/${slug}?lang=${l}&open=1`;
@@ -138,6 +143,7 @@ export default async function PublicInvitationPage({ params }: { params: Params 
       skipCoverFromUrl
       langHrefs={Object.fromEntries(invitation.doc.locales.map((l) => [l, link(l)]))}
       live={live}
+      voice={voice}
     />
   );
 }

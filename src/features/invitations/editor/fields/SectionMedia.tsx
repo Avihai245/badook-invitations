@@ -11,6 +11,7 @@ import { pixelsOf, scrimForPhoto } from '../../lib/photo-palette';
 import { scrimOf } from '../../renderer/theme';
 import { patchSectionMedia, setSectionMedia } from '../presentation';
 import { useEditor } from '../state/EditorProvider';
+import { CaptionsField } from './captions';
 import { FieldFrame } from './fields';
 import { IMAGE_TYPES, UploadTile, VIDEO_TYPES, captureVideoStill, useUpload, useUploader } from './media';
 
@@ -304,6 +305,7 @@ export function SectionMediaField({ index }: { index: number }) {
               {c.focalHint}
             </p>
             {media.kind === 'video' ? <p className="text-[12px] text-muted">{c.videoNote}</p> : null}
+            {media.kind === 'video' ? <CaptionsField path={path} /> : null}
             {media.kind === 'video' && !media.poster ? (
               <div className="flex flex-wrap items-center gap-2 rounded-input bg-warning-bg px-3 py-2 text-[12px] text-warning">
                 <span className="flex-1">{c.stillMissing}</span>

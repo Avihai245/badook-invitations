@@ -62,6 +62,38 @@ const STALL_MS = 1500;
 const FADE_MS = 850;
 
 /**
+ * While the cover is up it is all a keyboard or a screen reader can reach (WCAG 2.4.3, 2.4.7): the
+ * page under it — the sections, the floating controls (hidden until it opens) and what a page lays
+ * over the invitation (the review page's tools, `[data-under-cover]`) — is inert until it goes. The
+ * sections may stream in after the cover (InvitationBody's second boundary): they are caught as they
+ * arrive.
+ */
+function useInertUnder(up: boolean) {
+  useIsoLayoutEffect(() => {
+    if (!up) return;
+    const marked: HTMLElement[] = [];
+    const mark = () => {
+      for (const el of document.querySelectorAll<HTMLElement>(
+        '.inv > :not(.cover):not(script):not(style), [data-under-cover]',
+      ))
+        if (!el.inert) {
+          el.inert = true;
+          marked.push(el);
+        }
+    };
+    mark();
+    const observer = new MutationObserver(mark);
+    observer.observe(document.body, { childList: true });
+    const inv = document.querySelector('.inv');
+    if (inv) observer.observe(inv, { childList: true });
+    return () => {
+      observer.disconnect();
+      for (const el of marked) el.inert = false;
+    };
+  }, [up]);
+}
+
+/**
  * The opening's particles (renderer/fx/burst.ts — nothing with reduced motion): a spray of light where
  * the seal breaks, then the template's own burst (petals, confetti, stars…) out of the card / ticket.
  */
@@ -109,6 +141,7 @@ export function CoverOverlay(props: CoverOverlayProps) {
     return () => window.clearTimeout(t);
   }, []);
   useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
+  useInertUnder(phase === 'idle' || phase === 'opening');
 
   const finish = useCallback((fadeMs: number) => {
     document.documentElement.dataset.opened = '1';

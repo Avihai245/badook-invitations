@@ -123,6 +123,7 @@ export const editorEn: EditorDict = {
     fonts: 'Fonts',
     music: 'Music',
     style: 'Style & motion',
+    studio: 'Design it for me',
     event: 'Event details',
     languages: 'Languages',
     share: 'Link & sharing',
@@ -171,6 +172,7 @@ export const editorEn: EditorDict = {
     fonts: 'A pair of fonts for names, headings and text — in Hebrew and English.',
     music: 'Plays from the moment guests open the invitation.',
     style: 'Text size, spacing and how much things move — for the whole invitation.',
+    studio: 'Three complete, different designs from your photos — pick one and keep editing.',
     event: 'Names, date and time — updated everywhere in the invitation.',
     languages: 'Which languages the invitation has, and which one opens first.',
     share: 'The invitation’s address and how it looks when shared.',
@@ -764,6 +766,9 @@ export const editorEn: EditorDict = {
     layout_media: 'This layout needs a picture or video — until then the section shows as usual',
     media_link: 'A section’s background video must be a file you uploaded, not a YouTube or Vimeo link',
     media_poster: 'The video has no still — it shows until the video plays, and to guests saving data',
+    captions_missing:
+      'The video has speech and no {language} captions — guests who can’t hear it will miss what’s said',
+    captions_invalid: 'The {language} captions aren’t valid — upload them again or type them anew',
     empty_section: '“{field}” is empty and won’t be shown — add an item or hide it',
   },
   fieldLabels: {

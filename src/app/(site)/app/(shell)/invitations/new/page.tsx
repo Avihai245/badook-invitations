@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { isAdminEmail } from '@/features/billing/server/account';
+import { NO_OVERRIDES, whyOff } from '@/features/flags/features';
 import { accountFeatures, deploymentFeatures } from '@/features/flags/server';
 import { TemplateGallery, type DevPreviews } from '@/features/invitations/app/gallery/TemplateGallery';
 import { GALLERY_FONT_CSS } from '@/features/invitations/app/poster-fonts';
@@ -34,9 +35,25 @@ export default async function NewInvitationPage({
 }) {
   const env = serverEnv();
   const [{ previews }, user] = await Promise.all([searchParams, getSessionUser()]);
-  // languages beyond Hebrew and English (feature `languages`): the host's plan, or — before signing
-  // in — what this deployment offers
-  const moreLanguages = (user ? await accountFeatures(user) : deploymentFeatures()).has('languages');
+  // the host's plan in force and this deployment (before signing in: only what this deployment offers)
+  const account = user ? await accountFeatures(user).catch(() => null) : null;
+  // languages beyond Hebrew and English (feature `languages`)
+  const moreLanguages = (account ? account.features : deploymentFeatures()).has('languages');
+  // "design it from my photos" (feature `art_direction`)
+  const why = account
+    ? whyOff('art_direction', {
+        plan: account.plan,
+        admin: account.admin,
+        overrides: NO_OVERRIDES,
+        available: deploymentFeatures(),
+      })
+    : 'unavailable';
+  const studio =
+    why === null
+      ? { access: 'on' as const, cinematic: account!.features.has('cinematic') }
+      : why === 'plan'
+        ? { access: 'plan' as const, cinematic: false }
+        : null;
   return (
     <TemplateGallery
       moreLanguages={moreLanguages}
@@ -48,6 +65,7 @@ export default async function NewInvitationPage({
       devPreviews={devPreviews(previews)}
       // unlisted designs (manifest `listed: false`) are the platform admins' to try
       admin={isAdminEmail(user?.email)}
+      studio={studio}
     />
   );
 }

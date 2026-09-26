@@ -1,11 +1,14 @@
 import 'server-only';
 import { revalidatePath } from 'next/cache';
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { entitlementsFor, isAdminEmail } from '@/features/billing/server/account';
 import type { Feature } from '@/features/flags/features';
 import { accountFeatures, featuresFor } from '@/features/flags/server';
 import { invitationsEnabled } from '@/lib/feature';
+import { broadcastRefresh } from '@/lib/live/broadcast';
 import { getSessionUser } from '@/lib/supabase/session';
+import { voiceDeps } from '@/features/voice/server/deps';
+import { processVoice, queueVoice } from '@/features/voice/server/voice';
 import { LOCALES } from '../contracts/types';
 import { getTemplate } from '../templates/registry';
 import { translationRows } from '../translate/deps';
@@ -35,6 +38,13 @@ export const hostDeps: HostDeps = {
   revalidate,
   now: () => Date.now(),
   translations: translationRows,
+  broadcast: (channel, kind) => broadcastRefresh(channel, kind, fetch, 'invitations'),
+  // the invitation read aloud: after the answer, never in its way (features/voice)
+  voice: (id, ownerId, doc) =>
+    after(async () => {
+      const deps = voiceDeps();
+      if (await queueVoice(id, ownerId, doc, deps)) await processVoice(id, deps).catch(() => undefined);
+    }),
 };
 
 /**
@@ -44,7 +54,14 @@ export const hostDeps: HostDeps = {
  */
 export async function hostRoute(
   request: Request,
-  handler: (userId: string, body: unknown, deps: HostDeps) => Promise<ApiResult>,
+  handler: (
+    userId: string,
+    body: unknown,
+    deps: HostDeps,
+    user: { id: string; email: string | null },
+  ) => Promise<ApiResult>,
+  /** a larger body for the few routes that take one (the design studio's photos) */
+  { maxBytes = MAX_JSON_BYTES }: { maxBytes?: number } = {},
 ): Promise<Response> {
   if (!invitationsEnabled()) return json(404, { ok: false, code: 'not_found' });
   let body: unknown = undefined;
@@ -52,7 +69,7 @@ export async function hostRoute(
     if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
       return json(415, { ok: false, code: 'unsupported_media_type' });
     const text = await request.text();
-    if (text.length > MAX_JSON_BYTES) return json(413, { ok: false, code: 'too_large' });
+    if (text.length > maxBytes) return json(413, { ok: false, code: 'too_large' });
     try {
       body = text ? JSON.parse(text) : {};
     } catch {
@@ -72,13 +89,14 @@ export async function hostRoute(
       features: (id) => {
         const key = id ?? '';
         let pending = features.get(key);
-        if (!pending) features.set(key, (pending = id ? featuresFor(id) : accountFeatures(user)));
+        if (!pending)
+          features.set(key, (pending = id ? featuresFor(id) : accountFeatures(user).then((a) => a.features)));
         return pending;
       },
       cinematic: cinematicFor,
       admin: isAdminEmail(user.email),
     };
-    const result = await handler(user.id, body, deps);
+    const result = await handler(user.id, body, deps, { id: user.id, email: user.email ?? null });
     return json(result.status, result.body);
   } catch (err) {
     console.error('[host api]', request.method, new URL(request.url).pathname, err);

@@ -113,6 +113,8 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
       />
     );
   } else if (d.media.kind === 'video' && src) {
+    // its captions in the page's language (lib/captions)
+    const vtt = d.media.captions?.[ctx.locale];
     media = (
       <HeroVideo
         src={src}
@@ -120,6 +122,7 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
         focal={focal}
         sound={sound ? doc.music.volume : null}
         calm={ctx.mode === 'live'}
+        captions={vtt ? { vtt, lang: ctx.locale, label: ctx.t('captions.label') } : null}
       />
     );
   } else if (d.media.kind === 'video' && poster) {

@@ -1,6 +1,7 @@
 import 'server-only';
+import type { User } from '@supabase/supabase-js';
 import { isAdminEmail, loadAccount } from '@/features/billing/server/account';
-import { effectivePlan, isPlanId, type AccountPlanState } from '@/features/billing/plans';
+import { effectivePlan, isPlanId, type AccountPlanState, type PlanId } from '@/features/billing/plans';
 import { serverEnv, type ServerEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import type { FlagDeps } from './api';
@@ -16,7 +17,8 @@ import {
 /**
  * What this deployment offers: every feature but those switched off here (INVITES_FEATURES_OFF), the
  * ones that need an AI model when none is set up, and the face albums until they are approved
- * (INVITES_FACE_ALBUMS — biometric data, docs/features.md).
+ * (INVITES_FACE_ALBUMS — biometric data, docs/features.md). The design concepts (`art_direction`)
+ * don't need the AI: without it they are composed from the photos (features/art-direction).
  */
 export function deploymentFeatures(env: ServerEnv = serverEnv()): Set<Feature> {
   const off = new Set(env.INVITES_FEATURES_OFF);
@@ -25,7 +27,7 @@ export function deploymentFeatures(env: ServerEnv = serverEnv()): Set<Feature> {
     FEATURES.filter((f) => {
       if (off.has(f)) return false;
       if (f === 'face_albums') return env.INVITES_FACE_ALBUMS;
-      if (f === 'gallery_ai' || f === 'translate_ai' || f === 'art_direction') return ai;
+      if (f === 'gallery_ai' || f === 'translate_ai') return ai;
       return true;
     }),
   );
@@ -63,24 +65,27 @@ export async function featureInput(
   };
 }
 
-/** What an event may use now — for the guest's pages and the host's screens alike. */
-export async function featuresFor(invitationId: string): Promise<Set<Feature>> {
-  const input = await featureInput(invitationId);
-  return input ? effectiveFeatures(input) : new Set();
-}
-
 /**
- * What a new event of this user may use (the wizard, before the event exists): their plan in force
- * and this deployment, without an event's own choices.
+ * What a host's account may use before there is an event (the wizard's languages, the gallery's
+ * "design it for me"): their plan in force and this deployment, without an event's own choices.
  */
-export async function accountFeatures(user: { id: string; email?: string | null }): Promise<Set<Feature>> {
-  const account = await loadAccount({ id: user.id, email: user.email ?? undefined });
-  return effectiveFeatures({
+export async function accountFeatures(
+  user: Pick<User, 'id' | 'email'>,
+): Promise<{ features: Set<Feature>; admin: boolean; plan: PlanId }> {
+  const account = await loadAccount(user);
+  const features = effectiveFeatures({
     plan: account.effective,
     admin: account.admin,
     overrides: NO_OVERRIDES,
     available: deploymentFeatures(),
   });
+  return { features, admin: account.admin, plan: account.effective };
+}
+
+/** What an event may use now — for the guest's pages and the host's screens alike. */
+export async function featuresFor(invitationId: string): Promise<Set<Feature>> {
+  const input = await featureInput(invitationId);
+  return input ? effectiveFeatures(input) : new Set();
 }
 
 export const flagDeps: FlagDeps = {

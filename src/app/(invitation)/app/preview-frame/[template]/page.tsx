@@ -10,12 +10,13 @@ import { requestBaseUrl } from '@/lib/request-url';
 import { getSessionUser } from '@/lib/supabase/session';
 
 type Params = Promise<{ template: string }>;
-type Search = Promise<{ invitation?: string; version?: string; lang?: string }>;
+type Search = Promise<{ invitation?: string; version?: string; entry?: string; lang?: string }>;
 
 /**
  * The preview iframe's page — waits for the editor (or the gallery) to post a document.
  * With `?invitation=<id>` (the editor's "open in a new tab") it renders that invitation's saved draft,
- * or a published `&version=<n>`, full-page for its owner.
+ * a published `&version=<n>`, or any entry of its history (`&entry=<id>`: a publish or a save),
+ * full-page for its owner — on the design that document is on (the path's template).
  */
 export default async function PreviewFramePage({
   params,
@@ -27,19 +28,27 @@ export default async function PreviewFramePage({
   const entry = getTemplate((await params).template);
   if (!entry) notFound();
   const env = serverEnv();
-  const { invitation, version, lang } = await searchParams;
+  const { invitation, version, entry: entryId, lang } = await searchParams;
   let standalone = null;
   if (invitation) {
     const user = await getSessionUser();
     if (!user) redirect(`/login?next=${encodeURIComponent(`/app/invitations/${invitation}/edit`)}`);
     const inv = await hostDb.get(invitation, user.id);
-    if (!inv || inv.templateId !== entry.manifest.id) notFound();
-    const n = Number(version);
-    const doc = version ? await hostDb.version(invitation, user.id, n) : inv.draft;
-    if (!doc) notFound();
+    if (!inv) notFound();
+    const doc = entryId
+      ? (await hostDb.entry(invitation, user.id, Number(entryId)))?.document
+      : version
+        ? await hostDb.version(invitation, user.id, Number(version))
+        : inv.draft;
+    // an older version may be on another design: the path names the one it is on
+    if (!doc || doc.templateId !== entry.manifest.id) notFound();
     const locale: Locale = doc.locales.includes(lang as Locale) ? (lang as Locale) : doc.defaultLocale;
     const query = (l: Locale) =>
-      `?${new URLSearchParams({ invitation, ...(version ? { version } : {}), lang: l }).toString()}`;
+      `?${new URLSearchParams({
+        invitation,
+        ...(entryId ? { entry: entryId } : version ? { version } : {}),
+        lang: l,
+      }).toString()}`;
     standalone = {
       doc,
       locale,

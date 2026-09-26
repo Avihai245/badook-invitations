@@ -14,6 +14,8 @@ import {
   cn,
   useToast,
 } from '@/components/app';
+import { StudioPanel } from '@/features/art-direction/ui/StudioPanel';
+import { VoiceCard } from '@/features/voice/ui/VoiceCard';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { HEX_COLOR_RE } from '../../contracts/schemas';
@@ -62,6 +64,8 @@ export function trackLicense(license: string): string | null {
 
 export function GlobalPanel({ panel }: { panel: PanelId }) {
   switch (panel) {
+    case 'studio':
+      return <StudioPanel />;
     case 'cover':
       return <CoverPanel />;
     case 'palette':
@@ -762,6 +766,8 @@ function SharePanel() {
         <ImageField path="share.ogImage" label={s.ogImage} help={s.ogImageHelp} />
         <BoolField path="share.noindex" label={s.noindex} help={s.noindexHelp} />
       </PanelCard>
+      {/* the invitation read aloud (features/voice) */}
+      <VoiceCard />
     </>
   );
 }
