@@ -402,7 +402,9 @@ a {
   letter-spacing: var(--track-wide);
   color: var(--cover-hint, #7c6a60);
   opacity: 0;
-  animation: fadeIn 0.8s 1.2s var(--ease) forwards;
+  /* soon after the cover itself: on a cover without a picture or a monogram this line is the largest
+     text of the first screen — the page's LCP (npm run perf:templates) */
+  animation: fadeIn 0.8s 0.3s var(--ease) forwards;
 }
 :root[lang='en'] .cover-hint {
   text-transform: uppercase;

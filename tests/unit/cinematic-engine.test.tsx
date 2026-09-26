@@ -479,4 +479,35 @@ describe('responsive images', () => {
     expect(imageAt('/dev/media/cine-sunset.jpg', 1000)).toMatch(/&w=1080&/);
     expect(imageAt('https://other.example/a.jpg', 1000)).toBe('https://other.example/a.jpg');
   });
+
+  it('only the first section’s media is preloaded (the hero’s, with its srcset); the sections’ are lazy', () => {
+    const showcase = cinematicDocument('sahar-bordeaux');
+    const doc: InvitationDocument = {
+      ...showcase,
+      sections: showcase.sections.map((s): Section =>
+        s.type === 'hero'
+          ? {
+              ...s,
+              data: {
+                ...s.data,
+                media: {
+                  kind: 'image',
+                  src: 'upload:cine-sunset.jpg',
+                  poster: null,
+                  focalPoint: { x: 0.5, y: 0.5 },
+                },
+              },
+            }
+          : s,
+      ),
+    };
+    const html = renderToStaticMarkup(<InvitationSections ctx={{ ...ctxOf(doc), mode: 'live' }} />);
+    const preloads = html.match(/<link rel="preload" as="image"[^>]*>/g) ?? [];
+    expect(preloads).toHaveLength(1);
+    expect(preloads[0]).toMatch(/imageSrcSet="[^"]*cine-sunset\.jpg[^"]*640w/);
+    expect(preloads[0]).toContain('fetchPriority="high"');
+    const pictures = html.match(/<img class="cine-img"[^>]*>/g) ?? [];
+    expect(pictures.length).toBeGreaterThan(5);
+    for (const img of pictures) expect(img).toContain('loading="lazy"');
+  });
 });

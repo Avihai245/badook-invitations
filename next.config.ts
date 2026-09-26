@@ -1,4 +1,9 @@
 import type { NextConfig } from 'next';
+import {
+  IMAGE_DEVICE_SIZES,
+  IMAGE_QUALITIES,
+  IMAGE_SIZES,
+} from './src/features/invitations/renderer/image-config';
 
 // the regular face of each family's Hebrew and Latin subsets (~1.7MB) — what og-image.tsx loads
 const FONT_FILES = [
@@ -56,10 +61,10 @@ const nextConfig: NextConfig = {
   images: imageSources
     ? {
         formats: ['image/avif', 'image/webp'],
-        // phones to wide screens (a full-bleed photo); no 3840 — a 2048px photo is plenty behind text
-        deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-        imageSizes: [96, 256, 384],
-        qualities: [70, 75],
+        // the renderer writes the optimizer's addresses from the same lists (renderer/images.ts)
+        deviceSizes: IMAGE_DEVICE_SIZES,
+        imageSizes: IMAGE_SIZES,
+        qualities: IMAGE_QUALITIES,
         // uploads have unique paths and template media a content hash in its URL: safe to keep a month
         minimumCacheTTL: 2_592_000,
         remotePatterns: imageSources,

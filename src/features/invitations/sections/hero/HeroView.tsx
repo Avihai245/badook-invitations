@@ -1,5 +1,4 @@
 import type { CSSProperties } from 'react';
-import { preload } from 'react-dom';
 import type { AssetRef, SectionOf } from '../../contracts/types';
 import { imageSet } from '../../renderer/images';
 import { longestWordLength } from '../../lib/text';
@@ -68,15 +67,13 @@ function HeroPlaceholder({ art, date }: { art: PlaceholderArt; date: string }) {
 }
 
 /**
- * The hero's picture — the first thing on screen, the page's LCP: fetched first, and where the image
- * optimizer may serve it (renderer/images.ts) in the screen's width and a modern format, preloaded
- * from the <head> with its srcset. Only the first section's media is preloaded; every other picture of
- * the invitation loads lazily.
+ * The hero's picture — the first section's media, the first thing on screen after the cover: where the
+ * image optimizer may serve it (renderer/images.ts), in the screen's width and a modern format. It is
+ * the invitation's only eager picture besides the cover's: React hoists a preload for it into the
+ * <head> (with its srcset), while every other picture loads lazily.
  */
 function HeroPicture({ url, focal }: { url: string; focal: string }) {
   const set = imageSet(url, '100vw');
-  if (!set.srcSet) return <img src={url} alt="" style={{ objectPosition: focal }} fetchPriority="high" />;
-  preload(set.src, { as: 'image', imageSrcSet: set.srcSet, imageSizes: set.sizes, fetchPriority: 'high' });
   return (
     <img
       src={set.src}

@@ -1,4 +1,4 @@
-import { getImageProps } from 'next/image';
+import { IMAGE_DEVICE_SIZES, IMAGE_OPTIMIZER_PATH, IMAGE_QUALITIES, IMAGE_SIZES } from './image-config';
 
 /**
  * Invitation images through Next.js image optimization (AVIF / WebP, a srcset of widths): the
@@ -8,6 +8,10 @@ import { getImageProps } from 'next/image';
  * what it may fetch. Anything else (another host, optimization switched off with
  * INVITES_IMAGE_OPTIMIZATION=off) is a plain <img src>, and an optimized image that fails to load
  * falls back to its original address (IMAGE_FALLBACK, inlined in the page's <head>).
+ *
+ * The addresses are the ones next/image's default loader writes (`/_next/image?url=…&w=…&q=…`, the
+ * widths chosen from `sizes` the same way), from the same widths and qualities as next.config.ts
+ * (./image-config.ts) — without next/image itself, which would add ~10 KB to every guest's page.
  */
 
 interface Source {
@@ -62,17 +66,35 @@ export interface ImageSet {
 /** Photos: a little below the default 75 (they are behind text or framed; AVIF holds up well). */
 export const PHOTO_QUALITY = 70;
 
+const ALL_SIZES = [...IMAGE_DEVICE_SIZES, ...IMAGE_SIZES].sort((a, b) => a - b);
+
+/** The widths a srcset offers for `sizes` (next/image's rule: from the smallest share of the viewport). */
+function widthsFor(sizes: string): number[] {
+  const shares = [...sizes.matchAll(/(^|\s)(1?\d?\d)vw/g)].map((m) => Number.parseInt(m[2]!, 10));
+  if (!shares.length) return ALL_SIZES;
+  const smallest = Math.min(...shares) / 100;
+  return ALL_SIZES.filter((w) => w >= IMAGE_DEVICE_SIZES[0]! * smallest);
+}
+
+/** The configured quality nearest to the one asked for (the optimizer refuses any other). */
+const qualityOf = (q: number) =>
+  IMAGE_QUALITIES.reduce((best, cur) => (Math.abs(cur - q) < Math.abs(best - q) ? cur : best));
+
+const optimized = (url: string, width: number, quality: number) =>
+  `${IMAGE_OPTIMIZER_PATH}?url=${encodeURIComponent(url)}&w=${width}&q=${quality}`;
+
 /**
  * An image's src / srcset / sizes: optimized widths when the optimizer may serve it, else the file as
  * it is. `sizes` says how wide it shows (e.g. '100vw' for a full-bleed background).
  */
 export function imageSet(url: string, sizes: string, quality = PHOTO_QUALITY): ImageSet {
   if (!optimizable(url)) return { src: url };
-  const { props } = getImageProps({ src: url, alt: '', fill: true, sizes, quality });
+  const q = qualityOf(quality);
+  const widths = widthsFor(sizes);
   return {
-    src: props.src,
-    srcSet: props.srcSet,
-    sizes: props.sizes ?? sizes,
+    src: optimized(url, widths.at(-1)!, q),
+    srcSet: widths.map((w) => `${optimized(url, w, q)} ${w}w`).join(', '),
+    sizes,
     fallback: url,
   };
 }
@@ -82,17 +104,9 @@ export function imageSet(url: string, sizes: string, quality = PHOTO_QUALITY): I
  * can't take a srcset).
  */
 export function imageAt(url: string, width: number, quality = PHOTO_QUALITY): string {
-  const set = imageSet(url, '100vw', quality);
-  if (!set.srcSet) return set.src;
-  const candidates = set.srcSet
-    .split(', ')
-    .map((entry) => {
-      const [href, w] = entry.trim().split(/\s+/);
-      return { href: href!, w: Number.parseInt(w ?? '', 10) };
-    })
-    .filter((c) => c.href && Number.isFinite(c.w))
-    .sort((a, b) => a.w - b.w);
-  return (candidates.find((c) => c.w >= width) ?? candidates.at(-1))?.href ?? set.src;
+  if (!optimizable(url)) return url;
+  const widths = widthsFor('100vw');
+  return optimized(url, widths.find((w) => w >= width) ?? widths.at(-1)!, qualityOf(quality));
 }
 
 /**
