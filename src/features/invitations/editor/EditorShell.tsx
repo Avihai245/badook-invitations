@@ -67,9 +67,18 @@ export function EditorShell({
       setMobileView('edit');
     },
   });
+  const { highlight, replay, play: playSection } = channel;
   const controls = useMemo(
-    () => ({ highlight: channel.highlight, replay: channel.replay }),
-    [channel.highlight, channel.replay],
+    () => ({
+      highlight,
+      replay,
+      // a section's motion, played in the phone; on a phone the editor shows the preview for it
+      play: (path: string, ms: number) => {
+        setMobileView('preview');
+        playSection(path, ms);
+      },
+    }),
+    [highlight, replay, playSection],
   );
 
   // Selecting a section scrolls the preview to it (not when the frame itself asked for it: it's in view).
@@ -131,7 +140,12 @@ export function EditorShell({
     if (autosave.status === 'failed' || autosave.status === 'invalid')
       toast({
         id: 'autosave',
-        title: autosave.status === 'invalid' ? e.save.invalid : e.save.failed,
+        title:
+          autosave.refused === 'feature_off'
+            ? e.cine.featureOff
+            : autosave.status === 'invalid'
+              ? e.save.invalid
+              : e.save.failed,
         variant: 'danger',
         duration: Infinity,
         action: { label: t.common.retry, altText: t.common.retry, onClick: () => void autosave.flush() },

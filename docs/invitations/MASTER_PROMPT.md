@@ -137,7 +137,8 @@ export interface InvitationDocument {
     timeFormat: '24h' | '12h' | null;   // null → locale default (he 24h, en 12h)
     rsvpDeadline: ISODate | null;
   };
-  theme: { fontPairId: string; palette: Partial<Palette> | null };  // only template.editablePaletteKeys
+  theme: { fontPairId: string; palette: Partial<Palette> | null;   // only template.editablePaletteKeys
+           tokens?: ThemeTokens | null };  // v2 (feature `cinematic`): the host's scale of the design's own tokens
   cover: {                        // the cover design itself comes from the template
     enabled: boolean;
     monogram: L10n | null;        // overlay text; ≤ template.cover.overlay.text.maxGlyphs visible glyphs (e.g. 'N&I', 'נ&א', 'DANA 30')
@@ -180,12 +181,19 @@ export interface ThemeOverrides {    // a section's own tokens — only what it 
   typography?: Partial<Record<'display' | 'heading' | 'body' | 'caption', Partial<{ size: number; lineHeight: number; letterSpacing: number }>>>;
   spacing?: Partial<{ section: number; gutter: number; block: number }>;
 }
+/** The host's "Style & motion" (the editor's design tab): multiples of the design's own tokens, 1 = as designed. */
+export interface ThemeTokens {
+  typeScale?: number;             // 0.85..1.2 — every type size
+  spacing?: number;               // 0.7..1.4 — section and in-section spacing (not the gutter)
+  motion?: number;                // 0..2 — × motion.intensity; 0 = nothing moves (like reduced motion)
+}
 export type OpeningPreset = 'envelope' | 'gate' | 'curtain' | 'fireworks' | 'gold_dust';   // envelope = the template's own cover
 export interface OpeningConfig {
   preset: OpeningPreset;
   trigger?: 'tap' | 'scroll';     // scroll: scrolling / swiping opens it too, with a "scroll to enter" cue (gate, curtain default)
   motion?: 'swing' | 'slide' | 'part' | 'rise';   // gate: swing | slide · curtain: part | rise
   color?: string | null;          // doors / curtain / sky; null → from the palette
+  backdrop?: 'hero' | null;       // a photographic design: fireworks / gold dust play over the invitation's first picture
 }
 
 interface Base<T extends string, D> {
@@ -282,6 +290,8 @@ export type CoverStyle = 'envelope_seal' | 'ribbon' | 'gatefold' | 'pouch' | 'sw
 export interface TemplateManifest {
   id: string; version: number;
   name: L10n; description: L10n;
+  listed: boolean;                 // (default true) false: out of the public gallery, home page and design count; the
+                                   // platform's admins see and use it; seeded inactive; its demos open by link
   categories: EventType[];
   supportsLocales: Locale[];
   previewImage: string; previewVideo: string | null;
@@ -330,7 +340,12 @@ export interface TemplateManifest {
   };
   assets: Record<string, string>;               // referenced as 'template:<key>'
   decorations: Partial<Record<'afterHero' | 'betweenVenues' | 'afterTimeline' | 'beforeRsvp' | 'footer', AssetRef | null>>;
-  sectionDefaults: { order: Section['type'][]; variants: Partial<Record<Section['type'], string>> };
+  sectionDefaults: {
+    order: Section['type'][];      // may list the v2 types; only 'custom' may repeat; a v1 type left out is seeded hidden before the RSVP
+    variants: Partial<Record<Section['type'], string>>;
+    // v2: what the seed gives a section, by its seeded id (its picture from `assets`, layout, motion, colors)
+    presentation?: Record<string, Pick<Section, 'media' | 'layout' | 'animation' | 'themeOverrides'>>;
+  };
 }
 
 // ---------- template seed copy (invitation-templates-pack/<id>/defaults.json) ----------
@@ -345,6 +360,11 @@ export interface EventDefaults {
   extraSections: { kind: 'transport' | 'accommodation' | 'dress_code' | 'menu' | 'activities' | 'custom'; title: L10n; subtitle: L10n | null; body: L10n; illustration: AssetRef | null }[];
   rsvp: { title: L10n; subtitle: L10n | null; messageLabel: L10n; successMessage: L10n; declineMessage: L10n; closedMessage: L10n; dietaryOptions: DietaryKey[]; dietaryNote: L10n | null };
   closingLine: L10n;
+  // v2 section types' copy (optional — else generic copy)
+  quote?: { text: L10n; attribution: L10n | null };
+  when?: { title: L10n | null; note: L10n | null };
+  parents?: { title: L10n | null; note: L10n | null };
+  custom?: { title: L10n | null; subtitle: L10n | null; body: L10n }[];   // the n-th `custom` of the order
 }
 export interface TemplateDefaults { templateId: string; defaults: Partial<Record<EventType, EventDefaults>> }
 // seedDocument(template, defaults, wizardInput) → InvitationDocument. If the chosen eventType has no defaults
@@ -491,6 +511,7 @@ Routes (adapt names to the repo's conventions):
 ```
 
 - **Template registry**: at build time import every `invitation-templates-pack/<id>/manifest.json` + `defaults.json`, validate them with the Zod schemas (fail the build on error), and upsert manifests into `invitation_templates` via a seed script. Media paths point to `public/templates/<id>/…`.
+- **Placeholder photos** — a photographic design (Lumière) may ship generated placeholders for its `photo-*` assets in `public/templates/<id>/` (`npm run media:placeholders -- <id>`, listed with hashes in `templates/placeholder-media.json`); `templateFileUrl` prefers the bucket's file (`media-manifest.json`), else the placeholder, else null. Their `listed: false` keeps such a design out of the public gallery until its real photos are in.
 - **Missing media must never break an invitation** (the pack ships without media): `resolveAsset` checks a generated `public/templates/<id>/.available.json` (built by a script that lists existing files) — missing poster → CSS gradient from the palette with a subtle paper-noise texture + a CSS-drawn envelope/gate/pouch silhouette; missing `openVideo` → CSS 3D fallback; missing hero video → poster; missing poster → gradient; missing illustration/decoration → skipped; missing overlay image → a CSS circle (radial gradient in `sealColor`) under the monogram. Show a "placeholder media" badge in the editor only.
 - **Cover overlay rendering**: recolor = a `<div>` filled with `sealColor` masked by the PNG (`mask-image`) + the same PNG on top with `mix-blend-mode: multiply` (the blanks are light warm-gray, so shading survives). Monogram = inline `<svg>` `<text>` in `monogramFont` for the locale script, auto-fit to 58% of the overlay width, with SVG filters: `emboss`/`deboss` (feGaussianBlur + feSpecularLighting / inverted offset shadows, text color = sealColor darkened 18% / lightened 22%), `foil` (linearGradient gold/silver sheen animated once on hover/tap), `print` (flat ink `text.color`, slight 0.9 opacity, feTurbulence roughness). `crack` = two clip-path halves of the same overlay animated apart.
 - **Hero options**: the editor lists `template.hero.options`; the document stores the chosen option's `media` (`template:` refs); the renderer finds the option whose `media.src` matches to pick `mediaDesktop`.
@@ -501,7 +522,7 @@ Routes (adapt names to the repo's conventions):
 - **Asset resolution**: `resolveAsset(ref, template, invitation)` handles `template:` / `upload:` / https.
 - **Cinematic presentation (v2, feature `cinematic`)** — `renderer/cinematic`: a section with media, a layout, motion or tokens of its own is wrapped in `<div class="cine" data-layout data-on-media data-enter data-scroll data-tr data-palette>` (`CineSection`); full-bleed layouts put the media behind the text under a scrim (`tokens.overlay`, or the section's `media.overlay` for its opacity) — the text on media is light on a dark scrim in the design's own hues (its hero overlay when dark, else its ink; the text its paper or white), even on designs whose hero has dark text over pale art, unless the section sets its own `heroText` (the scrim follows it) or the template a light `tokens.overlay.color` (the text goes dark) — split layouts beside it (CSS grid; start follows `dir`), stack above it. Focal points → `object-position`. Section `themeOverrides` become the wrapper's CSS variables (`sectionThemeVars`), so they apply to that section only. Without the feature (`RenderOptions.cinematic: false`) nothing of this renders: sections come out exactly as v1, the new types render plainly without media, the cover is the template's own. The guest's page asks the event's flags only when the document or template uses v2 (`server/cinematic.ts`); a feature change reaches a cached page within the ISR minute (or at once on the next publish).
 - **Scroll Timeline Engine** — `renderer/motion/engine.ts` (animation JSON → attributes + variables, pure) and `ScrollEngine.client.tsx` (one component per page): CSS scroll-driven animations (`animation-timeline: view()`, a `view-timeline` per section) scrub the enter presets, the parallax and the Ken Burns zoom where supported; elsewhere one IntersectionObserver adds `.in` and the presets play in time, and the parallax is written once per frame from geometry measured outside the scroll handler. Transform and opacity only. Text reveals split a title into aria-hidden pieces over the real text (read once) and remove them after playing. Background videos get their `src` only near the screen (never with Save-Data, `prefers-reduced-data` or reduced motion), play muted/looped/inline and pause off screen. Blocks too near the page's end to finish a scroll-driven entrance come in on time instead. Reduced motion or `<html data-motion="none">`: everything static.
-- **Openings (v2)** — `renderer/cover/Openings.client.tsx`: gate (doors swing / slide), curtain (parts / rises), fireworks, gold dust, besides the template's envelope; the host's `cover.opening` wins over the template's `cover.opening` (whose trigger / motion / color apply when the presets match). The monogram is real text (set smaller on the medal / crest when it is long); gate and curtain also open by scrolling or swiping ("גללו להיכנס / Scroll to enter"); without a hint from the host each opening shows its own call to action (`cover.hint.<preset>`: "Tap to open the gate"…) — the template's seeded hint speaks of its own cover, so when the host picks another opening the editor should clear `cover.hint` (or offer the opening's wording); colors default to the design's dark tone (its ink on a light design, its background on a dark one); the light is a small canvas (`fx/sparks.ts`); reduced motion → a 300ms fade.
+- **Openings (v2)** — `renderer/cover/Openings.client.tsx`: gate (doors swing / slide), curtain (parts / rises), fireworks, gold dust, besides the template's envelope; with the template's `cover.opening.backdrop: 'hero'` the sheer ones (fireworks, gold dust) play over the hero's picture (the same optimized image the hero shows, zoomed like it, so it is one download); the host's `cover.opening` wins over the template's `cover.opening` (whose trigger / motion / color apply when the presets match). The monogram is real text (set smaller on the medal / crest when it is long); gate and curtain also open by scrolling or swiping ("גללו להיכנס / Scroll to enter"); without a hint from the host each opening shows its own call to action (`cover.hint.<preset>`: "Tap to open the gate"…) — the template's seeded hint speaks of its own cover, so when the host picks another opening the editor should clear `cover.hint` (or offer the opening's wording); colors default to the design's dark tone (its ink on a light design, its background on a dark one); the light is a small canvas (`fx/sparks.ts`); reduced motion → a 300ms fade.
 - **Responsive images** — `renderer/images.ts`: pictures go through Next's image optimizer (AVIF/WebP, srcset + sizes per layout) when `next.config.ts` allows their host (the Supabase Storage buckets from `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL`, and local paths); anything else, or `INVITES_IMAGE_OPTIMIZATION=off`, is a plain `<img>`, and an optimized image that fails falls back to its original (an inline capture listener). The renderer writes the optimizer's addresses itself (next/image's default-loader format, widths and qualities shared with `next.config.ts` via `renderer/image-config.ts`), so next/image stays out of the guest's bundle. The hero's picture is the only eager one besides the cover's (`fetchpriority=high`; React hoists its preload with the srcset); every section picture is lazy; videos have posters.
 - **Public bundle** must not import editor code (separate route group / dynamic imports).
 - **Utilities (unit-tested)**:
@@ -539,6 +560,9 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
 3. **Editor layout**: desktop 3 columns — (a) section list: toggle, drag-reorder (`@dnd-kit`, hero/footer locked), add from catalog, duplicate, delete custom; (b) form for the selected section/global settings (Event, Cover, Design, Music, Languages, Share); (c) live preview in a 390×844 phone frame (scaled), with "Replay opening" and locale toggle. Mobile: tabs Edit / Preview.
 4. **Localized fields**: when 2 locales are active, each `L10n` field shows `עב | EN` tabs with a dot for missing translations; the input's `dir` follows the tab. Optional "Copy from other language" helper.
 5. **Design panel**: palette preset swatches (`palettePresets`) + fine-tune of editable keys with contrast check (warn below 4.5:1 for text on bg), font pair select, cover: monogram/ticket-text input (live counter vs `maxGlyphs`, per locale) + seal color swatches (when `recolor`) + "Replay opening" button, hero: pick one of `hero.options` or upload (focal-point picker, overlay slider), music track picker + custom upload (with rights checkbox).
+   - **Colors from a photo** (palette panel): a picture from the device or the invitation is read on the device (a canvas, nothing uploaded) — `lib/photo-palette.ts`: k-means in OKLab on a ≤ 72px copy → up to three palettes (light, evening, tinted), every text pair repaired to WCAG AA (text and muted text ≥ 4.5:1 on the page and the cards, the button text on the accent, the accent ≥ 3:1 for titles); only the design's editable keys change, and an option its fixed colors rule out (an evening where the cards stay light) is left out. One tap applies (one undo step).
+   - **Suggested fonts** (fonts panel): `lib/font-suggest.ts` — three pairs from the design's own and the font library that fit the event type and the palette's mood (a dark palette is more formal, a vivid accent playful), of different styles, not the one in use; live specimens (the names and a line) in every language of the invitation.
+   - **Cinematic controls** (feature `cinematic`; hidden without it, and the server refuses a save that adds a v2 value the stored draft doesn't have — 403 `feature_off`; values already there stay, a section's own move with it): per section (`editor/panels/SectionCinematic.tsx`, after its content) — picture or video (upload with progress, or one the invitation already has; a tap sets the focal point, arrow keys nudge it; a video's still is read from the file; the scrim over text; the description of a framed picture), layout (drawn thumbnails, only the layouts the section can take — full-bleed ones for sections with a form, list or map — disabled until there is media / a video), motion (entrance presets with a live mini preview, the scroll effect, the text reveal, intensity, fine-tuning, "play" in the preview), its own colors (the invitation's, a dark / soft / accent band made readable, or custom, with a contrast badge, an automatic fix and three palettes from its picture; title size, spacing, corners); the hero: its background's motion and text color. The design tab's "Style & motion" sets `theme.tokens`; the cover panel's opening picker (with previews) sets `cover.opening` and clears the template's seeded `cover.hint`. "Add section" offers parents, when, where, a quote and text & picture, with starter copy (the template's `defaults.json`, else generic). All of it goes through the editor's `apply` (`editor/presentation.ts`: pure document changes that drop values back at their defaults) — one undo step each, autosaved, checked by `validate.ts`.
 6. **Autosave** draft (debounce 800ms, optimistic, conflict-safe via `updated_at`), "Unpublished changes" badge, undo/redo (in-memory, 50 steps).
 7. **Publish**: run full validation → list blocking errors (click to jump to field) and warnings → publish → share screen: copy link, WhatsApp share (`https://wa.me/?text=<encoded message + link>`), QR (PNG/SVG download), preview of the OG card.
 8. **Versions**: list published versions, preview, restore to draft.
@@ -562,7 +586,7 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
 ## 9. Performance, accessibility, security
 
 - LCP < 2.5s on mid-range mobile/4G: preload cover poster (≤200KB AVIF/WebP) and active display font; hero video ≤4MB 720×1280 H.264 with poster; below-the-fold images lazy; map iframe only after in view (static placeholder first); no editor code in the public bundle.
-- **Performance budget gate** — `npm run perf:templates` (`scripts/perf-templates.ts`, Playwright + the DevTools protocol, no Lighthouse; `.github/workflows/perf-templates.yml`): every template's demo and the v2 showcase on a 390×844 phone with Lighthouse's mobile 4G throttling (150 ms RTT, 1.6 Mbps down, 750 Kbps up — per request 562.5 ms, ×0.9) and a 4× slower CPU must keep LCP < 2.5 s (before the first tap), CLS < 0.1 (the whole visit) and a median ≥ 55 fps of frames the compositor presents while the whole invitation is scrolled (a trace's DrawFrame events; the main thread's frame rate over the same scroll is reported beside it, as information); JSON + Markdown report in `test-results/perf/`.
+- **Performance budget gate** — `npm run perf:templates` (`scripts/perf-templates.ts`, Playwright + the DevTools protocol, no Lighthouse; `.github/workflows/perf-templates.yml`): every template's demo and the v2 showcase on a 390×844 phone with Lighthouse's mobile 4G throttling (150 ms RTT, 1.6 Mbps down, 750 Kbps up — per request 562.5 ms, ×0.9) and a 4× slower CPU must keep LCP < 2.5 s (before the first tap), CLS < 0.1 (the whole visit) and a median ≥ 55 fps of frames the compositor presents while the whole invitation is scrolled (a trace's DrawFrame events; the main thread's frame rate over the same scroll is reported beside it, as information); JSON + Markdown report in `test-results/perf/`. The workflow runs on pull requests that touch how invitations render or what they load (renderer, sections, styles, fonts, lib, contracts, the templates and their pictures, the guest's routes, `next.config.ts`, the lockfile) and fails when a page misses a budget. Locally: `npm run build && npm run perf:templates -- --tpl <id>` on a quiet machine; `--profile old-phone` (360×640, 6× CPU; LCP < 4 s, CLS < 0.1, ≥ 50 fps) checks an older phone.
 - **First paint** — the page's shell must stay under React's 12.8 KB inlining limit so the cover comes with the first bytes: the font-face rules are a style resource (`<style href precedence>`, written into the head outside the shell), the cover has a Suspense boundary of its own ahead of the sections (which stream after it, under it), a drawn design's scene on the envelope's card streams after the cover, and the cover's call to action is on screen from the first paint. A boundary past the limit is streamed and revealed ≥ 300 ms after the first paint (React 19.2), moved into place (restarting its CSS animations) and restyled with the whole page.
 - Cover works in iOS Safari, Android Chrome, and WhatsApp/Instagram in-app browsers (test `playsInline`, audio start inside the gesture, `100svh`).
 - A11y: cover is a `<button aria-label>`; keyboard operable everywhere; visible focus; AA contrast; `aria-live="polite"` for form status; all animations disabled under `prefers-reduced-motion`; music never autoplays without a gesture and is always mutable.

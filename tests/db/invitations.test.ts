@@ -75,7 +75,10 @@ describe('seed', () => {
 
 describe('anonymous', () => {
   it('reads active templates only', async () => {
-    const all = (await c.query('select count(*)::int as n from invitation_templates')).rows[0].n as number;
+    // (an unlisted design — manifest `listed: false` — is seeded inactive)
+    const all = (await c.query('select count(*)::int as n from invitation_templates where is_active')).rows[0]
+      .n as number;
+    expect(all).toBe(TEMPLATES.size - [...TEMPLATES.values()].filter((t) => !t.manifest.listed).length);
     await c.query(`update invitation_templates set is_active = false where id = 'atara'`);
     const n = await as(
       c,

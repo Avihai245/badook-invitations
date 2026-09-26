@@ -86,5 +86,6 @@ export function usePreviewChannel(
     ),
     replay: useCallback(() => send({ type: 'replay' }), [send]),
     reveal: useCallback((path: string) => send({ type: 'reveal', path }), [send]),
+    play: useCallback((path: string, ms: number) => send({ type: 'play', path, ms }), [send]),
   };
 }

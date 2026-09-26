@@ -36,6 +36,18 @@ file should look like (sizes, length, loop, tone) is in the template's `ASSETS.m
 
 `npm run media:sync -- --check` only compares (exit code 1 when the manifest is out of date) — handy in CI.
 
+## Placeholder photos (photographic designs)
+
+A photographic design needs pictures to look like itself, so until its real photos are in the bucket it
+ships small generated placeholders in the build — the only template files in `public/templates/`:
+`npm run media:placeholders -- <id>` (`scripts/make-template-placeholders.mjs`) draws soft gradients,
+light and film grain in the design's palette at the sizes of the real photos, one per `photo-*` entry of
+its manifest's `assets`, writes them to `public/templates/<id>/` and lists them with a hash in
+`src/features/invitations/templates/placeholder-media.json`. A file the bucket has always wins over its
+placeholder (after `npm run media:sync`), so swapping in the real photos is: upload them under the same
+names (or change the paths in `assets` — the one list), `npm run media:sync`, commit, deploy. Delete the
+placeholders (and their entries) once the real ones are live.
+
 ## Music
 
 A template's theme track needs a licence that allows use in invitations shared publicly

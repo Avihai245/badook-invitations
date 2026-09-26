@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { loadAccount } from '@/features/billing/server/account';
 import { Editor } from '@/features/invitations/editor/Editor';
 import { fontFaceCss, libraryDisplayFamilies, templateFontFamilies } from '@/features/invitations/fonts';
+import { FONT_LIBRARY } from '@/features/invitations/fonts/library';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { cinematicFor } from '@/features/invitations/server/cinematic';
@@ -51,6 +52,8 @@ export default async function EditInvitationPage({ params }: { params: Params })
           __html: [
             fontFaceCss(templateFontFamilies(entry.manifest)),
             fontFaceCss(libraryDisplayFamilies(), [400]),
+            // the font suggestions write a line in each suggested library pair's text face
+            fontFaceCss(new Set(FONT_LIBRARY.flatMap((p) => [p.body.latin, p.body.hebrew])), [400]),
           ].join('\n'),
         }}
       />

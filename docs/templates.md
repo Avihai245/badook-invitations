@@ -110,3 +110,51 @@ layout and motion (master prompt §3). To check a template: `/dev/invitations/re
 shows every layout and motion (`?opening=gate|curtain|fireworks|gold_dust`, `?cinematic=0` for the plain
 rendering, `?motion=rise` for entrances on any document), and `npm run perf:templates -- --tpl <id>`
 measures its demo against the performance budget.
+
+More manifest fields for photographic designs (all optional, the drawn designs have none of them):
+
+- `listed` — `false` keeps a design out of the public gallery, the home page, the design count and the
+  support assistant's list; the seed writes its template row inactive. The platform's admins
+  (`INVITES_ADMIN_EMAILS`) see it in the gallery, marked "not in the gallery", and may create
+  invitations with it (the server refuses anyone else); `/dev/invitations` shows it; its demos are
+  seeded and open by their link like every demo. Set it to `true` (or remove it) to release the design.
+- `cover.opening.backdrop: "hero"` — the fireworks and gold-dust openings play over the invitation's
+  first picture (its hero's photo, or its video's still), zoomed like the hero it hands over to; the
+  doors and the curtain are opaque and ignore it. A host who picks another sheer opening keeps it.
+- `sectionDefaults.presentation` — what the seed gives each section, by its seeded id: `media` (a
+  `template:<key>` picture from `assets`), `layout`, `animation` and `themeOverrides`, exactly as a
+  section of the document has them. `sectionDefaults.order` may list the new section types (`quote`,
+  `when`, `where`, `parents`, `custom` — only `custom` may repeat); a v1 section type the order leaves
+  out is still seeded, hidden, before the RSVP (the host can switch it on). The copy of the new types
+  comes from `defaults.json` (`quote`, `when`, `parents`, `custom`, all optional — else generic copy).
+  `npm run templates:validate` seeds every event type and checks the presentation names sections the
+  seed makes and pictures that exist.
+
+## Lumière (`lumiere`): the photographic flagship
+
+A quiet, photographic invitation — premium, weddings, engagements and bar/bat mitzvahs (and
+save-the-dates): the gold-dust opening over the hero's photo, a different photo for every part (a
+full-bleed verse, the story beside its photo, the date as a dark band, the venue over its photo with a
+slow parallax, the timeline on paper) and the RSVP as its high point — full bleed over its photo with a
+slow zoom. Restrained type (Cormorant Garamond / Bellefair, Jost / Assistant; Bodoni Moda as the second
+pair), one signature motion — words rising one by one while the photos breathe — and golden motes over
+the first photo. Every colour is the host's to change.
+
+Its photographs are one list, the `photo-*` entries of `assets` in its manifest
+(`invitation-templates-pack/lumiere/ASSETS.md` says what each should show and its size). Until the real
+ones are in the `template-media` bucket it ships generated placeholders (see docs/template-media.md) and
+stays unlisted (`"listed": false`). To release it: upload the photos, `npm run media:sync`, set
+`"listed": true`, commit and deploy — the seed re-publishes its demos with them.
+
+## The performance budget, locally and in CI
+
+`npm run build`, then `npm run perf:templates -- --tpl <id>` measures the design's demo and the
+cinematic showcase the way the CI gate does (a 390×844 phone, 4G throttling, a 4× slower CPU; LCP < 2.5 s,
+CLS < 0.1, a scroll at ≥ 55 fps) and writes `test-results/perf/templates.md`. It starts `next start`
+itself (`--port`, default 3520; or `--base <url>` for a running server). Measure on a quiet machine: a
+busy one inflates every number. `--profile old-phone` measures an older, smaller phone (360×640, a 6×
+slower CPU; LCP < 4 s, CLS < 0.1, ≥ 50 fps) — not part of the gate, worth a run for a new design or a
+heavier effect. The GitHub workflow (`.github/workflows/perf-templates.yml`) runs the gate on every pull
+request that changes how invitations render or what they load (the renderer, sections, styles, fonts,
+the templates and their pictures, the guest's routes, the image settings) and fails when a page misses
+a budget; it can also be started by hand for chosen templates.

@@ -1,17 +1,23 @@
-import type {
-  EventDefaults,
-  EventType,
-  HHmm,
-  ISODate,
-  InvitationDocument,
-  L10n,
-  Locale,
-  Section,
-  TemplateDefaults,
-  TemplateManifest,
+import {
+  V2_SECTION_TYPES,
+  type EventDefaults,
+  type EventType,
+  type HHmm,
+  type ISODate,
+  type InvitationDocument,
+  type L10n,
+  type Locale,
+  type Section,
+  type SectionType,
+  type TemplateDefaults,
+  type TemplateManifest,
 } from '../contracts/types';
 import { firstGrapheme, suggestSlug } from '../lib/text';
 import { COUPLE_EVENTS, SEED_COPY } from './seed-copy';
+
+export type V2SectionType = (typeof V2_SECTION_TYPES)[number];
+export const isV2Type = (type: SectionType): type is V2SectionType =>
+  (V2_SECTION_TYPES as readonly SectionType[]).includes(type);
 
 export interface WizardInput {
   eventType: EventType;
@@ -71,6 +77,112 @@ const pick = (value: L10n, locales: readonly Locale[]): L10n => {
 };
 const pickOrNull = (value: L10n | null | undefined, locales: readonly Locale[]) =>
   value ? pick(value, locales) : null;
+
+/** What a schema-v2 section's starter content depends on. */
+export interface V2SeedInput {
+  eventType: EventType;
+  locales: readonly Locale[];
+  startTime: HHmm;
+  endTime: HHmm | null;
+  /** the template's copy for the event type (its v2 fields), when there is one */
+  defaults?: EventDefaults | null;
+  /** the n-th `custom` of the template's order (1-based): its copy is the n-th of `defaults.custom` */
+  n?: number;
+  /** a `custom` without the template's copy: a picture band (seed) or a titled section (editor) */
+  titled?: boolean;
+}
+
+/**
+ * A schema-v2 section (parents · when · where · quote · text & picture) with its starter content: the
+ * template's copy for the event type (defaults.json), else the generic copy (SEED_COPY). Shared by the
+ * seed and the editor's "add section"; `id` must be unique in the document.
+ */
+export function v2Section(type: V2SectionType, id: string, input: V2SeedInput): Section {
+  const { locales, eventType } = input;
+  const d = input.defaults ?? null;
+  const orNull = (v: L10n | null | undefined) => (v ? pick(v, locales) : null);
+  switch (type) {
+    case 'parents':
+      return {
+        id,
+        type,
+        enabled: true,
+        data: {
+          title: orNull(d?.parents ? d.parents.title : SEED_COPY.parentsTitle(eventType)),
+          // no names of its own: the section shows hosts.parents (the wizard's parents)
+          items: [],
+          note: orNull(d?.parents?.note),
+        },
+      };
+    case 'when':
+      return {
+        id,
+        type,
+        enabled: true,
+        data: {
+          title: orNull(d?.when ? d.when.title : SEED_COPY.whenTitle(eventType)),
+          showWeekday: true,
+          showHebrewDate: locales.includes('he'),
+          showTime: true,
+          countdown: true,
+          showCalendar: true,
+          note: orNull(d?.when?.note),
+        },
+      };
+    case 'where':
+      return {
+        id,
+        type,
+        enabled: true,
+        data: {
+          venue: {
+            id: 'venue-1',
+            label: pick(d?.venueLabels[0] ?? SEED_COPY.whereLabel, locales),
+            name: {},
+            address: {},
+            geo: null,
+            mapsQuery: null,
+            date: null,
+            startTime: input.startTime,
+            endTime: input.endTime,
+            showMap: true,
+            buttons: { maps: true, waze: locales.includes('he'), calendar: true },
+          },
+          note: null,
+        },
+      };
+    case 'quote': {
+      const q = d?.quote ?? SEED_COPY.quote(eventType);
+      return {
+        id,
+        type,
+        enabled: true,
+        data: { text: pick(q.text, locales), attribution: orNull(q.attribution) },
+      };
+    }
+    case 'custom': {
+      const own = d?.custom?.[(input.n ?? 1) - 1];
+      return {
+        id,
+        type,
+        enabled: true,
+        data: own
+          ? {
+              title: orNull(own.title),
+              subtitle: orNull(own.subtitle),
+              body: pick(own.body, locales),
+              cta: null,
+            }
+          : {
+              title: input.titled ? pick(SEED_COPY.customTitle, locales) : null,
+              subtitle: null,
+              body: {},
+              cta: null,
+            },
+      };
+    }
+  }
+}
 
 const addDays = (iso: ISODate, days: number): ISODate => {
   const [y, m, d] = iso.split('-').map(Number) as [number, number, number];
@@ -329,13 +441,42 @@ export function seedDocument(
     ],
   };
 
+  const order = template.sectionDefaults.order;
   const sections: Section[] = [];
-  for (const type of template.sectionDefaults.order) sections.push(...(bySlot[type] ?? []).map(withVariant));
-  // Section types that exist in the seed but not in the template order are appended before the footer.
-  for (const [type, list] of Object.entries(bySlot)) {
-    if (!template.sectionDefaults.order.includes(type as Section['type'])) {
-      sections.splice(sections.length - 1, 0, ...(list ?? []).map(withVariant));
+  const seen: Partial<Record<Section['type'], number>> = {};
+  for (const type of order) {
+    const n = (seen[type] = (seen[type] ?? 0) + 1);
+    if (isV2Type(type)) {
+      // v2 types come only from the order (`custom` may repeat: custom, custom-2…)
+      const section = v2Section(type, n === 1 ? type : `${type}-${n}`, {
+        eventType: input.eventType,
+        locales,
+        startTime: input.startTime,
+        endTime,
+        defaults: d,
+        n,
+      });
+      sections.push(withVariant({ ...section, enabled: !saveTheDate } as Section));
+    } else if (n === 1) {
+      sections.push(...(bySlot[type] ?? []).map(withVariant));
     }
+  }
+  // Section types that exist in the seed but not in the template order are added hidden (the template
+  // left them out, the host can switch them on) — before the RSVP, else before the footer, so a design
+  // that ends on its RSVP still does.
+  for (const [type, list] of Object.entries(bySlot)) {
+    if (!order.includes(type as Section['type'])) {
+      const rsvp = sections.findIndex((s) => s.type === 'rsvp');
+      const footer = sections.findIndex((s) => s.type === 'footer');
+      const at = rsvp >= 0 ? rsvp : footer >= 0 ? footer : sections.length;
+      sections.splice(at, 0, ...(list ?? []).map((s) => ({ ...withVariant(s), enabled: false }) as Section));
+    }
+  }
+  // v2: the template's own presentation of each seeded section — its photo, layout, motion, colors
+  const presentation = template.sectionDefaults.presentation ?? {};
+  for (const [i, s] of sections.entries()) {
+    const own = presentation[s.id];
+    if (own) sections[i] = { ...s, ...structuredClone(own) } as Section;
   }
 
   const names = [

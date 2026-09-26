@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import { isAdminEmail } from '@/features/billing/server/account';
 import { TemplateGallery, type DevPreviews } from '@/features/invitations/app/gallery/TemplateGallery';
 import { GALLERY_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { devRoutesEnabled } from '@/lib/dev-routes';
 import { serverEnv } from '@/lib/env';
 import { getUi } from '@/lib/i18n/server';
+import { getSessionUser } from '@/lib/supabase/session';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getUi();
@@ -30,7 +32,7 @@ export default async function NewInvitationPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const env = serverEnv();
-  const { previews } = await searchParams;
+  const [{ previews }, user] = await Promise.all([searchParams, getSessionUser()]);
   return (
     <TemplateGallery
       bases={assetBasesFromEnv({
@@ -39,6 +41,8 @@ export default async function NewInvitationPage({
       })}
       fontCss={GALLERY_FONT_CSS}
       devPreviews={devPreviews(previews)}
+      // unlisted designs (manifest `listed: false`) are the platform admins' to try
+      admin={isAdminEmail(user?.email)}
     />
   );
 }

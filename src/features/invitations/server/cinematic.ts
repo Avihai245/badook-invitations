@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { deploymentFeatures, featuresFor } from '@/features/flags/server';
 import type { InvitationDocument, TemplateManifest } from '../contracts/types';
 import { usesCinematic } from '../renderer/cinematic/presentation';
@@ -20,13 +21,16 @@ export async function cinematicFor(invitationId: string): Promise<boolean> {
 
 /**
  * The same for a guest's page, asking only when the invitation has something the feature gates (its
- * sections' presentation, the host's opening or the template's): most invitations need no query.
+ * sections' presentation, the host's opening or tokens, the template's opening): most invitations need
+ * no query. Once per request — the page's layout (the host's tokens on <html>) and the page share it.
  */
-export async function cinematicForPage(
-  invitationId: string,
-  doc: InvitationDocument,
-  template: Pick<TemplateManifest, 'cover'>,
-): Promise<boolean> {
-  if (!usesCinematic(doc) && !template.cover.opening) return false;
-  return cinematicFor(invitationId);
-}
+export const cinematicForPage = cache(
+  async (
+    invitationId: string,
+    doc: InvitationDocument,
+    template: Pick<TemplateManifest, 'cover'>,
+  ): Promise<boolean> => {
+    if (!usesCinematic(doc) && !template.cover.opening) return false;
+    return cinematicFor(invitationId);
+  },
+);

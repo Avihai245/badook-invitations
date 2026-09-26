@@ -1,6 +1,15 @@
-import { EVENT_TYPES, type L10n, type Locale, type TemplateManifest } from '../contracts/types';
+import { InvitationDocumentSchema } from '../contracts/schemas';
+import {
+  EVENT_TYPES,
+  type EventType,
+  type L10n,
+  type Locale,
+  type TemplateManifest,
+} from '../contracts/types';
 import { LIBRARY_PAIR_PREFIX } from '../fonts/library';
+import { parseVideoLink } from '../lib/video-links';
 import type { TemplateEntry } from './registry';
+import { seedDocument } from './seed-document';
 
 const templateKey = (ref: string | null | undefined) =>
   ref && ref.startsWith('template:') ? ref.slice('template:'.length) : null;
@@ -67,6 +76,21 @@ export function validateTemplate({ manifest, defaults }: TemplateEntry): string[
   const order = manifest.sectionDefaults.order;
   if (order[0] !== 'hero') at('sectionDefaults.order must start with hero');
   if (order[order.length - 1] !== 'footer') at('sectionDefaults.order must end with footer');
+  for (const type of new Set(order))
+    if (type !== 'custom' && order.filter((t) => t === type).length > 1)
+      at(`sectionDefaults.order lists "${type}" twice (only "custom" may repeat)`);
+
+  // v2: the seeded sections' presentation — its pictures exist, a section video is a file, the hero's
+  // picture is its hero option (its presentation is motion and colors only)
+  for (const [id, p] of Object.entries(manifest.sectionDefaults.presentation ?? {})) {
+    const where = `sectionDefaults.presentation.${id}`;
+    checkRef(p.media?.src, `${where}.media.src`);
+    checkRef(p.media?.poster, `${where}.media.poster`);
+    if (p.media?.kind === 'video' && parseVideoLink(p.media.src))
+      at(`${where}.media.src must be a file, not a link`);
+    if (id === 'hero' && (p.media || (p.layout && p.layout !== 'full_bleed')))
+      at(`${where}: the hero's picture is its hero option (motion and colors only here)`);
+  }
 
   // localized template texts
   checkL10n(manifest.name, 'name', locales);
@@ -112,7 +136,50 @@ export function validateTemplate({ manifest, defaults }: TemplateEntry): string[
     }
     checkL10n(d.rsvp.dietaryNote, w('rsvp.dietaryNote'), locales);
     checkL10n(d.closingLine, w('closingLine'), locales);
+    // v2 sections' copy
+    if (d.quote) {
+      checkL10n(d.quote.text, w('quote.text'), locales);
+      checkL10n(d.quote.attribution, w('quote.attribution'), locales);
+    }
+    for (const key of ['when', 'parents'] as const) {
+      checkL10n(d[key]?.title, w(`${key}.title`), locales);
+      checkL10n(d[key]?.note, w(`${key}.note`), locales);
+    }
+    d.custom?.forEach((c, i) => {
+      checkL10n(c.title, w(`custom[${i}].title`), locales);
+      checkL10n(c.subtitle, w(`custom[${i}].subtitle`), locales);
+      // an empty text is a picture band
+      if (Object.values(c.body).some((v) => v?.trim())) checkL10n(c.body, w(`custom[${i}].body`), locales);
+    });
   }
   if (Object.keys(defaults.defaults).length === 0) at('defaults.json has no event types');
+
+  // what a host gets: every event type's seed is a valid document, and the presentation names
+  // sections the seed makes
+  const seeded = new Set<string>();
+  for (const eventType of manifest.categories) {
+    try {
+      const doc = seedDocument(manifest, defaults, {
+        eventType: eventType as EventType,
+        locales: [...locales],
+        defaultLocale: locales[0]!,
+        hosts: { primary: { he: 'א', en: 'A' }, secondary: { he: 'ב', en: 'B' }, parents: null },
+        date: '2027-06-17',
+        startTime: '19:30',
+        timezone: 'Asia/Jerusalem',
+        slug: 'validate',
+      });
+      const parsed = InvitationDocumentSchema.safeParse(doc);
+      if (!parsed.success)
+        at(
+          `the ${eventType} seed is invalid: ${parsed.error.issues[0]?.path.join('.')} ${parsed.error.issues[0]?.message}`,
+        );
+      for (const s of doc.sections) seeded.add(s.id);
+    } catch (err) {
+      at(`the ${eventType} seed failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  for (const id of Object.keys(manifest.sectionDefaults.presentation ?? {}))
+    if (!seeded.has(id)) at(`sectionDefaults.presentation.${id} names no seeded section`);
   return problems;
 }
