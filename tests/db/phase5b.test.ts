@@ -3,7 +3,7 @@ import { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { as, createTestDatabase } from './harness';
 
-// Phase 5B's database functions (supabase/migrations/20260927130000–132000): the host's own gallery
+// Phase 5B's database functions (supabase/migrations/*_gallery_film_faces.sql, *_gallery_link.sql, *_insights.sql): the host's own gallery
 // items (the highlights film) and what the film chooses from; face search — indexing by the uploading
 // phone and the host's browser, searching, leaving out, forgetting, the host's view, the triggers and
 // the retention; the invitation's link to its gallery and sending it to guests (credits, the queue,
