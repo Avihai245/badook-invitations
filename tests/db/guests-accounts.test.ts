@@ -208,6 +208,8 @@ describe('guests', () => {
       name: 'Rina Cohen',
       phone: '+972501111111',
       partySize: 2,
+      // no language of their own: the invitation's (languages.test.ts)
+      language: null,
     });
     await commit('guest_open', [slug, token(1)]);
     expect(await call('guest_open', [slug, 'not-a-real-token-000000'])).toBeNull();
