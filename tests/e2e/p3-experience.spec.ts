@@ -78,7 +78,16 @@ test.describe('the opening', () => {
     await expect(audio).toHaveAttribute('src', /\/music\.mp3#t=5$/);
     await page.locator('.cover-tap').click();
     await expect.poll(() => paused(page)).toBe(false);
-    expect(await audio.evaluate((a: HTMLAudioElement) => a.currentTime)).toBeGreaterThanOrEqual(5);
+    // it begins at the host's second: nothing loads before the tap (preload="none"), so the position is
+    // there once the track's start has loaded, a moment after play() — and the 12s track loops, so what
+    // it played shows where it began
+    await expect
+      .poll(() =>
+        audio.evaluate((a: HTMLAudioElement) =>
+          Array.from({ length: a.played.length }, (_, i) => a.played.start(i)).some((s) => s >= 4.9),
+        ),
+      )
+      .toBe(true);
     await expect
       .poll(() => audio.evaluate((a: HTMLAudioElement) => a.volume), { timeout: 5000 })
       .toBeCloseTo(0.6, 2);
