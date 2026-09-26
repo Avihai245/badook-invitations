@@ -10,8 +10,9 @@ import { faceDistance, matchPhotos, normalizeFaces, type Face } from '@/features
  * The real face model, offline: the same @vladmandic/face-api build and weights the browsers load
  * (from node_modules — nothing is downloaded), run on TensorFlow.js's CPU backend over the sample
  * photos the package ships. It finds the faces, a face still matches itself in a changed copy of
- * the photo (mirrored and smaller) under the search threshold, and different people stay apart.
- * Slower than the other unit tests (tens of seconds).
+ * the photo (mirrored and smaller) under the search threshold, and different people (the photo's
+ * others) stay apart. Slower than the other unit tests: the model runs twice, on the CPU backend (tens
+ * of seconds; more on a busy machine, hence the long timeout).
  */
 
 type FaceApi = typeof import('@vladmandic/face-api');
@@ -105,10 +106,12 @@ describe('the real face model', () => {
     );
     expect(album.map((a) => a.itemId)).toEqual(['copy']);
 
-    // another photo's people: none is taken for this one's first face
-    const others = await detect('sample2.jpg', 720);
-    expect(others.length).toBeGreaterThan(0);
-    const strangers = others.map((o) => faceDistance(faces[0]!.descriptor, o.descriptor));
-    expect(Math.min(...strangers)).toBeGreaterThan(FACES.match.search);
-  }, 180_000);
+    // the photo's other people: none is taken for another
+    expect(faces.length).toBeGreaterThan(1);
+    faces.forEach((f, i) =>
+      faces
+        .slice(i + 1)
+        .forEach((o) => expect(faceDistance(f.descriptor, o.descriptor)).toBeGreaterThan(FACES.match.search)),
+    );
+  }, 600_000);
 });
