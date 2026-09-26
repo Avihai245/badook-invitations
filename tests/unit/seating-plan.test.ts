@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { excelSheets, guestRows, sortKey, tableRows } from '@/features/seating/export';
 import {
   DEFAULT_SETTINGS,
+  LayoutSchema,
   readState,
   toDbPlan,
   type Plan,
@@ -296,6 +297,28 @@ describe('reading the database', () => {
     });
     expect(state.plan.assignments).toEqual({ x: { tableId: 'a', source: 'solver' } });
     expect(state.plan.rules).toEqual([{ id: 'r', kind: 'apart', a: 'x', b: 'y', hard: false }]);
+  });
+});
+
+describe('what a save may name', () => {
+  const path = LayoutSchema.shape.background.unwrap().shape.path;
+  it('takes a stored file in its folder', () => {
+    for (const ok of ['u1/inv-2/plan.png', 'venues/ab12/f00d.pdf', 'u1/inv/a..b.webp']) {
+      expect(path.safeParse(ok).success).toBe(true);
+    }
+  });
+  it('refuses "." and ".." parts (no way out of the folder)', () => {
+    for (const bad of [
+      'u1/inv/../other/x.png',
+      'u1/./x.png',
+      'u1/inv/..',
+      'u1/..',
+      '../x.png',
+      '/u1/x.png',
+      'u1',
+    ]) {
+      expect(path.safeParse(bad).success).toBe(false);
+    }
   });
 });
 

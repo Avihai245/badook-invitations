@@ -341,6 +341,10 @@ describe('saving the plan', () => {
         metersPerPixel: 0.02,
         source: 'upload',
       });
+    expect(await save(s.layout.version, plan({ layout: bg(`${OWNER}/${inv}/../../${OTHER}/x.png`) }))).toMatchObject({
+      ok: false,
+      reason: 'background',
+    });
     expect(await save(s.layout.version, plan({ layout: bg(`${OTHER}/${other}/x.png`) }))).toMatchObject({
       ok: false,
       reason: 'background',

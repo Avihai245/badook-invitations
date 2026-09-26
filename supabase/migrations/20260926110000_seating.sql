@@ -443,10 +443,13 @@ begin
   select v.plan_path into v_venue_plan
   from public.partner_venue_users pu join public.partner_venues v on v.id = pu.venue_id
   where pu.user_id = p_owner;
-  if v_bg is not null
-     and not starts_with(v_bg, p_owner::text || '/' || p_id::text || '/')
-     and v_bg is distinct from v_venue_plan
-     and v_bg is distinct from l.background_path then
+  if v_bg is not null and (
+       -- no way out of the host's folder
+       v_bg ~ '(^|/)\.{1,2}(/|$)'
+       or (not starts_with(v_bg, p_owner::text || '/' || p_id::text || '/')
+           and v_bg is distinct from v_venue_plan
+           and v_bg is distinct from l.background_path)
+     ) then
     return jsonb_build_object('ok', false, 'code', 'invalid', 'reason', 'background');
   end if;
   if exists (

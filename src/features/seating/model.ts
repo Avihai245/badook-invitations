@@ -232,7 +232,8 @@ export const LayoutSchema = z.strictObject({
       path: z
         .string()
         .max(300)
-        .regex(/^[A-Za-z0-9_-]+(\/[A-Za-z0-9_.-]+)+$/),
+        // folders and a file name; no "." or ".." parts (no way out of a folder)
+        .regex(/^[A-Za-z0-9_-]+(\/(?!\.\.?(\/|$))[A-Za-z0-9_.-]+)+$/),
       type: z.enum(PLAN_TYPES),
       width: z.number().int().min(1).max(30000).nullable(),
       height: z.number().int().min(1).max(30000).nullable(),
