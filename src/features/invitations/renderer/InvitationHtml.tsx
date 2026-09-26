@@ -3,6 +3,7 @@ import { dirOf, type InvitationDocument, type Locale, type TemplateManifest } fr
 import { displayFontPreloads, fontFaceCss, templateFontFamilies } from '../fonts';
 import { FrameScrollCue } from './FrameScrollCue.client';
 import { FRAMED_BOOT } from './framed';
+import { IMAGE_FALLBACK } from './images';
 import { resolveFontPair, themeMode, themeVars } from './theme';
 
 /**
@@ -40,6 +41,8 @@ export function InvitationHtml({
         <style dangerouslySetInnerHTML={{ __html: fontCss }} />
         {/* Reveal animations only when JS runs — without it everything stays visible. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.remove('no-js')" }} />
+        {/* an optimized image that fails falls back to its original address (renderer/images.ts) */}
+        <script dangerouslySetInnerHTML={{ __html: IMAGE_FALLBACK }} />
         {/* inside another page's frame: no scrollbar, a floating arrow instead (FrameScrollCue) */}
         <script dangerouslySetInnerHTML={{ __html: FRAMED_BOOT }} />
       </head>

@@ -9,7 +9,7 @@ import { InvitationSections } from './InvitationSections';
 import { GuestLink } from './guest.client';
 import { LiveLocale } from './live/LiveLocale.client';
 import type { LivePayload } from './live/payload';
-import { RevealObserver } from './RevealObserver.client';
+import { ScrollEngine } from './motion/ScrollEngine.client';
 import { Scene } from './scenes';
 
 /**
@@ -142,7 +142,7 @@ export function InvitationBody({
             <InvitationSections ctx={ctx} />
           </>
         )}
-        <RevealObserver />
+        <ScrollEngine />
         <FitNames />
         {ctx.mode === 'live' ? <GuestLink slug={doc.share.slug} /> : null}
       </div>

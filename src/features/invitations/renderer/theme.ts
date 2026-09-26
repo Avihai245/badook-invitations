@@ -54,9 +54,9 @@ function paletteVars(palette: Palette, sealFallback: string): Record<string, str
 
 /**
  * Tokens v2 → CSS variables: the type scale (`--ty-<role>` size ×, `--lh-<role>` line height ×,
- * `--ls-<role>` Latin tracking added), the spacing (`--sp-section|gutter|block` ×), the media radius,
- * the scrim over section media and the motion intensity. invitation.css multiplies the design's own
- * values by them — at their defaults (1 / 1 / 0) every template looks exactly as before.
+ * `--ls-<role>` Latin tracking added), the spacing (`--sp-section|gutter|block` ×). invitation.css
+ * multiplies the design's own values by them, defaulting to 1 / 1 / 0 — so only what a template
+ * changes is emitted, and every template without tokens v2 looks exactly as before.
  */
 function tokenVars(
   typography: TemplateManifest['tokens']['typography'],
@@ -65,13 +65,12 @@ function tokenVars(
   const vars: Record<string, string> = {};
   for (const role of TYPE_ROLES) {
     const r = typography[role];
-    vars[`--ty-${role}`] = String(r.size);
-    vars[`--lh-${role}`] = String(r.lineHeight);
-    vars[`--ls-${role}`] = `${r.letterSpacing}em`;
+    if (r.size !== 1) vars[`--ty-${role}`] = String(r.size);
+    if (r.lineHeight !== 1) vars[`--lh-${role}`] = String(r.lineHeight);
+    if (r.letterSpacing !== 0) vars[`--ls-${role}`] = `${r.letterSpacing}em`;
   }
-  vars['--sp-section'] = String(spacing.section);
-  vars['--sp-gutter'] = String(spacing.gutter);
-  vars['--sp-block'] = String(spacing.block);
+  for (const key of ['section', 'gutter', 'block'] as const)
+    if (spacing[key] !== 1) vars[`--sp-${key}`] = String(spacing[key]);
   return vars;
 }
 

@@ -99,6 +99,14 @@ export function sectionPresentation(section: Section, ctx: RenderContext): CineP
   const theme = section.themeOverrides ? sectionThemeVars(template, doc, section.themeOverrides) : null;
   Object.assign(vars, theme?.vars);
   attrs['data-layout'] = layout;
+  if (hero) {
+    // the hero keeps its own entrance; its scroll effect is its media's drift (parallax, the default
+    // without an animation), a Ken Burns zoom, or none
+    delete attrs['data-enter'];
+    delete attrs['data-tr'];
+    const scroll = section.animation ? (motion.scroll[0] ?? 'none') : 'parallax';
+    attrs['data-hero-scroll'] = motion.intensity > 0 || !section.animation ? scroll : 'none';
+  }
   if (theme?.dark !== null && theme?.dark !== undefined) {
     attrs['data-palette'] = '';
     attrs['data-theme'] = theme.dark ? 'dark' : 'light';

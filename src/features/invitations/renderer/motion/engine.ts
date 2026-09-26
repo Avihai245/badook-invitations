@@ -116,6 +116,10 @@ export function motionAttributes(config: MotionConfig): {
     vars['--en-stagger'] = `${config.stagger}ms`;
     vars['--en-ease'] = EASING[enter.easing];
     vars['--en-dist'] = `${enter.distance}px`;
+    // the zoom and tilt presets' amounts follow the intensity too
+    vars['--en-zoom-in'] = String(round(1 - 0.08 * config.intensity, 3));
+    vars['--en-zoom-out'] = String(round(1 + 0.08 * config.intensity, 3));
+    vars['--en-tilt'] = `${round(12 * config.intensity, 1)}deg`;
     // the same timing as scroll distance: where the scroll drives the animation
     vars['--en-len'] = `${Math.round(enter.duration * PX_PER_MS)}px`;
     vars['--en-off'] = `${Math.round(enter.delay * PX_PER_MS)}px`;

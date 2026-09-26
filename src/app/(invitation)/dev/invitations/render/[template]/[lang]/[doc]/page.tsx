@@ -1,5 +1,10 @@
 import { notFound } from 'next/navigation';
-import type { Locale, Section } from '@/features/invitations/contracts/types';
+import {
+  OPENING_PRESETS,
+  type Locale,
+  type OpeningPreset,
+  type Section,
+} from '@/features/invitations/contracts/types';
 import { isLocale, loadDevDocument } from '@/features/invitations/dev/load-dev-document';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { buildRenderContext, type RenderOptions } from '@/features/invitations/renderer/context';
@@ -34,6 +39,9 @@ export const dynamic = 'force-dynamic';
  *   followup=1             a published full invitation to link to (a save-the-date's, /i/noa-and-itay)
  *   hero=video|youtube     the hero as an uploaded video (the test clip) or a YouTube link
  *   videoSound=1           the hero video's sound instead of a track (the host's "video sound" option)
+ *   opening=gate|curtain|fireworks|gold_dust|envelope   the host's cinematic opening (cover.opening)
+ *   cinematic=0            the event without the `cinematic` feature: the plain rendering
+ * Document `cinematic` (every v2 layout and motion) reads its pictures from /dev/media.
  */
 export default async function RenderPage({ params, searchParams }: { params: Params; searchParams: Search }) {
   assertDevRoutes();
@@ -143,10 +151,15 @@ export default async function RenderPage({ params, searchParams }: { params: Par
         }
       : doc.music;
 
+  const openingParam = one(sp.opening);
+  const opening = (OPENING_PRESETS as readonly string[]).includes(openingParam ?? '')
+    ? (openingParam as OpeningPreset)
+    : doc.cover.opening;
   const env = serverEnv();
-  const rendered = { ...doc, sections, music };
+  const rendered = { ...doc, sections, music, cover: { ...doc.cover, opening } };
   const options: Omit<RenderOptions, 'mode'> = {
     brand: env.INVITES_BRAND_NAME,
+    cinematic: one(sp.cinematic) !== '0',
     now,
     coverMedia,
     musicUrl: fixtureMusic ? `/dev/media/music.${musicParam === 'mp3' ? 'mp3' : 'webm'}` : undefined,
@@ -158,7 +171,7 @@ export default async function RenderPage({ params, searchParams }: { params: Par
         templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
       }),
       // the test photos and clip are "uploads" served by /dev/media
-      ...(gallery || heroParam === 'video' ? { uploads: '/dev/media' } : {}),
+      ...(gallery || heroParam === 'video' || docKey === 'cinematic' ? { uploads: '/dev/media' } : {}),
     },
   };
   const ctx = buildRenderContext(rendered, entry.manifest, lang, { ...options, mode });
