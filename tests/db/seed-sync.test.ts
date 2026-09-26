@@ -87,6 +87,49 @@ describe('seed sync', () => {
     expect(result.row).toEqual({ owner_id: USER, status: 'draft' });
   });
 
+  it('an unlisted design is seeded inactive (out of the public listing) and follows its manifest', async () => {
+    const active = async () =>
+      (
+        await c.query(
+          `select id, is_active from invitation_templates where id in ('lumiere', 'sahar-bordeaux') order by id`,
+        )
+      ).rows;
+    expect(await active()).toEqual([
+      { id: 'lumiere', is_active: false },
+      { id: 'sahar-bordeaux', is_active: true },
+    ]);
+    const lumiere = seedTemplates().find((t) => t.id === 'lumiere')!;
+    const upsert = (manifest: unknown) =>
+      c.query(`select public.seed_upsert($1, null, $2, null)`, [
+        JSON.stringify([{ ...lumiere, manifest }]),
+        DEMO_OWNER_ID,
+      ]);
+    // released (listed in its manifest) → active; and back (one transaction, rolled back after)
+    const states = await as(c, 'service_role', null, async () => {
+      await upsert({ ...lumiere.manifest, listed: true });
+      const released = (await active())[0];
+      await upsert(lumiere.manifest);
+      return [released, (await active())[0]];
+    });
+    expect(states).toEqual([
+      { id: 'lumiere', is_active: true },
+      { id: 'lumiere', is_active: false },
+    ]);
+    // its demos are there (reachable by link, like any demo)
+    const demos = (
+      await c.query(
+        `select slug from invitations where template_id = 'lumiere' and owner_id = $1 order by slug`,
+        [DEMO_OWNER_ID],
+      )
+    ).rows.map((r) => r.slug);
+    expect(demos).toEqual([
+      'demo-lumiere',
+      'demo-lumiere-bar-mitzvah',
+      'demo-lumiere-bat-mitzvah',
+      'demo-lumiere-engagement',
+    ]);
+  });
+
   it('without the demo owner, no invitations; and only the server may call it', async () => {
     const [invitation] = seedInvitations();
     expect(

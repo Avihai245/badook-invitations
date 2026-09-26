@@ -4,6 +4,7 @@ import { loadAccount } from '@/features/billing/server/account';
 import { deploymentFeatures, featuresFor } from '@/features/flags/server';
 import { Editor } from '@/features/invitations/editor/Editor';
 import { fontFaceCss, libraryDisplayFamilies, pageFontFaces } from '@/features/invitations/fonts';
+import { FONT_LIBRARY } from '@/features/invitations/fonts/library';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { hostDb } from '@/features/invitations/server/host-db';
@@ -55,6 +56,8 @@ export default async function EditInvitationPage({ params }: { params: Params })
           __html: [
             fontFaceCss(pageFontFaces(entry.manifest, undefined, inv.draft.locales)),
             fontFaceCss(libraryDisplayFamilies(), [400]),
+            // the font suggestions write a line in each suggested library pair's text face
+            fontFaceCss(new Set(FONT_LIBRARY.flatMap((p) => [p.body.latin, p.body.hebrew])), [400]),
           ].join('\n'),
         }}
       />

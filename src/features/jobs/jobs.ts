@@ -1,5 +1,7 @@
 import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
+import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
+import { processNoticeQueue } from '@/features/event-day/server/notify';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
@@ -18,8 +20,8 @@ import { dailyDue, WHATSAPP_EVERY_MS } from './schedule';
 export type JobName = 'daily' | 'whatsapp';
 
 /**
- * The daily run: the hosts' RSVP summaries, the purge, the billing checks, the templates sync and the
- * live gallery's housekeeping.
+ * The daily run: the hosts' RSVP summaries, the purge, the billing checks, the templates sync, the
+ * live gallery's housekeeping and the event day's (arrivals past their keeping time).
  */
 export async function runDaily(now: Date) {
   const digests = await sendDigests(now);
@@ -34,19 +36,27 @@ export async function runDaily(now: Date) {
   const gallery = await galleryHousekeeping().catch(
     (err) => (console.error('gallery housekeeping failed', err), null),
   );
-  return { ...digests, purged: (purged as number | null) ?? null, overdue, seed, gallery };
+  // the event day's: arrivals erased 30 days after the event
+  const eventDay = await eventDayHousekeeping().catch(
+    (err) => (console.error('event day housekeeping failed', err), null),
+  );
+  return { ...digests, purged: (purged as number | null) ?? null, overdue, seed, gallery, eventDay };
 }
 
-/** What is still queued for WhatsApp (a host closed the page mid-send, a retry that is due). */
+/**
+ * What is still queued for WhatsApp (a host closed the page mid-send, a retry that is due): the
+ * invitations, and the table numbers (features/event-day).
+ */
 export async function runWhatsAppQueue(budgetMs: number) {
   const total = { sent: 0, failed: 0, retried: 0 };
   const until = Date.now() + budgetMs;
   for (let round = 0; round < 4 && Date.now() < until; round++) {
     const r = await processQueue(null, 50);
-    total.sent += r.sent;
-    total.failed += r.failed;
-    total.retried += r.retried;
-    if (r.sent + r.failed + r.retried === 0) break;
+    const t = await processNoticeQueue(null, 50);
+    total.sent += r.sent + t.sent;
+    total.failed += r.failed + t.failed;
+    total.retried += r.retried + t.retried;
+    if (r.sent + r.failed + r.retried + t.sent + t.failed + t.retried === 0) break;
   }
   return total;
 }

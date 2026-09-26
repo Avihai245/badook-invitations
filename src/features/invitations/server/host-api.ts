@@ -21,6 +21,7 @@ import type { Feature } from '@/features/flags/features';
 import { findFontPair } from '../fonts/library';
 import { paidLocales } from '../lib/locales';
 import { graphemes } from '../lib/text';
+import { hasCinematicValues, introducedCinematic } from '../renderer/cinematic/presentation';
 import { followUpDocument, followUpSlug, saveTheDateSlug } from '../templates/follow-up';
 import { COUPLE_EVENTS } from '../templates/seed-copy';
 import type { TemplateEntry } from '../templates/registry';
@@ -65,6 +66,13 @@ export interface HostDeps {
   features?(invitationId: string | null): Promise<ReadonlySet<Feature>>;
   /** the event's machine translations (translate/): publishing waits for their review. Absent: none */
   translations?(invitationId: string, ownerId: string): Promise<TranslationRow[]>;
+  /**
+   * The event has the `cinematic` feature (features/flags) — without it a save may not bring new v2
+   * values (sections' media, layouts, motion, colors, the opening, the tokens). Absent: not checked.
+   */
+  cinematic?(invitationId: string): Promise<boolean>;
+  /** the signed-in user is one of the platform's admins (unlisted designs are theirs to use) */
+  admin?: boolean;
 }
 
 /**
@@ -143,7 +151,9 @@ export async function createInvitation(userId: string, raw: unknown, deps: HostD
     return fail(400, 'invalid', { issues: parsed.error.issues.map((i) => i.path.join('.')) });
   const input = parsed.data;
   const entry = deps.template(input.templateId);
-  if (!entry) return fail(400, 'invalid', { issues: ['templateId'] });
+  // an unlisted design (not in the public gallery) is for the platform's admins only
+  if (!entry || (!entry.manifest.listed && deps.admin === false))
+    return fail(400, 'invalid', { issues: ['templateId'] });
   const { manifest, defaults } = entry;
   const locales = [...new Set(input.locales)];
   const bad: string[] = [];
@@ -282,6 +292,16 @@ export async function saveDraft(
     if (!stored) return fail(404, 'not_found');
     const refused = await languagesRefused(draft.data.locales, id, deps, stored.draft.locales);
     if (refused) return refused;
+  }
+  // Without the `cinematic` feature the editor hides the v2 controls, and the server refuses what they
+  // would add: a new or changed v2 value. What the stored draft has already stays (the host keeps
+  // saving a draft made while the feature was on).
+  if (deps.cinematic && hasCinematicValues(draft.data) && !(await deps.cinematic(id))) {
+    const stored = await deps.db.get(id, userId);
+    if (!stored) return fail(404, 'not_found');
+    const introduced = introducedCinematic(stored.draft, draft.data);
+    if (introduced.length)
+      return fail(403, 'feature_off', { feature: 'cinematic', issues: introduced.slice(0, 20) });
   }
   const result = await deps.db.saveDraft(id, userId, draft.data, parsed.data.updatedAt);
   if (!result) return fail(404, 'not_found');

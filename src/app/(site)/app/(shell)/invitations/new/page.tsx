@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { isAdminEmail } from '@/features/billing/server/account';
 import { accountFeatures, deploymentFeatures } from '@/features/flags/server';
 import { TemplateGallery, type DevPreviews } from '@/features/invitations/app/gallery/TemplateGallery';
 import { GALLERY_FONT_CSS } from '@/features/invitations/app/poster-fonts';
@@ -45,6 +46,8 @@ export default async function NewInvitationPage({
       })}
       fontCss={GALLERY_FONT_CSS}
       devPreviews={devPreviews(previews)}
+      // unlisted designs (manifest `listed: false`) are the platform admins' to try
+      admin={isAdminEmail(user?.email)}
     />
   );
 }

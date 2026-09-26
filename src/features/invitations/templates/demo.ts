@@ -239,6 +239,9 @@ export function demoDocument(
   // for when its other sections are switched on
   const saveTheDate = type === 'save_the_date';
   if (!saveTheDate) doc.event.rsvpDeadline = '2027-06-01';
+  // the sample FAQ and gifts show where the design has them (a design that leaves them out of its
+  // order keeps them hidden: it ends on its RSVP)
+  const ordered = (type: Section['type']) => manifest.sectionDefaults.order.includes(type);
 
   const sections: Section[] = doc.sections.map((s): Section => {
     switch (s.type) {
@@ -267,7 +270,7 @@ export function demoDocument(
       case 'faq':
         return {
           ...s,
-          enabled: !saveTheDate,
+          enabled: !saveTheDate && ordered('faq'),
           data: {
             ...s.data,
             items: [
@@ -287,7 +290,7 @@ export function demoDocument(
       case 'gifts':
         return {
           ...s,
-          enabled: !saveTheDate,
+          enabled: !saveTheDate && ordered('gifts'),
           data: {
             ...s.data,
             links: [

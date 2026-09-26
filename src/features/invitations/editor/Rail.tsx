@@ -48,6 +48,7 @@ import {
   Quote,
   Settings2,
   Share2,
+  SlidersHorizontal,
   Sparkles,
   Type,
   Users,
@@ -65,7 +66,9 @@ import { validateDocument } from '../contracts/validate';
 import { availableEntries, insertionIndex, LOCKED_TYPES, newSection, type CatalogKey } from './catalog';
 import { sectionName } from './fields/fields';
 import { insertAt, moveAt } from './paths';
+import { withoutPresentation } from './presentation';
 import {
+  CINEMATIC_PANELS,
   DESIGN_PANELS,
   SETTINGS_PANELS,
   useEditor,
@@ -110,6 +113,7 @@ export const SECTION_ICONS: Record<IconKey, LucideIcon> = {
   footer: Type,
   palette: Palette,
   fonts: CaseSensitive,
+  style: SlidersHorizontal,
   music: Music,
   event: CalendarDays,
   languages: Languages,
@@ -497,11 +501,13 @@ function PanelList({
   panels: readonly PanelId[];
   onNavigate?: () => void;
 }) {
-  const { selection, select } = useEditor();
+  const { selection, select, features } = useEditor();
   const { t } = useUi();
+  // without the `cinematic` feature its panels aren't offered
+  const shown = panels.filter((p) => features.cinematic !== false || !CINEMATIC_PANELS.includes(p));
   return (
     <ul aria-label={label} className="flex flex-col gap-0.5">
-      {panels.map((panel) => {
+      {shown.map((panel) => {
         const selected = selection.kind === 'panel' && selection.panel === panel;
         return (
           <RowShell key={panel} selected={selected}>
@@ -525,7 +531,7 @@ function PanelList({
 
 /** "+ הוספת סקשן" (dashed, 40px) → a popover grid of section types (icon + name + one line). */
 function AddSection({ onAdded }: { onAdded?: () => void }) {
-  const { doc, template, defaults, selection, apply, select } = useEditor();
+  const { doc, template, defaults, selection, apply, select, features } = useEditor();
   const { t } = useUi();
   const e = t.editor;
   const dir = useDir();
@@ -562,7 +568,9 @@ function AddSection({ onAdded }: { onAdded?: () => void }) {
                   key={entry.key}
                   type="button"
                   onClick={() => {
-                    const section = newSection(entry, doc, template, defaults);
+                    const seeded = newSection(entry, doc, template, defaults);
+                    // the template's photo and motion for it need the `cinematic` feature
+                    const section = features.cinematic === false ? withoutPresentation(seeded) : seeded;
                     const at = insertionIndex(doc, selection.kind === 'section' ? selection.id : null);
                     apply((d) => insertAt(d, 'sections', section, at), null);
                     select({ kind: 'section', id: section.id });

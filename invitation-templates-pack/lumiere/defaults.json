@@ -1,0 +1,192 @@
+{
+  "templateId": "lumiere",
+  "defaults": {
+    "wedding": {
+      "coverHint": { "he": "לחצו כדי לפתוח", "en": "Tap to open" },
+      "eyebrow": { "he": "אנחנו מתחתנים", "en": "We are getting married" },
+      "heroTitle": { "mode": "hosts" },
+      "countdown": {
+        "title": { "he": "הספירה לאחור", "en": "Counting down" },
+        "subtitle": { "he": "עד שנגיד כן", "en": "Until we say yes" },
+        "afterEvent": { "he": "תודה שחגגתם איתנו", "en": "Thank you for celebrating with us" }
+      },
+      "story": {
+        "title": { "he": "הסיפור שלנו", "en": "Our story" },
+        "body": {
+          "he": "נפגשנו במקרה, והתאהבנו לגמרי.\nב־{date} אנחנו מתחילים את הפרק הכי יפה שלנו —\nוזה לא יהיה שלם בלעדיכם.",
+          "en": "We met by chance, and fell completely.\nOn {date} we begin our most beautiful chapter —\nand it would not be complete without you."
+        }
+      },
+      "venueLabels": [{ "he": "האירוע", "en": "The celebration" }],
+      "timeline": [
+        { "time": "19:30", "label": { "he": "קבלת פנים", "en": "Welcome" }, "icon": "glass" },
+        { "time": "20:30", "label": { "he": "חופה וקידושין", "en": "The chuppah" }, "icon": "chuppah" },
+        { "time": "21:15", "label": { "he": "ארוחת ערב", "en": "Dinner" }, "icon": "dinner" },
+        { "time": "22:00", "label": { "he": "רוקדים עד הבוקר", "en": "Dancing till dawn" }, "icon": "music" }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": { "he": "נשמח לראותכם", "en": "We would love to see you" },
+        "subtitle": { "he": "אנא אשרו הגעה עד {deadline}", "en": "Kindly reply by {deadline}" },
+        "messageLabel": { "he": "כמה מילים לזוג", "en": "A few words for the couple" },
+        "successMessage": { "he": "תודה! נתראה בשמחות", "en": "Thank you — see you there" },
+        "declineMessage": { "he": "תודה שעדכנתם. נתגעגע", "en": "Thank you for letting us know. We will miss you" },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": { "he": "באהבה, ומחכים לראותכם", "en": "With love — we cannot wait to see you" },
+      "quote": {
+        "text": { "he": "אני לדודי ודודי לי", "en": "I am my beloved’s, and my beloved is mine" },
+        "attribution": { "he": "שיר השירים", "en": "Song of Songs" }
+      },
+      "when": { "title": { "he": "היום שלנו", "en": "Our day" }, "note": null }
+    },
+    "engagement": {
+      "coverHint": { "he": "לחצו כדי לפתוח", "en": "Tap to open" },
+      "eyebrow": { "he": "אמרנו כן", "en": "We said yes" },
+      "heroTitle": { "mode": "hosts" },
+      "countdown": {
+        "title": { "he": "הספירה לאחור", "en": "Counting down" },
+        "subtitle": { "he": "עד שנרים כוסית", "en": "Until we raise a glass" },
+        "afterEvent": { "he": "תודה שחגגתם איתנו", "en": "Thank you for celebrating with us" }
+      },
+      "story": {
+        "title": { "he": "מתארסים", "en": "Engaged" },
+        "body": {
+          "he": "שאלה אחת, תשובה אחת, והרבה אושר.\nבואו לחגוג איתנו ב־{date}.",
+          "en": "One question, one answer, and so much joy.\nCome celebrate with us on {date}."
+        }
+      },
+      "venueLabels": [{ "he": "המסיבה", "en": "The party" }],
+      "timeline": [
+        { "time": "20:00", "label": { "he": "קבלת פנים", "en": "Welcome" }, "icon": "glass" },
+        { "time": "21:00", "label": { "he": "הרמת כוסית", "en": "A toast" }, "icon": "toast" },
+        { "time": "21:30", "label": { "he": "רוקדים", "en": "Dancing" }, "icon": "music" }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": { "he": "נשמח לראותכם", "en": "We would love to see you" },
+        "subtitle": { "he": "אנא אשרו הגעה עד {deadline}", "en": "Kindly reply by {deadline}" },
+        "messageLabel": { "he": "כמה מילים לזוג", "en": "A few words for the couple" },
+        "successMessage": { "he": "תודה! נתראה במסיבה", "en": "Thank you — see you at the party" },
+        "declineMessage": { "he": "תודה שעדכנתם. נתגעגע", "en": "Thank you for letting us know. We will miss you" },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": ["none", "vegetarian", "vegan", "gluten_free", "nut_allergy", "other_allergy"],
+        "dietaryNote": null
+      },
+      "closingLine": { "he": "באהבה, ומחכים לראותכם", "en": "With love — we cannot wait to see you" },
+      "quote": {
+        "text": { "he": "שימני כחותם על לבך", "en": "Set me as a seal upon your heart" },
+        "attribution": { "he": "שיר השירים", "en": "Song of Songs" }
+      },
+      "when": { "title": { "he": "חוגגים", "en": "Let us celebrate" }, "note": null }
+    },
+    "bar_mitzvah": {
+      "coverHint": { "he": "לחצו כדי לפתוח", "en": "Tap to open" },
+      "eyebrow": { "he": "בר המצווה של", "en": "The Bar Mitzvah of" },
+      "heroTitle": { "mode": "hosts" },
+      "countdown": {
+        "title": { "he": "הספירה לאחור", "en": "Counting down" },
+        "subtitle": { "he": "עד היום הגדול", "en": "Until the big day" },
+        "afterEvent": { "he": "תודה שחגגתם איתנו", "en": "Thank you for celebrating with us" }
+      },
+      "story": {
+        "title": { "he": "מגיע לגיל מצוות", "en": "Coming of age" },
+        "body": {
+          "he": "בשמחה ובגאווה אנו מזמינים אתכם לחגוג איתנו את בר המצווה של {primary}.\nיהיה מרגש יותר איתכם.",
+          "en": "With joy and pride we invite you to celebrate {primary}’s Bar Mitzvah with us.\nIt will mean more with you there."
+        }
+      },
+      "venueLabels": [{ "he": "החגיגה", "en": "The celebration" }],
+      "timeline": [
+        { "time": "19:30", "label": { "he": "קבלת פנים", "en": "Welcome" }, "icon": "glass" },
+        { "time": "20:30", "label": { "he": "ברכות", "en": "Blessings" }, "icon": "torah" },
+        { "time": "21:00", "label": { "he": "ארוחת ערב", "en": "Dinner" }, "icon": "dinner" },
+        { "time": "21:45", "label": { "he": "מסיבה", "en": "Party" }, "icon": "party" }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": { "he": "נשמח לראותכם", "en": "We would love to see you" },
+        "subtitle": { "he": "אנא אשרו הגעה עד {deadline}", "en": "Kindly reply by {deadline}" },
+        "messageLabel": { "he": "ברכה לחתן בר המצווה", "en": "A note for the Bar Mitzvah boy" },
+        "successMessage": { "he": "תודה! נתראה בשמחות", "en": "Thank you — see you there" },
+        "declineMessage": { "he": "תודה שעדכנתם. נתגעגע", "en": "Thank you for letting us know. We will miss you" },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": ["none", "vegetarian", "vegan", "gluten_free", "kosher_mehadrin", "kids_meal"],
+        "dietaryNote": { "he": "כל האוכל באירוע כשר.", "en": "All food at the event is kosher." }
+      },
+      "closingLine": { "he": "מחכים לחגוג איתכם", "en": "We look forward to celebrating with you" },
+      "quote": {
+        "text": { "he": "בכל דרכיך דעהו, והוא יישר אורחותיך", "en": "In all your ways know Him, and He will make your paths straight" },
+        "attribution": { "he": "משלי ג׳, ו׳", "en": "Proverbs 3:6" }
+      },
+      "when": { "title": { "he": "היום הגדול", "en": "The big day" }, "note": null }
+    },
+    "bat_mitzvah": {
+      "coverHint": { "he": "לחצו כדי לפתוח", "en": "Tap to open" },
+      "eyebrow": { "he": "בת המצווה של", "en": "The Bat Mitzvah of" },
+      "heroTitle": { "mode": "hosts" },
+      "countdown": {
+        "title": { "he": "הספירה לאחור", "en": "Counting down" },
+        "subtitle": { "he": "עד היום הגדול", "en": "Until the big day" },
+        "afterEvent": { "he": "תודה שחגגתם איתנו", "en": "Thank you for celebrating with us" }
+      },
+      "story": {
+        "title": { "he": "מגיעה לגיל מצוות", "en": "Coming of age" },
+        "body": {
+          "he": "בשמחה ובגאווה אנו מזמינים אתכם לחגוג איתנו את בת המצווה של {primary}.\nיהיה מרגש יותר איתכם.",
+          "en": "With joy and pride we invite you to celebrate {primary}’s Bat Mitzvah with us.\nIt will mean more with you there."
+        }
+      },
+      "venueLabels": [{ "he": "החגיגה", "en": "The celebration" }],
+      "timeline": [
+        { "time": "19:30", "label": { "he": "קבלת פנים", "en": "Welcome" }, "icon": "glass" },
+        { "time": "20:30", "label": { "he": "ברכות", "en": "Blessings" }, "icon": "star" },
+        { "time": "21:00", "label": { "he": "ארוחת ערב", "en": "Dinner" }, "icon": "dinner" },
+        { "time": "21:45", "label": { "he": "מסיבה", "en": "Party" }, "icon": "party" }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": { "he": "נשמח לראותכם", "en": "We would love to see you" },
+        "subtitle": { "he": "אנא אשרו הגעה עד {deadline}", "en": "Kindly reply by {deadline}" },
+        "messageLabel": { "he": "ברכה לבת המצווה", "en": "A note for the Bat Mitzvah girl" },
+        "successMessage": { "he": "תודה! נתראה בשמחות", "en": "Thank you — see you there" },
+        "declineMessage": { "he": "תודה שעדכנתם. נתגעגע", "en": "Thank you for letting us know. We will miss you" },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": ["none", "vegetarian", "vegan", "gluten_free", "kosher_mehadrin", "kids_meal"],
+        "dietaryNote": { "he": "כל האוכל באירוע כשר.", "en": "All food at the event is kosher." }
+      },
+      "closingLine": { "he": "מחכים לחגוג איתכם", "en": "We look forward to celebrating with you" },
+      "quote": {
+        "text": { "he": "רבות בנות עשו חיל, ואת עלית על כולנה", "en": "Many women have done valiantly, but you surpass them all" },
+        "attribution": { "he": "משלי ל״א, כ״ט", "en": "Proverbs 31:29" }
+      },
+      "when": { "title": { "he": "היום הגדול", "en": "The big day" }, "note": null }
+    }
+  }
+}

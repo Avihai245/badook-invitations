@@ -1,0 +1,322 @@
+{
+  "id": "lumiere",
+  "version": 1,
+  "name": {
+    "he": "לומייר",
+    "en": "Lumière"
+  },
+  "description": {
+    "he": "הזמנה צילומית ביד שקטה: תמונה אחרת לכל חלק, פתיחה באבק זהב מעל התמונה שלכם, מילים שעולות אחת אחת והתמונות נושמות בגלילה — ואישור ההגעה כשיא.",
+    "en": "A quiet, photographic invitation: a different photo for every part, a gold-dust opening over your own photo, words rising one by one while the photos breathe as guests scroll — and the RSVP as its high point."
+  },
+  "tier": "premium",
+  "listed": false,
+  "categories": ["wedding", "engagement", "bar_mitzvah", "bat_mitzvah", "save_the_date"],
+  "supportsLocales": ["he", "en"],
+  "previewImage": "/templates/lumiere/preview.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F7F3EE",
+      "surface": "#FCFAF7",
+      "ink": "#2A211C",
+      "inkMuted": "#6B5F56",
+      "accent": "#8A6A45",
+      "accentInk": "#FFFFFF",
+      "line": "#E2D8CC",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": ["bg", "surface", "ink", "inkMuted", "accent", "accentInk", "line", "heroText"],
+    "radius": {
+      "card": 2,
+      "button": 2,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": { "size": 0.9, "lineHeight": 1.02, "letterSpacing": 0 },
+      "heading": { "size": 1, "lineHeight": 1, "letterSpacing": 0.06 },
+      "body": { "size": 0.96, "lineHeight": 1.04, "letterSpacing": 0 },
+      "caption": { "size": 1, "lineHeight": 1, "letterSpacing": 0.12 }
+    },
+    "spacing": {
+      "section": 1.15,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#140F0C",
+      "opacity": 0.4
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "ivory",
+      "name": { "he": "שנהב", "en": "Ivory" },
+      "palette": {
+        "bg": "#F7F3EE",
+        "surface": "#FCFAF7",
+        "ink": "#2A211C",
+        "inkMuted": "#6B5F56",
+        "accent": "#8A6A45",
+        "accentInk": "#FFFFFF",
+        "line": "#E2D8CC"
+      }
+    },
+    {
+      "id": "night",
+      "name": { "he": "לילה", "en": "Night" },
+      "palette": {
+        "bg": "#16120F",
+        "surface": "#201A16",
+        "ink": "#F3EDE6",
+        "inkMuted": "#B9AEA3",
+        "accent": "#C8A46A",
+        "accentInk": "#16120F",
+        "line": "#3A312A"
+      }
+    },
+    {
+      "id": "sage",
+      "name": { "he": "מרווה", "en": "Sage" },
+      "palette": {
+        "bg": "#F1F2EC",
+        "surface": "#FAFAF6",
+        "ink": "#1F2A22",
+        "inkMuted": "#56615A",
+        "accent": "#566F58",
+        "accentInk": "#FFFFFF",
+        "line": "#D9DDD2"
+      }
+    },
+    {
+      "id": "blush",
+      "name": { "he": "ורוד עתיק", "en": "Old rose" },
+      "palette": {
+        "bg": "#F8F0EC",
+        "surface": "#FDF9F7",
+        "ink": "#35211F",
+        "inkMuted": "#6E5652",
+        "accent": "#94555E",
+        "accentInk": "#FFFFFF",
+        "line": "#E8D6D0"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "editorial",
+      "display": { "latin": "Cormorant Garamond", "hebrew": "Bellefair" },
+      "heading": { "latin": "Cormorant Garamond", "hebrew": "Frank Ruhl Libre" },
+      "body": { "latin": "Jost", "hebrew": "Assistant" },
+      "ui": { "latin": "Jost", "hebrew": "Assistant" }
+    },
+    {
+      "id": "couture",
+      "display": { "latin": "Bodoni Moda", "hebrew": "Noto Serif Hebrew" },
+      "heading": { "latin": "Bodoni Moda", "hebrew": "Noto Serif Hebrew" },
+      "body": { "latin": "Jost", "hebrew": "Heebo" },
+      "ui": { "latin": "Jost", "hebrew": "Heebo" }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/lumiere/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/lumiere/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": { "x": 0, "y": 0 },
+      "exit": "crack",
+      "text": { "color": "#FFFFFF", "effect": "emboss", "maxGlyphs": 3 }
+    },
+    "sealColors": ["#8A6A45", "#2A211C", "#566F58", "#94555E"],
+    "monogramFont": { "latin": "Cormorant Garamond", "hebrew": "Bellefair" },
+    "opening": { "preset": "gold_dust", "trigger": "tap", "backdrop": "hero" }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "portrait",
+        "name": { "he": "דיוקן באור ערב", "en": "Evening portrait" },
+        "media": {
+          "kind": "image",
+          "src": "template:photo-hero",
+          "poster": null,
+          "focalPoint": { "x": 0.5, "y": 0.36 }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "window",
+        "name": { "he": "אור מהחלון", "en": "Window light" },
+        "media": {
+          "kind": "image",
+          "src": "template:photo-story",
+          "poster": null,
+          "focalPoint": { "x": 0.4, "y": 0.4 }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#140F0C",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 28,
+    "revealBlur": false,
+    "stagger": 0.09,
+    "ambient": "fireflies",
+    "intensity": 0.85
+  },
+  "assets": {
+    "photo-hero": "/templates/lumiere/photo-hero.webp",
+    "photo-quote": "/templates/lumiere/photo-quote.webp",
+    "photo-story": "/templates/lumiere/photo-story.webp",
+    "photo-venue": "/templates/lumiere/photo-venue.webp",
+    "photo-rsvp": "/templates/lumiere/photo-rsvp.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": ["hero", "quote", "text", "when", "venues", "timeline", "rsvp", "footer"],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "quote": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:photo-quote",
+          "poster": null,
+          "focalPoint": { "x": 0.4, "y": 0.62 },
+          "overlay": 0.46
+        },
+        "animation": {
+          "enter": { "preset": "fade", "duration": 1400, "delay": 0, "distance": 0, "easing": "gentle" },
+          "scroll": "ken_burns",
+          "text": "words",
+          "stagger": 70,
+          "intensity": 0.8
+        }
+      },
+      "story": {
+        "layout": "split_start",
+        "media": {
+          "kind": "image",
+          "src": "template:photo-story",
+          "poster": null,
+          "focalPoint": { "x": 0.36, "y": 0.4 }
+        },
+        "animation": {
+          "enter": { "preset": "rise", "duration": 1100, "delay": 0, "distance": 28, "easing": "gentle" },
+          "scroll": "ken_burns",
+          "text": "words",
+          "stagger": 80,
+          "intensity": 0.8
+        }
+      },
+      "when": {
+        "animation": {
+          "enter": { "preset": "rise", "duration": 1200, "delay": 0, "distance": 24, "easing": "gentle" },
+          "scroll": "none",
+          "text": "words",
+          "stagger": 90,
+          "intensity": 0.8
+        },
+        "themeOverrides": {
+          "palette": {
+            "bg": "#1A1512",
+            "surface": "#241D18",
+            "ink": "#F4EEE7",
+            "inkMuted": "#BDB2A6",
+            "accent": "#C9A66B",
+            "accentInk": "#1A1512",
+            "line": "#3A3029"
+          }
+        }
+      },
+      "venues": {
+        "layout": "parallax",
+        "media": {
+          "kind": "image",
+          "src": "template:photo-venue",
+          "poster": null,
+          "focalPoint": { "x": 0.5, "y": 0.4 },
+          "overlay": 0.5
+        },
+        "animation": {
+          "enter": { "preset": "rise", "duration": 1100, "delay": 0, "distance": 28, "easing": "gentle" },
+          "scroll": "none",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 0.8
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": { "preset": "rise", "duration": 1000, "delay": 0, "distance": 24, "easing": "gentle" },
+          "scroll": "none",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 0.8
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:photo-rsvp",
+          "poster": null,
+          "focalPoint": { "x": 0.5, "y": 0.66 },
+          "overlay": 0.5
+        },
+        "animation": {
+          "enter": { "preset": "rise", "duration": 1200, "delay": 0, "distance": 32, "easing": "gentle" },
+          "scroll": "ken_burns",
+          "text": "words",
+          "stagger": 80,
+          "intensity": 0.9
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": { "preset": "fade", "duration": 1400, "delay": 0, "distance": 0, "easing": "gentle" },
+          "scroll": "none",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 0.8
+        },
+        "themeOverrides": {
+          "palette": {
+            "bg": "#1A1512",
+            "surface": "#241D18",
+            "ink": "#F4EEE7",
+            "inkMuted": "#BDB2A6",
+            "accent": "#C9A66B",
+            "accentInk": "#1A1512",
+            "line": "#3A3029"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import type { Locale } from '@/features/invitations/contracts/types';
+import type { RealtimeInfo } from '@/lib/live/types';
 import type { MediaKind } from './config';
 import type { ItemStatus, Reason } from './moderation';
 
@@ -39,11 +40,7 @@ export interface MineItem {
 }
 
 /** Realtime hints: where to listen (the channel is only given to pages that may see the gallery). */
-export interface RealtimeInfo {
-  url: string;
-  key: string;
-  channel: string;
-}
+export type { RealtimeInfo };
 
 export interface EventInfo {
   /** the names ("Noa & Itay") in the page's language */

@@ -260,8 +260,9 @@ test.describe('the cinematic openings', () => {
         await page.mouse.move(width / 2, height / 2);
         await page.mouse.wheel(0, 120);
         await expect.poll(peek).toBeGreaterThan(0);
-        await page.mouse.wheel(0, 120);
-        await page.mouse.wheel(0, 120);
+        // a scroll that keeps going opens it: the peek relaxes after 700 ms without a wheel, and a
+        // busy machine can take longer than that to answer the poll above, so it scrolls on in one go
+        for (let i = 0; i < 3; i++) await page.mouse.wheel(0, 120);
       }
       await expect(page.locator('html')).toHaveAttribute('data-opened', '1', { timeout: 10_000 });
       await expect(page.locator('.cover')).toHaveCount(0, { timeout: 10_000 });

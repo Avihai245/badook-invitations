@@ -85,10 +85,14 @@ const ServerEnvSchema = z.object({
   INVITES_WHATSAPP_VERIFY_TOKEN: z.string().default(''),
   INVITES_WHATSAPP_TEMPLATE: z.string().trim().min(1).default('badook_invitation'),
   // the languages the template is approved in, as Meta's codes ("he,en,ru,ar"; default he,en): each
-  // guest gets theirs, else the invitation's (features/whatsapp/languages.ts)
+  // guest gets theirs, else the invitation's (features/whatsapp/languages.ts) — the invitation's
+  // template and the table number's alike
   INVITES_WHATSAPP_TEMPLATE_LANGS: z.string().trim().optional(),
   // the older single language (used only when INVITES_WHATSAPP_TEMPLATE_LANGS isn't set)
   INVITES_WHATSAPP_TEMPLATE_LANG: z.string().trim().optional(),
+  // the table number's template (features/event-day: a guest's table and the map to it), once Meta
+  // approved it (docs/whatsapp-setup.md); empty: hosts send it from their own WhatsApp instead
+  INVITES_WHATSAPP_TABLE_TEMPLATE: z.string().trim().default(''),
   INVITES_WHATSAPP_API_VERSION: z.string().trim().min(2).default('v26.0'),
   INVITES_WHATSAPP_API_BASE: z
     .url()

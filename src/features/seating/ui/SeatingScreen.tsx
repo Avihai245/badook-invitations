@@ -3,6 +3,8 @@
 import { CircleAlert, FileSpreadsheet, LoaderCircle, Maximize, Printer, Sparkles } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Hint, PageHeader, Segmented, cn, useToast } from '@/components/app';
+import type { SeatingDayInfo } from '@/features/event-day/server/pages';
+import { useSeatingDay } from '@/features/event-day/ui/SeatingDay';
 import { hostApi } from '@/features/invitations/app/api';
 import { commit, createHistory, redo, undo, type History } from '@/features/invitations/editor/history';
 import { useUi } from '@/lib/i18n/client';
@@ -71,7 +73,8 @@ const isTyping = (el: EventTarget | null) =>
  * The seating screen (/app/invitations/[id]/seating): the map of the hall — floor plan, tables,
  * landmarks — beside the guest list, with undo / redo, autosave, the automatic seating (feature
  * `seating_auto`), print and Excel. On phones the map and the list are two views of one screen, and the
- * whole editor can go full screen.
+ * whole editor can go full screen. With the event day (`day`): telling guests their table, the freeze
+ * (a change that moves families already told their number is asked first) and the history of changes.
  */
 export function SeatingScreen({
   id,
@@ -79,6 +82,7 @@ export function SeatingScreen({
   auto,
   autoPackage,
   planBase,
+  day = null,
 }: {
   id: string;
   initial: SeatingState;
@@ -86,6 +90,8 @@ export function SeatingScreen({
   /** the package (and its plan) that has the automatic seating, for the upgrade prompt */
   autoPackage: { name: string; plan: string };
   planBase: string;
+  /** the event day's side of the seating: what families were told, telling them, the history */
+  day?: SeatingDayInfo | null;
 }) {
   const { t, fmt, plural, number } = useUi();
   const s = t.seating;
@@ -147,6 +153,31 @@ export function SeatingScreen({
   const tablesById = useMemo(() => new Map(plan.tables.map((x) => [x.id, x])), [plan.tables]);
   const names = useMemo(() => new Map(units.map((u) => [u.id, u.name])), [units]);
   const numbers = useMemo(() => new Map(plan.tables.map((x) => [x.id, x.number])), [plan.tables]);
+  const dayTools = useSeatingDay({
+    id,
+    day,
+    plan,
+    names,
+    saveStatus: save.status,
+    isStored: save.isStored,
+    onServerChange: save.reload,
+  });
+  /**
+   * a change to who sits where or to the tables' numbers (asked first when it moves told families);
+   * `then` once it is made
+   */
+  const edit = (fn: (p: Plan) => Plan, key: string | null = null, then?: () => void) =>
+    dayTools.guard(fn, () => {
+      update(fn, key);
+      then?.();
+    });
+  /** undo / redo, the same way */
+  const step = (fn: typeof undo) => {
+    const next = fn(history);
+    if (next !== history) dayTools.guard(next.present, () => setHistory(fn));
+  };
+  const stepRef = useRef(step);
+  stepRef.current = step;
   const bg = plan.layout.background;
   const planUrl = bg && bg.type !== 'application/pdf' && planBase ? `${planBase}/${bg.path}` : null;
   // the venue's current plan is the one in use (after a new one arrives, the old one no longer is)
@@ -160,10 +191,10 @@ export function SeatingScreen({
       const k = e.key.toLowerCase();
       if (k === 'z' && !e.shiftKey) {
         e.preventDefault();
-        setHistory(undo);
+        stepRef.current(undo);
       } else if ((k === 'z' && e.shiftKey) || k === 'y') {
         e.preventDefault();
-        setHistory(redo);
+        stepRef.current(redo);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -261,7 +292,7 @@ export function SeatingScreen({
       return;
     }
     setTableError(null);
-    update(
+    edit(
       (p) => {
         const next = updateTable(p, byId, tableId, patch);
         return next.ok ? next.plan : p;
@@ -272,15 +303,19 @@ export function SeatingScreen({
   const removeSelected = (ids: readonly string[]) => {
     if (!ids.length) return;
     const first = plan.tables.find((x) => ids.includes(x.id));
-    update((p) => removeItems(p, new Set(ids)));
     setSelection([]);
-    toast({
-      title:
-        ids.length === 1 && first
-          ? fmt(s.toasts.removed.one, { number: first.number })
-          : plural(s.toasts.removed, ids.length),
-      action: { label: s.toasts.undo, altText: s.toasts.undo, onClick: () => setHistory(undo) },
-    });
+    edit(
+      (p) => removeItems(p, new Set(ids)),
+      null,
+      () =>
+        toast({
+          title:
+            ids.length === 1 && first
+              ? fmt(s.toasts.removed.one, { number: first.number })
+              : plural(s.toasts.removed, ids.length),
+          action: { label: s.toasts.undo, altText: s.toasts.undo, onClick: () => stepRef.current(undo) },
+        }),
+    );
   };
   const nudge = (ids: readonly string[], dx: number, dy: number) => {
     const moves = new Map<string, Point>();
@@ -325,14 +360,17 @@ export function SeatingScreen({
       return false;
     }
     const moved = !!plan.assignments[unitId] && plan.assignments[unitId]!.tableId !== tableId;
-    update((p) => assign(p, byId, unitId, tableId).plan);
     const table = tablesById.get(tableId);
-    toast({
-      variant: 'success',
-      title: fmt(moved ? s.blocked.moved : s.blocked.seated, {
-        name: unit?.name ?? '',
-        number: table?.number ?? '',
-      }),
+    const fn = (p: Plan) => assign(p, byId, unitId, tableId).plan;
+    dayTools.guard(fn, () => {
+      update(fn);
+      toast({
+        variant: 'success',
+        title: fmt(moved ? s.blocked.moved : s.blocked.seated, {
+          name: unit?.name ?? '',
+          number: table?.number ?? '',
+        }),
+      });
     });
     return true;
   };
@@ -423,9 +461,12 @@ export function SeatingScreen({
       done: (r) => {
         setRunning(false);
         cancelRun.current = null;
-        update((p) => applySolution(p, units, r));
-        setResult(r);
-        setRuns((n) => n + 1);
+        const fn = (p: Plan) => applySolution(p, units, r);
+        dayTools.guard(fn, () => {
+          update(fn);
+          setResult(r);
+          setRuns((n) => n + 1);
+        });
         setDialog(null);
         setTab('map');
         // on a phone the map is below the buttons: bring it (with the result) into view
@@ -560,6 +601,7 @@ export function SeatingScreen({
         actions={
           <>
             {autoButton}
+            {dayTools.actions}
             <Hint text={s.actions.printHint}>
               <Button
                 variant="secondary"
@@ -651,10 +693,13 @@ export function SeatingScreen({
             <Button
               size="sm"
               variant="secondary"
-              onClick={() => {
-                update((p) => unassign(p, stats.declinedSeated));
-                toast({ title: plural(s.toasts.declinedFreed, stats.declinedSeated.length) });
-              }}
+              onClick={() =>
+                edit(
+                  (p) => unassign(p, stats.declinedSeated),
+                  null,
+                  () => toast({ title: plural(s.toasts.declinedFreed, stats.declinedSeated.length) }),
+                )
+              }
             >
               {s.warnings.declinedFix}
             </Button>
@@ -751,7 +796,7 @@ export function SeatingScreen({
               showPending={showPending}
               onShowPending={setShowPending}
               onSeat={(unitId) => setDialog({ kind: 'seat', unitId })}
-              onUnseat={(unitId) => update((p) => unassign(p, [unitId]))}
+              onUnseat={(unitId) => edit((p) => unassign(p, [unitId]))}
               onSettings={(unitId) => setDialog({ kind: 'unit', unitId })}
               onRules={() => setDialog({ kind: 'rules' })}
               onShowTable={(tableId) => {
@@ -779,8 +824,8 @@ export function SeatingScreen({
               full={full}
               onAddTable={addTableAt}
               onAddLandmark={addLandmarkAt}
-              onUndo={() => setHistory(undo)}
-              onRedo={() => setHistory(redo)}
+              onUndo={() => step(undo)}
+              onRedo={() => step(redo)}
               onZoom={(f) => controls.current?.zoom(f)}
               onFit={() => controls.current?.fit()}
               onSnap={setSnap}
@@ -824,7 +869,7 @@ export function SeatingScreen({
                   numbers={numbers}
                   onRerun={() => run()}
                   onUndo={() => {
-                    setHistory(undo);
+                    step(undo);
                     setResult(null);
                   }}
                   onClose={() => setResult(null)}
@@ -849,7 +894,7 @@ export function SeatingScreen({
                   }}
                   onRemove={() => removeSelected([selectedTable.id])}
                   onAddGuests={() => setDialog({ kind: 'add', tableId: selectedTable.id })}
-                  onUnseat={(unitId) => update((p) => unassign(p, [unitId]))}
+                  onUnseat={(unitId) => edit((p) => unassign(p, [unitId]))}
                   onClose={() => select([])}
                 />
               ) : selectedLandmark ? (
@@ -991,6 +1036,7 @@ export function SeatingScreen({
           onClose={() => setDialog(null)}
         />
       ) : null}
+      {dayTools.dialogs}
     </div>
   );
 }

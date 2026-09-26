@@ -1,3 +1,5 @@
+import type { PluralEntry } from './guest';
+
 /**
  * The live gallery's guest pages (the upload link and the venue's screen) — Hebrew. A dictionary of
  * its own: guests' phones download these strings only, not the host app's.
@@ -138,10 +140,6 @@ export const galleryGuestHe = {
   },
 };
 
-/** A plural entry: every CLDR category a language may need (Russian few/many, Arabic zero…many). */
-export type PluralEntry = { one: string; other: string } & Partial<
-  Record<'zero' | 'two' | 'few' | 'many', string>
->;
 type Dict<T> = {
   [K in keyof T]: T[K] extends string
     ? string

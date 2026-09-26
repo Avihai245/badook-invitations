@@ -37,13 +37,27 @@ import { ListEditor } from '../fields/ListEditor';
 import { HeroMediaField, IMAGE_TYPES, ImageField, UploadTile, useUploader } from '../fields/media';
 import { getAt, insertAt, setAt, uniqueId } from '../paths';
 import { useEditor } from '../state/EditorProvider';
+import { SectionCinematic } from './SectionCinematic';
 import { V2SectionForm } from './V2SectionForms';
 
 const pick = (value: L10n, locales: readonly Locale[]): L10n =>
   Object.fromEntries(locales.filter((l) => value[l] !== undefined).map((l) => [l, value[l]]));
 
-/** The form of one section (§7.3 b); `index` locates it in `doc.sections`. */
+/**
+ * The form of one section (§7.3 b); `index` locates it in `doc.sections`. After its content: its
+ * picture, layout, motion and colors — with the event's `cinematic` feature only.
+ */
 export function SectionForm({ section, index }: { section: Section; index: number }) {
+  const { features } = useEditor();
+  return (
+    <>
+      <SectionContent section={section} index={index} />
+      {features.cinematic !== false ? <SectionCinematic section={section} index={index} /> : null}
+    </>
+  );
+}
+
+function SectionContent({ section, index }: { section: Section; index: number }) {
   const base = `sections.${index}.data`;
   switch (section.type) {
     case 'hero':

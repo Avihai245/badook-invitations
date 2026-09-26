@@ -36,6 +36,8 @@ const fixtures = readdirSync(fixturesDir)
   .map((f) => [f, JSON.parse(readFileSync(join(fixturesDir, f), 'utf8'))] as const);
 
 const NOW = Date.parse('2026-09-23T10:00:00Z');
+/** Designs made with tokens v2: their manifests set type, spacing, motion and an opening. */
+const V2_DESIGNS: ReadonlySet<string> = new Set(['lumiere']);
 const render = (doc: InvitationDocument, locale = doc.defaultLocale) =>
   renderToStaticMarkup(
     <InvitationSections
@@ -223,7 +225,7 @@ describe('schema v2 contract', () => {
   });
 
   it('every template gets tokens v2 at the design’s own values (no manifest had to change)', () => {
-    for (const id of TEMPLATE_IDS) {
+    for (const id of TEMPLATE_IDS.filter((id) => !V2_DESIGNS.has(id))) {
       const { tokens, motion, cover } = requireTemplate(id).manifest;
       for (const role of ['display', 'heading', 'body', 'caption'] as const)
         expect(tokens.typography[role], `${id} ${role}`).toEqual({
@@ -235,6 +237,16 @@ describe('schema v2 contract', () => {
       expect(tokens.overlay).toEqual({ color: null, opacity: null });
       expect(motion.intensity).toBe(1);
       expect(cover.opening).toBeNull();
+    }
+  });
+
+  it('the designs made with tokens v2 set them within the ranges, with an opening over their photo', () => {
+    for (const id of V2_DESIGNS) {
+      const { tokens, motion, cover } = requireTemplate(id).manifest;
+      expect(tokens.typography.display.size).not.toBe(1);
+      expect(tokens.spacing.section).toBeGreaterThan(1);
+      expect(motion.intensity).toBeLessThan(1);
+      expect(cover.opening).toMatchObject({ preset: 'gold_dust', backdrop: 'hero' });
     }
   });
 

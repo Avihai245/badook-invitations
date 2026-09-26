@@ -1,7 +1,24 @@
 import type { Locale, TemplateManifest } from '../contracts/types';
+import { resolveAsset, templateFileUrl, type AssetBases } from '../renderer/assets';
 import { placeholderArt } from '../renderer/placeholders';
 import { demoPeople } from '../templates/demo-people';
 import { getTemplate } from '../templates/registry';
+
+/**
+ * A template's poster picture: its preview image, else its first hero option's picture (a
+ * photographic design's photo — from the one list of its media, `assets`), else null (the poster
+ * draws the template's scenery).
+ */
+export function posterImage(
+  template: Pick<TemplateManifest, 'id' | 'previewImage' | 'hero' | 'assets'>,
+  bases: AssetBases,
+): string | null {
+  const preview = templateFileUrl(template.id, template.previewImage, bases);
+  if (preview) return preview;
+  const media = template.hero.options[0]?.media;
+  if (!media) return null;
+  return resolveAsset(media.kind === 'image' ? media.src : media.poster, template, bases);
+}
 
 /** Poster background + default seal per template, exactly as in design-reference/app.html (POSTER). */
 const REFERENCE: Record<string, [background: string, seal: string]> = {

@@ -211,6 +211,27 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'hills',
     ornament: 'heart',
   },
+  // a photographic design: its pictures ship with it (templates/placeholder-media.json) — this only
+  // stands in where one is missing, a warm evening in its palette
+  lumiere: {
+    sky:
+      'radial-gradient(40% 20% at 70% 30%,rgba(255,236,200,.85),rgba(255,226,190,0) 70%),' +
+      'radial-gradient(90% 50% at 50% 100%,rgba(20,15,12,.6),transparent 70%),' +
+      'linear-gradient(180deg,#F6E7CF 0%,#EFD6B0 22%,#C99A6B 48%,#6E4B35 74%,#2A1D16 100%)',
+    shade: '#9C7658',
+    cloud: 'rgba(255,244,230,.4)',
+    hills: ['#6E4B35', '#4E3526', '#3A281D', '#2A1D16'],
+    cover: {
+      bg: ['#F7F3EE', '#EEE6DC', '#E2D8CC'],
+      envelope: ['#FAF6F0', '#F0E8DD'],
+      pocket: ['#FBF8F3', '#F2EBE1'],
+      flap: ['#F0E8DD', '#E6DCCF'],
+      card: 'linear-gradient(180deg,#F6E7CF 0%,#C99A6B 50%,#2A1D16 100%)',
+      hint: '#6B5F56',
+    },
+    panorama: 'hills',
+    ornament: 'rings',
+  },
   // ── scene templates: a drawn scene over a base gradient ──
   'cloud-arch': drawn('cloud-arch', ['#F5F3EF', '#EFECE6', '#E6E1D8'], {
     bg: ['#F2F0EB', '#E9E5DE', '#DCD5CB'],

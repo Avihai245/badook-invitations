@@ -39,7 +39,7 @@ import {
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
 import { useUi } from '@/lib/i18n/client';
 import { GALLERY } from '../../config';
-import { useLiveRefresh } from '../../client/live';
+import { useLiveRefresh } from '@/lib/live/client';
 import { formatBytes } from '../../format';
 import type { HostGalleryView } from '../../server/host-api';
 import type { HostPageData } from '../../server/pages';

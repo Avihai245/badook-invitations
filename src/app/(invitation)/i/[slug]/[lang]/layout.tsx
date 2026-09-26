@@ -4,6 +4,7 @@ import { dirOf } from '@/features/invitations/contracts/types';
 import { InvitationHtml } from '@/features/invitations/renderer/InvitationHtml';
 import { MissingInvitationHtml } from '@/features/invitations/renderer/MissingInvitation';
 import { isLocale } from '@/features/invitations/lib/locales';
+import { cinematicForPage } from '@/features/invitations/server/cinematic';
 import { getPublishedInvitation, resolveLocale } from '@/features/invitations/server/published';
 import '@/features/invitations/ui/invitation.css';
 import { serverEnv } from '@/lib/env';
@@ -38,11 +39,14 @@ export default async function PublicInvitationLayout({
       </MissingInvitationHtml>
     );
   const { doc } = invitation;
+  // the host's type scale, spacing and motion need the event's `cinematic` feature (asked once per request)
+  const cinematic = await cinematicForPage(invitation.id, doc, invitation.entry.manifest);
   return (
     <InvitationHtml
       doc={doc}
       template={invitation.entry.manifest}
       locale={locale}
+      cinematic={cinematic}
       boot={
         doc.locales.length > 1
           ? {

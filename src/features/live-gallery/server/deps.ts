@@ -2,6 +2,7 @@ import 'server-only';
 import QRCode from 'qrcode';
 import { featureInput, featuresFor } from '@/features/flags/server';
 import { serverEnv } from '@/lib/env';
+import { realtimeInfo } from '@/lib/live/broadcast';
 import { checkImage } from './ai';
 import { galleryDb } from './db';
 import type { GuestDeps } from './guest-api';
@@ -12,15 +13,7 @@ import { sweepNow } from './sweep';
 
 /** The real dependencies of the gallery's API (tests pass their own). */
 
-function realtime(channel: string) {
-  const env = serverEnv();
-  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) return null;
-  return {
-    url: env.NEXT_PUBLIC_SUPABASE_URL.replace(/\/+$/, ''),
-    key: env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    channel,
-  };
-}
+const realtime = realtimeInfo;
 
 function aiCheck() {
   const env = serverEnv();

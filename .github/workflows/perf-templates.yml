@@ -1,8 +1,11 @@
 # The invitations' performance budget (scripts/perf-templates.ts): every template's demo and the
 # cinematic showcase on a phone with 4G network throttling and a 4x slower CPU — LCP < 2.5 s,
 # CLS < 0.1, a scroll at ≥ 55 fps. Run by hand, or on pull requests that change how invitations
-# render. The report (JSON + Markdown) is kept as the run's artifact. A runner is slower than a laptop:
-# a page that misses a budget is measured twice before it fails the run.
+# render or what they load: the renderer and its sections, styles, fonts and helpers, the templates
+# (their JSON and their pictures), the guest's routes and the image settings. A page over a budget
+# fails the run (the check a regression trips); the report (JSON + Markdown) is kept as the run's
+# artifact. A runner is slower than a laptop: a page that misses a budget is measured twice before it
+# fails the run. Locally: `npm run build && npm run perf:templates -- --tpl <id>` (docs/templates.md).
 name: Invitation performance budget
 
 on:
@@ -23,7 +26,17 @@ on:
       - src/features/invitations/ui/**
       - src/features/invitations/templates/**
       - src/features/invitations/contracts/**
+      - src/features/invitations/fonts/**
+      - src/features/invitations/lib/**
+      - src/features/invitations/i18n/**
+      - src/features/invitations/dev/**
+      - src/app/(invitation)/**
+      - invitation-templates-pack/**
+      - public/templates/**
+      - next.config.ts
+      - package-lock.json
       - scripts/perf-templates.ts
+      - .github/workflows/perf-templates.yml
 
 permissions:
   contents: read

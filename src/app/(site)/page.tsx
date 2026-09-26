@@ -173,7 +173,8 @@ export default async function HomePage() {
     { key: 'assistant', icon: <Bot />, ...s.more.items.assistant },
     { key: 'help', icon: <CircleHelp />, ...s.more.items.help },
   ];
-  const designs = [...TEMPLATES.values()].map(({ manifest }) => manifest);
+  // the public designs (an unlisted one — manifest `listed: false` — isn't offered here)
+  const designs = [...TEMPLATES.values()].map(({ manifest }) => manifest).filter((m) => m.listed);
   const number = (v: number) => new Intl.NumberFormat(locale === 'he' ? 'he-IL' : 'en-GB').format(v);
   // the video sample skips the envelope: its first screen is the point
   const sample = (slug: string) => `/i/${slug}?lang=${locale}`;

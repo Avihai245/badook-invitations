@@ -15,6 +15,11 @@ export type ParentToFrame =
   | { type: 'reveal'; path: string }
   /** play the cover opening again */
   | { type: 'replay' }
+  /**
+   * play a section's motion as guests see it (its entrance as it scrolls in, its media's scroll
+   * effect; the hero: its entrance): the frame shows the live page for `ms`, then the editor again
+   */
+  | { type: 'play'; path: string; ms: number }
   /** the editor (re)attached its listener: answer with 'ready' (a 'ready' sent before that was lost) */
   | { type: 'ping' };
 

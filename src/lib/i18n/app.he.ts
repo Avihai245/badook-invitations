@@ -7,6 +7,7 @@ import { helpHe } from './help.he';
 import { supportHe } from './support.he';
 import { seatingHe } from './seating.he';
 import { liveGalleryHe } from './live-gallery.he';
+import { eventDayHe } from './event-day.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -24,6 +25,7 @@ export const he = {
   editor: editorHe,
   seating: seatingHe,
   liveGallery: liveGalleryHe,
+  eventDay: eventDayHe,
   common: {
     close: 'סגירה',
     cancel: 'ביטול',
@@ -411,6 +413,8 @@ export const he = {
     playPreview: 'הצגת התצוגה המקדימה של {name}',
     noResults: 'אין עיצובים לסוג האירוע הזה עדיין.',
     premium: 'פרימיום',
+    /** an unlisted design, shown to the platform's admins only */
+    unlisted: 'לא בגלריה הציבורית',
     preview: {
       title: '{name}',
       palettes: 'צבעים',

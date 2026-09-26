@@ -70,6 +70,8 @@ describe('template pack', () => {
       'ballet-rose',
       'vinyl-groove',
       'retro-80s',
+      // the photographic flagship (unlisted)
+      'lumiere',
     ]);
   });
 
@@ -102,7 +104,15 @@ describe('template pack', () => {
       'disco-ball',
       'ballet-rose',
       'retro-80s',
+      'lumiere',
     ]);
+  });
+
+  it('only the photographic flagship is unlisted (kept out of the public gallery)', () => {
+    expect(TEMPLATE_IDS.filter((id) => !TEMPLATES.get(id)!.manifest.listed)).toEqual(['lumiere']);
+    const { manifest } = TEMPLATES.get('sahar-bordeaux')!;
+    const { listed: _listed, ...legacy } = manifest;
+    expect(TemplateManifestSchema.parse(legacy).listed).toBe(true);
   });
 
   it.each(TEMPLATE_IDS)('%s passes the cross-field template rules', (id) => {

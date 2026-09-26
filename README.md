@@ -87,6 +87,17 @@ Host app (sign-in required; Hebrew UI by default, English via the `עב | EN` to
 | `/app/preview-frame/<template>`   | The editor's preview iframe; `?invitation=<id>[&version=<n>]` = full-page preview                                   |
 | `/api/invitations/…`              | JSON API (create, save, publish, versions, restore, slug, uploads, responses, notify, follow-up, CSV export, …)     |
 
+**The event day** (Phase 5A — features `seating_guide` and `checkin`): each guest's table guide
+`/e/<slug>/table?g=<their personal link's token>` (their table, the hall's map, the way from the
+entrance, kept on the phone for the evening, their entrance QR), and the entrance station
+`/e/<slug>/station?t=<the station link>` for the staff at the door (no account: scan or search, check
+in, undo). The host's side: the invitation's "Event day" tab `/app/invitations/<id>/live` (arrivals per
+table on the hall's map, live; half-empty alerts, merges, moving families with undo; the stations'
+link), and on the seating screen "send guests their table" — a second WhatsApp template
+(`INVITES_WHATSAPP_TABLE_TEMPLATE`, [docs/whatsapp-setup.md](docs/whatsapp-setup.md) §8), the host's own
+WhatsApp, or table cards to print (`/app/invitations/<id>/seating/cards`). Once numbers were sent, moving
+a family that was told asks first, and only it gets the new number.
+
 **Email notifications** (P4): a host gets an email per reply or a daily summary (their choice on the
 responses screen), sent through [Resend](https://resend.com) when `INVITES_EMAIL_API_KEY` and
 `INVITES_EMAIL_FROM` (a sender on a verified domain) are set — otherwise the emails are only logged.

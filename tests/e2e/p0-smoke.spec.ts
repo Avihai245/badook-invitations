@@ -37,7 +37,10 @@ test.describe('invitation renders', () => {
         await expect(page.locator('html')).toHaveAttribute('lang', locale);
         await expect(page.locator('html')).toHaveAttribute('dir', locale === 'he' ? 'rtl' : 'ltr');
         await expect(page.locator('.hero .names')).toBeVisible();
-        await expect(page.locator('main > section, main > footer').first()).toBeAttached();
+        // (a section with a picture, a layout or motion of its own sits in its `.cine` wrapper)
+        await expect(
+          page.locator('main > section, main > footer, main > .cine :is(section, footer)').first(),
+        ).toBeAttached();
         const overflow = await page.evaluate(
           () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
         );

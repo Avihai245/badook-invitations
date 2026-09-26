@@ -24,7 +24,16 @@ export interface Opening {
   deep: string;
   /** the metal of the medallion, the fringe and the dust */
   gold: string;
+  /**
+   * The night sky / the veil lets the invitation's first picture show through (the template's
+   * `cover.opening.backdrop: 'hero'` — fireworks and gold dust only: the doors and the curtain are
+   * opaque).
+   */
+  backdrop: boolean;
 }
+
+/** The openings that can play over the hero's picture. */
+const SHEER: readonly OpeningPreset[] = ['fireworks', 'gold_dust'];
 
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 
@@ -72,5 +81,7 @@ export function resolveOpening(
     light: mixHex(color, '#FFFFFF', 0.22),
     deep: mixHex(color, '#000000', 0.42),
     gold: mixHex('#D4AF63', palette.accent, 0.12),
+    // a photographic design's own setting, whichever sheer opening the host picks
+    backdrop: own?.backdrop === 'hero' && SHEER.includes(preset),
   };
 }

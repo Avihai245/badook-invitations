@@ -78,6 +78,9 @@ function bandPalette(p: Palette): Partial<Palette> {
   };
 }
 
+/** The sections the showcase adds, by id. */
+const SHOWCASE_IDS: ReadonlySet<string> = new Set(['quote', 'when', 'parents', 'where', 'dance', 'candles']);
+
 export function cinematicDocument(
   templateId: string,
   opening: OpeningPreset | null = null,
@@ -114,6 +117,9 @@ export function cinematicDocument(
   };
   const sections: Section[] = [];
   for (const s of doc.sections) {
+    // a design's own new-type sections (a photographic design seeds a verse and the date) give way to
+    // the showcase's
+    if (SHOWCASE_IDS.has(s.id)) continue;
     switch (s.type) {
       case 'text':
         // the story beside a golden-hour picture, line by line

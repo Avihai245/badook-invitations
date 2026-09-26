@@ -225,9 +225,166 @@ export const SEED_COPY = {
     en: 'Is there parking at the venue?',
     ru: 'Есть ли парковка на месте?',
     ar: 'هل توجد مواقف سيارات في المكان؟',
-    fr: 'Y a-t-il un parking sur place ?',
+    fr: 'Y a-t-il un parking sur place ?',
     es: '¿Hay aparcamiento en el lugar?',
     am: 'በቦታው የመኪና ማቆሚያ አለ?',
+  } satisfies L10n,
+  // ── the schema-v2 sections (parents · when · where · quote · text & picture) ──
+  parentsTitle: (eventType: EventType): L10n =>
+    COUPLE_EVENTS.includes(eventType)
+      ? {
+          he: 'בשמחת ההורים',
+          en: 'Together with our parents',
+          ru: 'Вместе с нашими родителями',
+          ar: 'بفرحة الأهل',
+          fr: 'Entourés de nos parents',
+          es: 'Junto a nuestros padres',
+          am: 'ከወላጆቻችን ጋር',
+        }
+      : eventType === 'bar_mitzvah' || eventType === 'bat_mitzvah'
+        ? {
+            he: 'ההורים הגאים',
+            en: 'The proud parents',
+            ru: 'Гордые родители',
+            ar: 'الأهل الفخورون',
+            fr: 'Les fiers parents',
+            es: 'Los orgullosos padres',
+            am: 'ኩሩዎቹ ወላጆች',
+          }
+        : eventType === 'brit' || eventType === 'baby_shower'
+          ? {
+              he: 'המשפחה המאושרת',
+              en: 'The happy family',
+              ru: 'Счастливая семья',
+              ar: 'العائلة السعيدة',
+              fr: 'L’heureuse famille',
+              es: 'La familia feliz',
+              am: 'ደስተኛው ቤተሰብ',
+            }
+          : {
+              he: 'המארחים',
+              en: 'Your hosts',
+              ru: 'Хозяева праздника',
+              ar: 'أصحاب الدعوة',
+              fr: 'Vos hôtes',
+              es: 'Los anfitriones',
+              am: 'አስተናጋጆቹ',
+            },
+  whenTitle: (eventType: EventType): L10n =>
+    COUPLE_EVENTS.includes(eventType)
+      ? {
+          he: 'היום שלנו',
+          en: 'Our day',
+          ru: 'Наш день',
+          ar: 'يومنا',
+          fr: 'Notre jour',
+          es: 'Nuestro día',
+          am: 'ቀናችን',
+        }
+      : {
+          he: 'מתי חוגגים',
+          en: 'When we celebrate',
+          ru: 'Когда празднуем',
+          ar: 'موعد الاحتفال',
+          fr: 'Quand nous célébrons',
+          es: 'Cuándo celebramos',
+          am: 'መቼ እናከብራለን',
+        },
+  whereLabel: {
+    he: 'איפה',
+    en: 'Where',
+    ru: 'Где',
+    ar: 'أين',
+    fr: 'Où',
+    es: 'Dónde',
+    am: 'የት',
+  } satisfies L10n,
+  /** A verse or a line for the quote section, by the kind of event. */
+  quote: (eventType: EventType): { text: L10n; attribution: L10n | null } =>
+    COUPLE_EVENTS.includes(eventType)
+      ? {
+          text: {
+            he: 'אני לדודי ודודי לי',
+            en: 'I am my beloved’s, and my beloved is mine',
+            ru: 'Я принадлежу возлюбленному моему, а возлюбленный мой — мне',
+            ar: 'أنا لحبيبي وحبيبي لي',
+            fr: 'Je suis à mon bien-aimé, et mon bien-aimé est à moi',
+            es: 'Yo soy de mi amado, y mi amado es mío',
+            am: 'እኔ ለውዴ ነኝ፥ ውዴም ለእኔ ነው',
+          },
+          attribution: {
+            he: 'שיר השירים ו׳, ג׳',
+            en: 'Song of Songs 6:3',
+            ru: 'Песнь песней 6:3',
+            ar: 'نشيد الأنشاد 6: 3',
+            fr: 'Cantique des cantiques 6:3',
+            es: 'Cantar de los Cantares 6:3',
+            am: 'መኃልየ መኃልይ 6፥3',
+          },
+        }
+      : eventType === 'bar_mitzvah' || eventType === 'bat_mitzvah'
+        ? {
+            text: {
+              he: 'בכל דרכיך דעהו, והוא יישר אורחותיך',
+              en: 'In all your ways acknowledge Him, and He will make your paths straight',
+              ru: 'Во всех путях твоих познавай Его, и Он направит стези твои',
+              ar: 'في كل طرقك اعرفه، وهو يقوّم سبلك',
+              fr: 'Dans toutes tes voies reconnais-le, et il aplanira tes sentiers',
+              es: 'Reconócelo en todos tus caminos, y él enderezará tus veredas',
+              am: 'በመንገድህ ሁሉ እርሱን እወቅ፥ እርሱም ጎዳናህን ያቃናል',
+            },
+            attribution: {
+              he: 'משלי ג׳, ו׳',
+              en: 'Proverbs 3:6',
+              ru: 'Притчи 3:6',
+              ar: 'سفر الأمثال 3: 6',
+              fr: 'Proverbes 3:6',
+              es: 'Proverbios 3:6',
+              am: 'መጽሐፈ ምሳሌ 3፥6',
+            },
+          }
+        : eventType === 'brit' || eventType === 'baby_shower'
+          ? {
+              text: {
+                he: 'אל הנער הזה התפללתי',
+                en: 'For this child I prayed',
+                ru: 'О сем дитяти молилась я',
+                ar: 'لأجل هذا الصبي صلّيت',
+                fr: 'C’est pour cet enfant que je priais',
+                es: 'Por este niño oraba',
+                am: 'ስለዚህ ሕፃን ጸለይሁ',
+              },
+              attribution: {
+                he: 'שמואל א׳ א׳, כ״ז',
+                en: '1 Samuel 1:27',
+                ru: '1 Царств 1:27',
+                ar: 'صموئيل الأول 1: 27',
+                fr: '1 Samuel 1:27',
+                es: '1 Samuel 1:27',
+                am: '1ኛ ሳሙኤል 1፥27',
+              },
+            }
+          : {
+              text: {
+                he: 'לחיים — ולכל מה שעוד יבוא',
+                en: 'To life — and to everything still to come',
+                ru: 'За жизнь — и за всё, что ещё впереди',
+                ar: 'نخب الحياة — وكل ما هو آتٍ',
+                fr: 'À la vie — et à tout ce qui nous attend',
+                es: 'Por la vida — y por todo lo que está por venir',
+                am: 'ለሕይወት — ለሚመጣውም ሁሉ',
+              },
+              attribution: null,
+            },
+  /** A new "text & picture" section: a title to write over or beside the host's own photo. */
+  customTitle: {
+    he: 'רגע משלנו',
+    en: 'A moment of ours',
+    ru: 'Наш момент',
+    ar: 'لحظة خاصة بنا',
+    fr: 'Un moment à nous',
+    es: 'Un momento nuestro',
+    am: 'የኛ ቅጽበት',
   } satisfies L10n,
 } as const;
 

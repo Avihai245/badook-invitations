@@ -1,7 +1,7 @@
 import 'server-only';
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
-import { entitlementsFor } from '@/features/billing/server/account';
+import { entitlementsFor, isAdminEmail } from '@/features/billing/server/account';
 import type { Feature } from '@/features/flags/features';
 import { accountFeatures, featuresFor } from '@/features/flags/server';
 import { invitationsEnabled } from '@/lib/feature';
@@ -9,6 +9,7 @@ import { getSessionUser } from '@/lib/supabase/session';
 import { LOCALES } from '../contracts/types';
 import { getTemplate } from '../templates/registry';
 import { translationRows } from '../translate/deps';
+import { cinematicFor } from './cinematic';
 import type { ApiResult, HostDeps } from './host-api';
 import { hostDb } from './host-db';
 
@@ -74,6 +75,8 @@ export async function hostRoute(
         if (!pending) features.set(key, (pending = id ? featuresFor(id) : accountFeatures(user)));
         return pending;
       },
+      cinematic: cinematicFor,
+      admin: isAdminEmail(user.email),
     };
     const result = await handler(user.id, body, deps);
     return json(result.status, result.body);

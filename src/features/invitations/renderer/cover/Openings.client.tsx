@@ -17,6 +17,21 @@ export interface CinematicCoverProps extends PhaseProps {
   scrollLabel?: readonly Variant[];
   /** the template's burst colors (renderer/fx/theme.ts): the fireworks' */
   fx?: { colors: string[] } | null;
+  /**
+   * A photo-led opening (`opening.backdrop`): the hero's picture under the night sky or the veil —
+   * the same image set as the hero's, so the page fetches it once and the hand-off is seamless.
+   */
+  backdrop?: CoverBackdrop | null;
+}
+
+/** The hero's still as the cover shows it (renderer/images.ts imageSet at 100vw + its focal point). */
+export interface CoverBackdrop {
+  src: string;
+  srcSet?: string;
+  sizes?: string;
+  fallback?: string;
+  /** CSS object-position */
+  position: string;
 }
 
 /** How far a wheel / a swipe goes before the doors or the curtain open by themselves. */
@@ -40,6 +55,7 @@ export function CinematicCover({
   skipLabel,
   scrollLabel,
   fx,
+  backdrop = null,
   phase,
   setPhase,
   showSkip,
@@ -49,6 +65,7 @@ export function CinematicCover({
   const root = useRef<HTMLDivElement>(null);
   const hintId = useId();
   const { preset } = opening;
+  const photo = opening.backdrop ? backdrop : null;
 
   const open = useOpening((skip: boolean) => {
     announceOpen();
@@ -81,6 +98,13 @@ export function CinematicCover({
     }
   });
 
+  // `open` changes on every render (the cover re-renders, e.g. when Skip appears): the listeners
+  // below read the latest one, so a render never restarts a scroll that is already under way
+  const openRef = useRef(open);
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+
   // scroll (or swipe) to enter: the doors / the curtain follow a little, then open
   useEffect(() => {
     const el = root.current;
@@ -105,7 +129,7 @@ export function CinematicCover({
       if (e.deltaY <= 0) return;
       wheel += e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY;
       show(wheel / WHEEL_TO_OPEN);
-      if (peek >= 1) open(false);
+      if (peek >= 1) openRef.current(false);
       else settle();
     };
     const onTouchStart = (e: TouchEvent) => {
@@ -120,13 +144,13 @@ export function CinematicCover({
     const onTouchEnd = () => {
       if (startY === null) return;
       startY = null;
-      if (peek >= 0.5) open(false);
+      if (peek >= 0.5) openRef.current(false);
       else show(0);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         e.preventDefault();
-        open(false);
+        openRef.current(false);
       }
     };
     el.addEventListener('wheel', onWheel, { passive: false });
@@ -142,7 +166,7 @@ export function CinematicCover({
       el.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('keydown', onKey);
     };
-  }, [opening.scroll, phase, open]);
+  }, [opening.scroll, phase]);
 
   const cls = ['cover', 'co', phase !== 'idle' ? 'opening' : '', phase === 'gone' ? 'gone' : '']
     .filter(Boolean)
@@ -221,6 +245,7 @@ export function CinematicCover({
       data-opening={preset}
       data-motion={opening.motion ?? undefined}
       data-scroll={opening.scroll ? '' : undefined}
+      data-backdrop={photo ? '' : undefined}
       style={style}
     >
       <button
@@ -235,6 +260,24 @@ export function CinematicCover({
           }
         }}
       >
+        {photo ? (
+          // the invitation's first picture, at the scale the hero's settle starts from (invitation.css)
+          <img
+            className="co-photo"
+            src={photo.src}
+            srcSet={photo.srcSet}
+            sizes={photo.sizes}
+            data-fallback={photo.fallback}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
+            draggable={false}
+            style={{ objectPosition: photo.position }}
+            // the error fallback (images.ts) may swap it for the original before React hydrates
+            suppressHydrationWarning
+          />
+        ) : null}
         {art}
         <span className="cover-hint" id={hintId} aria-hidden={hint.length > 1 ? undefined : true}>
           <Localized variants={hint} />

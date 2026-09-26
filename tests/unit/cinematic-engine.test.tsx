@@ -30,6 +30,8 @@ import { demoDocument } from '@/features/invitations/templates/demo';
 import { TEMPLATE_IDS, requireTemplate } from '@/features/invitations/templates/registry';
 
 const NOW = Date.parse('2026-09-23T10:00:00Z');
+/** Designs made with tokens v2: their manifests set type, spacing and motion. */
+const V2_DESIGNS: ReadonlySet<string> = new Set(['lumiere']);
 const sahar = () => requireTemplate('sahar-bordeaux').manifest;
 const ctxOf = (doc: InvitationDocument, options: { cinematic?: boolean; locale?: 'he' | 'en' } = {}) =>
   buildRenderContext(doc, requireTemplate(doc.templateId).manifest, options.locale ?? 'he', {
@@ -291,7 +293,7 @@ describe('presentation: how a section renders under schema v2', () => {
 
 describe('design tokens v2', () => {
   it('no template emits tokens v2 variables unless it sets them: every look stays as it was', () => {
-    for (const id of TEMPLATE_IDS) {
+    for (const id of TEMPLATE_IDS.filter((id) => !V2_DESIGNS.has(id))) {
       const t = requireTemplate(id).manifest;
       const vars = themeVars(t, demoDocument(id), 'he');
       expect(
@@ -302,6 +304,22 @@ describe('design tokens v2', () => {
       expect(vars['--motion-intensity']).toBe(t.motion.preset === 'none' ? '0' : '1');
       expect(vars['--reveal-distance']).toBe(`${t.motion.preset === 'none' ? 0 : t.motion.revealDistance}px`);
     }
+  });
+
+  it('a design made with tokens v2 emits exactly the ones it sets', () => {
+    const t = requireTemplate('lumiere').manifest;
+    const vars = themeVars(t, demoDocument('lumiere'), 'he');
+    expect(vars).toMatchObject({
+      '--ty-display': '0.9',
+      '--lh-display': '1.02',
+      '--ls-heading': '0.06em',
+      '--sp-section': '1.15',
+      '--sp-gutter': '1.05',
+      '--motion-intensity': '0.85',
+      '--scrim': '#140F0C',
+    });
+    expect(vars['--ty-heading']).toBeUndefined();
+    expect(vars['--r-media']).toBe('0px');
   });
 
   it('a template’s tokens reach the page as CSS variables', () => {

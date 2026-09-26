@@ -28,6 +28,9 @@ export default async function InvitationLayout({
   // the seating tab: when the event has the feature, or when only the package keeps it off
   const seatingOff = input ? whyOff('seating', input) : 'unavailable';
   const seating = seatingOff === null ? 'on' : seatingOff === 'plan' ? 'plan' : null;
+  // the event day (check-in and the live hall) the same way
+  const dayOff = input ? whyOff('checkin', input) : 'unavailable';
+  const eventDay = dayOff === null ? 'on' : dayOff === 'plan' ? 'plan' : null;
   return (
     <>
       {/* the header's poster writes the names in the design's font */}
@@ -35,6 +38,7 @@ export default async function InvitationLayout({
       <InvitationWorkspace
         item={item}
         seating={seating}
+        eventDay={eventDay}
         galleryTab={deploymentFeatures().has('live_gallery')}
       >
         {children}

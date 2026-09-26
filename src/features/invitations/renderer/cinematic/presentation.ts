@@ -9,7 +9,7 @@ import { mixHex, relativeLuminance } from '../../lib/contrast';
 import { parseVideoLink } from '../../lib/video-links';
 import type { RenderContext } from '../context-core';
 import { motionAttributes, motionConfig, type MotionConfig } from '../motion/engine';
-import { resolvePalette, scrimOf, sectionThemeVars } from '../theme';
+import { effectiveMotion, resolvePalette, scrimOf, sectionThemeVars } from '../theme';
 
 /**
  * How a section renders under the v2 presentation (feature `cinematic`): its effective layout, its
@@ -59,10 +59,70 @@ export function hasPresentation(section: Section): boolean {
   );
 }
 
-/** Whether the document uses the v2 presentation anywhere (sections or the host's opening). */
-export function usesCinematic(doc: Pick<InvitationDocument, 'sections' | 'cover'>): boolean {
-  return !!doc.cover.opening || doc.sections.some((s) => s.enabled && hasPresentation(s));
+/** The host scaled the design's type, spacing or motion (`theme.tokens`, v2). */
+export const hasThemeTokens = (doc: Pick<InvitationDocument, 'theme'>): boolean =>
+  Object.values(doc.theme.tokens ?? {}).some((v) => typeof v === 'number' && v !== 1);
+
+/** Whether the document uses the v2 presentation anywhere (sections, the host's opening, its tokens). */
+export function usesCinematic(doc: Pick<InvitationDocument, 'sections' | 'cover' | 'theme'>): boolean {
+  return (
+    !!doc.cover.opening || hasThemeTokens(doc) || doc.sections.some((s) => s.enabled && hasPresentation(s))
+  );
 }
+
+/** JSON with sorted keys: the same value reads the same whichever order its keys were stored in. */
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+  if (value && typeof value === 'object')
+    return `{${Object.keys(value as Record<string, unknown>)
+      .sort()
+      .filter((k) => (value as Record<string, unknown>)[k] !== undefined)
+      .map((k) => `${JSON.stringify(k)}:${stableJson((value as Record<string, unknown>)[k])}`)
+      .join(',')}}`;
+  return JSON.stringify(value);
+}
+
+type CinematicDoc = Pick<InvitationDocument, 'sections' | 'cover' | 'theme'>;
+
+/**
+ * Every v2-only value of a document (hidden sections too), with its path; a section's values are
+ * its own (keyed by its id — they move with it).
+ */
+function cinematicValues(doc: CinematicDoc): { path: string; key: string }[] {
+  const out: { path: string; key: string }[] = [];
+  const add = (path: string, kind: string, value: unknown) => {
+    if (value !== undefined && value !== null) out.push({ path, key: `${kind}:${stableJson(value)}` });
+  };
+  add('cover.opening', 'opening', doc.cover.opening);
+  if (hasThemeTokens(doc)) add('theme.tokens', 'tokens', doc.theme.tokens);
+  for (const [i, s] of doc.sections.entries()) {
+    const own = (kind: string) => `${kind}@${s.id}`;
+    if (s.type !== 'hero') {
+      add(`sections.${i}.media`, own('media'), s.media);
+      if (s.layout && s.layout !== 'stack') add(`sections.${i}.layout`, own('layout'), s.layout);
+    }
+    add(`sections.${i}.animation`, own('animation'), s.animation);
+    if (s.themeOverrides && Object.keys(s.themeOverrides).length)
+      add(`sections.${i}.themeOverrides`, own('colors'), s.themeOverrides);
+  }
+  return out;
+}
+
+/**
+ * The v2-only values `next` has that `previous` doesn't (their paths): what a save may not bring
+ * while the event lacks the `cinematic` feature. What was there already — kept, moved with its
+ * section or removed — is never a new value: a host whose feature went away keeps saving their draft.
+ * A value given to another section (a copy) is new: the editor copies sections without them then.
+ */
+export function introducedCinematic(previous: CinematicDoc | null, next: CinematicDoc): string[] {
+  const known = new Set(previous ? cinematicValues(previous).map((v) => v.key) : []);
+  return cinematicValues(next)
+    .filter((v) => !known.has(v.key))
+    .map((v) => v.path);
+}
+
+/** The document carries any v2-only value (hidden sections included). */
+export const hasCinematicValues = (doc: CinematicDoc): boolean => cinematicValues(doc).length > 0;
 
 function resolveMedia(section: Section, ctx: RenderContext): CineMedia | null {
   const m = section.type === 'hero' ? null : section.media;
@@ -127,7 +187,8 @@ export function sectionPresentation(section: Section, ctx: RenderContext): CineP
   }
   const onMedia = !hero && ON_MEDIA.includes(layout) && !!media;
   const split = layout === 'split_start' || layout === 'split_end';
-  const motion = motionConfig(section.animation, template, layout);
+  // the template's motion × the host's intensity for the whole invitation (theme.tokens.motion)
+  const motion = motionConfig(section.animation, { motion: effectiveMotion(template, doc) }, layout);
   const { attrs, vars } = motionAttributes(motion);
   const theme = section.themeOverrides ? sectionThemeVars(template, doc, section.themeOverrides) : null;
   Object.assign(vars, theme?.vars);

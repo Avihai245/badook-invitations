@@ -46,9 +46,30 @@ feature (or without an AI model) the same review screen is where hosts translate
 `invitations.features` keeps an event's own choices: `{ "off": [...], "grant": [...] }`. Switched off wins
 over a grant (it's the host's event). Unknown ids are ignored, so removing a feature needs no migration.
 
+## Cinematic (`cinematic`)
+
+Each section's picture or video, its layout, motion and colors, the cinematic openings and the
+design-wide "Style & motion" (invitation schema v2). In the editor these controls show only when the
+event has the feature; without it "add section" and "duplicate" add content only, and the server refuses
+a draft that brings a v2 value the stored draft doesn't have (`PATCH /api/invitations/:id` → 403
+`feature_off`, the paths in `issues`) — what the draft already has stays, so a host whose feature went
+away keeps saving. Guests then get the design's plain rendering. Colors from a photo and the suggested
+fonts aren't part of it: they set ordinary colors and fonts.
+
 ## Face albums (biometric data)
 
 Grouping photos by face processes biometric data — "sensitive information" under the Privacy Protection
 Law (amendment 13). The feature stays off everywhere until `INVITES_FACE_ALBUMS=on`, which should follow a
 legal review; when on, it runs only with each guest's explicit opt-in, keeps no names, never links events,
 and deletes the face data automatically after the retention period.
+
+## The event day (`seating_guide`, `checkin`)
+
+- `seating_guide` (Premium): each guest's table guide (`/e/<slug>/table?g=…`), telling guests their table
+  (the second WhatsApp template, the host's own WhatsApp, marked by hand) and the table cards to print.
+  Off: the guide answers "not available", the notices API refuses (403 `feature_off`), the buttons are
+  gone (the seating screen offers the package instead).
+- `checkin` (VIP): the entrance stations (`/e/<slug>/station?t=…`), the entrance QR on the guide and the
+  cards, the "Event day" tab (live hall, re-seating live). Off: the stations' link opens nothing, the
+  check-in and live APIs refuse, the tab is gone (or offers the package).
+- The seating's history of changes (and undo) belongs to `seating`, which every package has.

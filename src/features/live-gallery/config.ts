@@ -131,18 +131,11 @@ export const GALLERY = {
     uploadTokenMaxAgeMs: 100 * 60_000,
   },
 
-  /** Live updates: a Realtime hint, polling only while that connection is down. */
+  /** Live updates: a Realtime hint, polling only while that connection is down (src/lib/live). */
   live: {
     pollGuestMs: 12_000,
     pollProjectorMs: 6_000,
     pollHostMs: 15_000,
-    /** hints closer together than this make one refresh */
-    hintThrottleMs: 1_500,
-    heartbeatMs: 25_000,
-    joinTimeoutMs: 10_000,
-    /** a hidden page lets go of its connection after this */
-    hiddenDisconnectMs: 60_000,
-    reconnectMs: [1_000, 2_000, 5_000, 10_000, 20_000, 30_000],
   },
 
   queue: {

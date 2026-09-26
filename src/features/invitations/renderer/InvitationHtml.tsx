@@ -6,7 +6,7 @@ import { FrameScrollCue } from './FrameScrollCue.client';
 import { FRAMED_BOOT } from './framed';
 import { IMAGE_FALLBACK } from './images';
 import { bootLocaleScript, type BootConfig } from './live/detect';
-import { resolveFontPair, themeMode, themeVars } from './theme';
+import { motionOff, resolveFontPair, themedDoc, themeMode, themeVars } from './theme';
 
 /**
  * The invitation document root (<html>/<head>/<body>) — used by every invitation root layout
@@ -20,6 +20,7 @@ export function InvitationHtml({
   template,
   locale,
   boot = null,
+  cinematic = true,
   children,
 }: {
   doc: InvitationDocument;
@@ -30,19 +31,24 @@ export function InvitationHtml({
    * first paint (live/detect.ts) — the cached page itself is always the default language's.
    */
   boot?: BootConfig | null;
+  /** the event has the `cinematic` feature: the host's type scale, spacing and motion apply */
+  cinematic?: boolean;
   children: ReactNode;
 }) {
   const pair = resolveFontPair(template, doc);
   const fontCss = fontFaceCss(pageFontFaces(template, pair.id, doc.locales));
   const scripts = scriptsOf(doc.locales).sort().join('-');
+  const themed = themedDoc(doc, cinematic);
   return (
     <html
       lang={locale}
       dir={dirOf(locale)}
       data-theme={themeMode(template, doc)}
       data-template={template.id}
+      // the host's motion at 0: nothing moves (the CSS and the engine treat it like reduced motion)
+      data-motion={motionOff(themed) ? 'none' : undefined}
       className="no-js"
-      style={themeVars(template, doc, locale) as CSSProperties}
+      style={themeVars(template, themed, locale) as CSSProperties}
       suppressHydrationWarning
     >
       <head>

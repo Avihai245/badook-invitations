@@ -9,7 +9,7 @@ import { EVENT_TYPES, type EventType, type Locale, type TemplateManifest } from 
 import type { AssetBases } from '../../renderer/assets';
 import { templateFileUrl } from '../../renderer/assets';
 import { TEMPLATES } from '../../templates/registry';
-import { posterSample, type PosterText } from '../poster';
+import { posterImage, posterSample, type PosterText } from '../poster';
 import { TemplatePoster, type PosterTemplate } from '../TemplatePoster';
 import { CreateWizard, type WizardSeed } from './CreateWizard';
 import { PreviewDialog } from './PreviewDialog';
@@ -52,12 +52,15 @@ export function TemplateGallery({
   fontCss,
   devPreviews = null,
   moreLanguages = true,
+  admin = false,
 }: {
   bases: AssetBases;
   fontCss: string;
   devPreviews?: DevPreviews | null;
   /** the host may use languages beyond Hebrew and English (feature `languages`) */
   moreLanguages?: boolean;
+  /** the platform's admins also see the unlisted designs (manifest `listed: false`), marked */
+  admin?: boolean;
 }) {
   const { t, locale, plural, number } = useUi();
   const videos = usePreviewVideos();
@@ -68,14 +71,16 @@ export function TemplateGallery({
 
   const templates = useMemo(
     () =>
-      [...TEMPLATES.values()].map(({ manifest }) => ({
-        manifest,
-        image: devPreviews ? devPreviews.image : templateFileUrl(manifest.id, manifest.previewImage, bases),
-        video: devPreviews ? devPreviews.video : templateFileUrl(manifest.id, manifest.previewVideo, bases),
-        // the poster speaks the preview language (the switch above the gallery)
-        sample: posterSample(manifest.id, previewLocale),
-      })),
-    [bases, previewLocale, devPreviews],
+      [...TEMPLATES.values()]
+        .filter(({ manifest }) => manifest.listed || admin)
+        .map(({ manifest }) => ({
+          manifest,
+          image: devPreviews ? devPreviews.image : posterImage(manifest, bases),
+          video: devPreviews ? devPreviews.video : templateFileUrl(manifest.id, manifest.previewVideo, bases),
+          // the poster speaks the preview language (the switch above the gallery)
+          sample: posterSample(manifest.id, previewLocale),
+        })),
+    [bases, previewLocale, devPreviews, admin],
   );
   const visible = templates.filter(({ manifest }) => matchesFilter(manifest, filter));
   const chips = useMemo(
@@ -153,6 +158,7 @@ export function TemplateGallery({
               <GalleryCard
                 name={manifest.name[locale as UiLocale] ?? manifest.name.en ?? manifest.id}
                 premium={manifest.tier === 'premium'}
+                unlisted={!manifest.listed}
                 categories={manifest.categories.map((c) => t.eventTypes[c]).join(' · ')}
                 palette={manifest.tokens.palette}
                 template={manifest}
@@ -199,6 +205,7 @@ export function TemplateGallery({
 function GalleryCard({
   name,
   premium,
+  unlisted = false,
   categories,
   palette,
   template,
@@ -211,6 +218,7 @@ function GalleryCard({
 }: {
   name: string;
   premium: boolean;
+  unlisted?: boolean;
   categories: string;
   palette: { bg: string; accent: string; ink: string };
   template: PosterTemplate;
@@ -250,7 +258,18 @@ function GalleryCard({
         text={sample}
         image={image}
         play={!playing}
-        badge={premium ? <PremiumBadge label={t.gallery.premium} /> : null}
+        badge={
+          premium || unlisted ? (
+            <span className="flex flex-wrap gap-[1.5cqw]">
+              {premium ? <PremiumBadge label={t.gallery.premium} /> : null}
+              {unlisted ? (
+                <span className="inline-flex items-center rounded-full bg-black/70 px-2 py-0.5 text-[11px] font-semibold text-white">
+                  {t.gallery.unlisted}
+                </span>
+              ) : null}
+            </span>
+          ) : null
+        }
         className="transition-[transform,box-shadow] duration-250 group-hover:-translate-y-1 group-hover:shadow-lg motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
       >
         {video && !failed ? (

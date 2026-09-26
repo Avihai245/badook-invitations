@@ -19,6 +19,11 @@ let configured = true;
 vi.mock('@/features/whatsapp/cloud-api', () => ({ cloudApiConfigured: () => configured }));
 const processQueue = vi.fn(async () => ({ sent: 0, failed: 0, retried: 0 }));
 vi.mock('@/features/whatsapp/sender', () => ({ processQueue }));
+// the table numbers' messages and the arrivals' keeping time (features/event-day)
+const processNoticeQueue = vi.fn(async () => ({ sent: 0, failed: 0, retried: 0 }));
+vi.mock('@/features/event-day/server/notify', () => ({ processNoticeQueue }));
+const eventDayHousekeeping = vi.fn(async () => ({ checkins: 0, undone: 0 }));
+vi.mock('@/features/event-day/server/housekeeping', () => ({ eventDayHousekeeping }));
 
 const { dailyDue } = await import('@/features/jobs/schedule');
 const { runJob, runWhatsAppQueue, tick } = await import('@/features/jobs/jobs');
@@ -92,6 +97,17 @@ describe('the WhatsApp queue', () => {
     expect(processQueue).toHaveBeenCalledTimes(3);
     expect(processQueue).toHaveBeenCalledWith(null, 50);
   });
+
+  it('sends the table numbers’ messages in the same rounds', async () => {
+    processQueue.mockClear();
+    processNoticeQueue.mockClear();
+    processNoticeQueue
+      .mockResolvedValueOnce({ sent: 4, failed: 0, retried: 1 })
+      .mockResolvedValueOnce({ sent: 0, failed: 0, retried: 0 });
+    expect(await runWhatsAppQueue(60_000)).toEqual({ sent: 4, failed: 0, retried: 1 });
+    expect(processNoticeQueue).toHaveBeenCalledTimes(2);
+    expect(processNoticeQueue).toHaveBeenCalledWith(null, 50);
+  });
 });
 
 describe('the app’s own clock (tick)', () => {
@@ -108,6 +124,8 @@ describe('the app’s own clock (tick)', () => {
     ]);
     expect(processQueue).toHaveBeenCalled();
     expect(sendDigests).toHaveBeenCalled();
+    // the daily run keeps the privacy policy's promise about arrivals too
+    expect(eventDayHousekeeping).toHaveBeenCalled();
     expect(called('app_job_done')).toHaveLength(2);
   });
 

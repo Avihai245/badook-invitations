@@ -16,7 +16,11 @@
  * measured once more before it counts as a failure (the machine may be busy).
  *
  *   npm run perf:templates [-- --base http://127.0.0.1:3000] [--tpl a,b] [--docs demo,cinematic]
- *                             [--lang he] [--out test-results/perf] [--port 3520]
+ *                             [--lang he] [--out test-results/perf] [--port 3520] [--profile old-phone]
+ *
+ * `--profile old-phone`: an older, smaller phone — 360×640 @2x, a 6× slower CPU, the same network —
+ * with its own budget (LCP < 4 s, CLS < 0.1, ≥ 50 fps): the invitation still opens, comes in and
+ * scrolls smoothly there. Not part of the CI gate; run it for a new design or a heavier effect.
  *
  * Pages: `demo` — the template's own demo (its first event type); `cinematic` — the schema-v2 showcase
  * (every section layout, parallax, Ken Burns, a video background, text reveals; photos from /dev/media).
@@ -48,7 +52,23 @@ const only = arg('tpl', '')
   .filter(Boolean);
 const TEMPLATES = only.length ? TEMPLATE_IDS.filter((id) => only.includes(id)) : [...TEMPLATE_IDS];
 
-export const BUDGET = { lcpMs: 2500, cls: 0.1, fps: 55 } as const;
+/** The phone the gate measures on, and an older one (`--profile old-phone`) with its own budget. */
+const PROFILES = {
+  phone: {
+    viewport: { width: 390, height: 844, dpr: 2 },
+    cpu: 4,
+    budget: { lcpMs: 2500, cls: 0.1, fps: 55 },
+  },
+  'old-phone': {
+    viewport: { width: 360, height: 640, dpr: 2 },
+    cpu: 6,
+    budget: { lcpMs: 4000, cls: 0.1, fps: 50 },
+  },
+} as const;
+const PROFILE = arg('profile', 'phone') as keyof typeof PROFILES;
+if (!(PROFILE in PROFILES)) throw new Error(`--profile: one of ${Object.keys(PROFILES).join(', ')}`);
+
+export const BUDGET = PROFILES[PROFILE].budget;
 /** Lighthouse's mobile throttling (constants.throttling.mobileSlow4G), applied per request by CDP. */
 export const NETWORK = {
   label: '4G — 150 ms RTT, 1.6 Mbps down, 750 Kbps up (per request: 562.5 ms, ×0.9)',
@@ -56,8 +76,8 @@ export const NETWORK = {
   downloadThroughput: (1.6 * 1024 * 0.9 * 1024) / 8,
   uploadThroughput: (750 * 0.9 * 1024) / 8,
 };
-export const CPU_SLOWDOWN = 4;
-const PHONE = { width: 390, height: 844, dpr: 2 };
+export const CPU_SLOWDOWN = PROFILES[PROFILE].cpu;
+const PHONE = PROFILES[PROFILE].viewport;
 /** How fast the page is scrolled (px/s, per gesture): a brisk read, not a fling. */
 const SCROLL_SPEED = 1400;
 /** The scroll test's cap (px) — a very long invitation is sampled, not read to the end. */
@@ -405,7 +425,7 @@ function markdown(rows: Row[], meta: Record<string, string>): string {
   const lines = [
     '# Invitation performance budget',
     '',
-    `${meta.when} · ${meta.browser} · phone ${PHONE.width}×${PHONE.height} @${PHONE.dpr}x (touch) · ${NETWORK.label} · CPU ${CPU_SLOWDOWN}× slower`,
+    `${meta.when} · ${meta.browser} · ${PROFILE === 'phone' ? 'phone' : 'older phone'} ${PHONE.width}×${PHONE.height} @${PHONE.dpr}x (touch) · ${NETWORK.label} · CPU ${CPU_SLOWDOWN}× slower`,
     '',
     `Budgets: LCP < ${BUDGET.lcpMs / 1000} s · CLS < ${BUDGET.cls} · scroll median ≥ ${BUDGET.fps} fps. ` +
       'LCP: before the first tap (the cover). CLS: the whole visit. Scroll: frames the compositor presents ' +
@@ -529,6 +549,7 @@ async function main() {
       `${JSON.stringify(
         {
           ...meta,
+          profile: PROFILE,
           budget: BUDGET,
           network: NETWORK,
           cpuSlowdown: CPU_SLOWDOWN,

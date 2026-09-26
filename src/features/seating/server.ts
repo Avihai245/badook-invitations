@@ -21,8 +21,15 @@ async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
 export const seatingDeps: SeatingDeps = {
   access: featureInput,
   state: (id, ownerId) => rpc<unknown | null>('seating_state', { p_id: id, p_owner: ownerId }),
+  // seating_save that also records changes to what guests were already told (the event day's audit
+  // trail — supabase/migrations/*_event_day.sql)
   save: (id, ownerId, version, plan) =>
-    rpc<SaveAnswer | null>('seating_save', { p_id: id, p_owner: ownerId, p_version: version, p_plan: plan }),
+    rpc<SaveAnswer | null>('seating_save_tracked', {
+      p_id: id,
+      p_owner: ownerId,
+      p_version: version,
+      p_plan: plan,
+    }),
   async signedUpload(path) {
     const { data, error } = await serviceDb().storage.from(PLAN_BUCKET).createSignedUploadUrl(path);
     if (error || !data) throw new Error(`signed upload: ${error?.message ?? 'no data'}`);

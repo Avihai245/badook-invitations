@@ -18,7 +18,7 @@ import { hostView, listItems, type HostGalleryView } from './host-api';
 type UiLocale = Locale;
 const isUiLocale = (v: unknown): v is UiLocale => typeof v === 'string' && isLocale(v);
 
-function eventInfo(
+export function eventInfo(
   inv: TokenLookup['invitation'],
 ): EventInfo & { titles: Partial<Record<UiLocale, string>> } {
   const locales = (inv.locales ?? []).filter(isUiLocale);

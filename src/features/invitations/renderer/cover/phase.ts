@@ -17,7 +17,10 @@ export interface PhaseProps {
   later: (fn: () => void, ms: number) => void;
 }
 
-export const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/** The guest prefers less motion, or the host turned motion off (<html data-motion="none">): a fade. */
+export const reducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+  document.documentElement.dataset.motion === 'none';
 
 /** Everything the gesture must start synchronously (iOS): the music listens to this event. */
 export const announceOpen = () => window.dispatchEvent(new CustomEvent('invitation:open'));
