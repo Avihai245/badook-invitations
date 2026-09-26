@@ -6,6 +6,7 @@ import { siteEn } from './site.en';
 import { helpEn } from './help.en';
 import { supportEn } from './support.en';
 import { editorEn } from './editor.en';
+import { liveGalleryEn } from './live-gallery.en';
 
 /** Host-app UI strings, English. Same shape as app.he.ts (checked by the type). */
 export const en: AppDict = {
@@ -17,6 +18,7 @@ export const en: AppDict = {
   billing: billingEn,
   accountPage: accountEn,
   editor: editorEn,
+  liveGallery: liveGalleryEn,
   common: {
     close: 'Close',
     cancel: 'Cancel',

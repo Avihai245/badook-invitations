@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { InvitationWorkspace } from '@/features/invitations/app/workspace/InvitationWorkspace';
+import { deploymentFeatures } from '@/features/flags/server';
 import { requireUser } from '@/lib/supabase/session';
 
 type Params = Promise<{ id: string }>;
@@ -27,7 +28,9 @@ export default async function InvitationLayout({
     <>
       {/* the header's poster writes the names in the design's font */}
       <style dangerouslySetInnerHTML={{ __html: POSTER_FONT_CSS }} />
-      <InvitationWorkspace item={item}>{children}</InvitationWorkspace>
+      <InvitationWorkspace item={item} galleryTab={deploymentFeatures().has('live_gallery')}>
+        {children}
+      </InvitationWorkspace>
     </>
   );
 }

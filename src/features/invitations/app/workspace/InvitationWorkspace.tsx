@@ -3,6 +3,7 @@
 import {
   ChevronLeft,
   ExternalLink,
+  Images,
   LayoutDashboard,
   ListChecks,
   Maximize2,
@@ -31,7 +32,16 @@ import { publishHref, workspaceTab, type WorkspaceTab } from './paths';
  * open it); then its tabs — the guests tab stands out — and "edit the design", which opens the
  * full-screen editor.
  */
-export function InvitationWorkspace({ item, children }: { item: InvitationSummary; children: ReactNode }) {
+export function InvitationWorkspace({
+  item,
+  galleryTab = false,
+  children,
+}: {
+  item: InvitationSummary;
+  /** the live gallery's tab (when this deployment offers it: features/flags) */
+  galleryTab?: boolean;
+  children: ReactNode;
+}) {
   const { t, locale, date, plural, number } = useUi();
   const w = t.workspace;
   const current = workspaceTab(usePathname(), item.id);
@@ -68,6 +78,9 @@ export function InvitationWorkspace({ item, children }: { item: InvitationSummar
         : undefined,
     },
     { key: 'share', href: `${base}/share`, icon: Share2, label: w.tabs.share },
+    ...(galleryTab
+      ? [{ key: 'gallery' as const, href: `${base}/gallery`, icon: Images, label: t.liveGallery.tab }]
+      : []),
     { key: 'edit', href: `${base}/edit`, icon: PenLine, label: w.tabs.edit },
   ];
   const countOf = (key: WorkspaceTab) =>

@@ -62,7 +62,7 @@ export interface GuestDeps {
 
 // ─── the link ───────────────────────────────────────────────────────────────────────────────────
 
-interface Resolved {
+export interface Resolved {
   lookup: TokenLookup;
   invitationId: string;
   features: Set<Feature>;
@@ -72,7 +72,7 @@ interface Resolved {
 const notFound = fail(404, 'not_found');
 
 /** The gallery behind a link, when its event may use it (live_gallery; the screen also needs projector). */
-async function resolve(
+export async function resolve(
   token: unknown,
   kind: 'upload' | 'projector',
   deps: GuestDeps,

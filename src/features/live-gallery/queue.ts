@@ -25,6 +25,8 @@ export interface PartState {
   issuedAt?: number;
   /** a resumable upload under way: its address and how much the server has */
   resumable?: { endpoint: string; location: string | null; offset: number } | null;
+  /** the storage's public key, sent along like Supabase's own client does */
+  apiKey?: string;
 }
 
 export type Stage = 'queued' | 'reserved' | 'visible' | 'done' | 'failed' | 'skipped';
