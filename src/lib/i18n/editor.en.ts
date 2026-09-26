@@ -177,7 +177,8 @@ export const editorEn: EditorDict = {
       overlay: 'Darken the picture',
       overlayAuto: 'Automatic ({percent})',
       overlayAutoButton: 'Automatic',
-      overlayHelp: 'A dark layer under the text, so it reads on any picture.',
+      overlayHelp:
+        'A dark layer under the text, so it reads on any picture — it deepens by itself for a bright one.',
       alt: 'Picture description',
       altHelp: 'For guests using a screen reader. Can stay empty.',
       reading: 'Reading the colors…',

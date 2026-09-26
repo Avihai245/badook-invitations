@@ -6,6 +6,9 @@ import { Button, cn } from '@/components/app';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import type { AssetRef, InvitationDocument, SectionMedia, TemplateManifest } from '../../contracts/types';
+import { relativeLuminance } from '../../lib/contrast';
+import { pixelsOf, scrimForPhoto } from '../../lib/photo-palette';
+import { scrimOf } from '../../renderer/theme';
 import { patchSectionMedia, setSectionMedia } from '../presentation';
 import { useEditor } from '../state/EditorProvider';
 import { FieldFrame } from './fields';
@@ -67,6 +70,44 @@ export function invitationPictures(
 }
 
 const round2 = (n: number) => Math.round(Math.min(1, Math.max(0, n)) * 100) / 100;
+
+/**
+ * How dark the scrim over a picture must be for light text to read on it (lib/photo-palette
+ * `scrimForPhoto`), read on the device — a file, or an address the browser may read — else null.
+ */
+async function scrimFor(source: Blob | string | null): Promise<number | null> {
+  if (!source) return null;
+  try {
+    let image: CanvasImageSource & { width: number; height: number };
+    if (typeof source === 'string') {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = source;
+      await img.decode();
+      image = img;
+    } else image = await createImageBitmap(source);
+    const { rgba, width } = pixelsOf(image);
+    return scrimForPhoto(rgba, width);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A new picture's scrim: the section's own (the design's or the host's) stays unless the picture
+ * needs a darker one for its text to read — then that. Only when the text over pictures is light
+ * (a design whose scrim is light sets dark text: nothing to raise).
+ */
+export function scrimForNew(
+  needed: number | null,
+  own: number | null,
+  template: Pick<TemplateManifest, 'tokens' | 'hero'>,
+): number | null {
+  const configured = template.tokens.overlay.color;
+  if (needed === null || (configured && relativeLuminance(configured) > 0.45)) return own;
+  const floor = own ?? scrimOf(template as TemplateManifest).opacity;
+  return needed > floor + 0.02 ? Math.min(0.85, needed) : own;
+}
 
 /**
  * The picture itself, where a tap sets its focal point (the part that stays in frame): the point is
@@ -204,10 +245,18 @@ export function SectionMediaField({ index }: { index: number }) {
     (next: SectionMedia | null) => apply((d) => setSectionMedia(d, index, next), null),
     [apply, index],
   );
+  /** The new picture with the scrim it needs (read from it) when its text will sit on it. */
+  const withScrim = (next: SectionMedia, needed: number | null): SectionMedia => {
+    const overlay = scrimForNew(needed, media?.overlay ?? null, template);
+    return overlay === null ? next : { ...next, overlay };
+  };
 
   const onFiles = async ([file]: File[]) => {
     if (!file) return;
-    const still = file.type.startsWith('video/') ? captureVideoStill(file) : Promise.resolve(null);
+    const video = file.type.startsWith('video/');
+    const still = video ? captureVideoStill(file) : Promise.resolve(null);
+    // read while it uploads: a video by its still
+    const needed = video ? still.then(scrimFor) : scrimFor(file);
     const res = await run(file);
     if (!res || res.kind === 'audio') return;
     let poster: AssetRef | null = null;
@@ -219,7 +268,7 @@ export function SectionMediaField({ index }: { index: number }) {
           () => null,
         );
     }
-    set({ kind: res.kind, src: res.ref, poster, focalPoint: { x: 0.5, y: 0.5 } });
+    set(withScrim({ kind: res.kind, src: res.ref, poster, focalPoint: { x: 0.5, y: 0.5 } }, await needed));
     setLibrary(false);
   };
 
@@ -327,8 +376,15 @@ export function SectionMediaField({ index }: { index: number }) {
                 label={fmt(c.pick, { n: n + 1 })}
                 selected={media?.src === p.src}
                 onPick={() => {
-                  set({ kind: p.kind, src: p.src, poster: p.poster, focalPoint: p.focalPoint });
                   setLibrary(false);
+                  void scrimFor(p.thumb).then((needed) =>
+                    set(
+                      withScrim(
+                        { kind: p.kind, src: p.src, poster: p.poster, focalPoint: p.focalPoint },
+                        needed,
+                      ),
+                    ),
+                  );
                 }}
               />
             ))}

@@ -54,6 +54,7 @@ import {
   hasCinematicValues,
   introducedCinematic,
 } from '@/features/invitations/renderer/cinematic/presentation';
+import { scrimForNew } from '@/features/invitations/editor/fields/SectionMedia';
 import { resolveOpening } from '@/features/invitations/renderer/cover/opening';
 import { demoDocument } from '@/features/invitations/templates/demo';
 import placeholderMedia from '@/features/invitations/templates/placeholder-media.json';
@@ -193,6 +194,22 @@ describe('colors from a photo', () => {
     const bright = pixels('couple');
     const dim = pixels('bokeh');
     expect(scrimForPhoto(bright.data, bright.width)).toBeGreaterThan(scrimForPhoto(dim.data, dim.width));
+  });
+
+  it('a host’s bright photo gets the scrim it needs; the design’s stays the floor', () => {
+    const lumiere = requireTemplate('lumiere').manifest;
+    // lumiere's own scrim is 0.4: a dark photo keeps it (nothing stored), a bright one raises it
+    expect(scrimForNew(0.2, null, lumiere)).toBeNull();
+    expect(scrimForNew(0.74, null, lumiere)).toBe(0.74);
+    expect(scrimForNew(0.95, null, lumiere)).toBe(0.85);
+    // a section's own (the design's .5 over its venue) is kept unless the picture needs more
+    expect(scrimForNew(0.3, 0.5, lumiere)).toBe(0.5);
+    expect(scrimForNew(0.7, 0.5, lumiere)).toBe(0.7);
+    // unreadable picture: as it was
+    expect(scrimForNew(null, 0.5, lumiere)).toBe(0.5);
+    // a design whose scrim is light sets dark text over pictures: nothing to raise
+    const light = { ...lumiere, tokens: { ...lumiere.tokens, overlay: { color: '#FFFFFF', opacity: 0.5 } } };
+    expect(scrimForNew(0.8, null, light)).toBeNull();
   });
 
   it('a transparent or empty picture gives nothing', () => {

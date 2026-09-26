@@ -263,6 +263,9 @@ test.describe('the cinematic editor', () => {
     ]);
     expect(Math.abs(fx! - 30), `focal x ${fx}`).toBeLessThanOrEqual(2);
     expect(Math.abs(fy! - 70), `focal y ${fy}`).toBeLessThanOrEqual(2);
+    // the photo is bright at golden hour: it got a darker scrim than the design's own (0.42) by itself
+    const scrim = await section.evaluate((el) => parseFloat(el.style.getPropertyValue('--scrim-a')));
+    expect(scrim).toBeGreaterThan(0.5);
     // the page's background is the tinted palette's
     const pageBg = await guest.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(pageBg).toBe(bg);

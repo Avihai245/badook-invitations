@@ -335,7 +335,7 @@ export const helpEn: typeof helpHe = {
       },
       overlay: {
         label: 'Darken the picture',
-        text: 'A dark layer under the text when it sits on the picture. “Automatic” — as the design sets it.',
+        text: 'A dark layer under the text when it sits on the picture. A bright photo you add gets enough of it by itself to read; “Automatic” — as the design sets it.',
       },
       alt: {
         label: 'Picture description',
