@@ -21,6 +21,7 @@ import { CSS } from '@dnd-kit/utilities';
 import {
   BedDouble,
   Bus,
+  CalendarClock,
   CalendarDays,
   Camera,
   CaseSensitive,
@@ -28,19 +29,23 @@ import {
   Gift,
   GripVertical,
   Heart,
+  HeartHandshake,
   Image,
+  ImagePlus,
   Languages,
   Layers,
   ListPlus,
   Lock,
   Mail,
   MapPin,
+  MapPinned,
   MessageCircle,
   Music,
   Palette,
   PartyPopper,
   PenLine,
   Plus,
+  Quote,
   Settings2,
   Share2,
   Sparkles,
@@ -55,7 +60,7 @@ import { useDeferredValue, useId, useMemo, useState } from 'react';
 import { Switch, cn, rovingKeyDown, useDir } from '@/components/app';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
-import type { Section } from '../contracts/types';
+import type { Section, V2_SECTION_TYPES } from '../contracts/types';
 import { validateDocument } from '../contracts/validate';
 import { availableEntries, insertionIndex, LOCKED_TYPES, newSection, type CatalogKey } from './catalog';
 import { sectionName } from './fields/fields';
@@ -69,9 +74,22 @@ import {
 } from './state/EditorProvider';
 import { HelpFor } from '../app/HelpFor';
 
-type IconKey = CatalogKey | 'cover' | 'hero' | 'footer' | PanelId;
+type IconKey =
+  | CatalogKey
+  | 'cover'
+  | 'hero'
+  | 'footer'
+  | PanelId
+  | Exclude<(typeof V2_SECTION_TYPES)[number], 'custom'>
+  | 'custom_media';
 
 export const SECTION_ICONS: Record<IconKey, LucideIcon> = {
+  // v2 section types (custom_media: the `custom` type — `custom` is the free-text section's)
+  parents: HeartHandshake,
+  when: CalendarClock,
+  where: MapPinned,
+  quote: Quote,
+  custom_media: ImagePlus,
   cover: Mail,
   hero: Image,
   countdown: Clock,
@@ -102,7 +120,13 @@ export const SECTION_ICONS: Record<IconKey, LucideIcon> = {
 const restrictToVerticalAxis: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 
 export const iconOf = (section: Section): LucideIcon =>
-  SECTION_ICONS[section.type === 'text' ? section.data.kind : (section.type as IconKey)];
+  SECTION_ICONS[
+    section.type === 'text'
+      ? section.data.kind
+      : section.type === 'custom'
+        ? 'custom_media'
+        : (section.type as IconKey)
+  ];
 
 /** Hidden between 1024 and 1279px, where the rail collapses to 64px of icons (§9B.3-D). */
 const COMPACT_HIDE = 'lg:max-xl:hidden';

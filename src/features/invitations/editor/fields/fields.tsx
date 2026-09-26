@@ -88,6 +88,8 @@ export function sectionName(section: Section, e: EditorDict, locale: Locale): st
     const title = section.data.kind === 'custom' ? section.data.title?.[locale]?.trim() : '';
     return title || e.names[section.data.kind];
   }
+  // the v2 `custom` section (text with a picture) — `names.custom` is the free-text section's name
+  if (section.type === 'custom') return section.data.title?.[locale]?.trim() || e.names.custom_media;
   return e.names[section.type];
 }
 

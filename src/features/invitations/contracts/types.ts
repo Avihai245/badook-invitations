@@ -44,7 +44,8 @@ export type AssetRef = string; // 'template:<key>' | 'upload:<storage path>' | a
 
 // ---------- document ----------
 export interface InvitationDocument {
-  schemaVersion: 1;
+  /** 2 since the cinematic presentation (v1 documents are migrated on read and on save: migrate.ts) */
+  schemaVersion: 2;
   templateId: string;
   eventType: EventType;
   locales: Locale[]; // order = switcher order
@@ -71,6 +72,8 @@ export interface InvitationDocument {
     monogram: L10n | null; // overlay text; ≤ template.cover.overlay.text.maxGlyphs visible glyphs (e.g. 'N&I', 'נ&א', 'DANA 30')
     sealColor: string | null; // must be in template.cover.sealColors when overlay.recolor
     hint: L10n | null;
+    /** v2 (cinematic): the host's choice of opening; absent / null → the template's (cover.opening) */
+    opening?: OpeningPreset | null;
   };
   music: {
     enabled: boolean;
@@ -97,12 +100,194 @@ export interface Media {
   focalPoint: { x: number; y: number };
 }
 
-interface Base<T extends string, D> {
+// ---------- v2: cinematic presentation (feature `cinematic`) ----------
+/**
+ * How a section is laid out: `stack` is the classic single column (a section's media shows as a
+ * framed picture at its top); `full_bleed` puts the media behind the text, edge to edge;
+ * `split_start` / `split_end` put it beside the text on wide screens — start = the reading side (right
+ * in Hebrew) — and above / below it on a phone; `parallax` is full-bleed with the media moving slower
+ * than the page; `video_bg` is full-bleed with a looping muted video (its poster until it may play).
+ * A layout that needs media renders as `stack` while the section has none.
+ */
+export type SectionLayout = 'stack' | 'full_bleed' | 'split_start' | 'split_end' | 'parallax' | 'video_bg';
+export const SECTION_LAYOUTS = [
+  'stack',
+  'full_bleed',
+  'split_start',
+  'split_end',
+  'parallax',
+  'video_bg',
+] as const satisfies readonly SectionLayout[];
+
+/** A section's own picture or video: an upload (or a template asset), never a YouTube / Vimeo link. */
+export interface SectionMedia extends Media {
+  /** what a content picture shows (stack / split); background media is decorative. null → none */
+  alt?: L10n | null;
+  /** the scrim over media that text sits on, 0..0.85; null → the template's (tokens.overlay) */
+  overlay?: number | null;
+}
+
+/**
+ * How a section's blocks come in: `auto` is the template's own reveal (§9A.6); the others are
+ * transform/opacity presets — `slide_start` comes from the reading side, `tilt` lifts in tipped back.
+ */
+export type EnterPreset =
+  | 'auto'
+  | 'none'
+  | 'fade'
+  | 'rise'
+  | 'sink'
+  | 'zoom'
+  | 'zoom_out'
+  | 'slide_start'
+  | 'slide_end'
+  | 'tilt';
+export const ENTER_PRESETS = [
+  'auto',
+  'none',
+  'fade',
+  'rise',
+  'sink',
+  'zoom',
+  'zoom_out',
+  'slide_start',
+  'slide_end',
+  'tilt',
+] as const satisfies readonly EnterPreset[];
+/** What the media does while the section scrolls by: drifts slower than the page, or slowly zooms. */
+export type ScrollEffect = 'none' | 'parallax' | 'ken_burns';
+export const SCROLL_EFFECTS = ['none', 'parallax', 'ken_burns'] as const satisfies readonly ScrollEffect[];
+/** Titles, subtitles, texts and quotes appearing letter by letter, word by word or line by line. */
+export type TextReveal = 'none' | 'letters' | 'words' | 'lines';
+export const TEXT_REVEALS = ['none', 'letters', 'words', 'lines'] as const satisfies readonly TextReveal[];
+export type MotionEasing = 'smooth' | 'spring' | 'gentle' | 'linear';
+export const MOTION_EASINGS = ['smooth', 'spring', 'gentle', 'linear'] as const satisfies readonly MotionEasing[];
+
+/**
+ * A section's motion, declaratively (renderer/motion/engine.ts reads it). Where the browser has
+ * scroll-driven animations the enter preset is tied to the scroll (`duration` / `delay` / `stagger`
+ * become scroll distances: 0.3px per ms); elsewhere it plays once as the section comes into view.
+ * Only transform and opacity move; nothing moves with reduced motion.
+ */
+export interface SectionAnimation {
+  enter: {
+    preset: EnterPreset;
+    /** ms, 150..4000 */
+    duration: number;
+    /** ms, 0..3000 */
+    delay: number;
+    /** px of travel (rise, sink, slides, tilt), 0..240 — × intensity */
+    distance: number;
+    easing: MotionEasing;
+  };
+  scroll: ScrollEffect;
+  text: TextReveal;
+  /** ms between the section's blocks (and a text reveal's letters / words / lines), 0..600 */
+  stagger: number;
+  /** × the template's motion.intensity (travel, parallax depth, zoom), 0..2 */
+  intensity: number;
+}
+
+/** The type roles of the design (§9A.2): names and titles, subtitles and labels, texts, small print. */
+export type TypeRole = 'display' | 'heading' | 'body' | 'caption';
+export const TYPE_ROLES = ['display', 'heading', 'body', 'caption'] as const satisfies readonly TypeRole[];
+/** One role of the type scale, relative to the design's own (§9A.2) so every template keeps its look. */
+export interface TypeRoleTokens {
+  /** × the role's base sizes, 0.5..2 */
+  size: number;
+  /** × the role's base line heights, 0.7..1.6 */
+  lineHeight: number;
+  /** em added to the role's letter spacing in Latin text (Hebrew is never letter-spaced), -0.05..0.3 */
+  letterSpacing: number;
+}
+export type TypographyTokens = Record<TypeRole, TypeRoleTokens>;
+/** × the design's spacing: section padding (56 / 80px), the side gutter (24px), the gaps in a section. */
+export interface SpacingTokens {
+  section: number;
+  gutter: number;
+  block: number;
+}
+/** The neutral values — the design as it is (what a manifest without tokens v2 gets). */
+export const DEFAULT_TYPE_ROLE: Readonly<TypeRoleTokens> = Object.freeze({
+  size: 1,
+  lineHeight: 1,
+  letterSpacing: 0,
+});
+export const DEFAULT_SPACING: Readonly<SpacingTokens> = Object.freeze({ section: 1, gutter: 1, block: 1 });
+/** What a section's `animation` starts from (the editor's defaults; the schema fills missing fields). */
+export const DEFAULT_SECTION_ANIMATION: Readonly<SectionAnimation> = Object.freeze({
+  enter: Object.freeze({
+    preset: 'auto' as const,
+    duration: 900,
+    delay: 0,
+    distance: 40,
+    easing: 'smooth' as const,
+  }),
+  scroll: 'none' as const,
+  text: 'none' as const,
+  stagger: 80,
+  intensity: 1,
+});
+
+/** A section's own tokens (v2): only what it changes. */
+export interface ThemeOverrides {
+  palette?: Partial<Palette>;
+  radius?: { card?: number; button?: number; media?: number };
+  typography?: Partial<Record<TypeRole, Partial<TypeRoleTokens>>>;
+  spacing?: Partial<SpacingTokens>;
+}
+
+/**
+ * v2 presentation any section may carry — all optional: without them a section renders exactly as in
+ * v1. They show only while the event has the `cinematic` feature (else the plain rendering). The
+ * hero's media is `data.media` and it always fills the screen: its `media` is null and its `layout`
+ * `full_bleed` when set.
+ */
+export interface SectionPresentation {
+  media?: SectionMedia | null;
+  layout?: SectionLayout;
+  animation?: SectionAnimation | null;
+  themeOverrides?: ThemeOverrides | null;
+}
+
+/**
+ * The cinematic openings (renderer/cover): `envelope` is the template's own cover (envelope, ticket,
+ * pouch… or its opening video); `gate` two doors swing open; `curtain` a theatre curtain parts or
+ * rises; `fireworks` a night sky bursts into fireworks; `gold_dust` a veil of gold dust blows away.
+ */
+export type OpeningPreset = 'envelope' | 'gate' | 'curtain' | 'fireworks' | 'gold_dust';
+export const OPENING_PRESETS = [
+  'envelope',
+  'gate',
+  'curtain',
+  'fireworks',
+  'gold_dust',
+] as const satisfies readonly OpeningPreset[];
+/** The template's opening (manifest cover.opening, v2). */
+export interface OpeningConfig {
+  preset: OpeningPreset;
+  /**
+   * `scroll`: scrolling or swiping opens it too, with a "scroll to enter" cue (default for the gate
+   * and the curtain); `tap`: a tap only (default for the others)
+   */
+  trigger?: 'tap' | 'scroll';
+  /** gate: the doors swing or slide apart · curtain: it parts to the sides or rises */
+  motion?: 'swing' | 'slide' | 'part' | 'rise';
+  /** the doors' / curtain's / sky's color; null → from the palette */
+  color?: string | null;
+}
+
+interface Base<T extends string, D, M extends SectionMedia | null = SectionMedia | null, L = SectionLayout> {
   id: string;
   type: T;
   enabled: boolean;
   variant?: string;
   data: D;
+  // v2 presentation (SectionPresentation)
+  media?: M;
+  layout?: L;
+  animation?: SectionAnimation | null;
+  themeOverrides?: ThemeOverrides | null;
 }
 
 export type Section =
@@ -119,7 +304,9 @@ export type Section =
         captions: boolean;
         /** greets the guest by name on their personal link — `{guest}` = the name; null = none */
         greeting: L10n | null;
-      }
+      },
+      null,
+      'full_bleed'
     >
   | Base<
       'countdown',
@@ -183,6 +370,51 @@ export type Section =
         showParents: boolean;
         closingLine: L10n | null;
         showCredit: boolean;
+      }
+    >
+  // ── v2 section types ──
+  | Base<
+      'parents',
+      {
+        title: L10n | null;
+        /** "The bride's parents" · "Rachel & Moshe Cohen"; none → `hosts.parents` as one line */
+        items: { id: string; label: L10n; names: L10n }[];
+        /** e.g. "together with the grandparents …" */
+        note: L10n | null;
+      }
+    >
+  | Base<
+      'when',
+      {
+        title: L10n | null;
+        showWeekday: boolean;
+        /** the Hebrew date line (as `event.hebrewDate` formats it; nothing while that is off) */
+        showHebrewDate: boolean;
+        showTime: boolean;
+        /** a small countdown to the event under the date */
+        countdown: boolean;
+        /** the "Add to calendar" menu */
+        showCalendar: boolean;
+        note: L10n | null;
+      }
+    >
+  | Base<
+      'where',
+      {
+        /** one place, told big: its label is the section title; map and buttons as in venues */
+        venue: Venue;
+        /** directions, parking… */
+        note: L10n | null;
+      }
+    >
+  | Base<'quote', { text: L10n; attribution: L10n | null }>
+  | Base<
+      'custom',
+      {
+        title: L10n | null;
+        subtitle: L10n | null;
+        body: L10n; // '\n' = line break
+        cta: { label: L10n; url: string } | null;
       }
     >;
 
@@ -327,8 +559,14 @@ export interface TemplateManifest {
   tokens: {
     palette: Palette;
     editablePaletteKeys: (keyof Palette)[];
-    radius: { card: number; button: number };
+    /** px; `media` (v2): a section's framed picture — absent → `card` */
+    radius: { card: number; button: number; media?: number };
     divider: 'gradient_line' | 'none';
+    // v2 — each defaults to the design's own values, so a manifest without them keeps its look
+    typography: TypographyTokens;
+    spacing: SpacingTokens;
+    /** the scrim over section media under text; null → the hero's overlayColor / 0.42 */
+    overlay: { color: string | null; opacity: number | null };
   };
   palettePresets: { id: string; name: L10n; palette: Partial<Palette> }[]; // keys ⊆ editablePaletteKeys; shown as swatches
   fontPairs: FontPair[]; // [0] is default
@@ -351,6 +589,8 @@ export interface TemplateManifest {
     };
     sealColors: string[];
     monogramFont: { latin: string; hebrew: string };
+    /** v2: a cinematic opening instead of the style's own; null → the style's (feature `cinematic`) */
+    opening: OpeningConfig | null;
   };
   hero: {
     options: { id: string; name: L10n; media: Media; mediaDesktop: Media | null }[]; // [0] default; offered in the editor
@@ -369,6 +609,8 @@ export interface TemplateManifest {
     stagger: number;
     /** optional: the hero's particles; without it renderer/fx/theme.ts picks one by template id */
     ambient?: AmbientKind;
+    /** v2: × every travel of the motion engine (reveal distance, parallax depth, zoom), 0..2; default 1 */
+    intensity: number;
   };
   assets: Record<string, string>; // referenced as 'template:<key>'
   decorations: Partial<
@@ -468,6 +710,19 @@ export const SECTION_TYPES = [
   'reveal',
   'rsvp',
   'footer',
+  'parents',
+  'when',
+  'where',
+  'quote',
+  'custom',
+] as const satisfies readonly SectionType[];
+/** The section types schema v2 added. */
+export const V2_SECTION_TYPES = [
+  'parents',
+  'when',
+  'where',
+  'quote',
+  'custom',
 ] as const satisfies readonly SectionType[];
 export const TIMELINE_ICONS = [
   'glass',

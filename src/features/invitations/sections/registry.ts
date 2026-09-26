@@ -1,16 +1,21 @@
 import type { ComponentType } from 'react';
 import {
   CountdownSectionSchema,
+  CustomSectionSchema,
   FaqSectionSchema,
   FooterSectionSchema,
   GallerySectionSchema,
   GiftsSectionSchema,
   HeroSectionSchema,
+  ParentsSectionSchema,
+  QuoteSectionSchema,
   RevealSectionSchema,
   RsvpSectionSchema,
   TextSectionSchema,
   TimelineSectionSchema,
   VenuesSectionSchema,
+  WhenSectionSchema,
+  WhereSectionSchema,
 } from '../contracts/schemas';
 import type { SectionOf, SectionType } from '../contracts/types';
 import type { SectionViewProps } from './shared';
@@ -58,4 +63,10 @@ export const SECTIONS: Registry = {
   },
   rsvp: { type: 'rsvp', schema: RsvpSectionSchema, view: V.rsvp, variants: [] },
   footer: { type: 'footer', schema: FooterSectionSchema, view: V.footer, variants: [] },
+  // schema v2
+  parents: { type: 'parents', schema: ParentsSectionSchema, view: V.parents, variants: [] },
+  when: { type: 'when', schema: WhenSectionSchema, view: V.when, variants: [] },
+  where: { type: 'where', schema: WhereSectionSchema, view: V.where, variants: [] },
+  quote: { type: 'quote', schema: QuoteSectionSchema, view: V.quote, variants: [] },
+  custom: { type: 'custom', schema: CustomSectionSchema, view: V.custom, variants: [] },
 };

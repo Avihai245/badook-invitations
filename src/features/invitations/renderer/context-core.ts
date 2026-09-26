@@ -55,6 +55,12 @@ export interface RenderContext {
   musicUrl: string | null;
   /** a save-the-date's published full invitation — in this locale when it has it */
   followUp: { href: string; lang: Locale | null } | null;
+  /**
+   * The event has the `cinematic` feature (features/flags): the v2 presentation shows — sections'
+   * media, layouts, motion and colors, the cinematic openings. Off: the plain rendering (v1 look; the
+   * v2 section types as plain sections).
+   */
+  cinematic: boolean;
 }
 
 export interface RenderOptions {
@@ -69,6 +75,8 @@ export interface RenderOptions {
   musicUrl?: string | null;
   /** a save-the-date's full invitation, once published: the page links to it */
   followUp?: { slug: string; locales: Locale[] } | null;
+  /** the event has the `cinematic` feature (default true: the public page asks features/flags) */
+  cinematic?: boolean;
 }
 
 /**
@@ -122,5 +130,6 @@ export function createRenderContext(
           lang: options.followUp.locales.includes(locale) ? locale : null,
         }
       : null,
+    cinematic: options.cinematic ?? true,
   };
 }

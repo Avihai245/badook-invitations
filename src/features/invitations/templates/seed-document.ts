@@ -343,7 +343,7 @@ export function seedDocument(
     input.hosts.secondary?.en ?? input.hosts.secondary?.he ?? '',
   ];
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     templateId: template.id,
     eventType: input.eventType,
     locales,

@@ -1,7 +1,11 @@
 import { LOCALES, type Locale } from '@/features/invitations/contracts/types';
 import { buildIcs } from '@/features/invitations/lib/calendar';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
-import { eventCalendarEvent, venueCalendarEvent } from '@/features/invitations/renderer/calendar-event';
+import {
+  eventCalendarEvent,
+  shownVenues,
+  venueCalendarEvent,
+} from '@/features/invitations/renderer/calendar-event';
 import { buildRenderContext } from '@/features/invitations/renderer/context';
 import { getPublishedInvitation } from '@/features/invitations/server/published';
 import { serverEnv } from '@/lib/env';
@@ -22,7 +26,7 @@ export async function GET(request: Request, { params }: { params: Params }) {
   if (!invitation) return notFound();
   const { doc, entry } = invitation;
   const query = new URL(request.url).searchParams;
-  const venues = doc.sections.flatMap((s) => (s.type === 'venues' && s.enabled ? s.data.items : []));
+  const venues = shownVenues(doc);
   const venueId = query.get('venue');
   // ?venue=<id> → that venue; none → the first venue, or the event itself (a save-the-date)
   const venue = venueId ? venues.find((v) => v.id === venueId) : (venues[0] ?? null);

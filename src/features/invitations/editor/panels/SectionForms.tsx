@@ -37,6 +37,7 @@ import { ListEditor } from '../fields/ListEditor';
 import { HeroMediaField, IMAGE_TYPES, ImageField, UploadTile, useUploader } from '../fields/media';
 import { getAt, insertAt, setAt, uniqueId } from '../paths';
 import { useEditor } from '../state/EditorProvider';
+import { V2SectionForm } from './V2SectionForms';
 
 const pick = (value: L10n, locales: readonly Locale[]): L10n =>
   Object.fromEntries(locales.filter((l) => value[l] !== undefined).map((l) => [l, value[l]]));
@@ -67,6 +68,12 @@ export function SectionForm({ section, index }: { section: Section; index: numbe
       return <RsvpForm base={base} section={section} />;
     case 'footer':
       return <FooterForm base={base} />;
+    case 'parents':
+    case 'when':
+    case 'where':
+    case 'quote':
+    case 'custom':
+      return <V2SectionForm section={section} base={base} />;
   }
 }
 

@@ -20,9 +20,52 @@ const publicHost = (() => {
   }
 })();
 
+/**
+ * Where invitation images may be optimized from (next/image: AVIF / WebP in a srcset of widths): the
+ * Supabase Storage buckets — the project's public objects (uploads, template media) and a separate
+ * template-media address when one is set. Local paths are always allowed. The same list reaches the
+ * renderer as INVITES_IMAGE_SOURCES (renderer/images.ts), so it never asks for an image the optimizer
+ * would refuse; INVITES_IMAGE_OPTIMIZATION=off serves every image as it is.
+ */
+const imageSources = (() => {
+  if (process.env.INVITES_IMAGE_OPTIMIZATION === 'off') return null;
+  const list: { protocol: 'http' | 'https'; hostname: string; port: string; pathname: string }[] = [];
+  const add = (base: string | undefined, pathname: (u: URL) => string) => {
+    try {
+      if (!base) return;
+      const u = new URL(base);
+      if (u.protocol !== 'https:' && u.protocol !== 'http:') return;
+      list.push({
+        protocol: u.protocol === 'https:' ? 'https' : 'http',
+        hostname: u.hostname,
+        port: u.port,
+        pathname: pathname(u),
+      });
+    } catch {
+      // not a URL: nothing to allow
+    }
+  };
+  add(process.env.NEXT_PUBLIC_SUPABASE_URL, () => '/storage/v1/object/public/**');
+  add(process.env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL, (u) => `${u.pathname.replace(/\/+$/, '')}/**`);
+  return list;
+})();
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  images: imageSources
+    ? {
+        formats: ['image/avif', 'image/webp'],
+        // phones to wide screens (a full-bleed photo); no 3840 — a 2048px photo is plenty behind text
+        deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+        imageSizes: [96, 256, 384],
+        qualities: [70, 75],
+        // uploads have unique paths and template media a content hash in its URL: safe to keep a month
+        minimumCacheTTL: 2_592_000,
+        remotePatterns: imageSources,
+      }
+    : { unoptimized: true },
+  env: { INVITES_IMAGE_SOURCES: imageSources ? JSON.stringify(imageSources) : 'off' },
   // The dev-tools badge would show up in Design QA screenshots.
   devIndicators: false,
   // Lets a second dev server run side by side (e.g. QA scripts) without clobbering `.next`.
