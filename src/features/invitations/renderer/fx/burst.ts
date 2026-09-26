@@ -364,6 +364,8 @@ function stop() {
   canvas?.remove();
   canvas = null;
   ctx = null;
+  // the next burst (an RSVP) is usually far off: give the memory back
+  sprites.clear();
   window.removeEventListener('resize', size);
   document.removeEventListener('visibilitychange', onVisibility);
 }
