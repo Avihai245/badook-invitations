@@ -595,7 +595,8 @@ create trigger invitations_faces_feature_off after update of features on public.
 
 -- Every published photo and video guests added (with a preview), newest first, with what the film's
 -- choice weighs — sharpness, exposure, size, time taken, the automatic check's quality score, the
--- perceptual hash — and where faces are when face search found them (never their descriptors).
+-- perceptual hash — and where faces are when face search looked at the photo (null when it didn't;
+-- never their descriptors).
 create function public.gallery_owner_film(p_id uuid, p_owner_id uuid, p_limit int) returns jsonb
 language plpgsql stable security definer set search_path = '' as $$
 begin
@@ -603,11 +604,13 @@ begin
     return null;
   end if;
   return coalesce((
-    select jsonb_agg(public.gallery_item_json(x.item) || jsonb_build_object('faces', coalesce((
-        select jsonb_agg(to_jsonb(f.box) order by f.score desc)
-        from public.gallery_faces f
-        where f.item_id = (x.item).id and f.deleted_at is null
-      ), '[]'::jsonb))
+    select jsonb_agg(public.gallery_item_json(x.item) || jsonb_build_object('faces', case
+        when exists (select 1 from public.gallery_face_scans s where s.item_id = (x.item).id) then coalesce((
+          select jsonb_agg(to_jsonb(f.box) order by f.score desc)
+          from public.gallery_faces f
+          where f.item_id = (x.item).id and f.deleted_at is null
+        ), '[]'::jsonb)
+      end)
       order by (x.item).published_at desc, (x.item).id desc)
     from (
       select i as item from public.gallery_items i

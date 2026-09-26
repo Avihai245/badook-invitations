@@ -7,12 +7,15 @@ import {
   Crown,
   Download,
   ExternalLink,
+  Film,
   Images,
   KeyRound,
   Link2,
   MonitorPlay,
   Pause,
   RefreshCw,
+  ScanFace,
+  Send,
   ShieldCheck,
   Smartphone,
   Sparkles,
@@ -38,6 +41,7 @@ import {
 } from '@/components/app';
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
 import { FaceSearchCard } from '@/features/faces/ui/FaceSearchCard';
+import { FilmCard } from '@/features/film/ui/FilmCard';
 import { useUi } from '@/lib/i18n/client';
 import { GALLERY } from '../../config';
 import { useLiveRefresh } from '@/lib/live/client';
@@ -63,6 +67,9 @@ const HELP_ICONS: Record<keyof Help, LucideIcon> = {
   delete: Trash2,
   projector: MonitorPlay,
   download: Download,
+  send: Send,
+  film: Film,
+  faces: ScanFace,
 };
 
 /**
@@ -325,6 +332,9 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
               plan={projector.plan}
               onRotate={() => rotate('projector')}
             />
+          ) : null}
+          {view.features.auto_reel.why !== 'unavailable' ? (
+            <FilmCard id={id} feature={view.features.auto_reel} />
           ) : null}
         </div>
         <div className="grid gap-5">

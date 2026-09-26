@@ -74,7 +74,8 @@ export interface HostGalleryView {
   id: string;
   slug: string;
   timezone: string;
-  features: Record<'live_gallery' | 'projector' | 'gallery_ai', FeatureState>;
+  /** the gallery's features, and the highlights film made from it (its card in the tab) */
+  features: Record<'live_gallery' | 'projector' | 'gallery_ai' | 'auto_reel', FeatureState>;
   gallery: {
     enabled: boolean;
     mode: 'instant' | 'approval';
@@ -93,7 +94,12 @@ export interface HostGalleryView {
   counts: GalleryCounts | null;
 }
 
-const FEATURES = ['live_gallery', 'projector', 'gallery_ai'] as const satisfies readonly Feature[];
+const FEATURES = [
+  'live_gallery',
+  'projector',
+  'gallery_ai',
+  'auto_reel',
+] as const satisfies readonly Feature[];
 
 function featureStates(input: FeatureInput): HostGalleryView['features'] {
   const out = {} as HostGalleryView['features'];
@@ -306,6 +312,7 @@ export function hostItem(
     aiQuality: r.aiQuality,
     enhanced: r.enhanced,
     guestName: r.guestName ?? null,
+    source: r.source ?? 'guest',
   };
 }
 

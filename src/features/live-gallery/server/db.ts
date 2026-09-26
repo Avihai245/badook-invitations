@@ -347,7 +347,7 @@ export const galleryDb = {
     }),
 
   ownerFilm: (id: string, ownerId: string, limit: number) =>
-    rpc<(ItemRow & { faces: [number, number, number, number][] })[] | null>('gallery_owner_film', {
+    rpc<(ItemRow & { faces: [number, number, number, number][] | null })[] | null>('gallery_owner_film', {
       p_id: id,
       p_owner_id: ownerId,
       p_limit: limit,

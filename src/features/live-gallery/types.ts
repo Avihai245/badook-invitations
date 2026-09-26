@@ -100,4 +100,6 @@ export interface HostItem extends FeedItem {
   aiQuality: number | null;
   enhanced: boolean;
   guestName: string | null;
+  /** who added it: a guest, or the host (their highlights film) */
+  source: 'guest' | 'host';
 }
