@@ -7,6 +7,8 @@ import type { GallerySettings, ItemRow, OwnerGallery } from '@/features/live-gal
 import type { GalleryNotifyDeps } from '@/features/live-gallery/server/notices-api';
 import type { ClaimedGalleryNotice, GalleryNoticeRow } from '@/features/live-gallery/server/notices-db';
 import type { GalleryStorage } from '@/features/live-gallery/server/storage';
+import { scriptFamily } from '@/features/invitations/fonts';
+import { resolveFontPair } from '@/features/invitations/renderer/theme';
 import { TEMPLATES } from '@/features/invitations/templates/registry';
 import { seedDocument } from '@/features/invitations/templates/seed-document';
 
@@ -35,6 +37,7 @@ vi.mock('@/lib/env', () => ({ serverEnv: () => env }));
 vi.mock('@/lib/supabase/server', () => ({ serviceDb: () => ({}) }));
 
 const film = await import('@/features/film/server/api');
+const filmServer = await import('@/features/film/server/deps');
 const tokens = await import('@/features/live-gallery/server/tokens');
 const notices = await import('@/features/live-gallery/server/notices-api');
 const notify = await import('@/features/live-gallery/server/notify');
@@ -50,6 +53,21 @@ const doc = seedDocument(manifest, defaults, {
   locales: ['he', 'en'],
   defaultLocale: 'he',
   hosts: { primary: { he: 'נועה', en: 'Noa' }, secondary: { he: 'איתי', en: 'Itay' } },
+  date: '2027-06-17',
+  startTime: '19:30',
+  endTime: '01:00',
+  timezone: 'Asia/Jerusalem',
+});
+
+/** The same wedding in five languages, three scripts beyond Hebrew and Latin among them. */
+const doc5 = seedDocument(manifest, defaults, {
+  eventType: 'wedding',
+  locales: ['he', 'en', 'ru', 'ar', 'am'],
+  defaultLocale: 'he',
+  hosts: {
+    primary: { he: 'נועה', en: 'Noa', ru: 'Ноа', ar: 'نوعا', am: 'ኖዓ' },
+    secondary: { he: 'איתי', en: 'Itay', ru: 'Итай', ar: 'إيتاي', am: 'ኢታይ' },
+  },
   date: '2027-06-17',
   startTime: '19:30',
   endTime: '01:00',
@@ -123,7 +141,7 @@ function itemRow(over: Partial<FilmRow> = {}): FilmRow {
   };
 }
 
-function filmWorld(opts: { input?: Partial<FeatureInput>; gallery?: boolean } = {}) {
+function filmWorld(opts: { input?: Partial<FeatureInput>; gallery?: boolean; doc?: typeof doc } = {}) {
   const files = new Map<string, number>();
   const storage: GalleryStorage = {
     signUpload: vi.fn(async (bucket, path) => ({
@@ -158,9 +176,13 @@ function filmWorld(opts: { input?: Partial<FeatureInput>; gallery?: boolean } = 
   };
   const invitation: FilmInvitation = {
     slug: 'noa-itay',
-    doc,
+    doc: opts.doc ?? doc,
     palette: manifest.tokens.palette,
-    fonts: { display: { he: 'Suez One', en: 'Playfair' }, heading: { he: 'Heebo', en: 'Inter' } },
+    fonts: {
+      display: { he: '"Suez One", serif', en: '"Playfair", serif' },
+      heading: { he: '"Heebo", sans-serif', en: '"Inter", sans-serif' },
+      faces: [],
+    },
     musicUrl: 'https://db.test/templates/song.mp3',
   };
   const db = {
@@ -221,6 +243,46 @@ describe('the film studio’s view', () => {
     });
     expect(view!.music.url).toBe('https://db.test/templates/song.mp3');
     expect(view!.expiresAt).toBe(NOW + GALLERY.urls.signedTtlSeconds * 1000);
+  });
+
+  it('the cards can be in any of the invitation’s languages, each with its names', async () => {
+    const view = await film.filmView(OWNER, INV, filmWorld({ doc: doc5 }).deps);
+    expect(view!.event).toMatchObject({
+      locales: ['he', 'en', 'ru', 'ar', 'am'],
+      defaultLocale: 'he',
+      names: {
+        he: 'נועה & איתי',
+        en: 'Noa & Itay',
+        ru: 'Ноа & Итай',
+        ar: 'نوعا & إيتاي',
+        am: 'ኖዓ & ኢታይ',
+      },
+    });
+  });
+
+  it('the cards’ fonts are the invitation’s, for every script, and the page declares them', () => {
+    const pair = resolveFontPair(manifest, doc5);
+    const fonts = filmServer.filmFonts(manifest, doc5);
+    const first = (stack: string | undefined) => /^"([^"]+)"/.exec(stack ?? '')?.[1];
+    // each language's own script first: the pair's Hebrew and Latin faces, the design's Arabic and
+    // Ethiopic faces, and Russian in the Latin face or its Cyrillic stand-in
+    expect(first(fonts.display.he)).toBe(pair.display.hebrew);
+    expect(first(fonts.display.en)).toBe(pair.display.latin);
+    expect(first(fonts.display.ar)).toBe(scriptFamily(pair.display.latin, 'display', 'arabic'));
+    expect(first(fonts.display.am)).toBe(scriptFamily(pair.display.latin, 'display', 'ethiopic'));
+    expect(first(fonts.heading.ar)).toBe(scriptFamily(pair.heading.latin, 'heading', 'arabic'));
+    expect(first(fonts.display.ru)).toBe(pair.display.latin);
+    expect(fonts.display.ru).toContain(
+      `"${scriptFamily(pair.display.latin, 'display', 'cyrillic') ?? pair.display.latin}"`,
+    );
+    // a name in another script keeps a designed face: every stack has the others' faces too
+    expect(fonts.display.he).toContain(`"${scriptFamily(pair.display.latin, 'display', 'arabic')}"`);
+    // the page declares those faces — the Arabic one in its Arabic letters
+    const arabic = scriptFamily(pair.display.latin, 'display', 'arabic')!;
+    expect(fonts.faces).toContainEqual({ family: arabic, subsets: ['arabic'] });
+    expect(filmServer.filmFontCss(fonts)).toContain(`font-family:'${arabic}'`);
+    // a Hebrew and English invitation declares no other script's faces
+    expect(filmServer.filmFonts(manifest, doc).faces.map((f) => f.family)).not.toContain(arabic);
   });
 
   it('shows the package (and no photos) without the feature; nothing for someone else', async () => {
@@ -512,20 +574,7 @@ describe('sending guests the gallery link', () => {
   });
 
   describe('in each guest’s language', () => {
-    // an invitation in five languages; the template approved in Hebrew, English, Russian and Arabic
-    const doc5 = seedDocument(manifest, defaults, {
-      eventType: 'wedding',
-      locales: ['he', 'en', 'ru', 'ar', 'am'],
-      defaultLocale: 'he',
-      hosts: {
-        primary: { he: 'נועה', en: 'Noa', ru: 'Ноа', ar: 'نوعا', am: 'ኖዓ' },
-        secondary: { he: 'איתי', en: 'Itay', ru: 'Итай', ar: 'إيتاي', am: 'ኢታይ' },
-      },
-      date: '2027-06-17',
-      startTime: '19:30',
-      endTime: '01:00',
-      timezone: 'Asia/Jerusalem',
-    });
+    // the five-language invitation; the template approved in Hebrew, English, Russian and Arabic
     const s = gallerySettings();
     const upload = tokens.linkToken('upload', INV, s.uploadTokenNonce, s.uploadTokenHash)!;
     const claimed = (guestLanguage: string | null, id: string = randomUUID()): ClaimedGalleryNotice => ({

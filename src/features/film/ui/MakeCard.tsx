@@ -10,7 +10,7 @@ import { formatBytes } from '@/features/live-gallery/format';
 import { useUi } from '@/lib/i18n/client';
 import { FilmAssets } from '../client/assets';
 import { renderSoundtrack } from '../client/audio';
-import { paintFrame, type CardStyle, type Sources } from '../client/paint';
+import { loadCardFonts, paintFrame, type CardStyle, type Sources } from '../client/paint';
 import { addFilmToGallery } from '../client/publish';
 import { filmStills, pickEngine, playFilm, renderFilm, type Engine } from '../client/render';
 import type { FilmQuality, FilmShape } from '../config';
@@ -139,7 +139,7 @@ export function MakeCard({
     const current = await fresh();
     const assets = new FilmAssets(itemsOf(current), previewSize);
     try {
-      await assets.prepare(plan);
+      await Promise.all([assets.prepare(plan), loadCardFonts(card)]);
       const soundtrack = await renderSoundtrack(track, plan);
       if (controller.signal.aborted) return;
       setPlaying('playing');
@@ -174,7 +174,8 @@ export function MakeCard({
     const current = await fresh();
     const assets = new FilmAssets(itemsOf(current), size);
     try {
-      await assets.prepare(plan);
+      // the photos, and the cards' faces for their language
+      await Promise.all([assets.prepare(plan), loadCardFonts(card)]);
       const soundtrack = await renderSoundtrack(track, plan);
       if (controller.signal.aborted) throw new DOMException('aborted', 'AbortError');
       setMaking({ phase: 'rendering', progress: 0, engine: engine.kind });
@@ -273,6 +274,7 @@ export function MakeCard({
             aria-label={P.title}
             role="img"
             data-testid="film-preview-canvas"
+            data-card-dir={card.rtl ? 'rtl' : 'ltr'}
           />
           {playing === 'playing' ? (
             <span

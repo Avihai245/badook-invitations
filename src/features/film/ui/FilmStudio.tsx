@@ -24,14 +24,16 @@ import {
   Hint,
   PageHeader,
   Segmented,
+  Select,
   useToast,
 } from '@/components/app';
+import { RTL_LOCALES, type Locale } from '@/features/invitations/contracts/types';
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
-import { filmEn } from '@/lib/i18n/film.en';
-import { filmHe } from '@/lib/i18n/film.he';
+import { formatDate } from '@/features/invitations/lib/dates';
+import { FILM_CARDS } from '@/lib/i18n/film-cards';
 import { useUi } from '@/lib/i18n/client';
 import { loadFilmChoice, saveFilmChoice } from '../client/choice';
-import type { CardStyle } from '../client/paint';
+import { loadCardFonts, type CardStyle } from '../client/paint';
 import { suggestedQuality } from '../client/render';
 import { FILM, filmSize, type FilmLength, type FilmQuality, type FilmShape } from '../config';
 import { NO_CHOICE, selectShots, usable, type FilmCandidate, type FilmChoice } from '../select';
@@ -51,13 +53,16 @@ const HELP_ICONS: Record<keyof Help, LucideIcon> = {
   gallery: Images,
 };
 
-type CardLocale = 'he' | 'en';
+/** Up to this many card languages side by side; more are a list. */
+const SIDE_BY_SIDE = 3;
 
 /**
  * /app/invitations/[id]/gallery/film — the highlights film studio (feature auto_reel): the film's
- * length, shape, quality, card language and music; the shots it chose (pin, remove, reorder, add);
- * a preview; making it in this browser with progress and cancel; then download, and add it to the
- * gallery. Without the feature it offers the package that has it; without a gallery, the gallery tab.
+ * length, shape, quality, card language (any of the invitation's — the cards right to left in Hebrew
+ * and Arabic, in the invitation's faces for every script) and music; the shots it chose (pin, remove,
+ * reorder, add); a preview; making it in this browser with progress and cancel; then download, and add
+ * it to the gallery. Without the feature it offers the package that has it; without a gallery, the
+ * gallery tab.
  */
 export function FilmStudio({ initial }: { initial: FilmView }) {
   const { t, fmt } = useUi();
@@ -72,7 +77,7 @@ export function FilmStudio({ initial }: { initial: FilmView }) {
   const [length, setLength] = useState<FilmLength>(60);
   const [shape, setShape] = useState<FilmShape>('vertical');
   const [quality, setQuality] = useState<FilmQuality>('full');
-  const [cardLocale, setCardLocale] = useState<CardLocale>(view.event.defaultLocale);
+  const [cardLocale, setCardLocale] = useState<Locale>(view.event.defaultLocale);
   const [music, setMusic] = useState<MusicSource>(view.music.url ? 'invitation' : 'none');
   const restored = useRef(false);
   useEffect(() => {
@@ -89,19 +94,6 @@ export function FilmStudio({ initial }: { initial: FilmView }) {
 
   const { state: track, pick } = useFilmTrack(music, view.music.url);
   const ready = track.status === 'ready' ? track : null;
-
-  // the fonts of the cards, before they are painted
-  const [fontsReady, setFontsReady] = useState(false);
-  useEffect(() => {
-    const f = view.event.fonts;
-    const sample = Object.values(view.event.names).join(' ') || 'Aa א';
-    const families = [f.display.he, f.display.en, f.heading.he, f.heading.en];
-    void Promise.all(
-      [...new Set(families)].map((family) =>
-        document.fonts.load(`400 48px "${family}"`, sample).catch(() => []),
-      ),
-    ).finally(() => setFontsReady(true));
-  }, [view.event]);
 
   // the film: the shots chosen and the edit
   const candidates = useMemo<FilmCandidate[]>(
@@ -150,29 +142,38 @@ export function FilmStudio({ initial }: { initial: FilmView }) {
   }, [ready, music, view.music.startAt, bpm, length, selection]);
 
   const size = filmSize(shape, quality);
+  // the cards in their language: the names, the date (as the invitation writes it — Arabic in Latin
+  // digits) and the end card's line, in the invitation's faces for that script, right to left in
+  // Hebrew and Arabic
+  const cardLang: Locale = view.event.locales.includes(cardLocale) ? cardLocale : view.event.defaultLocale;
   const card = useMemo<CardStyle>(() => {
     const p = view.event.palette;
-    const locale = view.event.locales.includes(cardLocale) ? cardLocale : view.event.defaultLocale;
-    const dict = locale === 'he' ? filmHe : filmEn;
+    const fonts = view.event.fonts;
     return {
       bg: p.bg,
       surface: p.surface,
       ink: p.ink,
       muted: p.inkMuted,
       accent: p.accent,
-      display: view.event.fonts.display[locale],
-      heading: view.event.fonts.heading[locale],
-      names: view.event.names[locale] ?? Object.values(view.event.names)[0] ?? '',
-      date: new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-US', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'UTC',
-      }).format(new Date(`${view.event.date}T12:00:00Z`)),
-      thanks: dict.cards.thanks,
-      rtl: locale === 'he',
+      display: fonts.display[cardLang] ?? fonts.display[view.event.defaultLocale] ?? 'serif',
+      heading: fonts.heading[cardLang] ?? fonts.heading[view.event.defaultLocale] ?? 'serif',
+      names: view.event.names[cardLang] ?? Object.values(view.event.names)[0] ?? '',
+      date: formatDate(view.event.date, cardLang, { day: 'numeric', month: 'long', year: 'numeric' }),
+      thanks: FILM_CARDS[cardLang].thanks,
+      rtl: RTL_LOCALES.includes(cardLang),
     };
-  }, [view.event, cardLocale]);
+  }, [view.event, cardLang]);
+
+  // the cards' faces, before they are painted (again for another language)
+  const [fontsReady, setFontsReady] = useState(false);
+  useEffect(() => {
+    let live = true;
+    setFontsReady(false);
+    void loadCardFonts(card).finally(() => live && setFontsReady(true));
+    return () => {
+      live = false;
+    };
+  }, [card]);
 
   /** Fresh signed URLs when they are about to expire (a page left open for hours). */
   const fresh = async (): Promise<FilmView> => {
@@ -354,12 +355,26 @@ export function FilmStudio({ initial }: { initial: FilmView }) {
       </div>
       {view.event.locales.length > 1 ? (
         <Field label={S.language} help={S.languageHint}>
-          <Segmented
-            value={cardLocale}
-            onValueChange={setCardLocale}
-            options={view.event.locales.map((l) => ({ value: l, label: S.languageNames[l] }))}
-            fullWidth
-          />
+          {view.event.locales.length <= SIDE_BY_SIDE ? (
+            <Segmented
+              value={cardLang}
+              onValueChange={setCardLocale}
+              options={view.event.locales.map((l) => ({ value: l, label: S.languageNames[l] }))}
+              fullWidth
+            />
+          ) : (
+            <Select
+              value={cardLang}
+              onChange={(e) => setCardLocale(e.target.value as Locale)}
+              data-testid="film-card-language"
+            >
+              {view.event.locales.map((l) => (
+                <option key={l} value={l} lang={l}>
+                  {S.languageNames[l]}
+                </option>
+              ))}
+            </Select>
+          )}
         </Field>
       ) : null}
       <Field label={S.music} help={S.musicHint}>

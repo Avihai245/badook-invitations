@@ -21,13 +21,17 @@ export interface CardStyle {
   ink: string;
   muted: string;
   accent: string;
-  /** the font families (loaded before painting) */
+  /**
+   * CSS font stacks, the invitation's faces for the cards' language (loadCardFonts before painting):
+   * the names in `display`, the date and the end card's line in `heading`
+   */
   display: string;
   heading: string;
   names: string;
   date: string;
-  /** the end card's line ("thank you for celebrating with us") */
+  /** the end card's line ("thank you for celebrating with us"), in the cards' language */
   thanks: string;
+  /** a right-to-left language (Hebrew, Arabic): the text and the whip's direction */
   rtl: boolean;
 }
 
@@ -191,13 +195,28 @@ export function paintPicture(
 
 // ─── the cards ──────────────────────────────────────────────────────────────────────────────────
 
-const font = (weight: number, size: number, family: string) =>
-  `${weight} ${Math.round(size)}px "${family}", serif`;
+const font = (weight: number, size: number, stack: string) => `${weight} ${Math.round(size)}px ${stack}`;
+
+/** Letters of a script that joins them (Arabic): no letter spacing. */
+const JOINED = /[؀-ۿݐ-ݿࢠ-ࣿ]/;
+
+/**
+ * Loads the faces the cards' texts need — for their script, from the stacks — before they are painted
+ * (a canvas draws with whatever face is ready). Resolves either way: a face that fails to load leaves
+ * the stack's next one.
+ */
+export async function loadCardFonts(card: CardStyle): Promise<void> {
+  if (typeof document === 'undefined' || !document.fonts) return;
+  await Promise.all([
+    document.fonts.load(font(400, 48, card.display), card.names || 'Aa'),
+    document.fonts.load(font(400, 48, card.heading), `${card.date} ${card.thanks}`.trim() || 'Aa'),
+  ]).catch(() => undefined);
+}
 
 /** The names in as few lines as fit (one, else two split near the middle), and their size. */
-function fitLines(ctx: Ctx, text: string, family: string, maxWidth: number, max: number, min: number) {
+function fitLines(ctx: Ctx, text: string, stack: string, maxWidth: number, max: number, min: number) {
   const widest = (lines: string[], size: number) => {
-    ctx.font = font(400, size, family);
+    ctx.font = font(400, size, stack);
     return Math.max(...lines.map((l) => ctx.measureText(l).width));
   };
   for (let size = max; size >= min; size *= 0.94)
@@ -279,7 +298,8 @@ function paintCard(ctx: Ctx, shot: Shot, local: number, width: number, height: n
   if (card.date) {
     ctx.fillStyle = card.muted;
     ctx.font = font(400, unit * 0.036, card.heading);
-    if ('letterSpacing' in ctx)
+    // the date's letters a little apart — not in a joined script (Arabic), whose words it would break
+    if ('letterSpacing' in ctx && !JOINED.test(card.date))
       (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing =
         `${Math.round(unit * 0.004)}px`;
     ctx.fillText(card.date, cx, cy + block / 2 + unit * 0.075 + rise * 1.5, width * 0.86);
