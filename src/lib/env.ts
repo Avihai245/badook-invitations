@@ -74,6 +74,16 @@ const ServerEnvSchema = z.object({
   // from the photos without it. The site's ceiling for them is INVITES_AI_DAILY_LIMIT.
   INVITES_ART_DIRECTION_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(12),
 
+  // ── the invitation read aloud (feature `voice`): Azure AI Speech, text to speech (REST) ──
+  // without the key and region the guest's "listen" uses the device's own voice (when it has one)
+  INVITES_TTS_AZURE_KEY: z.string().default(''),
+  INVITES_TTS_AZURE_REGION: z.string().trim().default(''),
+  // another address for the service (a local stand-in in tests); empty: the region's
+  INVITES_TTS_AZURE_ENDPOINT: z
+    .union([z.url(), z.literal('')])
+    .default('')
+    .transform((u) => u.replace(/\/+$/, '')),
+
   // ── live gallery (features/live-gallery) ──
   // the key its links are derived from (random, ≥32 chars); empty: the Supabase secret key. Changing
   // it keeps the links already out working; the hosts' screens then offer new ones.

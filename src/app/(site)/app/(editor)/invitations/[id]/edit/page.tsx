@@ -91,7 +91,8 @@ export default async function EditInvitationPage({ params }: { params: Params })
           cinematic,
           draftReview: studio('draft_review'),
           artDirection: studio('art_direction'),
-          voice: studio('voice'),
+          // the voice card carries the event's own switch: shown also while the host has it off
+          voice: input && whyOff('voice', input) === 'switched_off' ? 'on' : studio('voice'),
         }}
       />
     </>

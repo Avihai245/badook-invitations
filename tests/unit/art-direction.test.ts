@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { describe, expect, it, vi } from 'vitest';
 import { applyConcept, conceptDocument, rethemeDocument } from '@/features/art-direction/apply';
+import { invitationPhotos } from '@/features/art-direction/client/photos';
 import { candidateTemplates, slotLayouts } from '@/features/art-direction/catalog';
 import { composeConcepts, scoreTemplate } from '@/features/art-direction/compose';
 import { headlineCopy } from '@/features/art-direction/copy';
@@ -485,5 +486,79 @@ describe('focal points', () => {
       expect(p.focal.x).toBeGreaterThanOrEqual(0.1);
       expect(p.focal.x).toBeLessThanOrEqual(0.9);
     }
+  });
+});
+
+describe('three more, and the invitation’s own photos', () => {
+  it('"three more" avoids the designs already shown (while the event has others)', () => {
+    const first = composeConcepts(input());
+    const more = composeConcepts(input({ avoid: first }));
+    const shown = new Set(first.map((c) => c.templateId));
+    expect(more).toHaveLength(3);
+    expect(more.filter((c) => shown.has(c.templateId))).toEqual([]);
+    // the AI hears what was shown
+    expect(briefText(input({ avoid: first }))).toContain('alreadyShown');
+    expect(briefText(input())).not.toContain('alreadyShown');
+  });
+
+  it('the API passes what was shown to the composer and to the AI', async () => {
+    const USER = { id: '11111111-1111-4111-8111-111111111111', email: 'host@example.com' };
+    const jpeg = Buffer.from('fake jpeg bytes').toString('base64');
+    const first = composeConcepts(input({ uiLocale: 'en', photos: PHOTOS.slice(0, 3) }));
+    const avoid = first.map((c) => ({ templateId: c.templateId, fontPairId: c.fontPairId }));
+    const ask = vi.fn(async () => ({ status: 'error' as const, error: 'down' }));
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const res = await createConcepts(
+      USER,
+      {
+        eventType: 'wedding',
+        locales: ['he', 'en'],
+        uiLocale: 'en',
+        photos: PHOTOS.slice(0, 3).map((p) => ({ jpeg, info: p })),
+        avoid,
+      },
+      {
+        access: vi.fn(async () => ({
+          status: 'ok' as const,
+          access: { admin: false, premium: true },
+          cinematic: true,
+        })),
+        rateHit: vi.fn(async () => true),
+        rateKey: (scope, value) => `${scope}:${value}`,
+        ask,
+        limits: { perAccount: 12, site: 2000 },
+      },
+    );
+    error.mockRestore();
+    expect(ask).toHaveBeenCalledWith(expect.objectContaining({ avoid }), expect.any(Array));
+    const again = (res.body.concepts as Concept[]).map((c) => c.templateId);
+    expect(again.filter((id) => avoid.some((a) => a.templateId === id))).toEqual([]);
+  });
+
+  it('the invitation’s own photos: the host’s uploads, each once, never the design’s', () => {
+    const doc = structuredClone(FIXTURES['wedding-he-en']) as InvitationDocument;
+    const hero = doc.sections.find((s) => s.type === 'hero')!;
+    if (hero.type !== 'hero') throw new Error('hero');
+    hero.data.media = {
+      kind: 'image',
+      src: 'upload:o/i/a.jpg',
+      poster: null,
+      focalPoint: { x: 0.5, y: 0.5 },
+    };
+    const story = doc.sections.find((s) => s.type === 'text')!;
+    story.media = {
+      kind: 'video',
+      src: 'upload:o/i/v.mp4',
+      poster: 'upload:o/i/v.jpg',
+      focalPoint: { x: 0.5, y: 0.5 },
+    };
+    const other = doc.sections.find((s) => s.type === 'venues')!;
+    other.media = { kind: 'image', src: 'template:photo1', poster: null, focalPoint: { x: 0.5, y: 0.5 } };
+    const last = doc.sections.find((s) => s.type === 'rsvp')!;
+    last.media = { kind: 'image', src: 'upload:o/i/a.jpg', poster: null, focalPoint: { x: 0.5, y: 0.5 } };
+    const refs = invitationPhotos(doc);
+    expect(refs.slice(0, 2)).toEqual(['upload:o/i/a.jpg', 'upload:o/i/v.jpg']);
+    expect(refs).not.toContain('template:photo1');
+    expect(new Set(refs).size).toBe(refs.length);
   });
 });

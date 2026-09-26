@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { flushSync } from 'react-dom';
 import { dirOf, type Locale } from '../../contracts/types';
+import type { ListenProps } from '@/features/voice/ui/Listen.client';
 import { FloatingControls, type MusicProps } from '../FloatingControls.client';
 import type { LivePayload } from './payload';
 
@@ -114,11 +115,14 @@ export function LiveLocale({
   initial,
   payload,
   music,
+  listen = {},
   children,
 }: {
   initial: Locale;
   payload: LivePayload;
   music: MusicProps | null;
+  /** the invitation read aloud in each language (features/voice) */
+  listen?: Partial<Record<Locale, ListenProps | null>>;
   /** the sections in `initial`, rendered on the server */
   children: ReactNode;
 }) {
@@ -218,6 +222,7 @@ export function LiveLocale({
           onIntent: () => prepare(target),
         }}
         music={music ? { ...music, playLabel: entry.labels.play, pauseLabel: entry.labels.pause } : null}
+        listen={listen[locale] ?? null}
       />
       {locale === initial || !Sections ? children : <Sections payload={payload} locale={locale} />}
     </>

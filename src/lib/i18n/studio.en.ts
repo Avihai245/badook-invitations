@@ -263,6 +263,53 @@ export const studioEn: StudioDict = {
         'You got this email because you asked for updates on comments on the review link. You can change it in the editor, under “Comments”.',
     },
   },
+  // ─── the invitation read aloud (features/voice) ─────────────────────────────────────────────
+  voice: {
+    title: 'Read aloud',
+    body: 'Guests can listen to the invitation with a “Listen” button. Each time you publish with changed words it is read again, in every language.',
+    switch: 'Offer guests to listen',
+    switchHint:
+      'A “Listen” button on the invitation: a voice reads its texts. When it starts, the music stops',
+    languages: 'Languages',
+    states: {
+      ready: 'Ready',
+      pending: 'Being prepared…',
+      failed: 'We couldn’t prepare it — meanwhile the guest’s phone reads it',
+      device: 'Read by the guest’s phone (when it has a voice for the language)',
+      unpublished: 'Ready after you publish',
+      changes: 'Updated at your next publish',
+    },
+    offPlan: 'Read aloud — in the {package} package',
+    failed: 'We couldn’t load the read-aloud state.',
+  },
+  // ─── video captions (lib/captions) ─────────────────────────────────────────────────────────────
+  captions: {
+    title: 'Captions',
+    help: 'What’s said in the video, in writing — for guests who can’t hear or watch without sound. One per language.',
+    speech: 'The video has speech',
+    speechHelp: 'So we remind you to add captions before publishing',
+    none: 'No captions',
+    count: { one: '1 caption', other: '{n} captions' },
+    upload: 'Upload a file',
+    uploadHint: 'A .vtt or .srt file — an .srt file is converted automatically',
+    type: 'Type',
+    edit: 'Edit',
+    typeHint: 'Write the captions yourself: when each appears, when it goes and what it says',
+    remove: 'Remove',
+    removeHint: 'Deletes the captions in this language',
+    invalid: 'The file couldn’t be read as captions. Check that it is a valid .vtt or .srt file.',
+    editorTitle: 'Captions in {language}',
+    editorIntro:
+      'Each row is a caption: when it appears, when it goes, and what it says. Times like 0:03 or 1:05.5.',
+    start: 'Start',
+    end: 'End',
+    text: 'Text',
+    add: 'Add a caption',
+    removeCue: 'Delete caption {n}',
+    badTime: 'Caption {n} has invalid times (the end must come after the start)',
+    empty: 'Add at least one caption',
+    save: 'Save the captions',
+  },
 };
 
 export const studioHelpEn: typeof studioHelpHe = {

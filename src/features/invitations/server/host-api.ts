@@ -15,7 +15,7 @@ import {
   SLUG_RE,
   TimezoneSchema,
 } from '../contracts/schemas';
-import type { L10n, Locale } from '../contracts/types';
+import type { InvitationDocument, L10n, Locale } from '../contracts/types';
 import { validateDocument } from '../contracts/validate';
 import { findFontPair } from '../fonts/library';
 import { graphemes } from '../lib/text';
@@ -69,6 +69,11 @@ export interface HostDeps {
    * when the draft changes. Absent: nobody is told.
    */
   broadcast?(channel: string, kind: string): Promise<unknown>;
+  /**
+   * After a publish: the invitation read aloud (features/voice) — its languages queued and made in
+   * the background, never holding up the answer. Absent: no voice.
+   */
+  voice?(invitationId: string, ownerId: string, doc: InvitationDocument): void;
 }
 
 /** 402 when the plan has no room for one more active invitation. */
@@ -332,6 +337,7 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
   if (previousSlug && previousSlug !== published.slug) deps.revalidate(previousSlug);
   // the save-the-date it was created from links here now (and follows a new slug)
   if (inv.sourceSlug) deps.revalidate(inv.sourceSlug);
+  deps.voice?.(id, userId, draft);
   return ok({ ok: true, ...published, warnings });
 }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { CaptionsTrack } from '../../renderer/CaptionsTrack.client';
 import { videoEmbedUrl, videoStillUrl, type VideoLink } from '../../lib/video-links';
 
 /** Starts `v` when the browser hasn't; one it won't play with sound plays muted. */
@@ -44,12 +45,15 @@ export function HeroVideo({
   focal,
   sound,
   calm = false,
+  captions = null,
 }: {
   src: string;
   poster: string | null;
   focal: string;
   /** the host's volume when its sound is the music (0..1), else null */
   sound: number | null;
+  /** its captions in the page's language (WebVTT) */
+  captions?: { vtt: string; lang: string; label: string } | null;
   /** the live page: a guest who prefers less motion gets the first frame (the editor shows it playing) */
   calm?: boolean;
 }) {
@@ -91,7 +95,9 @@ export function HeroVideo({
       style={{ objectPosition: focal }}
       // the cover's early-tap script may have turned its sound on before React hydrates: keep it
       suppressHydrationWarning
-    />
+    >
+      {captions ? <CaptionsTrack {...captions} /> : null}
+    </video>
   );
 }
 

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { CaptionsTrack } from '../CaptionsTrack.client';
 import { imageSet } from '../images';
 import type { CineMedia, CinePresentation } from './presentation';
 
@@ -49,7 +50,9 @@ function MediaLayer({ media, sizes, decorative }: { media: CineMedia; sizes: str
         aria-hidden="true"
         style={position}
         suppressHydrationWarning
-      />
+      >
+        {media.captions ? <CaptionsTrack {...media.captions} /> : null}
+      </video>
     </>
   );
 }

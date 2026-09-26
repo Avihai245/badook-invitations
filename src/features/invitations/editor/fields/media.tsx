@@ -17,6 +17,7 @@ import {
 import { placeholderArt } from '../../renderer/placeholders';
 import { getAt } from '../paths';
 import { useEditor } from '../state/EditorProvider';
+import { CaptionsField } from './captions';
 import { FieldFrame } from './fields';
 
 export const IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/avif';
@@ -420,6 +421,7 @@ export function HeroMediaField({ path, label }: { path: string; label: string })
       >
         {u.videoLink}
       </Button>
+      {media.kind === 'video' && !link && isUpload ? <CaptionsField path={path} /> : null}
       {link?.start ? (
         <p className="mt-1.5 text-[12px] text-muted" data-testid="video-start">
           {fmt(u.videoLinkStart, { time: formatStartTime(link.start) })}

@@ -25,5 +25,8 @@
   "cover.hint.gate": "לחצו לפתיחת השער",
   "cover.hint.curtain": "לחצו לפתיחת המסך",
   "cover.hint.fireworks": "לחצו להדלקת הזיקוקים",
-  "cover.hint.gold_dust": "לחצו לפתיחה"
+  "cover.hint.gold_dust": "לחצו לפתיחה",
+  "voice.listen": "האזנה להזמנה",
+  "voice.stop": "עצירת ההקראה",
+  "captions.label": "כתוביות"
 }

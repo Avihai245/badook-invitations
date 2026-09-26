@@ -8,6 +8,7 @@
  * editor turns into a human label ("missing English translation in 'Location line'").
  */
 import { findFontPair } from '../fonts/library';
+import { validVtt } from '../lib/captions';
 import { contrastRatio } from '../lib/contrast';
 import { cappedLength } from '../lib/l10n';
 import { visibleGlyphCount } from '../lib/text';
@@ -48,7 +49,10 @@ export type IssueCode =
   // v2 (cinematic presentation)
   | 'layout_media' // params.layout: the layout needs media (video_bg: a video) — it renders as stack
   | 'media_link' // a section's video must be a file (an upload), not a YouTube / Vimeo link
-  | 'media_poster'; // a section's video has no still (shown until it plays, and when saving data)
+  | 'media_poster' // a section's video has no still (shown until it plays, and when saving data)
+  // captions (lib/captions)
+  | 'captions_missing' // params.locale: a video the host says has speech has no captions in a language
+  | 'captions_invalid'; // params.locale: a language's captions aren't well-formed WebVTT
 
 /** Stable keys the editor maps to field labels. */
 export type FieldKey =
@@ -642,6 +646,34 @@ export function validateDocument(
         break;
       default:
         break;
+    }
+    // ── captions: a video's words for those who can't hear them ──
+    const video = s.type === 'hero' ? s.data.media : (s.media ?? null);
+    if (video?.kind === 'video' && !parseVideoLink(video.src)) {
+      const at = s.type === 'hero' ? `${base}.media.captions` : `sections.${i}.media.captions`;
+      const field = s.type === 'hero' ? 'hero.media' : 'section.media';
+      for (const locale of doc.locales) {
+        const vtt = video.captions?.[locale];
+        if (vtt && !validVtt(vtt))
+          add({
+            path: at,
+            code: 'captions_invalid',
+            severity: 'warning',
+            field,
+            sectionId: s.id,
+            params: { locale },
+          });
+        // only when it can know: the host said the video has speech
+        else if (!vtt && video.speech === true)
+          add({
+            path: at,
+            code: 'captions_missing',
+            severity: 'warning',
+            field,
+            sectionId: s.id,
+            params: { locale },
+          });
+      }
     }
     // ── v2 presentation ──
     const layout = s.type === 'hero' ? 'full_bleed' : (s.layout ?? 'stack');

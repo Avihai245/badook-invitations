@@ -4,6 +4,7 @@
  * length caps, section order, palette keys…) live in ./validate.ts.
  */
 import { z } from 'zod';
+import { CAPTIONS } from '../lib/captions';
 import {
   AMBIENT_KINDS,
   DECORATION_SLOTS,
@@ -96,6 +97,9 @@ export const MediaSchema = z.strictObject({
   src: AssetRefSchema,
   poster: AssetRefSchema.nullable(),
   focalPoint: z.strictObject({ x: unit, y: unit }),
+  // a video's captions (WebVTT per language, lib/captions) and whether it has speech
+  captions: z.partialRecord(LocaleSchema, z.string().max(CAPTIONS.maxChars)).nullable().optional(),
+  speech: z.boolean().nullable().optional(),
 });
 
 const PaletteShape = {

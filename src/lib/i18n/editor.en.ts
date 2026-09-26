@@ -703,6 +703,9 @@ export const editorEn: EditorDict = {
     layout_media: 'This layout needs a picture or video — until then the section shows as usual',
     media_link: 'A section’s background video must be a file you uploaded, not a YouTube or Vimeo link',
     media_poster: 'The video has no still — it shows until the video plays, and to guests saving data',
+    captions_missing:
+      'The video has speech and no {language} captions — guests who can’t hear it will miss what’s said',
+    captions_invalid: 'The {language} captions aren’t valid — upload them again or type them anew',
     empty_section: '“{field}” is empty and won’t be shown — add an item or hide it',
   },
   fieldLabels: {

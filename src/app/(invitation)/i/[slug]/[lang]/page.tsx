@@ -17,6 +17,7 @@ import {
   resolveLocale,
   type PublishedInvitation,
 } from '@/features/invitations/server/published';
+import { voiceForPage } from '@/features/voice/server/page';
 import { serverEnv } from '@/lib/env';
 
 type Params = Promise<{ slug: string; lang: string }>;
@@ -121,7 +122,11 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   if (!invitation || !locale) notFound();
   const next = otherLocale(invitation.doc, locale);
   // the event's `cinematic` feature: its v2 presentation, or the plain rendering (features/flags)
-  const cinematic = await cinematicForPage(invitation.id, invitation.doc, invitation.entry.manifest);
+  const [cinematic, voice] = await Promise.all([
+    cinematicForPage(invitation.id, invitation.doc, invitation.entry.manifest),
+    // the invitation read aloud (feature `voice`): each language's audio, or its words for the device
+    voiceForPage(invitation),
+  ]);
   // the pill's plain link keeps the cover skipped; with JS the language switches in place (LiveLocale)
   const link = (l: Locale) => `/i/${slug}?lang=${l}&open=1`;
   const live = buildLivePayload(
@@ -140,6 +145,7 @@ export default async function PublicInvitationPage({ params }: { params: Params 
       skipCoverFromUrl
       langSwitchHref={next ? link(next) : null}
       live={live}
+      voice={voice}
     />
   );
 }

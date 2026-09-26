@@ -1,10 +1,12 @@
 import 'server-only';
 import { revalidatePath } from 'next/cache';
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { entitlementsFor, isAdminEmail } from '@/features/billing/server/account';
 import { invitationsEnabled } from '@/lib/feature';
 import { broadcastRefresh } from '@/lib/live/broadcast';
 import { getSessionUser } from '@/lib/supabase/session';
+import { voiceDeps } from '@/features/voice/server/deps';
+import { processVoice, queueVoice } from '@/features/voice/server/voice';
 import { getTemplate } from '../templates/registry';
 import { cinematicFor } from './cinematic';
 import type { ApiResult, HostDeps } from './host-api';
@@ -32,6 +34,12 @@ export const hostDeps: HostDeps = {
   revalidate,
   now: () => Date.now(),
   broadcast: (channel, kind) => broadcastRefresh(channel, kind, fetch, 'invitations'),
+  // the invitation read aloud: after the answer, never in its way (features/voice)
+  voice: (id, ownerId, doc) =>
+    after(async () => {
+      const deps = voiceDeps();
+      if (await queueVoice(id, ownerId, doc, deps)) await processVoice(id, deps).catch(() => undefined);
+    }),
 };
 
 /**

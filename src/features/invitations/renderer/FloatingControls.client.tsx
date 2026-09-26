@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
+import { LISTEN_EVENT, ListenButton, MUSIC_EVENT, type ListenProps } from '@/features/voice/ui/Listen.client';
 import type { Locale } from '../contracts/types';
 import { Icon } from '../ui/Icon';
 import { withStartAt } from './assets';
@@ -35,6 +36,7 @@ const FADE_MS = 1500;
 export function FloatingControls({
   langSwitch,
   music,
+  listen = null,
 }: {
   langSwitch: {
     href: string;
@@ -44,6 +46,8 @@ export function FloatingControls({
     onIntent?: () => void;
   } | null;
   music: MusicProps | null;
+  /** the invitation read aloud (features/voice): above the music button */
+  listen?: ListenProps | null;
 }) {
   return (
     <>
@@ -66,6 +70,11 @@ export function FloatingControls({
         </a>
       ) : null}
       {music ? <MusicButton {...music} /> : null}
+      {listen ? (
+        <span className="fab-listen-slot" data-stacked={music ? '' : undefined}>
+          <ListenButton {...listen} />
+        </span>
+      ) : null}
     </>
   );
 }
@@ -157,6 +166,8 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
 
   const play = useCallback(
     (withFade: boolean) => {
+      // the invitation read aloud stops (features/voice)
+      window.dispatchEvent(new CustomEvent(MUSIC_EVENT));
       if (!videoSound) {
         const a = audio.current;
         // already playing: started by the cover's early-tap script (InvitationBody) before React took over
@@ -192,6 +203,12 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
     } else embedSound(false, target);
     setPlaying(false);
   }, [videoSound, stopFade, target]);
+
+  // "Listen" (features/voice) pauses the music.
+  useEffect(() => {
+    window.addEventListener(LISTEN_EVENT, pause);
+    return () => window.removeEventListener(LISTEN_EVENT, pause);
+  }, [pause]);
 
   // The cover's tap starts the music. Listening from the hydration commit on (a layout effect): a tap
   // React replays right after hydrating must not come before the listener.

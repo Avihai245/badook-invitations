@@ -1445,6 +1445,18 @@ html[data-framed] body::-webkit-scrollbar {
 [data-mode='editor'] .fab-lang {
   display: none;
 }
+/* "listen" (the invitation read aloud, features/voice): above the music button, or in its place */
+.fab-listen {
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  inset-inline-end: 16px;
+}
+.fab-listen-slot[data-stacked] .fab-listen {
+  bottom: calc(72px + env(safe-area-inset-bottom));
+}
+.fab-listen[aria-pressed='true'] {
+  border-color: var(--inv-accent);
+  color: var(--inv-accent-text);
+}
 
 /* ============ 5. HERO ============ */
 .hero {

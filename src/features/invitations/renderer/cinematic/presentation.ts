@@ -27,6 +27,8 @@ export interface CineMedia {
   focal: { x: number; y: number };
   /** '' — decorative (every background) */
   alt: string;
+  /** a video's captions in the page's language (WebVTT, lib/captions) */
+  captions?: { vtt: string; lang: string; label: string } | null;
 }
 
 export interface CinePresentation {
@@ -133,7 +135,9 @@ function resolveMedia(section: Section, ctx: RenderContext): CineMedia | null {
   if (m.kind === 'video') {
     // a section plays files only (a YouTube / Vimeo link can't be a section's background): its still
     const file = parseVideoLink(m.src) ? null : ctx.asset(m.src);
-    if (file) return { kind: 'video', src: file, still, focal, alt };
+    const vtt = m.captions?.[ctx.locale];
+    const captions = vtt ? { vtt, lang: ctx.locale, label: ctx.t('captions.label') } : null;
+    if (file) return { kind: 'video', src: file, still, focal, alt, captions };
     return still ? { kind: 'image', src: still, still, focal, alt } : null;
   }
   const src = ctx.asset(m.src);

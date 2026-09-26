@@ -6,6 +6,8 @@ import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
 import { studioHousekeeping } from '@/features/review/server/housekeeping';
+import { voiceDeps } from '@/features/voice/server/deps';
+import { processVoice } from '@/features/voice/server/voice';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { processQueue } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
@@ -117,6 +119,9 @@ export function tick(now = Date.now()): Promise<void> {
     try {
       if (cloudApiConfigured())
         await runJob('whatsapp', new Date(now - WHATSAPP_EVERY_MS), 120, () => runWhatsAppQueue(15_000));
+      // the invitations read aloud: what publishes queued, and retries that are due (each language is
+      // taken by one server: voice_claim)
+      await processVoice(null, voiceDeps()).catch((err) => console.error('[jobs] voice failed', err));
       await runJob('daily', dailyDue(new Date(now)), 15 * 60, () => runDaily(new Date(now)));
     } catch (err) {
       console.error('[jobs] tick failed', err);
