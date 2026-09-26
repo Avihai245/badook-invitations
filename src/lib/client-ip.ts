@@ -5,8 +5,13 @@
  * one bucket.
  */
 export function clientIp(request: Request): string | null {
-  const viewer = request.headers.get('cloudfront-viewer-address');
+  return ipFromHeaders(request.headers);
+}
+
+/** The same from a request's headers (a server page's `headers()`). */
+export function ipFromHeaders(headers: Pick<Headers, 'get'>): string | null {
+  const viewer = headers.get('cloudfront-viewer-address');
   if (viewer) return viewer.replace(/:\d+$/, '').replace(/^\[|\]$/g, '');
-  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  return forwarded || request.headers.get('x-real-ip') || null;
+  const forwarded = headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  return forwarded || headers.get('x-real-ip') || null;
 }

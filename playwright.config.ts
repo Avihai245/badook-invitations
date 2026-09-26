@@ -86,6 +86,8 @@ export default defineConfig({
             INVITES_WHATSAPP_API_BASE: `http://127.0.0.1:${whatsappPort}`,
             INVITES_WHATSAPP_APP_SECRET: 'e2e-whatsapp-app-secret',
             INVITES_WHATSAPP_VERIFY_TOKEN: 'e2e-whatsapp-verify',
+            // the table numbers' template (the event day: tests/e2e/event-day.spec.ts)
+            INVITES_WHATSAPP_TABLE_TEMPLATE: 'badook_table',
             INVITES_ADMIN_EMAILS: 'wa-admin-mobile@example.com,wa-admin-desktop@example.com',
             // billing through our own test payment page instead of PayPlus (tests/e2e/billing.spec.ts)
             INVITES_BILLING_TEST_MODE: 'true',

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { featuresFor } from '@/features/flags/server';
 import { GuestsScreen } from '@/features/invitations/app/guests/GuestsScreen';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { hostDb } from '@/features/invitations/server/host-db';
@@ -39,6 +40,8 @@ export default async function GuestsPage({
   const data = await loadGuestsPage(id, user, locale, await requestBaseUrl());
   if (!data) notFound();
   const open = query.import ? 'import' : query.send ? 'send' : null;
+  // "send guests their table" (the event day)
+  const tables = (await featuresFor(id)).has('seating_guide');
   // the invitation's header and tabs come from the workspace layout ([id]/layout.tsx)
-  return <GuestsScreen data={data} open={open} />;
+  return <GuestsScreen data={data} open={open} tables={tables} />;
 }

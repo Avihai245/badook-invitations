@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Armchair,
   CheckCheck,
   CheckSquare,
   Copy,
@@ -45,6 +46,7 @@ import {
   useToast,
 } from '@/components/app';
 import { UpgradeDialog, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
+import { NoticesDialog } from '@/features/event-day/ui/NoticesDialog';
 import { dictFor, fmt as format } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { hostApi, loginUrl } from '../api';
@@ -98,7 +100,16 @@ export type GuestsDeepLink = 'import' | 'send' | null;
  * linked to them), send on WhatsApp or from the host's own, and follow each guest — sent, delivered,
  * read, opened, coming or not. Refreshes itself while open.
  */
-export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open?: GuestsDeepLink }) {
+export function GuestsScreen({
+  data,
+  open = null,
+  tables = false,
+}: {
+  data: GuestsPageData;
+  open?: GuestsDeepLink;
+  /** the event tells guests their table (seating_guide): "send guests their table" in the menu */
+  tables?: boolean;
+}) {
   const { t, number, plural, locale } = useUi();
   const g = t.guests;
   const fmt = format;
@@ -113,6 +124,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
     open === 'import' ? { kind: 'import' } : open === 'send' ? { kind: 'whatsapp' } : null,
   );
   const [, startRefresh] = useTransition();
+  const [tablesOpen, setTablesOpen] = useState(false);
 
   const refresh = () => startRefresh(() => router.refresh());
   useEffect(() => {
@@ -391,6 +403,9 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
     { icon: <PartyPopper />, label: g.greeting.edit, text: h.greeting },
     { icon: <Download />, label: g.actions.export, text: h.export },
     { icon: <FileSpreadsheet />, label: g.actions.sample, text: h.sample },
+    ...(tables
+      ? [{ icon: <Armchair />, label: t.eventDay.notices.button, text: t.eventDay.notices.buttonHint }]
+      : []),
     { icon: <CheckCheck />, label: g.columns.status, text: h.status },
   ];
 
@@ -423,6 +438,15 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
                 onSelect: () => window.location.assign(`/api/invitations/${data.id}/guests/export`),
               },
               { label: g.actions.sample, icon: <FileSpreadsheet />, onSelect: sample },
+              ...(tables
+                ? [
+                    {
+                      label: t.eventDay.notices.button,
+                      icon: <Armchair />,
+                      onSelect: () => setTablesOpen(true),
+                    },
+                  ]
+                : []),
             ]}
           />
         </div>
@@ -660,6 +684,7 @@ export function GuestsScreen({ data, open = null }: { data: GuestsPageData; open
           }}
         />
       ) : null}
+      {tables ? <NoticesDialog id={data.id} open={tablesOpen} onOpenChange={setTablesOpen} /> : null}
     </>
   );
 }

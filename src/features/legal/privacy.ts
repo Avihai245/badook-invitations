@@ -140,6 +140,22 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           ],
         },
         {
+          id: 'event-day',
+          heading: '7B. The event day: table numbers and check-in at the entrance',
+          body: [
+            'A host whose plan includes it can tell each guest their table with a map to it, and check guests in at the entrance of the event. This information is collected for the host, like a guest list (section 1).',
+            {
+              list: [
+                'The table guide: a guest’s personal link opens their own table and the hall’s map, never other guests’ names. The page is kept on the guest’s phone for the evening, so it works without signal. Turning the map with the phone uses the phone’s compass on the phone only: nothing about where the phone points or where it is reaches us.',
+                'Telling guests their table: when the host sends table numbers from our WhatsApp number, we keep for each family the number it was sent, when, and the message’s delivery status, as with invitations; a number the host marks as told themselves is kept the same way. This stays with the guest list until the host deletes it, the invitation or the account.',
+                'Check-in: when a family arrives, the entrance station records which family arrived, how many people, the time, and the name the staff gave their station. The staff open the station from a link the host shares, without an account; there they can find the event’s guests by name or phone and see each family’s table. The entrance code on a guest’s guide (and on printed table cards) is derived from their personal link and identifies the family only to that event’s station.',
+                'Re-seating: families moved between tables (from where to where, when, and the reason the host wrote) are kept in the seating’s history, with the seating.',
+                'How long: check-ins are erased 30 days after the event’s date, and a check-in that was undone after a day.',
+              ],
+            },
+          ],
+        },
+        {
           id: 'rights',
           heading: '8. Your rights',
           body: [
@@ -317,6 +333,22 @@ export function privacyDoc(c: LegalContext): LegalDoc {
             ],
           },
           'אורח שרוצה שתמונה שלו תוסר יכול לבקש זאת מהמארח, או לפנות אלינו (סעיף 8).',
+        ],
+      },
+      {
+        id: 'event-day',
+        heading: '7ב. יום האירוע: מספרי שולחנות ורישום בכניסה',
+        body: [
+          'מארח שהחבילה שלו כוללת את זה יכול לשלוח לכל אורח את השולחן שלו עם מפה אליו, ולרשום את האורחים בכניסה לאירוע. המידע הזה נאסף עבור המארח, כמו רשימת המוזמנים (סעיף 1).',
+          {
+            list: [
+              'מדריך השולחן: הקישור האישי של אורח פותח את השולחן שלו ואת מפת האולם, אף פעם לא שמות של אורחים אחרים. העמוד נשמר בטלפון של האורח לערב האירוע, כדי שיעבוד גם בלי קליטה. סיבוב המפה עם הטלפון משתמש במצפן של הטלפון בטלפון בלבד: שום דבר על הכיוון או המיקום של הטלפון לא מגיע אלינו.',
+              'שליחת מספר השולחן: כשהמארח שולח מספרי שולחנות מהמספר שלנו בוואטסאפ, נשמרים לכל משפחה המספר שנשלח, מתי, ומצב המסירה של ההודעה, כמו בהזמנות; מספר שהמארח מסמן שמסר בעצמו נשמר באותו אופן. המידע נשמר עם רשימת המוזמנים, עד שהמארח מוחק אותה, את ההזמנה או את החשבון.',
+              'רישום בכניסה: כשמשפחה מגיעה, עמדת הכניסה רושמת איזו משפחה הגיעה, כמה אנשים, מתי, ואת השם שנתנו לעמדה. הצוות פותח את העמדה מקישור שהמארח משתף, בלי חשבון; בעמדה אפשר למצוא את אורחי האירוע לפי שם או טלפון ולראות את השולחן של כל משפחה. קוד הכניסה שבמדריך של האורח (ועל כרטיסי שולחן מודפסים) נגזר מהקישור האישי שלו, ומזהה את המשפחה רק בעמדה של אותו אירוע.',
+              'הושבה מחדש: העברות של משפחות בין שולחנות (מאיפה לאן, מתי, והסיבה שהמארח כתב) נשמרות בהיסטוריה של סידור השולחנות, יחד עם הסידור.',
+              'כמה זמן: רישומי הכניסה נמחקים 30 יום אחרי תאריך האירוע, ורישום שבוטל נמחק אחרי יום.',
+            ],
+          },
         ],
       },
       {

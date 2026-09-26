@@ -8,6 +8,7 @@ import { supportEn } from './support.en';
 import { editorEn } from './editor.en';
 import { seatingEn } from './seating.en';
 import { liveGalleryEn } from './live-gallery.en';
+import { eventDayEn } from './event-day.en';
 
 /** Host-app UI strings, English. Same shape as app.he.ts (checked by the type). */
 export const en: AppDict = {
@@ -21,6 +22,7 @@ export const en: AppDict = {
   editor: editorEn,
   seating: seatingEn,
   liveGallery: liveGalleryEn,
+  eventDay: eventDayEn,
   common: {
     close: 'Close',
     cancel: 'Cancel',

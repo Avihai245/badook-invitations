@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GALLERY } from '../../config';
 import { galleryApi } from '../../client/api';
-import { useLiveRefresh } from '../../client/live';
+import { useLiveRefresh } from '@/lib/live/client';
 import type { ProjectorPageData } from '../../server/pages';
 import { advance, arrive, depart, EMPTY_SHOW, type SlideState } from '../../slideshow';
 import type { FeedItem, GalleryState, RealtimeInfo } from '../../types';

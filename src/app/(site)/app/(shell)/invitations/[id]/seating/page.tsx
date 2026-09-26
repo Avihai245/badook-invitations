@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { seatingDayInfo } from '@/features/event-day/server/pages';
 import { packageFor, planForPackage, whyOff } from '@/features/flags/features';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { hostsLine } from '@/features/invitations/lib/text';
@@ -43,7 +44,7 @@ export default async function SeatingPage({ params }: { params: Params }) {
     const { name, plan } = names('seating');
     return <SeatingOff id={id} reason={why} packageName={name} planName={plan} />;
   }
-  const raw = await seatingDeps.state(id, user.id);
+  const [raw, day] = await Promise.all([seatingDeps.state(id, user.id), seatingDayInfo(user.id, id)]);
   if (!raw) notFound();
   const autoWhy = whyOff('seating_auto', input);
   return (
@@ -53,6 +54,7 @@ export default async function SeatingPage({ params }: { params: Params }) {
       auto={autoWhy === null ? 'on' : autoWhy === 'plan' ? 'plan' : 'off'}
       autoPackage={names('seating_auto')}
       planBase={planBaseUrl()}
+      day={day}
     />
   );
 }

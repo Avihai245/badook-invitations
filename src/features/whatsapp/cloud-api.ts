@@ -60,6 +60,37 @@ const param = (text: string) => ({
 
 export async function sendTemplate(m: TemplateMessage, fetchImpl: typeof fetch = fetch): Promise<SendResult> {
   const env = serverEnv();
+  return postTemplate(
+    {
+      to: m.to,
+      template: env.INVITES_WHATSAPP_TEMPLATE,
+      lang: env.INVITES_WHATSAPP_TEMPLATE_LANG,
+      body: [m.guestName, m.hosts, m.event, m.date],
+      button: m.linkSuffix,
+      ref: m.ref,
+    },
+    fetchImpl,
+  );
+}
+
+/**
+ * Any of the system's approved templates (the invitation's, and the table number's —
+ * features/event-day): its body's positional parameters and the URL button's suffix.
+ */
+export interface TemplateSend {
+  /** E.164 */
+  to: string;
+  template: string;
+  lang: string;
+  body: string[];
+  /** appended to the template's URL button */
+  button: string;
+  /** our message id, echoed back in the status webhooks */
+  ref: string;
+}
+
+export async function postTemplate(m: TemplateSend, fetchImpl: typeof fetch = fetch): Promise<SendResult> {
+  const env = serverEnv();
   const url = `${env.INVITES_WHATSAPP_API_BASE}/${env.INVITES_WHATSAPP_API_VERSION}/${env.INVITES_WHATSAPP_PHONE_NUMBER_ID}/messages`;
   const body = {
     messaging_product: 'whatsapp',
@@ -68,11 +99,11 @@ export async function sendTemplate(m: TemplateMessage, fetchImpl: typeof fetch =
     type: 'template',
     biz_opaque_callback_data: m.ref,
     template: {
-      name: env.INVITES_WHATSAPP_TEMPLATE,
-      language: { code: env.INVITES_WHATSAPP_TEMPLATE_LANG },
+      name: m.template,
+      language: { code: m.lang },
       components: [
-        { type: 'body', parameters: [param(m.guestName), param(m.hosts), param(m.event), param(m.date)] },
-        { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: m.linkSuffix }] },
+        { type: 'body', parameters: m.body.map(param) },
+        { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: m.button }] },
       ],
     },
   };

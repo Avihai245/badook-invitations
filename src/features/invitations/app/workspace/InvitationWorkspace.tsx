@@ -3,6 +3,7 @@
 import {
   Armchair,
   ChevronLeft,
+  DoorOpen,
   ExternalLink,
   Images,
   LayoutDashboard,
@@ -32,16 +33,19 @@ import { publishHref, workspaceTab, type WorkspaceTab } from './paths';
  * invitation's poster, names, date and countdown, whether it's live, and the main action (publish, or
  * open it); then its tabs — the guests tab stands out — and "edit the design", which opens the
  * full-screen editor. `seating`: the seating tab — shown when the event has the feature ('on'), or when
- * only the owner's package keeps it off ('plan': the tab offers the package that has it).
+ * only the owner's package keeps it off ('plan': the tab offers the package that has it); `eventDay`:
+ * the event day's live hall, the same way (feature checkin).
  */
 export function InvitationWorkspace({
   item,
   seating = null,
+  eventDay = null,
   galleryTab = false,
   children,
 }: {
   item: InvitationSummary;
   seating?: 'on' | 'plan' | null;
+  eventDay?: 'on' | 'plan' | null;
   /** the live gallery's tab (when this deployment offers it: features/flags) */
   galleryTab?: boolean;
   children: ReactNode;
@@ -83,6 +87,9 @@ export function InvitationWorkspace({
     },
     ...(seating
       ? [{ key: 'seating' as const, href: `${base}/seating`, icon: Armchair, label: t.seating.tab }]
+      : []),
+    ...(eventDay
+      ? [{ key: 'live' as const, href: `${base}/live`, icon: DoorOpen, label: t.eventDay.tab }]
       : []),
     { key: 'share', href: `${base}/share`, icon: Share2, label: w.tabs.share },
     ...(galleryTab
@@ -146,7 +153,9 @@ export function InvitationWorkspace({
                   <bdi>{name}</bdi>
                 </p>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
-                  <span>
+                  {/* the server's and the browser's Intl may punctuate a long date differently ("Thursday, 17
+                      June" / "Thursday 17 June"): either is right, and it mustn't fail the page's hydration */}
+                  <span suppressHydrationWarning>
                     {date(item.date, {
                       weekday: 'long',
                       day: 'numeric',

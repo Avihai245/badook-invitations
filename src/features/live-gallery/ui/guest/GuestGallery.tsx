@@ -15,7 +15,7 @@ import {
 import { GALLERY } from '../../config';
 import { galleryApi } from '../../client/api';
 import { openStore, type QueueStore } from '../../client/idb';
-import { useLiveRefresh } from '../../client/live';
+import { useLiveRefresh } from '@/lib/live/client';
 import { Uploader, randomToken, type AddResult, type Snapshot } from '../../client/uploader';
 import type { FeedItem, FeedResponse, GalleryState, MineItem, RealtimeInfo } from '../../types';
 import type { GuestPageData } from '../../server/pages';
