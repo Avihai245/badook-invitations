@@ -501,13 +501,20 @@ describe('re-seating live', () => {
 describe('telling guests their table', () => {
   it('needs seating_guide; sends from the system’s number, or records what the host told themselves', async () => {
     const pro = hostWorld({ input: input('free') });
-    expect(await host.noticesState(OWNER, INV, pro.deps)).toMatchObject({
+    expect(await host.noticesState(OWNER, INV, 'https://site', pro.deps)).toMatchObject({
       status: 403,
       body: { feature: 'seating_guide' },
     });
     const w = hostWorld();
-    expect(await host.noticesState(OWNER, INV, w.deps)).toMatchObject({
-      body: { rows: [], ready: true, credits: 10 },
+    expect(await host.noticesState(OWNER, INV, 'https://site', w.deps)).toMatchObject({
+      body: {
+        rows: [],
+        ready: true,
+        credits: 10,
+        slug: 'noa-and-itay',
+        own: { locale: 'he' },
+        base: 'https://site',
+      },
     });
     expect(await host.sendNotices(OWNER, INV, { action: 'send', unitIds: [UNIT] }, w.deps)).toMatchObject({
       status: 200,

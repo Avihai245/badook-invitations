@@ -141,7 +141,6 @@ function StationBody({
       } else if (res.body?.code === 'unknown_code') setNotice({ text: s.unknownCode, tone: 'danger' });
       else fail(res.status);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- openParty only sets state
     [token, s, fail],
   );
 

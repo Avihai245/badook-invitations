@@ -9,6 +9,7 @@ import {
   type FeatureInput,
   type Package,
 } from '@/features/flags/features';
+import { hostsLine } from '@/features/invitations/lib/text';
 import type { ProcessResult } from '@/features/whatsapp/sender';
 import type { RealtimeInfo } from '@/lib/live/types';
 import { EVENT_DAY } from '../config';
@@ -449,18 +450,35 @@ export interface NoticesView {
   priceUsd: number;
 }
 
-/** GET /api/invitations/:id/seating/notices — every family with a seat to tell, and what it was told. */
-export async function noticesState(userId: string, id: string, deps: DayHostDeps): Promise<ApiResult> {
+/**
+ * GET /api/invitations/:id/seating/notices — every family with a seat to tell, and what it was told;
+ * whether the system's number can send; and what a message from the host's own WhatsApp says (the
+ * invitation's language, the hosts, the guides' address).
+ */
+export async function noticesState(
+  userId: string,
+  id: string,
+  base: string,
+  deps: DayHostDeps,
+): Promise<ApiResult> {
   const g = await gate(userId, id, 'seating_guide', deps);
   if ('refused' in g) return g.refused;
-  const state = await deps.db.notices(id, userId);
-  if (!state) return notFound;
-  const account = await deps.notify.account(userId);
+  const [state, owned, account] = await Promise.all([
+    deps.db.notices(id, userId),
+    deps.db.ownerGet(id, userId),
+    deps.notify.account(userId),
+  ]);
+  if (!state || !owned) return notFound;
+  const inv = owned.invitation;
+  const locale = inv.defaultLocale === 'en' ? 'en' : 'he';
   return ok({
     rows: state.rows,
     ready: deps.notify.ready(),
     credits: account.credits,
     unlimited: account.admin,
+    slug: inv.slug,
+    own: { locale, hosts: inv.hosts ? hostsLine(inv.hosts, locale) : '' },
+    base,
   });
 }
 
