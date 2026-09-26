@@ -279,6 +279,7 @@ export function InsightsScreen({ initial }: { initial: InsightsPageData }) {
           <KpiCard
             label={I.kpi.median}
             value={v.medianSeconds === null ? I.kpi.none : duration(v.medianSeconds)}
+            sub={v.medianSeconds === null ? undefined : I.kpi.medianSub}
             icon={<Clock />}
           />
         </div>
