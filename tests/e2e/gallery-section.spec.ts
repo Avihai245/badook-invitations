@@ -250,6 +250,17 @@ test('the gallery link in each guest’s language: counted and previewed by lang
   await page.getByTestId('gallery-send-links').click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByTestId('gallery-notices-rows').locator('li')).toHaveCount(4);
+  // each guest's language on their row (no language of their own: the invitation's)
+  for (const [g, lang] of [
+    [dana!, 'he'],
+    [olga!, 'ru'],
+    [samir!, 'ar'],
+    [abebe!, 'am'],
+  ] as const)
+    await expect(dialog.locator(`[data-notice-row="${g.name}"] [data-notice-language]`)).toHaveAttribute(
+      'data-notice-language',
+      lang,
+    );
 
   // how many go out in each language: Amharic has no Meta template — the invitation's Hebrew
   const languages = dialog.getByTestId('gallery-notices-languages');

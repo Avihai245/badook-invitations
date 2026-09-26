@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Copy, MessageCircle, Send } from 'lucide-react';
+import { Check, Copy, Globe, MessageCircle, Send } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Dialog, Hint, IconButton, Segmented, Skeleton, useToast } from '@/components/app';
 import { isolate } from '@/features/event-day/messages';
@@ -57,6 +57,21 @@ const markable = (r: GalleryNoticeRow) => {
   const s = rowState(r);
   return s === 'unsent' || s === 'failed';
 };
+
+/**
+ * "{language}: 3 messages" with the language's own name kept whole in its direction (<bdi>): a
+ * right-to-left name never pulls the colon and the number into its run in a left-to-right line.
+ */
+function languageLine(text: string, l: Locale) {
+  const [before = '', after = ''] = text.split('{language}');
+  return (
+    <>
+      {before}
+      <bdi lang={l}>{nativeName(l)}</bdi>
+      {after}
+    </>
+  );
+}
 
 /**
  * The guests by the language the system's message is written in (the sender's choice: their own
@@ -361,6 +376,8 @@ export function SendLinkDialog({
           >
             {shown.map((r) => {
               const note = reachNote(r);
+              // the language their messages are written in (an invitation in several languages)
+              const language = data.own.locales.length > 1 ? languageOf(r) : null;
               return (
                 <li
                   key={r.guestId}
@@ -377,6 +394,15 @@ export function SendLinkDialog({
                     </p>
                     <p className="mt-1 flex flex-wrap items-center gap-2">
                       {badge(r)}
+                      {language ? (
+                        <span
+                          className="inline-flex items-center gap-1 text-[11.5px] text-muted"
+                          data-notice-language={language}
+                        >
+                          <Globe aria-hidden className="size-3" />
+                          <span lang={language}>{nativeName(language)}</span>
+                        </span>
+                      ) : null}
                       {note ? <span className="text-[11.5px] text-muted">{note}</span> : null}
                     </p>
                   </div>
@@ -420,11 +446,7 @@ export function SendLinkDialog({
                 <ul className="flex flex-col gap-0.5 text-[12.5px]" data-testid="gallery-notices-languages">
                   {groups.map(([l, list]) => (
                     <li key={l}>
-                      ·{' '}
-                      {plural(N.byLanguage, list.length, {
-                        n: number(list.length),
-                        language: nativeName(l),
-                      })}
+                      · {languageLine(plural(N.byLanguage, list.length, { n: number(list.length) }), l)}
                     </li>
                   ))}
                   {fallbacks.map(({ wanted, got }) => (

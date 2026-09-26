@@ -47,6 +47,21 @@ function planFor(base: readonly GuestRecord[], resend: boolean): Plan {
 }
 
 /**
+ * "{language}: 3 messages" with the language's own name kept whole in its direction (<bdi>): a
+ * right-to-left name never pulls the colon and the number into its run in a left-to-right line.
+ */
+function languageLine(text: string, l: Locale) {
+  const [before = '', after = ''] = text.split('{language}');
+  return (
+    <>
+      {before}
+      <bdi lang={l}>{nativeName(l)}</bdi>
+      {after}
+    </>
+  );
+}
+
+/**
  * The recipients by the language their message is written in (the sender's choice: the guest's own
  * language when the template is approved in it, else the invitation's — features/whatsapp/languages),
  * in the order the template's languages are configured; and the languages guests wanted but get
@@ -357,11 +372,7 @@ export function WhatsAppDialog({
               >
                 {groups.map(([l, list]) => (
                   <li key={l}>
-                    ·{' '}
-                    {plural(w.byLanguage, list.length, {
-                      n: number(list.length),
-                      language: nativeName(l),
-                    })}
+                    · {languageLine(plural(w.byLanguage, list.length, { n: number(list.length) }), l)}
                   </li>
                 ))}
                 {fallbacks.map(({ wanted, got }) => (
