@@ -190,6 +190,7 @@ export const seatingHe = {
     atTable: 'שולחן {number}',
     seat: 'הושבה',
     seatHint: 'בחירת שולחן עם מספיק מקומות',
+    move: 'העברה לשולחן אחר',
     drag: 'גררו אל שולחן במפה',
     dragAria: 'גרירת {name} אל שולחן',
     more: 'אפשרויות ל{name}',
@@ -346,6 +347,9 @@ export const seatingHe = {
     upgradeCta: 'לחבילות',
     later: 'לא עכשיו',
   },
+  /** the packages and plans an upgrade prompt names (docs/features.md) */
+  packages: { basic: 'Basic', premium: 'Premium', vip: 'VIP' },
+  plans: { free: 'חינם', pro: 'Pro', business: 'Business' },
   off: {
     title: 'סידור השולחנות כבוי בהזמנה הזו',
     body: 'הפעילו אותו כדי לסדר את האורחים בשולחנות, להדפיס מפה ולייצא ל־Excel.',

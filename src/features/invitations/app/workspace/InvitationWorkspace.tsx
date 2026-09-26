@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Armchair,
   ChevronLeft,
   ExternalLink,
   LayoutDashboard,
@@ -29,9 +30,18 @@ import { publishHref, workspaceTab, type WorkspaceTab } from './paths';
  * An invitation's workspace (its overview, guests & WhatsApp, RSVPs and sharing): a header with the
  * invitation's poster, names, date and countdown, whether it's live, and the main action (publish, or
  * open it); then its tabs — the guests tab stands out — and "edit the design", which opens the
- * full-screen editor.
+ * full-screen editor. `seating`: the seating tab — shown when the event has the feature ('on'), or when
+ * only the owner's package keeps it off ('plan': the tab offers the package that has it).
  */
-export function InvitationWorkspace({ item, children }: { item: InvitationSummary; children: ReactNode }) {
+export function InvitationWorkspace({
+  item,
+  seating = null,
+  children,
+}: {
+  item: InvitationSummary;
+  seating?: 'on' | 'plan' | null;
+  children: ReactNode;
+}) {
   const { t, locale, date, plural, number } = useUi();
   const w = t.workspace;
   const current = workspaceTab(usePathname(), item.id);
@@ -67,6 +77,9 @@ export function InvitationWorkspace({ item, children }: { item: InvitationSummar
         ? plural(w.responsesCount, item.responses, { n: number(item.responses) })
         : undefined,
     },
+    ...(seating
+      ? [{ key: 'seating' as const, href: `${base}/seating`, icon: Armchair, label: t.seating.tab }]
+      : []),
     { key: 'share', href: `${base}/share`, icon: Share2, label: w.tabs.share },
     { key: 'edit', href: `${base}/edit`, icon: PenLine, label: w.tabs.edit },
   ];

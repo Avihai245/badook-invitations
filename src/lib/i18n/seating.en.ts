@@ -195,6 +195,7 @@ export const seatingEn: SeatingDict = {
     atTable: 'Table {number}',
     seat: 'Seat',
     seatHint: 'Pick a table with enough seats',
+    move: 'Move to another table',
     drag: 'Drag onto a table on the map',
     dragAria: 'Drag {name} onto a table',
     more: 'Options for {name}',
@@ -352,6 +353,8 @@ export const seatingEn: SeatingDict = {
     upgradeCta: 'See the packages',
     later: 'Not now',
   },
+  packages: { basic: 'Basic', premium: 'Premium', vip: 'VIP' },
+  plans: { free: 'Free', pro: 'Pro', business: 'Business' },
   off: {
     title: 'Seating is switched off for this invitation',
     body: 'Switch it on to seat your guests at tables, print a map and export to Excel.',
