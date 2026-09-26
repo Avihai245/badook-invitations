@@ -75,6 +75,7 @@ describe('seed', () => {
 
 describe('anonymous', () => {
   it('reads active templates only', async () => {
+    const all = (await c.query('select count(*)::int as n from invitation_templates')).rows[0].n as number;
     await c.query(`update invitation_templates set is_active = false where id = 'atara'`);
     const n = await as(
       c,
@@ -83,7 +84,7 @@ describe('anonymous', () => {
       async () => (await c.query('select id from invitation_templates')).rowCount,
     );
     await c.query(`update invitation_templates set is_active = true where id = 'atara'`);
-    expect(n).toBe(27);
+    expect(n).toBe(all - 1);
   });
 
   it('cannot read invitations, versions, responses or attendees', async () => {
