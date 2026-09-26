@@ -37,7 +37,8 @@ const LONG_NAMES: { primary: L10n; secondary: L10n } = {
 export function lengthen(text: string, factor: number, cap?: number): string {
   const length = cappedLength(text);
   const target = Math.min(Math.ceil(length * factor), cap ?? Infinity);
-  const words = text.split(/\s+/).filter(Boolean);
+  // placeholders ("{primary}") are not repeated: one cut short by the cap would show its braces
+  const words = text.split(/\s+/).filter((w) => w && !/[{}]/.test(w));
   if (!words.length || length >= target) return text;
   let out = text;
   for (let i = 0; cappedLength(out) < target; i++) out += ` ${words[i % words.length]}`;
