@@ -317,7 +317,10 @@ function ChangeList({ changes, uiLocale }: { changes: DocChange[]; uiLocale: 'he
   return (
     <ul className="flex list-disc flex-col gap-1 ps-5 text-[12.5px] leading-relaxed">
       {lines.slice(0, SHOWN_CHANGES).map((line, i) => (
-        <li key={i}>{line}</li>
+        // the phrases are written to follow "restoring would…": each line starts with a capital
+        <li key={i} className="first-letter:uppercase">
+          {line}
+        </li>
       ))}
       {rest > 0 ? <li className="list-none text-muted">{plural(c.more, rest)}</li> : null}
     </ul>
