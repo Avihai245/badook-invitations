@@ -33,18 +33,19 @@ export async function updateProfile(userId: string, raw: unknown): Promise<ApiRe
     : fail(404, 'not_found');
 }
 
-const MEDIA_BUCKET = 'invitation-media';
+/** The buckets a host uploads to, each under <user>/<invitation>/<file>: media and floor plans. */
+const USER_BUCKETS = ['invitation-media', 'venue-plans'];
 
-/** Every file under a folder of the media bucket (uploads live at <user>/<invitation>/<file>). */
-async function removeFolder(prefix: string, depth = 0): Promise<number> {
-  const bucket = serviceDb().storage.from(MEDIA_BUCKET);
+/** Every file under a folder of one of the host's buckets. */
+async function removeFolder(bucketId: string, prefix: string, depth = 0): Promise<number> {
+  const bucket = serviceDb().storage.from(bucketId);
   let removed = 0;
   for (;;) {
     const { data, error } = await bucket.list(prefix, { limit: 1000 });
     if (error || !data?.length) return removed;
     const files = data.filter((e) => e.id !== null).map((e) => `${prefix}/${e.name}`);
     const folders = data.filter((e) => e.id === null).map((e) => `${prefix}/${e.name}`);
-    if (depth < 3) for (const folder of folders) removed += await removeFolder(folder, depth + 1);
+    if (depth < 3) for (const folder of folders) removed += await removeFolder(bucketId, folder, depth + 1);
     if (!files.length) return removed;
     const { error: removeError } = await bucket.remove(files);
     if (removeError) throw new Error(`storage remove: ${removeError.message}`);
@@ -80,7 +81,7 @@ export async function deleteAccount(user: Pick<User, 'id' | 'email'>, raw: unkno
       });
   }
   const invitations = (await hostDb.list(user.id)) ?? [];
-  await removeFolder(user.id);
+  for (const bucketId of USER_BUCKETS) await removeFolder(bucketId, user.id);
   const { error } = await serviceDb().auth.admin.deleteUser(user.id);
   if (error) throw new Error(`delete user: ${error.message}`);
   for (const inv of invitations) {
