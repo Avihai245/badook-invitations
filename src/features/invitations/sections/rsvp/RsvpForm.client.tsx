@@ -3,6 +3,9 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useGuest } from '../../renderer/guest.client';
 import type { DietaryKey, Locale, RsvpResult, RsvpSubmission } from '../../contracts/types';
+import { burstFrom } from '../../renderer/fx/burst';
+import { motionAllowed } from '../../renderer/fx/motion';
+import type { BurstKind } from '../../renderer/fx/theme';
 import { t } from '../../i18n/dictionary';
 import { Icon } from '../../ui/Icon';
 import { CalendarMenu, type CalendarLinks } from '../venues/CalendarMenu.client';
@@ -41,6 +44,8 @@ export interface RsvpFormConfig {
   } | null;
   /** 'simulate' in the kitchen sink (P0); 'api' posts to /api/invitations/rsvp (P1). */
   submitMode: 'simulate' | 'api';
+  /** a "yes" bursts in the template's particles (renderer/fx) — none when absent */
+  celebrate?: { kind: BurstKind; colors: string[] } | null;
 }
 
 interface Adult {
@@ -174,6 +179,9 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
   const [focusFirstError, setFocusFirstError] = useState(0);
   const [closed, setClosed] = useState(false);
   const [reply, setReply] = useState<StoredReply | null>(null);
+  /** the "thank you" of a reply sent just now (celebrated) — not one shown again after a language switch */
+  const [fresh, setFresh] = useState(false);
+  const badge = useRef<HTMLSpanElement>(null);
   const hpRef = useRef<HTMLInputElement>(null);
   // a personal link (?g=): the guest's name and phone fill whatever is still empty
   const guest = useGuest();
@@ -216,6 +224,24 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       demo,
     });
   }, [config.slug, attending, adults, children, answers, message, decline, status, demo]);
+
+  // A reply just sent: the (much shorter) "thank you" replaces the form — bring it into view, then a
+  // "yes" bursts in the template's particles from the badge as its ring closes.
+  const celebrateKind = config.celebrate?.kind;
+  const celebrateColors = config.celebrate?.colors.join(',') ?? '';
+  useEffect(() => {
+    if (status !== 'sent' || !fresh) return;
+    const el = badge.current?.parentElement;
+    const r = el?.getBoundingClientRect();
+    if (el && r && (r.top < 0 || r.bottom > window.innerHeight))
+      el.scrollIntoView?.({ block: 'center', behavior: motionAllowed() ? 'smooth' : 'auto' });
+    if (!attending || !celebrateKind || !celebrateColors) return;
+    const id = window.setTimeout(
+      () => burstFrom(badge.current, celebrateKind, celebrateColors.split(','), { x: 0.5, y: 0.5 }),
+      480,
+    );
+    return () => window.clearTimeout(id);
+  }, [status, fresh, attending, celebrateKind, celebrateColors]);
 
   /** "You already replied — edit": refill the form from the stored answers; the next send replaces the reply. */
   const editStoredReply = () => {
@@ -394,6 +420,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     setStatus('sending');
     if (config.submitMode === 'simulate') {
       await new Promise((r) => setTimeout(r, 700));
+      setFresh(true);
       setStatus('sent');
       return;
     }
@@ -416,6 +443,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       // a sample invitation keeps nothing: neither does the browser
       if ('demo' in result && result.demo) {
         setDemo(true);
+        setFresh(true);
         setStatus('sent');
         return;
       }
@@ -426,6 +454,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       const stored = { responseId: result.responseId, editToken: result.editToken, draft };
       writeReply(replyKey, stored);
       setReply(stored);
+      setFresh(true);
       setStatus('sent');
       return;
     }
@@ -446,21 +475,25 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
 
   if (status === 'sent') {
     return (
-      <div className="success" role="status" aria-live="polite">
-        <svg
-          width="64"
-          height="64"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="10" opacity=".25" />
-          <path className="draw" d="m7.5 12.5 3 3 6-6.5" />
-        </svg>
+      <div className="success" role="status" aria-live="polite" data-fresh={fresh ? '' : undefined}>
+        <span className="success-badge" ref={badge}>
+          <svg
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" fill="currentColor" stroke="none" opacity=".07" />
+            <circle cx="12" cy="12" r="10" opacity=".25" />
+            <circle className="ring" cx="12" cy="12" r="10" pathLength={1} transform="rotate(-90 12 12)" />
+            <path className="draw" d="m7.5 12.5 3 3 6-6.5" />
+          </svg>
+        </span>
         <h3>{attending ? config.successMessage : config.declineMessage}</h3>
         {demo ? (
           <p className="demo-note" style={NOTE_STYLE}>
@@ -476,7 +509,14 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
             />
           </div>
         ) : null}
-        <button className="linkbtn" type="button" onClick={() => setStatus('idle')}>
+        <button
+          className="linkbtn"
+          type="button"
+          onClick={() => {
+            setFresh(false);
+            setStatus('idle');
+          }}
+        >
           {t(L, 'rsvp.editResponse')}
         </button>
       </div>
@@ -553,7 +593,12 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       >
         <Icon name="minus" size={18} />
       </button>
-      <output aria-live="polite">{value}</output>
+      <output aria-live="polite">
+        {/* a new number bumps in (invitation.css) — the live region itself stays */}
+        <span className="bump" key={value}>
+          {value}
+        </span>
+      </output>
       <button
         type="button"
         onClick={() => step(kind, 1)}

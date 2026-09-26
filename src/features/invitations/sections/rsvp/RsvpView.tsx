@@ -2,6 +2,7 @@ import type { SectionOf } from '../../contracts/types';
 import { endOfDayUtc } from '../../lib/dates';
 import { Decoration, SecHead, editPath, iv, type SectionViewProps } from '../shared';
 import { calendarLabels, calendarLinks, firstVenue } from '../../renderer/calendar-event';
+import { fxTheme } from '../../renderer/fx/theme';
 import { RsvpForm, type RsvpFormConfig } from './RsvpForm.client';
 
 export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) {
@@ -51,6 +52,10 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
       links: calendarLinks(ctx, firstVenue(ctx)),
     },
     submitMode: ctx.mode === 'live' && ctx.icsViaRoute ? 'api' : 'simulate',
+    celebrate: (() => {
+      const fx = fxTheme(ctx.template, doc);
+      return fx.burst ? { kind: fx.burst, colors: fx.burstColors } : null;
+    })(),
   };
 
   return (

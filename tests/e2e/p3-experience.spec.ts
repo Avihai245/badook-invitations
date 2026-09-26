@@ -164,6 +164,88 @@ test.describe('the opening', () => {
   });
 });
 
+test.describe('motion', () => {
+  test('the opening bursts in the template’s particles and the hero gets its ambient layer — decorative, capped, click-through, paused off screen', async ({
+    page,
+  }) => {
+    const errors = collectErrors(page);
+    await open(page, SINK);
+    await page.locator('.cover-tap').click();
+    // the burst: a canvas over everything that nobody can click or hear, gone once the particles land
+    const canvas = page.locator('canvas.fx-burst');
+    await expect(canvas).toBeAttached({ timeout: 3000 });
+    await expect(canvas).toHaveAttribute('aria-hidden', 'true');
+    await expect(canvas).toHaveCSS('pointer-events', 'none');
+    await expect(page.locator('.cover')).toHaveCount(0, { timeout: 8000 });
+    // the hero's particles (sahar-bordeaux: petals), at most 24 on a phone
+    const ambient = page.locator('.hero .fx-amb');
+    await expect(ambient).toHaveAttribute('data-kind', 'petals', { timeout: 5000 });
+    await expect(ambient).toHaveAttribute('aria-hidden', 'true');
+    await expect(ambient).toHaveCSS('pointer-events', 'none');
+    const count = await ambient.locator(':scope > i:not(.fx-shoot)').count();
+    expect(count).toBeGreaterThan(0);
+    expect(count).toBeLessThanOrEqual(24);
+    await expect(canvas).toHaveCount(0, { timeout: 10_000 });
+    // the names got their glint copy, hidden from assistive technology
+    await expect(page.locator('.names .n-shine').first()).toHaveAttribute('aria-hidden', 'true');
+    // scrolled away, the particles rest
+    await page.locator('#rsvp').scrollIntoViewIfNeeded();
+    await expect(ambient).toHaveAttribute('data-paused', '');
+    expect(errors).toEqual([]);
+  });
+
+  test('reduced motion: every element in its final state at once, no particles', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page, `${SINK}?open=1`);
+    const opacity = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((el) => getComputedStyle(el).opacity);
+    for (const selector of ['.hero-lead', '.names .n', '.hero .rule', '.hero-date']) {
+      expect(await opacity(selector), selector).toBe('1');
+    }
+    // a section far below the hero shows without being scrolled to
+    expect(await opacity('#rsvp .sec-title')).toBe('1');
+    expect(
+      await page
+        .locator('.divider')
+        .first()
+        .evaluate((el) => getComputedStyle(el).transform),
+    ).toBe('none');
+    await page.waitForTimeout(2500);
+    await expect(page.locator('.fx-amb, canvas.fx-burst, .n-shine')).toHaveCount(0);
+  });
+
+  test('the countdown’s digits roll as they change', async ({ page }) => {
+    await open(page, `${SINK}?open=1`);
+    const countdown = page.locator('.cd');
+    await countdown.scrollIntoViewIfNeeded();
+    // the seconds tick: the new digit rolls in while the one leaving (hidden from assistive technology)
+    // rolls out, then goes
+    await expect(countdown.locator('.cd-dv.new').first()).toBeAttached({ timeout: 4000 });
+    const leaving = countdown.locator('.cd-dv.out');
+    await expect(leaving.first()).toBeAttached({ timeout: 4000 });
+    expect(
+      await leaving.evaluateAll((els) => els.every((el) => el.getAttribute('aria-hidden') === 'true')),
+    ).toBe(true);
+  });
+
+  test('a “yes” celebrates: the badge, then a burst in the template’s particles', async ({ page }) => {
+    await open(page, `${SINK}?open=1`);
+    const form = page.locator('.form');
+    await form.scrollIntoViewIfNeeded();
+    await form.locator('.opt').first().click();
+    await form.locator('[id$="-a0.firstName"]').fill('דנה');
+    await form.locator('[id$="-a0.lastName"]').fill('לוי');
+    await form.locator('[id$="-a0.phone"]').fill('050-123-4567');
+    await form.locator('button.btn-primary').click();
+    await expect(page.locator('.success[data-fresh][role="status"]')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('canvas.fx-burst')).toBeAttached({ timeout: 3000 });
+    await expect(page.locator('canvas.fx-burst')).toHaveCount(0, { timeout: 10_000 });
+  });
+});
+
 test.describe('hero video', () => {
   test('an uploaded video autoplays muted (the attribute too, for iOS), over its still', async ({ page }) => {
     await open(page, `${SINK}?open=1&hero=video`);

@@ -195,7 +195,8 @@
     "preset": "soft",
     "revealDistance": 40,
     "revealBlur": true,
-    "stagger": 0.08
+    "stagger": 0.08,
+    "ambient": "fireflies"
   },
   "assets": {
     "hero": "/templates/midnight-bloom/hero.mp4",

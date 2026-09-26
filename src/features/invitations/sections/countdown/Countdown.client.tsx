@@ -7,6 +7,38 @@ import { countdownParts, countdownPhase } from '../../lib/countdown';
 
 const UNITS = ['days', 'hours', 'minutes', 'seconds'] as const;
 
+/**
+ * One digit that rolls when it changes (invitation.css `.cd-d`): the old one drops out while the new
+ * one comes down into place. The first render — the server's, and hydration's — is the plain digit.
+ */
+function Digit({ ch }: { ch: string }) {
+  const [roll, setRoll] = useState<{ cur: string; old: string | null; n: number }>({
+    cur: ch,
+    old: null,
+    n: 0,
+  });
+  // a new digit: remember the one leaving (state derived during render — no extra paint)
+  if (roll.cur !== ch) setRoll({ cur: ch, old: roll.cur, n: roll.n + 1 });
+  return (
+    <span className="cd-d">
+      {roll.old !== null ? (
+        <span
+          className="cd-dv out"
+          key={`o${roll.n}`}
+          aria-hidden="true"
+          // gone once it has rolled out (with reduced motion it is never shown)
+          onAnimationEnd={() => setRoll((r) => (r.n === roll.n ? { ...r, old: null } : r))}
+        >
+          {roll.old}
+        </span>
+      ) : null}
+      <span className={roll.n ? 'cd-dv new' : 'cd-dv'} key={`n${roll.n}`} suppressHydrationWarning>
+        {roll.cur}
+      </span>
+    </span>
+  );
+}
+
 /** Ticks every second; after the target shows the `afterEvent` text (the server hides it after +24h). */
 export function Countdown({
   targetMs,
@@ -36,16 +68,22 @@ export function Countdown({
   const parts = countdownParts(targetMs, now);
   return (
     <div className="cd reveal" style={{ '--i': 2 } as CSSProperties} role="timer" aria-live="off">
-      {UNITS.map((u) => (
-        <div className="cd-cell" key={u}>
-          <div className="cd-num" suppressHydrationWarning>
-            {String(parts[u]).padStart(2, '0')}
+      {UNITS.map((u) => {
+        const digits = String(parts[u]).padStart(2, '0');
+        return (
+          <div className="cd-cell" key={u}>
+            {/* a 3-digit day count keeps its own digits: keyed by place from the right */}
+            <div className="cd-num" suppressHydrationWarning>
+              {[...digits].map((ch, i) => (
+                <Digit key={digits.length - i} ch={ch} />
+              ))}
+            </div>
+            <div className="cd-lbl" suppressHydrationWarning>
+              {t(locale, `countdown.${u}`, { n: parts[u] })}
+            </div>
           </div>
-          <div className="cd-lbl" suppressHydrationWarning>
-            {t(locale, `countdown.${u}`, { n: parts[u] })}
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

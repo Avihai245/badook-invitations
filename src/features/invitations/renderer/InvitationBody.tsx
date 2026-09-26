@@ -4,6 +4,7 @@ import type { RenderContext } from './context-core';
 import { CoverOverlay } from './cover/CoverOverlay.client';
 import { FitNames } from './FitNames.client';
 import { FloatingControls, type MusicProps } from './FloatingControls.client';
+import { fxTheme } from './fx/theme';
 import { InvitationSections } from './InvitationSections';
 import { GuestLink } from './guest.client';
 import { LiveLocale } from './live/LiveLocale.client';
@@ -67,6 +68,7 @@ export function InvitationBody({
 }) {
   const { doc, template } = ctx;
   const coverOn = showCover && doc.cover.enabled && ctx.mode === 'live';
+  const fx = fxTheme(template, doc);
   const nextLocale = doc.locales[(doc.locales.indexOf(ctx.locale) + 1) % doc.locales.length] as Locale;
   // the host's "video sound" option: the hero video's own sound instead of the track (HeroMedia)
   const hero = doc.sections.find((s) => s.type === 'hero');
@@ -117,6 +119,7 @@ export function InvitationBody({
               card={
                 ctx.art.scene ? <Scene id={ctx.art.scene} place="card" date={doc.event.date} /> : undefined
               }
+              fx={{ burst: fx.burst, colors: fx.burstColors }}
             />
           </>
         ) : (

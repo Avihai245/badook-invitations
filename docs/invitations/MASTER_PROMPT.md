@@ -90,7 +90,7 @@ A single mobile-first vertical page (content max-width 560px, centered on deskto
 Global: every section reveals once when 20% in view (`y 40→0`, `opacity 0→1`, 800ms, ease `[0.22,1,0.36,1]`, children stagger 80ms). Floating **music toggle** (`inset-inline-end`, bottom) after the cover opens; pause on `visibilitychange` hidden. **Locale switcher** pill (top, `inset-inline-end`) when `locales.length > 1`: swaps texts and `dir` instantly without reload, keeps scroll position, syncs `?lang=`.
 
 ### 2.3 Look & feel in one paragraph
-Stationery-grade, calm and romantic: paper textures, generous white space, one centered column, script display type for names and titles, serif body, thin 1px lines, soft tinted badges, no heavy shadows, no gradients on UI chrome, motion that is slow and gentle (800–900ms eases, nothing bouncy). The host app is the opposite: neutral, fast, dense-but-airy SaaS UI (stone neutrals, black primary buttons, 8–12px radii), so the invitation is always the colorful thing on screen. Exact specs: §9A (invitation) and §9B (app).
+Stationery-grade, calm and romantic: paper textures, generous white space, one centered column, script display type for names and titles, serif body, thin 1px lines, soft tinted badges, no heavy shadows, no gradients on UI chrome, motion that is cinematic yet gentle (800–1300ms eases, soft springs with a few percent of overshoot where things land, themed particles — §9A.6). The host app is the opposite: neutral, fast, dense-but-airy SaaS UI (stone neutrals, black primary buttons, 8–12px radii), so the invitation is always the colorful thing on screen. Exact specs: §9A (invitation) and §9B (app).
 
 ### 2.4 Why this matters vs the reference
 The reference product is done-for-you (designers hand-build each invitation in a site builder, ~AUD 395–995). Our differentiator is **self-serve editing with guaranteed design quality**, plus Israeli-market features: Hebrew date (gematria), kosher/mehadrin dietary, shuttles, Waze, Bit/PayBox gifts, parents' names, WhatsApp-first sharing.
@@ -264,7 +264,13 @@ export interface TemplateManifest {
     textColor: string; overlayColor: string; defaultOverlay: number;
   };
   music: { defaultTrackId: string | null; tracks: { id: string; title: string; url: string; license: string }[] };
-  motion: { preset: 'soft' | 'none'; revealDistance: number; revealBlur: boolean; stagger: number };
+  motion: {
+    preset: 'soft' | 'none'; revealDistance: number; revealBlur: boolean; stagger: number;
+    // optional: the hero's ambient particles — the cover's opening burst and the RSVP celebration follow
+    // it. Without it the renderer picks one by template id (renderer/fx/theme.ts FX_BY_TEMPLATE), else by
+    // the first event type. preset 'none' turns all of them off.
+    ambient?: 'none' | 'petals' | 'leaves' | 'confetti' | 'sparkles' | 'stars' | 'bubbles' | 'balloons' | 'hearts' | 'fireflies' | 'embers' | 'notes' | 'pixels';
+  };
   assets: Record<string, string>;               // referenced as 'template:<key>'
   decorations: Partial<Record<'afterHero' | 'betweenVenues' | 'afterTimeline' | 'beforeRsvp' | 'footer', AssetRef | null>>;
   sectionDefaults: { order: Section['type'][]; variants: Partial<Record<Section['type'], string>> };
@@ -555,7 +561,7 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
   - Person card: page bg, 1px `line`, radius 12, padding 16; header 14px/700 + "Primary contact" tag (`accent-12` bg, `accent` text).
   - Fields: label 13px `inkMuted` (+ danger `*` when required); input 48px, radius 10, white on light templates / `bg` on dark, 1px `line`; focus = `accent` border + 3px `accent-12` ring; error = danger border + 12px message; first/last name side by side (stacked below 360px).
   - Dietary chips: pill, min-height 34px, 1px `line`, 14px; checked = `accent` bg + `accentInk` + check icon; dietary note = `surface` bg, 3px `accent` border at inline-start, 13px muted. Selecting an allergy reveals a required notes field.
-  - Submit: primary button with send icon; "Sending…" state; success view = 64px circle-check drawn with stroke-dash animation (600ms), message in the display font, then "Add to calendar" and "Edit my response".
+  - Submit: primary button with send icon; "Sending…" state; success view = 64px circle-check drawn with stroke-dash animation (ring then check), message in the display font, then "Add to calendar" and "Edit my response" (§9A.6: a reply just sent is brought into view and celebrated).
 - **Footer:** 72px thin rings illustration (or the template's `footer` decoration), names in display 48px × scale (HE 40px), date, parents (ui 14px muted), closing line (heading 19px, EN italic), credit (ui 12px muted).
 - **Cover:** hint ui 15px (EN uppercase 12px, .14em) in `#7C6A60` on light covers / `rgba(255,255,255,.8)` on dark; overlay size from `overlay.size` (reference: `clamp(92px, 26vw, 120px)`).
 
@@ -572,16 +578,19 @@ Host dashboard (`/responses`): KPI cards (responses, attending adults, attending
 ### 9A.6 Motion summary
 | What | Spec |
 |---|---|
-| Cover idle | hint fades in after 1.2s · overlay pulse scale 1→1.04, 2.4s loop |
-| Cover open | overlay exit in `holdMs` (crack 450ms / lift 400ms / fade 250ms) → video → crossfade 600ms (CSS fallback: flap 700ms, card 600ms, fade 700ms) |
-| Hero text | stagger 0/150/300/450/550ms, 900ms, from `opacity 0, blur(10px), y 16px` |
-| Section reveal | once at 20% visible, 800ms, `y 40px`, `blur(6px)`, children +80ms each, ease `cubic-bezier(.22,1,.36,1)` |
+| Cover idle | hint fades in after 1.2s · overlay pulse scale 1→1.04, 2.4s loop · the envelope / ticket floats ±4px, 6s |
+| Cover open | overlay exit in `holdMs` (crack 450ms / lift 400ms / fade 250ms) with a flash of light and a spray of sparks → video → crossfade 600ms with the template's burst (CSS fallback: flap 700ms with a glow from inside, card rises 750ms and the template's burst comes out of it at 1.25s, then the card lifts toward the guest and dissolves while the envelope falls away, fade 800ms; ticket: the stub tears off at the perforation with the burst, the ticket lifts away) |
+| Particles (`renderer/fx`) | burst: a canvas that exists ≈ 3s, ≤ 24 particles on a phone (40 elsewhere), petals / confetti / sparkles / stars / bubbles / balloons / hearts / fireflies / embers / notes / pixels in the palette's colors · hero ambient: CSS (transform/opacity), ≤ 24 on a phone, after the cover opens, paused off screen and in a hidden tab, none with Save-Data |
+| Hero text | lead 0 → names one by one (140/420/560ms, 1.35s, from `opacity 0, blur(12px), y .3em, scale .96`) with a gold-foil glint sweeping each name once (in the reading direction) → rule draws (780ms) and a spark runs along it → date 900ms → place 1.02s · the scene / photo / video settles from scale 1.12 over 2.8s · where scroll-driven animations exist, the media drifts slower than the page and the text lifts away |
+| Section reveal | once at 20% visible, `y 40px`, `blur(6px)`, children +80ms each; opacity 800ms ease `cubic-bezier(.22,1,.36,1)`, transform 1.05s on a gentle spring (`linear()`, ~4.5% overshoot) · cards and the map lift in tilted back, the map's pin drops · a block's children cascade (countdown cells flip down, buttons, FAQ, gallery) · dividers draw from the centre with a spark · the timeline's line draws and its dots pop |
+| Countdown | a digit that changes rolls (out 550ms, in 700ms) |
 | Clouds / hero loop | video only (CSS placeholder drifts 34–52s) |
 | Accordion / chevron | 250ms |
 | Flip card | 600ms `rotateY` |
-| RSVP success | check drawn in 600ms |
+| RSVP success | the badge pops, its ring and check draw, two ripples, then the message rises; a "yes" bursts in the template's particles |
+| Buttons | press in (scale .95, 80ms) and spring back; the fabs pop in after the cover opens |
 | Floating controls | fade + rise 8px, 500ms |
-| Reduced motion | everything above becomes instant; the cover uses a 300ms fade |
+| Reduced motion | everything above becomes instant — no particles, no glint, no parallax; the cover uses a 300ms fade |
 
 ### 9A.7 Desktop (≥ 1024px)
 Same single column (560px), full-bleed hero using `mediaDesktop` (or the 9:16 media over a blurred copy), horizontal timeline, 16:9 map, same floating controls. No sidebars, no multi-column layouts: the invitation must feel like the phone experience, just wider.
