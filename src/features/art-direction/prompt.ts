@@ -57,6 +57,9 @@ export function briefText(input: ConceptInput): string {
     hostLanguage: LANGUAGE_NAME[input.uiLocale],
     mood: input.mood || null,
     ...(input.current ? { currentDesign: input.current } : {}),
+    ...(input.avoid?.length
+      ? { alreadyShown: input.avoid, note2: 'Suggest other templates and font pairs than alreadyShown.' }
+      : {}),
     templates,
     fontLibrary: libraryBrief(),
     openings: {

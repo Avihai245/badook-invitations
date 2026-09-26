@@ -38,7 +38,7 @@ type UploadTicket =
   { ok: true; url: string; ref: AssetRef; kind: UploadKind } | { ok: false; code: string; max?: number };
 
 /** PUT to the signed upload URL with progress events (fetch has none). */
-function put(url: string, file: File, onProgress?: (percent: number) => void): Promise<void> {
+function put(url: string, file: Blob, onProgress?: (percent: number) => void): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', url);
@@ -64,23 +64,30 @@ function put(url: string, file: File, onProgress?: (percent: number) => void): P
  * §4 uploads: the API checks type/size and returns a signed URL for `<user>/<invitation>/<uuid>.<ext>`
  * in the invitation-media bucket; the browser sends the file straight to storage.
  */
+export async function uploadFile(
+  invitationId: string,
+  file: Blob,
+  onProgress?: (percent: number) => void,
+): Promise<{ ref: AssetRef; kind: UploadKind }> {
+  const res = await hostApi<UploadTicket>(`/api/invitations/${invitationId}/uploads`, {
+    method: 'POST',
+    body: { contentType: file.type, size: file.size },
+  });
+  const body = res.body;
+  if (!res.ok || !body?.ok)
+    throw new UploadError(
+      res.status === 413 ? 'too_large' : res.status === 415 ? 'unsupported_type' : 'failed',
+      body && !body.ok ? body.max : undefined,
+    );
+  await put(body.url, file, onProgress);
+  return { ref: body.ref, kind: body.kind };
+}
+
+/** uploadFile for the invitation being edited. */
 export function useUpload() {
   const { meta } = useEditor();
   return useCallback(
-    async (file: File, onProgress?: (percent: number) => void) => {
-      const res = await hostApi<UploadTicket>(`/api/invitations/${meta.id}/uploads`, {
-        method: 'POST',
-        body: { contentType: file.type, size: file.size },
-      });
-      const body = res.body;
-      if (!res.ok || !body?.ok)
-        throw new UploadError(
-          res.status === 413 ? 'too_large' : res.status === 415 ? 'unsupported_type' : 'failed',
-          body && !body.ok ? body.max : undefined,
-        );
-      await put(body.url, file, onProgress);
-      return { ref: body.ref, kind: body.kind };
-    },
+    (file: File, onProgress?: (percent: number) => void) => uploadFile(meta.id, file, onProgress),
     [meta.id],
   );
 }

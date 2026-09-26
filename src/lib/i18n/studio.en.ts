@@ -19,6 +19,9 @@ export const studioEn: StudioDict = {
     uploadHint: 'Your photos are made smaller on your device before they are sent',
     remove: 'Remove photo {n}',
     first: 'The first photo opens the invitation',
+    firstBadge: 'Opening',
+    makeFirst: 'Make photo {n} the opening photo',
+    makeFirstHint: 'Moves the photo to the first place: it will open the invitation',
     mood: 'Mood (optional)',
     moodPlaceholder: 'e.g. sea, sunset, soft gold',
     moodHelp: 'A few words about the feel you love — they help choose a template and colors',
@@ -31,6 +34,7 @@ export const studioEn: StudioDict = {
     creating: 'Designing for you…',
     creatingHint: 'This takes a few seconds',
     failed: 'We couldn’t make designs. Please try again in a moment.',
+    rate: 'Too many requests in a short time. Please try again in a few minutes.',
     conceptsTitle: 'Three designs for you',
     conceptsIntro:
       'The previews are live — scroll through each one. Pick a design; you can always undo it or go back in the versions.',
@@ -86,6 +90,7 @@ export const studioEn: StudioDict = {
     wizardProgress: 'Step {step} of 4',
     creatingInvitation: 'Creating the invitation and uploading the photos…',
     uploadFailed: 'Uploading the photos failed. Please try again.',
+    openEditor: 'Continue in the editor',
   },
   composer: {
     name: '{template} · {palette}',

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { isAdminEmail } from '@/features/billing/server/account';
+import { NO_OVERRIDES, whyOff } from '@/features/flags/features';
+import { accountFeatures, deploymentFeatures } from '@/features/flags/server';
 import { TemplateGallery, type DevPreviews } from '@/features/invitations/app/gallery/TemplateGallery';
 import { GALLERY_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
@@ -33,6 +35,22 @@ export default async function NewInvitationPage({
 }) {
   const env = serverEnv();
   const [{ previews }, user] = await Promise.all([searchParams, getSessionUser()]);
+  // "design it from my photos" (feature `art_direction`): the host's plan in force, this deployment
+  const account = user ? await accountFeatures(user).catch(() => null) : null;
+  const why = account
+    ? whyOff('art_direction', {
+        plan: account.plan,
+        admin: account.admin,
+        overrides: NO_OVERRIDES,
+        available: deploymentFeatures(),
+      })
+    : 'unavailable';
+  const studio =
+    why === null
+      ? { access: 'on' as const, cinematic: account!.features.has('cinematic') }
+      : why === 'plan'
+        ? { access: 'plan' as const, cinematic: false }
+        : null;
   return (
     <TemplateGallery
       bases={assetBasesFromEnv({
@@ -43,6 +61,7 @@ export default async function NewInvitationPage({
       devPreviews={devPreviews(previews)}
       // unlisted designs (manifest `listed: false`) are the platform admins' to try
       admin={isAdminEmail(user?.email)}
+      studio={studio}
     />
   );
 }

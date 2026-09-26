@@ -17,6 +17,7 @@ import { HelpFor, type HelpArea } from '../app/HelpFor';
 
 /** Each design and settings panel's "?" (what each of its controls does). */
 const PANEL_HELP: Record<PanelId, HelpArea> = {
+  studio: 'studio',
   palette: 'designPalette',
   fonts: 'designFonts',
   style: 'designStyle',

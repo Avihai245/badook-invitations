@@ -235,7 +235,11 @@ function openingFor(k: number, m: TemplateManifest, input: ConceptInput): Concep
  * `count` concepts (three by default) — avoiding the templates of `avoid` (concepts already chosen)
  * where the event has others. In the host's language (names, reasons).
  */
-export function composeConcepts(input: ConceptInput, count = 3, avoid: readonly Concept[] = []): Concept[] {
+export function composeConcepts(
+  input: ConceptInput,
+  count = 3,
+  avoid: readonly Pick<Concept, 'templateId' | 'fontPairId'>[] = input.avoid ?? [],
+): Concept[] {
   const swatches = allSwatches(input);
   let pool = candidateTemplates(input.eventType, input.locales, input.access);
   if (!pool.length && input.current) {

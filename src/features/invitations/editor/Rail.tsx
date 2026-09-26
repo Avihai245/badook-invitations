@@ -115,6 +115,7 @@ export const SECTION_ICONS: Record<IconKey, LucideIcon> = {
   palette: Palette,
   fonts: CaseSensitive,
   style: SlidersHorizontal,
+  studio: WandSparkles,
   music: Music,
   event: CalendarDays,
   languages: Languages,
@@ -540,8 +541,12 @@ function PanelList({
 }) {
   const { selection, select, features } = useEditor();
   const { t } = useUi();
-  // without the `cinematic` feature its panels aren't offered
-  const shown = panels.filter((p) => features.cinematic !== false || !CINEMATIC_PANELS.includes(p));
+  // without the `cinematic` feature its panels aren't offered; "design it for me" only with its own
+  const shown = panels.filter(
+    (p) =>
+      (features.cinematic !== false || !CINEMATIC_PANELS.includes(p)) &&
+      (p !== 'studio' || !!features.artDirection),
+  );
   return (
     <ul aria-label={label} className="flex flex-col gap-0.5">
       {shown.map((panel) => {

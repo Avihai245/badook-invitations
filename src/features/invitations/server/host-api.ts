@@ -368,6 +368,16 @@ export async function restoreVersion(
   return ok({ ok: true, draft: inv.draft, updatedAt: inv.updatedAt });
 }
 
+/**
+ * GET /api/invitations/:id — the draft and when it was saved (the gallery's "design it for me" puts
+ * the chosen design on the invitation it just made, then saves it with this `updatedAt`).
+ */
+export async function getDraft(userId: string, id: string, deps: HostDeps): Promise<ApiResult> {
+  const inv = await deps.db.get(id, userId);
+  if (!inv) return fail(404, 'not_found');
+  return ok({ ok: true, draft: inv.draft, updatedAt: inv.updatedAt, templateId: inv.templateId });
+}
+
 // ─── the history: every publish and the draft's saves (Phase 5C) ─────────────────────────────────
 
 /** GET /api/invitations/:id/history — publishes and saves, newest first, with the keeping rules. */

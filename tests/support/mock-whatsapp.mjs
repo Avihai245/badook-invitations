@@ -11,6 +11,11 @@
 // The live gallery's automatic check (POST /v1/messages with a photo, not streamed): answers JSON
 // scores like the real model would, and remembers each request apart (GET /__ai/gallery). A square
 // photo counts as suspicious (nsfw 0.62: held for the host), any other as fine — so tests can choose.
+//
+// "Design it for me" (POST /v1/messages whose system prompt is the art director's, with the photos):
+// answers three concepts on the first templates of the catalog it was sent, and remembers each request
+// without the photos (GET /__ai/art). A mood with "crash" / "נפילה" fails (overloaded) and one with
+// "garbage" / "זבל" answers something that isn't JSON — the app then composes the concepts itself.
 import { createServer } from 'node:http';
 
 const port = Number(process.env.MOCK_WHATSAPP_PORT || 54340);
@@ -19,6 +24,7 @@ const aiKey = process.env.MOCK_AI_KEY || 'e2e-anthropic-key';
 const sent = [];
 const aiRequests = [];
 const galleryAiRequests = [];
+const artAiRequests = [];
 let n = 0;
 
 const ANSWERS = [
@@ -51,6 +57,7 @@ async function answerAi(req, res) {
   let raw = '';
   for await (const chunk of req) raw += chunk;
   const body = JSON.parse(raw || '{}');
+  if (typeof body.system === 'string' && body.system.includes('art director')) return answerArt(res, body);
   const photo = Array.isArray(body.messages?.[0]?.content)
     ? body.messages[0].content.find((c) => c?.type === 'image')
     : null;
@@ -127,6 +134,83 @@ function answerGalleryCheck(res, body, photo) {
   });
 }
 
+function answerArt(res, body) {
+  const content = Array.isArray(body.messages?.[0]?.content) ? body.messages[0].content : [];
+  const texts = content.filter((c) => c?.type === 'text').map((c) => c.text);
+  const images = content.filter((c) => c?.type === 'image');
+  const brief = texts[0] ?? '';
+  const catalogJson = brief.startsWith('Catalog:\n') ? brief.slice(9).split('\n\n')[0] : '{}';
+  let catalog = {};
+  try {
+    catalog = JSON.parse(catalogJson);
+  } catch {
+    catalog = {};
+  }
+  artAiRequests.push({
+    model: body.model,
+    structured: !!body.output_config?.format,
+    images: images.length,
+    mediaTypes: images.map((i) => i.source?.media_type),
+    bytes: images.map((i) => (i.source?.data ? Buffer.from(i.source.data, 'base64').length : 0)),
+    mood: catalog.mood ?? null,
+    event: catalog.event ?? null,
+    templates: (catalog.templates ?? []).map((t) => t.id),
+    alreadyShown: catalog.alreadyShown ?? null,
+  });
+  if (!body.max_tokens || !images.length)
+    return json(res, 400, {
+      type: 'error',
+      error: { type: 'invalid_request_error', message: 'bad request' },
+    });
+  const mood = String(catalog.mood ?? '');
+  if (/crash|נפילה/i.test(mood))
+    return json(res, 529, { type: 'error', error: { type: 'overloaded_error', message: 'Overloaded' } });
+  const reply = (text) =>
+    json(res, 200, {
+      id: `msg_e2e_art_${artAiRequests.length}`,
+      type: 'message',
+      role: 'assistant',
+      model: body.model,
+      content: [{ type: 'text', text }],
+      stop_reason: 'end_turn',
+      usage: { input_tokens: 2400, output_tokens: 900 },
+    });
+  if (/garbage|זבל/i.test(mood)) return reply('I would love to help with that invitation!');
+  const shown = new Set((catalog.alreadyShown ?? []).map((c) => c.templateId));
+  const all = catalog.templates ?? [];
+  const fresh = all.filter((t) => !shown.has(t.id));
+  const pool = (fresh.length >= 3 ? fresh : all).slice(0, 3);
+  const langs = (catalog.languages ?? ['he (Hebrew)']).map((l) => String(l).split(' ')[0]);
+  const he = catalog.hostLanguage === 'Hebrew';
+  const line = (heText, enText) => Object.fromEntries(langs.map((l) => [l, l === 'he' ? heText : enText]));
+  const slots = Object.keys(catalog.slots ?? {});
+  const concepts = pool.map((t, i) => ({
+    name: he ? `קונספט בדיקה ${i + 1}` : `Test concept ${i + 1}`,
+    rationale: he
+      ? 'עיצוב מבדיקת הבינה המלאכותית, בצבעי התמונות.'
+      : 'A design from the AI stand-in, in the photos’ colors.',
+    templateId: t.id,
+    palette: { ...t.palette, accent: ['#9c4a2f', '#2f5d8a', '#6b4f8a'][i % 3] },
+    fontPairId: (t.fontPairs[i % t.fontPairs.length] ?? t.fontPairs[0]).id,
+    opening: ['envelope', 'gate', 'curtain'][i % 3],
+    motion: ['gentle', 'lively', 'calm'][i % 3],
+    heroPhoto: i % images.length,
+    placements: images
+      .map((_, p) => p)
+      .filter((p) => p !== i % images.length)
+      .slice(0, 2)
+      .map((photo, k) => {
+        const slot = slots[(i + k) % Math.max(1, slots.length)] ?? 'band';
+        return { slot, photo, layout: (catalog.slots?.[slot] ?? ['full_bleed'])[0] };
+      }),
+    copy: {
+      eyebrow: line('בשמחה גדולה', 'With great joy'),
+      closing: line('מחכים לראותכם', 'We can’t wait to see you'),
+    },
+  }));
+  return reply(JSON.stringify({ concepts }));
+}
+
 const json = (res, status, body) => {
   res.writeHead(status, { 'content-type': 'application/json' });
   res.end(JSON.stringify(body));
@@ -141,6 +225,7 @@ createServer(async (req, res) => {
   }
   if (req.method === 'GET' && url.pathname === '/__ai') return json(res, 200, aiRequests);
   if (req.method === 'GET' && url.pathname === '/__ai/gallery') return json(res, 200, galleryAiRequests);
+  if (req.method === 'GET' && url.pathname === '/__ai/art') return json(res, 200, artAiRequests);
   if (req.method === 'POST' && url.pathname === '/v1/messages') return answerAi(req, res);
   const match = url.pathname.match(/^\/v[\d.]+\/(\d+)\/messages$/);
   if (req.method !== 'POST' || !match)

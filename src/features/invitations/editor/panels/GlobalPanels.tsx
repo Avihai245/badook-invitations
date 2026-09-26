@@ -15,6 +15,7 @@ import {
   cn,
   useToast,
 } from '@/components/app';
+import { StudioPanel } from '@/features/art-direction/ui/StudioPanel';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { HEX_COLOR_RE } from '../../contracts/schemas';
@@ -55,6 +56,8 @@ export function trackLicense(license: string): string | null {
 
 export function GlobalPanel({ panel }: { panel: PanelId }) {
   switch (panel) {
+    case 'studio':
+      return <StudioPanel />;
     case 'cover':
       return <CoverPanel />;
     case 'palette':

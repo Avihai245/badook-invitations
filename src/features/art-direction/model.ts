@@ -83,6 +83,8 @@ export interface ConceptInput {
   cinematic: boolean;
   /** the editor: the invitation's design now (the concepts differ from it) */
   current?: { templateId: string; fontPairId: string } | null;
+  /** "three more": the designs already shown (others come first) */
+  avoid?: readonly Pick<Concept, 'templateId' | 'fontPairId'>[];
 }
 
 // ─── the wire: what the API takes and answers ────────────────────────────────────────────────────

@@ -42,6 +42,11 @@ export const ConceptsRequestSchema = z.strictObject({
     .strictObject({ templateId: z.string().min(1), fontPairId: z.string().min(1) })
     .nullable()
     .optional(),
+  /** "three more": the designs shown already */
+  avoid: z
+    .array(z.strictObject({ templateId: z.string().min(1).max(80), fontPairId: z.string().min(1).max(80) }))
+    .max(12)
+    .optional(),
 });
 
 /** What the host may do here: the feature, who they are (the designs open to them), `cinematic`. */
@@ -87,6 +92,7 @@ export async function createConcepts(
     access: allowed.access,
     cinematic: allowed.cinematic,
     current: req.current ?? null,
+    avoid: req.avoid ?? [],
   };
   const compose = (reason: ConceptsReason): ApiResult => {
     const concepts = composeConcepts(input);
@@ -111,7 +117,7 @@ export async function createConcepts(
   let filled = 0;
   const concepts = conceptsFromAnswer(asked.answer, input, (count, avoid) => {
     filled = count;
-    return composeConcepts(input, count, avoid);
+    return composeConcepts(input, count, [...(input.avoid ?? []), ...avoid]);
   });
   if (!concepts.length) return compose('invalid');
   return {

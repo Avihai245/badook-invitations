@@ -19,6 +19,9 @@ export const studioHe = {
     uploadHint: 'התמונות מוקטנות במכשיר שלכם לפני שהן נשלחות',
     remove: 'הסרת תמונה {n}',
     first: 'התמונה הראשונה היא תמונת הפתיחה',
+    firstBadge: 'פתיחה',
+    makeFirst: 'תמונה {n} תהיה תמונת הפתיחה',
+    makeFirstHint: 'מעביר את התמונה למקום הראשון: היא תפתח את ההזמנה',
     mood: 'מצב רוח (רשות)',
     moodPlaceholder: 'למשל: ים, שקיעה, זהב עדין',
     moodHelp: 'כמה מילים על האווירה שאתם אוהבים — הן עוזרות לבחור תבנית וצבעים',
@@ -31,6 +34,7 @@ export const studioHe = {
     creating: 'מעצבים בשבילכם…',
     creatingHint: 'זה לוקח כמה שניות',
     failed: 'לא הצלחנו להכין עיצובים. נסו שוב בעוד רגע.',
+    rate: 'יותר מדי בקשות בזמן קצר. נסו שוב בעוד כמה דקות.',
     conceptsTitle: 'שלושה עיצובים בשבילכם',
     conceptsIntro: 'התצוגה חיה — גוללים בכל אחד. בוחרים עיצוב, ואפשר תמיד לבטל או לחזור אחורה בגרסאות.',
     sourceAi: 'עוצבו עם בינה מלאכותית',
@@ -84,6 +88,7 @@ export const studioHe = {
     wizardProgress: 'שלב {step} מתוך 4',
     creatingInvitation: 'יוצרים את ההזמנה ומעלים את התמונות…',
     uploadFailed: 'העלאת התמונות נכשלה. נסו שוב.',
+    openEditor: 'להמשך בעורך',
   },
   /** the composer's names and reasons (concepts made without the AI) */
   composer: {

@@ -24,12 +24,16 @@ import { getTemplate } from '../../templates/registry';
 import { commit, createHistory, redo, replacePresent, undo, type History } from '../history';
 import { setAt } from '../paths';
 
-export type PanelId = 'cover' | 'palette' | 'fonts' | 'style' | 'music' | 'event' | 'languages' | 'share';
+export type PanelId =
+  'studio' | 'cover' | 'palette' | 'fonts' | 'style' | 'music' | 'event' | 'languages' | 'share';
 export type Selection = { kind: 'section'; id: string } | { kind: 'panel'; panel: PanelId };
 export type RailTab = 'sections' | 'design' | 'settings';
 
-/** The design tab's panels (`style`: the type scale, spacing and motion — feature `cinematic`). */
-export const DESIGN_PANELS: readonly PanelId[] = ['palette', 'fonts', 'style', 'cover', 'music'];
+/**
+ * The design tab's panels (`style`: the type scale, spacing and motion — feature `cinematic`;
+ * `studio`: "design it for me" — feature `art_direction`).
+ */
+export const DESIGN_PANELS: readonly PanelId[] = ['studio', 'palette', 'fonts', 'style', 'cover', 'music'];
 /** Panels only an event with the `cinematic` feature has. */
 export const CINEMATIC_PANELS: readonly PanelId[] = ['style'];
 export const SETTINGS_PANELS: readonly PanelId[] = ['event', 'languages', 'share'];
