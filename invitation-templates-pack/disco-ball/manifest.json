@@ -1,0 +1,240 @@
+{
+  "id": "disco-ball",
+  "version": 2,
+  "name": {
+    "he": "דיסקו",
+    "en": "Disco Ball"
+  },
+  "description": {
+    "he": "כדור מראות מתנדנד על השרשרת מעל רחבת ריקודים זוהרת — מאות אריחי מראה, קרני אור צבעוניות, נצנוצים, זרקורים שסורקים את החדר, אריחים שפועמים וקונפטי. ליל דיסקו אמיתי.",
+    "en": "A mirror ball swinging on its chain over a glowing dance floor — hundreds of mirror tiles, colored rays, glints, spotlights sweeping the room, pulsing floor tiles and confetti. A real disco night."
+  },
+  "tier": "premium",
+  "categories": [
+    "bat_mitzvah",
+    "birthday",
+    "corporate"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/disco-ball/preview.webp",
+  "previewVideo": "/templates/disco-ball/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#160A26",
+      "surface": "#231238",
+      "ink": "#FFF4FB",
+      "inkMuted": "#C5B2D8",
+      "accent": "#FF4FB8",
+      "accentInk": "#160A26",
+      "line": "#3A2257",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 20,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "disco-pink",
+      "name": {
+        "he": "ורוד דיסקו",
+        "en": "Disco pink"
+      },
+      "palette": {
+        "accent": "#FF4FB8",
+        "accentInk": "#160A26"
+      }
+    },
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב",
+        "en": "Gold"
+      },
+      "palette": {
+        "accent": "#FFC94D",
+        "accentInk": "#160A26"
+      }
+    },
+    {
+      "id": "silver",
+      "name": {
+        "he": "כסף",
+        "en": "Silver"
+      },
+      "palette": {
+        "accent": "#D8DCEB",
+        "accentInk": "#160A26"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "studio",
+      "display": {
+        "latin": "Righteous",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Josefin Sans",
+        "hebrew": "Assistant"
+      },
+      "body": {
+        "latin": "Josefin Sans",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "glam",
+      "display": {
+        "latin": "Abril Fatface",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Playfair Display",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "video",
+    "poster": "/templates/disco-ball/cover-poster.webp",
+    "posterDesktop": "/templates/disco-ball/cover-poster-desktop.webp",
+    "openVideo": "/templates/disco-ball/cover-open.mp4",
+    "openVideoDesktop": "/templates/disco-ball/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/disco-ball/medallion-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#2A1740",
+        "effect": "foil",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#D8DCEB",
+      "#FF4FB8",
+      "#FFC94D"
+    ],
+    "monogramFont": {
+      "latin": "Righteous",
+      "hebrew": "Suez One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "כדור דיסקו מעל רחבה זוהרת",
+          "en": "A mirror ball over a glowing dance floor"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#12061F",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "disco-ball-theme",
+    "tracks": [
+      {
+        "id": "disco-ball-theme",
+        "title": "Mirror Ball (disco funk)",
+        "url": "/templates/disco-ball/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 50,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/disco-ball/hero.mp4",
+    "hero-poster": "/templates/disco-ball/hero-poster.webp",
+    "hero-desktop": "/templates/disco-ball/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/disco-ball/hero-desktop-poster.webp",
+    "sparkle-band": "/templates/disco-ball/sparkle-band.webp",
+    "floor-panorama": "/templates/disco-ball/floor-panorama.webp",
+    "mirror-ball": "/templates/disco-ball/mirror-ball.webp",
+    "confetti": "/templates/disco-ball/confetti.webp",
+    "disco-star": "/templates/disco-ball/disco-star.webp"
+  },
+  "decorations": {
+    "afterHero": "template:sparkle-band",
+    "betweenVenues": "template:floor-panorama",
+    "afterTimeline": "template:mirror-ball",
+    "beforeRsvp": "template:confetti",
+    "footer": "template:disco-star"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

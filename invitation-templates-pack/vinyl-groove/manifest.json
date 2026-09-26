@@ -1,0 +1,241 @@
+{
+  "id": "vinyl-groove",
+  "version": 2,
+  "name": {
+    "he": "תקליט",
+    "en": "Vinyl Groove"
+  },
+  "description": {
+    "he": "פינת היי־פיי אחרי השקיעה — פטיפון מעץ אגוז עם תקליט מסתובב, זרוע ומחט, רמקול שהוופר שלו פועם, מנורת קשת באור חמים, מד עוצמה מרצד ותווים שמרחפים באוויר.",
+    "en": "A hi-fi corner after dark — a walnut turntable with a record turning, a tonearm on the grooves, a speaker whose woofer thumps, an arc lamp’s warm glow, a level meter’s peaks breathing and music notes floating up."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "engagement",
+    "corporate",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/vinyl-groove/preview.webp",
+  "previewVideo": "/templates/vinyl-groove/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#1B1411",
+      "surface": "#271D18",
+      "ink": "#F6EADB",
+      "inkMuted": "#BFAE98",
+      "accent": "#F0A43A",
+      "accentInk": "#1B1411",
+      "line": "#3B2D25",
+      "heroText": "#F6EADB"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "amber",
+      "name": {
+        "he": "ענבר",
+        "en": "Amber"
+      },
+      "palette": {
+        "accent": "#F0A43A",
+        "accentInk": "#1B1411"
+      }
+    },
+    {
+      "id": "teal",
+      "name": {
+        "he": "טורקיז",
+        "en": "Teal"
+      },
+      "palette": {
+        "accent": "#3FB8AF",
+        "accentInk": "#1B1411"
+      }
+    },
+    {
+      "id": "rust",
+      "name": {
+        "he": "חלודה",
+        "en": "Rust"
+      },
+      "palette": {
+        "accent": "#E0703A",
+        "accentInk": "#1B1411"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "liner-notes",
+      "display": {
+        "latin": "Fraunces",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "b-side",
+      "display": {
+        "latin": "Bebas Neue",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Space Mono",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "pouch",
+    "renderer": "video",
+    "poster": "/templates/vinyl-groove/cover-poster.webp",
+    "posterDesktop": "/templates/vinyl-groove/cover-poster-desktop.webp",
+    "openVideo": "/templates/vinyl-groove/cover-open.mp4",
+    "openVideoDesktop": "/templates/vinyl-groove/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/vinyl-groove/label-blank.png",
+      "recolor": true,
+      "size": 0.32,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#1B1411",
+        "effect": "print",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#F0A43A",
+      "#3FB8AF",
+      "#E0703A"
+    ],
+    "monogramFont": {
+      "latin": "Fraunces",
+      "hebrew": "Frank Ruhl Libre"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "פטיפון באור מנורה חמים",
+          "en": "A turntable in warm lamplight"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#F6EADB",
+    "overlayColor": "#120C09",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "vinyl-groove-theme",
+    "tracks": [
+      {
+        "id": "vinyl-groove-theme",
+        "title": "Needle Drop (warm soul & funk)",
+        "url": "/templates/vinyl-groove/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/vinyl-groove/hero.mp4",
+    "hero-poster": "/templates/vinyl-groove/hero-poster.webp",
+    "hero-desktop": "/templates/vinyl-groove/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/vinyl-groove/hero-desktop-poster.webp",
+    "groove-band": "/templates/vinyl-groove/groove-band.webp",
+    "records-panorama": "/templates/vinyl-groove/records-panorama.webp",
+    "turntable": "/templates/vinyl-groove/turntable.webp",
+    "speaker": "/templates/vinyl-groove/speaker.webp",
+    "vinyl-record": "/templates/vinyl-groove/vinyl-record.webp"
+  },
+  "decorations": {
+    "afterHero": "template:groove-band",
+    "betweenVenues": "template:records-panorama",
+    "afterTimeline": "template:turntable",
+    "beforeRsvp": "template:speaker",
+    "footer": "template:vinyl-record"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

@@ -39,6 +39,12 @@ import SuperheroPow from './superhero-pow';
 import CircusTop from './circus-top';
 import GrandPrix from './grand-prix';
 import SkateGraffiti from './skate-graffiti';
+// T3: teens & music
+import PixelQuest from './pixel-quest';
+import DiscoBall from './disco-ball';
+import BalletRose from './ballet-rose';
+import VinylGroove from './vinyl-groove';
+import Retro80s from './retro-80s';
 
 export type { SceneId } from './ids';
 export type { ScenePlace } from './kit';
@@ -82,6 +88,12 @@ const SCENES: Record<SceneId, ComponentType<SceneProps>> = {
   'circus-top': CircusTop,
   'grand-prix': GrandPrix,
   'skate-graffiti': SkateGraffiti,
+  // T3: teens & music
+  'pixel-quest': PixelQuest,
+  'disco-ball': DiscoBall,
+  'ballet-rose': BalletRose,
+  'vinyl-groove': VinylGroove,
+  'retro-80s': Retro80s,
 };
 
 const ROOT: CSSProperties = {

@@ -1,0 +1,240 @@
+{
+  "id": "retro-80s",
+  "version": 2,
+  "name": {
+    "he": "שנות ה־80",
+    "en": "Retro 80s"
+  },
+  "description": {
+    "he": "שקיעת סינת׳ווייב — שמש עם פסים ששוקעת מאחורי הרים עם קו ורוד, רשת זוהרת עד האופק, דקלים בצללית, קלטת שהסלילים שלה מסתובבים, נצנוצי כרום ושמיים מלאי כוכבים. כל הנוסטלגיה של שנות השמונים.",
+    "en": "A synthwave sunset — a striped sun sinking behind pink-rimmed mountains, a glowing grid to the horizon, palm silhouettes, a cassette whose reels turn, chrome sparkles and a sky full of stars. All the nostalgia of the eighties."
+  },
+  "tier": "premium",
+  "categories": [
+    "birthday",
+    "corporate",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/retro-80s/preview.webp",
+  "previewVideo": "/templates/retro-80s/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#150A2E",
+      "surface": "#22123F",
+      "ink": "#FDF3FF",
+      "inkMuted": "#BCA8E4",
+      "accent": "#FF4FA3",
+      "accentInk": "#150A2E",
+      "line": "#36205E",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "hot-pink",
+      "name": {
+        "he": "ורוד לוהט",
+        "en": "Hot pink"
+      },
+      "palette": {
+        "accent": "#FF4FA3",
+        "accentInk": "#150A2E"
+      }
+    },
+    {
+      "id": "sunset",
+      "name": {
+        "he": "שקיעה",
+        "en": "Sunset"
+      },
+      "palette": {
+        "accent": "#FF9A3C",
+        "accentInk": "#150A2E"
+      }
+    },
+    {
+      "id": "miami",
+      "name": {
+        "he": "מיאמי",
+        "en": "Miami"
+      },
+      "palette": {
+        "accent": "#37E2D5",
+        "accentInk": "#150A2E"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "outrun",
+      "display": {
+        "latin": "Unbounded",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "vhs",
+      "display": {
+        "latin": "Bebas Neue",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Space Mono",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Space Mono",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/retro-80s/cover-poster.webp",
+    "posterDesktop": "/templates/retro-80s/cover-poster-desktop.webp",
+    "openVideo": "/templates/retro-80s/cover-open.mp4",
+    "openVideoDesktop": "/templates/retro-80s/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/retro-80s/medallion-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#150A2E",
+        "effect": "foil",
+        "maxGlyphs": 9
+      }
+    },
+    "sealColors": [
+      "#C9CCD8",
+      "#FF4FA3",
+      "#FF9A3C"
+    ],
+    "monogramFont": {
+      "latin": "Bebas Neue",
+      "hebrew": "Secular One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שקיעת ניאון עם רשת ודקלים",
+          "en": "A neon sunset with a grid and palms"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#12062A",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "retro-80s-theme",
+    "tracks": [
+      {
+        "id": "retro-80s-theme",
+        "title": "Midnight Drive (synthwave)",
+        "url": "/templates/retro-80s/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 50,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/retro-80s/hero.mp4",
+    "hero-poster": "/templates/retro-80s/hero-poster.webp",
+    "hero-desktop": "/templates/retro-80s/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/retro-80s/hero-desktop-poster.webp",
+    "grid-band": "/templates/retro-80s/grid-band.webp",
+    "sunset-panorama": "/templates/retro-80s/sunset-panorama.webp",
+    "cassette": "/templates/retro-80s/cassette.webp",
+    "palms": "/templates/retro-80s/palms.webp",
+    "chrome-star": "/templates/retro-80s/chrome-star.webp"
+  },
+  "decorations": {
+    "afterHero": "template:grid-band",
+    "betweenVenues": "template:sunset-panorama",
+    "afterTimeline": "template:cassette",
+    "beforeRsvp": "template:palms",
+    "footer": "template:chrome-star"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

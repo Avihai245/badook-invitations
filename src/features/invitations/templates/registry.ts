@@ -81,6 +81,17 @@ import goldenDefaults from '@pack/golden-years/defaults.json';
 import goldenManifest from '@pack/golden-years/manifest.json';
 import grandmaDefaults from '@pack/grandma-garden/defaults.json';
 import grandmaManifest from '@pack/grandma-garden/manifest.json';
+// T3: teens & music
+import pixelQuestDefaults from '@pack/pixel-quest/defaults.json';
+import pixelQuestManifest from '@pack/pixel-quest/manifest.json';
+import discoBallDefaults from '@pack/disco-ball/defaults.json';
+import discoBallManifest from '@pack/disco-ball/manifest.json';
+import balletRoseDefaults from '@pack/ballet-rose/defaults.json';
+import balletRoseManifest from '@pack/ballet-rose/manifest.json';
+import vinylGrooveDefaults from '@pack/vinyl-groove/defaults.json';
+import vinylGrooveManifest from '@pack/vinyl-groove/manifest.json';
+import retro80sDefaults from '@pack/retro-80s/defaults.json';
+import retro80sManifest from '@pack/retro-80s/manifest.json';
 import { TemplateDefaultsSchema, TemplateManifestSchema } from '../contracts/schemas';
 import type { TemplateDefaults, TemplateManifest } from '../contracts/types';
 // T2: sports & action
@@ -151,6 +162,12 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: circusManifest, defaults: circusDefaults },
   { manifest: grandPrixManifest, defaults: grandPrixDefaults },
   { manifest: skateManifest, defaults: skateDefaults },
+  // T3: teens & music
+  { manifest: pixelQuestManifest, defaults: pixelQuestDefaults },
+  { manifest: discoBallManifest, defaults: discoBallDefaults },
+  { manifest: balletRoseManifest, defaults: balletRoseDefaults },
+  { manifest: vinylGrooveManifest, defaults: vinylGrooveDefaults },
+  { manifest: retro80sManifest, defaults: retro80sDefaults },
 ];
 
 function loadTemplates(): Map<string, TemplateEntry> {

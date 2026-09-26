@@ -1,6 +1,6 @@
 # Invitation templates pack v2
 
-28 templates: the 8 originals, then 20 whose placeholder art is a drawn scene (`src/features/invitations/renderer/scenes`) — the hero, the gallery poster and the cover's card draw it until the template's media exist. Each folder: `manifest.json` (TemplateManifest v2), `defaults.json` (TemplateDefaults — HE+EN seed copy per event type), `ASSETS.md` (checklist of media files to produce).
+48 templates: the 8 originals, then 40 whose placeholder art is a drawn scene (`src/features/invitations/renderer/scenes`) — the hero, the gallery poster and the cover's card draw it until the template's media exist. Each folder: `manifest.json` (TemplateManifest v2), `defaults.json` (TemplateDefaults — HE+EN seed copy per event type), `ASSETS.md` (checklist of media files to produce).
 
 Install: the manifests and defaults are read from this folder by the app (src/features/invitations/templates/registry.ts). Media files are produced with `invitation-templates-kit-he.md` and uploaded to the Supabase Storage bucket `template-media` (docs/template-media.md); until they exist, the app renders its own art.
 
@@ -51,3 +51,8 @@ Install: the manifests and defaults are read from this folder by the app (src/fe
 | `circus-top` | birthday | standard |
 | `grand-prix` | birthday, bar_mitzvah | standard |
 | `skate-graffiti` | bar_mitzvah, bat_mitzvah, birthday | premium |
+| `pixel-quest` | birthday, bar_mitzvah, bat_mitzvah | standard |
+| `disco-ball` | bat_mitzvah, birthday, corporate | premium |
+| `ballet-rose` | bat_mitzvah, birthday | premium |
+| `vinyl-groove` | birthday, engagement, corporate, other | standard |
+| `retro-80s` | birthday, corporate, other | premium |

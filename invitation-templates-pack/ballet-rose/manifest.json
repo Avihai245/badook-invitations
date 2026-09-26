@@ -1,0 +1,239 @@
+{
+  "id": "ballet-rose",
+  "version": 2,
+  "name": {
+    "he": "בלט",
+    "en": "Ballet Rose"
+  },
+  "description": {
+    "he": "במה קטנה רגע לפני ההופעה — וילונות קטיפה ורודים עם חבלי זהב וציציות, זרקור חמים על רקע ורדרד, נעלי בלט תלויות בסרטים, טוטו על קולב, זר ורדים על הבמה ועלי כותרת שנושרים.",
+    "en": "A little theatre just before the show — rose velvet curtains tied back with gold ropes and tassels, a warm spotlight on a blush backdrop, pointe shoes hanging by their ribbons, a tutu on a satin hanger, roses thrown on the stage and petals drifting down."
+  },
+  "tier": "premium",
+  "categories": [
+    "bat_mitzvah",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/ballet-rose/preview.webp",
+  "previewVideo": "/templates/ballet-rose/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FFF6F6",
+      "surface": "#FFFFFF",
+      "ink": "#3F1A2B",
+      "inkMuted": "#7A5563",
+      "accent": "#C8385F",
+      "accentInk": "#FFFFFF",
+      "line": "#F1D5DC",
+      "heroText": "#4A1830"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 22,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "rose",
+      "name": {
+        "he": "ורד",
+        "en": "Rose"
+      },
+      "palette": {
+        "accent": "#C8385F",
+        "accentInk": "#FFFFFF"
+      }
+    },
+    {
+      "id": "antique-gold",
+      "name": {
+        "he": "זהב עתיק",
+        "en": "Antique gold"
+      },
+      "palette": {
+        "accent": "#946A1E",
+        "accentInk": "#FFFFFF"
+      }
+    },
+    {
+      "id": "lilac",
+      "name": {
+        "he": "לילך",
+        "en": "Lilac"
+      },
+      "palette": {
+        "accent": "#8E5BB5",
+        "accentInk": "#FFFFFF"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "pointe",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Bellefair"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "tutu",
+      "display": {
+        "latin": "Ballet",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "heading": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "body": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "ui": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ribbon",
+    "renderer": "video",
+    "poster": "/templates/ballet-rose/cover-poster.webp",
+    "posterDesktop": "/templates/ballet-rose/cover-poster-desktop.webp",
+    "openVideo": "/templates/ballet-rose/cover-open.mp4",
+    "openVideoDesktop": "/templates/ballet-rose/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/ballet-rose/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#C8385F",
+      "#C9A15A",
+      "#E7A6B8"
+    ],
+    "monogramFont": {
+      "latin": "Great Vibes",
+      "hebrew": "Bellefair"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "במה עם וילונות קטיפה וזרקור",
+          "en": "A stage with velvet curtains and a spotlight"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#4A1830",
+    "overlayColor": "#FFF7F5",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "ballet-rose-theme",
+    "tracks": [
+      {
+        "id": "ballet-rose-theme",
+        "title": "Music Box Waltz (celesta & strings)",
+        "url": "/templates/ballet-rose/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/ballet-rose/hero.mp4",
+    "hero-poster": "/templates/ballet-rose/hero-poster.webp",
+    "hero-desktop": "/templates/ballet-rose/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/ballet-rose/hero-desktop-poster.webp",
+    "fringe-band": "/templates/ballet-rose/fringe-band.webp",
+    "stage-panorama": "/templates/ballet-rose/stage-panorama.webp",
+    "slippers": "/templates/ballet-rose/slippers.webp",
+    "tutu": "/templates/ballet-rose/tutu.webp",
+    "roses": "/templates/ballet-rose/roses.webp"
+  },
+  "decorations": {
+    "afterHero": "template:fringe-band",
+    "betweenVenues": "template:stage-panorama",
+    "afterTimeline": "template:slippers",
+    "beforeRsvp": "template:tutu",
+    "footer": "template:roses"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

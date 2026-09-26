@@ -64,6 +64,12 @@ describe('template pack', () => {
       'circus-top',
       'grand-prix',
       'skate-graffiti',
+      // T3: teens & music
+      'pixel-quest',
+      'disco-ball',
+      'ballet-rose',
+      'vinyl-groove',
+      'retro-80s',
     ]);
   });
 
@@ -92,6 +98,10 @@ describe('template pack', () => {
       'golden-years',
       // T2: sports & action
       'skate-graffiti',
+      // T3: teens & music
+      'disco-ball',
+      'ballet-rose',
+      'retro-80s',
     ]);
   });
 
