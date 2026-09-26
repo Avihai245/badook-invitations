@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { Frame, Layer, Piece, cm, cmh, polar, r1, rng, useIds, type SceneProps } from './kit';
 
 /**
- * Golden Years — timeless elegance on champagne satin: golden bokeh drifting, a double foil frame with
+ * Golden Years — timeless elegance on champagne satin: gold dust shimmering, a double foil frame with
  * scrolled corners, a laurel wreath crowning two champagne flutes that clink under a sparkle, bubbles
  * rising, a laurel garland tied with a ribbon at the foot and gold sparkles twinkling. The gold stays
  * gold; the ribbons follow the accent (burgundy and navy presets). Calm motion, a quiet centre.
@@ -103,29 +103,21 @@ function Bow({ x, y, s }: { x: number; y: number; s: number }) {
 function Flute({ x, y, deg, u }: { x: number; y: number; deg: number; u: Url }) {
   return (
     <g transform={`rotate(${deg} ${x} ${y})`}>
-      <ellipse
-        cx={x}
-        cy={y}
-        rx="15"
-        ry="3.4"
-        fill="#FFFFFF"
-        opacity=".75"
-        stroke={GOLD_LINE}
-        strokeWidth=".8"
-      />
-      <path d={`M${x - 1.4} ${y}V${y - 44}h2.8V${y}Z`} fill="#FFFFFF" opacity=".85" />
+      <ellipse cx={x} cy={y} rx="15" ry="3.4" fill="#FFFDF6" stroke={GOLD_LINE} strokeWidth="1.1" />
+      <path d={`M${x - 1.5} ${y}V${y - 44}h3V${y}Z`} fill="#FFFDF6" stroke={GOLD_LINE} strokeWidth=".7" />
       <path
         d={`M${x - 13} ${y - 130}C${x - 13} ${y - 84} ${x - 8} ${y - 50} ${x} ${y - 44}C${x + 8} ${y - 50} ${x + 13} ${y - 84} ${x + 13} ${y - 130}Z`}
-        fill="#FFFFFF"
-        opacity=".35"
-        stroke="#FFFFFF"
-        strokeWidth="1.4"
+        fill="#FFFDF6"
+        fillOpacity=".55"
+        stroke={GOLD_LINE}
+        strokeWidth="1.5"
       />
       <path
         d={`M${x - 12.4} ${y - 108}C${x - 12} ${y - 80} ${x - 7.6} ${y - 52} ${x} ${y - 46}C${x + 7.6} ${y - 52} ${x + 12} ${y - 80} ${x + 12.4} ${y - 108}Z`}
         fill={u('champagne')}
       />
-      <ellipse cx={x} cy={y - 108} rx="12.4" ry="2.2" fill="#FFF3C4" />
+      <ellipse cx={x} cy={y - 108} rx="12.4" ry="2.2" fill="#FFF0B8" />
+      <ellipse cx={x} cy={y - 130} rx="13" ry="2.4" fill="none" stroke={GOLD_LINE} strokeWidth="1.2" />
       {[
         [-4, 62, 1.3],
         [3, 74, 1],
@@ -192,12 +184,17 @@ export default function GoldenYears({ place }: SceneProps) {
   const card = place === 'card';
   const poster = place === 'poster';
   const rand = rng(53);
-  const bokeh = Array.from(
-    { length: 16 },
-    () => [r1(rand() * 100), r1(rand() * 180), r1(3 + rand() * 9), r1(0.1 + rand() * 0.18)] as const,
+  // gold dust: fine glints (and a few soft glows) drifting over the satin
+  const dust = Array.from(
+    { length: 44 },
+    () => [r1(rand() * 100), r1(rand() * 180), r1(0.25 + rand() * 0.6), r1(0.35 + rand() * 0.45)] as const,
+  );
+  const glows = Array.from(
+    { length: 6 },
+    () => [r1(rand() * 100), r1(rand() * 180), r1(5 + rand() * 6)] as const,
   );
   // the crest at the top: a laurel wreath around two flutes (the text stays below it)
-  const crestW = card ? cm(30) : poster ? cmh(38) : cmh(46);
+  const crestW = card ? cm(30) : poster ? cmh(40) : cmh(46);
   const crestTop = card ? cm(5) : poster ? cm(6) : cm(8);
   const sparkles: [string, string, number, string][] = [
     // [left, top, size (cqmin), delay]
@@ -228,11 +225,16 @@ export default function GoldenYears({ place }: SceneProps) {
             <stop offset="1" stopColor="#A57722" />
           </linearGradient>
           <linearGradient id={ref('champagne')} x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#FBE7A8" />
-            <stop offset="1" stopColor="#E0B85A" />
+            <stop offset="0" stopColor="#F8D97E" />
+            <stop offset="1" stopColor="#D39A34" />
           </linearGradient>
+          <radialGradient id={ref('halo')} cx=".5" cy=".5" r=".5">
+            <stop offset="0" stopColor="#FFF6D8" stopOpacity=".95" />
+            <stop offset=".5" stopColor="#FBE7B4" stopOpacity=".35" />
+            <stop offset="1" stopColor="#F6DFA6" stopOpacity="0" />
+          </radialGradient>
           <filter id={ref('blur')} x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1.4" />
+            <feGaussianBlur stdDeviation="2.4" />
           </filter>
           <filter id={ref('lift')} x="-10%" y="-10%" width="120%" height="130%">
             <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#6B4A12" floodOpacity=".25" />
@@ -255,12 +257,12 @@ export default function GoldenYears({ place }: SceneProps) {
             'linear-gradient(115deg, transparent 58%, rgba(255,255,255,.22) 66%, transparent 74%)',
         }}
       />
-      {/* golden bokeh */}
+      {/* gold dust shimmering over the satin */}
       {[0, 1].map((k) => (
         <Piece
           key={k}
           vb={[0, 0, 100, 180]}
-          anim="float"
+          anim={k ? 'float' : 'twinkle'}
           fit="xMidYMid slice"
           style={{
             left: 0,
@@ -273,12 +275,17 @@ export default function GoldenYears({ place }: SceneProps) {
           }}
         >
           <g filter={url('blur')}>
-            {bokeh
+            {glows
               .filter((_, i) => i % 2 === k)
-              .map(([x, y, r, o], i) => (
-                <circle key={i} cx={x} cy={y} r={r} fill="#E2B85E" opacity={o} />
+              .map(([x, y, r], i) => (
+                <circle key={i} cx={x} cy={y} r={r} fill="#FFF7E0" opacity=".55" />
               ))}
           </g>
+          {dust
+            .filter((_, i) => i % 2 === k)
+            .map(([x, y, r, o], i) => (
+              <circle key={i} cx={x} cy={y} r={r} fill={i % 3 ? '#D9AE52' : '#FFF4D2'} opacity={o} />
+            ))}
         </Piece>
       ))}
       {/* the double foil frame and its scrolled corners */}
@@ -328,9 +335,9 @@ export default function GoldenYears({ place }: SceneProps) {
           vb={[0, 0, 120, 400]}
           anim="sway"
           style={{
-            [edge]: `calc(50% + ${cm(card ? 56 : 62)})`,
-            bottom: '10%',
-            height: '72%',
+            [edge]: `calc(50% + ${cm(card ? 44 : 52)})`,
+            bottom: '18%',
+            height: '60%',
             aspectRatio: '120 / 400',
             animationDelay: i ? '-2.6s' : '0s',
           }}
@@ -340,19 +347,32 @@ export default function GoldenYears({ place }: SceneProps) {
           </g>
         </Piece>
       ))}
-      {/* the crest: a laurel wreath around two clinking flutes */}
+      {/* the crest: a laurel wreath around two clinking flutes, a soft light behind it */}
+      <Piece
+        vb={[0, 0, 100, 100]}
+        anim="pulse"
+        style={{
+          left: '50%',
+          top: `calc(${crestTop} + ${crestW} * .45)`,
+          width: `calc(${crestW} * 1.5)`,
+          translate: '-50% -50%',
+        }}
+      >
+        <circle cx="50" cy="50" r="50" fill={url('halo')} />
+      </Piece>
       <Piece vb={[0, 0, 240, 220]} style={{ left: '50%', top: crestTop, width: crestW, translate: '-50% 0' }}>
         <g filter={url('lift')}>
           <Branch cx={120} cy={112} r={96} a0={100} a1={236} n={8} size={24} u={url} />
           <Branch cx={120} cy={112} r={96} a0={80} a1={-56} n={8} size={24} u={url} />
-          <Flute x={100} y={196} deg={13} u={url} />
-          <Flute x={140} y={196} deg={-13} u={url} />
+          <Flute x={80} y={196} deg={12} u={url} />
+          <Flute x={160} y={196} deg={-12} u={url} />
           <Bow x={120} y={206} s={16} />
         </g>
         <g data-anim="pop" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%' }}>
-          <path d="M120 38Q122 58 142 60Q122 62 120 82Q118 62 98 60Q118 58 120 38Z" fill="#FFF7DC" />
-          <circle cx="138" cy="44" r="2.4" fill="#FFF7DC" />
-          <circle cx="103" cy="46" r="1.8" fill="#FFF7DC" />
+          <path d="M120 42Q122 60 140 62Q122 64 120 82Q118 64 100 62Q118 60 120 42Z" fill="#FFFDF2" />
+          <path d="M120 48Q121 61 132 62Q121 63 120 76Q119 63 108 62Q119 61 120 48Z" fill="#E7B84E" />
+          <circle cx="137" cy="47" r="2.4" fill="#E7B84E" />
+          <circle cx="104" cy="49" r="1.8" fill="#E7B84E" />
         </g>
       </Piece>
       {card
@@ -362,6 +382,34 @@ export default function GoldenYears({ place }: SceneProps) {
               <circle cx="5" cy="5" r="4.2" fill="none" stroke="#D9AE52" strokeWidth="1.2" />
             </Piece>
           ))}
+      {/* a gold filigree above the garland */}
+      <Piece
+        vb={[0, 0, 300, 50]}
+        style={{
+          left: '50%',
+          bottom: card ? cm(19) : `calc(${cm(11)} + ${cmh(64)} * .28)`,
+          width: card ? cm(38) : cmh(52),
+          translate: '-50% 0',
+        }}
+      >
+        <path d="M150 17L156 25 150 33 144 25Z" fill={url('foil')} />
+        {[0, 1].map((k) => (
+          <g
+            key={k}
+            transform={k ? 'translate(300 0) scale(-1 1)' : undefined}
+            fill="none"
+            stroke={url('foil')}
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          >
+            <path d="M160 25C176 25 182 14 198 14C214 14 220 26 212 32C206 36 198 30 202 24" />
+            <path d="M198 14C222 6 250 8 272 20C280 24 286 30 294 28" strokeWidth="1.2" />
+            <path d={leaf(232, 10, -35, 11, 3.4)} fill={url('foil')} stroke="none" />
+            <path d={leaf(256, 13, 20, 9, 2.8)} fill={url('foil')} stroke="none" />
+            <circle cx="170" cy="33" r="1.6" fill={url('foil')} stroke="none" />
+          </g>
+        ))}
+      </Piece>
       {/* the garland at the foot */}
       <Piece
         vb={[0, 0, 320, 90]}

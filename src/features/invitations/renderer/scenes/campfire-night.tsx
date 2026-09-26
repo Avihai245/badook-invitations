@@ -26,30 +26,40 @@ function Pine({ x, y, h, w, fill }: { x: number; y: number; h: number; w: number
   }
   return (
     <g fill={fill}>
-      <path d={`M${r1(x - w * 0.05)} ${r1(y)}h${r1(w * 0.1)}V${r1(y - h * 0.2)}h${r1(-w * 0.1)}Z`} />
+      <path
+        d={`M${r1(x - w * 0.05)} ${r1(y)}h${r1(w * 0.1)}V${r1(y - h * 0.2)}h${r1(-w * 0.1)}Z`}
+        fill="#050B14"
+      />
       <path d={paths.join('')} />
     </g>
   );
 }
 
-/** A stand of pines on the left edge (viewBox 0 0 300 700), the feet on the bottom edge. */
-function Stand({ owl }: { owl: boolean }) {
+/**
+ * A stand of pines on the left edge (viewBox 0 0 200 700), the feet on the bottom edge: a tall one at
+ * the edge, shorter ones inward so the text keeps its space. `far`: the paler row behind.
+ */
+function Stand({ owl, far = false }: { owl: boolean; far?: boolean }) {
+  const [back, mid, near] = far ? ['#1E3B5E', '#1A3556', '#16304E'] : [PINE_FAR, PINE_MID, PINE_NEAR];
   return (
     <g>
-      <Pine x={236} y={700} h={430} w={150} fill={PINE_FAR} />
-      <Pine x={150} y={700} h={560} w={190} fill={PINE_MID} />
-      <Pine x={52} y={700} h={690} w={230} fill={PINE_NEAR} />
+      <Pine x={166} y={700} h={far ? 380 : 260} w={far ? 84 : 76} fill={back} />
+      <Pine x={112} y={700} h={far ? 530 : 420} w={far ? 116 : 104} fill={mid} />
+      <Pine x={40} y={700} h={690} w={150} fill={near} />
       {owl ? (
-        <g transform="translate(104 212)">
+        // an SVG transform places it, the CSS wiggle (a transform too) runs on the group inside
+        <g transform="translate(62 230)">
           <path d="M-30 20Q0 14 34 22" stroke="#0A1626" strokeWidth="5" strokeLinecap="round" fill="none" />
-          <ellipse cx="0" cy="0" rx="15" ry="19" fill="#3A3F52" />
-          <path d="M-13-12L-9-24-3-15M13-12L9-24 3-15" fill="#3A3F52" />
-          <circle cx="-6" cy="-6" r="5.4" fill="#F4E3B0" />
-          <circle cx="6" cy="-6" r="5.4" fill="#F4E3B0" />
-          <circle cx="-6" cy="-6" r="2.4" fill="#141A26" />
-          <circle cx="6" cy="-6" r="2.4" fill="#141A26" />
-          <path d="M-2-1L0 3 2-1Z" fill="#E0A34A" />
-          <path d="M-9 6Q0 12 9 6M-8 11Q0 16 8 11" stroke="#5A6078" strokeWidth="1.4" fill="none" />
+          <g data-anim="wiggle" style={{ transformBox: 'fill-box' }}>
+            <ellipse cx="0" cy="0" rx="15" ry="19" fill="#3A3F52" />
+            <path d="M-13-12L-9-24-3-15M13-12L9-24 3-15" fill="#3A3F52" />
+            <circle cx="-6" cy="-6" r="5.4" fill="#F4E3B0" />
+            <circle cx="6" cy="-6" r="5.4" fill="#F4E3B0" />
+            <circle cx="-6" cy="-6" r="2.4" fill="#141A26" />
+            <circle cx="6" cy="-6" r="2.4" fill="#141A26" />
+            <path d="M-2-1L0 3 2-1Z" fill="#E0A34A" />
+            <path d="M-9 6Q0 12 9 6M-8 11Q0 16 8 11" stroke="#5A6078" strokeWidth="1.4" fill="none" />
+          </g>
         </g>
       ) : null}
     </g>
@@ -174,8 +184,10 @@ export default function CampfireNight({ place }: SceneProps) {
     [30, 82],
     [70, 84],
   ] as const;
-  // the pines stand at both sides: on a phone half off the edge, on a wide hero beside the text
-  const stand = card ? 'calc(50% - 50cqmin)' : 'max(-16cqmin, calc(50% - 88cqmin))';
+  // the pines stand at both sides — on a phone partly off the edge, on a wide hero beside the text —
+  // with a paler row behind them, spread further in on a wide hero
+  const stand = card ? 'calc(50% - 56cqmin)' : 'max(-9cqmin, calc(50% - 80cqmin))';
+  const back = card ? 'calc(50% - 38cqmin)' : 'calc(50% - 66cqmin)';
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -314,21 +326,30 @@ export default function CampfireNight({ place }: SceneProps) {
       >
         <circle cx="50" cy="50" r="50" fill={url('fire-glow')} />
       </Piece>
-      {/* pines at both sides */}
+      {/* pines at both sides: the paler row behind, the dark stand in front */}
+      {(['left', 'right'] as const).map((edge, i) => (
+        <Piece
+          key={`b${edge}`}
+          vb={[0, 0, 200, 700]}
+          style={{ [edge]: back, bottom: 0, height: ch(card ? 80 : 64), aspectRatio: '200 / 700' }}
+        >
+          <g transform={i ? 'translate(200 0) scale(-1 1)' : undefined}>
+            <Stand owl={false} far />
+          </g>
+        </Piece>
+      ))}
       {(['left', 'right'] as const).map((edge, i) => (
         <Piece
           key={edge}
-          vb={[0, 0, 300, 700]}
-          anim="sway"
+          vb={[0, 0, 200, 700]}
           style={{
             [edge]: stand,
             bottom: 0,
-            height: card ? ch(96) : poster ? ch(82) : ch(92),
-            aspectRatio: '300 / 700',
-            animationDelay: i ? '-3.4s' : '0s',
+            height: card ? ch(96) : poster ? ch(76) : ch(82),
+            aspectRatio: '200 / 700',
           }}
         >
-          <g transform={i ? 'translate(300 0) scale(-1 1)' : undefined}>
+          <g transform={i ? 'translate(200 0) scale(-1 1)' : undefined}>
             <Stand owl={!i && !card} />
           </g>
         </Piece>
@@ -358,19 +379,20 @@ export default function CampfireNight({ place }: SceneProps) {
       {card
         ? null
         : [
-            [-3, 0, 1.2],
-            [2, -2.6, 1],
-            [-1, -5.2, 0.9],
-            [4, -1.5, 0.8],
-            [0, -3.8, 1.1],
-          ].map(([dx, delay, s], k) => (
+            // [offset from the centre, delay, size, height above the flames] (cqmin)
+            [-5, 0, 1.2, 0],
+            [3, -2.6, 1, 7],
+            [-2, -5.2, 0.9, 13],
+            [6, -1.5, 0.8, 3],
+            [1, -3.8, 1.1, 10],
+          ].map(([dx, delay, s, lift], k) => (
             <Piece
               key={k}
               vb={[0, 0, 10, 10]}
               anim="rise"
               style={{
                 left: `calc(50% + ${cm(dx!)})`,
-                bottom: `calc(${ch(1.5)} + ${size(24 + k * 5, 20 + k * 4)})`,
+                bottom: `calc(${ch(1.5)} + ${size(26 + lift!, 22 + lift! * 0.8)})`,
                 width: cm(s!),
                 animationDelay: `${delay}s`,
               }}

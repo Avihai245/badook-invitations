@@ -386,7 +386,7 @@ export default function VineyardHarvest({ place }: SceneProps) {
         vb={[0, 0, 200, 200]}
         anim="sweep"
         style={{
-          left: card ? '72%' : 'calc(50% + 26cqmin)',
+          left: card ? '72%' : 'calc(50% + 34cqmin)',
           top: card ? '58%' : '63%',
           width: size(card ? 70 : 110, 90),
           translate: '-50% -50%',
@@ -404,7 +404,7 @@ export default function VineyardHarvest({ place }: SceneProps) {
         vb={[0, 0, 200, 200]}
         anim="pulse"
         style={{
-          left: card ? '72%' : 'calc(50% + 26cqmin)',
+          left: card ? '72%' : 'calc(50% + 34cqmin)',
           top: card ? '58%' : '63%',
           width: size(card ? 40 : 58, 46),
           translate: '-50% -50%',

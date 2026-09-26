@@ -164,23 +164,40 @@ function Daisy({ x, y, r }: { x: number; y: number; r: number }) {
 function Hollyhock({ tone }: { tone: 'pink' | 'cream' }) {
   const [light, mid, deep] = ROSES[tone === 'pink' ? 'pink' : 'cream'];
   const blooms = [
-    [30, 230, 17],
-    [24, 196, 16],
-    [36, 164, 15],
-    [26, 134, 13],
-    [34, 106, 11],
-    [28, 82, 9],
+    [30, 232, 14],
+    [23, 202, 13],
+    [37, 174, 12],
+    [26, 146, 11],
+    [34, 120, 9],
+    [28, 98, 8],
+    [32, 80, 6],
   ];
   return (
     <g>
-      <path d="M30 300C28 220 32 140 30 40" stroke={STEM} strokeWidth="3" fill="none" />
-      <Leaf x={30} y={280} deg={-150} len={30} fill={LEAF_DARK} />
-      <Leaf x={30} y={270} deg={-30} len={28} />
+      <path d="M30 300C28 220 32 140 30 50" stroke={STEM} strokeWidth="2.6" fill="none" />
+      <Leaf x={30} y={282} deg={-150} len={26} fill={LEAF_DARK} />
+      <Leaf x={30} y={272} deg={-30} len={24} />
+      <Leaf x={30} y={250} deg={-160} len={18} />
       {blooms.map(([x, y, r], i) => (
+        // a mallow: five round petals around a deep eye
         <g key={i}>
-          <circle cx={x} cy={y} r={r} fill={i % 2 ? mid : light} stroke={deep} strokeOpacity=".25" />
-          <circle cx={x} cy={y} r={r! * 0.4} fill={deep} opacity=".55" />
-          <circle cx={x} cy={y} r={r! * 0.14} fill="#FFF3C4" />
+          {[0, 72, 144, 216, 288].map((a) => {
+            const [px, py] = polar(x!, y!, r! * 0.46, a - 90 + i * 17);
+            return (
+              <circle
+                key={a}
+                cx={px}
+                cy={py}
+                r={r1(r! * 0.58)}
+                fill={i % 2 ? mid : light}
+                stroke={deep}
+                strokeOpacity=".25"
+                strokeWidth=".8"
+              />
+            );
+          })}
+          <circle cx={x} cy={y} r={r! * 0.34} fill={deep} opacity=".6" />
+          <circle cx={x} cy={y} r={r! * 0.13} fill="#FFF3C4" />
         </g>
       ))}
       {[
@@ -296,24 +313,29 @@ function Climber({ rich }: { rich: boolean }) {
   return (
     <g>
       <path
-        d="M-10 6C40 30 60 24 100 40S150 90 160 150M60 26C80 60 70 100 84 140"
+        d="M-10 6C40 30 60 24 100 40S150 90 160 150M60 26C80 60 70 100 84 150M100 40C140 36 180 30 226 46"
         stroke="#6E6A44"
-        strokeWidth="3"
+        strokeWidth="3.6"
         fill="none"
         strokeLinecap="round"
       />
-      <Leaf x={40} y={22} deg={100} len={26} fill={LEAF_DARK} />
-      <Leaf x={96} y={40} deg={60} len={24} />
-      <Leaf x={70} y={70} deg={160} len={22} fill={LEAF_DARK} />
-      <Leaf x={140} y={96} deg={20} len={22} />
-      <Leaf x={80} y={118} deg={140} len={20} />
-      <Leaf x={156} y={138} deg={60} len={18} fill={LEAF_DARK} />
-      <Rose x={34} y={34} r={26} tone="pink" turn={10} />
-      <Rose x={110} y={62} r={20} tone="cream" turn={-20} />
-      {rich ? <Rose x={78} y={104} r={16} tone="pink" turn={40} /> : null}
-      <Rose x={154} y={122} r={12} tone="peach" turn={5} />
-      <ellipse cx="86" cy="146" rx="5" ry="7" fill="#D36A86" />
-      <ellipse cx="162" cy="156" rx="4" ry="6" fill="#E68F6A" />
+      <Leaf x={18} y={14} deg={120} len={30} fill={LEAF_DARK} />
+      <Leaf x={52} y={26} deg={70} len={28} />
+      <Leaf x={96} y={42} deg={100} len={28} fill={LEAF_DARK} />
+      <Leaf x={70} y={70} deg={165} len={26} />
+      <Leaf x={140} y={36} deg={-40} len={22} />
+      <Leaf x={140} y={96} deg={20} len={26} fill={LEAF_DARK} />
+      <Leaf x={80} y={120} deg={140} len={24} />
+      <Leaf x={158} y={140} deg={60} len={22} fill={LEAF_DARK} />
+      <Leaf x={190} y={40} deg={80} len={22} fill={LEAF_DARK} />
+      <Rose x={30} y={30} r={32} tone="pink" turn={10} />
+      <Rose x={112} y={60} r={25} tone="cream" turn={-20} />
+      {rich ? <Rose x={78} y={106} r={21} tone="pink" turn={40} /> : null}
+      <Rose x={156} y={120} r={17} tone="peach" turn={5} />
+      {rich ? <Rose x={196} y={52} r={15} tone="pink" turn={-30} /> : null}
+      <ellipse cx="84" cy="152" rx="5.4" ry="7.4" fill="#D36A86" />
+      <ellipse cx="162" cy="156" rx="4.6" ry="6.4" fill="#E68F6A" />
+      <ellipse cx="226" cy="52" rx="4" ry="5.6" fill="#D36A86" />
     </g>
   );
 }
@@ -345,16 +367,16 @@ export default function GrandmaGarden({ place }: SceneProps) {
   const card = place === 'card';
   const poster = place === 'poster';
   const size = (n: number, h: number) => `min(${n}cqmin, ${h}cqh)`;
-  // the fence's foot is 6% up; its top ~22% above the foot on a phone
-  const fenceH = card ? 26 : 20;
+  // the fence stands 9% up (12% on the card) and is 13% tall
+  const fenceH = card ? 18 : 13;
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
-          <linearGradient id={ref('lawn')} x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#A4C08A" />
-            <stop offset="1" stopColor="#7A9E66" />
-          </linearGradient>
+          <radialGradient id={ref('beam')} gradientUnits="userSpaceOnUse" cx="0" cy="0" r="220">
+            <stop offset="0" stopColor="#FFFBEA" stopOpacity=".9" />
+            <stop offset="1" stopColor="#FFFBEA" stopOpacity="0" />
+          </radialGradient>
           <filter id={ref('soft')} x="-10%" y="-10%" width="120%" height="130%">
             <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#5A4A3A" floodOpacity=".22" />
           </filter>
@@ -377,7 +399,7 @@ export default function GrandmaGarden({ place }: SceneProps) {
           const [x1, y1] = polar(0, 0, 220, a - 2.6);
           const [x2, y2] = polar(0, 0, 220, a + 2.6);
           return (
-            <path key={a} d={`M0 0L${x1} ${y1}L${x2} ${y2}Z`} fill="#FFFBEA" opacity={0.28 - i * 0.03} />
+            <path key={a} d={`M0 0L${x1} ${y1}L${x2} ${y2}Z`} fill={url('beam')} opacity={0.5 - i * 0.05} />
           );
         })}
       </Piece>
@@ -434,7 +456,7 @@ export default function GrandmaGarden({ place }: SceneProps) {
           style={{
             [edge]: card ? '6%' : 'max(3cqmin, calc(50% - 46cqmin))',
             bottom: ch(card ? 12 : 9),
-            height: ch(card ? 60 : poster ? 42 : 46),
+            height: ch(card ? 52 : poster ? 36 : 40),
             aspectRatio: '60 / 300',
             animationDelay: i ? '-2.2s' : '0s',
           }}
@@ -489,28 +511,28 @@ export default function GrandmaGarden({ place }: SceneProps) {
             </Piece>
           ))}
       {/* the corner beds and the watering can */}
-      <Piece vb={[0, 0, 260, 240]} style={{ left: cm(-8), bottom: cm(-6), width: size(card ? 34 : 56, 44) }}>
+      <Piece vb={[0, 0, 260, 240]} style={{ left: cm(-8), bottom: cm(-4), width: size(card ? 34 : 56, 44) }}>
         <g filter={url('soft')}>
           <Bed rich />
         </g>
       </Piece>
       <Piece
-        vb={[0, 0, 140, 100]}
-        style={{
-          right: card ? '18%' : 'max(12cqmin, calc(50% - 30cqmin))',
-          bottom: ch(card ? 3 : 2.5),
-          width: size(card ? 16 : 24, 20),
-        }}
-      >
-        <WateringCan />
-      </Piece>
-      <Piece
         vb={[0, 0, 260, 240]}
-        style={{ right: cm(-10), bottom: cm(-7), width: size(card ? 30 : 50, 40) }}
+        style={{ right: cm(-10), bottom: cm(-5), width: size(card ? 30 : 50, 40) }}
       >
         <g filter={url('soft')} transform="translate(260 0) scale(-1 1)">
           <Bed rich={false} />
         </g>
+      </Piece>
+      <Piece
+        vb={[0, 0, 140, 100]}
+        style={{
+          right: card ? '22%' : `calc(max(4cqmin, 50% - 46cqmin) + ${cm(12)})`,
+          bottom: ch(card ? 3 : 2),
+          width: size(card ? 14 : 20, 17),
+        }}
+      >
+        <WateringCan />
       </Piece>
       {/* climbing roses from the top corners */}
       <Piece
