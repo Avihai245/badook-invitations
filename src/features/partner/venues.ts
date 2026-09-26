@@ -184,12 +184,19 @@ export async function putVenue(venueIdRaw: string, raw: unknown, deps: VenueDeps
     };
   }
 
-  const answer = await deps.put(
-    venueId.data,
-    fields,
-    { name: body.name ?? null, address: body.address ?? null, widthMeters: body.widthMeters ?? null },
-    plan,
-  );
+  let answer: Awaited<ReturnType<VenueDeps['put']>>;
+  try {
+    answer = await deps.put(
+      venueId.data,
+      fields,
+      { name: body.name ?? null, address: body.address ?? null, widthMeters: body.widthMeters ?? null },
+      plan,
+    );
+  } catch (err) {
+    // the database didn't take it: the file just stored isn't anyone's
+    if (plan) await deps.remove(plan.path).catch(() => {});
+    throw err;
+  }
   if (!answer.ok) {
     if (plan) await deps.remove(plan.path).catch(() => {});
     return fail(400, 'invalid', { fields: ['name'] });

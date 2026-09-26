@@ -19,6 +19,7 @@ import {
   pinch,
   planSize,
   snapPoint,
+  toScreen,
   toWorld,
   zoomAt,
   type Point,
@@ -35,6 +36,12 @@ export interface CanvasControls {
   center(): Point;
   /** brings a world point into the middle of the view (a table picked in the guest list) */
   reveal(p: Point): void;
+  /** where a world point is on the map (pixels from its top left corner) */
+  screenOf(p: Point): Point;
+  /** moves the map by so many pixels */
+  panBy(dx: number, dy: number): void;
+  /** a finger or the mouse is down on the map */
+  busy(): boolean;
 }
 
 type Gesture =
@@ -112,12 +119,15 @@ export function SeatingCanvas({
   const [line, setLine] = useState<{ a: Point; b: Point } | null>(null);
   const selected = useMemo(() => new Set(selection), [selection]);
 
+  // the size the map last had on screen (while the phone shows the guest list instead, it has none)
+  const dims = useRef({ w: 0, h: 0 });
   const bounds = useMemo(() => contentBounds(plan), [plan]);
   const fit = useCallback(() => {
-    if (size.w <= 0 || size.h <= 0) return;
+    const { w, h } = dims.current;
+    if (w <= 0 || h <= 0) return;
     asFitted.current = true;
-    setViewState(fitView(bounds, size.w, size.h, size.w < 500 ? 12 : 32));
-  }, [bounds, size]);
+    setViewState(fitView(bounds, w, h, w < 500 ? 12 : 32));
+  }, [bounds]);
   const fitRef = useRef(fit);
   fitRef.current = fit;
 
@@ -126,7 +136,11 @@ export function SeatingCanvas({
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
-    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight });
+    const measure = () => {
+      const next = { w: el.clientWidth, h: el.clientHeight };
+      if (next.w > 0 && next.h > 0) dims.current = next;
+      setSize(next);
+    };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -135,7 +149,7 @@ export function SeatingCanvas({
   const lastSize = useRef({ w: 0, h: 0 });
   useEffect(() => {
     const prev = lastSize.current;
-    // hidden (the phone's guest list is showing), or no change
+    // hidden, or no change
     if (size.w <= 0 || size.h <= 0 || (prev.w === size.w && prev.h === size.h)) return;
     lastSize.current = size;
     if (asFitted.current) return fitRef.current();
@@ -154,13 +168,20 @@ export function SeatingCanvas({
   useImperativeHandle(
     controls,
     () => ({
-      zoom: (factor) => setView((v) => zoomAt(v, factor, { x: size.w / 2, y: size.h / 2 })),
+      zoom: (factor) => setView((v) => zoomAt(v, factor, { x: dims.current.w / 2, y: dims.current.h / 2 })),
       fit,
-      center: () => toWorld(viewRef.current, { x: size.w / 2, y: size.h / 2 }),
+      center: () => toWorld(viewRef.current, { x: dims.current.w / 2, y: dims.current.h / 2 }),
       reveal: (p) =>
-        setView((v) => ({ ...v, tx: size.w / 2 - p.x * v.scale, ty: size.h / 2 - p.y * v.scale })),
+        setView((v) => ({
+          ...v,
+          tx: dims.current.w / 2 - p.x * v.scale,
+          ty: dims.current.h / 2 - p.y * v.scale,
+        })),
+      screenOf: (p) => toScreen(viewRef.current, p),
+      panBy: (dx, dy) => setView((v) => ({ ...v, tx: v.tx + dx, ty: v.ty + dy })),
+      busy: () => pointers.current.size > 0,
     }),
-    [fit, size],
+    [fit],
   );
 
   // the wheel zooms around the pointer (a trackpad's pinch comes as a wheel with ctrlKey)

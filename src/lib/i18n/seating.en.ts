@@ -190,7 +190,7 @@ export const seatingEn: SeatingDict = {
     search: 'Search by name',
     filters: { label: 'Filter', all: 'All', unseated: 'No table', seated: 'Seated' },
     category: 'Category',
-    allCategories: 'All categories',
+    allCategories: 'Any category',
     noCategory: 'No category',
     showPending: 'Also those who haven’t replied',
     showPendingHint: 'Guests on the list who haven’t replied yet, by their party size on the list.',

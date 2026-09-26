@@ -200,7 +200,7 @@ export function GuestsPanel({
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="h-8 min-w-0 text-[13px]"
-              wrapperClassName="min-w-0 flex-1"
+              wrapperClassName="min-w-[7.5rem] flex-1"
             >
               <option value="">{g.allCategories}</option>
               {categories.map((c) => (

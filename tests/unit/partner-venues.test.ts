@@ -531,6 +531,16 @@ describe('PUT / GET /api/partner/v1/venues/{venueId}', () => {
     expect(await putVenue('v', { name: 'A', extra: 1 }, deps)).toMatchObject({ status: 400 });
   });
 
+  it('a plan the database didn’t take is removed from storage', async () => {
+    const { deps, stored, removed } = venueWorld();
+    vi.mocked(deps.put).mockRejectedValueOnce(new Error('database down'));
+    await expect(
+      putVenue('v', { name: 'A', floorPlan: { url: 'https://venues.example.com/a.png' } }, deps),
+    ).rejects.toThrow('database down');
+    expect([...stored.keys()]).toEqual(['venues/f-v/file-1.png']);
+    expect(removed).toEqual(['venues/f-v/file-1.png']);
+  });
+
   it('a rate-limited partner gets 429; GET returns the venue or 404', async () => {
     const { deps } = venueWorld();
     await putVenue('v', { name: 'A' }, deps);

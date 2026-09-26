@@ -140,6 +140,7 @@ export function SeatingScreen({
   const cancelRun = useRef<(() => void) | null>(null);
   const controls = useRef<CanvasControls>(null);
   const editor = useRef<HTMLDivElement>(null);
+  const mapArea = useRef<HTMLDivElement>(null);
 
   const taken = useMemo(() => occupancyOf(plan, byId), [plan, byId]);
   const stats = useMemo(() => seatingStats(plan, units), [plan, units]);
@@ -468,6 +469,54 @@ export function SeatingScreen({
   const selectedTable = selection.length === 1 ? tablesById.get(selection[0]!) : undefined;
   const selectedLandmark =
     selection.length === 1 ? plan.layout.landmarks.find((m) => m.id === selection[0]) : undefined;
+
+  // A picked table stays in sight: when its panel opens over it (a phone's panel along the bottom, or
+  // beside the map on a wider screen), the map moves just enough to show it — once the finger or the
+  // mouse is up, so a table being dragged never jumps away from under it.
+  const pickedId = selectedTable?.id;
+  const pickedRef = useRef(selectedTable);
+  pickedRef.current = selectedTable;
+  useEffect(() => {
+    if (!pickedId) return;
+    let frame = 0;
+    const check = () => {
+      const t = pickedRef.current;
+      const c = controls.current;
+      const area = mapArea.current;
+      const panel = area?.querySelector<HTMLElement>('[data-testid="table-inspector"]');
+      if (!t || t.id !== pickedId || !c || !area || !panel) return;
+      const a = area.getBoundingClientRect();
+      const r = panel.getBoundingClientRect();
+      const box = {
+        left: r.left - a.left,
+        right: r.right - a.left,
+        top: r.top - a.top,
+        bottom: r.bottom - a.top,
+      };
+      const p = c.screenOf(t);
+      // the table with its chairs
+      const reach = c.screenOf({ x: t.x + Math.hypot(t.w, t.h) / 2 + 0.6, y: t.y }).x - p.x;
+      const hidden =
+        p.x + reach > box.left &&
+        p.x - reach < box.right &&
+        p.y + reach > box.top &&
+        p.y - reach < box.bottom;
+      if (!hidden) return;
+      const gap = 12;
+      if (box.right - box.left > a.width * 0.6) c.panBy(0, box.top - gap - reach - p.y);
+      else if (box.left + box.right < a.width) c.panBy(box.right + gap + reach - p.x, 0);
+      else c.panBy(box.left - gap - reach - p.x, 0);
+    };
+    const later = () => {
+      frame = requestAnimationFrame(check);
+    };
+    if (controls.current?.busy()) window.addEventListener('pointerup', later, { once: true });
+    else later();
+    return () => {
+      window.removeEventListener('pointerup', later);
+      cancelAnimationFrame(frame);
+    };
+  }, [pickedId]);
   const unseatedCandidates = (tableId: string) =>
     listedUnits(plan, units, showPending).filter(
       (u) =>
@@ -741,7 +790,7 @@ export function SeatingScreen({
               }}
               onFull={setFull}
             />
-            <div className="relative min-h-0 flex-1">
+            <div ref={mapArea} className="relative min-h-0 flex-1">
               <SeatingCanvas
                 plan={plan}
                 occupancy={taken}
