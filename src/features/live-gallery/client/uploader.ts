@@ -60,6 +60,11 @@ export interface UploaderOptions {
   onChange(snapshot: Snapshot): void;
   /** an item reached the gallery (its outcome is known) */
   onResult?(item: QueueItem): void;
+  /**
+   * Keep a photo's display version after it is in the gallery (face search looks at it on this phone —
+   * features/faces — and drops it with dropPreview). Off: it goes as soon as it is uploaded.
+   */
+  keepPreviews?: boolean;
 }
 
 export function randomToken(bytes = 16): string {
@@ -304,6 +309,15 @@ export class Uploader {
   /** The thumbnail kept for an item still in the queue (for the progress list). */
   thumbnail(localId: string): Promise<Blob | null> {
     return this.o.store.getBlob(localId, 'thumb').catch(() => null);
+  }
+
+  /** A photo's display version kept for face search (keepPreviews), until dropPreview. */
+  preview(localId: string): Promise<Blob | null> {
+    return this.o.store.getBlob(localId, 'display').catch(() => null);
+  }
+
+  async dropPreview(localId: string): Promise<void> {
+    await this.o.store.dropBlob(localId, 'display').catch(() => undefined);
   }
 
   // ── the loop ──
@@ -623,7 +637,13 @@ export class Uploader {
       nextAt: mismatches > (item.mismatches ?? 0) && !finished ? Date.now() + backoff(mismatches) : 0,
     };
     await this.save(next);
-    await this.dropBlobs(next, finished ? ['thumb', 'display', 'original'] : ['thumb', 'display']);
+    // a photo's display version may stay for face search on this phone (keepPreviews)
+    const keep = this.o.keepPreviews && next.kind === 'image';
+    const drop: PartName[] = finished ? ['thumb', 'display', 'original'] : ['thumb', 'display'];
+    await this.dropBlobs(
+      next,
+      drop.filter((p) => !(keep && p === 'display')),
+    );
     if (!item.result) this.o.onResult?.(next);
   }
 

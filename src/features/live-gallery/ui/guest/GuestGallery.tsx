@@ -12,6 +12,8 @@ import {
   type FormEvent,
   type ReactNode,
 } from 'react';
+import { UploadFaceIndexer } from '@/features/faces/client/upload-indexer';
+import { FaceSearch } from '@/features/faces/ui/FaceSearch';
 import { GALLERY } from '../../config';
 import { galleryApi } from '../../client/api';
 import { openStore, type QueueStore } from '../../client/idb';
@@ -109,6 +111,7 @@ function GalleryBody({
   const [store, setStore] = useState<QueueStore | null>(null);
   const [uploaderId, setUploaderId] = useState<string | null>(null);
   const code = useRef<string | null>(null);
+  const codeOf = useCallback(() => code.current, []);
   const [name, setName] = useState('');
   const nameRef = useRef('');
   const uploader = useRef<Uploader | null>(null);
@@ -245,8 +248,11 @@ function GalleryBody({
   useEffect(() => {
     refreshRef.current = refresh;
   }, [refresh]);
+  const faces = !!data.faces;
   useEffect(() => {
     if (!store || !uploaderId) return;
+    // face search (feature face_albums): this phone looks for faces in its own photos once they are in
+    let indexer: UploadFaceIndexer | null = null;
     const u = new Uploader({
       token,
       store,
@@ -255,10 +261,27 @@ function GalleryBody({
       name: () => nameRef.current.trim() || null,
       guest,
       onChange: setSnapshot,
-      onResult: () => void refreshRef.current('items'),
+      onResult: (item) => {
+        void refreshRef.current('items');
+        if (indexer && item.kind === 'image' && item.remoteId) indexer.add(item.localId, item.remoteId);
+      },
+      keepPreviews: faces,
     });
+    if (faces)
+      indexer = new UploadFaceIndexer({
+        token,
+        uploader: uploaderId,
+        code: () => code.current,
+        preview: (id) => u.preview(id),
+        drop: (id) => u.dropPreview(id),
+      });
     uploader.current = u;
     void u.start().then(() => {
+      // photos of an earlier visit still waiting to be looked at for faces
+      if (indexer)
+        for (const item of u.snapshot().items)
+          if (item.kind === 'image' && item.remoteId && (item.stage === 'done' || item.stage === 'visible'))
+            indexer.add(item.localId, item.remoteId);
       // what didn't finish last time belongs to this round
       setRound(
         new Set(
@@ -271,9 +294,10 @@ function GalleryBody({
     });
     return () => {
       u.stop();
+      indexer?.stop();
       uploader.current = null;
     };
-  }, [store, uploaderId, token, guest]);
+  }, [store, uploaderId, token, guest, faces]);
   // the hosts opened the gallery again: the queue goes on
   useEffect(() => {
     if (state === 'open' && snapshot?.blocked && snapshot.blocked !== 'code' && snapshot.blocked !== 'full')
@@ -508,6 +532,8 @@ function GalleryBody({
                 />
               </div>
             ) : null}
+
+            {data.faces ? <FaceSearch token={token} code={codeOf} until={data.faces.until} /> : null}
 
             {waiting.length ? (
               <section className="mt-6" aria-labelledby="gallery-mine">

@@ -88,7 +88,7 @@ export async function resolve(
 }
 
 /** The access code, when the host set one: missing or wrong → 401 (wrong ones are rate-limited per address). */
-async function checkCode(
+export async function checkCode(
   r: Resolved,
   code: unknown,
   ip: string | null,
@@ -122,7 +122,7 @@ async function rateOk(
 // ─── signed URLs ────────────────────────────────────────────────────────────────────────────────
 
 /** Read URLs for items, one request per bucket. */
-async function signItems(rows: ItemRow[], deps: GuestDeps, ttl = GALLERY.urls.signedTtlSeconds) {
+export async function signItems(rows: ItemRow[], deps: GuestDeps, ttl = GALLERY.urls.signedTtlSeconds) {
   const media = rows.flatMap((r) => [r.thumbPath, r.displayPath]).filter((p): p is string => !!p);
   const videos = rows.filter((r) => r.kind === 'video').map((r) => r.originalPath);
   const [m, v] = await Promise.all([

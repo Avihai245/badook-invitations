@@ -25,6 +25,7 @@ export function FeedGrid({
   hasMore,
   loadingMore,
   onMore,
+  testId = 'gallery-feed',
 }: {
   items: FeedItem[];
   /** ids that just arrived (they fade in) */
@@ -33,6 +34,8 @@ export function FeedGrid({
   hasMore: boolean;
   loadingMore: boolean;
   onMore(): void;
+  /** the grid's test id (the feed's by default; the album of "the photos I'm in" has its own) */
+  testId?: string;
 }) {
   const { t, number } = useGuestText();
   const sentinel = useRef<HTMLDivElement>(null);
@@ -56,10 +59,7 @@ export function FeedGrid({
 
   return (
     <>
-      <ul
-        className="grid grid-cols-3 gap-1 sm:grid-cols-4 sm:gap-1.5 lg:grid-cols-5"
-        data-testid="gallery-feed"
-      >
+      <ul className="grid grid-cols-3 gap-1 sm:grid-cols-4 sm:gap-1.5 lg:grid-cols-5" data-testid={testId}>
         {items.map((item, i) => {
           const kind = item.kind === 'video' ? t.item.video : t.item.photo;
           const label = item.name

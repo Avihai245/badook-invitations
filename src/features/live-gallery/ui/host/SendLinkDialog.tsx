@@ -82,7 +82,7 @@ export function SendLinkDialog({
     void load();
   }, [open, load]);
 
-  const rows = data?.rows ?? [];
+  const rows = useMemo(() => data?.rows ?? [], [data]);
   const counts = useMemo(() => {
     const c: Record<Tab, number> = { all: rows.length, unsent: 0, sent: 0 };
     for (const r of rows) {

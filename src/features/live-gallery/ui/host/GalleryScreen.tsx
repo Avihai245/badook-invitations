@@ -37,6 +37,7 @@ import {
   useToast,
 } from '@/components/app';
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
+import { FaceSearchCard } from '@/features/faces/ui/FaceSearchCard';
 import { useUi } from '@/lib/i18n/client';
 import { GALLERY } from '../../config';
 import { useLiveRefresh } from '@/lib/live/client';
@@ -326,7 +327,10 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
             />
           ) : null}
         </div>
-        <SettingsCard view={view} onPatch={patch} onAi={(on) => feature('gallery_ai', on)} />
+        <div className="grid gap-5">
+          <SettingsCard view={view} onPatch={patch} onAi={(on) => feature('gallery_ai', on)} />
+          {initial.faces ? <FaceSearchCard id={id} initial={initial.faces} /> : null}
+        </div>
       </div>
 
       <ItemsSection

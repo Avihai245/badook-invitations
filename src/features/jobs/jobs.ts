@@ -2,6 +2,7 @@ import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
 import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
+import { facesHousekeeping } from '@/features/faces/server/deps';
 import { insightsHousekeeping } from '@/features/insights/server/deps';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
@@ -46,6 +47,10 @@ export async function runDaily(now: Date) {
   const insights = await insightsHousekeeping().catch(
     (err) => (console.error('insights housekeeping failed', err), null),
   );
+  // face search's promise: its data erased 30 days after the event, and wherever the feature is off
+  const faces = await facesHousekeeping().catch(
+    (err) => (console.error('face search housekeeping failed', err), null),
+  );
   return {
     ...digests,
     purged: (purged as number | null) ?? null,
@@ -54,6 +59,7 @@ export async function runDaily(now: Date) {
     gallery,
     eventDay,
     insights,
+    faces,
   };
 }
 
