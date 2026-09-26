@@ -122,6 +122,7 @@ const FUNCTIONS = new Set([
   'translations_discard',
   'translation_glossary_set',
   'translation_run_begin',
+  'translation_runs_purge',
   // the event day (supabase/migrations/*_event_day.sql)
   'seating_save_tracked',
   'seating_guide',

@@ -278,6 +278,25 @@ describe('machine translations and their review', () => {
     expect(await commit('translation_run_begin', [inv, OWNER, 'fr', 2, 3600])).toBe(true);
   });
 
+  it('erases every owner’s run records two days after the run (the daily run)', async () => {
+    await c.query(`delete from translation_runs`);
+    expect(await commit('translation_run_begin', [inv, OWNER, 'ru', 5, 3600])).toBe(true);
+    expect(await commit('translation_run_begin', [inv, OWNER, 'ar', 5, 3600])).toBe(true);
+    await c.query(
+      `update translation_runs set created_at = now() - interval '2 days 1 minute'
+       where id = (select min(id) from translation_runs where owner_id = $1)`,
+      [OWNER],
+    );
+    expect(await commit('translation_runs_purge', [])).toBe(1);
+    const left = await c.query(`select locale from translation_runs where owner_id = $1`, [OWNER]);
+    expect(left.rows).toEqual([{ locale: 'ar' }]);
+    expect(await commit('translation_runs_purge', [])).toBe(0);
+    for (const role of ['anon', 'authenticated'] as const)
+      await expect(
+        as(c, role, OWNER, () => c.query(`select public.translation_runs_purge()`)),
+      ).rejects.toThrow(/permission denied/);
+  });
+
   it('keeps the tables and functions away from visitors and signed-in users', async () => {
     for (const role of ['anon', 'authenticated'] as const) {
       for (const table of ['translations', 'translation_glossaries', 'translation_runs'])

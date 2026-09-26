@@ -4,6 +4,7 @@ import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
+import { translationHousekeeping } from '@/features/invitations/translate/deps';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { processQueue } from '@/features/whatsapp/sender';
@@ -21,7 +22,8 @@ export type JobName = 'daily' | 'whatsapp';
 
 /**
  * The daily run: the hosts' RSVP summaries, the purge, the billing checks, the templates sync, the
- * live gallery's housekeeping and the event day's (arrivals past their keeping time).
+ * live gallery's housekeeping, the event day's (arrivals past their keeping time) and the machine
+ * translation's (its run records).
  */
 export async function runDaily(now: Date) {
   const digests = await sendDigests(now);
@@ -40,7 +42,19 @@ export async function runDaily(now: Date) {
   const eventDay = await eventDayHousekeeping().catch(
     (err) => (console.error('event day housekeeping failed', err), null),
   );
-  return { ...digests, purged: (purged as number | null) ?? null, overdue, seed, gallery, eventDay };
+  // the machine translation's: its run records (for the daily limit) erased after two days
+  const translations = await translationHousekeeping().catch(
+    (err) => (console.error('translation housekeeping failed', err), null),
+  );
+  return {
+    ...digests,
+    purged: (purged as number | null) ?? null,
+    overdue,
+    seed,
+    gallery,
+    eventDay,
+    translations,
+  };
 }
 
 /**

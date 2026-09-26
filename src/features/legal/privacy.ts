@@ -40,7 +40,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
             {
               list: [
                 'Account details: name, email address, phone number (optional) and a password, stored only as a secure hash. Signing in with Google gives us your name, email and profile picture from Google. An account opened for you by Badook Events (our events system) comes with the name, email and phone you gave it.',
-                'What hosts create: event details, texts, photos, videos, songs and links they add to an invitation, and their settings.',
+                'What hosts create: event details, texts (and their translations into the invitation’s other languages), photos, videos, songs and links they add to an invitation, and their settings.',
                 'Guest lists: names, phone numbers and optionally email addresses, party size and group, uploaded from a file or typed in; plus each guest’s personal-link status (sent, delivered, read, opened).',
                 'A do-not-send list: phone numbers that asked our WhatsApp number to stop (a “STOP” reply, or turning off marketing messages from us in WhatsApp), with the date. We keep it so that no host sends to them again from that number.',
                 'RSVPs: the name, phone and email a guest enters, whether they are coming and with how many people, dietary preferences, answers to the host’s questions and a message.',
@@ -88,7 +88,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
                 'Meta (WhatsApp Business Platform) — when a host sends invitations on WhatsApp: the guest’s phone number, name and the invitation’s link;',
                 'PayPlus — processing payments and issuing invoices;',
                 'Resend — sending emails;',
-                'Anthropic — answering questions in the support assistant (the text of the question only), and, when the host’s plan includes it, the automatic check of photos uploaded to an event’s live gallery (a small thumbnail of the photo only);',
+                'Anthropic — answering questions in the support assistant (the text of the question only); when the host’s plan includes it, the automatic check of photos uploaded to an event’s live gallery (a small thumbnail of the photo only); and, when a host asks for automatic translation, the invitation’s texts in the language they are written in, which Anthropic returns translated (names in the texts may be part of them and are kept as they are, like the words on the invitation’s list of words never translated; nothing about guests is sent);',
                 'Google (Maps), YouTube and Vimeo — maps and videos shown in invitations and on the site.',
               ],
             },
@@ -113,6 +113,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
                 'Invitations, guest lists and RSVPs: until the host deletes them, or deletes the account. Hosts can delete a guest, a reply or a whole invitation at any time.',
                 'After an account is deleted its information is erased within 30 days, and from backups within 90 days.',
                 'Payment and invoice records: kept by our payment provider (PayPlus) for seven years, as tax law requires; the copies in our own system are erased with the account.',
+                'Automatic translations: the translated texts, and whether the host approved them, are kept with the invitation until the host deletes it or the account; the record of each translation run (kept for the daily limit) is erased after two days.',
                 'Hashed IP addresses used against abuse: up to 30 days.',
                 'Messages sent through the contact form: up to two years.',
                 'The do-not-send list: as long as our WhatsApp number sends invitations, so the request keeps being honoured. Its owner can ask to be removed from it through the contact form.',
@@ -236,7 +237,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           {
             list: [
               'פרטי חשבון: שם, כתובת מייל, מספר טלפון (לא חובה) וסיסמה, שנשמרת רק בצורה מוצפנת חד־כיוונית (hash). בכניסה עם Google אנחנו מקבלים מ־Google את השם, המייל ותמונת הפרופיל. חשבון שנפתח עבורכם דרך Badook Events (מערכת האירועים שלנו) מגיע עם השם, המייל והטלפון שמסרתם שם.',
-              'מה שמארחים יוצרים: פרטי האירוע, טקסטים, תמונות, סרטונים, שירים וקישורים שמוסיפים להזמנה, וההגדרות שלה.',
+              'מה שמארחים יוצרים: פרטי האירוע, טקסטים (והתרגומים שלהם לשפות האחרות של ההזמנה), תמונות, סרטונים, שירים וקישורים שמוסיפים להזמנה, וההגדרות שלה.',
               'רשימות מוזמנים: שמות, מספרי טלפון ולפעמים מיילים, כמות מוזמנים וקבוצה, מקובץ או בהקלדה; וגם הסטטוס של הקישור האישי של כל מוזמן (נשלח, נמסר, נקרא, נפתח).',
               'רשימת ״לא לשלוח״: מספרי טלפון שביקשו מהמספר שלנו בוואטסאפ להפסיק (תשובת ״הסר״ או STOP, או כיבוי הודעות שיווק מאיתנו בוואטסאפ), עם התאריך. אנחנו שומרים אותה כדי שאף מארח לא ישלח אליהם שוב מהמספר הזה.',
               'אישורי הגעה: השם, הטלפון והמייל שהאורח מקליד, אם הוא מגיע ועם כמה, העדפות תזונה, תשובות לשאלות של המארח וברכה.',
@@ -284,7 +285,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'Meta (WhatsApp Business Platform): כשמארח שולח הזמנות בוואטסאפ, מועברים מספר הטלפון של המוזמן, השם שלו והקישור להזמנה;',
               'PayPlus: סליקת תשלומים והפקת חשבוניות;',
               'Resend: שליחת מיילים;',
-              'Anthropic: מענה לשאלות בעוזר התמיכה (רק טקסט השאלה), וכשהחבילה של המארח כוללת את זה, הבדיקה האוטומטית של תמונות שמועלות לגלריה החיה של אירוע (רק תמונה ממוזערת של התמונה);',
+              'Anthropic: מענה לשאלות בעוזר התמיכה (רק טקסט השאלה); כשהחבילה של המארח כוללת את זה, הבדיקה האוטומטית של תמונות שמועלות לגלריה החיה של אירוע (רק תמונה ממוזערת של התמונה); וכשמארח מבקש תרגום אוטומטי, הטקסטים של ההזמנה בשפה שבה נכתבו, ו־Anthropic מחזירה אותם מתורגמים (שמות שבטקסטים יכולים להיות חלק מהם, והם נשארים כמו שהם, כמו המילים ברשימת ״מילים שלא מתרגמים״ של ההזמנה; שום דבר על המוזמנים לא נשלח);',
               'Google (מפות), YouTube ו־Vimeo: מפות וסרטונים שמוצגים בהזמנות ובאתר.',
             ],
           },
@@ -309,6 +310,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'הזמנות, רשימות מוזמנים ואישורי הגעה: עד שהמארח מוחק אותם או את החשבון. אפשר למחוק מוזמן, תשובה או הזמנה שלמה בכל רגע.',
               'אחרי מחיקת חשבון, המידע שלו נמחק תוך 30 יום, ומהגיבויים תוך 90 יום.',
               'רישומי תשלומים וחשבוניות: נשמרים אצל ספק התשלומים שלנו (PayPlus) שבע שנים, כפי שדיני המס מחייבים; העותקים במערכת שלנו נמחקים עם החשבון.',
+              'תרגומים אוטומטיים: הטקסטים המתורגמים, והאם המארח אישר אותם, נשמרים עם ההזמנה עד שהמארח מוחק אותה או את החשבון; הרישום של כל הפעלת תרגום (בשביל המגבלה היומית) נמחק אחרי יומיים.',
               'גיבובי כתובות IP לחסימת שימוש לרעה: עד 30 יום.',
               'הודעות מטופס יצירת הקשר: עד שנתיים.',
               'רשימת ״לא לשלוח״: כל עוד המספר שלנו בוואטסאפ שולח הזמנות, כדי שהבקשה תמשיך להיות מכובדת. בעל המספר יכול לבקש להסיר אותו מהרשימה בטופס יצירת הקשר.',

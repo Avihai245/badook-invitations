@@ -45,6 +45,12 @@ export const translationsDb: TranslationsDb = {
     }),
 };
 
+/**
+ * What the privacy policy promises about the machine translation's run records (part of the daily
+ * run, features/jobs): erased two days after the run.
+ */
+export const translationHousekeeping = () => rpc<number>('translation_runs_purge', {});
+
 /** The translations of an invitation, for the publish check (host-api publish). */
 export async function translationRows(id: string, ownerId: string): Promise<TranslationRow[]> {
   return (await translationsDb.list(id, ownerId))?.rows ?? [];
