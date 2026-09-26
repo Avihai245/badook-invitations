@@ -112,6 +112,8 @@ export interface Layout {
   /** null: not calibrated */
   metersPerPixel: number | null;
   source: 'upload' | 'partner' | 'none' | null;
+  /** the venue's plan the background came from (a PDF's rendering points at the PDF) */
+  venuePlan: string | null;
   gridM: number;
   landmarks: Landmark[];
   settings: SeatingSettings;
@@ -238,6 +240,7 @@ export const LayoutSchema = z.strictObject({
     .nullable(),
   metersPerPixel: z.number().finite().gt(0).max(1000).nullable(),
   source: z.enum(['upload', 'partner', 'none']).nullable(),
+  venuePlan: z.string().max(300).nullable(),
   gridM: Num(0.1, 5),
   landmarks: z.array(LandmarkSchema).max(LIMITS.landmarks),
   settings: SettingsSchema,
@@ -378,6 +381,7 @@ export function readState(raw: unknown): SeatingState {
         background: readBackground(l.background),
         metersPerPixel: l.metersPerPixel == null ? null : num(l.metersPerPixel) || null,
         source: l.source === 'upload' || l.source === 'partner' || l.source === 'none' ? l.source : null,
+        venuePlan: typeof l.venuePlan === 'string' ? l.venuePlan : null,
         gridM: num(l.gridM, 0.5) || 0.5,
         landmarks: (Array.isArray(l.landmarks) ? l.landmarks : [])
           .map((m) => LandmarkSchema.safeParse(m))

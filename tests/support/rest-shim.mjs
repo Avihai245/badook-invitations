@@ -5,8 +5,8 @@
 //     GET/PUT /user, logout, recover; HS256 access tokens; users live in auth.users; "Continue with
 //     Google" through a stand-in account chooser (authorize → code → the PKCE grant); /settings;
 //     admin: create users, one-time sign-in links (generate_link → POST /verify), get / update / delete;
-//   · Storage /storage/v1 — signed upload URLs (service role), uploads, public reads; files on disk,
-//     bucket size/MIME limits from storage.buckets.
+//   · Storage /storage/v1 — signed upload URLs (service role), uploads, the server's own uploads
+//     (service role), public reads; files on disk, bucket size/MIME limits from storage.buckets.
 //
 //   DATABASE_URL=postgres://… REST_SHIM_PORT=54321 node tests/support/rest-shim.mjs
 //   app env: NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
@@ -76,6 +76,12 @@ const FUNCTIONS = new Set([
   'invitation_features',
   'invitation_feature_off',
   'invitation_feature_grant',
+  'seating_state',
+  'seating_save',
+  'partner_venue_put',
+  'partner_venue_get',
+  'partner_user_venue_set',
+  'partner_user_venue',
   'app_meta_get',
   'seed_upsert',
   'billing_pending_checkouts',
@@ -600,6 +606,38 @@ async function storage(req, res, rest, query) {
         metadata: d.isDirectory() ? null : {},
       })),
     );
+  }
+  // the server stores a file itself (service role): storage.from(bucket).upload(path, bytes, options)
+  m = /^object\/(?!upload\/|list\/|public\/|sign\/)([a-z0-9-]+)\/(.+)$/.exec(rest);
+  if (m && req.method === 'POST') {
+    if (ROLES[req.headers.apikey] !== 'service_role') return send(res, 403, { error: 'Unauthorized' });
+    const bucket = (await pool.query('select * from storage.buckets where id = $1', [m[1]])).rows[0];
+    if (!bucket) return send(res, 404, { statusCode: '404', error: 'Bucket not found' });
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    const file = Buffer.concat(chunks);
+    const contentType = String(req.headers['content-type'] ?? 'application/octet-stream');
+    if (bucket.file_size_limit && file.length > Number(bucket.file_size_limit))
+      return send(res, 413, { statusCode: '413', error: 'Payload too large' });
+    if (bucket.allowed_mime_types?.length && !bucket.allowed_mime_types.includes(contentType))
+      return send(res, 415, { statusCode: '415', error: 'invalid_mime_type' });
+    const target = storagePath(m[1], m[2]);
+    let exists = true;
+    try {
+      statSync(target);
+    } catch {
+      exists = false;
+    }
+    if (exists && req.headers['x-upsert'] !== 'true')
+      return send(res, 400, {
+        statusCode: '409',
+        error: 'Duplicate',
+        message: 'The resource already exists',
+      });
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, file);
+    writeFileSync(`${target}.type`, contentType);
+    return send(res, 200, { Key: `${m[1]}/${m[2]}`, Id: randomUUID() });
   }
   m = /^object\/([a-z0-9-]+)$/.exec(rest);
   if (m && req.method === 'DELETE') {

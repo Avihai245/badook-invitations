@@ -70,6 +70,7 @@ const empty: Plan = {
     background: null,
     metersPerPixel: null,
     source: null,
+    venuePlan: null,
     gridM: 0.5,
     landmarks: [],
     settings: DEFAULT_SETTINGS,

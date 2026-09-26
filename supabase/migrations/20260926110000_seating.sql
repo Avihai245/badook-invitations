@@ -84,6 +84,9 @@ create table public.venue_layouts (
   -- (then the venue's plan isn't put back by itself); null: never set
   source text check (source is null or source in ('upload', 'partner', 'none')),
   venue_id uuid references public.partner_venues (id) on delete set null,
+  -- the venue's plan the background came from (a PDF's rendering still points at the PDF): the screen
+  -- offers the venue's plan again once the venue sends a new one
+  venue_plan_path text check (venue_plan_path is null or char_length(venue_plan_path) <= 300),
   grid_m numeric(4, 2) not null default 0.5 check (grid_m between 0.1 and 5),
   -- the stage, dance floor, bar, entrance and exits drawn on the plan: [{ id, kind, x, y, w, h, rotation,
   -- label }] (validated by the server; the solver measures "near the stage" from them)
@@ -329,7 +332,8 @@ begin
       meters_per_pixel = case when v_venue.width_meters is not null and v_venue.plan_width is not null
                               then v_venue.width_meters / v_venue.plan_width end,
       source = 'partner',
-      venue_id = v_venue.id
+      venue_id = v_venue.id,
+      venue_plan_path = v_venue.plan_path
     where invitation_id = p_id and source is null;
   end if;
   select * into l from public.venue_layouts where invitation_id = p_id;
@@ -343,6 +347,7 @@ begin
         'width', l.background_width, 'height', l.background_height) end,
       'metersPerPixel', l.meters_per_pixel,
       'source', l.source,
+      'venuePlan', l.venue_plan_path,
       'gridM', l.grid_m,
       'landmarks', l.landmarks,
       'settings', l.settings
@@ -506,10 +511,14 @@ begin
     background_height = case when v_bg is null then null else (p_plan #>> '{layout,background,height}')::int end,
     meters_per_pixel = (p_plan #>> '{layout,metersPerPixel}')::numeric,
     source = p_plan #>> '{layout,source}',
-    -- the venue's plan (kept, or chosen again by the host): which venue it is
+    -- the venue's plan (kept, or chosen again by the host): which venue, and which of its plans
     venue_id = case when p_plan #>> '{layout,source}' = 'partner' then coalesce(
       venue_id, (select pu.venue_id from public.partner_venue_users pu where pu.user_id = p_owner)
     ) end,
+    venue_plan_path = case
+      when p_plan #>> '{layout,source}' = 'partner'
+           and p_plan #>> '{layout,venuePlan}' in (v_venue_plan, l.venue_plan_path)
+      then p_plan #>> '{layout,venuePlan}' end,
     grid_m = coalesce((p_plan #>> '{layout,gridM}')::numeric, grid_m),
     landmarks = coalesce(p_plan #> '{layout,landmarks}', '[]'::jsonb),
     settings = coalesce(p_plan #> '{layout,settings}', '{}'::jsonb),

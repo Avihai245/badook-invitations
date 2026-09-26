@@ -146,7 +146,9 @@ export function SeatingScreen({
   const numbers = useMemo(() => new Map(plan.tables.map((x) => [x.id, x.number])), [plan.tables]);
   const bg = plan.layout.background;
   const planUrl = bg && bg.type !== 'application/pdf' && planBase ? `${planBase}/${bg.path}` : null;
-  const usingVenue = !!bg && !!venue?.plan && plan.layout.source === 'partner';
+  // the venue's current plan is the one in use (after a new one arrives, the old one no longer is)
+  const usingVenue =
+    !!bg && !!venue?.plan && plan.layout.source === 'partner' && plan.layout.venuePlan === venue.plan.path;
 
   // ── undo / redo from the keyboard (not while typing in a field) ──
   useEffect(() => {
@@ -343,7 +345,8 @@ export function SeatingScreen({
     background: PlanBackground | null,
     source: Plan['layout']['source'],
     mpp: number | null,
-  ) => update((p) => ({ ...p, layout: { ...p.layout, background, source, metersPerPixel: mpp } }));
+    venuePlan: string | null = null,
+  ) => update((p) => ({ ...p, layout: { ...p.layout, background, source, venuePlan, metersPerPixel: mpp } }));
   const onPlanFile = async (file: File) => {
     setPlanError(null);
     setPlanBusy(
@@ -378,7 +381,7 @@ export function SeatingScreen({
   const useVenuePlan = () => {
     if (!venue?.plan) return;
     const v = venue.plan;
-    commitBackground(v, 'partner', venue.widthMeters && v.width ? venue.widthMeters / v.width : null);
+    commitBackground(v, 'partner', venue.widthMeters && v.width ? venue.widthMeters / v.width : null, v.path);
     convertingRef.current = false;
     setDialog(null);
   };

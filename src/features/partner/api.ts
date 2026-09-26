@@ -1,7 +1,8 @@
 /**
  * The partner API (Badook Events → this app, server to server): opens users remotely — name, email
- * and phone — hands out one-time sign-in links for them, and gives a user's account a discount on the
- * plans. Plain functions over injected
+ * and phone — hands out one-time sign-in links for them, gives a user's account a discount on the
+ * plans, and links a user to one of the partner's venues (venues.ts: its floor plan is where the user's
+ * seating starts). Plain functions over injected
  * dependencies; the route files (app/api/partner/v1/…) wire Supabase in. Tested in
  * tests/unit/partner.test.ts; the contract for the partner is docs/partner-api.md.
  *
@@ -14,6 +15,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { MAX_DISCOUNT_PERCENT } from '../billing/plans';
 import { normalizeGuestPhone } from '../invitations/lib/guest-import';
+import { VenueIdSchema } from './venues';
 
 export const PARTNER_SOURCE = 'partner:badook-events';
 /** Supabase's default one-time link lifetime (Auth → Email OTP expiration). */
@@ -44,6 +46,8 @@ export interface PartnerUser {
   userManaged: boolean;
   /** the discount on plans the partner granted, while a purchase gets it (null: none, or it ended) */
   discount: PartnerDiscount | null;
+  /** the partner's id of the venue the user belongs to (null: none) */
+  venueId?: string | null;
 }
 
 /** A discount on the user's plans: `percent` off a plan bought until `until` (null: no end). */
@@ -85,6 +89,12 @@ export interface PartnerDeps {
   loginToken(email: string): Promise<string>;
   /** false once the partner is over its hourly limit */
   rateHit(): Promise<boolean>;
+  /** the partner's venue a user belongs to (absent: venues aren't wired in) */
+  venueOf?(userId: string): Promise<string | null>;
+  /** whether the partner has a venue by this id */
+  venueExists?(venueId: string): Promise<boolean>;
+  /** links one of the partner's users to one of its venues (null: unlinks) */
+  setVenue?(userId: string, venueId: string | null): Promise<'ok' | 'venue_not_found' | 'not_found'>;
 }
 
 export class ExternalIdTaken extends Error {}
@@ -132,6 +142,8 @@ export const ProvisionSchema = z.strictObject({
   externalId: ExternalId.nullish(),
   /** where the sign-in link lands (an in-app path, default /app/invitations) */
   next: Next.optional(),
+  /** the partner's venue the user belongs to (PUT /venues/{venueId} first): seating starts from its plan */
+  venueId: VenueIdSchema.nullish(),
 });
 
 const oneOf = (v: { userId?: string; externalId?: string }) => !!v.userId !== !!v.externalId;
@@ -142,8 +154,15 @@ export const LoginLinkSchema = z
   .refine(oneOf, ONE_OF);
 
 export const EmailChangeSchema = z
-  .strictObject({ userId: z.uuid().optional(), externalId: ExternalId.optional(), email: Email })
-  .refine(oneOf, ONE_OF);
+  .strictObject({
+    userId: z.uuid().optional(),
+    externalId: ExternalId.optional(),
+    email: Email.optional(),
+    /** the venue the user belongs to (null: none) */
+    venueId: VenueIdSchema.nullable().optional(),
+  })
+  .refine(oneOf, ONE_OF)
+  .refine((v) => v.email !== undefined || v.venueId !== undefined, { message: 'email or venueId' });
 
 /** A day (2026-12-31: through the end of that day in Israel) or a moment with its offset. */
 const Until = z.union([z.iso.date(), z.iso.datetime({ offset: true })]);
@@ -176,13 +195,19 @@ export function discountEnd(until: string): string {
 const invalid = (error: z.ZodError) =>
   fail(400, 'invalid', { fields: [...new Set(error.issues.map((i) => i.path.join('.') || '(body)'))] });
 
+/** A user as the partner sees them, with their venue (when venues are wired in). */
+const withVenue = async (user: PartnerUser, deps: PartnerDeps): Promise<PartnerUser> =>
+  deps.venueOf ? { ...user, venueId: await deps.venueOf(user.userId) } : user;
+
 /** POST /api/partner/v1/users — opens a user (or updates the partner's own) and returns a sign-in link. */
 export async function provisionUser(raw: unknown, deps: PartnerDeps): Promise<ApiResult> {
   if (!(await deps.rateHit())) return fail(429, 'rate_limited');
   const parsed = ProvisionSchema.safeParse(raw);
   if (!parsed.success) return invalid(parsed.error);
-  const { email, fullName, next } = parsed.data;
+  const { email, fullName, next, venueId } = parsed.data;
   const externalId = parsed.data.externalId ?? null;
+  // an unknown venue: nothing is created
+  if (venueId && deps.venueExists && !(await deps.venueExists(venueId))) return fail(404, 'venue_not_found');
   let phone: string | null = null;
   if (parsed.data.phone) {
     phone = normalizeGuestPhone(parsed.data.phone);
@@ -214,10 +239,11 @@ export async function provisionUser(raw: unknown, deps: PartnerDeps): Promise<Ap
     return fail(409, 'account_exists');
   }
   if (user.userManaged) return userManaged(deps.site, next);
+  if (venueId !== undefined && deps.setVenue) await deps.setVenue(user.userId, venueId);
   return ok(
     {
       created,
-      user,
+      user: await withVenue(user, deps),
       loginUrl: loginUrl(deps.site, await deps.loginToken(user.email), next),
       loginUrlExpiresIn: LOGIN_LINK_SECONDS,
     },
@@ -250,11 +276,18 @@ export async function changeEmail(raw: unknown, deps: PartnerDeps): Promise<ApiR
   if (!parsed.success) return invalid(parsed.error);
   const user = await deps.find({ userId: parsed.data.userId, externalId: parsed.data.externalId });
   if (!user) return fail(404, 'not_found');
-  const { email } = parsed.data;
-  if (user.email.toLowerCase() === email) return ok({ user });
+  const { email, venueId } = parsed.data;
+  // the venue first: it is the partner's to set, also for a user who signs in by themselves
+  if (venueId !== undefined && deps.setVenue) {
+    const linked = await deps.setVenue(user.userId, venueId);
+    if (linked === 'venue_not_found') return fail(404, 'venue_not_found');
+    if (linked === 'not_found') return fail(404, 'not_found');
+  }
+  if (email === undefined || user.email.toLowerCase() === email)
+    return ok({ user: await withVenue(user, deps) });
   if (user.userManaged) return fail(409, 'user_managed');
   if (!(await deps.updateEmail(user.userId, email))) return fail(409, 'email_taken');
-  return ok({ user: { ...user, email } });
+  return ok({ user: await withVenue({ ...user, email }, deps) });
 }
 
 /**
@@ -273,7 +306,7 @@ export async function setDiscount(raw: unknown, deps: PartnerDeps, now = Date.no
     { userId, externalId },
     { percent, until, note: parsed.data.note || null },
   );
-  return user ? ok({ user }) : fail(404, 'not_found');
+  return user ? ok({ user: await withVenue(user, deps) }) : fail(404, 'not_found');
 }
 
 /** DELETE /api/partner/v1/discounts?externalId=… | ?userId=… — the user's discount is removed. */
@@ -285,7 +318,7 @@ export async function removeDiscount(params: URLSearchParams, deps: PartnerDeps)
   });
   if (!by.success) return invalid(by.error);
   const user = await deps.setDiscount({ userId: by.data.userId, externalId: by.data.externalId }, null);
-  return user ? ok({ user }) : fail(404, 'not_found');
+  return user ? ok({ user: await withVenue(user, deps) }) : fail(404, 'not_found');
 }
 
 /** GET /api/partner/v1/users?externalId=… | ?userId=… | ?email=… — one of the partner's users. */
@@ -307,5 +340,5 @@ export async function lookupUser(params: URLSearchParams, deps: PartnerDeps): Pr
     if (!id) return fail(404, 'not_found');
   }
   const user = await deps.find(id ? { userId: id } : { externalId: externalId ?? undefined });
-  return user ? ok({ user }) : fail(404, 'not_found');
+  return user ? ok({ user: await withVenue(user, deps) }) : fail(404, 'not_found');
 }

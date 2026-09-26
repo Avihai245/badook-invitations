@@ -280,6 +280,7 @@ describe('the plan and the solver', () => {
       background: null,
       metersPerPixel: null,
       source: null,
+      venuePlan: null,
       gridM: 0.5,
       landmarks: [{ id: 'stage', kind: 'stage', x: 3, y: 0, w: 4, h: 1, rotation: 0, label: null }],
       settings: DEFAULT_SETTINGS,

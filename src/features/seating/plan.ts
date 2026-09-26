@@ -406,6 +406,7 @@ export function mergePlans(base: Plan, local: Plan, server: Plan): Plan {
       background: layoutFields('background'),
       metersPerPixel: layoutFields('metersPerPixel'),
       source: layoutFields('source'),
+      venuePlan: layoutFields('venuePlan'),
       gridM: layoutFields('gridM'),
       settings: layoutFields('settings'),
       landmarks,

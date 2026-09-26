@@ -132,5 +132,18 @@ export function partnerDeps(site: string): PartnerDeps {
         p_limit: PARTNER_LIMIT.count,
         p_window_seconds: PARTNER_LIMIT.windowSeconds,
       }),
+    // the venue a user belongs to (supabase/migrations/*_seating.sql)
+    venueOf: (userId) =>
+      rpc<string | null>('partner_user_venue', { p_source: PARTNER_SOURCE, p_user_id: userId }),
+    venueExists: async (venueId) =>
+      !!(await rpc<unknown>('partner_venue_get', { p_source: PARTNER_SOURCE, p_external_id: venueId })),
+    async setVenue(userId, venueId) {
+      const answer = await rpc<{ ok: boolean; code?: string } | null>('partner_user_venue_set', {
+        p_source: PARTNER_SOURCE,
+        p_user_id: userId,
+        p_venue: venueId,
+      });
+      return !answer ? 'not_found' : answer.ok ? 'ok' : 'venue_not_found';
+    },
   };
 }
