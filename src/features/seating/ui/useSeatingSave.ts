@@ -123,19 +123,19 @@ export function useSeatingSave({
   }, [plan, flush]);
 
   // replies (and other windows' saves) while the screen is open
+  const refresh = useCallback(async () => {
+    if (document.visibilityState !== 'visible' || busy.current) return;
+    const server = await fetchState();
+    if (!server) return;
+    onUnits(server);
+    if (server.version !== version.current && latest.current === base.current) {
+      version.current = server.version;
+      base.current = server.plan;
+      latest.current = server.plan;
+      onServerPlan(server.plan, false);
+    }
+  }, [fetchState, onServerPlan, onUnits]);
   useEffect(() => {
-    const refresh = async () => {
-      if (document.visibilityState !== 'visible' || busy.current) return;
-      const server = await fetchState();
-      if (!server) return;
-      onUnits(server);
-      if (server.version !== version.current && latest.current === base.current) {
-        version.current = server.version;
-        base.current = server.plan;
-        latest.current = server.plan;
-        onServerPlan(server.plan, false);
-      }
-    };
     const every = window.setInterval(() => void refresh(), REFRESH_MS);
     const onFocus = () => void refresh();
     window.addEventListener('focus', onFocus);
@@ -143,7 +143,7 @@ export function useSeatingSave({
       window.clearInterval(every);
       window.removeEventListener('focus', onFocus);
     };
-  }, [fetchState, onServerPlan, onUnits]);
+  }, [refresh]);
 
   // leaving with unsaved changes: the browser asks first
   useEffect(() => {
@@ -154,5 +154,18 @@ export function useSeatingSave({
     return () => window.removeEventListener('beforeunload', onLeave);
   }, []);
 
-  return { status, overTable, retry: () => void flush() };
+  // (the event day's freeze: a confirmed change's families are told their new table once it is stored)
+  const isStored = useCallback((p: Plan) => p === base.current, []);
+  return {
+    status,
+    overTable,
+    retry: () => void flush(),
+    /** the plan changed on the server (an undo in the history): show it now (after a save in flight) */
+    reload: () =>
+      void (async () => {
+        for (let i = 0; i < 20 && busy.current; i++) await new Promise((r) => setTimeout(r, 250));
+        await refresh();
+      })(),
+    isStored,
+  };
 }

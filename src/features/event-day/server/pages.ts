@@ -13,7 +13,7 @@ import { eventDayDb } from './db';
 import { featureStates, type DayFeatures } from './host-api';
 import { tableTemplateReady } from './notify';
 import { checkinCode, rateKey, sha256Hex, STATION_TOKEN_RE } from './tokens';
-import { qrCode } from './deps';
+import { qrSvg } from './deps';
 
 /** What the event day's pages need on their first render (the pages fetch the rest themselves). */
 
@@ -81,7 +81,7 @@ export async function guidePage(
       table: table ? { id: table.id, number: table.number, label: table.label ?? null } : null,
       hall: { ...hall, planUrl: hall.background && base ? `${base}/${hall.background.path}` : null },
       route: route ? { points: route.points, length: route.length } : null,
-      checkin: code ? { code, qr: (await qrCode(qrPayload(code))).svg } : null,
+      checkin: code ? { code, qr: await qrSvg(qrPayload(code)) } : null,
       inviteUrl: `/i/${row.invitation.slug}?g=${token}`,
     },
   };

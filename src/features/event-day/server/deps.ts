@@ -20,6 +20,9 @@ export function stationDeps(): StationDeps {
 
 const QR = { margin: 1, errorCorrectionLevel: 'M', color: { dark: '#1C1917', light: '#FFFFFF' } } as const;
 
+/** A QR code as SVG (a guest's entrance code on the guide and on printed table cards). */
+export const qrSvg = (text: string): Promise<string> => QRCode.toString(text, { ...QR, type: 'svg' });
+
 /** A QR code as SVG and PNG (the station link on the host's screen). */
 export async function qrCode(text: string): Promise<{ svg: string; png: string }> {
   const [svg, png] = await Promise.all([
