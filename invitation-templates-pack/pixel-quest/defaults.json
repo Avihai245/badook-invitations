@@ -1,0 +1,440 @@
+{
+  "templateId": "pixel-quest",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו כדי להתחיל את המשחק",
+        "en": "Press start"
+      },
+      "eyebrow": {
+        "he": "עולים שלב! בואו לחגוג עם",
+        "en": "Level up! Celebrate with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמשחק מתחיל",
+          "en": "Until the game begins"
+        },
+        "afterEvent": {
+          "he": "איזה משחק! תודה ששיחקתם איתנו",
+          "en": "What a game! Thanks for playing with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שחקן אחד, שלב חדש",
+          "en": "Player one, new level"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה שלב — עם משחקים, אתגרים, פיצה ועוגה.\nמוכנים? השלט אצלכם.",
+          "en": "On {date}, {primary} levels up — with games, challenges, pizza and cake.\nReady? The controller is yours."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "זירת המשחק",
+          "en": "The game zone"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "השחקנים מגיעים",
+            "en": "Players arrive"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "טורניר משחקים",
+            "en": "Game tournament"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "פיצה ונשנושים",
+            "en": "Pizza & snacks"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ונרות",
+            "en": "Cake & candles"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "19:15",
+          "label": {
+            "he": "הבוס האחרון: ריקודים",
+            "en": "Final boss: dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "מה להביא",
+            "en": "What to bring"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "בגדים נוחים ומצב רוח של אלופים — את השלטים והקונסולות אנחנו מביאים.",
+            "en": "Comfy clothes and a champion’s spirit — we’ll bring the controllers and consoles."
+          },
+          "illustration": "template:controller"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למשחק?",
+          "en": "Joining the game?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה בשלב הבא",
+          "en": "Awesome! See you on the next level"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם חיים נוספים",
+          "en": "Too bad! We’ll save you an extra life"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בשלב הבא!",
+        "en": "See you on the next level!"
+      }
+    },
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "לחצו כדי להתחיל את המשחק",
+        "en": "Press start"
+      },
+      "eyebrow": {
+        "he": "עולה לתורה ועולה שלב — בר המצווה של",
+        "en": "Level 13 unlocked — the Bar Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהשלב הבא נפתח",
+          "en": "Until the next level unlocks"
+        },
+        "afterEvent": {
+          "he": "איזה שלב! מזל טוב ותודה",
+          "en": "What a level! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלב 13: בר מצווה",
+          "en": "Level 13: Bar Mitzvah"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה — ובערב עולים שלב כולנו ביחד.\nמשחקים, רחבה והמון הפתעות.",
+          "en": "On {date}, {primary} is called to the Torah — and in the evening we all level up together.\nGames, dancing and plenty of surprises."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ומצגת",
+            "en": "Blessings & slideshow"
+          },
+          "icon": "camera"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "רחבה ועמדות משחק",
+            "en": "Dancing & game zone"
+          },
+          "icon": "party"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "הבוס האחרון: הפתעה",
+            "en": "Final boss: a surprise"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "activities",
+          "title": {
+            "he": "עמדות משחק",
+            "en": "Game zone"
+          },
+          "subtitle": {
+            "he": "מי ישבור את השיא?",
+            "en": "Who’ll beat the high score?"
+          },
+          "body": {
+            "he": "קונסולות, סימולטורים ותחרויות עם פרסים — תביאו את כל הכישרון.",
+            "en": "Consoles, simulators and contests with prizes — bring your A-game."
+          },
+          "illustration": "template:controller"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למשחק?",
+          "en": "Joining the game?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the Bar Mitzvah boy"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה בשלב הבא",
+          "en": "Awesome! See you on the next level"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם חיים נוספים",
+          "en": "Too bad! We’ll save you an extra life"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה בשלב הבא!",
+        "en": "Mazal tov — see you on the next level!"
+      }
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "לחצו כדי להתחיל את המשחק",
+        "en": "Press start"
+      },
+      "eyebrow": {
+        "he": "שלב 12 נפתח — בת המצווה של",
+        "en": "Level 12 unlocked — the Bat Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהשלב הבא נפתח",
+          "en": "Until the next level unlocks"
+        },
+        "afterEvent": {
+          "he": "איזה שלב! מזל טוב ותודה",
+          "en": "What a level! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלב 12: בת מצווה",
+          "en": "Level 12: Bat Mitzvah"
+        },
+        "body": {
+          "he": "ב־{date} {primary} חוגגת בת מצווה — ואנחנו פותחים את השלב הכי שמח שיש.\nמשחקים, רחבה והמון הפתעות.",
+          "en": "On {date}, {primary} celebrates her Bat Mitzvah — and we’re unlocking the happiest level yet.\nGames, dancing and plenty of surprises."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ומצגת",
+            "en": "Blessings & slideshow"
+          },
+          "icon": "camera"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "רחבה ועמדות משחק",
+            "en": "Dancing & game zone"
+          },
+          "icon": "party"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "הבוס האחרון: הפתעה",
+            "en": "Final boss: a surprise"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "activities",
+          "title": {
+            "he": "עמדות משחק",
+            "en": "Game zone"
+          },
+          "subtitle": {
+            "he": "מי תשבור את השיא?",
+            "en": "Who’ll beat the high score?"
+          },
+          "body": {
+            "he": "קונסולות, ריקודים מול המסך ותחרויות עם פרסים — תביאו את כל הכישרון.",
+            "en": "Consoles, dance-offs on the big screen and contests with prizes — bring your A-game."
+          },
+          "illustration": "template:controller"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למשחק?",
+          "en": "Joining the game?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A blessing for the Bat Mitzvah girl"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה בשלב הבא",
+          "en": "Awesome! See you on the next level"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם חיים נוספים",
+          "en": "Too bad! We’ll save you an extra life"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה בשלב הבא!",
+        "en": "Mazal tov — see you on the next level!"
+      }
+    }
+  }
+}

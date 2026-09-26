@@ -1,0 +1,285 @@
+{
+  "templateId": "ballet-rose",
+  "defaults": {
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "לחצו כדי להרים את המסך",
+        "en": "Tap to raise the curtain"
+      },
+      "eyebrow": {
+        "he": "המסך עולה לכבוד בת המצווה של",
+        "en": "The curtain rises for the Bat Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמסך עולה",
+          "en": "Until the curtain rises"
+        },
+        "afterEvent": {
+          "he": "איזו הופעה! מזל טוב ותודה",
+          "en": "What a performance! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "רגע על הבמה",
+          "en": "Her moment on stage"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לבמה וחוגגת בת מצווה.\nנשמח שתהיו בקהל — ותרקדו איתנו אחרי ההופעה.",
+          "en": "On {date}, {primary} takes the stage for her Bat Mitzvah.\nWe’d love you in the audience — and on the dance floor after the show."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ומצגת",
+            "en": "Blessings & slideshow"
+          },
+          "icon": "camera"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "ריקוד בת המצווה",
+            "en": "The Bat Mitzvah dance"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "רחבה",
+            "en": "Dance floor"
+          },
+          "icon": "party"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "ורוד, זהב ונצנוץ עדין",
+            "en": "Blush, gold and a little sparkle"
+          },
+          "body": {
+            "he": "משהו חגיגי שנוח לרקוד בו — ורוד, שמנת או זהב יתאימו בדיוק לבמה.",
+            "en": "Something festive you can dance in — blush, cream or gold will match the stage perfectly."
+          },
+          "illustration": "template:slippers"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "נשמור לכם מקום?",
+          "en": "Shall we save you a seat?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A blessing for the Bat Mitzvah girl"
+        },
+        "successMessage": {
+          "he": "נפלא! שמרנו לכם מקום בשורה הראשונה",
+          "en": "Wonderful! Your front-row seat is saved"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד צעד גם בשבילכם",
+          "en": "Too bad! We’ll dance a step for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה בשורה הראשונה",
+        "en": "Mazal tov — see you in the front row"
+      }
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו כדי להרים את המסך",
+        "en": "Tap to raise the curtain"
+      },
+      "eyebrow": {
+        "he": "המסך עולה! בואו לחגוג עם",
+        "en": "Curtain up! Come celebrate with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמסך עולה",
+          "en": "Until the curtain rises"
+        },
+        "afterEvent": {
+          "he": "איזו הופעה! תודה שבאתם",
+          "en": "What a show! Thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "בלרינה קטנה, חגיגה גדולה",
+          "en": "Little ballerina, big party"
+        },
+        "body": {
+          "he": "ב־{date} חוגגים עם טוטו, נעלי בלט והרבה סיבובים.\nסדנת בלט, מופע קטן ועוגה — בואו לרקוד איתנו!",
+          "en": "On {date} we celebrate with tutus, ballet shoes and lots of twirls.\nA ballet workshop, a little show and cake — come dance with us!"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "16:30",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:00",
+          "label": {
+            "he": "סדנת בלט",
+            "en": "Ballet workshop"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "17:45",
+          "label": {
+            "he": "מופע קטן",
+            "en": "A little show"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "עוגה ונרות",
+            "en": "Cake & candles"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "מה להביא",
+            "en": "What to bring"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "בגדים נוחים לריקוד — וטוטו תמיד מתקבל בברכה!",
+            "en": "Comfy clothes for dancing — tutus always welcome!"
+          },
+          "illustration": "template:tutu"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים להופעה?",
+          "en": "Coming to the show?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "נפלא! שמרנו לכם מקום בשורה הראשונה",
+          "en": "Wonderful! Your front-row seat is saved"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד צעד גם בשבילכם",
+          "en": "Too bad! We’ll dance a step for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בשורה הראשונה!",
+        "en": "See you in the front row!"
+      }
+    }
+  }
+}

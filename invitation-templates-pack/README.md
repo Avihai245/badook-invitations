@@ -36,3 +36,8 @@ Install: the manifests and defaults are read from this folder by the app (src/fe
 | `martini-olive` | birthday, engagement, corporate | standard |
 | `majolica` | wedding, engagement, baby_shower, other | standard |
 | `white-city` | corporate, wedding, other | premium |
+| `pixel-quest` | birthday, bar_mitzvah, bat_mitzvah | standard |
+| `disco-ball` | bat_mitzvah, birthday, corporate | premium |
+| `ballet-rose` | bat_mitzvah, birthday | premium |
+| `vinyl-groove` | birthday, engagement, corporate, other | standard |
+| `retro-80s` | birthday, corporate, other | premium |

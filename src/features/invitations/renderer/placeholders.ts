@@ -354,6 +354,43 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'skyline',
     ornament: 'bauhaus',
   }),
+  // T3: teens & music
+  'pixel-quest': drawn('pixel-quest', ['#1B3698', '#2A54C6', '#5E93F4'], {
+    bg: ['#3A6FE0', '#2A54C6', '#1B3698'],
+    paper: ['#FFFFFF', '#EAF2FF', '#C8D7F5'],
+    hint: 'rgba(255,255,255,.9)',
+    panorama: 'hills',
+    ornament: 'pixel-heart',
+    ticket: { paper: '#FFD447', edge: 'rgba(21,32,75,.45)' },
+  }),
+  'disco-ball': drawn('disco-ball', ['#2A0E45', '#1C0A30', '#12071F'], {
+    bg: ['#231038', '#170A28', '#0D0618'],
+    paper: ['#5A2F86', '#46236C', '#321852'],
+    hint: 'rgba(255,244,251,.85)',
+    panorama: 'stars',
+    ornament: 'mirror-ball',
+  }),
+  'ballet-rose': drawn('ballet-rose', ['#EFC3CD', '#F8DCE2', '#EDBFC9'], {
+    bg: ['#9A2A4C', '#7E1C3C', '#5C102B'],
+    paper: ['#FFF8F8', '#FBEAEE', '#F1D3DA'],
+    hint: 'rgba(255,240,244,.9)',
+    panorama: 'swags',
+    ornament: 'ballet-slippers',
+  }),
+  'vinyl-groove': drawn('vinyl-groove', ['#1C1410', '#261A14', '#1A120E'], {
+    bg: ['#2E221B', '#221914', '#16100C'],
+    paper: ['#E9D3B0', '#DCC29A', '#C9AA7E'],
+    hint: 'rgba(246,234,219,.85)',
+    panorama: 'doodle',
+    ornament: 'vinyl',
+  }),
+  'retro-80s': drawn('retro-80s', ['#0D0526', '#33104F', '#2A0848'], {
+    bg: ['#2A1052', '#1C0B3A', '#110626'],
+    paper: ['#FFB38A', '#FF6F91', '#C2458F'],
+    hint: 'rgba(255,243,255,.88)',
+    panorama: 'stars',
+    ornament: 'cassette',
+  }),
 };
 
 /**

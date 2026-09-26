@@ -21,6 +21,12 @@ import MidnightBloom from './midnight-bloom';
 import NeonNight from './neon-night';
 import ScribbleLove from './scribble-love';
 import WhiteCity from './white-city';
+// T3: teens & music
+import PixelQuest from './pixel-quest';
+import DiscoBall from './disco-ball';
+import BalletRose from './ballet-rose';
+import VinylGroove from './vinyl-groove';
+import Retro80s from './retro-80s';
 
 export type { SceneId } from './ids';
 export type { ScenePlace } from './kit';
@@ -46,6 +52,12 @@ const SCENES: Record<SceneId, ComponentType<SceneProps>> = {
   'dino-hatch': DinoHatch,
   'deco-gatsby': DecoGatsby,
   'white-city': WhiteCity,
+  // T3: teens & music
+  'pixel-quest': PixelQuest,
+  'disco-ball': DiscoBall,
+  'ballet-rose': BalletRose,
+  'vinyl-groove': VinylGroove,
+  'retro-80s': Retro80s,
 };
 
 const ROOT: CSSProperties = {

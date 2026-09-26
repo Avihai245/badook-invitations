@@ -1,0 +1,236 @@
+{
+  "id": "pixel-quest",
+  "version": 2,
+  "name": {
+    "he": "גיימינג",
+    "en": "Pixel Quest"
+  },
+  "description": {
+    "he": "שלב שמונה־ביט בצהרי היום — שמיים כחולים בפיקסלים, עננים עם קו מתאר, לבבות ושלט LEVEL UP, קוביית סימן שאלה שמקפיצה מטבע, מטבעות באמצע סיבוב וגבעות ירוקות. מסיבה שמתחילה בלחיצה על Start.",
+    "en": "An 8-bit level at noon — a pixel-blue sky, outlined clouds, a HUD of hearts and a LEVEL UP banner, a question block popping a coin, coins mid-spin and rolling green hills. A party that starts when you press Start."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "bar_mitzvah",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/pixel-quest/preview.webp",
+  "previewVideo": "/templates/pixel-quest/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#EAF2FF",
+      "surface": "#FFFFFF",
+      "ink": "#15204B",
+      "inkMuted": "#4A5785",
+      "accent": "#FFC21A",
+      "accentInk": "#15204B",
+      "line": "#C8D7F5",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 0,
+      "button": 0
+    },
+    "divider": "none"
+  },
+  "palettePresets": [
+    {
+      "id": "coin",
+      "name": {
+        "he": "מטבע זהב",
+        "en": "Gold coin"
+      },
+      "palette": {
+        "accent": "#FFC21A",
+        "accentInk": "#15204B"
+      }
+    },
+    {
+      "id": "one-up",
+      "name": {
+        "he": "חיים נוספים",
+        "en": "Extra life"
+      },
+      "palette": {
+        "accent": "#36C95A",
+        "accentInk": "#15204B"
+      }
+    },
+    {
+      "id": "power-up",
+      "name": {
+        "he": "פאוור־אפ",
+        "en": "Power-up"
+      },
+      "palette": {
+        "accent": "#FF5C8A",
+        "accentInk": "#15204B"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "level-up",
+      "display": {
+        "latin": "Titan One",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Space Mono",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Rubik",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "console",
+      "display": {
+        "latin": "Unbounded",
+        "hebrew": "Fredoka"
+      },
+      "heading": {
+        "latin": "Nunito",
+        "hebrew": "Fredoka"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Varela Round"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Varela Round"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "video",
+    "poster": "/templates/pixel-quest/cover-poster.webp",
+    "posterDesktop": "/templates/pixel-quest/cover-poster-desktop.webp",
+    "openVideo": "/templates/pixel-quest/cover-open.mp4",
+    "openVideoDesktop": "/templates/pixel-quest/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#15204B",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Titan One",
+      "hebrew": "Secular One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שלב פיקסלים עם מטבעות וקוביית הפתעה",
+          "en": "A pixel level with coins and a question block"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0E1D5C",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "pixel-quest-theme",
+    "tracks": [
+      {
+        "id": "pixel-quest-theme",
+        "title": "Press Start (8-bit chiptune)",
+        "url": "/templates/pixel-quest/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": false,
+    "stagger": 0.06
+  },
+  "assets": {
+    "hero": "/templates/pixel-quest/hero.mp4",
+    "hero-poster": "/templates/pixel-quest/hero-poster.webp",
+    "hero-desktop": "/templates/pixel-quest/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/pixel-quest/hero-desktop-poster.webp",
+    "pixel-band": "/templates/pixel-quest/pixel-band.webp",
+    "hills-panorama": "/templates/pixel-quest/hills-panorama.webp",
+    "question-block": "/templates/pixel-quest/question-block.webp",
+    "hearts": "/templates/pixel-quest/hearts.webp",
+    "controller": "/templates/pixel-quest/controller.webp"
+  },
+  "decorations": {
+    "afterHero": "template:pixel-band",
+    "betweenVenues": "template:hills-panorama",
+    "afterTimeline": "template:question-block",
+    "beforeRsvp": "template:hearts",
+    "footer": "template:controller"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

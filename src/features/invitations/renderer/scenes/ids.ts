@@ -20,6 +20,12 @@ export const SCENE_IDS = [
   'dino-hatch',
   'deco-gatsby',
   'white-city',
+  // T3: teens & music
+  'pixel-quest',
+  'disco-ball',
+  'ballet-rose',
+  'vinyl-groove',
+  'retro-80s',
 ] as const;
 
 export type SceneId = (typeof SCENE_IDS)[number];

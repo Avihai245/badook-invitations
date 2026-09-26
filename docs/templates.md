@@ -41,6 +41,11 @@ and takes the colour presets and the font pairs like the others. Ten are premium
 | ניאון / Neon Night (`neon-night`) | Neon signage — glowing tubes for night parties and bar/bat mitzvahs | bar_mitzvah, bat_mitzvah, birthday, corporate | ✓ |
 | שרבוט / Scribble Love (`scribble-love`) | Hand-drawn / “imperfect on purpose” — notes-app collage and marker doodles | engagement, birthday, other | |
 | העיר הלבנה / White City (`white-city`) | Tel Aviv Bauhaus architecture — modernist balconies and grids | corporate, wedding, other | ✓ |
+| גיימינג / Pixel Quest (`pixel-quest`) | 8-bit video-game pixel art — a platformer level with a question block, coins and a LEVEL UP banner, for gamer kids and teens | birthday, bar_mitzvah, bat_mitzvah | |
+| דיסקו / Disco Ball (`disco-ball`) | Disco revival — a mirror ball, coloured rays and a light-up dance floor, for teens and grown-up parties | bat_mitzvah, birthday, corporate | ✓ |
+| בלט / Ballet Rose (`ballet-rose`) | Ballet-core — a jewel-box theatre stage with pointe shoes, a tutu and roses, for young dancers and bat mitzvahs | bat_mitzvah, birthday | ✓ |
+| תקליט / Vinyl Groove (`vinyl-groove`) | The vinyl revival — a mid-century hi-fi corner with a walnut turntable, a speaker and lamplight | birthday, engagement, corporate, other | |
+| שנות ה־80 / Retro 80s (`retro-80s`) | Synthwave / outrun — a striped sun, a neon grid to the horizon, palms and a cassette | birthday, corporate, other | ✓ |
 
 Each design has: Hebrew and English names, starter texts for every event it's listed under, two font
 pairs (plus the shared font library), three colour presets, a cover, a hero scene and a gallery poster,

@@ -1,0 +1,497 @@
+{
+  "templateId": "vinyl-groove",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו כדי להוריד את המחט",
+        "en": "Tap to drop the needle"
+      },
+      "eyebrow": {
+        "he": "מסובבים תקליטים לכבוד",
+        "en": "Spinning records for"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמחט יורדת",
+          "en": "Until the needle drops"
+        },
+        "afterEvent": {
+          "he": "איזה ערב! תודה שבאתם",
+          "en": "What a night! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הלהיטים הגדולים",
+          "en": "The greatest hits"
+        },
+        "body": {
+          "he": "ב־{date} חוגגים עוד שנה של להיטים — תקליטים, קוקטיילים וחברים טובים.\nבואו לרקוד איתנו.",
+          "en": "On {date} we celebrate another year of greatest hits — records, cocktails and good friends.\nCome dance with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:30",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "צד א׳: ארוחת ערב",
+            "en": "Side A: dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:15",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "22:45",
+          "label": {
+            "he": "צד ב׳: ריקודים",
+            "en": "Side B: dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "בקשות מוזיקליות",
+            "en": "Song requests"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "יש שיר שחייב להתנגן? כתבו לנו אותו כשאתם מאשרים הגעה.",
+            "en": "Got a song that has to be played? Tell us when you RSVP."
+          },
+          "illustration": "template:vinyl-record"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "תהיו שם?",
+          "en": "Will you be there?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה — ובקשה לשיר",
+          "en": "Wishes — and a song request"
+        },
+        "successMessage": {
+          "he": "מעולה! נשמור לכם מקום ליד הרחבה",
+          "en": "Great! We’ll save you a spot by the dance floor"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמיע שיר גם בשבילכם",
+          "en": "Too bad! We’ll play one for you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה, והמוזיקה עלינו",
+        "en": "See you there — the music’s on us"
+      }
+    },
+    "engagement": {
+      "coverHint": {
+        "he": "לחצו כדי להוריד את המחט",
+        "en": "Tap to drop the needle"
+      },
+      "eyebrow": {
+        "he": "מצאנו את השיר שלנו — ומתארסים",
+        "en": "We found our song — and we’re engaged"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמחט יורדת",
+          "en": "Until the needle drops"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "השיר שלנו",
+          "en": "Our song"
+        },
+        "body": {
+          "he": "יש שירים שמתנגנים פעם אחת ונשארים לתמיד.\nב־{date} חוגגים את האירוסין שלנו — עם מוזיקה טובה ואנשים שאנחנו אוהבים.",
+          "en": "Some songs play once and stay forever.\nOn {date} we celebrate our engagement — with good music and the people we love."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "A toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "בקשות מוזיקליות",
+            "en": "Song requests"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "יש שיר שחייב להתנגן? כתבו לנו אותו כשאתם מאשרים הגעה.",
+            "en": "Got a song that has to be played? Tell us when you RSVP."
+          },
+          "illustration": "template:vinyl-record"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "תבואו לחגוג?",
+          "en": "Will you celebrate with us?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A note for the couple"
+        },
+        "successMessage": {
+          "he": "נפלא! נתראה על הרחבה",
+          "en": "Wonderful! See you on the dance floor"
+        },
+        "declineMessage": {
+          "he": "חבל! נרים כוסית לכבודכם",
+          "en": "Too bad! We’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "באהבה ובמוזיקה",
+        "en": "With love and music"
+      }
+    },
+    "corporate": {
+      "coverHint": {
+        "he": "לחצו כדי להוריד את המחט",
+        "en": "Tap to drop the needle"
+      },
+      "eyebrow": {
+        "he": "ערב של מוזיקה טובה עם",
+        "en": "An evening of good music with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמחט יורדת",
+          "en": "Until the needle drops"
+        },
+        "afterEvent": {
+          "he": "איזה ערב! תודה שבאתם",
+          "en": "What an evening! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הלהיטים של השנה",
+          "en": "This year’s greatest hits"
+        },
+        "body": {
+          "he": "לשנה של הצלחות מגיע פסקול טוב.\nב־{date} — ערב של תקליטים, קוקטיילים וצוות מנצח.",
+          "en": "A year of wins deserves a great soundtrack.\nOn {date} — an evening of records, cocktails and a winning team."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הערב",
+          "en": "The evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome drinks"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "דברי ברכה",
+            "en": "Opening remarks"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "די־ג׳יי ותקליטים",
+            "en": "DJ & vinyl set"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "הערה למארגנים",
+          "en": "A note for the organizers"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בערב",
+          "en": "Thank you! See you there"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון",
+          "en": "Thanks for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה, והמוזיקה עלינו",
+        "en": "See you there — the music’s on us"
+      }
+    },
+    "other": {
+      "coverHint": {
+        "he": "לחצו כדי להוריד את המחט",
+        "en": "Tap to drop the needle"
+      },
+      "eyebrow": {
+        "he": "ערב תקליטים עם",
+        "en": "A night of records with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהמחט יורדת",
+          "en": "Until the needle drops"
+        },
+        "afterEvent": {
+          "he": "תודה שהייתם איתנו",
+          "en": "Thank you for joining us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "צד א׳, שיר ראשון",
+          "en": "Side A, track one"
+        },
+        "body": {
+          "he": "מוזיקה טובה, משהו טעים ואנשים שאנחנו אוהבים.\nנתראה ב־{date}.",
+          "en": "Good music, something delicious and people we love.\nSee you on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הערב",
+          "en": "The evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחה",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "תקליטים וריקודים",
+            "en": "Records & dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כמה מילים טובות",
+          "en": "A few kind words"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה",
+          "en": "Thank you! See you there"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם",
+          "en": "Thank you for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה, והמוזיקה עלינו",
+        "en": "See you there — the music’s on us"
+      }
+    }
+  }
+}

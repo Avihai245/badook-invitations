@@ -42,7 +42,26 @@ const COUPLE: DemoPeople = {
  * Designs made for one age or crowd show a person who fits them — a toddler's third birthday, a
  * grandmother's eightieth — instead of the event type's sample: by template id, then event type.
  */
-const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = {};
+const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = {
+  // T3: teens & music
+  'pixel-quest': {
+    birthday: { primary: { he: 'גיא', en: 'Guy' }, monogram: { he: 'גיא 12', en: 'GUY 12' } },
+    bar_mitzvah: PEOPLE.bar_mitzvah!,
+    bat_mitzvah: PEOPLE.bat_mitzvah!,
+  },
+  'disco-ball': {
+    birthday: { primary: { he: 'נועה', en: 'Noa' }, monogram: { he: 'נועה 16', en: 'NOA 16' } },
+  },
+  'ballet-rose': {
+    birthday: { primary: { he: 'אלה', en: 'Ella' }, monogram: { he: 'אלה 8', en: 'ELLA 8' } },
+  },
+  'vinyl-groove': {
+    birthday: { primary: { he: 'רון', en: 'Ron' }, monogram: { he: 'רון 40', en: 'RON 40' } },
+  },
+  'retro-80s': {
+    birthday: { primary: { he: 'מיכל', en: 'Michal' }, monogram: { he: 'מיכל 45', en: 'MICHAL 45' } },
+  },
+};
 
 /**
  * Who a demo of this event type is for: the design's own sample person when it has one, else a

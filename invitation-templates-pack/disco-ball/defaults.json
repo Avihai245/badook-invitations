@@ -1,0 +1,422 @@
+{
+  "templateId": "disco-ball",
+  "defaults": {
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "לחצו כדי להדליק את כדור הדיסקו",
+        "en": "Tap to light up the mirror ball"
+      },
+      "eyebrow": {
+        "he": "ליל דיסקו לכבוד בת המצווה של",
+        "en": "Disco night for the Bat Mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהכדור מתחיל להסתובב",
+          "en": "Until the mirror ball starts to spin"
+        },
+        "afterEvent": {
+          "he": "איזה לילה! מזל טוב ותודה",
+          "en": "What a night! Mazal tov and thank you"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שתים־עשרה ונוצצת",
+          "en": "Twelve and sparkling"
+        },
+        "body": {
+          "he": "ב־{date} {primary} חוגגת בת מצווה — והרחבה כבר מנצנצת.\nבואו לרקוד איתנו מתחת לכדור הדיסקו.",
+          "en": "On {date}, {primary} celebrates her Bat Mitzvah — and the dance floor is already sparkling.\nCome dance with us under the mirror ball."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ומצגת",
+            "en": "Blessings & slideshow"
+          },
+          "icon": "camera"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "דיסקו על הרחבה",
+            "en": "Disco dance floor"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "הפתעה נוצצת",
+            "en": "A sparkling surprise"
+          },
+          "icon": "star"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "כל מה שמנצנץ",
+            "en": "Anything that sparkles"
+          },
+          "body": {
+            "he": "פאייטים, כסף, זהב ונעליים שנוח לרקוד בהן — הרחבה תהיה מלאה.",
+            "en": "Sequins, silver, gold and shoes made for dancing — the floor will be packed."
+          },
+          "illustration": "template:mirror-ball"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לרקוד?",
+          "en": "Coming to dance?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A blessing for the Bat Mitzvah girl"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה מתחת לכדור הדיסקו",
+          "en": "Awesome! See you under the mirror ball"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד גם בשבילכם",
+          "en": "Too bad! We’ll dance for you too"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הרחבה!",
+        "en": "Mazal tov — see you on the dance floor!"
+      }
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו כדי להדליק את כדור הדיסקו",
+        "en": "Tap to light up the mirror ball"
+      },
+      "eyebrow": {
+        "he": "ליל דיסקו לכבוד",
+        "en": "A disco night for"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהכדור מתחיל להסתובב",
+          "en": "Until the mirror ball starts to spin"
+        },
+        "afterEvent": {
+          "he": "איזה לילה! תודה שבאתם לרקוד",
+          "en": "What a night! Thanks for dancing with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "לילה אחד של נצנצים",
+          "en": "One night of sparkle"
+        },
+        "body": {
+          "he": "ב־{date} מכבים את האורות, מדליקים את כדור הדיסקו ורוקדים עד הבוקר.\nמוזיקה טובה, עוגה ואתם.",
+          "en": "On {date} we dim the lights, switch on the mirror ball and dance till morning.\nGood music, cake and you."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:30",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "די־ג׳יי",
+            "en": "DJ set"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "23:00",
+          "label": {
+            "he": "דיסקו עד הבוקר",
+            "en": "Disco till dawn"
+          },
+          "icon": "party"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "כל מה שמנצנץ",
+            "en": "Anything that sparkles"
+          },
+          "body": {
+            "he": "פאייטים, כסף, זהב וכמה שיותר נצנצים — ונעליים שנוח לרקוד בהן.",
+            "en": "Sequins, silver, gold and all the glitter you’ve got — plus shoes made for dancing."
+          },
+          "illustration": "template:mirror-ball"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "באים לרקוד?",
+          "en": "Coming to dance?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה מתחת לכדור הדיסקו",
+          "en": "Awesome! See you under the mirror ball"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד גם בשבילכם",
+          "en": "Too bad! We’ll dance for you too"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על הרחבה!",
+        "en": "See you on the dance floor!"
+      }
+    },
+    "corporate": {
+      "coverHint": {
+        "he": "לחצו כדי להדליק את כדור הדיסקו",
+        "en": "Tap to light up the mirror ball"
+      },
+      "eyebrow": {
+        "he": "ליל הדיסקו השנתי של",
+        "en": "The annual disco night of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שהרחבה נפתחת",
+          "en": "Until the dance floor opens"
+        },
+        "afterEvent": {
+          "he": "איזו מסיבה! תודה שבאתם",
+          "en": "What a party! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שנה נוצצת",
+          "en": "A year that sparkled"
+        },
+        "body": {
+          "he": "עבדנו קשה, הצלחנו בגדול — ועכשיו הזמן לרקוד.\nב־{date}, ליל דיסקו לכל הצוות.",
+          "en": "We worked hard and shone bright — now it’s time to dance.\nOn {date}, a disco night for the whole team."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome drinks"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "A toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "דיסקו על הרחבה",
+            "en": "Disco dance floor"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "נגיעה של נצנוץ",
+            "en": "A touch of sparkle"
+          },
+          "body": {
+            "he": "מה שנוח לרקוד בו, עם נגיעה של פאייטים, כסף או זהב.",
+            "en": "Whatever you can dance in — with a touch of sequins, silver or gold."
+          },
+          "illustration": "template:mirror-ball"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "הערה למארגנים",
+          "en": "A note for the organizers"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה על הרחבה",
+          "en": "Thank you! See you on the dance floor"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון",
+          "en": "Thanks for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על הרחבה",
+        "en": "See you on the dance floor"
+      }
+    }
+  }
+}
