@@ -84,7 +84,10 @@ function stableJson(value: unknown): string {
 
 type CinematicDoc = Pick<InvitationDocument, 'sections' | 'cover' | 'theme'>;
 
-/** Every v2-only value of a document (hidden sections too), with its path. */
+/**
+ * Every v2-only value of a document (hidden sections too), with its path; a section's values are
+ * its own (keyed by its id — they move with it).
+ */
 function cinematicValues(doc: CinematicDoc): { path: string; key: string }[] {
   const out: { path: string; key: string }[] = [];
   const add = (path: string, kind: string, value: unknown) => {
@@ -93,21 +96,23 @@ function cinematicValues(doc: CinematicDoc): { path: string; key: string }[] {
   add('cover.opening', 'opening', doc.cover.opening);
   if (hasThemeTokens(doc)) add('theme.tokens', 'tokens', doc.theme.tokens);
   for (const [i, s] of doc.sections.entries()) {
+    const own = (kind: string) => `${kind}@${s.id}`;
     if (s.type !== 'hero') {
-      add(`sections.${i}.media`, 'media', s.media);
-      if (s.layout && s.layout !== 'stack') add(`sections.${i}.layout`, 'layout', s.layout);
+      add(`sections.${i}.media`, own('media'), s.media);
+      if (s.layout && s.layout !== 'stack') add(`sections.${i}.layout`, own('layout'), s.layout);
     }
-    add(`sections.${i}.animation`, 'animation', s.animation);
+    add(`sections.${i}.animation`, own('animation'), s.animation);
     if (s.themeOverrides && Object.keys(s.themeOverrides).length)
-      add(`sections.${i}.themeOverrides`, 'colors', s.themeOverrides);
+      add(`sections.${i}.themeOverrides`, own('colors'), s.themeOverrides);
   }
   return out;
 }
 
 /**
  * The v2-only values `next` has that `previous` doesn't (their paths): what a save may not bring
- * while the event lacks the `cinematic` feature. What was there already — kept, moved, duplicated
- * or removed — is never a new value: a host whose feature went away keeps saving their draft.
+ * while the event lacks the `cinematic` feature. What was there already — kept, moved with its
+ * section or removed — is never a new value: a host whose feature went away keeps saving their draft.
+ * A value given to another section (a copy) is new: the editor copies sections without them then.
  */
 export function introducedCinematic(previous: CinematicDoc | null, next: CinematicDoc): string[] {
   const known = new Set(previous ? cinematicValues(previous).map((v) => v.key) : []);

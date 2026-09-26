@@ -178,7 +178,7 @@
     "revealDistance": 28,
     "revealBlur": false,
     "stagger": 0.09,
-    "ambient": "none",
+    "ambient": "fireflies",
     "intensity": 0.85
   },
   "assets": {

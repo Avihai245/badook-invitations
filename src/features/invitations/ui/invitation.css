@@ -2898,6 +2898,9 @@ html[data-framed] body::-webkit-scrollbar {
   padding: 14px 0 10px;
 }
 .cd-num {
+  /* a number reads left to right in Hebrew too: its rolling digits are boxes of their own, which an
+     RTL line would lay out from the right (264 days painted as 462) */
+  direction: ltr;
   font-family: var(--f-heading);
   font-size: 34px;
   line-height: 1;
