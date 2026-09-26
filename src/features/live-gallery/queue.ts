@@ -55,6 +55,8 @@ export interface QueueItem {
   error: string | null;
   /** bytes sent of all parts (progress) */
   sent: number;
+  /** times the server didn't find a file this phone had sent (bounded: GALLERY.queue.maxMismatches) */
+  mismatches?: number;
 }
 
 export type Action =

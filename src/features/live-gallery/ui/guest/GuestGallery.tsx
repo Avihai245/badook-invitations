@@ -100,6 +100,11 @@ function GalleryBody({
   const [loadingMore, setLoadingMore] = useState(false);
   const since = useRef<string | null>(data.initial?.now ?? null);
   const expires = useRef<number>(data.initial?.expiresAt ?? 0);
+  // what the feed shows, for telling what a refresh brought that is new
+  const itemsRef = useRef(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
 
   const [store, setStore] = useState<QueueStore | null>(null);
   const [uploaderId, setUploaderId] = useState<string | null>(null);
@@ -167,11 +172,12 @@ function GalleryBody({
       setNext(body.next);
     } else {
       const removed = new Set(body.removed);
+      const shown = new Set(itemsRef.current.map((c) => c.id));
+      const added = body.items.filter((i) => !shown.has(i.id));
+      if (added.length) setFresh(new Set(added.map((i) => i.id)));
       setItems((cur) => {
         const known = new Set(cur.map((c) => c.id));
-        const added = body.items.filter((i) => !known.has(i.id));
-        if (added.length) setFresh(new Set(added.map((i) => i.id)));
-        return [...added, ...cur.filter((c) => !removed.has(c.id))];
+        return [...body.items.filter((i) => !known.has(i.id)), ...cur.filter((c) => !removed.has(c.id))];
       });
     }
   }, []);

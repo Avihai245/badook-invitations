@@ -2,6 +2,7 @@ import { GALLERY } from '../config';
 import { hamming } from '../image-metrics';
 import type { Reason } from '../moderation';
 import {
+  backoff,
   failed,
   nextAction,
   retryNow,
@@ -380,6 +381,7 @@ export class Uploader {
       if (status === 409 && code === 'full') await this.save({ ...item, stage: 'failed', error: 'full' });
       else if (status === 404) await this.save({ ...item, stage: 'failed', error: 'gone' });
       else if (status === 400) await this.save({ ...item, stage: 'failed', error: 'invalid' });
+      else if (status === 413) await this.save({ ...item, stage: 'failed', error: 'too_large' });
       else await this.save(failed(item, status === 0 ? 'network' : 'busy', now) as StoredItem);
     }
   }
@@ -574,11 +576,21 @@ export class Uploader {
       { timeoutMs: 45_000 },
     );
     if (res.status === 409 && res.body && Array.isArray((res.body as { parts?: unknown }).parts)) {
-      // storage doesn't have some of the files after all: send them again
+      // storage doesn't have some of the files after all: send them again (a few times, not forever)
       const missing = (res.body as { parts: PartName[] }).parts;
+      const mismatches = (item.mismatches ?? 0) + 1;
+      if (mismatches > GALLERY.queue.maxMismatches) {
+        await this.save({ ...item, stage: 'failed', error: 'invalid', mismatches });
+        return;
+      }
       const parts = { ...item.parts };
       for (const name of missing) if (parts[name]) parts[name] = { ...parts[name]!, done: false };
-      await this.save({ ...succeeded(item), parts } as StoredItem);
+      await this.save({
+        ...succeeded(item),
+        parts,
+        mismatches,
+        nextAt: Date.now() + backoff(mismatches),
+      } as StoredItem);
       return;
     }
     if (!res.ok || !res.body)
@@ -586,8 +598,15 @@ export class Uploader {
     const body = res.body;
     const result = { status: body.status, reason: body.reason };
     let parts = item.parts;
-    // the original was reported sent but the server doesn't see it yet: send it again
-    if (originalDone && item.parts.original && !body.originalDone)
+    let mismatches = item.mismatches ?? 0;
+    // the original was reported sent but the server doesn't see it yet: send it again (a few times;
+    // then the photo stays as it is in the gallery, and the host's download takes its display version)
+    if (
+      originalDone &&
+      item.parts.original &&
+      !body.originalDone &&
+      ++mismatches <= GALLERY.queue.maxMismatches
+    )
       parts = { ...parts, original: { ...parts.original!, done: false } };
     const finished = !parts.original || parts.original.done;
     const next: StoredItem = {
@@ -595,6 +614,8 @@ export class Uploader {
       parts,
       stage: finished ? 'done' : 'visible',
       result: item.result ?? result,
+      mismatches,
+      nextAt: mismatches > (item.mismatches ?? 0) && !finished ? Date.now() + backoff(mismatches) : 0,
     };
     await this.save(next);
     await this.dropBlobs(next, finished ? ['thumb', 'display', 'original'] : ['thumb', 'display']);

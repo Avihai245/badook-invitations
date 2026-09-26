@@ -151,6 +151,8 @@ export const GALLERY = {
     jitter: 0.25,
     /** a paused or closed gallery is asked again after this */
     blockedRetryMs: 60_000,
+    /** times the server may say a file isn't in storage after it was sent, before the item gives up */
+    maxMismatches: 5,
   },
 
   feed: {
