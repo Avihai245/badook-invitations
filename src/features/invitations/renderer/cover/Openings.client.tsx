@@ -80,6 +80,13 @@ export function CinematicCover({
     }
   });
 
+  // `open` changes on every render (the cover re-renders, e.g. when Skip appears): the listeners
+  // below read the latest one, so a render never restarts a scroll that is already under way
+  const openRef = useRef(open);
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+
   // scroll (or swipe) to enter: the doors / the curtain follow a little, then open
   useEffect(() => {
     const el = root.current;
@@ -104,7 +111,7 @@ export function CinematicCover({
       if (e.deltaY <= 0) return;
       wheel += e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY;
       show(wheel / WHEEL_TO_OPEN);
-      if (peek >= 1) open(false);
+      if (peek >= 1) openRef.current(false);
       else settle();
     };
     const onTouchStart = (e: TouchEvent) => {
@@ -119,13 +126,13 @@ export function CinematicCover({
     const onTouchEnd = () => {
       if (startY === null) return;
       startY = null;
-      if (peek >= 0.5) open(false);
+      if (peek >= 0.5) openRef.current(false);
       else show(0);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         e.preventDefault();
-        open(false);
+        openRef.current(false);
       }
     };
     el.addEventListener('wheel', onWheel, { passive: false });
@@ -141,7 +148,7 @@ export function CinematicCover({
       el.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('keydown', onKey);
     };
-  }, [opening.scroll, phase, open]);
+  }, [opening.scroll, phase]);
 
   const cls = ['cover', 'co', phase !== 'idle' ? 'opening' : '', phase === 'gone' ? 'gone' : '']
     .filter(Boolean)
