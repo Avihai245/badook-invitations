@@ -281,7 +281,7 @@ export function SendLinkDialog({
             <p className="rounded-input bg-warning-bg px-3 py-2 text-[13px] text-warning">{N.notReady}</p>
           ) : null}
           <p className="text-[12.5px] text-muted">
-            {fmt(N.counts, { guests: number(rows.length), sent: number(counts.sent) })}
+            {plural(N.counts, rows.length, { guests: number(rows.length), sent: number(counts.sent) })}
           </p>
           <Segmented<Tab>
             value={current}

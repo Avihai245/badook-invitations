@@ -9,7 +9,10 @@ export const galleryNotifyEn: GalleryNotifyDict = {
   intro:
     'Each guest gets their own gallery link: what they upload shows up for you with their name. Send it from the official number (a credit a message), from your own WhatsApp, or copy the link.',
   tabs: { all: 'Everyone', unsent: 'Not sent yet', sent: 'Got it' },
-  counts: '{guests} guests on the list · {sent} got the link',
+  counts: {
+    one: '1 guest on the list · {sent} got the link',
+    other: '{guests} guests on the list · {sent} got the link',
+  },
   row: {
     unsent: 'Not sent yet',
     queued: 'On its way',
