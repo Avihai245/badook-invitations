@@ -5,8 +5,10 @@ import path from 'node:path';
 import { ImageResponse } from 'next/og';
 import { dirOf, type FontPair, type InvitationDocument, type Locale } from '../contracts/types';
 import { displayEmPerChar, fontFaceFiles, fontFor } from '../fonts';
+import { shapeArabic } from '../lib/arabic-shape';
 import { visualLine } from '../lib/bidi';
 import { formatDate } from '../lib/dates';
+import { LOCALE_INFO, type Script } from '../lib/locales';
 import type { RenderContext } from '../renderer/context';
 import { resolveFontPair } from '../renderer/theme';
 
@@ -59,18 +61,39 @@ function readWoff(url: string): Promise<ArrayBuffer | null> {
   return pending;
 }
 
+/** The subsets of a script's text, first to last (digits and "&" come from the Latin one). */
+const OG_SUBSETS: Record<Script, readonly string[]> = {
+  hebrew: ['hebrew', 'latin'],
+  latin: ['latin', 'hebrew'],
+  cyrillic: ['cyrillic', 'latin'],
+  arabic: ['arabic', 'latin'],
+  ethiopic: ['ethiopic', 'latin'],
+};
+
+/**
+ * The image draws Arabic in its presentation forms (lib/arabic-shape): a design whose Arabic face
+ * lacks them is drawn in the face of its style that has them.
+ */
+const OG_ARABIC: Record<string, string> = { 'Aref Ruqaa': 'Amiri', Cairo: 'Noto Kufi Arabic' };
+
 /**
  * The fonts of a role (display, ui) for the locale, as a satori font-family list: the locale's family
  * then the other script's (like the browser's stack), each subset registered under its own name —
  * satori keeps one font per name, and takes a missing glyph (digits, "&") from the next in the list.
  */
 async function loadFonts(pair: FontPair, locale: Locale) {
-  const other: Locale = locale === 'he' ? 'en' : 'he';
-  const subsets = locale === 'he' ? ['hebrew', 'latin'] : ['latin', 'hebrew'];
+  const script = LOCALE_INFO[locale].script;
+  // Hebrew text next to Latin, any other script next to the pair's Latin face (digits, "&")
+  const other: Locale = locale === 'en' ? 'he' : 'en';
+  const subsets = OG_SUBSETS[script];
   const fonts: OgFont[] = [];
+  const own = (role: 'display' | 'ui') => {
+    const family = fontFor(pair, role, locale);
+    return script === 'arabic' ? (OG_ARABIC[family] ?? family) : family;
+  };
   const stack = async (role: 'display' | 'ui') => {
     const names: string[] = [];
-    for (const family of new Set([fontFor(pair, role, locale), fontFor(pair, role, other)])) {
+    for (const family of new Set([own(role), fontFor(pair, role, other)])) {
       for (const subset of subsets) {
         // the regular face (the one next.config traces into the server bundle)
         const face = fontFaceFiles(family).find(
@@ -123,6 +146,8 @@ function skyGradient(sky: string): string {
 export async function invitationOgImage(ctx: RenderContext, headers?: HeadersInit): Promise<ImageResponse> {
   const { doc, template, locale } = ctx;
   const dir = dirOf(locale);
+  // satori neither shapes Arabic nor lays out right to left: joined forms first, then visual order
+  const line = (text: string) => visualLine(locale === 'ar' ? shapeArabic(text) : text, dir);
   const pair = resolveFontPair(template, doc);
   const { fonts, display, ui } = await loadFonts(pair, locale);
 
@@ -201,18 +226,18 @@ export async function invitationOgImage(ctx: RenderContext, headers?: HeadersIni
           textShadow: '0 2px 24px rgba(0,0,0,.28)',
         }}
       >
-        {lines.map((line, i) => (
+        {lines.map((l, i) => (
           <div
             key={i}
             style={{
               display: 'flex',
               fontFamily: display,
-              fontSize: line.size,
+              fontSize: l.size,
               lineHeight: 1.15,
               whiteSpace: 'nowrap',
             }}
           >
-            {visualLine(line.text, dir)}
+            {line(l.text)}
           </div>
         ))}
         <div
@@ -230,7 +255,7 @@ export async function invitationOgImage(ctx: RenderContext, headers?: HeadersIni
         <div
           style={{ display: 'flex', fontFamily: ui, fontSize: subSize, whiteSpace: 'nowrap', opacity: 0.95 }}
         >
-          {visualLine(sub, dir)}
+          {line(sub)}
         </div>
       </div>
     </div>,

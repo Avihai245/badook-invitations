@@ -1,5 +1,6 @@
 import 'server-only';
-import type { Palette } from '@/features/invitations/contracts/types';
+import type { Locale, Palette } from '@/features/invitations/contracts/types';
+import { isLocale } from '@/features/invitations/lib/locales';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { resolvePalette } from '@/features/invitations/renderer/theme';
 import { getTemplate } from '@/features/invitations/templates/registry';
@@ -13,8 +14,9 @@ import { hostView, listItems, type HostGalleryView } from './host-api';
 
 /** What the gallery's pages need on their first render (the pages fetch the rest themselves). */
 
-type UiLocale = 'he' | 'en';
-const isUiLocale = (v: unknown): v is UiLocale => v === 'he' || v === 'en';
+/** The pages speak every invitation language. */
+type UiLocale = Locale;
+const isUiLocale = (v: unknown): v is UiLocale => typeof v === 'string' && isLocale(v);
 
 function eventInfo(
   inv: TokenLookup['invitation'],

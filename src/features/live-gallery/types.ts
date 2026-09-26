@@ -1,3 +1,4 @@
+import type { Locale } from '@/features/invitations/contracts/types';
 import type { MediaKind } from './config';
 import type { ItemStatus, Reason } from './moderation';
 
@@ -49,8 +50,8 @@ export interface EventInfo {
   title: string;
   eventType: string;
   date: string | null;
-  locales: ('he' | 'en')[];
-  defaultLocale: 'he' | 'en';
+  locales: Locale[];
+  defaultLocale: Locale;
   /** the design's accent and the text on it, for the page's buttons */
   accent: string;
   accentInk: string;

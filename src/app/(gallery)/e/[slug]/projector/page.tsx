@@ -6,8 +6,7 @@ import { projectorPage } from '@/features/live-gallery/server/pages';
 import { GalleryUnavailable } from '@/features/live-gallery/ui/guest/GalleryUnavailable';
 import { fmt } from '@/features/live-gallery/format';
 import { Projector } from '@/features/live-gallery/ui/projector/Projector';
-import { galleryGuestEn } from '@/lib/i18n/gallery-guest.en';
-import { galleryGuestHe } from '@/lib/i18n/gallery-guest.he';
+import { GALLERY_GUEST } from '@/lib/i18n/gallery-guest';
 
 type Params = Promise<{ slug: string }>;
 type Search = Promise<{ t?: string | string[] }>;
@@ -21,7 +20,7 @@ const load = cache(async (token: string | undefined) =>
 
 export async function generateMetadata({ searchParams }: { searchParams: Search }): Promise<Metadata> {
   const data = await load(one((await searchParams).t));
-  const t = data?.event.defaultLocale === 'en' ? galleryGuestEn : galleryGuestHe;
+  const t = GALLERY_GUEST[data?.event.defaultLocale ?? 'he'];
   return {
     title: data ? fmt(t.projector.title, { name: data.event.title }) : t.eyebrow,
     robots: { index: false, follow: false, noarchive: true },

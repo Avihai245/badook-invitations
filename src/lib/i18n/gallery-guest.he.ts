@@ -6,7 +6,8 @@ export const galleryGuestHe = {
   metaTitle: 'גלריה · {name}',
   metaDescription: 'שתפו את התמונות והסרטונים שלכם מהאירוע',
   eyebrow: 'הגלריה של האירוע',
-  otherLanguage: 'English',
+  /** the language switch (the languages themselves show by their own names) */
+  language: 'שפה',
   invalid: {
     title: 'הקישור לא עובד',
     body: 'אולי המארחים החליפו אותו בקישור חדש. בקשו מהם את הקישור העדכני.',
@@ -137,4 +138,17 @@ export const galleryGuestHe = {
   },
 };
 
-export type GalleryGuestDict = typeof galleryGuestHe;
+/** A plural entry: every CLDR category a language may need (Russian few/many, Arabic zero…many). */
+export type PluralEntry = { one: string; other: string } & Partial<
+  Record<'zero' | 'two' | 'few' | 'many', string>
+>;
+type Dict<T> = {
+  [K in keyof T]: T[K] extends string
+    ? string
+    : T[K] extends { one: string; other: string }
+      ? PluralEntry
+      : Dict<T[K]>;
+};
+
+/** The shape every language's dictionary has (the Hebrew one's, with any plural categories). */
+export type GalleryGuestDict = Dict<typeof galleryGuestHe>;

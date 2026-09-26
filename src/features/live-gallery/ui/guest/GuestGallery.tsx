@@ -12,6 +12,8 @@ import {
   type FormEvent,
   type ReactNode,
 } from 'react';
+import { RTL_LOCALES } from '@/features/invitations/contracts/types';
+import { nativeName } from '@/features/invitations/lib/locales';
 import { GALLERY } from '../../config';
 import { galleryApi } from '../../client/api';
 import { openStore, type QueueStore } from '../../client/idb';
@@ -49,7 +51,7 @@ export function GuestGallery({
   // the page's language and direction (the layout set the invitation's default)
   useEffect(() => {
     document.documentElement.lang = locale;
-    document.documentElement.dir = locale === 'he' ? 'rtl' : 'ltr';
+    document.documentElement.dir = RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr';
   }, [locale]);
   return (
     <GuestTextProvider locale={locale}>
@@ -57,7 +59,7 @@ export function GuestGallery({
         data={data}
         token={token}
         guest={guest}
-        other={data.event.locales.find((l) => l !== locale) ?? null}
+        others={data.event.locales.filter((l) => l !== locale)}
         onLocale={setLocale}
       />
     </GuestTextProvider>
@@ -70,13 +72,14 @@ function GalleryBody({
   data,
   token,
   guest,
-  other,
+  others,
   onLocale,
 }: {
   data: GuestPageData;
   token: string;
   guest: string | null;
-  other: GuestLocale | null;
+  /** the invitation's other languages */
+  others: GuestLocale[];
   onLocale(l: GuestLocale): void;
 }) {
   const text = useGuestText();
@@ -345,16 +348,33 @@ function GalleryBody({
     <div style={accent} className="min-h-svh bg-canvas" dir={dir}>
       <div className="mx-auto w-full max-w-[720px] px-4 pt-5 pb-10 sm:px-6 sm:pt-8">
         <header className="relative text-center">
-          {other ? (
+          {others.length === 1 ? (
             <button
               type="button"
-              onClick={() => onLocale(other)}
-              lang={other}
+              onClick={() => onLocale(others[0]!)}
+              lang={others[0]}
               className="absolute end-0 top-0 inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-[12.5px] font-semibold text-ink shadow-sm"
             >
               <Globe aria-hidden className="size-3.5" />
-              {t.otherLanguage}
+              {nativeName(others[0]!)}
             </button>
+          ) : others.length > 1 ? (
+            // more languages: a menu of them, each by its own name
+            <label className="absolute end-0 top-0 inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-surface ps-3 pe-2 text-[12.5px] font-semibold text-ink shadow-sm">
+              <Globe aria-hidden className="size-3.5" />
+              <select
+                aria-label={t.language}
+                value={locale}
+                onChange={(e) => onLocale(e.target.value as GuestLocale)}
+                className="cursor-pointer appearance-none bg-transparent font-semibold outline-none"
+              >
+                {[locale, ...others].map((l) => (
+                  <option key={l} value={l} lang={l}>
+                    {nativeName(l)}
+                  </option>
+                ))}
+              </select>
+            </label>
           ) : null}
           <p className="text-[12.5px] font-semibold tracking-[0.08em] text-[var(--gallery-accent)] uppercase">
             {t.eyebrow}

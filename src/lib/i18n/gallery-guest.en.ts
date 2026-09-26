@@ -5,7 +5,7 @@ export const galleryGuestEn: GalleryGuestDict = {
   metaTitle: 'Gallery · {name}',
   metaDescription: 'Share your photos and videos from the event',
   eyebrow: 'The event’s gallery',
-  otherLanguage: 'עברית',
+  language: 'Language',
   invalid: {
     title: 'This link doesn’t work',
     body: 'The hosts may have replaced it with a new one. Ask them for the current link.',

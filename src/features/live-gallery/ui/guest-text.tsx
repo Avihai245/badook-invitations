@@ -1,8 +1,10 @@
 'use client';
 
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { galleryGuestEn } from '@/lib/i18n/gallery-guest.en';
-import { galleryGuestHe, type GalleryGuestDict } from '@/lib/i18n/gallery-guest.he';
+import { RTL_LOCALES, type Locale } from '@/features/invitations/contracts/types';
+import { LOCALE_INFO } from '@/features/invitations/lib/locales';
+import { GALLERY_GUEST, type GalleryGuestDict } from '@/lib/i18n/gallery-guest';
+import type { PluralEntry } from '@/lib/i18n/gallery-guest.he';
 import { fmt } from '../format';
 
 export { fmt, formatBytes } from '../format';
@@ -12,12 +14,11 @@ export { fmt, formatBytes } from '../format';
  * dictionaries — guests' phones don't download the host app's — in the invitation's language.
  */
 
-export type GuestLocale = 'he' | 'en';
-export type PluralEntry = { one: string; other: string } & Partial<
-  Record<'two' | 'many' | 'few' | 'zero', string>
->;
+/** Any of the invitation languages (the pages follow the invitation's). */
+export type GuestLocale = Locale;
+export type { PluralEntry };
 
-const intl = (l: GuestLocale) => (l === 'he' ? 'he-IL' : 'en-GB');
+const intl = (l: GuestLocale) => LOCALE_INFO[l].intl;
 
 export interface GuestText {
   locale: GuestLocale;
@@ -32,8 +33,8 @@ export function guestText(locale: GuestLocale): GuestText {
   const rules = new Intl.PluralRules(intl(locale));
   return {
     locale,
-    dir: locale === 'he' ? 'rtl' : 'ltr',
-    t: locale === 'en' ? galleryGuestEn : galleryGuestHe,
+    dir: RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr',
+    t: GALLERY_GUEST[locale],
     plural: (entry, n, vars = {}) =>
       fmt(entry[rules.select(n) as keyof PluralEntry] ?? entry.other, {
         n: new Intl.NumberFormat(intl(locale)).format(n),

@@ -75,8 +75,15 @@ const pick = (value: L10n, locales: readonly Locale[]): L10n => {
   for (const l of locales) if (value[l] !== undefined) out[l] = value[l];
   return out;
 };
-const pickOrNull = (value: L10n | null | undefined, locales: readonly Locale[]) =>
-  value ? pick(value, locales) : null;
+/**
+ * An optional text in the chosen languages — or none, when the design writes it only in languages the
+ * invitation doesn't have (a subtitle about the design's own details, say): nothing to show, nothing
+ * the host must fill.
+ */
+const pickOrNull = (value: L10n | null | undefined, locales: readonly Locale[]) => {
+  const out = value ? pick(value, locales) : null;
+  return out && Object.values(out).some((v) => v?.trim()) ? out : null;
+};
 
 const addDays = (iso: ISODate, days: number): ISODate => {
   const [y, m, d] = iso.split('-').map(Number) as [number, number, number];
