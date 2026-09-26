@@ -30,7 +30,6 @@ export function FreezeDialog({
 }) {
   const { t, fmt, plural, number } = useUi();
   const F = t.eventDay.freeze;
-  const table = (n: number | null) => (n === null ? '' : fmt(t.eventDay.notices.ownTable, { number: n }));
   const [notify, setNotify] = useState(true);
   const sendable = changes.some((c) => c.to !== null);
   return (
@@ -58,7 +57,7 @@ export function FreezeDialog({
       <ul className="grid max-h-[40dvh] gap-1.5 overflow-y-auto text-[13.5px]" data-testid="freeze-list">
         {changes.map((c) => (
           <li key={c.unitId} className="rounded-input bg-subtle px-3 py-2">
-            {fmt(F[c.kind], { name: names.get(c.unitId) ?? '', told: table(c.told), to: table(c.to) })}
+            {fmt(F[c.kind], { name: names.get(c.unitId) ?? '', told: c.told, to: c.to ?? '' })}
           </li>
         ))}
       </ul>
