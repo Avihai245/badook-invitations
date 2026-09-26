@@ -169,6 +169,7 @@ export function FaceSearchCard({ id, initial }: { id: string; initial: FaceHostV
               <Button
                 size="sm"
                 icon={<ScanFace />}
+                className="self-start"
                 onClick={() => void prepare()}
                 disabled={!ready}
                 data-testid="face-search-prepare"

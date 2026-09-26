@@ -49,7 +49,7 @@ export const galleryNotifyHe = {
     queued: '{n} שכבר בדרך',
   },
   errors: {
-    credits: 'צריך {needed} קרדיטים, ויש לכם {balance}.',
+    credits: 'קרדיטים שצריך: {needed} · יש לכם: {balance}.',
     nobody: 'אין למי לשלוח מהמספר הרשמי.',
     no_gallery: 'קודם מפעילים את הגלריה.',
     failed: 'משהו השתבש. נסו שוב.',

@@ -51,7 +51,7 @@ export const galleryNotifyEn: GalleryNotifyDict = {
     queued: '{n} already on their way',
   },
   errors: {
-    credits: '{needed} credits needed, you have {balance}.',
+    credits: 'Credits needed: {needed} · you have: {balance}.',
     nobody: 'Nobody to send to from the official number.',
     no_gallery: 'Turn the gallery on first.',
     failed: 'Something went wrong. Try again.',

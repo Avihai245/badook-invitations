@@ -145,7 +145,7 @@ export function ShotsCard({
                   </Badge>
                 ) : null}
                 <span className="absolute end-1.5 bottom-1.5 rounded-full bg-ink/75 px-1.5 text-[11px] leading-5 text-white tabular-nums">
-                  {(shot.end - shot.start).toFixed(1)}
+                  {fmt(t.film.settings.seconds, { n: (shot.end - shot.start).toFixed(1) })}
                 </span>
               </div>
               <div
