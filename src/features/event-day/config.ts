@@ -27,6 +27,8 @@ export const EVENT_DAY = {
   maxCount: 99,
   /** a scanned code shown again this soon is the same guest still in front of the camera */
   rescanMs: 4_000,
+  /** arrivals are erased this many days after the event (the privacy policy; the daily run) */
+  keepCheckinsDays: 30,
 } as const;
 
 /** The QR on a guest's table guide (and printed cards): "BDK1." and the entrance code. */

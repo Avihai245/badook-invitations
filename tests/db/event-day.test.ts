@@ -275,6 +275,15 @@ describe('the host’s event day', () => {
 
 describe('the entrance station', () => {
   it('opens by its link’s hash: the event, its channel, the hall’s numbers', async () => {
+    // the server's light lookup (it checks the event's features first)
+    expect(await commit('checkin_station_link', [STATION.hash])).toEqual({
+      invitationId: inv,
+      channel: STATION.channel,
+    });
+    expect(await commit('checkin_station_link', [sha('nope')])).toBeNull();
+    // the pages' language
+    expect(await commit('event_day_slug_locale', ['day-db'])).toBe('he');
+    expect(await commit('event_day_slug_locale', ['no-such-slug'])).toBeNull();
     expect(await commit('checkin_station_open', [sha('nope'), RATE])).toBeNull();
     const open = await commit<Record<string, unknown>>('checkin_station_open', [STATION.hash, RATE]);
     expect(open).toMatchObject({

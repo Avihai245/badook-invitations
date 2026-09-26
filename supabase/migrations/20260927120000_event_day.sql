@@ -300,6 +300,15 @@ language sql stable security definer set search_path = '' as $$
   where d.station_token_hash = p_token_hash and i.status <> 'archived'
 $$;
 
+-- The same for the server — { invitationId, channel } — which checks the event's features before a
+-- station may do anything, and tells the event's open pages when a station changed something.
+create function public.checkin_station_link(p_token_hash text) returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object('invitationId', d.invitation_id, 'channel', d.channel)
+  from public.event_days d
+  where d.invitation_id = public.event_day_by_station(p_token_hash)
+$$;
+
 -- ─── the entrance stations (by the station link's hash; rate-limited per address) ───────────────
 
 -- A station opens: the event, its Realtime channel, the hall's numbers and the latest arrivals (the
@@ -548,6 +557,14 @@ begin
     ), '[]'::jsonb)
   );
 end $$;
+
+-- The main language of the published invitation behind a slug (the event-day pages' <html lang>).
+create function public.event_day_slug_locale(p_slug text) returns text
+language sql stable security definer set search_path = '' as $$
+  select coalesce(i.published, i.draft)->>'defaultLocale'
+  from public.invitations i
+  where i.slug = p_slug and i.status = 'published'
+$$;
 
 -- ─── what guests were told (the freeze) ─────────────────────────────────────────────────────────
 
@@ -1433,12 +1450,14 @@ begin
   end loop;
   -- what the server calls
   foreach f in array array[
+    'public.checkin_station_link(text)',
     'public.checkin_station_open(text, text)',
     'public.checkin_station_find(text, text, text)',
     'public.checkin_station_search(text, text, text)',
     'public.checkin_station_arrive(text, uuid, uuid, int, text, text)',
     'public.checkin_station_undo(text, uuid, text)',
     'public.seating_guide(text, text, text)',
+    'public.event_day_slug_locale(text)',
     'public.seating_notices_state(uuid, uuid)',
     'public.seating_notice_queue(uuid, uuid, uuid[], numeric)',
     'public.seating_notice_mark(uuid, uuid, uuid[])',
