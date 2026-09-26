@@ -1,0 +1,236 @@
+{
+  "id": "safari-pals",
+  "version": 2,
+  "name": {
+    "he": "ספארי",
+    "en": "Safari Pals"
+  },
+  "description": {
+    "he": "בוקר חמים בסוואנה — גור אריות עם פפיון, ג׳ירפה סקרנית שמציצה, פיל קטן עם בלון, עלי דקל, עשב גבוה ושמש גדולה ומחייכת. לקטנטנים שלנו.",
+    "en": "A warm morning on the savanna — a lion cub in a bow tie, a curious giraffe peeking in, a baby elephant with a balloon, palm fronds, tall grass and a big smiling sun. For our littlest ones."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "brit",
+    "baby_shower"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/safari-pals/preview.webp",
+  "previewVideo": "/templates/safari-pals/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FBF0DC",
+      "surface": "#FFFAF1",
+      "ink": "#3A2817",
+      "inkMuted": "#6B563F",
+      "accent": "#E2762C",
+      "accentInk": "#2E1E10",
+      "line": "#EBDABB",
+      "heroText": "#3A2817"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 24,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "sunset",
+      "name": {
+        "he": "שקיעה",
+        "en": "Sunset"
+      },
+      "palette": {
+        "accent": "#E2762C"
+      }
+    },
+    {
+      "id": "acacia",
+      "name": {
+        "he": "שיטה",
+        "en": "Acacia"
+      },
+      "palette": {
+        "accent": "#6F9A36"
+      }
+    },
+    {
+      "id": "oasis",
+      "name": {
+        "he": "נווה מדבר",
+        "en": "Oasis"
+      },
+      "palette": {
+        "accent": "#2F9AA6"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "safari",
+      "display": {
+        "latin": "Fraunces",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "cubs",
+      "display": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "heading": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/safari-pals/cover-poster.webp",
+    "posterDesktop": "/templates/safari-pals/cover-poster-desktop.webp",
+    "openVideo": "/templates/safari-pals/cover-open.mp4",
+    "openVideoDesktop": "/templates/safari-pals/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/safari-pals/paw-seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "print",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#E2762C",
+      "#6F9A36",
+      "#2F9AA6"
+    ],
+    "monogramFont": {
+      "latin": "Fraunces",
+      "hebrew": "Suez One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "בוקר בסוואנה",
+          "en": "Morning on the savanna"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#3A2817",
+    "overlayColor": "#FFF8EC",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "safari-pals-theme",
+    "tracks": [
+      {
+        "id": "safari-pals-theme",
+        "title": "Little Safari (kalimba & shakers)",
+        "url": "/templates/safari-pals/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": false,
+    "stagger": 0.07
+  },
+  "assets": {
+    "hero": "/templates/safari-pals/hero.mp4",
+    "hero-poster": "/templates/safari-pals/hero-poster.webp",
+    "hero-desktop": "/templates/safari-pals/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/safari-pals/hero-desktop-poster.webp",
+    "grass-band": "/templates/safari-pals/grass-band.webp",
+    "savanna-panorama": "/templates/safari-pals/savanna-panorama.webp",
+    "lion": "/templates/safari-pals/lion.webp",
+    "elephant": "/templates/safari-pals/elephant.webp",
+    "giraffe": "/templates/safari-pals/giraffe.webp"
+  },
+  "decorations": {
+    "afterHero": "template:grass-band",
+    "betweenVenues": "template:savanna-panorama",
+    "afterTimeline": "template:lion",
+    "beforeRsvp": "template:elephant",
+    "footer": "template:giraffe"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

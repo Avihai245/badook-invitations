@@ -59,6 +59,17 @@ import scribbleDefaults from '@pack/scribble-love/defaults.json';
 import scribbleManifest from '@pack/scribble-love/manifest.json';
 import whiteCityDefaults from '@pack/white-city/defaults.json';
 import whiteCityManifest from '@pack/white-city/manifest.json';
+// T1: little ones
+import safariDefaults from '@pack/safari-pals/defaults.json';
+import safariManifest from '@pack/safari-pals/manifest.json';
+import digItDefaults from '@pack/dig-it/defaults.json';
+import digItManifest from '@pack/dig-it/manifest.json';
+import oceanDefaults from '@pack/ocean-friends/defaults.json';
+import oceanManifest from '@pack/ocean-friends/manifest.json';
+import rocketDefaults from '@pack/rocket-launch/defaults.json';
+import rocketManifest from '@pack/rocket-launch/manifest.json';
+import unicornDefaults from '@pack/unicorn-dream/defaults.json';
+import unicornManifest from '@pack/unicorn-dream/manifest.json';
 import { TemplateDefaultsSchema, TemplateManifestSchema } from '../contracts/schemas';
 import type { TemplateDefaults, TemplateManifest } from '../contracts/types';
 
@@ -100,6 +111,12 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: martiniManifest, defaults: martiniDefaults },
   { manifest: majolicaManifest, defaults: majolicaDefaults },
   { manifest: whiteCityManifest, defaults: whiteCityDefaults },
+  // T1: little ones
+  { manifest: safariManifest, defaults: safariDefaults },
+  { manifest: digItManifest, defaults: digItDefaults },
+  { manifest: oceanManifest, defaults: oceanDefaults },
+  { manifest: rocketManifest, defaults: rocketDefaults },
+  { manifest: unicornManifest, defaults: unicornDefaults },
 ];
 
 function loadTemplates(): Map<string, TemplateEntry> {

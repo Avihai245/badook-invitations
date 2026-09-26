@@ -16,7 +16,7 @@ const fixtures = readdirSync(fixturesDir)
   .map((f) => [f, JSON.parse(readFileSync(join(fixturesDir, f), 'utf8'))] as const);
 
 describe('template pack', () => {
-  it('registers all 28 templates in gallery order: the 8 originals first', () => {
+  it('registers every template in gallery order: the 8 originals first', () => {
     expect(TEMPLATE_IDS).toEqual([
       'sahar-bordeaux',
       'papercut-gold',
@@ -46,6 +46,12 @@ describe('template pack', () => {
       'martini-olive',
       'majolica',
       'white-city',
+      // T1: little ones
+      'safari-pals',
+      'dig-it',
+      'ocean-friends',
+      'rocket-launch',
+      'unicorn-dream',
     ]);
   });
 
@@ -66,6 +72,9 @@ describe('template pack', () => {
       'jet-set',
       'bukhara',
       'white-city',
+      // T1: little ones
+      'rocket-launch',
+      'unicorn-dream',
     ]);
   });
 

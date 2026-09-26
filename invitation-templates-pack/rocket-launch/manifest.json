@@ -1,0 +1,235 @@
+{
+  "id": "rocket-launch",
+  "version": 2,
+  "name": {
+    "he": "חללית",
+    "en": "Rocket Launch"
+  },
+  "description": {
+    "he": "3… 2… 1… שיגור! חללית שממריאה על להבה מהבהבת, אסטרונאוט שמנופף, ירח עם כוכב לכת שמקיף אותו, כוכב שביט ושמיים מלאי כוכבים נוצצים. לחוקרי החלל הצעירים.",
+    "en": "3… 2… 1… liftoff! A rocket rising on a flickering flame, a waving astronaut, a moon with a planet circling it, a comet and a sky full of twinkling stars. For young space explorers."
+  },
+  "tier": "premium",
+  "categories": [
+    "birthday",
+    "bar_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/rocket-launch/preview.webp",
+  "previewVideo": "/templates/rocket-launch/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#11163A",
+      "surface": "#1A2152",
+      "ink": "#F3F1FF",
+      "inkMuted": "#B8B6E3",
+      "accent": "#FF8A3D",
+      "accentInk": "#11163A",
+      "line": "#2C3470",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 18,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "blast-off",
+      "name": {
+        "he": "להבה",
+        "en": "Blast-off"
+      },
+      "palette": {
+        "accent": "#FF8A3D"
+      }
+    },
+    {
+      "id": "nebula",
+      "name": {
+        "he": "ערפילית",
+        "en": "Nebula"
+      },
+      "palette": {
+        "accent": "#C38BFF"
+      }
+    },
+    {
+      "id": "comet",
+      "name": {
+        "he": "שביט",
+        "en": "Comet"
+      },
+      "palette": {
+        "accent": "#4FD6FF"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "liftoff",
+      "display": {
+        "latin": "Righteous",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Outfit",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Outfit",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Outfit",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "mission-control",
+      "display": {
+        "latin": "Space Mono",
+        "hebrew": "Cousine"
+      },
+      "heading": {
+        "latin": "Space Mono",
+        "hebrew": "Heebo"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "video",
+    "poster": "/templates/rocket-launch/cover-poster.webp",
+    "posterDesktop": "/templates/rocket-launch/cover-poster-desktop.webp",
+    "openVideo": "/templates/rocket-launch/cover-open.mp4",
+    "openVideoDesktop": "/templates/rocket-launch/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/rocket-launch/mission-patch-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#FF8A3D",
+      "#C38BFF",
+      "#4FD6FF"
+    ],
+    "monogramFont": {
+      "latin": "Righteous",
+      "hebrew": "Secular One"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שיגור בין הכוכבים",
+          "en": "Liftoff among the stars"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0B0F2E",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": "rocket-launch-theme",
+    "tracks": [
+      {
+        "id": "rocket-launch-theme",
+        "title": "Countdown to the Stars (synth & bells)",
+        "url": "/templates/rocket-launch/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 50,
+    "revealBlur": true,
+    "stagger": 0.07
+  },
+  "assets": {
+    "hero": "/templates/rocket-launch/hero.mp4",
+    "hero-poster": "/templates/rocket-launch/hero-poster.webp",
+    "hero-desktop": "/templates/rocket-launch/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/rocket-launch/hero-desktop-poster.webp",
+    "stars-band": "/templates/rocket-launch/stars-band.webp",
+    "planets-panorama": "/templates/rocket-launch/planets-panorama.webp",
+    "rocket": "/templates/rocket-launch/rocket.webp",
+    "astronaut": "/templates/rocket-launch/astronaut.webp",
+    "moon": "/templates/rocket-launch/moon.webp"
+  },
+  "decorations": {
+    "afterHero": "template:stars-band",
+    "betweenVenues": "template:planets-panorama",
+    "afterTimeline": "template:rocket",
+    "beforeRsvp": "template:astronaut",
+    "footer": "template:moon"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "horizontal-icons",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

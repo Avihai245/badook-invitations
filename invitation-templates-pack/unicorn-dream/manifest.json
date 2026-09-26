@@ -1,0 +1,239 @@
+{
+  "id": "unicorn-dream",
+  "version": 2,
+  "name": {
+    "he": "חד־קרן",
+    "en": "Unicorn Dream"
+  },
+  "description": {
+    "he": "שמיים בצבעי סוכריות — קשת בענן פסטלית, עננים רכים, נצנצים וכוכבים, בלונים ולבבות, וחד־קרן עם רעמה בכל צבעי הקשת וקרן זהב נוצצת. קסם ורוד ומתוק.",
+    "en": "A candy-coloured sky — a pastel rainbow, soft clouds, sparkles and stars, balloons and hearts, and a unicorn with a rainbow mane and a glittering golden horn. Sweet pink magic."
+  },
+  "tier": "premium",
+  "categories": [
+    "birthday",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/unicorn-dream/preview.webp",
+  "previewVideo": "/templates/unicorn-dream/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FDF0F6",
+      "surface": "#FFFFFF",
+      "ink": "#4A2A55",
+      "inkMuted": "#765A80",
+      "accent": "#C7307F",
+      "accentInk": "#FFFFFF",
+      "line": "#F2DCE8",
+      "heroText": "#4A2A55"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 28,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "bubblegum",
+      "name": {
+        "he": "מסטיק",
+        "en": "Bubblegum"
+      },
+      "palette": {
+        "accent": "#C7307F",
+        "accentInk": "#FFFFFF"
+      }
+    },
+    {
+      "id": "lilac",
+      "name": {
+        "he": "לילך",
+        "en": "Lilac"
+      },
+      "palette": {
+        "accent": "#8A55D4",
+        "accentInk": "#FFFFFF"
+      }
+    },
+    {
+      "id": "mint",
+      "name": {
+        "he": "מנטה",
+        "en": "Mint"
+      },
+      "palette": {
+        "accent": "#35AE9A",
+        "accentInk": "#2A1733"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "sparkle",
+      "display": {
+        "latin": "Atma",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "heading": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "body": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "ui": {
+        "latin": "Quicksand",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "fairytale",
+      "display": {
+        "latin": "Yeseva One",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Josefin Sans",
+        "hebrew": "Assistant"
+      },
+      "body": {
+        "latin": "Josefin Sans",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ribbon",
+    "renderer": "video",
+    "poster": "/templates/unicorn-dream/cover-poster.webp",
+    "posterDesktop": "/templates/unicorn-dream/cover-poster-desktop.webp",
+    "openVideo": "/templates/unicorn-dream/cover-open.mp4",
+    "openVideoDesktop": "/templates/unicorn-dream/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/unicorn-dream/star-seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#C7307F",
+      "#8A55D4",
+      "#35AE9A"
+    ],
+    "monogramFont": {
+      "latin": "Atma",
+      "hebrew": "Playpen Sans Hebrew"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שמיים של קסם",
+          "en": "A magical sky"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#4A2A55",
+    "overlayColor": "#FFF6FB",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "unicorn-dream-theme",
+    "tracks": [
+      {
+        "id": "unicorn-dream-theme",
+        "title": "Rainbow Waltz (music box & harp)",
+        "url": "/templates/unicorn-dream/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/unicorn-dream/hero.mp4",
+    "hero-poster": "/templates/unicorn-dream/hero-poster.webp",
+    "hero-desktop": "/templates/unicorn-dream/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/unicorn-dream/hero-desktop-poster.webp",
+    "cloud-band": "/templates/unicorn-dream/cloud-band.webp",
+    "rainbow-panorama": "/templates/unicorn-dream/rainbow-panorama.webp",
+    "unicorn": "/templates/unicorn-dream/unicorn.webp",
+    "balloons": "/templates/unicorn-dream/balloons.webp",
+    "rainbow": "/templates/unicorn-dream/rainbow.webp"
+  },
+  "decorations": {
+    "afterHero": "template:cloud-band",
+    "betweenVenues": "template:rainbow-panorama",
+    "afterTimeline": "template:unicorn",
+    "beforeRsvp": "template:balloons",
+    "footer": "template:rainbow"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

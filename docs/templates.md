@@ -45,3 +45,20 @@ and takes the colour presets and the font pairs like the others. Ten are premium
 Each design has: Hebrew and English names, starter texts for every event it's listed under, two font
 pairs (plus the shared font library), three colour presets, a cover, a hero scene and a gallery poster,
 and a live demo per event type (`/i/demo-<id>`).
+
+## Little ones: five designs for ages 0–9
+
+The set above had one illustrated kids' birthday (the dinosaurs) and one nursery (the teddy). These five
+cover the themes small children — and their parents — ask for most: baby animals, diggers and trucks,
+the sea, space and unicorns, each drawn for its age: soft and round for babies and toddlers, busier and
+bolder for school-age kids. Each hero moves a little (a turning sun, a swinging sign and a digging arm,
+bubbles and a floating jellyfish, a flickering flame and an orbiting planet, a rocking unicorn) and
+keeps its centre calm for the names.
+
+| Design | Style / source of inspiration | Events | Premium |
+| --- | --- | --- | --- |
+| ספארי / Safari Pals (`safari-pals`) | Baby-animal nursery illustration, ages 0–4 — a lion cub, a giraffe and a baby elephant on the savanna | birthday, brit, baby_shower | |
+| חופרים! / Dig It! (`dig-it`) | Toddlers' vehicle picture books, ages 2–5 — friendly diggers, a dump truck and a crane on a building site | birthday | |
+| מתחת לים / Ocean Friends (`ocean-friends`) | Under-the-sea picture books, ages 1–6 — a smiling whale, fish, a jellyfish and a treasure chest | birthday, baby_shower, brit | |
+| חללית / Rocket Launch (`rocket-launch`) | Space adventure, ages 4–9 — a rocket lifting off, an astronaut, planets and a starfield | birthday, bar_mitzvah | ✓ |
+| חד־קרן / Unicorn Dream (`unicorn-dream`) | The pastel “unicorn and rainbow” party trend, ages 3–9 — candy colours, glitter and clouds | birthday, bat_mitzvah | ✓ |

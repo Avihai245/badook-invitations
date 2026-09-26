@@ -1,0 +1,240 @@
+{
+  "id": "ocean-friends",
+  "version": 2,
+  "name": {
+    "he": "מתחת לים",
+    "en": "Ocean Friends"
+  },
+  "description": {
+    "he": "צוללים לחגוג — לוויתן מחייך שנושף בועות, מדוזה מרחפת, דגים צבעוניים, אצות מתנועעות, צדפים, סרטן חמוד ותיבת אוצר נוצצת על החול. עולם תת־ימי לקטנטנים.",
+    "en": "Dive in to celebrate — a smiling whale blowing bubbles, a floating jellyfish, colourful fish, swaying seaweed, shells, a friendly crab and a sparkling treasure chest on the sand. An undersea world for little ones."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "baby_shower",
+    "brit"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/ocean-friends/preview.webp",
+  "previewVideo": "/templates/ocean-friends/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#E8F6F6",
+      "surface": "#FFFFFF",
+      "ink": "#123A57",
+      "inkMuted": "#46677C",
+      "accent": "#FF7A6B",
+      "accentInk": "#123A57",
+      "line": "#CBE6E8",
+      "heroText": "#123A57"
+    },
+    "editablePaletteKeys": [
+      "accent",
+      "accentInk"
+    ],
+    "radius": {
+      "card": 26,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "coral",
+      "name": {
+        "he": "אלמוג",
+        "en": "Coral"
+      },
+      "palette": {
+        "accent": "#FF7A6B",
+        "accentInk": "#123A57"
+      }
+    },
+    {
+      "id": "sunny",
+      "name": {
+        "he": "דג זהב",
+        "en": "Goldfish"
+      },
+      "palette": {
+        "accent": "#F5B82E",
+        "accentInk": "#123A57"
+      }
+    },
+    {
+      "id": "lilac",
+      "name": {
+        "he": "סגול",
+        "en": "Lilac"
+      },
+      "palette": {
+        "accent": "#7E5FD0",
+        "accentInk": "#FFFFFF"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "bubbles",
+      "display": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "heading": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Varela Round"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "shells",
+      "display": {
+        "latin": "Shantell Sans",
+        "hebrew": "Playpen Sans Hebrew"
+      },
+      "heading": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "pouch",
+    "renderer": "video",
+    "poster": "/templates/ocean-friends/cover-poster.webp",
+    "posterDesktop": "/templates/ocean-friends/cover-poster-desktop.webp",
+    "openVideo": "/templates/ocean-friends/cover-open.mp4",
+    "openVideoDesktop": "/templates/ocean-friends/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/ocean-friends/coin-blank.png",
+      "recolor": true,
+      "size": 0.28,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#E9B949",
+      "#FF7A6B",
+      "#4FB6CF"
+    ],
+    "monogramFont": {
+      "latin": "Fredoka",
+      "hebrew": "Fredoka"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "שונית תת־ימית",
+          "en": "An undersea reef"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#123A57",
+    "overlayColor": "#F2FCFC",
+    "defaultOverlay": 0.4
+  },
+  "music": {
+    "defaultTrackId": "ocean-friends-theme",
+    "tracks": [
+      {
+        "id": "ocean-friends-theme",
+        "title": "Bubble Parade (steel drum & glockenspiel)",
+        "url": "/templates/ocean-friends/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.07
+  },
+  "assets": {
+    "hero": "/templates/ocean-friends/hero.mp4",
+    "hero-poster": "/templates/ocean-friends/hero-poster.webp",
+    "hero-desktop": "/templates/ocean-friends/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/ocean-friends/hero-desktop-poster.webp",
+    "wave-band": "/templates/ocean-friends/wave-band.webp",
+    "reef-panorama": "/templates/ocean-friends/reef-panorama.webp",
+    "whale": "/templates/ocean-friends/whale.webp",
+    "shell": "/templates/ocean-friends/shell.webp",
+    "treasure": "/templates/ocean-friends/treasure.webp"
+  },
+  "decorations": {
+    "afterHero": "template:wave-band",
+    "betweenVenues": "template:reef-panorama",
+    "afterTimeline": "template:whale",
+    "beforeRsvp": "template:shell",
+    "footer": "template:treasure"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "flip-cards",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}
