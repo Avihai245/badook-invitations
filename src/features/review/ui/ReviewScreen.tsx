@@ -22,6 +22,7 @@ import { fontFaceCss, pairFontFamilies } from '@/features/invitations/fonts';
 import type { AssetBases } from '@/features/invitations/renderer/assets';
 import { buildRenderContext } from '@/features/invitations/renderer/context';
 import { InvitationBody } from '@/features/invitations/renderer/InvitationBody';
+import { MotionPause } from '@/features/invitations/renderer/MotionPause.client';
 import {
   motionOff,
   resolveFontPair,
@@ -191,6 +192,16 @@ export function ReviewScreen({
   const [toast, setToast] = useState<string | null>(null);
   const [announce, setAnnounce] = useState('');
   const [mine, setMine] = useState<string[]>([]);
+  // The comment's sheet closed with nothing after it: its opener (the list's link, or a tap on the
+  // invitation) is gone, so the focus goes back to "add a comment" instead of the page's start.
+  const addButton = useRef<HTMLButtonElement>(null);
+  const composing = compose !== null;
+  const wasComposing = useRef(false);
+  useEffect(() => {
+    const now = document.activeElement;
+    if (wasComposing.current && !composing && (!now || now === document.body)) addButton.current?.focus();
+    wasComposing.current = composing;
+  }, [composing]);
   useEffect(() => {
     try {
       setMine(JSON.parse(store.get(mineKey(token)) ?? '[]') as string[]);
@@ -349,7 +360,8 @@ export function ReviewScreen({
           return fill(x.pinLabel, { n: p.number, name: c?.name ?? '' });
         }}
       />
-      <div className="rv-ui" data-testid="review-ui">
+      {/* under the invitation's cover while it is up: CoverOverlay makes it inert meanwhile */}
+      <div className="rv-ui" data-testid="review-ui" data-under-cover="">
         <div className="rv-watermark" aria-hidden>
           <span>{x.watermark}</span>
         </div>
@@ -361,6 +373,7 @@ export function ReviewScreen({
         </p>
         <div role="toolbar" aria-label={x.toolbar} className="rv-toolbar">
           <button
+            ref={addButton}
             type="button"
             className="rv-btn"
             data-primary=""
@@ -386,6 +399,11 @@ export function ReviewScreen({
               </span>
             ) : null}
           </button>
+          {/* "pause the animations" (WCAG 2.2.2) — the guest's page has it as a floating button */}
+          <MotionPause
+            labels={{ pause: ctx.t('motion.pause'), play: ctx.t('motion.play') }}
+            className="rv-btn rv-btn-icon"
+          />
         </div>
         {picking ? (
           <div className="rv-hint" role="status">

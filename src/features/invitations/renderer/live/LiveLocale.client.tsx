@@ -13,6 +13,7 @@ import { flushSync } from 'react-dom';
 import { dirOf, type Locale } from '../../contracts/types';
 import type { ListenProps } from '@/features/voice/ui/Listen.client';
 import { FloatingControls, type MusicProps } from '../FloatingControls.client';
+import type { MotionLabels } from '../MotionPause.client';
 import type { LivePayload } from './payload';
 
 type Sections = ComponentType<{ payload: LivePayload; locale: Locale }>;
@@ -116,6 +117,7 @@ export function LiveLocale({
   payload,
   music,
   listen = {},
+  motion = {},
   children,
 }: {
   initial: Locale;
@@ -123,6 +125,8 @@ export function LiveLocale({
   music: MusicProps | null;
   /** the invitation read aloud in each language (features/voice) */
   listen?: Partial<Record<Locale, ListenProps | null>>;
+  /** "pause the animations" in each language (MotionPause) */
+  motion?: Partial<Record<Locale, MotionLabels | null>>;
   /** the sections in `initial`, rendered on the server */
   children: ReactNode;
 }) {
@@ -223,6 +227,7 @@ export function LiveLocale({
         }}
         music={music ? { ...music, playLabel: entry.labels.play, pauseLabel: entry.labels.pause } : null}
         listen={listen[locale] ?? null}
+        motion={motion[locale] ?? null}
       />
       {locale === initial || !Sections ? children : <Sections payload={payload} locale={locale} />}
     </>

@@ -5,6 +5,7 @@ import { LISTEN_EVENT, ListenButton, MUSIC_EVENT, type ListenProps } from '@/fea
 import type { Locale } from '../contracts/types';
 import { Icon } from '../ui/Icon';
 import { withStartAt } from './assets';
+import { MotionPause, type MotionLabels } from './MotionPause.client';
 
 export interface MusicProps {
   /** the track — or null: the hero video's own sound (the host's "video sound" option, HeroMedia) */
@@ -37,6 +38,7 @@ export function FloatingControls({
   langSwitch,
   music,
   listen = null,
+  motion = null,
 }: {
   langSwitch: {
     href: string;
@@ -48,6 +50,8 @@ export function FloatingControls({
   music: MusicProps | null;
   /** the invitation read aloud (features/voice): above the music button */
   listen?: ListenProps | null;
+  /** "pause the animations" (WCAG 2.2.2): the corner opposite the music */
+  motion?: MotionLabels | null;
 }) {
   return (
     <>
@@ -75,6 +79,7 @@ export function FloatingControls({
           <ListenButton {...listen} />
         </span>
       ) : null}
+      {motion ? <MotionPause labels={motion} className="fab fab-motion" /> : null}
     </>
   );
 }

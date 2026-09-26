@@ -70,17 +70,22 @@ export function Countdown({
     <div className="cd reveal" style={{ '--i': 2 } as CSSProperties} role="timer" aria-live="off">
       {UNITS.map((u) => {
         const digits = String(parts[u]).padStart(2, '0');
+        const label = t(locale, `countdown.${u}`, { n: parts[u] });
         return (
           <div className="cd-cell" key={u}>
             {/* a 3-digit day count keeps its own digits: keyed by place from the right */}
-            <div className="cd-num" suppressHydrationWarning>
+            <div className="cd-num" aria-hidden="true" suppressHydrationWarning>
               {[...digits].map((ch, i) => (
                 <Digit key={digits.length - i} ch={ch} />
               ))}
             </div>
-            <div className="cd-lbl" suppressHydrationWarning>
-              {t(locale, `countdown.${u}`, { n: parts[u] })}
+            <div className="cd-lbl" aria-hidden="true" suppressHydrationWarning>
+              {label}
             </div>
+            {/* read as one ("263 days"), not digit by digit */}
+            <span className="sr-only" suppressHydrationWarning>
+              {`${parts[u]} ${label}`}
+            </span>
           </div>
         );
       })}

@@ -28,5 +28,7 @@
   "cover.hint.gold_dust": "לחצו לפתיחה",
   "voice.listen": "האזנה להזמנה",
   "voice.stop": "עצירת ההקראה",
-  "captions.label": "כתוביות"
+  "captions.label": "כתוביות",
+  "motion.pause": "עצירת האנימציות",
+  "motion.play": "הפעלת האנימציות"
 }

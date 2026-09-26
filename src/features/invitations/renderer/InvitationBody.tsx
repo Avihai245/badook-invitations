@@ -8,6 +8,7 @@ import { FitNames } from './FitNames.client';
 import type { ListenProps, ListenTrack } from '@/features/voice/ui/Listen.client';
 import { t as translate } from '../i18n/dictionary';
 import { FloatingControls, type MusicProps } from './FloatingControls.client';
+import type { MotionLabels } from './MotionPause.client';
 import { fxTheme } from './fx/theme';
 import { imageSet } from './images';
 import { InvitationSections } from './InvitationSections';
@@ -127,6 +128,11 @@ export function InvitationBody({
         }
       : null;
 
+  // "pause the animations" (WCAG 2.2.2) on the guest's page; the review page has it in its toolbar
+  const motionIn = (l: Locale): MotionLabels | null =>
+    ctx.mode === 'live' && !ctx.review
+      ? { pause: translate(l, 'motion.pause'), play: translate(l, 'motion.play') }
+      : null;
   const listenIn = (l: Locale): ListenProps | null => {
     const track = ctx.mode === 'live' && !ctx.review ? voice?.[l] : undefined;
     return track
@@ -196,6 +202,7 @@ export function InvitationBody({
             payload={live}
             music={music}
             listen={Object.fromEntries(doc.locales.map((l) => [l, listenIn(l)]))}
+            motion={Object.fromEntries(doc.locales.map((l) => [l, motionIn(l)]))}
           >
             <InvitationSections ctx={ctx} />
           </LiveLocale>
@@ -209,6 +216,7 @@ export function InvitationBody({
               }
               music={music}
               listen={listenIn(ctx.locale)}
+              motion={motionIn(ctx.locale)}
             />
             <InvitationSections ctx={ctx} />
           </>

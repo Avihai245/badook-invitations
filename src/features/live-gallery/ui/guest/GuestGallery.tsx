@@ -612,7 +612,7 @@ function GalleryBody({
               {t.footer.accessibility}
             </a>
           </p>
-          <p className="mt-2 text-faint">{fmt(t.footer.made, { brand: data.brand })}</p>
+          <p className="mt-2 text-muted">{fmt(t.footer.made, { brand: data.brand })}</p>
         </footer>
       </div>
 

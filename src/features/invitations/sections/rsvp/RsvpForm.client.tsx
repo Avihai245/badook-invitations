@@ -587,8 +587,9 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     </Field>
   );
 
+  // named by its question: "how many adults? — fewer, 2, more" (not two unnamed "fewer" buttons)
   const stepper = (kind: 'adults' | 'children', value: number, min: number, max: number) => (
-    <div className="stepper">
+    <div className="stepper" role="group" aria-labelledby={fid(`${kind}-q`)}>
       <button
         type="button"
         onClick={() => step(kind, -1)}
@@ -657,7 +658,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
         <>
           <div className="grp steppers">
             <div className="srow">
-              <p className="q">
+              <p className="q" id={fid('adults-q')}>
                 <Icon name="users" size={18} />
                 {t(L, 'rsvp.adults')}
               </p>
@@ -665,7 +666,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
             </div>
             {config.askChildren ? (
               <div className="srow">
-                <p className="q">
+                <p className="q" id={fid('children-q')}>
                   <Icon name="baby" size={18} />
                   {t(L, 'rsvp.children')}
                 </p>

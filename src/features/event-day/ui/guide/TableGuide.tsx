@@ -209,7 +209,7 @@ function GuideBody({
               {t.footer.accessibility}
             </a>
           </p>
-          <p className="mt-2 text-faint">{fill(t.footer.made, { brand })}</p>
+          <p className="mt-2 text-muted">{fill(t.footer.made, { brand })}</p>
         </footer>
       </div>
     </main>

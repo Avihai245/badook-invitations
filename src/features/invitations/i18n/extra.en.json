@@ -28,5 +28,7 @@
   "cover.hint.gold_dust": "Tap to open",
   "voice.listen": "Listen to the invitation",
   "voice.stop": "Stop listening",
-  "captions.label": "Captions"
+  "captions.label": "Captions",
+  "motion.pause": "Pause the animations",
+  "motion.play": "Play the animations"
 }

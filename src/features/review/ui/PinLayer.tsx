@@ -128,7 +128,14 @@ export function PinLayer({
   useEffect(() => setHost(document.body), []);
   if (!host) return null;
   return createPortal(
-    <div className="review-pins" role="group" aria-label={label} data-testid="review-pins">
+    // under the invitation's cover while it is up (CoverOverlay makes these inert meanwhile)
+    <div
+      className="review-pins"
+      role="group"
+      aria-label={label}
+      data-testid="review-pins"
+      data-under-cover=""
+    >
       {places.map(({ pin, left, top }) => (
         <button
           key={pin.id}
