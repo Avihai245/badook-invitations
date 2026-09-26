@@ -2,6 +2,7 @@ import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
+import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { processQueue } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
@@ -16,7 +17,10 @@ import { dailyDue, WHATSAPP_EVERY_MS } from './schedule';
 
 export type JobName = 'daily' | 'whatsapp';
 
-/** The daily run: the hosts' RSVP summaries, the purge, the billing checks and the templates sync. */
+/**
+ * The daily run: the hosts' RSVP summaries, the purge, the billing checks, the templates sync and the
+ * live gallery's housekeeping.
+ */
 export async function runDaily(now: Date) {
   const digests = await sendDigests(now);
   // what the privacy policy promises about keeping data
@@ -26,7 +30,11 @@ export async function runDaily(now: Date) {
   const overdue = await reportOverdue().catch((err) => (console.error('billing_overdue failed', err), null));
   // the templates and demos match this deployment (a no-op when they do)
   const seed = await syncSeedOnce('daily');
-  return { ...digests, purged: (purged as number | null) ?? null, overdue, seed };
+  // the live gallery's promises: deleted items' files leave storage, unfinished uploads and old rows go
+  const gallery = await galleryHousekeeping().catch(
+    (err) => (console.error('gallery housekeeping failed', err), null),
+  );
+  return { ...digests, purged: (purged as number | null) ?? null, overdue, seed, gallery };
 }
 
 /** What is still queued for WhatsApp (a host closed the page mid-send, a retry that is due). */

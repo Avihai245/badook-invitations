@@ -8,9 +8,9 @@ const NO_STORE = { 'cache-control': 'no-store' };
 /**
  * POST /api/cron/rsvp-digest with `Authorization: Bearer <INVITES_CRON_SECRET>` — the daily run: the
  * RSVP summaries for invitations set to "daily summary", the purge of data past its keeping time, the
- * billing checks and the templates sync (features/jobs, runDaily). The app runs it by itself once a
- * day; a scheduler's call (.github/workflows/rsvp-digest.yml) runs it now and counts as that day's
- * turn. Every part is safe to run twice. Off (404) without a secret.
+ * billing checks, the templates sync and the live gallery's housekeeping (features/jobs, runDaily). The
+ * app runs it by itself once a day; a scheduler's call (.github/workflows/rsvp-digest.yml) runs it now
+ * and counts as that day's turn. Every part is safe to run twice. Off (404) without a secret.
  */
 export async function POST(request: Request) {
   const secret = serverEnv().INVITES_CRON_SECRET;
