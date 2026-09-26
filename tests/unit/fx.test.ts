@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { AMBIENT_KINDS, type AmbientKind, type TemplateManifest } from '@/features/invitations/contracts/types';
+import {
+  AMBIENT_KINDS,
+  type AmbientKind,
+  type TemplateManifest,
+} from '@/features/invitations/contracts/types';
 import { TemplateManifestSchema } from '@/features/invitations/contracts/schemas';
 import { AMBIENT } from '@/features/invitations/renderer/fx/Ambient.client';
 import { BURSTS } from '@/features/invitations/renderer/fx/burst';
@@ -157,7 +161,8 @@ describe('manifest field motion.ambient', () => {
   it('is optional and validated', () => {
     const { ambient: _a, ...motion } = m.motion;
     expect(TemplateManifestSchema.safeParse({ ...m, motion }).success).toBe(true);
-    for (const kind of AMBIENT_KINDS) expect(TemplateManifestSchema.safeParse(withAmbient(kind)).success).toBe(true);
+    for (const kind of AMBIENT_KINDS)
+      expect(TemplateManifestSchema.safeParse(withAmbient(kind)).success).toBe(true);
     expect(TemplateManifestSchema.safeParse(withAmbient('glitter')).success).toBe(false);
   });
 

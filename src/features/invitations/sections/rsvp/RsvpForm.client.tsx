@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode 
 import { useGuest } from '../../renderer/guest.client';
 import type { DietaryKey, Locale, RsvpResult, RsvpSubmission } from '../../contracts/types';
 import { burstFrom } from '../../renderer/fx/burst';
+import { motionAllowed } from '../../renderer/fx/motion';
 import type { BurstKind } from '../../renderer/fx/theme';
 import { t } from '../../i18n/dictionary';
 import { Icon } from '../../ui/Icon';
@@ -224,14 +225,20 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     });
   }, [config.slug, attending, adults, children, answers, message, decline, status, demo]);
 
-  // a "yes" just sent: the template's particles burst from the badge as its ring closes
+  // A reply just sent: the (much shorter) "thank you" replaces the form — bring it into view, then a
+  // "yes" bursts in the template's particles from the badge as its ring closes.
   const celebrateKind = config.celebrate?.kind;
   const celebrateColors = config.celebrate?.colors.join(',') ?? '';
   useEffect(() => {
-    if (status !== 'sent' || !fresh || !attending || !celebrateKind || !celebrateColors) return;
+    if (status !== 'sent' || !fresh) return;
+    const el = badge.current?.parentElement;
+    const r = el?.getBoundingClientRect();
+    if (el && r && (r.top < 0 || r.bottom > window.innerHeight))
+      el.scrollIntoView?.({ block: 'center', behavior: motionAllowed() ? 'smooth' : 'auto' });
+    if (!attending || !celebrateKind || !celebrateColors) return;
     const id = window.setTimeout(
       () => burstFrom(badge.current, celebrateKind, celebrateColors.split(','), { x: 0.5, y: 0.5 }),
-      420,
+      480,
     );
     return () => window.clearTimeout(id);
   }, [status, fresh, attending, celebrateKind, celebrateColors]);

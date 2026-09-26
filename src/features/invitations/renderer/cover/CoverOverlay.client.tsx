@@ -45,6 +45,8 @@ const WIDE = '(min-width: 1024px) and (min-aspect-ratio: 1/1)';
 
 /** Crossfade of the whole cover layer (§2.2.1: starts 600ms before the video ends). */
 const CROSSFADE_MS = 600;
+/** A video that doesn't play within this is skipped (§2.2.1). */
+const STALL_MS = 1500;
 /** The CSS cover's fade as it goes (invitation.css `.cover.gone`: 120ms + 800ms). */
 const FADE_MS = 850;
 
@@ -58,8 +60,6 @@ function sparkFrom(el: Element | null, fx: CoverOverlayProps['fx'], at?: { x: nu
 function burstOf(el: Element | null, fx: CoverOverlayProps['fx'], at?: { x: number; y: number }) {
   if (fx?.burst) burstFrom(el, fx.burst, fx.colors, at);
 }
-/** A video that doesn't play within this is skipped (§2.2.1). */
-const STALL_MS = 1500;
 
 /**
  * The cover (§2.2.1). With the template's media: the poster, a hidden opening video whose first frame
@@ -385,7 +385,7 @@ function CssCover({
     }
     // the seal breaks (sparks) → the flap opens → the card rises (the burst) → the push into the card
     later(() => sparkFrom(el?.querySelector('.seal') ?? null, fx), 60);
-    later(() => burstOf(el?.querySelector('.env-card') ?? null, fx, { x: 0.5, y: 0.3 }), 1250);
+    later(() => burstOf(el?.querySelector('.env-card') ?? null, fx, { x: 0.5, y: 0.12 }), 1250);
     later(() => finish(FADE_MS), overlay.exit === 'fade' ? 700 : 1650);
   });
 

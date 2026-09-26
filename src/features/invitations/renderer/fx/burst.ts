@@ -76,12 +76,12 @@ export const BURSTS: Record<BurstKind, Spec> = {
   confetti: {
     shapes: ['rect', 'rect', 'circle', 'tri', 'squiggle'],
     count: [24, 40],
-    size: [9, 15],
-    speed: [440, 1000],
+    size: [12, 20],
+    speed: [380, 900],
     angle: [-160, -20],
-    gravity: 760,
-    drag: 2.1,
-    ttl: [2.5, 3.5],
+    gravity: 700,
+    drag: 2.4,
+    ttl: [2.6, 3.6],
     spin: [-8, 8],
     flip: [8, 17],
     sway: 70,
@@ -432,7 +432,10 @@ function draw(p: Particle, alpha: number) {
 
 function frame(now: number) {
   if (!ctx || !canvas) return;
-  const dt = Math.min(0.034, Math.max(0, (now - last) / 1000));
+  // the physics steps at most 1/30s (smooth after a stall); lives run on the clock, so a slow device
+  // never keeps the canvas up longer than the burst lasts
+  const elapsed = Math.min(0.25, Math.max(0, (now - last) / 1000));
+  const dt = Math.min(0.034, elapsed);
   last = now;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
@@ -440,7 +443,7 @@ function frame(now: number) {
   const h = window.innerHeight;
   particles = particles.filter((p) => p.age < p.ttl && p.y < h + 80 && p.y > -200);
   for (const p of particles) {
-    p.age += dt;
+    p.age += elapsed;
     if (p.age < 0) continue; // staggered launch
     const s = p.spec;
     const decay = Math.exp(-s.drag * dt);

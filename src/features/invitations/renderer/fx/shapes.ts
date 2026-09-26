@@ -31,7 +31,7 @@ export const SHAPES = {
     d: 'M4 20C3.6 11.6 9.4 4.6 20.5 3.5 20.2 14 13.8 20.4 4 20Z',
     detail: { d: 'M4.5 19.5C8.6 14.6 12.8 10.4 18 5.8', stroke: 0.9, color: 'light', opacity: 0.4 },
   },
-  rect: { d: 'M3 8.5H21V15.5H3Z' },
+  rect: { d: 'M4 7H20V17H4Z' },
   circle: { d: 'M12 6.5A5.5 5.5 0 1 1 12 17.5 5.5 5.5 0 0 1 12 6.5Z' },
   tri: { d: 'M12 4.5 20.5 19H3.5Z' },
   squiggle: { d: 'M2.5 15C4.9 9.8 7.3 9.8 9.7 15S14.5 20.2 16.9 15 19.8 10.2 21.5 12', stroke: 2.8 },
@@ -46,7 +46,7 @@ export const SHAPES = {
   dot: { d: 'M12 8A4 4 0 1 1 12 16 4 4 0 0 1 12 8Z' },
   bubble: {
     d: 'M12 3A9 9 0 1 1 12 21 9 9 0 0 1 12 3Z',
-    stroke: 1.3,
+    stroke: 1.7,
     detail: { d: 'M7 9.6C7.7 7.8 9.1 6.6 10.8 6.1', stroke: 1.6, color: 'light', opacity: 0.9 },
   },
   balloon: {

@@ -142,7 +142,11 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
             </p>
           ) : null}
         </div>
-        <h1 className={custom ? 'names custom' : 'names'} data-edit-path={path && `${path}.data.title`}>
+        <h1
+          className={custom ? 'names custom' : 'names'}
+          data-edit-path={path && `${path}.data.title`}
+          style={{ '--shine': fx.shine } as CSSProperties}
+        >
           {custom ? (
             <span className="n" style={fit(customTitle)}>
               {customTitle}

@@ -26,7 +26,8 @@ export const MAX_PARTICLES = 40;
 
 /**
  * How many particles this device gets: `phone` on a small or touch screen (never more than 24),
- * `desktop` elsewhere (never more than 40), about 40% fewer on a low-end device.
+ * `desktop` elsewhere (never more than 40), about 40% fewer on a low-end device (2 cores or 2 GB —
+ * not by a 4-core count, which Safari reports for fast iPhones too).
  */
 export function particleBudget(phone: number, desktop: number): number {
   if (typeof window === 'undefined') return 0;
@@ -38,7 +39,10 @@ export function particleBudget(phone: number, desktop: number): number {
   }
   let n = small ? Math.min(phone, PHONE_MAX_PARTICLES) : Math.min(desktop, MAX_PARTICLES);
   const nav = navigator as Nav;
-  if ((nav.hardwareConcurrency && nav.hardwareConcurrency <= 4) || (nav.deviceMemory && nav.deviceMemory <= 2))
+  if (
+    (nav.hardwareConcurrency && nav.hardwareConcurrency <= 2) ||
+    (nav.deviceMemory && nav.deviceMemory <= 2)
+  )
     n = Math.round(n * 0.6);
   return Math.max(1, n);
 }

@@ -22,7 +22,13 @@ function Digit({ ch }: { ch: string }) {
   return (
     <span className="cd-d">
       {roll.old !== null ? (
-        <span className="cd-dv out" key={`o${roll.n}`} aria-hidden="true">
+        <span
+          className="cd-dv out"
+          key={`o${roll.n}`}
+          aria-hidden="true"
+          // gone once it has rolled out (with reduced motion it is never shown)
+          onAnimationEnd={() => setRoll((r) => (r.n === roll.n ? { ...r, old: null } : r))}
+        >
           {roll.old}
         </span>
       ) : null}

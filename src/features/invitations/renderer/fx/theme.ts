@@ -238,6 +238,18 @@ export interface FxTheme {
   /** the cover's opening burst and the RSVP celebration (null: none) */
   burst: BurstKind | null;
   burstColors: string[];
+  /**
+   * The gold-foil glint over the hero's names (NameShine): a deep gold over light names (it must show
+   * on white), a bright warm light over dark ones.
+   */
+  shine: string;
+}
+
+/** The glint's color for names in `heroText`, warmed by the accent. */
+export function shineColor(heroText: string, accent: string): string {
+  const light = HEX.test(heroText) ? relativeLuminance(heroText) > 0.45 : true;
+  const a = HEX.test(accent) ? accent : '#B08D57';
+  return light ? mixHex('#E4AE3F', a, 0.12) : mixHex('#FFF0C2', a, 0.08);
 }
 
 /** Everything the renderer's particles need for this template and document. */
@@ -252,5 +264,6 @@ export function fxTheme(template: Template, doc: Pick<InvitationDocument, 'theme
     ambientColors: ambient === 'none' ? [] : fxColors(ambient, palette, seals),
     burst,
     burstColors: burst ? fxColors(burst, palette, seals, 'burst') : [],
+    shine: shineColor(palette.heroText, palette.accent),
   };
 }

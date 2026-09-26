@@ -28,8 +28,8 @@ export const AMBIENT: Record<Exclude<AmbientKind, 'none'>, Spec> = {
   petals: {
     motion: 'fall',
     shapes: ['petal', 'petal2'],
-    count: [11, 16],
-    size: [12, 21],
+    count: [12, 16],
+    size: [13, 23],
     dur: [12, 19],
     opacity: [0.6, 0.92],
     sway: [3, 8],
@@ -46,8 +46,8 @@ export const AMBIENT: Record<Exclude<AmbientKind, 'none'>, Spec> = {
   confetti: {
     motion: 'fall',
     shapes: ['rect', 'rect', 'circle', 'tri', 'squiggle'],
-    count: [15, 22],
-    size: [7, 12],
+    count: [16, 22],
+    size: [12, 19],
     dur: [8, 13],
     opacity: [0.75, 1],
     sway: [2, 6],
@@ -72,8 +72,8 @@ export const AMBIENT: Record<Exclude<AmbientKind, 'none'>, Spec> = {
   bubbles: {
     motion: 'rise',
     shapes: ['bubble'],
-    count: [11, 16],
-    size: [10, 30],
+    count: [12, 16],
+    size: [14, 36],
     dur: [10, 16],
     opacity: [0.55, 0.9],
     sway: [2, 6],
@@ -81,8 +81,8 @@ export const AMBIENT: Record<Exclude<AmbientKind, 'none'>, Spec> = {
   balloons: {
     motion: 'rise',
     shapes: ['balloon'],
-    count: [6, 8],
-    size: [26, 42],
+    count: [7, 9],
+    size: [38, 58],
     dur: [17, 25],
     opacity: [0.85, 1],
     sway: [2, 5],
@@ -90,8 +90,8 @@ export const AMBIENT: Record<Exclude<AmbientKind, 'none'>, Spec> = {
   hearts: {
     motion: 'rise',
     shapes: ['heart'],
-    count: [10, 14],
-    size: [10, 20],
+    count: [11, 15],
+    size: [12, 23],
     dur: [11, 17],
     opacity: [0.5, 0.85],
     sway: [2, 6],
@@ -187,6 +187,8 @@ function makeParticles(kind: Exclude<AmbientKind, 'none'>, colors: string[], see
   return list;
 }
 
+const SHEEN = new Set<ShapeId>(['petal', 'petal2', 'leaf', 'leaf2', 'heart', 'balloon']);
+
 function Glyph({ shape }: { shape: ShapeId }) {
   const s = SHAPES[shape] as (typeof SHAPES)[ShapeId] & {
     stroke?: number;
@@ -203,14 +205,18 @@ function Glyph({ shape }: { shape: ShapeId }) {
         <path
           d={s.d}
           fill={shape === 'bubble' ? 'currentColor' : 'none'}
-          fillOpacity={shape === 'bubble' ? 0.12 : undefined}
+          fillOpacity={shape === 'bubble' ? 0.16 : undefined}
           stroke="currentColor"
-          strokeWidth={s.stroke}
+          strokeWidth={shape === 'bubble' ? 2 : s.stroke}
           strokeLinecap="round"
         />
       ) : (
         <path d={s.d} fill="currentColor" />
       )}
+      {SHEEN.has(shape) ? (
+        // a smaller, lighter copy toward the top: the light on a petal, a leaf, a balloon
+        <path d={s.d} fill="#fff" opacity=".24" transform="translate(12 5) scale(.55) translate(-12 -5)" />
+      ) : null}
       {s.detail ? (
         <path
           d={s.detail.d}
