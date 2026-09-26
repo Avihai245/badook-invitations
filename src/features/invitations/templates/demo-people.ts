@@ -42,7 +42,33 @@ const COUPLE: DemoPeople = {
  * Designs made for one age or crowd show a person who fits them — a toddler's third birthday, a
  * grandmother's eightieth — instead of the event type's sample: by template id, then event type.
  */
-const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = {};
+const TEMPLATE_PEOPLE: Record<string, Partial<Record<EventType, DemoPeople>>> = {
+  // T4: grown-ups & golden years
+  'tropical-tiki': {
+    birthday: { primary: { he: 'יעל', en: 'Yael' }, monogram: { he: 'יעל 35', en: 'YAEL 35' } },
+    other: { primary: { he: 'יעל ורון', en: 'Yael & Ron' }, monogram: { he: 'י&ר', en: 'Y&R' } },
+  },
+  'vineyard-harvest': {
+    birthday: { primary: { he: 'אבי', en: 'Avi' }, monogram: { he: 'אבי 60', en: 'AVI 60' } },
+  },
+  'campfire-night': {
+    birthday: { primary: { he: 'תום', en: 'Tom' }, monogram: { he: 'תום 11', en: 'TOM 11' } },
+    bar_mitzvah: {
+      primary: { he: 'יונתן', en: 'Jonathan' },
+      parents: { he: 'מיכל ודוד לוי', en: 'Michal & David Levi' },
+      monogram: { he: 'י', en: 'J' },
+    },
+    other: { primary: { he: 'משפחת כהן', en: 'The Cohens' }, monogram: { he: 'כהן', en: 'COHEN' } },
+  },
+  'golden-years': {
+    birthday: { primary: { he: 'משה', en: 'Moshe' }, monogram: { he: 'משה 80', en: 'MOSHE 80' } },
+    other: { primary: { he: 'רחל ומשה', en: 'Rachel & Moshe' }, monogram: { he: 'ר&מ', en: 'R&M' } },
+  },
+  'grandma-garden': {
+    birthday: { primary: { he: 'רחל', en: 'Rachel' }, monogram: { he: 'רחל 90', en: 'RACHEL 90' } },
+    other: { primary: { he: 'משפחת לוי', en: 'The Levis' }, monogram: { he: 'לוי', en: 'LEVI' } },
+  },
+};
 
 /**
  * Who a demo of this event type is for: the design's own sample person when it has one, else a

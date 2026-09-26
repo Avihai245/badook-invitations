@@ -27,6 +27,12 @@ import DigIt from './dig-it';
 import OceanFriends from './ocean-friends';
 import RocketLaunch from './rocket-launch';
 import UnicornDream from './unicorn-dream';
+// T4: grown-ups & golden years
+import TropicalTiki from './tropical-tiki';
+import VineyardHarvest from './vineyard-harvest';
+import CampfireNight from './campfire-night';
+import GoldenYears from './golden-years';
+import GrandmaGarden from './grandma-garden';
 
 export type { SceneId } from './ids';
 export type { ScenePlace } from './kit';
@@ -58,6 +64,12 @@ const SCENES: Record<SceneId, ComponentType<SceneProps>> = {
   'ocean-friends': OceanFriends,
   'rocket-launch': RocketLaunch,
   'unicorn-dream': UnicornDream,
+  // T4: grown-ups & golden years
+  'tropical-tiki': TropicalTiki,
+  'vineyard-harvest': VineyardHarvest,
+  'campfire-night': CampfireNight,
+  'golden-years': GoldenYears,
+  'grandma-garden': GrandmaGarden,
 };
 
 const ROOT: CSSProperties = {

@@ -1,0 +1,237 @@
+{
+  "id": "vineyard-harvest",
+  "version": 2,
+  "name": {
+    "he": "בציר",
+    "en": "Vineyard Harvest"
+  },
+  "description": {
+    "he": "שעת זהב בכרם, מבט מתחת לפרגולה — שורות גפנים עד האופק, ברושים ובית אבן, אשכולות ענבים ועלי גפן שמתחילים להזהיב, שתי כוסות יין על חבית עץ וגחליליות באוויר החם.",
+    "en": "Golden hour in the vineyard, seen from under a pergola — vine rows to the horizon, cypresses and a stone farmhouse, grape clusters and vine leaves turning gold, two glasses of wine on an oak barrel and fireflies in the warm air."
+  },
+  "tier": "premium",
+  "categories": [
+    "birthday",
+    "wedding",
+    "engagement",
+    "corporate"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/vineyard-harvest/preview.webp",
+  "previewVideo": "/templates/vineyard-harvest/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F6EFE3",
+      "surface": "#FFFBF4",
+      "ink": "#2E1D22",
+      "inkMuted": "#6B5A55",
+      "accent": "#7A2140",
+      "accentInk": "#FFF6EC",
+      "line": "#E6D9C4",
+      "heroText": "#33191F"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 6
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "merlot",
+      "name": {
+        "he": "מרלו",
+        "en": "Merlot"
+      },
+      "palette": {
+        "accent": "#7A2140"
+      }
+    },
+    {
+      "id": "cabernet",
+      "name": {
+        "he": "קברנה",
+        "en": "Cabernet"
+      },
+      "palette": {
+        "accent": "#57285C"
+      }
+    },
+    {
+      "id": "chardonnay",
+      "name": {
+        "he": "שרדונה",
+        "en": "Chardonnay"
+      },
+      "palette": {
+        "accent": "#7A6A1A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "estate",
+      "display": {
+        "latin": "Playfair Display",
+        "hebrew": "Bona Nova"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Bona Nova"
+      },
+      "body": {
+        "latin": "EB Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "vintage",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "Bellefair"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ribbon",
+    "renderer": "video",
+    "poster": "/templates/vineyard-harvest/cover-poster.webp",
+    "posterDesktop": "/templates/vineyard-harvest/cover-poster-desktop.webp",
+    "openVideo": "/templates/vineyard-harvest/cover-open.mp4",
+    "openVideoDesktop": "/templates/vineyard-harvest/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/vineyard-harvest/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 6
+      }
+    },
+    "sealColors": [
+      "#7A2140",
+      "#57285C",
+      "#8C6B1F"
+    ],
+    "monogramFont": {
+      "latin": "Cinzel",
+      "hebrew": "Frank Ruhl Libre"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "כרם בשעת זהב",
+          "en": "A vineyard at golden hour"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#33191F",
+    "overlayColor": "#FFF6E6",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "vineyard-harvest-theme",
+    "tracks": [
+      {
+        "id": "vineyard-harvest-theme",
+        "title": "Golden Harvest (Spanish guitar & strings)",
+        "url": "/templates/vineyard-harvest/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/vineyard-harvest/hero.mp4",
+    "hero-poster": "/templates/vineyard-harvest/hero-poster.webp",
+    "hero-desktop": "/templates/vineyard-harvest/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/vineyard-harvest/hero-desktop-poster.webp",
+    "vine-band": "/templates/vineyard-harvest/vine-band.webp",
+    "vineyard-panorama": "/templates/vineyard-harvest/vineyard-panorama.webp",
+    "grapes": "/templates/vineyard-harvest/grapes.webp",
+    "wine-glasses": "/templates/vineyard-harvest/wine-glasses.webp",
+    "barrel": "/templates/vineyard-harvest/barrel.webp"
+  },
+  "decorations": {
+    "afterHero": "template:vine-band",
+    "betweenVenues": "template:vineyard-panorama",
+    "afterTimeline": "template:grapes",
+    "beforeRsvp": "template:wine-glasses",
+    "footer": "template:barrel"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

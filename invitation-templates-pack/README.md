@@ -41,3 +41,8 @@ Install: the manifests and defaults are read from this folder by the app (src/fe
 | `ocean-friends` | birthday, baby_shower, brit | standard |
 | `rocket-launch` | birthday, bar_mitzvah | premium |
 | `unicorn-dream` | birthday, bat_mitzvah | premium |
+| `tropical-tiki` | birthday, engagement, other | standard |
+| `vineyard-harvest` | birthday, wedding, engagement, corporate | premium |
+| `campfire-night` | birthday, bar_mitzvah, other | standard |
+| `golden-years` | birthday, other | premium |
+| `grandma-garden` | birthday, other, baby_shower | standard |

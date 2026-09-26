@@ -52,6 +52,12 @@ describe('template pack', () => {
       'ocean-friends',
       'rocket-launch',
       'unicorn-dream',
+      // T4: grown-ups & golden years
+      'tropical-tiki',
+      'vineyard-harvest',
+      'campfire-night',
+      'golden-years',
+      'grandma-garden',
     ]);
   });
 
@@ -75,6 +81,9 @@ describe('template pack', () => {
       // T1: little ones
       'rocket-launch',
       'unicorn-dream',
+      // T4: grown-ups & golden years
+      'vineyard-harvest',
+      'golden-years',
     ]);
   });
 

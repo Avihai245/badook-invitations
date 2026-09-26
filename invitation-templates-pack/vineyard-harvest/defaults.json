@@ -1,0 +1,536 @@
+{
+  "templateId": "vineyard-harvest",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "שנת בציר מצוינת — חוגגים עם",
+        "en": "A fine vintage — celebrating with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנפתח את הבקבוק",
+          "en": "Until we uncork the bottle"
+        },
+        "afterEvent": {
+          "he": "לחיים! תודה שחגגתם איתנו",
+          "en": "Cheers! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "יין טוב לוקח את הזמן",
+          "en": "Fine wine takes its time"
+        },
+        "body": {
+          "he": "כמו יין טוב — עם השנים רק משתבחים.\nב־{date} נרים כוסית, נאכל טוב ונחגוג יחד עם האנשים הכי קרובים.",
+          "en": "Like a fine wine, some things only get better with the years.\nOn {date} we’ll raise a glass, eat well and celebrate with the people closest to us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הערב",
+          "en": "The evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים ויין",
+            "en": "Welcome & wine"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:30",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "A toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "22:15",
+          "label": {
+            "he": "עוגה וקינוחים",
+            "en": "Cake & dessert"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "אלגנטי־כפרי",
+            "en": "Country elegant"
+          },
+          "body": {
+            "he": "ערב בין הגפנים — בגדים קלילים ונעליים נוחות לדשא. ושכבה דקה למקרה שיתקרר.",
+            "en": "An evening among the vines — light clothes and comfortable shoes for the lawn. And a light layer in case it cools down."
+          },
+          "illustration": "template:grapes"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "תצטרפו אלינו?",
+          "en": "Will you join us?"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "לחיים! נתראה בערב",
+          "en": "Cheers! See you there"
+        },
+        "declineMessage": {
+          "he": "חבל! נרים כוסית לכבודכם",
+          "en": "Too bad! We’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "לחיים!",
+        "en": "Cheers!"
+      }
+    },
+    "wedding": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בין הגפנים, אנחנו מתחתנים",
+        "en": "Among the vines, we’re getting married"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנרים כוסית מתחת לחופה",
+          "en": "Until we raise a glass under the chuppah"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "אהבה שהבשילה",
+          "en": "A love that ripened"
+        },
+        "body": {
+          "he": "כמו כרם בשעת זהב — לאט, בסבלנות ובהמון אהבה.\nב־{date} אנחנו מתחתנים, ונשמח לחגוג איתכם.",
+          "en": "Like a vineyard at golden hour — slowly, patiently and with lots of love.\nWe’re getting married on {date}, and we’d love to celebrate with you."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החופה והמסיבה",
+          "en": "Ceremony & party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "18:30",
+          "label": {
+            "he": "קבלת פנים בכרם",
+            "en": "Vineyard welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:30",
+          "label": {
+            "he": "חופה",
+            "en": "Chuppah"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "חגיגי ונוח לדשא",
+            "en": "Festive, lawn-friendly"
+          },
+          "body": {
+            "he": "חלק מהערב בחוץ, בין הגפנים — עדיף לוותר על עקבים דקים ולבוא עם נעליים נוחות.",
+            "en": "Part of the evening is outdoors among the vines — skip the stilettos and bring comfortable shoes."
+          },
+          "illustration": "template:grapes"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בין הגפנים",
+          "en": "Thank you! See you among the vines"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נרים כוסית לכבודכם",
+          "en": "Thanks for letting us know — we’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה ובשמחה",
+        "en": "With love and joy"
+      }
+    },
+    "engagement": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "כוס יין, טבעת אחת — התארסנו!",
+        "en": "One glass, one ring — we’re engaged!"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנרים כוסית יחד",
+          "en": "Until we raise a glass together"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הבציר הכי מתוק",
+          "en": "Our sweetest harvest"
+        },
+        "body": {
+          "he": "בחרנו זה בזה — עכשיו נשאר רק להרים כוסית.\nבואו לחגוג איתנו את האירוסין ב־{date}.",
+          "en": "We chose each other — now all that’s left is to raise a glass.\nCome celebrate our engagement with us on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "מסיבת האירוסין",
+          "en": "Engagement party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:30",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "Toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחה",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "מוזיקה",
+            "en": "Music"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג המאורס",
+          "en": "A wish for the happy couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בקרוב",
+          "en": "Thank you! See you soon"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נחגוג יחד בהזדמנות",
+          "en": "Thanks for letting us know — we’ll celebrate together soon"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      }
+    },
+    "corporate": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "ערב היין השנתי של",
+        "en": "The annual wine evening of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הכוסית הראשונה",
+          "en": "Until the first glass"
+        },
+        "afterEvent": {
+          "he": "לחיים! תודה שהייתם איתנו",
+          "en": "Cheers! Thank you for joining us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שנה משובחת",
+          "en": "A vintage year"
+        },
+        "body": {
+          "he": "שנה של עבודה משותפת ראויה לכוסית טובה.\nמזמינים אתכם לערב של יין, אוכל ושיחות טובות ב־{date}.",
+          "en": "A year of working together deserves a good glass.\nJoin us for an evening of wine, food and good conversation on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הערב",
+          "en": "The evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "18:30",
+          "label": {
+            "he": "טעימות יין",
+            "en": "Wine tasting"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:30",
+          "label": {
+            "he": "דברי ברכה",
+            "en": "Welcome remarks"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:00",
+          "label": {
+            "he": "ארוחת שף",
+            "en": "Chef’s dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "מוזיקה חיה",
+            "en": "Live music"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "dress_code",
+          "title": {
+            "he": "קוד לבוש",
+            "en": "Dress Code"
+          },
+          "subtitle": {
+            "he": "סמארט קז׳ואל",
+            "en": "Smart casual"
+          },
+          "body": {
+            "he": "ערב ביקב — לבוש נוח ואלגנטי, ונעליים שנוח ללכת בהן על הדשא.",
+            "en": "An evening at the winery — smart and comfortable, with shoes that can handle the grass."
+          },
+          "illustration": "template:grapes"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "הערה למארגנים",
+          "en": "A note for the organizers"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה ביקב",
+          "en": "Thank you! See you at the winery"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון",
+          "en": "Thank you for letting us know"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "לחיים!",
+        "en": "Cheers!"
+      }
+    }
+  }
+}

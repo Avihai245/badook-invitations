@@ -1,0 +1,235 @@
+{
+  "id": "golden-years",
+  "version": 2,
+  "name": {
+    "he": "שנים של זהב",
+    "en": "Golden Years"
+  },
+  "description": {
+    "he": "אלגנטיות על־זמנית על סאטן בצבע שמפניה — זר דפנה מוזהב סביב שתי כוסות שמפניה בהרמה, מסגרת כפולה של רדיד זהב, אורות זהב רכים ונצנוצים. חגיגה חמה, ברורה וקלה לקריאה לימי הולדת עגולים ולחתונות זהב.",
+    "en": "Timeless elegance on champagne satin — a gilded laurel wreath around two raised champagne flutes, a double gold-foil frame, soft golden lights and sparkles. A warm, clear, easy-to-read celebration for milestone birthdays and golden anniversaries."
+  },
+  "tier": "premium",
+  "categories": [
+    "birthday",
+    "other"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/golden-years/preview.webp",
+  "previewVideo": "/templates/golden-years/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#F8F1E4",
+      "surface": "#FFFCF5",
+      "ink": "#2B2118",
+      "inkMuted": "#655442",
+      "accent": "#86601A",
+      "accentInk": "#FFFFFF",
+      "line": "#E8DBC3",
+      "heroText": "#3B2A12"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 12,
+      "button": 8
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב",
+        "en": "Gold"
+      },
+      "palette": {
+        "accent": "#86601A"
+      }
+    },
+    {
+      "id": "burgundy",
+      "name": {
+        "he": "בורדו",
+        "en": "Burgundy"
+      },
+      "palette": {
+        "accent": "#7A2335"
+      }
+    },
+    {
+      "id": "navy",
+      "name": {
+        "he": "כחול לילה",
+        "en": "Navy"
+      },
+      "palette": {
+        "accent": "#23406E"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "timeless",
+      "display": {
+        "latin": "DM Serif Display",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Lora",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "grand",
+      "display": {
+        "latin": "Cinzel Decorative",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Cinzel",
+        "hebrew": "Suez One"
+      },
+      "body": {
+        "latin": "EB Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "video",
+    "poster": "/templates/golden-years/cover-poster.webp",
+    "posterDesktop": "/templates/golden-years/cover-poster-desktop.webp",
+    "openVideo": "/templates/golden-years/cover-open.mp4",
+    "openVideoDesktop": "/templates/golden-years/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "medallion",
+      "image": "/templates/golden-years/medallion-blank.png",
+      "recolor": true,
+      "size": 0.32,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "lift",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 8
+      }
+    },
+    "sealColors": [
+      "#B08A3E",
+      "#7A2335",
+      "#23406E"
+    ],
+    "monogramFont": {
+      "latin": "DM Serif Display",
+      "hebrew": "Frank Ruhl Libre"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "זהב ושמפניה",
+          "en": "Gold & champagne"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#3B2A12",
+    "overlayColor": "#FFF9EE",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "golden-years-theme",
+    "tracks": [
+      {
+        "id": "golden-years-theme",
+        "title": "Golden Waltz (string quartet)",
+        "url": "/templates/golden-years/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/golden-years/hero.mp4",
+    "hero-poster": "/templates/golden-years/hero-poster.webp",
+    "hero-desktop": "/templates/golden-years/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/golden-years/hero-desktop-poster.webp",
+    "foil-band": "/templates/golden-years/foil-band.webp",
+    "laurel-panorama": "/templates/golden-years/laurel-panorama.webp",
+    "champagne-toast": "/templates/golden-years/champagne-toast.webp",
+    "laurel": "/templates/golden-years/laurel.webp",
+    "medallion-crest": "/templates/golden-years/medallion-crest.webp"
+  },
+  "decorations": {
+    "afterHero": "template:foil-band",
+    "betweenVenues": "template:laurel-panorama",
+    "afterTimeline": "template:champagne-toast",
+    "beforeRsvp": "template:laurel",
+    "footer": "template:medallion-crest"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}

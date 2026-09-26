@@ -1,0 +1,281 @@
+{
+  "templateId": "golden-years",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "הנכם מוזמנים לחגוג את",
+        "en": "You’re invited to celebrate"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "ה־80 של {primary}",
+          "en": "{primary}’s 80th"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנרים כוסית",
+          "en": "Until we raise a glass"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שנים של זהב",
+          "en": "Golden years"
+        },
+        "body": {
+          "he": "כל כך הרבה משפחה, חברים, סיפורים ורגעים יפים — והטובים עוד לפנינו.\nב־{date} נתכנס כולנו לחגוג יחד, ונשמח מאוד לראות גם אתכם.",
+          "en": "So much family, so many friends, stories and beautiful moments — and the best is yet to come.\nOn {date} we’ll all gather to celebrate together, and we’d be so glad to see you there."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החגיגה",
+          "en": "The celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחה חגיגית",
+            "en": "Festive dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ברכות וזיכרונות",
+            "en": "Toasts & memories"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "הביאו איתכם זיכרון",
+            "en": "Bring a memory"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "תמונה ישנה או סיפור קצר — נאסוף את כולם לאלבום מתנה ליום ההולדת.",
+            "en": "An old photo or a short story — we’re collecting them all into a birthday gift album."
+          },
+          "illustration": "template:laurel"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "תבואו לחגוג?",
+          "en": "Will you join us?"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Kindly let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "תודה! נשמח לראותכם",
+          "en": "Thank you! We look forward to seeing you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נרים כוסית לכבודכם",
+          "en": "Thank you for letting us know — we’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה גדולה",
+        "en": "With all our love"
+      }
+    },
+    "other": {
+      "coverHint": {
+        "he": "לחצו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "חתונת זהב — 50 שנה ביחד",
+        "en": "Fifty golden years together"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנרים כוסית לזוג",
+          "en": "Until we toast the happy couple"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "יד ביד",
+          "en": "Hand in hand"
+        },
+        "body": {
+          "he": "חמישים שנה של אהבה, משפחה ובית חם.\nב־{date} נחגוג יחד עם {primary} — ונשמח שתהיו איתנו.",
+          "en": "Fifty years of love, family and a warm home.\nOn {date} we’ll celebrate {primary} together — and we’d love you to be there."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החגיגה",
+          "en": "The celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחה חגיגית",
+            "en": "Festive dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ברכות וזיכרונות",
+            "en": "Toasts & memories"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "הריקוד של הזוג",
+            "en": "The couple’s dance"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [
+        {
+          "kind": "custom",
+          "title": {
+            "he": "הביאו איתכם זיכרון",
+            "en": "Bring a memory"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "תמונה או סיפור משותף — נאסוף את כולם לאלבום מתנה לזוג.",
+            "en": "A photo or a story you share with them — we’re collecting them all into a gift album for the couple."
+          },
+          "illustration": "template:laurel"
+        }
+      ],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נשמח לראותכם",
+          "en": "Thank you! We look forward to seeing you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נרים כוסית לכבודכם",
+          "en": "Thank you for letting us know — we’ll raise a glass to you"
+        },
+        "closedMessage": {
+          "he": "מועד אישורי ההגעה הסתיים. לשאלות אפשר לפנות אלינו ישירות.",
+          "en": "RSVPs are now closed. Please contact us directly with any questions."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו זאת.",
+          "en": "All food served is kosher. If you need a Mehadrin-certified meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      }
+    }
+  }
+}

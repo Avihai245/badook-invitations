@@ -1,0 +1,236 @@
+{
+  "id": "grandma-garden",
+  "version": 2,
+  "name": {
+    "he": "הגן של סבתא",
+    "en": "Grandma’s Garden"
+  },
+  "description": {
+    "he": "גן כפרי אנגלי באור בוקר רך — ורדים מטפסים, לבנדר ומלוות שמתנדנדים ברוח, גדר עץ לבנה עם אדום־חזה, כוס תה מהבילה, מזלף ופרפרים. חם, רך ומלא אהבה — לימי הולדת של סבים וסבתות ולמפגשי משפחה.",
+    "en": "An English cottage garden in soft morning light — climbing roses, lavender and hollyhocks swaying in the breeze, a white picket fence with a robin, a steaming teacup, a watering can and butterflies. Warm, gentle and full of love — for grandparents’ birthdays and family gatherings."
+  },
+  "tier": "standard",
+  "categories": [
+    "birthday",
+    "other",
+    "baby_shower"
+  ],
+  "supportsLocales": [
+    "he",
+    "en"
+  ],
+  "previewImage": "/templates/grandma-garden/preview.webp",
+  "previewVideo": "/templates/grandma-garden/preview.mp4",
+  "tokens": {
+    "palette": {
+      "bg": "#FBF7F1",
+      "surface": "#FFFFFF",
+      "ink": "#33292E",
+      "inkMuted": "#685B61",
+      "accent": "#AE4766",
+      "accentInk": "#FFFFFF",
+      "line": "#EFE3DA",
+      "heroText": "#3A2A32"
+    },
+    "editablePaletteKeys": [
+      "accent"
+    ],
+    "radius": {
+      "card": 20,
+      "button": 999
+    },
+    "divider": "gradient_line"
+  },
+  "palettePresets": [
+    {
+      "id": "rose",
+      "name": {
+        "he": "ורד",
+        "en": "Rose"
+      },
+      "palette": {
+        "accent": "#AE4766"
+      }
+    },
+    {
+      "id": "lavender",
+      "name": {
+        "he": "לבנדר",
+        "en": "Lavender"
+      },
+      "palette": {
+        "accent": "#6E5A9E"
+      }
+    },
+    {
+      "id": "sage",
+      "name": {
+        "he": "מרווה",
+        "en": "Sage"
+      },
+      "palette": {
+        "accent": "#4E7358"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "cottage",
+      "display": {
+        "latin": "Young Serif",
+        "hebrew": "David Libre"
+      },
+      "heading": {
+        "latin": "Lora",
+        "hebrew": "David Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "tea-party",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Bellefair"
+      },
+      "body": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "video",
+    "poster": "/templates/grandma-garden/cover-poster.webp",
+    "posterDesktop": "/templates/grandma-garden/cover-poster-desktop.webp",
+    "openVideo": "/templates/grandma-garden/cover-open.mp4",
+    "openVideoDesktop": "/templates/grandma-garden/cover-open-desktop.mp4",
+    "holdMs": 500,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/grandma-garden/seal-blank.png",
+      "recolor": true,
+      "size": 0.32,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 8
+      }
+    },
+    "sealColors": [
+      "#9C7BB8",
+      "#C2607A",
+      "#6F8F6A"
+    ],
+    "monogramFont": {
+      "latin": "Young Serif",
+      "hebrew": "David Libre"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "default",
+        "name": {
+          "he": "גן כפרי באור בוקר",
+          "en": "A cottage garden in morning light"
+        },
+        "media": {
+          "kind": "video",
+          "src": "template:hero",
+          "poster": "template:hero-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": {
+          "kind": "video",
+          "src": "template:hero-desktop",
+          "poster": "template:hero-desktop-poster",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      }
+    ],
+    "textColor": "#3A2A32",
+    "overlayColor": "#FFFDF9",
+    "defaultOverlay": 0.35
+  },
+  "music": {
+    "defaultTrackId": "grandma-garden-theme",
+    "tracks": [
+      {
+        "id": "grandma-garden-theme",
+        "title": "Sunday in the Garden (piano & strings)",
+        "url": "/templates/grandma-garden/music.mp3",
+        "license": "TBD — must be royalty-free for commercial use"
+      }
+    ]
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 40,
+    "revealBlur": true,
+    "stagger": 0.08
+  },
+  "assets": {
+    "hero": "/templates/grandma-garden/hero.mp4",
+    "hero-poster": "/templates/grandma-garden/hero-poster.webp",
+    "hero-desktop": "/templates/grandma-garden/hero-desktop.mp4",
+    "hero-desktop-poster": "/templates/grandma-garden/hero-desktop-poster.webp",
+    "rose-band": "/templates/grandma-garden/rose-band.webp",
+    "garden-panorama": "/templates/grandma-garden/garden-panorama.webp",
+    "teacup": "/templates/grandma-garden/teacup.webp",
+    "watering-can": "/templates/grandma-garden/watering-can.webp",
+    "rose": "/templates/grandma-garden/rose.webp"
+  },
+  "decorations": {
+    "afterHero": "template:rose-band",
+    "betweenVenues": "template:garden-panorama",
+    "afterTimeline": "template:teacup",
+    "beforeRsvp": "template:watering-can",
+    "footer": "template:rose"
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "countdown",
+      "text",
+      "venues",
+      "timeline",
+      "gallery",
+      "faq",
+      "gifts",
+      "rsvp",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical",
+      "venues": "stacked-with-map",
+      "countdown": "boxes"
+    }
+  }
+}
