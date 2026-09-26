@@ -7,6 +7,7 @@ import {
   type TemplateManifest,
 } from '@/features/invitations/contracts/types';
 import { cinematicDocument } from '@/features/invitations/dev/cinematic-demo';
+import { contrastRatio } from '@/features/invitations/lib/contrast';
 import {
   hasPresentation,
   sectionPresentation,
@@ -181,6 +182,40 @@ describe('presentation: how a section renders under schema v2', () => {
       'data-tr': 'words',
     });
     expect(p.vars).toMatchObject({ '--fx': '65%', '--fy': '62%', '--scrim': sahar().hero.overlayColor });
+  });
+
+  it('text over a photo reads on any design: light on a dark scrim of its own hues, unless asked otherwise', () => {
+    // a design whose hero has dark text over pale art (half of them)
+    const teddy = cinematicDocument('cocoa-teddy');
+    const t = requireTemplate('cocoa-teddy').manifest;
+    const quote = teddy.sections.find((s) => s.id === 'quote')!;
+    const p = sectionPresentation(quote, ctxOf(teddy, { locale: 'en' }))!;
+    expect(p.onMedia).toBe(true);
+    expect(p.vars['--inv-hero-text']).toBe(t.tokens.palette.bg);
+    expect(p.vars['--scrim']).not.toBe('#FFFFFF');
+    expect(contrastRatio(p.vars['--inv-hero-text']!, p.vars['--scrim']!)).toBeGreaterThan(7);
+    // a design with light hero text keeps its hero's scrim and text
+    expect(sectionPresentation(byId('quote'), ctxOf(doc))!.vars['--inv-hero-text']).toBeUndefined();
+    // the section's own dark text: a light scrim under it
+    const own = { ...quote, themeOverrides: { palette: { heroText: '#222222' } } } as Section;
+    const dark = sectionPresentation(own, ctxOf(teddy, { locale: 'en' }))!;
+    expect(dark.vars['--scrim']).toBe('#FFFFFF');
+    expect(dark.vars['--inv-hero-text']).toBe('#222222');
+    // a template whose scrim is light: dark text on it
+    const pale = {
+      ...sahar(),
+      tokens: { ...sahar().tokens, overlay: { color: '#FFF8F0', opacity: 0.5 } },
+    } as TemplateManifest;
+    const ctx = buildRenderContext(doc, pale, 'he', {
+      brand: 'Badook',
+      now: NOW,
+      bases: { templateMedia: '', uploads: '/dev/media' },
+      publicBaseUrl: 'https://invitations.example',
+    });
+    expect(sectionPresentation(byId('quote'), ctx)!.vars).toMatchObject({
+      '--scrim': '#FFF8F0',
+      '--inv-hero-text': pale.tokens.palette.ink,
+    });
   });
 
   it('split: the picture beside the text, with its description', () => {

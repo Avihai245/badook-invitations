@@ -9,7 +9,7 @@ import type {
   SectionMedia,
 } from '../contracts/types';
 import { DEFAULT_SECTION_ANIMATION } from '../contracts/types';
-import { mixHex } from '../lib/contrast';
+import { contrastRatio, mixHex, relativeLuminance } from '../lib/contrast';
 import { demoDocument } from '../templates/demo';
 import { requireTemplate } from '../templates/registry';
 
@@ -41,16 +41,40 @@ const motion = (
   ...more,
 });
 
-/** A dark band in the template's own hues: its ink as the background, its paper as the text. */
-function nightPalette(p: Palette): Partial<Palette> {
+/** The accent mixed toward `toward` until it reads on `bg` (4.5:1), or as far as it can go. */
+function readableAccent(accent: string, toward: string, bg: string): string {
+  let t = 0.2;
+  while (t < 0.85 && contrastRatio(mixHex(accent, toward, t), bg) < 4.5) t += 0.05;
+  return mixHex(accent, toward, t);
+}
+
+/**
+ * A band in the template's own hues, the other way round: on a light design a night band (its ink as
+ * the background, its paper as the text), on a dark one a day band (its paper light, its ink dark) —
+ * the accent lifted or deepened until the titles read.
+ */
+function bandPalette(p: Palette): Partial<Palette> {
+  if (relativeLuminance(p.bg) >= relativeLuminance(p.ink)) {
+    const bg = mixHex(p.ink, '#000000', 0.35);
+    return {
+      bg,
+      surface: mixHex(p.ink, '#000000', 0.15),
+      ink: mixHex(p.bg, '#FFFFFF', 0.4),
+      inkMuted: mixHex(p.bg, p.ink, 0.28),
+      line: mixHex(p.ink, '#FFFFFF', 0.28),
+      accent: readableAccent(p.accent, '#FFFFFF', bg),
+      accentInk: mixHex(p.ink, '#000000', 0.5),
+    };
+  }
+  const bg = mixHex(p.ink, '#FFFFFF', 0.55);
   return {
-    bg: mixHex(p.ink, '#000000', 0.35),
-    surface: mixHex(p.ink, '#000000', 0.15),
-    ink: mixHex(p.bg, '#FFFFFF', 0.4),
-    inkMuted: mixHex(p.bg, p.ink, 0.28),
-    line: mixHex(p.ink, '#FFFFFF', 0.28),
-    accent: mixHex(p.accent, '#FFFFFF', 0.35),
-    accentInk: mixHex(p.ink, '#000000', 0.5),
+    bg,
+    surface: mixHex(p.ink, '#FFFFFF', 0.8),
+    ink: mixHex(p.bg, '#000000', 0.15),
+    inkMuted: mixHex(p.bg, p.ink, 0.3),
+    line: mixHex(p.bg, p.ink, 0.65),
+    accent: readableAccent(p.accent, '#000000', bg),
+    accentInk: mixHex(p.ink, '#FFFFFF', 0.85),
   };
 }
 
@@ -106,13 +130,13 @@ export function cinematicDocument(
         );
         break;
       case 'countdown':
-        // the date, big, in a night band of the template's own hues
+        // the date, big, in a band of the template's own hues, the other way round (dark on a light design)
         sections.push({
           id: 'when',
           type: 'when',
           enabled: true,
           animation: motion('zoom', { text: 'letters' }),
-          themeOverrides: { palette: nightPalette(manifest.tokens.palette) },
+          themeOverrides: { palette: bandPalette(manifest.tokens.palette) },
           data: {
             title: t({ he: 'מתי', en: 'When' }),
             showWeekday: true,

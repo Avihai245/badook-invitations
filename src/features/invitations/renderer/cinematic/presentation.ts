@@ -1,5 +1,11 @@
-import type { InvitationDocument, Section, SectionLayout, TemplateManifest } from '../../contracts/types';
-import { relativeLuminance } from '../../lib/contrast';
+import type {
+  InvitationDocument,
+  Palette,
+  Section,
+  SectionLayout,
+  TemplateManifest,
+} from '../../contracts/types';
+import { mixHex, relativeLuminance } from '../../lib/contrast';
 import { parseVideoLink } from '../../lib/video-links';
 import type { RenderContext } from '../context-core';
 import { motionAttributes, motionConfig, type MotionConfig } from '../motion/engine';
@@ -74,10 +80,37 @@ function resolveMedia(section: Section, ctx: RenderContext): CineMedia | null {
   return src ? { kind: 'image', src, still: src, focal, alt } : null;
 }
 
-/** The scrim's color: the template's (dark) one under light text; a light one under dark text. */
-function scrimColor(template: TemplateManifest, heroText: string): string {
-  const light = /^#[0-9A-Fa-f]{6}$/.test(heroText) ? relativeLuminance(heroText) > 0.45 : true;
-  return light ? scrimOf(template).color : '#FFFFFF';
+const isLight = (hex: string) => (/^#[0-9A-Fa-f]{6}$/.test(hex) ? relativeLuminance(hex) > 0.45 : true);
+
+/** A dark scrim in the design's own hues: the hero's overlay when it is dark, else its ink, deepened. */
+function darkScrim(template: TemplateManifest, palette: Palette): string {
+  if (!isLight(template.hero.overlayColor)) return template.hero.overlayColor;
+  return relativeLuminance(palette.ink) < 0.05 ? palette.ink : mixHex(palette.ink, '#000000', 0.45);
+}
+/** Light text in the design's own hues: its paper when it is light enough, else white. */
+const lightText = (palette: Palette) => (relativeLuminance(palette.bg) > 0.7 ? palette.bg : '#FFFFFF');
+
+/**
+ * The scrim over a section's media and the text on it (`text`: set when it isn't the hero's). Light
+ * text on a dark scrim unless something asks otherwise: the section's own hero-text color (the scrim
+ * follows it), or a template whose scrim (tokens.overlay.color) is light (its text goes dark). A design
+ * whose hero has dark text over pale art keeps that for its hero only — over a photo, whose tones
+ * nobody knows in advance, its text goes light on a scrim of its own ink.
+ */
+function overMedia(
+  template: TemplateManifest,
+  palette: Palette,
+  ownText: string | undefined,
+): { scrim: string; text?: string } {
+  if (ownText) return { scrim: isLight(ownText) ? darkScrim(template, palette) : '#FFFFFF' };
+  const configured = template.tokens.overlay.color;
+  if (configured) {
+    if (isLight(configured))
+      return { scrim: configured, text: isLight(palette.heroText) ? palette.ink : undefined };
+    return { scrim: configured, text: isLight(palette.heroText) ? undefined : lightText(palette) };
+  }
+  if (isLight(palette.heroText)) return { scrim: scrimOf(template).color };
+  return { scrim: darkScrim(template, palette), text: lightText(palette) };
 }
 
 const pct = (n: number) => `${Math.round(n * 1000) / 10}%`;
@@ -117,8 +150,10 @@ export function sectionPresentation(section: Section, ctx: RenderContext): CineP
   }
   if (onMedia) {
     attrs['data-on-media'] = '';
-    const heroText = theme?.vars['--inv-hero-text'] ?? resolvePalette(template, doc).heroText;
-    vars['--scrim'] = scrimColor(template, heroText);
+    const palette = { ...resolvePalette(template, doc), ...section.themeOverrides?.palette };
+    const { scrim, text } = overMedia(template, palette, section.themeOverrides?.palette?.heroText);
+    vars['--scrim'] = scrim;
+    if (text) vars['--inv-hero-text'] = text;
     const own = section.media?.overlay;
     if (own !== null && own !== undefined) vars['--scrim-a'] = String(own);
   }
