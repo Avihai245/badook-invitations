@@ -39,6 +39,7 @@ import { getAt, insertAt, setAt, uniqueId } from '../paths';
 import { useEditor } from '../state/EditorProvider';
 import { SectionCinematic } from './SectionCinematic';
 import { V2SectionForm } from './V2SectionForms';
+import { LiveGalleryForm } from './LiveGalleryForm';
 
 const pick = (value: L10n, locales: readonly Locale[]): L10n =>
   Object.fromEntries(locales.filter((l) => value[l] !== undefined).map((l) => [l, value[l]]));
@@ -88,6 +89,8 @@ function SectionContent({ section, index }: { section: Section; index: number })
     case 'quote':
     case 'custom':
       return <V2SectionForm section={section} base={base} />;
+    case 'live_gallery':
+      return <LiveGalleryForm base={base} />;
   }
 }
 

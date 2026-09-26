@@ -10,6 +10,7 @@ import { fxTheme } from './fx/theme';
 import { imageSet } from './images';
 import { InvitationSections } from './InvitationSections';
 import { GuestLink } from './guest.client';
+import { Insights } from './Insights.client';
 import { LiveLocale } from './live/LiveLocale.client';
 import type { LivePayload } from './live/payload';
 import { ScrollEngine } from './motion/ScrollEngine.client';
@@ -195,6 +196,8 @@ export function InvitationBody({
         <ScrollEngine />
         <FitNames />
         {ctx.mode === 'live' ? <GuestLink slug={doc.share.slug} /> : null}
+        {/* how guests use the invitation (feature analytics): fetched once the page is interactive */}
+        {ctx.mode === 'live' && ctx.insights ? <Insights slug={doc.share.slug} /> : null}
       </Suspense>
     </div>
   );

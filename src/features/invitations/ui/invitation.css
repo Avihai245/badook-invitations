@@ -5258,3 +5258,95 @@ footer.sec {
   text-transform: uppercase;
   color: #a39584;
 }
+
+/* ── the live gallery on the invitation (sections/live-gallery, feature live_gallery) ─────────────
+   A card inviting guests to share their photos — a button and, on a wide screen, a QR code beside it;
+   after the event it leads to the album. */
+.lg-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  padding: 36px 24px 30px;
+  margin-top: 0;
+}
+.lg-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+}
+.lg-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: var(--accent-12);
+  color: var(--inv-accent-text);
+}
+.lg-card .sec-body {
+  margin-top: 12px;
+}
+.lg-soon {
+  margin-top: 10px;
+  font-family: var(--f-ui);
+  font-size: 14px;
+  color: var(--inv-ink-muted);
+}
+.lg-card .actions {
+  width: 100%;
+  max-width: 360px;
+}
+.lg-cta[aria-disabled='true'] {
+  opacity: 0.75;
+  cursor: default;
+}
+.lg-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.lg-qr > span {
+  display: block;
+  width: 148px;
+  height: 148px;
+  padding: 8px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--inv-line);
+}
+.lg-qr > span svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lg-qr figcaption {
+  max-width: 160px;
+  font-family: var(--f-ui);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--inv-ink-muted);
+}
+@media (min-width: 720px) {
+  .lg-card {
+    flex-direction: row;
+    justify-content: center;
+    gap: 40px;
+    padding: 40px 44px;
+  }
+  .lg-card:has(.lg-qr) .lg-main {
+    align-items: flex-start;
+    text-align: start;
+    width: auto;
+    flex: 1;
+  }
+  .lg-card:has(.lg-qr) .actions {
+    justify-content: flex-start;
+  }
+}

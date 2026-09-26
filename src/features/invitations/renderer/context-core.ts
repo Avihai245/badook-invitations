@@ -61,6 +61,13 @@ export interface RenderContext {
    * v2 section types as plain sections).
    */
   cinematic: boolean;
+  /**
+   * The event's live gallery (feature `live_gallery`, turned on): the guests' upload page the
+   * invitation's gallery section links to. null: the section shows nothing to guests.
+   */
+  liveGallery: { url: string } | null;
+  /** The event measures how guests use the invitation (feature `analytics`): the live page's beacon. */
+  insights: boolean;
 }
 
 export interface RenderOptions {
@@ -77,6 +84,10 @@ export interface RenderOptions {
   followUp?: { slug: string; locales: Locale[] } | null;
   /** the event has the `cinematic` feature (default true: the public page asks features/flags) */
   cinematic?: boolean;
+  /** the live gallery's upload page (the public page asks the gallery; default none) */
+  liveGallery?: { url: string } | null;
+  /** the event has the `analytics` feature (the public page asks features/flags; default off) */
+  insights?: boolean;
 }
 
 /**
@@ -131,5 +142,7 @@ export function createRenderContext(
         }
       : null,
     cinematic: options.cinematic ?? true,
+    liveGallery: options.liveGallery ?? null,
+    insights: options.insights ?? false,
   };
 }

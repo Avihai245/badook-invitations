@@ -61,6 +61,11 @@ export interface HostDeps {
    * values (sections' media, layouts, motion, colors, the opening, the tokens). Absent: not checked.
    */
   cinematic?(invitationId: string): Promise<boolean>;
+  /**
+   * The event has the `live_gallery` feature — without it a save may not add the gallery's section (one
+   * the stored draft already has stays). Absent: not checked.
+   */
+  liveGallery?(invitationId: string): Promise<boolean>;
   /** the signed-in user is one of the platform's admins (unlisted designs are theirs to use) */
   admin?: boolean;
 }
@@ -265,6 +270,19 @@ export async function saveDraft(
     const introduced = introducedCinematic(stored.draft, draft.data);
     if (introduced.length)
       return fail(403, 'feature_off', { feature: 'cinematic', issues: introduced.slice(0, 20) });
+  }
+  // The gallery's section (feature `live_gallery`) the same way: a new one needs the feature.
+  const galleryIds = draft.data.sections.filter((s) => s.type === 'live_gallery').map((s) => s.id);
+  if (deps.liveGallery && galleryIds.length && !(await deps.liveGallery(id))) {
+    const stored = await deps.db.get(id, userId);
+    if (!stored) return fail(404, 'not_found');
+    const had = new Set(stored.draft.sections.filter((s) => s.type === 'live_gallery').map((s) => s.id));
+    const added = galleryIds.filter((sid) => !had.has(sid));
+    if (added.length)
+      return fail(403, 'feature_off', {
+        feature: 'live_gallery',
+        issues: added.map((sid) => `sections.${draft.data.sections.findIndex((s) => s.id === sid)}`),
+      });
   }
   const result = await deps.db.saveDraft(id, userId, draft.data, parsed.data.updatedAt);
   if (!result) return fail(404, 'not_found');

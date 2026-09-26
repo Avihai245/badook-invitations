@@ -51,6 +51,7 @@ export function FloatingControls({
         <a
           className="fab fab-lang"
           href={langSwitch.href}
+          data-insight="lang"
           hrefLang={langSwitch.targetLocale}
           onPointerEnter={langSwitch.onIntent}
           onPointerDown={langSwitch.onIntent}

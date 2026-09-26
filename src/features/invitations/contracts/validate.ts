@@ -124,7 +124,11 @@ export type FieldKey =
   | 'quote.attribution'
   | 'custom.body'
   | 'custom.ctaLabel'
-  | 'custom.ctaUrl';
+  | 'custom.ctaUrl'
+  // the live gallery's section
+  | 'liveGallery.body'
+  | 'liveGallery.afterTitle'
+  | 'liveGallery.afterBody';
 
 export interface Issue {
   /** dotted document path, e.g. 'sections.3.data.items.1.label' */
@@ -321,6 +325,16 @@ export function* l10nFields(doc: InvitationDocument): Generator<L10nField> {
         // a title alone, or a picture band, is a whole section: its text is checked once it has one
         if (Object.values(d.body).some((v) => v?.trim())) yield f('body', d.body, 'custom.body', CAPS.body);
         if (d.cta) yield f('cta.label', d.cta.label, 'custom.ctaLabel');
+        break;
+      }
+      case 'live_gallery': {
+        // every text is optional (the guest's page has its own words): checked once it has one
+        const d = section.data;
+        const has = (v: L10n | null) => !!v && Object.values(v).some((x) => x?.trim());
+        if (has(d.title)) yield f('title', d.title, 'section.title', CAPS.title);
+        if (has(d.body)) yield f('body', d.body, 'liveGallery.body', CAPS.note);
+        if (has(d.afterTitle)) yield f('afterTitle', d.afterTitle, 'liveGallery.afterTitle', CAPS.title);
+        if (has(d.afterBody)) yield f('afterBody', d.afterBody, 'liveGallery.afterBody', CAPS.note);
         break;
       }
     }

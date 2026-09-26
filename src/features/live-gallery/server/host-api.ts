@@ -56,6 +56,11 @@ export interface HostGalleryDeps {
   sweep(): Promise<void>;
   qr(url: string): Promise<{ svg: string; png: string }>;
   now(): number;
+  /**
+   * The invitation's cached page links to the gallery (its gallery section): refreshed when the link
+   * or whether the gallery is on changes. Absent: nothing to refresh.
+   */
+  revalidateInvitation?(slug: string): void;
 }
 
 export interface FeatureState {
@@ -180,6 +185,7 @@ export async function turnOn(
   );
   if (!created) return notFound;
   if (created.gallery) await deps.broadcast(created.gallery.channel, 'settings');
+  deps.revalidateInvitation?.(created.slug);
   return getGallery(userId, id, base, deps);
 }
 
@@ -233,6 +239,7 @@ export async function updateSettings(
   const updated = await deps.db.ownerUpdate(id, userId, patch);
   if (!updated?.gallery) return notFound;
   await deps.broadcast(updated.gallery.channel, 'settings');
+  if ('enabled' in patch) deps.revalidateInvitation?.(updated.slug);
   return getGallery(userId, id, base, deps);
 }
 
@@ -256,6 +263,7 @@ export async function rotateLink(
   if (!rotated) return notFound;
   // pages on the old link learn that it is gone (the new channel is for the new link)
   await deps.broadcast(current.gallery.channel, 'settings');
+  if (parsed.data.which === 'upload') deps.revalidateInvitation?.(current.slug);
   return getGallery(userId, id, base, deps);
 }
 
@@ -266,6 +274,7 @@ export async function deleteGallery(userId: string, id: string, deps: HostGaller
   if (!current?.gallery) return notFound;
   if (!(await deps.db.ownerDelete(id, userId))) return notFound;
   await Promise.all([deps.broadcast(current.gallery.channel, 'settings'), deps.sweep()]);
+  deps.revalidateInvitation?.(current.slug);
   return ok({});
 }
 

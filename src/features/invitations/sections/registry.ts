@@ -7,6 +7,7 @@ import {
   GallerySectionSchema,
   GiftsSectionSchema,
   HeroSectionSchema,
+  LiveGallerySectionSchema,
   ParentsSectionSchema,
   QuoteSectionSchema,
   RevealSectionSchema,
@@ -69,4 +70,11 @@ export const SECTIONS: Registry = {
   where: { type: 'where', schema: WhereSectionSchema, view: V.where, variants: [] },
   quote: { type: 'quote', schema: QuoteSectionSchema, view: V.quote, variants: [] },
   custom: { type: 'custom', schema: CustomSectionSchema, view: V.custom, variants: [] },
+  // the live gallery on the invitation (feature live_gallery)
+  live_gallery: {
+    type: 'live_gallery',
+    schema: LiveGallerySectionSchema,
+    view: V.live_gallery,
+    variants: [],
+  },
 };

@@ -73,6 +73,10 @@ export interface EditorFeatures {
   premiumTemplates: boolean;
   /** the event has the `cinematic` feature (features/flags): the preview shows the v2 presentation */
   cinematic?: boolean;
+  /** the event has the `live_gallery` feature: the gallery section can be added */
+  liveGallery?: boolean;
+  /** the event's live gallery is on (the gallery section's form says when it isn't) */
+  galleryOn?: boolean;
 }
 const ALL_FEATURES: EditorFeatures = { removeBranding: true, premiumTemplates: true };
 

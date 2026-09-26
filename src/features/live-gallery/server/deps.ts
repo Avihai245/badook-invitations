@@ -1,6 +1,7 @@
 import 'server-only';
 import QRCode from 'qrcode';
 import { featureInput, featuresFor } from '@/features/flags/server';
+import { hostDeps } from '@/features/invitations/server/host-route';
 import { serverEnv } from '@/lib/env';
 import { realtimeInfo } from '@/lib/live/broadcast';
 import { checkImage } from './ai';
@@ -54,5 +55,7 @@ export function hostGalleryDeps(): HostGalleryDeps {
       return { svg, png };
     },
     now: () => Date.now(),
+    // the invitation's gallery section links to the gallery: its cached page follows the link
+    revalidateInvitation: (slug) => hostDeps.revalidate(slug),
   };
 }

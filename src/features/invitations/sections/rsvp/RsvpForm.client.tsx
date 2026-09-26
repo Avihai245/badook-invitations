@@ -456,6 +456,8 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       setReply(stored);
       setFresh(true);
       setStatus('sent');
+      // the invitation's insights count the reply (features/insights: nothing listens without them)
+      window.dispatchEvent(new CustomEvent('badook:insight', { detail: 'rsvp_sent' }));
       return;
     }
     if (result && !result.ok && result.code === 'closed') {
@@ -613,7 +615,8 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
   if (closed) return <p className="closed">{config.closedMessage}</p>;
 
   return (
-    <div ref={formRef}>
+    // data-insight-area: the invitation's insights count the form's first touch (features/insights)
+    <div ref={formRef} data-insight-area="rsvp">
       {reply && status !== 'sending' ? (
         <p className="replied" role="status">
           <Icon name="check" size={16} strokeWidth={2} />

@@ -223,25 +223,41 @@ end $$;
 
 -- ─── the host's Insights screen (the server passes the signed-in user's id; null when not theirs) ─
 
--- The daily numbers from p_from to p_to (the event's days), and what the screen shows beside them:
--- the personal links (guests, sent, opened — and the first opens per day, in p_tz), the RSVPs, the
--- gallery's uploads (null without a gallery), the event's date and zone.
-create function public.insight_owner_report(p_id uuid, p_owner uuid, p_from date, p_to date, p_tz text)
-returns jsonb
+-- The last p_days days (0: since the invitation was published) in the event's time zone — today
+-- included — with the daily numbers and what the screen shows beside them: the personal links (guests,
+-- sent, opened, and the first opens per day), the RSVPs, the gallery's uploads (null without a
+-- gallery), the event's date.
+create function public.insight_owner_report(p_id uuid, p_owner uuid, p_days int) returns jsonb
 language plpgsql stable security definer set search_path = '' as $$
 declare
   i public.invitations;
-  v_tz text := p_tz;
+  v_tz text;
+  v_to date;
+  v_from date;
 begin
   select * into i from public.invitations where id = p_id and owner_id = p_owner;
   if not found then
     return null;
   end if;
+  v_tz := coalesce(i.published, i.draft)->>'timezone';
   if v_tz is null or not exists (select 1 from pg_catalog.pg_timezone_names where name = v_tz) then
     v_tz := 'UTC';
   end if;
+  v_to := (now() at time zone v_tz)::date;
+  if coalesce(p_days, 0) > 0 then
+    v_from := v_to - (least(p_days, 366) - 1);
+  else
+    v_from := least(
+      coalesce((i.published_at at time zone v_tz)::date, v_to),
+      coalesce((select min(d.day) from public.insight_daily d where d.invitation_id = p_id), v_to)
+    );
+    v_from := greatest(v_from, v_to - 365);
+  end if;
   return jsonb_build_object(
     'status', i.status,
+    'timezone', v_tz,
+    'from', v_from,
+    'to', v_to,
     'eventDate', coalesce(i.published, i.draft)#>>'{event,date}',
     'publishedAt', i.published_at,
     'days', coalesce((
@@ -252,7 +268,7 @@ begin
           'bySource', d.by_source, 'byDevice', d.by_device, 'timeHist', d.time_hist
         ) order by d.day)
       from public.insight_daily d
-      where d.invitation_id = p_id and d.day between p_from and p_to
+      where d.invitation_id = p_id and d.day between v_from and v_to
     ), '[]'::jsonb),
     'personal', (
       select jsonb_build_object(
@@ -266,7 +282,7 @@ begin
             select (g2.opened_at at time zone v_tz)::date as day, count(*) as n
             from public.invitation_guests g2
             where g2.invitation_id = p_id and g2.opened_at is not null
-              and (g2.opened_at at time zone v_tz)::date between p_from and p_to
+              and (g2.opened_at at time zone v_tz)::date between v_from and v_to
             group by 1
           ) x
         ), '[]'::jsonb)
@@ -317,7 +333,7 @@ begin
   foreach f in array array[
     'public.insight_invitation(text)',
     'public.insight_hit(uuid, uuid, date, jsonb, text)',
-    'public.insight_owner_report(uuid, uuid, date, date, text)',
+    'public.insight_owner_report(uuid, uuid, int)',
     'public.insight_maintenance(int)'
   ] loop
     execute format('revoke all on function %s from public, anon, authenticated', f);

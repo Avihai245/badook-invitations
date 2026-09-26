@@ -2,6 +2,7 @@ import 'server-only';
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { entitlementsFor, isAdminEmail } from '@/features/billing/server/account';
+import { featuresFor } from '@/features/flags/server';
 import { invitationsEnabled } from '@/lib/feature';
 import { getSessionUser } from '@/lib/supabase/session';
 import { getTemplate } from '../templates/registry';
@@ -58,6 +59,7 @@ export async function hostRoute(
       ...hostDeps,
       entitlements: () => (entitlements ??= entitlementsFor(user)),
       cinematic: cinematicFor,
+      liveGallery: async (invitationId) => (await featuresFor(invitationId)).has('live_gallery'),
       admin: isAdminEmail(user.email),
     };
     const result = await handler(user.id, body, deps);

@@ -53,7 +53,9 @@ export type CatalogKey =
   | 'when'
   | 'where'
   | 'quote'
-  | 'custom_media';
+  | 'custom_media'
+  // the live gallery on the invitation (feature live_gallery)
+  | 'live_gallery';
 
 export const CATALOG: readonly CatalogEntry[] = [
   { key: 'story', type: 'text', kind: 'story' },
@@ -76,14 +78,25 @@ export const CATALOG: readonly CatalogEntry[] = [
   { key: 'gifts', type: 'gifts' },
   { key: 'reveal', type: 'reveal' },
   { key: 'rsvp', type: 'rsvp' },
+  { key: 'live_gallery', type: 'live_gallery' },
 ];
 
 /** Section types that exist exactly once and can't be added, removed or moved. */
 export const LOCKED_TYPES: readonly SectionType[] = ['hero', 'footer'];
 
-/** Entries the host can add now (≤ 1 RSVP). */
-export const availableEntries = (doc: InvitationDocument) =>
-  CATALOG.filter((e) => e.type !== 'rsvp' || !doc.sections.some((s) => s.type === 'rsvp'));
+/** Section types an invitation has at most once. */
+const SINGLE: readonly SectionType[] = ['rsvp', 'live_gallery'];
+
+/**
+ * Entries the host can add now: ≤ 1 RSVP and one gallery section — the gallery's only while the event
+ * has the `live_gallery` feature.
+ */
+export const availableEntries = (doc: InvitationDocument, features: { liveGallery?: boolean } = {}) =>
+  CATALOG.filter(
+    (e) =>
+      (e.type !== 'live_gallery' || features.liveGallery === true) &&
+      (!SINGLE.includes(e.type) || !doc.sections.some((s) => s.type === e.type)),
+  );
 
 const pick = (value: L10n, locales: readonly Locale[]): L10n => {
   const out: L10n = {};
@@ -157,7 +170,7 @@ export function newSection(
     section = genericSection(entry, doc, locales);
     if (variant) section = { ...section, variant } as Section;
   }
-  const idBase = entry.type === 'text' ? (entry.kind ?? 'text').replace(/_/g, '-') : entry.type;
+  const idBase = (entry.type === 'text' ? (entry.kind ?? 'text') : entry.type).replace(/_/g, '-');
   // a section the template seeds keeps the template's presentation for it (its photo, layout, motion
   // — sectionDefaults.presentation); the rail drops it when the event lacks the `cinematic` feature
   return { ...section, id: uniqueId(idBase, ids) } as Section;
@@ -243,6 +256,19 @@ function genericSection(entry: CatalogEntry, doc: InvitationDocument, locales: r
         data: {
           title: pick(SEED_COPY.faqTitle, locales),
           items: [{ id: 'q1', q: pick(SEED_COPY.faqSample, locales), a: {} }],
+        },
+      };
+    case 'live_gallery':
+      return {
+        id: 'live-gallery',
+        type: 'live_gallery',
+        enabled: true,
+        data: {
+          title: pick(SEED_COPY.liveGallery.title, locales),
+          body: pick(SEED_COPY.liveGallery.body, locales),
+          afterTitle: pick(SEED_COPY.liveGallery.afterTitle, locales),
+          afterBody: pick(SEED_COPY.liveGallery.afterBody, locales),
+          showQr: true,
         },
       };
     default:

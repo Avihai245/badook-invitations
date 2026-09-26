@@ -88,6 +88,19 @@ export const SEED_COPY = {
             },
   /** A new "text & picture" section: a title to write over or beside the host's own photo. */
   customTitle: { he: 'רגע משלנו', en: 'A moment of ours' } satisfies L10n,
+  /** The live gallery's section (feature live_gallery): before and during the event, then after it. */
+  liveGallery: {
+    title: { he: 'צלמו ושתפו', en: 'Snap and share' } satisfies L10n,
+    body: {
+      he: 'צילמתם באירוע? העלו לכאן את התמונות והסרטונים שלכם — כולם יראו אותם בגלריה.',
+      en: 'Taking photos at the event? Upload your photos and videos here — everyone will see them in the gallery.',
+    } satisfies L10n,
+    afterTitle: { he: 'האלבום מהאירוע', en: 'The album from the event' } satisfies L10n,
+    afterBody: {
+      he: 'כל התמונות והסרטונים שצילמתם, במקום אחד. תודה ששיתפתם!',
+      en: 'All the photos and videos you took, in one place. Thank you for sharing!',
+    } satisfies L10n,
+  },
 } as const;
 
 /** Event types that naturally have two hosts joined by "&". */

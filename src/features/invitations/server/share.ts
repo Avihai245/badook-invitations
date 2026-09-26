@@ -75,9 +75,11 @@ export async function shareData(
       },
     };
   });
+  // the QR code's link says it came from a QR code (the invitation's insights count its visits apart)
+  const qrUrl = `${url}?src=qr`;
   const [svg, png] = await Promise.all([
-    QRCode.toString(url, { ...QR_OPTIONS, type: 'svg' }),
-    QRCode.toDataURL(url, { ...QR_OPTIONS, width: 1024 }),
+    QRCode.toString(qrUrl, { ...QR_OPTIONS, type: 'svg' }),
+    QRCode.toDataURL(qrUrl, { ...QR_OPTIONS, width: 1024 }),
   ]);
   return {
     url,

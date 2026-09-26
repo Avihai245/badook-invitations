@@ -56,6 +56,7 @@ export const LAYOUTS_BY_TYPE: Record<SectionType, readonly SectionLayout[]> = {
   faq: OVER,
   gifts: OVER,
   rsvp: OVER,
+  live_gallery: OVER,
 };
 
 /** Sections with a picture / video of their own (not the hero — its media is its data — nor a gallery). */

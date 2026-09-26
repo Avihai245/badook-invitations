@@ -12,6 +12,7 @@ import { InvitationBody } from '@/features/invitations/renderer/InvitationBody';
 import { buildLivePayload } from '@/features/invitations/renderer/live/build';
 import { cinematicForPage } from '@/features/invitations/server/cinematic';
 import { OG_SIZE, ogVersion } from '@/features/invitations/server/og-image';
+import { pageExtras, type PageExtras } from '@/features/invitations/server/page-extras';
 import {
   getPublishedInvitation,
   resolveLocale,
@@ -29,10 +30,17 @@ export async function generateStaticParams(): Promise<{ slug: string; lang: stri
   return [];
 }
 
-function renderOptions(invitation: PublishedInvitation, cinematic: boolean): Omit<RenderOptions, 'mode'> {
+function renderOptions(
+  invitation: PublishedInvitation,
+  cinematic: boolean,
+  extras?: PageExtras,
+): Omit<RenderOptions, 'mode'> {
   const env = serverEnv();
   return {
     cinematic,
+    // the event's live gallery (the gallery section's link) and its insights beacon
+    liveGallery: extras?.liveGallery ?? null,
+    insights: extras?.insights ?? false,
     followUp: invitation.followUp,
     brand: env.INVITES_BRAND_NAME,
     publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
@@ -44,9 +52,14 @@ function renderOptions(invitation: PublishedInvitation, cinematic: boolean): Omi
   };
 }
 
-function context(invitation: PublishedInvitation, locale: Locale, cinematic = false): RenderContext {
+function context(
+  invitation: PublishedInvitation,
+  locale: Locale,
+  cinematic = false,
+  extras?: PageExtras,
+): RenderContext {
   return buildRenderContext(invitation.doc, invitation.entry.manifest, locale, {
-    ...renderOptions(invitation, cinematic),
+    ...renderOptions(invitation, cinematic, extras),
     mode: 'live',
   });
 }
@@ -121,13 +134,17 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   if (!invitation || !locale) notFound();
   const next = otherLocale(invitation.doc, locale);
   // the event's `cinematic` feature: its v2 presentation, or the plain rendering (features/flags)
-  const cinematic = await cinematicForPage(invitation.id, invitation.doc, invitation.entry.manifest);
+  const [cinematic, extras] = await Promise.all([
+    cinematicForPage(invitation.id, invitation.doc, invitation.entry.manifest),
+    // the gallery section's link and the insights beacon, when the event has them (features/flags)
+    pageExtras(invitation.id, invitation.doc),
+  ]);
   // the pill's plain link keeps the cover skipped; with JS the language switches in place (LiveLocale)
   const link = (l: Locale) => `/i/${slug}?lang=${l}&open=1`;
   const live = buildLivePayload(
     invitation.doc,
     invitation.entry.manifest,
-    renderOptions(invitation, cinematic),
+    renderOptions(invitation, cinematic, extras),
     (l) => ({
       url: `/i/${slug}?lang=${l}`,
       href: link(l),
@@ -135,7 +152,7 @@ export default async function PublicInvitationPage({ params }: { params: Params 
   );
   return (
     <InvitationBody
-      ctx={context(invitation, locale, cinematic)}
+      ctx={context(invitation, locale, cinematic, extras)}
       showCover
       skipCoverFromUrl
       langSwitchHref={next ? link(next) : null}

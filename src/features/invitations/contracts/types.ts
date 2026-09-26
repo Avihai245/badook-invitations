@@ -442,6 +442,20 @@ export type Section =
         body: L10n; // '\n' = line break
         cta: { label: L10n; url: string } | null;
       }
+    >
+  // ── the live gallery on the invitation (feature `live_gallery`) ──
+  | Base<
+      'live_gallery',
+      {
+        /** before and during the event: guests are invited to share their photos (button + QR code) */
+        title: L10n | null;
+        body: L10n | null;
+        /** after the event: the same section leads to the album */
+        afterTitle: L10n | null;
+        afterBody: L10n | null;
+        /** the QR code to the gallery beside the button (for a guest reading on a computer) */
+        showQr: boolean;
+      }
     >;
 
 export interface Venue {
@@ -766,6 +780,7 @@ export const SECTION_TYPES = [
   'where',
   'quote',
   'custom',
+  'live_gallery',
 ] as const satisfies readonly SectionType[];
 /** The section types schema v2 added. */
 export const V2_SECTION_TYPES = [

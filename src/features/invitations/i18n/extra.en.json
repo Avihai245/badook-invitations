@@ -25,5 +25,17 @@
   "cover.hint.gate": "Tap to open the gate",
   "cover.hint.curtain": "Tap to open the curtain",
   "cover.hint.fireworks": "Tap to light up the sky",
-  "cover.hint.gold_dust": "Tap to open"
+  "cover.hint.gold_dust": "Tap to open",
+  "liveGallery.title": "Your photos from the event",
+  "liveGallery.body": "Took some photos? Upload your photos and videos from the event here — they’ll appear in everyone’s gallery.",
+  "liveGallery.afterTitle": "The album is ready",
+  "liveGallery.afterBody": "All the photos and videos from the event, in one place.",
+  "liveGallery.cta.before": "To the event’s gallery",
+  "liveGallery.cta.during": "Upload your photos",
+  "liveGallery.cta.after": "See the album",
+  "liveGallery.soon": "On the day of the event, upload the photos you take right here.",
+  "liveGallery.qr": "Scan to upload from your phone",
+  "liveGallery.qrAfter": "Scan to see it on your phone",
+  "liveGallery.qrLabel": "QR code to the event’s gallery",
+  "liveGallery.preview": "The button leads to the event’s live gallery once it is on"
 }
