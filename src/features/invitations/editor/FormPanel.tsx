@@ -11,6 +11,7 @@ import { sectionName, useFocusRequest } from './fields/fields';
 import { GlobalPanel } from './panels/GlobalPanels';
 import { ReviewTextsNote, SectionForm } from './panels/SectionForms';
 import { insertAt, moveAt, uniqueId } from './paths';
+import { withoutPresentation } from './presentation';
 import { useEditor, type PanelId } from './state/EditorProvider';
 import { HelpFor, type HelpArea } from '../app/HelpFor';
 
@@ -18,6 +19,7 @@ import { HelpFor, type HelpArea } from '../app/HelpFor';
 const PANEL_HELP: Record<PanelId, HelpArea> = {
   palette: 'designPalette',
   fonts: 'designFonts',
+  style: 'designStyle',
   cover: 'designCover',
   music: 'designMusic',
   event: 'settingsEvent',
@@ -27,7 +29,7 @@ const PANEL_HELP: Record<PanelId, HelpArea> = {
 
 /** The form panel (§9B.3-D): title + helper line, then the cards of the selected section or panel. */
 export function FormPanel({ className }: { className?: string }) {
-  const { doc, defaults, selection, select, apply, undo } = useEditor();
+  const { doc, defaults, selection, select, apply, undo, features } = useEditor();
   const { t, locale } = useUi();
   const { toast } = useToast();
   const e = t.editor;
@@ -90,8 +92,11 @@ export function FormPanel({ className }: { className?: string }) {
                     label: m.duplicate,
                     icon: <Copy />,
                     onSelect: () => {
+                      // without the `cinematic` feature a copy is its content only (the server
+                      // would refuse its picture, layout and motion as new)
+                      const clone = structuredClone(section);
                       const copy = {
-                        ...structuredClone(section),
+                        ...(features.cinematic === false ? withoutPresentation(clone) : clone),
                         id: uniqueId(
                           section.id.replace(/-\d+$/, ''),
                           doc.sections.map((s) => s.id),

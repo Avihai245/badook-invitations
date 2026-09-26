@@ -35,13 +35,16 @@ import {
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
-import { getTemplate, TEMPLATE_IDS } from '../../templates/registry';
+import { getTemplate, TEMPLATES } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
 import { CountdownChip, daysUntilEvent, useToday } from '../countdown';
 import { HelpFor } from '../HelpFor';
 import { TemplatePoster } from '../TemplatePoster';
 import { publishHref } from '../workspace/paths';
 import { FollowUpDialog, followUpTypes } from './FollowUpDialog';
+
+/** How many designs the gallery offers (an unlisted one isn't counted). */
+const LISTED_DESIGNS = [...TEMPLATES.values()].filter(({ manifest }) => manifest.listed).length;
 
 const BADGE: Record<InvitationSummary['status'], BadgeVariant> = {
   draft: 'draft',
@@ -258,7 +261,7 @@ function EmptyList() {
                   {step.title}
                 </p>
                 <p className="mt-1 text-[13px] text-pretty text-muted">
-                  {fmt(step.body, { n: number(TEMPLATE_IDS.length) })}
+                  {fmt(step.body, { n: number(LISTED_DESIGNS) })}
                 </p>
               </li>
             );

@@ -7,6 +7,7 @@ import { resolveOpening, type Opening } from './cover/opening';
 import { FitNames } from './FitNames.client';
 import { FloatingControls, type MusicProps } from './FloatingControls.client';
 import { fxTheme } from './fx/theme';
+import { imageSet } from './images';
 import { InvitationSections } from './InvitationSections';
 import { GuestLink } from './guest.client';
 import { LiveLocale } from './live/LiveLocale.client';
@@ -52,6 +53,22 @@ const OPENING_HINT = {
   fireworks: 'cover.hint.fireworks',
   gold_dust: 'cover.hint.gold_dust',
 } as const satisfies Record<Opening['preset'], DictKey>;
+
+/**
+ * A photo-led opening's picture: the hero's still (its photo, or its video's poster) in the hero's
+ * own image set — one download for both — at its focal point. null without one.
+ */
+function heroBackdrop(ctx: RenderContext) {
+  const hero = ctx.doc.sections.find((s) => s.type === 'hero' && s.enabled);
+  if (hero?.type !== 'hero') return null;
+  const m = hero.data.media;
+  const url = m.kind === 'image' ? ctx.asset(m.src) : ctx.asset(m.poster);
+  if (!url) return null;
+  return {
+    ...imageSet(url, '100vw'),
+    position: `${m.focalPoint.x * 100}% ${m.focalPoint.y * 100}%`,
+  };
+}
 
 /**
  * The single renderer body used by the public page, the preview link, the editor preview frame and
@@ -153,6 +170,7 @@ export function InvitationBody({
             fx={{ burst: fx.burst, colors: fx.burstColors }}
             opening={opening}
             scrollLabel={ctx.t('cover.scroll')}
+            backdrop={opening?.backdrop ? heroBackdrop(ctx) : null}
           />
         </Suspense>
       ) : null}

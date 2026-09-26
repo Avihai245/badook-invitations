@@ -276,11 +276,19 @@ export const helpEn: typeof helpHe = {
         text: 'Whether the text is readable on its background. “Low” means a darker or lighter color would be better.',
       },
       reset: { label: 'Back to the design’s colors', text: 'Undoes every color change.' },
+      fromPhoto: {
+        label: 'Colors from a photo',
+        text: 'Pick a photo (from this device or the invitation) and get three color suggestions that suit it — light, evening and tinted. A tap applies one; ↶ undoes it. The photo isn’t uploaded anywhere.',
+      },
     },
   },
   designFonts: {
     title: 'Fonts: what each thing does',
     items: {
+      suggested: {
+        label: 'Suggested for your invitation',
+        text: 'Three font pairs that suit the kind of event and the colors, written with your names in every language of the invitation. A tap picks one.',
+      },
       pairs: {
         label: 'A font pair',
         text: 'A font for the names and headings and one for the text, in Hebrew and English. The sample is written with your names.',
@@ -289,6 +297,135 @@ export const helpEn: typeof helpHe = {
       live: {
         label: 'In the preview',
         text: 'Your choice shows in the preview right away. ↶ brings back the previous one.',
+      },
+    },
+  },
+  designStyle: {
+    title: 'Style & motion: what each thing does',
+    items: {
+      typeScale: {
+        label: 'Text size',
+        text: 'Makes every text of the invitation larger or smaller together — names, titles and text — keeping the design’s proportions.',
+      },
+      spacing: {
+        label: 'Spacing',
+        text: 'How much air there is between and inside the sections: compact — a shorter invitation; airy — a calmer one.',
+      },
+      motion: {
+        label: 'Motion intensity',
+        text: 'How much things move as guests scroll: the entrances, the parallax and the zoom. “Still” — nothing moves.',
+      },
+      reset: { label: 'Back to the design', text: 'Sets all three back to what the design set.' },
+    },
+  },
+  sectionMedia: {
+    title: 'A section’s picture or video: what each thing does',
+    items: {
+      upload: {
+        label: 'Upload a photo or video',
+        text: 'Your own photo (JPG, PNG, WebP) or MP4 video. A video gets its still automatically.',
+      },
+      library: {
+        label: 'From this invitation',
+        text: 'Pick a picture that’s already in the invitation — no need to upload it again.',
+      },
+      focal: {
+        label: 'Tapping the picture',
+        text: 'Sets what matters in it: that part stays in frame on every screen size.',
+      },
+      overlay: {
+        label: 'Darken the picture',
+        text: 'A dark layer under the text when it sits on the picture. A bright photo you add gets enough of it by itself to read; “Automatic” — as the design sets it.',
+      },
+      alt: {
+        label: 'Picture description',
+        text: 'For guests using a screen reader, when the picture is framed or beside the text. A background needs none.',
+      },
+      remove: {
+        label: 'Remove',
+        text: 'Takes the picture off the section. The layout goes back to classic.',
+      },
+    },
+  },
+  sectionLayout: {
+    title: 'Layout: what each thing does',
+    items: {
+      stack: {
+        label: 'Classic',
+        text: 'The picture framed above the text, like the rest of the invitation.',
+      },
+      full: {
+        label: 'Full bleed',
+        text: 'The picture behind the text, edge to edge, darkened so the text always reads.',
+      },
+      split: {
+        label: 'Picture beside',
+        text: 'On a computer the picture sits beside the text (in Hebrew “beside” is the right); on a phone above or below it.',
+      },
+      parallax: { label: 'Parallax', text: 'Full bleed, moving slower than the scroll — a sense of depth.' },
+      video: {
+        label: 'Video background',
+        text: 'A silent looping video behind the text. Needs an uploaded video.',
+      },
+      disabled: {
+        label: 'A greyed-out layout',
+        text: 'It needs a picture or a video — add one in the “Picture or video” card.',
+      },
+    },
+  },
+  sectionMotion: {
+    title: 'Motion: what each thing does',
+    items: {
+      entrance: {
+        label: 'Entrance',
+        text: 'How the section comes in as guests scroll to it: fade, rise, zoom and more. “The design’s” — its usual motion; “None” — no motion.',
+      },
+      play: { label: 'Play', text: 'Plays the motion in the preview, as guests will see it.' },
+      scroll: {
+        label: 'While scrolling',
+        text: 'What the section’s picture does as guests scroll: parallax (it moves slower) or a slow zoom.',
+      },
+      text: {
+        label: 'Text reveal',
+        text: 'Titles and text appear letter by letter, word by word or line by line.',
+      },
+      intensity: {
+        label: 'Intensity',
+        text: 'How far and how strongly things move — from subtle to lively.',
+      },
+      fineTune: {
+        label: 'Fine-tune',
+        text: 'Duration, delay, distance and feel, for those who want it exact.',
+      },
+      reset: { label: 'Back to the design’s motion', text: 'Undoes every motion change in the section.' },
+    },
+  },
+  sectionColors: {
+    title: 'Section colors: what each thing does',
+    items: {
+      bands: {
+        label: 'Ready bands',
+        text: 'Dark, soft or in the accent color — a section in colors of its own, from the invitation’s colors and always readable.',
+      },
+      custom: {
+        label: 'Custom',
+        text: 'Background, text and accent — from the invitation’s colors or any other.',
+      },
+      contrast: {
+        label: 'Contrast warning',
+        text: 'When the text may be hard to read on its background. “Fix automatically” darkens or lightens it just enough.',
+      },
+      fromPhoto: {
+        label: 'Colors from the picture',
+        text: 'Three color suggestions from the section’s picture; the darkening follows how bright the picture is.',
+      },
+      size: {
+        label: 'Size and spacing',
+        text: 'A larger or smaller title, the spacing and the picture’s corners — in this section only.',
+      },
+      reset: {
+        label: 'Back to the invitation’s colors',
+        text: 'The section goes back to the invitation’s colors.',
       },
     },
   },
@@ -306,6 +443,10 @@ export const helpEn: typeof helpHe = {
       seal: { label: 'Seal color', text: 'The color of the wax seal, from the colors that suit the design.' },
       hint: { label: 'Hint text', text: 'The line that invites a tap, e.g. “Tap to open”.' },
       replay: { label: 'Replay opening', text: 'Plays the envelope opening again in the preview.' },
+      opening: {
+        label: 'Opening',
+        text: 'How the invitation opens: the design’s envelope, a gate, a theatre curtain, fireworks or gold dust. Picking one plays it in the preview right away.',
+      },
     },
   },
   designMusic: {

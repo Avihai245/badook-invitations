@@ -48,6 +48,46 @@ export const SEED_COPY = {
   venueLabel: { he: 'האירוע', en: 'The Celebration' } satisfies L10n,
   timelineSample: { label: { he: 'קבלת פנים', en: 'Welcome' } satisfies L10n },
   faqSample: { he: 'יש חניה במקום?', en: 'Is there parking at the venue?' } satisfies L10n,
+  // ── the schema-v2 sections (parents · when · where · quote · text & picture) ──
+  parentsTitle: (eventType: EventType): L10n =>
+    COUPLE_EVENTS.includes(eventType)
+      ? { he: 'בשמחת ההורים', en: 'Together with our parents' }
+      : eventType === 'bar_mitzvah' || eventType === 'bat_mitzvah'
+        ? { he: 'ההורים הגאים', en: 'The proud parents' }
+        : eventType === 'brit' || eventType === 'baby_shower'
+          ? { he: 'המשפחה המאושרת', en: 'The happy family' }
+          : { he: 'המארחים', en: 'Your hosts' },
+  whenTitle: (eventType: EventType): L10n =>
+    COUPLE_EVENTS.includes(eventType)
+      ? { he: 'היום שלנו', en: 'Our day' }
+      : { he: 'מתי חוגגים', en: 'When we celebrate' },
+  whereLabel: { he: 'איפה', en: 'Where' } satisfies L10n,
+  /** A verse or a line for the quote section, by the kind of event. */
+  quote: (eventType: EventType): { text: L10n; attribution: L10n | null } =>
+    COUPLE_EVENTS.includes(eventType)
+      ? {
+          text: { he: 'אני לדודי ודודי לי', en: 'I am my beloved’s, and my beloved is mine' },
+          attribution: { he: 'שיר השירים ו׳, ג׳', en: 'Song of Songs 6:3' },
+        }
+      : eventType === 'bar_mitzvah' || eventType === 'bat_mitzvah'
+        ? {
+            text: {
+              he: 'בכל דרכיך דעהו, והוא יישר אורחותיך',
+              en: 'In all your ways acknowledge Him, and He will make your paths straight',
+            },
+            attribution: { he: 'משלי ג׳, ו׳', en: 'Proverbs 3:6' },
+          }
+        : eventType === 'brit' || eventType === 'baby_shower'
+          ? {
+              text: { he: 'אל הנער הזה התפללתי', en: 'For this child I prayed' },
+              attribution: { he: 'שמואל א׳ א׳, כ״ז', en: '1 Samuel 1:27' },
+            }
+          : {
+              text: { he: 'לחיים — ולכל מה שעוד יבוא', en: 'To life — and to everything still to come' },
+              attribution: null,
+            },
+  /** A new "text & picture" section: a title to write over or beside the host's own photo. */
+  customTitle: { he: 'רגע משלנו', en: 'A moment of ours' } satisfies L10n,
 } as const;
 
 /** Event types that naturally have two hosts joined by "&". */

@@ -1225,6 +1225,47 @@ a {
   opacity: 0;
   transition: opacity 1.3s ease 0.15s;
 }
+
+/* ── a photo-led opening (the template's cover.opening.backdrop 'hero'): the invitation's first
+   picture under the veil or the night sky, at the scale the hero's settle starts from — the cover
+   fades onto that very picture, which then settles (the hero's entrance) ── */
+.co-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scale: 1.12;
+  pointer-events: none;
+  user-select: none;
+}
+.co[data-backdrop][data-opening='gold_dust'] .co-veil {
+  background: radial-gradient(
+    95% 70% at 50% 46%,
+    color-mix(in srgb, var(--co-color) 34%, transparent),
+    color-mix(in srgb, var(--co-color) 64%, transparent) 58%,
+    color-mix(in srgb, var(--co-deep) 88%, transparent)
+  );
+}
+.co[data-backdrop][data-opening='fireworks'] {
+  background: var(--co-deep);
+}
+.co[data-backdrop][data-opening='fireworks'] .co-photo {
+  opacity: 0.4;
+}
+.co.opening[data-backdrop][data-opening='fireworks'] .co-photo {
+  opacity: 1;
+  transition: opacity 1.4s ease 0.3s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .co-photo {
+    scale: 1;
+    transition: none !important;
+  }
+}
+:root[data-motion='none'] .co-photo {
+  scale: 1;
+}
 /* the canvas of the openings' light: over the cover and the page, never in the way */
 .fx-sparks {
   position: fixed;
@@ -2792,6 +2833,29 @@ html[data-framed] body::-webkit-scrollbar {
     display: none !important;
   }
 }
+/* the host's motion at 0 (<html data-motion="none"> — the editor's "Style & motion"): as still as
+   reduced motion, the hero's entrance and its picture's settle included */
+:root[data-motion='none'] :is(.hero-enter > *, .names > *) {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition: none;
+  animation: none !important;
+}
+:root[data-motion='none'] :is(.divider, .deco, .cd > *, .actions > *, .stack > *, .faq > details) {
+  transition: none !important;
+  animation: none !important;
+}
+:root[data-motion='none'] :is(.cloud, .hero .cue, .hero-media, .hero-inner, .tl .dot, .map .pin),
+:root[data-motion='none'] :is(.hero .rule, .divider, .map)::after {
+  animation: none !important;
+}
+:root[data-motion='none'] .hero .cue {
+  opacity: 0.8;
+}
+:root[data-motion='none'] :is(.n-shine, .fx-amb, .fx-burst) {
+  display: none !important;
+}
 /* Live language switch (LiveLocale): the other locale's nodes appear in place — the hero's entrance
    has played already, and what is on screen shows at once (lower sections still reveal on scroll). */
 :root[data-locale-switched] .hero-enter > *,
@@ -2834,6 +2898,9 @@ html[data-framed] body::-webkit-scrollbar {
   padding: 14px 0 10px;
 }
 .cd-num {
+  /* a number reads left to right in Hebrew too: its rolling digits are boxes of their own, which an
+     RTL line would lay out from the right (264 days painted as 462) */
+  direction: ltr;
   font-family: var(--f-heading);
   font-size: 34px;
   line-height: 1;

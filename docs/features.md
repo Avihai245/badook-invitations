@@ -31,6 +31,16 @@ Changing a package is one line in `PACKAGE_FEATURES` (`src/features/flags/featur
 `invitations.features` keeps an event's own choices: `{ "off": [...], "grant": [...] }`. Switched off wins
 over a grant (it's the host's event). Unknown ids are ignored, so removing a feature needs no migration.
 
+## Cinematic (`cinematic`)
+
+Each section's picture or video, its layout, motion and colors, the cinematic openings and the
+design-wide "Style & motion" (invitation schema v2). In the editor these controls show only when the
+event has the feature; without it "add section" and "duplicate" add content only, and the server refuses
+a draft that brings a v2 value the stored draft doesn't have (`PATCH /api/invitations/:id` → 403
+`feature_off`, the paths in `issues`) — what the draft already has stays, so a host whose feature went
+away keeps saving. Guests then get the design's plain rendering. Colors from a photo and the suggested
+fonts aren't part of it: they set ordinary colors and fonts.
+
 ## Face albums (biometric data)
 
 Grouping photos by face processes biometric data — "sensitive information" under the Privacy Protection

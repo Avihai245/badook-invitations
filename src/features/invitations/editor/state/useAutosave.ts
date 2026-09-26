@@ -41,6 +41,8 @@ export function useAutosave({
 }) {
   const [status, setStatus] = useState<SaveStatus>('saved');
   const [conflict, setConflict] = useState<Conflict | null>(null);
+  // why the last save was refused, when the server said (`feature_off`: a cinematic value without the feature)
+  const [refused, setRefused] = useState<'feature_off' | null>(null);
   const latest = useRef(doc);
   const saved = useRef(initialDoc);
   const updatedAt = useRef(initialUpdatedAt);
@@ -71,6 +73,7 @@ export function useAutosave({
       });
       const body = res.body;
       if (res.ok && body?.ok) {
+        setRefused(null);
         updatedAt.current = body.updatedAt;
         saved.current = snapshot;
         callbacks.current.onSaved?.(snapshot);
@@ -92,7 +95,10 @@ export function useAutosave({
         setStatus('failed');
         return false;
       }
-      setStatus(res.status === 422 ? 'invalid' : !navigator.onLine ? 'offline' : 'failed');
+      // 403 feature_off: a value the event's features don't allow (the cinematic controls without it)
+      const featureOff = res.status === 403 && !!body && !body.ok && body.code === 'feature_off';
+      setRefused(featureOff ? 'feature_off' : null);
+      setStatus(res.status === 422 || featureOff ? 'invalid' : !navigator.onLine ? 'offline' : 'failed');
       return false;
     })();
     running.current = run;
@@ -171,6 +177,7 @@ export function useAutosave({
   return {
     status,
     conflict,
+    refused,
     /** save now (before publishing); resolves true when the server has the current draft */
     flush: save,
     acceptTheirs,

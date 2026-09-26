@@ -14,7 +14,13 @@ import type {
   TemplateManifest,
 } from '../contracts/types';
 import { COUPLE_EVENTS, SEED_COPY } from '../templates/seed-copy';
-import { seedDocument, type WizardInput } from '../templates/seed-document';
+import {
+  isV2Type,
+  resolveEventDefaults,
+  seedDocument,
+  v2Section,
+  type WizardInput,
+} from '../templates/seed-document';
 import { uniqueId } from './paths';
 
 export type TextKind = Extract<Section, { type: 'text' }>['data']['kind'];
@@ -41,10 +47,21 @@ export type CatalogKey =
   | 'gallery'
   | 'gifts'
   | 'reveal'
-  | 'rsvp';
+  | 'rsvp'
+  // v2 section types (custom_media: the `custom` type — `custom` is the free-text section's key)
+  | 'parents'
+  | 'when'
+  | 'where'
+  | 'quote'
+  | 'custom_media';
 
 export const CATALOG: readonly CatalogEntry[] = [
   { key: 'story', type: 'text', kind: 'story' },
+  { key: 'custom_media', type: 'custom' },
+  { key: 'quote', type: 'quote' },
+  { key: 'when', type: 'when' },
+  { key: 'where', type: 'where' },
+  { key: 'parents', type: 'parents' },
   { key: 'countdown', type: 'countdown' },
   { key: 'venues', type: 'venues' },
   { key: 'timeline', type: 'timeline' },
@@ -102,6 +119,20 @@ export function newSection(
   template: TemplateManifest,
   defaults: TemplateDefaults,
 ): Section {
+  const ids = doc.sections.map((s) => s.id);
+  // the v2 types: the template's copy for the event type (defaults.json) or the generic starter copy
+  if (isV2Type(entry.type)) {
+    const section = v2Section(entry.type, uniqueId(entry.type, ids), {
+      eventType: doc.eventType,
+      locales: doc.locales,
+      startTime: doc.event.startTime,
+      endTime: doc.event.endTime,
+      defaults: resolveEventDefaults(defaults, doc.eventType).defaults,
+      titled: true,
+    });
+    const variant = template.sectionDefaults.variants[entry.type];
+    return variant ? ({ ...section, variant } as Section) : section;
+  }
   const seeded = seedDocument(template, defaults, wizardInputOf(doc));
   const fromSeed = seeded.sections.find(
     (s) =>
@@ -127,13 +158,9 @@ export function newSection(
     if (variant) section = { ...section, variant } as Section;
   }
   const idBase = entry.type === 'text' ? (entry.kind ?? 'text').replace(/_/g, '-') : entry.type;
-  return {
-    ...section,
-    id: uniqueId(
-      idBase,
-      doc.sections.map((s) => s.id),
-    ),
-  } as Section;
+  // a section the template seeds keeps the template's presentation for it (its photo, layout, motion
+  // — sectionDefaults.presentation); the rail drops it when the event lacks the `cinematic` feature
+  return { ...section, id: uniqueId(idBase, ids) } as Section;
 }
 
 function genericSection(entry: CatalogEntry, doc: InvitationDocument, locales: readonly Locale[]): Section {

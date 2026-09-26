@@ -318,6 +318,68 @@ describe('autosave', () => {
     expect((await saveDraft(USER, ID, { draft: FIXTURES['wedding-he-en'] }, d)).status).toBe(400);
     expect(d.db.saveDraft).not.toHaveBeenCalled();
   });
+
+  it('without the cinematic feature: a new picture, layout, motion or opening is refused; what the draft has stays', async () => {
+    const stored = invitation({}, (doc) => {
+      const story = doc.sections.find((s) => s.id === 'story')!;
+      story.animation = {
+        enter: { preset: 'rise', duration: 900, delay: 0, distance: 32, easing: 'smooth' },
+        scroll: 'none',
+        text: 'none',
+        stagger: 90,
+        intensity: 1,
+      };
+    });
+    const off = (on: boolean) => ({
+      ...deps({ get: vi.fn(async () => stored) }),
+      cinematic: vi.fn(async () => on),
+    });
+    // the stored draft as it is (a text change): saved
+    const edited = structuredClone(stored.draft);
+    edited.hosts.primary = { he: 'רות', en: 'Ruth' };
+    const d = off(false);
+    expect((await saveDraft(USER, ID, { draft: edited, updatedAt: 'a' }, d)).status).toBe(200);
+    // a new opening and a new layout: 403, naming them, nothing written
+    const dressed = structuredClone(stored.draft);
+    dressed.cover.opening = 'curtain';
+    const quote = dressed.sections.findIndex((s) => s.id === 'story');
+    dressed.sections[quote] = {
+      ...dressed.sections[quote]!,
+      layout: 'full_bleed',
+      media: { kind: 'image', src: 'upload:a/b/c.jpg', poster: null, focalPoint: { x: 0.5, y: 0.5 } },
+    } as (typeof dressed.sections)[number];
+    const refused = off(false);
+    const r = await saveDraft(USER, ID, { draft: dressed, updatedAt: 'a' }, refused);
+    expect(r.status).toBe(403);
+    expect(r.body).toMatchObject({ code: 'feature_off', feature: 'cinematic' });
+    expect((r.body as { issues: string[] }).issues.sort()).toEqual(
+      ['cover.opening', `sections.${quote}.layout`, `sections.${quote}.media`].sort(),
+    );
+    expect(refused.db.saveDraft).not.toHaveBeenCalled();
+    // with the feature: saved, and the stored draft isn't even read
+    const on = off(true);
+    expect((await saveDraft(USER, ID, { draft: dressed, updatedAt: 'a' }, on)).status).toBe(200);
+    expect(on.db.get).not.toHaveBeenCalled();
+  });
+});
+
+describe('unlisted designs', () => {
+  const lumiere = wizard({ templateId: 'lumiere' });
+
+  it('are the admins’ to use: a host gets "invalid template", an admin a new draft', async () => {
+    const host = { ...deps(), admin: false };
+    expect((await createInvitation(USER, lumiere, host)).body).toMatchObject({
+      code: 'invalid',
+      issues: ['templateId'],
+    });
+    expect(host.db.create).not.toHaveBeenCalled();
+    const admin = { ...deps(), admin: true };
+    const r = await createInvitation(USER, lumiere, admin);
+    expect(r.status).toBe(201);
+    const draft = admin.db.create.mock.calls[0]![4] as InvitationDocument;
+    expect(draft.templateId).toBe('lumiere');
+    expect(draft.sections.find((s) => s.id === 'quote')).toMatchObject({ layout: 'full_bleed' });
+  });
 });
 
 describe('publish', () => {

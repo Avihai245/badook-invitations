@@ -25,6 +25,7 @@
     "qa:app-ui": "node scripts/qa-app-ui.mjs",
     "db:seed": "tsx scripts/seed.ts",
     "media:sync": "tsx scripts/media-sync.ts",
+    "media:placeholders": "node scripts/make-template-placeholders.mjs",
     "test:db": "vitest run --config vitest.db.config.ts",
     "qa:host": "node scripts/qa-host.mjs",
     "perf:templates": "tsx scripts/perf-templates.ts"

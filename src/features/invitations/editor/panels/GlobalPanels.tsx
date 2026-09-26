@@ -42,6 +42,7 @@ import { LibraryFontPairs } from '../fields/font-library';
 import { AUDIO_TYPES, ImageField, UploadTile, useUploader } from '../fields/media';
 import { addLocale, removeLocale } from '../locales';
 import { useEditor, type PanelId } from '../state/EditorProvider';
+import { FontSuggestions, OpeningPicker, PhotoPaletteCard, StylePanel } from './DesignCinematic';
 
 /**
  * A track's licence as the template pack gives it — unless it's still a placeholder ("TBD …"),
@@ -60,6 +61,8 @@ export function GlobalPanel({ panel }: { panel: PanelId }) {
       return <PalettePanel />;
     case 'fonts':
       return <FontsPanel />;
+    case 'style':
+      return <StylePanel />;
     case 'music':
       return <MusicPanel />;
     case 'event':
@@ -74,7 +77,7 @@ export function GlobalPanel({ panel }: { panel: PanelId }) {
 // ─── cover ─────────────────────────────────────────────────────────────────────────────────────
 
 function CoverPanel() {
-  const { doc, template, update } = useEditor();
+  const { doc, template, update, features } = useEditor();
   const { t } = useUi();
   const e = t.editor;
   const c = e.f.cover;
@@ -86,6 +89,8 @@ function CoverPanel() {
       <PanelCard>
         <BoolField path="cover.enabled" label={c.enabled} help={c.enabledHelp} />
       </PanelCard>
+      {/* the cinematic openings (feature `cinematic`) */}
+      {doc.cover.enabled && features.cinematic !== false ? <OpeningPicker /> : null}
       {doc.cover.enabled ? (
         <PanelCard
           title={e.cards.overlay}
@@ -157,6 +162,7 @@ function PalettePanel() {
 
   return (
     <>
+      <PhotoPaletteCard />
       {template.palettePresets.length ? (
         <PanelCard title={e.cards.presets}>
           <FieldFrame path="theme.palette" label={e.names.palette}>
@@ -288,61 +294,64 @@ function FontsPanel() {
   const e = t.editor;
   const sample = (l: Locale) => hostsText(doc, l) || (l === 'he' ? 'נועה & איתי' : 'Noa & Itay');
   return (
-    <PanelCard>
-      <FieldFrame path="theme.fontPairId" label={e.names.fonts}>
-        <div role="radiogroup" aria-label={e.names.fonts} className="flex flex-col gap-2">
-          {template.fontPairs.map((pair) => {
-            const on = doc.theme.fontPairId === pair.id;
-            return (
-              <button
-                key={pair.id}
-                type="button"
-                role="radio"
-                aria-checked={on}
-                onClick={() => update('theme.fontPairId', pair.id, null)}
-                className={cn(
-                  'flex items-center justify-between gap-3 rounded-card border bg-surface px-3 py-3 text-start',
-                  on ? 'border-ink ring-1 ring-ink' : 'border-line hover:bg-subtle',
-                )}
-              >
-                <span className="flex min-w-0 flex-col gap-0.5">
-                  <span
-                    lang="he"
-                    dir="rtl"
-                    className="truncate text-[24px] leading-tight"
-                    style={{ fontFamily: `"${pair.display.hebrew}", serif` }}
-                  >
-                    {sample('he')}
-                  </span>
-                  <span
-                    lang="en"
-                    dir="ltr"
-                    className="truncate text-[24px] leading-tight"
-                    style={{ fontFamily: `"${pair.display.latin}", serif` }}
-                  >
-                    {sample('en')}
-                  </span>
-                </span>
-                <span
-                  className="flex shrink-0 flex-col items-end gap-1 text-[11px] leading-snug text-muted"
-                  dir="ltr"
+    <>
+      <FontSuggestions />
+      <PanelCard>
+        <FieldFrame path="theme.fontPairId" label={e.names.fonts}>
+          <div role="radiogroup" aria-label={e.names.fonts} className="flex flex-col gap-2">
+            {template.fontPairs.map((pair) => {
+              const on = doc.theme.fontPairId === pair.id;
+              return (
+                <button
+                  key={pair.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => update('theme.fontPairId', pair.id, null)}
+                  className={cn(
+                    'flex items-center justify-between gap-3 rounded-card border bg-surface px-3 py-3 text-start',
+                    on ? 'border-ink ring-1 ring-ink' : 'border-line hover:bg-subtle',
+                  )}
                 >
-                  {on ? <Check aria-hidden size={16} className="text-ink" /> : null}
-                  <span>{pair.display.hebrew}</span>
-                  <span>{pair.display.latin}</span>
-                </span>
-              </button>
-            );
-          })}
-          <LibraryFontPairs
-            selected={doc.theme.fontPairId}
-            onSelect={(id) => update('theme.fontPairId', id, null)}
-            title={e.f.fonts.more}
-            help={e.f.fonts.moreHelp}
-          />
-        </div>
-      </FieldFrame>
-    </PanelCard>
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span
+                      lang="he"
+                      dir="rtl"
+                      className="truncate text-[24px] leading-tight"
+                      style={{ fontFamily: `"${pair.display.hebrew}", serif` }}
+                    >
+                      {sample('he')}
+                    </span>
+                    <span
+                      lang="en"
+                      dir="ltr"
+                      className="truncate text-[24px] leading-tight"
+                      style={{ fontFamily: `"${pair.display.latin}", serif` }}
+                    >
+                      {sample('en')}
+                    </span>
+                  </span>
+                  <span
+                    className="flex shrink-0 flex-col items-end gap-1 text-[11px] leading-snug text-muted"
+                    dir="ltr"
+                  >
+                    {on ? <Check aria-hidden size={16} className="text-ink" /> : null}
+                    <span>{pair.display.hebrew}</span>
+                    <span>{pair.display.latin}</span>
+                  </span>
+                </button>
+              );
+            })}
+            <LibraryFontPairs
+              selected={doc.theme.fontPairId}
+              onSelect={(id) => update('theme.fontPairId', id, null)}
+              title={e.f.fonts.more}
+              help={e.f.fonts.moreHelp}
+            />
+          </div>
+        </FieldFrame>
+      </PanelCard>
+    </>
   );
 }
 

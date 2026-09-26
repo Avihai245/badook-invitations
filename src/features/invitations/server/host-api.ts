@@ -19,6 +19,7 @@ import type { L10n, Locale } from '../contracts/types';
 import { validateDocument } from '../contracts/validate';
 import { findFontPair } from '../fonts/library';
 import { graphemes } from '../lib/text';
+import { hasCinematicValues, introducedCinematic } from '../renderer/cinematic/presentation';
 import { followUpDocument, followUpSlug, saveTheDateSlug } from '../templates/follow-up';
 import { COUPLE_EVENTS } from '../templates/seed-copy';
 import type { TemplateEntry } from '../templates/registry';
@@ -55,6 +56,13 @@ export interface HostDeps {
   now(): number;
   /** the host's plan limits (absent: nothing is limited) */
   entitlements?(): Promise<Entitlements>;
+  /**
+   * The event has the `cinematic` feature (features/flags) — without it a save may not bring new v2
+   * values (sections' media, layouts, motion, colors, the opening, the tokens). Absent: not checked.
+   */
+  cinematic?(invitationId: string): Promise<boolean>;
+  /** the signed-in user is one of the platform's admins (unlisted designs are theirs to use) */
+  admin?: boolean;
 }
 
 /** 402 when the plan has no room for one more active invitation. */
@@ -116,7 +124,9 @@ export async function createInvitation(userId: string, raw: unknown, deps: HostD
     return fail(400, 'invalid', { issues: parsed.error.issues.map((i) => i.path.join('.')) });
   const input = parsed.data;
   const entry = deps.template(input.templateId);
-  if (!entry) return fail(400, 'invalid', { issues: ['templateId'] });
+  // an unlisted design (not in the public gallery) is for the platform's admins only
+  if (!entry || (!entry.manifest.listed && deps.admin === false))
+    return fail(400, 'invalid', { issues: ['templateId'] });
   const { manifest, defaults } = entry;
   const locales = [...new Set(input.locales)];
   const bad: string[] = [];
@@ -246,6 +256,16 @@ export async function saveDraft(
   // any known schema version (an editor still open on the previous release saves v1): stored as the latest
   const draft = safeMigrateDocument(parsed.data.draft);
   if (!draft.success) return fail(422, 'invalid', { issues: draft.issues.slice(0, 20).map((i) => i.path) });
+  // Without the `cinematic` feature the editor hides the v2 controls, and the server refuses what they
+  // would add: a new or changed v2 value. What the stored draft has already stays (the host keeps
+  // saving a draft made while the feature was on).
+  if (deps.cinematic && hasCinematicValues(draft.data) && !(await deps.cinematic(id))) {
+    const stored = await deps.db.get(id, userId);
+    if (!stored) return fail(404, 'not_found');
+    const introduced = introducedCinematic(stored.draft, draft.data);
+    if (introduced.length)
+      return fail(403, 'feature_off', { feature: 'cinematic', issues: introduced.slice(0, 20) });
+  }
   const result = await deps.db.saveDraft(id, userId, draft.data, parsed.data.updatedAt);
   if (!result) return fail(404, 'not_found');
   if (!result.ok) return fail(409, 'conflict', { updatedAt: result.updatedAt, draft: result.draft });

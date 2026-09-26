@@ -65,7 +65,12 @@ export interface InvitationDocument {
     timeFormat: '24h' | '12h' | null; // null → locale default (he 24h, en 12h)
     rsvpDeadline: ISODate | null;
   };
-  theme: { fontPairId: string; palette: Partial<Palette> | null }; // only template.editablePaletteKeys
+  theme: {
+    fontPairId: string;
+    palette: Partial<Palette> | null; // only template.editablePaletteKeys
+    /** v2 (cinematic): the host's scale of the design's type, spacing and motion; absent / null → as designed */
+    tokens?: ThemeTokens | null;
+  };
   cover: {
     // the cover design itself comes from the template
     enabled: boolean;
@@ -234,6 +239,25 @@ export interface ThemeOverrides {
 }
 
 /**
+ * The host's scale of the design's tokens for the whole invitation (v2, feature `cinematic` — the
+ * editor's "Style & motion"): each × the template's own; absent (or 1) = as designed.
+ */
+export interface ThemeTokens {
+  /** × every type role's size (names, titles, text, small print), 0.85..1.2 */
+  typeScale?: number;
+  /** spacing density: × the section padding and the gaps inside a section (not the side gutter), 0.7..1.4 */
+  spacing?: number;
+  /** × the template's motion intensity, 0..2 — 0: nothing moves (as with reduced motion) */
+  motion?: number;
+}
+/** The ranges of ThemeTokens (the schema's and the editor's sliders). */
+export const THEME_TOKEN_RANGES = Object.freeze({
+  typeScale: Object.freeze({ min: 0.85, max: 1.2 }),
+  spacing: Object.freeze({ min: 0.7, max: 1.4 }),
+  motion: Object.freeze({ min: 0, max: 2 }),
+});
+
+/**
  * v2 presentation any section may carry — all optional: without them a section renders exactly as in
  * v1. They show only while the event has the `cinematic` feature (else the plain rendering). The
  * hero's media is `data.media` and it always fills the screen: its `media` is null and its `layout`
@@ -271,6 +295,12 @@ export interface OpeningConfig {
   motion?: 'swing' | 'slide' | 'part' | 'rise';
   /** the doors' / curtain's / sky's color; null → from the palette */
   color?: string | null;
+  /**
+   * `hero`: the fireworks' night sky and the gold dust's veil let the invitation's first picture (the
+   * hero's photo, or its video's still) show through — a photo-led opening. Applies to those two
+   * openings whichever the host picks; null / absent → the opening's own sky or veil.
+   */
+  backdrop?: 'hero' | null;
 }
 
 interface Base<T extends string, D, M extends SectionMedia | null = SectionMedia | null, L = SectionLayout> {
@@ -548,6 +578,11 @@ export interface TemplateManifest {
   name: L10n;
   description: L10n;
   tier: TemplateTier;
+  /**
+   * false: kept out of the public gallery, the home page's posters and the assistant's list (admins
+   * see it in the gallery, /dev lists every design); the seed writes its row inactive. Default true.
+   */
+  listed: boolean;
   categories: EventType[];
   supportsLocales: Locale[];
   previewImage: string;
@@ -612,7 +647,21 @@ export interface TemplateManifest {
   decorations: Partial<
     Record<'afterHero' | 'betweenVenues' | 'afterTimeline' | 'beforeRsvp' | 'footer', AssetRef | null>
   >;
-  sectionDefaults: { order: Section['type'][]; variants: Partial<Record<Section['type'], string>> };
+  sectionDefaults: {
+    /**
+     * The seeded sections, in order. A v1 type left out is still seeded, hidden, before the footer (the
+     * host can switch it on); a v2 type (parents · when · where · quote · custom) is seeded only when
+     * listed — `custom` may repeat (a picture band each time: custom, custom-2…).
+     */
+    order: Section['type'][];
+    variants: Partial<Record<Section['type'], string>>;
+    /**
+     * v2: a seeded section's presentation by its seeded id ('hero', 'quote', 'story', 'venues', 'rsvp',
+     * 'custom-2'…) — its media (template: refs), layout, motion and colors, as a document carries them.
+     * How a JSON-only template sets its rhythm: a photo per section, full-bleed / split / parallax.
+     */
+    presentation?: Record<string, SectionPresentation>;
+  };
 }
 
 // ---------- template seed copy (invitation-templates-pack/<id>/defaults.json) ----------
@@ -642,6 +691,12 @@ export interface EventDefaults {
     dietaryNote: L10n | null;
   };
   closingLine: L10n;
+  // v2 — the copy of the schema-v2 sections a template's order seeds (absent → the generic copy)
+  quote?: { text: L10n; attribution: L10n | null };
+  when?: { title: L10n | null; note: L10n | null };
+  parents?: { title: L10n | null; note: L10n | null };
+  /** the n-th `custom` of the order takes the n-th entry (none: a picture band without text) */
+  custom?: { title: L10n | null; subtitle: L10n | null; body: L10n }[];
 }
 export interface TemplateDefaults {
   templateId: string;

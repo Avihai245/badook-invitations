@@ -20,6 +20,7 @@ import {
   SECTION_TYPES,
   TEMPLATE_TIERS,
   TEXT_REVEALS,
+  THEME_TOKEN_RANGES,
   TIMELINE_ICONS,
   type EventDefaults,
   type InvitationDocument,
@@ -31,9 +32,11 @@ import {
   type Section,
   type SectionAnimation,
   type SectionMedia,
+  type SectionPresentation,
   type TemplateDefaults,
   type TemplateManifest,
   type ThemeOverrides,
+  type ThemeTokens,
   type TypographyTokens,
   type Venue,
 } from './types';
@@ -167,6 +170,14 @@ export const ThemeOverridesSchema = z.strictObject({
     .optional(),
 });
 
+/** The host's scale of the design's tokens (v2): each × the template's; absent = as designed. */
+const R = THEME_TOKEN_RANGES;
+export const ThemeTokensSchema = z.strictObject({
+  typeScale: z.number().min(R.typeScale.min).max(R.typeScale.max).optional(),
+  spacing: z.number().min(R.spacing.min).max(R.spacing.max).optional(),
+  motion: z.number().min(R.motion.min).max(R.motion.max).optional(),
+});
+
 /** The v2 presentation fields of a section (all optional — without them it renders as in v1). */
 const PRESENTATION = {
   media: SectionMediaSchema.nullable().optional(),
@@ -174,6 +185,8 @@ const PRESENTATION = {
   animation: SectionAnimationSchema.nullable().optional(),
   themeOverrides: ThemeOverridesSchema.nullable().optional(),
 };
+/** A section's v2 presentation on its own (a template's seeded sections: sectionDefaults.presentation). */
+export const SectionPresentationSchema = z.strictObject(PRESENTATION);
 /** The hero's media is data.media and it always fills the screen. */
 const HERO_PRESENTATION = {
   ...PRESENTATION,
@@ -448,7 +461,12 @@ export const InvitationDocumentSchema = z.strictObject({
     timeFormat: z.enum(['24h', '12h']).nullable(),
     rsvpDeadline: ISODateSchema.nullable(),
   }),
-  theme: z.strictObject({ fontPairId: z.string().min(1), palette: PartialPaletteSchema.nullable() }),
+  theme: z.strictObject({
+    fontPairId: z.string().min(1),
+    palette: PartialPaletteSchema.nullable(),
+    // v2: the host's type scale, spacing density and motion intensity (feature `cinematic`)
+    tokens: ThemeTokensSchema.nullable().optional(),
+  }),
   cover: z.strictObject({
     enabled: z.boolean(),
     monogram: L10nSchema.nullable(),
@@ -507,6 +525,8 @@ export const OpeningConfigSchema = z.strictObject({
   trigger: z.enum(['tap', 'scroll']).optional(),
   motion: z.enum(['swing', 'slide', 'part', 'rise']).optional(),
   color: HexColorSchema.nullable().optional(),
+  // a photo-led opening: the fireworks' sky / the gold dust's veil over the hero's picture
+  backdrop: z.literal('hero').nullable().optional(),
 });
 
 export const TemplateManifestSchema = z.strictObject({
@@ -516,6 +536,8 @@ export const TemplateManifestSchema = z.strictObject({
   description: L10nSchema,
   // added after v2: a manifest without it is a standard design
   tier: z.enum(TEMPLATE_TIERS).default('standard'),
+  // added with the flagship photographic design: false keeps a design out of the public gallery
+  listed: z.boolean().default(true),
   categories: z.array(EventTypeSchema).min(1),
   supportsLocales: z.array(LocaleSchema).min(1),
   previewImage: TemplatePathSchema,
@@ -611,6 +633,8 @@ export const TemplateManifestSchema = z.strictObject({
   sectionDefaults: z.strictObject({
     order: z.array(SectionTypeSchema),
     variants: z.partialRecord(SectionTypeSchema, z.string().min(1)),
+    // v2: the seeded sections' presentation by seeded id (a JSON-only template's photos and rhythm)
+    presentation: z.record(z.string().min(1), SectionPresentationSchema).optional(),
   }),
 });
 
@@ -647,6 +671,15 @@ export const EventDefaultsSchema = z.strictObject({
     dietaryNote: L10nSchema.nullable(),
   }),
   closingLine: L10nSchema,
+  // v2: the copy of the schema-v2 sections the template's order seeds (absent → generic copy)
+  quote: z.strictObject({ text: L10nSchema, attribution: L10nSchema.nullable() }).optional(),
+  when: z.strictObject({ title: L10nSchema.nullable(), note: L10nSchema.nullable() }).optional(),
+  parents: z.strictObject({ title: L10nSchema.nullable(), note: L10nSchema.nullable() }).optional(),
+  custom: z
+    .array(
+      z.strictObject({ title: L10nSchema.nullable(), subtitle: L10nSchema.nullable(), body: L10nSchema }),
+    )
+    .optional(),
 });
 
 export const TemplateDefaultsSchema = z.strictObject({
@@ -729,6 +762,8 @@ export type _ContractChecks = [
   Assert<MutuallyAssignable<z.infer<typeof SectionMediaSchema>, SectionMedia>>,
   Assert<MutuallyAssignable<z.infer<typeof SectionAnimationSchema>, SectionAnimation>>,
   Assert<MutuallyAssignable<z.infer<typeof ThemeOverridesSchema>, ThemeOverrides>>,
+  Assert<MutuallyAssignable<z.infer<typeof ThemeTokensSchema>, ThemeTokens>>,
+  Assert<MutuallyAssignable<z.infer<typeof SectionPresentationSchema>, SectionPresentation>>,
   Assert<MutuallyAssignable<z.infer<typeof TypographySchema>, TypographyTokens>>,
   Assert<MutuallyAssignable<z.infer<typeof OpeningConfigSchema>, OpeningConfig>>,
   Assert<MutuallyAssignable<z.infer<typeof VenueSchema>, Venue>>,

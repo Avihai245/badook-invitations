@@ -105,6 +105,9 @@ import grandPrixDefaults from '@pack/grand-prix/defaults.json';
 import grandPrixManifest from '@pack/grand-prix/manifest.json';
 import skateDefaults from '@pack/skate-graffiti/defaults.json';
 import skateManifest from '@pack/skate-graffiti/manifest.json';
+// the photographic flagship (unlisted until its real photos are in)
+import lumiereDefaults from '@pack/lumiere/defaults.json';
+import lumiereManifest from '@pack/lumiere/manifest.json';
 
 export interface TemplateEntry {
   manifest: TemplateManifest;
@@ -168,6 +171,8 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: balletRoseManifest, defaults: balletRoseDefaults },
   { manifest: vinylGrooveManifest, defaults: vinylGrooveDefaults },
   { manifest: retro80sManifest, defaults: retro80sDefaults },
+  // the photographic flagship: unlisted (`listed: false`) — admins and /dev see it
+  { manifest: lumiereManifest, defaults: lumiereDefaults },
 ];
 
 function loadTemplates(): Map<string, TemplateEntry> {
