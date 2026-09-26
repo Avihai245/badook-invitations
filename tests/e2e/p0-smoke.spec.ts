@@ -51,8 +51,10 @@ test.describe('invitation renders', () => {
 test('cover opens and unlocks scrolling', async ({ page }) => {
   const errors = collectErrors(page);
   await open(page, render('sahar-bordeaux', 'he', 'wedding-he-en', 'x=1'));
-  const cover = page.locator('.cover > button[aria-label]');
+  // named by its hint in the page's language (a cover in several languages: aria-labelledby)
+  const cover = page.locator('.cover > button.cover-tap');
   await expect(cover).toBeVisible();
+  await expect(cover).toHaveAccessibleName(/\S/);
   await expect(page.locator('body')).toHaveClass(/locked/);
   await cover.click();
   await expect(page.locator('html')).toHaveAttribute('data-opened', '1');

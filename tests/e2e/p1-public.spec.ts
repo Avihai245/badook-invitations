@@ -143,7 +143,7 @@ test.describe('public invitations', () => {
   }) => {
     await open(page, '/i/noa-and-itay');
     await expect(page.locator('body')).toHaveClass(/locked/);
-    await page.locator('.cover > button[aria-label]').click();
+    await page.locator('.cover > button.cover-tap').click();
     await expect(page.locator('.cover')).toHaveCount(0, { timeout: 5000 });
     await expect(page.locator('body')).not.toHaveClass(/locked/);
 
