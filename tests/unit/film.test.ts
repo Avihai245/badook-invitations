@@ -329,6 +329,10 @@ describe('the edit', () => {
     expect(photoBeats(90)).toBe(4);
     expect(photoBeats(170)).toBe(8);
     expect(photoBeats(72)).toBe(2);
+    // the title and end cards: a bar each, also at a tempo a hair over 120 (a bar a hair under 2 s)
+    const hair = planFilm({ ...grid(120.2, 60), length: 30, items: items(10) });
+    expect(hair.shots[0]!.beats).toBe(4);
+    expect(hair.shots.at(-1)!.beats).toBe(4);
     const plan = planFilm({
       ...grid(120, 120),
       length: 30,

@@ -115,10 +115,9 @@ export function shotCount(length: FilmLength, bpm: number): number {
 
 function cardBeats(period: number) {
   const bar = 4 * period;
-  return {
-    title: 4 * Math.max(1, Math.ceil(FILM.cards.titleSeconds / bar)),
-    end: 4 * Math.max(1, Math.ceil(FILM.cards.endSeconds / bar)),
-  };
+  // whole bars, about as long as FILM.cards asks (a tempo a hair over 120 keeps its one bar of two seconds)
+  const bars = (seconds: number) => Math.max(1, Math.ceil(seconds / bar - 0.1));
+  return { title: 4 * bars(FILM.cards.titleSeconds), end: 4 * bars(FILM.cards.endSeconds) };
 }
 
 /** Seconds of distance from the chosen length an ending on a mere bar costs, against a phrase's end. */
