@@ -511,7 +511,7 @@ test.describe('seven languages', () => {
     const families = [
       { name: 'משפחת כהן', language: null, table: 12 },
       { name: 'Семья Ивановых', language: 'ru', table: 12 },
-      { name: 'عائلة حداد', language: 'ar', table: 3 },
+      { name: 'عائلة حداد', language: 'ar', table: 13 },
     ].map((f, i) => ({ ...f, phone: `+9725${suffix}${i}2`, token: `i18nday${suffix}${i}abcdefghij` }));
     for (const f of families) {
       const [g] = await query<{ id: string }>(
@@ -551,7 +551,7 @@ test.describe('seven languages', () => {
           zones: [],
           locked: false,
         });
-        const tables = [table(12, 6), table(3, 12)];
+        const tables = [table(12, 6), table(13, 12)];
         const ids = Object.fromEntries(tables.map((t) => [t.number, t.id]));
         const assignments: Record<string, { tableId: string; source: 'host' }> = {};
         for (const s of seats) {
@@ -590,8 +590,9 @@ test.describe('seven languages', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
     await expect(page.getByTestId('guide-table')).toContainText(GUIDE_TEXT.ar.guide.yourTable);
-    await expect(page.getByTestId('guide-table-number')).toHaveText('3');
-    expect(await digitsLeftToRight(page, '[data-testid="guide-table"]', '3')).toBe(true);
+    await expect(page.getByTestId('guide-table-number')).toHaveText('13');
+    // the number reads left to right in the right-to-left page
+    expect(await digitsLeftToRight(page, '[data-testid="guide-table"]', '13')).toBe(true);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -639,7 +640,7 @@ test.describe('seven languages', () => {
     expect(ar).toMatchObject({
       template: 'badook_table',
       language: 'he',
-      params: ['عائلة حداد', `${NAMES.he.primary} & ${NAMES.he.secondary}`, '3'],
+      params: ['عائلة حداد', `${NAMES.he.primary} & ${NAMES.he.secondary}`, '13'],
       button: `${slug}/table?g=${haddad!.token}`,
     });
     await expect.poll(async () => (await sentTo(cohen!.phone)).length, { timeout: 20_000 }).toBe(1);
