@@ -19,6 +19,7 @@ import {
   resolveEventDefaults,
   seedDocument,
   v2Section,
+  wazeByDefault,
   type WizardInput,
 } from '../templates/seed-document';
 import { uniqueId } from './paths';
@@ -199,7 +200,7 @@ function genericSection(entry: CatalogEntry, doc: InvitationDocument, locales: r
               startTime: doc.event.startTime,
               endTime: doc.event.endTime,
               showMap: true,
-              buttons: { maps: true, waze: locales.includes('he'), calendar: true },
+              buttons: { maps: true, waze: wazeByDefault(locales), calendar: true },
             },
           ],
         },

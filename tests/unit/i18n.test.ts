@@ -37,7 +37,7 @@ import { CULTURE_COPY } from '@/features/invitations/templates/culture-copy';
 import { demoPeople } from '@/features/invitations/templates/demo-people';
 import { requireTemplate, TEMPLATES } from '@/features/invitations/templates/registry';
 import { SEED_COPY } from '@/features/invitations/templates/seed-copy';
-import { seedDocument } from '@/features/invitations/templates/seed-document';
+import { seedDocument, v2Section, wazeByDefault } from '@/features/invitations/templates/seed-document';
 import { templateLanguages, templateChain } from '@/features/whatsapp/languages';
 import { fillTemplate, TEMPLATE_TEXT } from '@/features/whatsapp/template-text';
 import { GALLERY_GUEST } from '@/lib/i18n/gallery-guest';
@@ -390,6 +390,19 @@ describe('a new invitation in each language', () => {
         expect(c.countdown.after[type], `${l} after ${type}`).toBeTruthy();
       }
     }
+  });
+
+  it('a new venue offers Waze when the event is most likely in Israel: Hebrew, Arabic, Russian or Amharic', () => {
+    for (const l of ['he', 'ar', 'ru', 'am'] as const) expect(wazeByDefault([l]), l).toBe(true);
+    expect(wazeByDefault(['en', 'fr', 'es'])).toBe(false);
+    // the "where" section of the cinematic designs too
+    const where = v2Section('where', 'where', {
+      eventType: 'wedding',
+      locales: ['ar'],
+      startTime: '19:30',
+      endTime: null,
+    });
+    expect(where.type === 'where' && where.data.venue.buttons.waze).toBe(true);
   });
 
   it('every template seeds a complete invitation in Russian, Arabic, French, Spanish and Amharic', () => {

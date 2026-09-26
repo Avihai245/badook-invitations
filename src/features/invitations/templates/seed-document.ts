@@ -34,6 +34,8 @@ export interface WizardInput {
 
 /** The languages most Israeli invitations are written in — their venues get a Waze button. */
 const ISRAELI_LOCALES: readonly Locale[] = ['he', 'ar', 'ru', 'am'];
+/** A new venue's Waze button: on when the event is most likely in Israel (ISRAELI_LOCALES). */
+export const wazeByDefault = (locales: readonly Locale[]) => locales.some((l) => ISRAELI_LOCALES.includes(l));
 /** The hosts' names a slug is made of: a Latin-script language's, else Hebrew's or Russian's (transliterated). */
 const SLUG_LOCALES: readonly Locale[] = ['en', 'he', 'fr', 'es', 'ru'];
 
@@ -159,7 +161,7 @@ export function v2Section(type: V2SectionType, id: string, input: V2SeedInput): 
             startTime: input.startTime,
             endTime: input.endTime,
             showMap: true,
-            buttons: { maps: true, waze: locales.includes('he'), calendar: true },
+            buttons: { maps: true, waze: wazeByDefault(locales), calendar: true },
           },
           note: null,
         },
@@ -362,7 +364,7 @@ export function seedDocument(
             endTime,
             showMap: true,
             // Waze: the event is most likely in Israel (an invitation in Hebrew, Arabic, Russian or Amharic)
-            buttons: { maps: true, waze: locales.some((l) => ISRAELI_LOCALES.includes(l)), calendar: true },
+            buttons: { maps: true, waze: wazeByDefault(locales), calendar: true },
           })),
         },
       },

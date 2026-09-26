@@ -19,6 +19,7 @@ import { t as invitationText } from '../../i18n/dictionary';
 import { formatTime } from '../../lib/dates';
 import { parseVideoLink } from '../../lib/video-links';
 import { SEED_COPY } from '../../templates/seed-copy';
+import { wazeByDefault } from '../../templates/seed-document';
 import {
   BoolField,
   DateField,
@@ -285,7 +286,7 @@ function VenuesForm({ base }: { base: string }) {
           startTime: doc.event.startTime,
           endTime: null,
           showMap: true,
-          buttons: { maps: true, waze: doc.locales.includes('he'), calendar: true },
+          buttons: { maps: true, waze: wazeByDefault(doc.locales), calendar: true },
         })}
         render={(item, _i, p) => (
           <>
