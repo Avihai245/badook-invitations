@@ -210,6 +210,7 @@ export const supportEn: typeof supportHe = {
     reasonPlaceholder: 'For example: spam',
     reasonRequired: 'Write a reason.',
     remove: 'Delete',
+    theCustomer: 'the customer',
   },
   toasts: {
     replied: 'The answer was sent to the customer',

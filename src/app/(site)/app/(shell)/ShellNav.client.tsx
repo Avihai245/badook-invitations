@@ -126,7 +126,7 @@ export function AppSidebar({
         <UserMenu email={email} admin={admin} unread={unread} />
         <nav
           aria-label={t.shell.legal}
-          className="hidden flex-wrap gap-x-3 gap-y-1 px-2 text-[11.5px] leading-5 text-faint lg:flex"
+          className="hidden flex-wrap gap-x-3 gap-y-1 px-2 text-[11.5px] leading-5 text-muted lg:flex"
         >
           {LEGAL.map((key) => (
             <Link key={key} href={`/${key}`} className="rounded-[4px] hover:text-ink hover:underline">

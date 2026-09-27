@@ -123,6 +123,9 @@ export const ticketsEn: TicketsDict = {
     send: 'Send to the team',
     sendHint: 'Sends the team the subject, your message and the conversation with the assistant.',
     back: 'Back to the chat',
+    backHint: 'Back to the conversation with the assistant. What you wrote here stays until you come back.',
+    openHint: 'The ticket’s page: the team’s answer shows there, and you can reply on it.',
+    finishHint: 'Back to the conversation with the assistant.',
     done: 'Ticket #{n} was sent to the team. The answer will come to Support in the app and by email.',
     open: 'Open the ticket',
     errors: {

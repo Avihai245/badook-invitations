@@ -28,8 +28,9 @@ export type SegmentedProps<V extends string> = {
 };
 
 /**
- * app.html `.seg`: subtle track (radius 8, padding 3, gap 2), 28px items, 13px muted; the active item
- * is surface + shadow-sm + ink/600. Radiogroup semantics; arrow keys follow the visual order (RTL-aware).
+ * app.html `.seg`: subtle track (radius 8, padding 3, gap 2), 28px items, 13px muted (ink at 65%: the
+ * muted token on the subtle track is 4.4:1, under WCAG AA's 4.5); the active item is surface +
+ * shadow-sm + ink/600. Radiogroup semantics; arrow keys follow the visual order (RTL-aware).
  */
 export function Segmented<V extends string>({
   value,
@@ -78,7 +79,7 @@ export function Segmented<V extends string>({
               'inline-flex h-7 min-w-0 items-center justify-center gap-1.5 rounded-[6px] px-2.5 text-[13px] whitespace-nowrap',
               'transition-[background-color,color,box-shadow] duration-150 motion-reduce:transition-none',
               fullWidth && 'flex-1',
-              checked ? 'bg-surface font-semibold text-ink shadow-sm' : 'text-muted',
+              checked ? 'bg-surface font-semibold text-ink shadow-sm' : 'text-ink/65',
               off ? 'cursor-not-allowed opacity-50' : !checked && 'hover:text-ink',
             )}
           >

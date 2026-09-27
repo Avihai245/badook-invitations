@@ -158,6 +158,34 @@ describe('the customer’s tickets', () => {
     ).toBeNull();
   });
 
+  it('names the invitation as the app does: its hosts, with their joiner', async () => {
+    const title = async (draft: unknown) => {
+      await c.query('begin');
+      try {
+        const r = await c.query(
+          `with i as (
+             insert into invitations (owner_id, template_id, slug, event_type, draft)
+             values ($1, 'sahar-bordeaux', 'x-title', 'wedding', $2) returning *
+           )
+           select public.support_invitation_title(i) as t from i`,
+          [DANA, JSON.stringify(draft)],
+        );
+        return r.rows[0].t;
+      } finally {
+        await c.query('rollback');
+      }
+    };
+    const hosts = { primary: { en: 'Noa' }, secondary: { en: 'Itay' } };
+    expect(await title({ defaultLocale: 'en', hosts })).toBe('Noa & Itay');
+    expect(await title({ defaultLocale: 'en', hosts: { ...hosts, joiner: { en: 'and' } } })).toBe(
+      'Noa and Itay',
+    );
+    expect(await title({ defaultLocale: 'en', hosts: { primary: { en: 'Dana' }, secondary: null } })).toBe(
+      'Dana',
+    );
+    expect(await title({ defaultLocale: 'he', hosts })).toBeNull();
+  });
+
   it('checks what it is given', async () => {
     const bad = async (args: unknown[]) => reason(call('support_ticket_open', args));
     expect(await bad([DANA, ' ', 'support', 'y', null, 'he', 'app', null])).toContain('invalid_subject');

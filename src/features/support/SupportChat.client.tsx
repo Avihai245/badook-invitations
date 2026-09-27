@@ -13,7 +13,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
-import { cn } from '@/components/app';
+import { cn, Hint } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { SUPPORT_OPEN, openSupport, type SupportOpenDetail } from './open';
 import { ChatHandoff } from './tickets/ui/ChatHandoff.client';
@@ -226,7 +226,8 @@ export function SupportChat() {
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   // "talk to a person": a ticket for the team with this conversation (features/support/tickets)
-  const [handoff, setHandoff] = useState(false);
+  // (shown; hidden while back in the chat, its draft kept; null: none)
+  const [handoff, setHandoff] = useState<'shown' | 'hidden' | null>(null);
   const abort = useRef<AbortController | null>(null);
   const panel = useRef<HTMLDivElement>(null);
   const log = useRef<HTMLDivElement>(null);
@@ -244,7 +245,7 @@ export function SupportChat() {
 
   const close = useCallback(() => {
     setOpen(false);
-    setHandoff(false);
+    setHandoff(null);
   }, []);
 
   // closing gives the focus back to what opened the chat (once it is visible again)
@@ -360,8 +361,9 @@ export function SupportChat() {
     if (window.matchMedia('(max-width: 639px)').matches) setOpen(false);
   }, []);
 
-  const backToChat = () => {
-    setHandoff(false);
+  /** Back to the conversation: `keep` the hand-off's draft for later, or start over (it was sent). */
+  const backToChat = (keep: boolean) => {
+    setHandoff(keep ? 'hidden' : null);
     requestAnimationFrame(() => field.current?.focus({ preventScroll: true }));
   };
 
@@ -373,7 +375,7 @@ export function SupportChat() {
 
   const restart = () => {
     abort.current?.abort();
-    setHandoff(false);
+    setHandoff(null);
     setMessages([]);
     setInput('');
     field.current?.focus();
@@ -469,11 +471,17 @@ export function SupportChat() {
             </header>
 
             {handoff ? (
-              <ChatHandoff conversation={conversation} onBack={backToChat} onNavigate={onNavigate} />
+              <ChatHandoff
+                conversation={conversation}
+                hidden={handoff === 'hidden'}
+                onBack={() => backToChat(true)}
+                onFinish={() => backToChat(false)}
+                onNavigate={onNavigate}
+              />
             ) : null}
             <div
               ref={log}
-              hidden={handoff}
+              hidden={handoff === 'shown'}
               role="log"
               aria-label={fmt(s.title, { brand })}
               aria-busy={busy}
@@ -536,7 +544,7 @@ export function SupportChat() {
             </div>
 
             <form
-              hidden={handoff}
+              hidden={handoff === 'shown'}
               className="shrink-0 border-t border-line bg-surface px-3 pt-3 pb-[max(12px,env(safe-area-inset-bottom))]"
               onSubmit={(e) => {
                 e.preventDefault();
@@ -585,15 +593,16 @@ export function SupportChat() {
               <p className="mt-2 px-1 text-[11.5px] leading-[1.45] text-muted">
                 {s.disclaimer}{' '}
                 {conversation.some((m) => m.role === 'user') ? (
-                  <button
-                    type="button"
-                    onClick={() => setHandoff(true)}
-                    title={t.tickets.handoff.buttonHint}
-                    data-testid="support-human"
-                    className="font-semibold text-ink underline underline-offset-2"
-                  >
-                    {t.tickets.handoff.button}
-                  </button>
+                  <Hint text={t.tickets.handoff.buttonHint}>
+                    <button
+                      type="button"
+                      onClick={() => setHandoff('shown')}
+                      data-testid="support-human"
+                      className="font-semibold text-ink underline underline-offset-2"
+                    >
+                      {t.tickets.handoff.button}
+                    </button>
+                  </Hint>
                 ) : (
                   <Link
                     href="/app/support/new"

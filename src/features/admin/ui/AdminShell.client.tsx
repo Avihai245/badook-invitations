@@ -102,7 +102,7 @@ function AdminNavList({ badges, onNavigate }: { badges: AdminNavBadges; onNaviga
             <Icon aria-hidden className="size-[18px] shrink-0" strokeWidth={1.75} />
             <span className="min-w-0 flex-1 truncate">{t.nav[item.key]}</span>
             {count > 0 ? (
-              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1.5 text-[11px] font-bold text-white tabular-nums">
+              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-deep px-1.5 text-[11px] font-bold text-white tabular-nums">
                 {count > 99 ? '99+' : count}
               </span>
             ) : null}

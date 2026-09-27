@@ -125,13 +125,17 @@ language sql immutable set search_path = '' as $$
   end
 $$;
 
--- "נועה & איתי": an invitation's hosts in its own language (null when it has none yet).
+-- "נועה & איתי": an invitation's hosts in its own language, joined as the app joins them (hostsLine);
+-- null when it has none yet.
 create function public.support_invitation_title(i public.invitations) returns text
 language sql stable set search_path = '' as $$
-  select nullif(concat_ws(' & ',
-    nullif(trim(i.draft #>> array['hosts', 'primary', coalesce(i.draft ->> 'defaultLocale', 'he')]), ''),
-    nullif(trim(i.draft #>> array['hosts', 'secondary', coalesce(i.draft ->> 'defaultLocale', 'he')]), '')
+  with l as (select coalesce(i.draft ->> 'defaultLocale', 'he') as lang)
+  select nullif(concat_ws(
+    ' ' || coalesce(nullif(trim(i.draft #>> array['hosts', 'joiner', l.lang]), ''), '&') || ' ',
+    nullif(trim(i.draft #>> array['hosts', 'primary', l.lang]), ''),
+    nullif(trim(i.draft #>> array['hosts', 'secondary', l.lang]), '')
   ), '')
+  from l
 $$;
 
 -- A ticket as its customer sees it: never a team note, never who on the team wrote. p_full: with the

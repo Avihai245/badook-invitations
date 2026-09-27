@@ -16,12 +16,19 @@ import type { ChatLine } from '../types';
  */
 export function ChatHandoff({
   conversation,
+  hidden = false,
   onBack,
+  onFinish,
   onNavigate,
 }: {
   /** the conversation as the assistant's server gets it (the latest part, starting with a question) */
   conversation: ChatLine[];
+  /** back in the chat for a moment: the draft stays */
+  hidden?: boolean;
+  /** back to the chat, the draft kept */
   onBack: () => void;
+  /** back to the chat once the ticket was sent */
+  onFinish: () => void;
   /** a link was followed (a phone closes the chat that covers the page) */
   onNavigate: () => void;
 }) {
@@ -37,7 +44,9 @@ export function ChatHandoff({
   const heading = useRef<HTMLHeadingElement>(null);
 
   // the view changed under the keyboard: its heading takes the focus
-  useEffect(() => heading.current?.focus({ preventScroll: true }), [done]);
+  useEffect(() => {
+    if (!hidden) heading.current?.focus({ preventScroll: true });
+  }, [done, hidden]);
 
   const send = async (e: FormEvent) => {
     e.preventDefault();
@@ -68,33 +77,38 @@ export function ChatHandoff({
   if (done)
     return (
       <div
+        hidden={hidden}
         className="flex min-h-0 flex-1 flex-col items-start gap-3 overflow-y-auto px-4 py-6"
         data-testid="handoff-done"
       >
         <CheckCircle2 aria-hidden className="size-9 text-success" />
-        <h3
-          ref={heading}
-          tabIndex={-1}
-          className="text-[15px] leading-snug font-bold outline-none"
-          role="status"
-        >
+        <h3 ref={heading} tabIndex={-1} className="text-[15px] leading-snug font-bold outline-none">
           {fmt(h.done, { n: done.number })}
         </h3>
         <div className="flex flex-wrap gap-2">
-          <Button asChild size="sm">
-            <Link href={`/app/support/${done.id}`} onClick={onNavigate} data-testid="handoff-open">
-              {h.open}
-            </Link>
-          </Button>
-          <Button size="sm" variant="secondary" onClick={onBack}>
-            {h.back}
-          </Button>
+          <Hint text={h.openHint}>
+            <Button asChild size="sm">
+              <Link href={`/app/support/${done.id}`} onClick={onNavigate} data-testid="handoff-open">
+                {h.open}
+              </Link>
+            </Button>
+          </Hint>
+          <Hint text={h.finishHint}>
+            <Button size="sm" variant="secondary" onClick={onFinish}>
+              {h.back}
+            </Button>
+          </Hint>
         </div>
       </div>
     );
 
   return (
-    <form onSubmit={(e) => void send(e)} className="flex min-h-0 flex-1 flex-col" data-testid="handoff">
+    <form
+      hidden={hidden}
+      onSubmit={(e) => void send(e)}
+      className="flex min-h-0 flex-1 flex-col"
+      data-testid="handoff"
+    >
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 py-4">
         <h3 ref={heading} tabIndex={-1} className="text-[15px] font-bold outline-none">
           {h.title}
@@ -149,9 +163,11 @@ export function ChatHandoff({
         ) : null}
       </div>
       <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line px-3 pt-3 pb-[max(12px,env(safe-area-inset-bottom))]">
-        <Button variant="secondary" onClick={onBack} disabled={busy}>
-          {h.back}
-        </Button>
+        <Hint text={h.backHint}>
+          <Button variant="secondary" onClick={onBack} disabled={busy}>
+            {h.back}
+          </Button>
+        </Hint>
         <Hint text={h.sendHint}>
           <Button
             type="submit"

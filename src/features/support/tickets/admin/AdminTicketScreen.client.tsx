@@ -41,7 +41,7 @@ export function AdminTicketScreen({ ticket }: { ticket: AdminTicket }) {
   const field = useRef<HTMLTextAreaElement>(null);
   const me = ticket.agents.find((a) => a.email === staff.email) ?? null;
   const base = `/api/admin/support/${ticket.id}`;
-  const name = ticket.customer.name ?? s.list.noName;
+  const name = ticket.customer.name ?? s.confirm.theCustomer;
   const email = ticket.customer.email ?? s.customer.none;
 
   /** The answer or the note needs words; then the confirmation. */

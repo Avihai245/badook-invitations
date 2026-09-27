@@ -200,6 +200,8 @@ export const supportHe = {
     reasonPlaceholder: 'למשל: ספאם',
     reasonRequired: 'צריך לכתוב סיבה.',
     remove: 'מחיקה',
+    /** the customer, in the confirmations, when they gave no name */
+    theCustomer: 'הלקוח',
   },
   toasts: {
     replied: 'התשובה נשלחה ללקוח',
