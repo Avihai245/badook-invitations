@@ -23,6 +23,7 @@ import {
   PersonCell,
   ScrollRegion,
   Section,
+  SWITCH_CONTRAST,
   useReportFormat,
   type Tile,
 } from '../../ui/charts/parts.client';
@@ -172,6 +173,7 @@ function Daily({ data }: { data: MessagesPageData }) {
       intro={M.period}
       actions={
         <Segmented
+          className={SWITCH_CONTRAST}
           label={M.kindsLabel}
           value={kind}
           onValueChange={setKind}

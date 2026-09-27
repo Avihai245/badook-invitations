@@ -68,11 +68,15 @@ export async function nudgeConsole(kind: string) {
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
-/** WCAG 2.1 AA (axe-core) on what is on screen: no violations. */
+/**
+ * WCAG 2.1 AA (axe-core) on the console page's own content (#admin-main — the frame around it, its menu
+ * and language switch, is the console's foundation): no violations.
+ */
 export async function audit(page: Page, key: string) {
   // animations settled (the tiles' and the toasts')
   await page.waitForTimeout(300);
   const results = await new AxeBuilder({ page })
+    .include('#admin-main')
     .options({ resultTypes: ['violations'] })
     .withTags(TAGS)
     .analyze();

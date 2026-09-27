@@ -38,6 +38,7 @@ import {
   PersonCell,
   ScrollRegion,
   Section,
+  SWITCH_CONTRAST,
   useReportFormat,
   type Tile,
 } from '../../ui/charts/parts.client';
@@ -185,6 +186,7 @@ function DailyIncome({ data }: { data: FinancePageData }) {
       intro={fmt(D.total, { total: f.exact(sum), days: number(rows.length) })}
       actions={
         <Segmented
+          className={SWITCH_CONTRAST}
           label={D.range}
           value={range}
           onValueChange={setRange}

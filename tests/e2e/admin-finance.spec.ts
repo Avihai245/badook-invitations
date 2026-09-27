@@ -179,6 +179,9 @@ test.describe('the cash flow', () => {
     await hydrated(buyer);
     await buyer.getByRole('button', { name: 'תשלום (בדיקה)' }).click();
     await buyer.waitForURL(/\/app\/billing\?status=/);
+    // (the billing page settled before its browser goes: no request cut off halfway)
+    await hydrated(buyer);
+    await buyer.waitForLoadState('networkidle');
     await other.close();
 
     // the open page, without reloading
