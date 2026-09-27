@@ -78,7 +78,8 @@ export const usersHe = {
     staffLine: '{role} ({source})',
     staffSources: { console: 'נוסף בניהול', env: 'מההגדרות' },
     platformOwner: 'מבעלי הפלטפורמה: כל היכולות פתוחות לו',
-    suspendedLine: 'הכניסה חסומה מאז {date}',
+    suspendedLine:
+      'המשתמש לא יכול להיכנס לחשבון עד שיחזירו לו את הכניסה כאן. הזמנות שכבר באוויר ממשיכות לעבוד.',
     plan: 'חבילה וחיוב',
     planInForce: 'החבילה בתוקף',
     planStored: 'החבילה ברשומה',

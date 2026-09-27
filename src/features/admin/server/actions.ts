@@ -1,9 +1,12 @@
 import { z } from 'zod';
 import type { ApiResult } from '@/features/invitations/server/host-api';
 import { FEATURES } from '@/features/flags/features';
+import { CREDIT_CAPS, REASON_MAX, REASON_MIN } from '../lists';
 import { STAFF_ROLES, can, manageableRoles, type StaffRole } from '../permissions';
 import type { AuditTarget, StaffMember } from './db';
 import type { AdminNudgeKind } from './live';
+
+export { CREDIT_CAPS } from '../lists';
 
 /**
  * What the console's staff do (the /api/admin/* routes, behind adminRoute: staff, the permission, a
@@ -59,8 +62,14 @@ export interface ActionDeps {
     grant: boolean,
     reason: string,
   ): Promise<unknown>;
-  staffSet(actor: string, email: string, role: StaffRole, note: string | null): Promise<StaffMember>;
-  staffRemove(actor: string, email: string): Promise<boolean>;
+  staffSet(
+    actor: string,
+    email: string,
+    role: StaffRole,
+    note: string | null,
+    reason: string,
+  ): Promise<StaffMember>;
+  staffRemove(actor: string, email: string, reason: string): Promise<boolean>;
   /** a new name for the console's live channel (owners) */
   renameChannel(): Promise<void>;
   /** tells the console's open pages, after the answer */
@@ -79,23 +88,12 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const notFound = fail(404, 'not_found');
 
 /** Why the team did it: 3–200 characters (the database checks it again). */
-export const REASON_MIN = 3;
-export const REASON_MAX = 200;
 const Reason = z.string().trim().min(REASON_MIN).max(REASON_MAX);
 /** A day in Israel, YYYY-MM-DD. */
 const Day = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/)
   .refine((d) => !Number.isNaN(Date.parse(`${d}T00:00:00Z`)));
-
-/** The most credits one action may add or remove, by role (the database holds the same caps). */
-export const CREDIT_CAPS: Record<StaffRole, number> = {
-  owner: 100_000,
-  admin: 100_000,
-  finance: 1_000,
-  support: 100,
-  viewer: 0,
-};
 
 const CreditsSchema = z.strictObject({
   delta: z
@@ -221,33 +219,39 @@ export async function grantFeature(
   return ok({ ok: true, overrides });
 }
 
+const Email = z.string().trim().toLowerCase().max(254).pipe(z.email());
+
 const StaffSetSchema = z.strictObject({
-  email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
+  email: Email,
   role: z.enum(STAFF_ROLES),
   note: z.string().trim().max(200).nullable().optional(),
+  reason: Reason,
 });
 
-/** POST /api/admin/staff { email, role, note } — adds a member or changes their role. */
+/**
+ * POST /api/admin/staff { email, role, note, reason } — adds a member or changes their role (who may
+ * open the console and do what: a reason, like every change of access).
+ */
 export async function setStaff(staff: ActionStaff, raw: unknown, deps: ActionDeps): Promise<ApiResult> {
   const parsed = StaffSetSchema.safeParse(raw);
   if (!parsed.success) return invalid(parsed.error);
-  const { email, role, note } = parsed.data;
+  const { email, role, note, reason } = parsed.data;
   // (the database decides; this only answers early)
   if (!manageableRoles(staff.role).includes(role)) return fail(403, 'forbidden');
   if (email === staff.email) return fail(409, 'self');
-  const member = await deps.staffSet(staff.userId, email, role, note || null);
+  const member = await deps.staffSet(staff.userId, email, role, note || null, reason);
   deps.nudge('staff');
   return ok({ ok: true, member });
 }
 
-const StaffRemoveSchema = z.strictObject({ email: z.string().trim().toLowerCase().pipe(z.email()) });
+const StaffRemoveSchema = z.strictObject({ email: Email, reason: Reason });
 
-/** DELETE /api/admin/staff { email } — the member leaves the console. */
+/** DELETE /api/admin/staff { email, reason } — the member leaves the console. */
 export async function removeStaff(staff: ActionStaff, raw: unknown, deps: ActionDeps): Promise<ApiResult> {
   const parsed = StaffRemoveSchema.safeParse(raw);
   if (!parsed.success) return invalid(parsed.error);
   if (parsed.data.email === staff.email) return fail(409, 'self');
-  const removed = await deps.staffRemove(staff.userId, parsed.data.email);
+  const removed = await deps.staffRemove(staff.userId, parsed.data.email, parsed.data.reason);
   if (!removed) return notFound;
   deps.nudge('staff');
   return ok({ ok: true });

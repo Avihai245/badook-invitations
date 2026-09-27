@@ -2,7 +2,7 @@ import 'server-only';
 import type { ActivityItem } from '../activity';
 import type { InvitationSort, InvitationStatus, UserSort } from '../lists';
 import type { StaffRole } from '../permissions';
-import { adminRpc } from './db';
+import { adminRpc, type StaffMember } from './db';
 
 export { INVITATION_SORTS, USER_SORTS } from '../lists';
 export type { InvitationSort, InvitationStatus, UserSort } from '../lists';
@@ -386,6 +386,18 @@ export const coreDb = {
       p_suspend: suspend,
       p_reason: reason,
     }),
+  /** a staff member added or their role changed (admin_staff_set's rules), with the reason recorded */
+  staffChange: (actor: string, email: string, role: StaffRole, note: string | null, reason: string) =>
+    adminRpc<StaffMember>('admin_staff_change', {
+      p_actor: actor,
+      p_email: email,
+      p_role: role,
+      p_note: note,
+      p_reason: reason,
+    }),
+  /** a staff member removed, with the reason recorded (false: no such member) */
+  staffDrop: (actor: string, email: string, reason: string) =>
+    adminRpc<boolean>('admin_staff_drop', { p_actor: actor, p_email: email, p_reason: reason }),
   invitations: (actor: string, q: InvitationQuery) =>
     adminRpc<InvitationList>('admin_invitations', { p_actor: actor, p_query: compact(q) }),
   invitation: (actor: string, id: string) =>

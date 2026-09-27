@@ -72,7 +72,7 @@ function fakeDeps(overrides: Partial<ActionDeps> = {}) {
       ),
     ),
     staffRemove: vi.fn(
-      async (_a, email) => (calls.push(`staff remove ${email}`), email !== 'gone@example.com'),
+      async (_a, email, _reason) => (calls.push(`staff remove ${email}`), email !== 'gone@example.com'),
     ),
     renameChannel: vi.fn(async () => void calls.push('rename')),
     nudge: (kind) => void nudges.push(kind),
@@ -270,47 +270,61 @@ describe('features', () => {
 });
 
 describe('the staff', () => {
-  it('adds or changes only the roles the member may manage', async () => {
+  const why = 'joins the support team';
+  it('adds or changes only the roles the member may manage, with a reason', async () => {
     const { deps, calls, nudges } = fakeDeps();
     expect(
       (
         await setStaff(
           staffOf('admin'),
-          { email: ' New@Example.com ', role: 'support', note: 'tickets' },
+          { email: ' New@Example.com ', role: 'support', note: 'tickets', reason: why },
           deps,
         )
       ).status,
     ).toBe(200);
     expect(calls).toEqual(['staff set new@example.com support']);
+    expect(deps.staffSet).toHaveBeenCalledWith(
+      expect.any(String),
+      'new@example.com',
+      'support',
+      'tickets',
+      why,
+    );
     expect(nudges).toEqual(['staff']);
     // an admin never gives the owner's role; no one changes their own
-    expect(await setStaff(staffOf('admin'), { email: 'o@example.com', role: 'owner' }, deps)).toEqual({
+    expect(
+      await setStaff(staffOf('admin'), { email: 'o@example.com', role: 'owner', reason: why }, deps),
+    ).toEqual({
       status: 403,
       body: { ok: false, code: 'forbidden' },
     });
     expect(
-      (await setStaff(staffOf('owner'), { email: 'owner@example.com', role: 'viewer' }, deps)).body,
-    ).toEqual({
-      ok: false,
-      code: 'self',
-    });
-    expect((await setStaff(staffOf('owner'), { email: 'not an email', role: 'viewer' }, deps)).status).toBe(
-      400,
-    );
-    expect((await setStaff(staffOf('owner'), { email: 'a@example.com', role: 'god' }, deps)).status).toBe(
-      400,
-    );
+      (await setStaff(staffOf('owner'), { email: 'owner@example.com', role: 'viewer', reason: why }, deps))
+        .body,
+    ).toEqual({ ok: false, code: 'self' });
+    for (const body of [
+      { email: 'not an email', role: 'viewer', reason: why },
+      { email: 'a@example.com', role: 'god', reason: why },
+      { email: 'a@example.com', role: 'viewer' },
+      { email: 'a@example.com', role: 'viewer', reason: 'no' },
+    ])
+      expect((await setStaff(staffOf('owner'), body, deps)).status, JSON.stringify(body)).toBe(400);
     expect(calls).toHaveLength(1);
   });
 
-  it('removes a member; not found when there is none', async () => {
+  it('removes a member with a reason; not found when there is none', async () => {
     const { deps, nudges } = fakeDeps();
-    expect((await removeStaff(staffOf('owner'), { email: 'x@example.com' }, deps)).status).toBe(200);
-    expect((await removeStaff(staffOf('owner'), { email: 'gone@example.com' }, deps)).status).toBe(404);
-    expect((await removeStaff(staffOf('owner'), { email: 'owner@example.com' }, deps)).body).toEqual({
+    const reason = 'left the company';
+    expect((await removeStaff(staffOf('owner'), { email: 'x@example.com', reason }, deps)).status).toBe(200);
+    expect(deps.staffRemove).toHaveBeenCalledWith(expect.any(String), 'x@example.com', reason);
+    expect((await removeStaff(staffOf('owner'), { email: 'gone@example.com', reason }, deps)).status).toBe(
+      404,
+    );
+    expect((await removeStaff(staffOf('owner'), { email: 'owner@example.com', reason }, deps)).body).toEqual({
       ok: false,
       code: 'self',
     });
+    expect((await removeStaff(staffOf('owner'), { email: 'x@example.com' }, deps)).status).toBe(400);
     expect(nudges).toEqual(['staff']);
   });
 });

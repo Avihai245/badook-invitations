@@ -1377,6 +1377,43 @@ begin
   return jsonb_build_object('email', lower(u.email), 'suspended', coalesce(u.banned_until > now(), false));
 end $$;
 
+-- ─── the staff, with the reason ────────────────────────────────────────────────────────────────
+
+-- Adds a staff member or changes their role (admin_staff_set: its rules and its record) — with why,
+-- like every change of access: the reason goes into that same record.
+create function public.admin_staff_change(
+  p_actor uuid, p_email text, p_role text, p_note text, p_reason text
+) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_reason text;
+  v jsonb;
+begin
+  perform public.admin_require(p_actor, 'staff.manage');
+  v_reason := public.admin_reason(p_reason);
+  v := public.admin_staff_set(p_actor, p_email, p_role, p_note);
+  -- (the row admin_staff_set just wrote: this session's last id)
+  update public.admin_audit set details = details || jsonb_build_object('reason', v_reason)
+  where id = currval(pg_get_serial_sequence('public.admin_audit', 'id'));
+  return v;
+end $$;
+
+-- Removes a staff member (admin_staff_remove), with why. false: no such member.
+create function public.admin_staff_drop(p_actor uuid, p_email text, p_reason text) returns boolean
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_reason text;
+begin
+  perform public.admin_require(p_actor, 'staff.manage');
+  v_reason := public.admin_reason(p_reason);
+  if not public.admin_staff_remove(p_actor, p_email) then
+    return false;
+  end if;
+  update public.admin_audit set details = details || jsonb_build_object('reason', v_reason)
+  where id = currval(pg_get_serial_sequence('public.admin_audit', 'id'));
+  return true;
+end $$;
+
 -- ─── invitations ───────────────────────────────────────────────────────────────────────────────
 
 -- Invitations, 50 a page: p_query { q (the hosts, the title, the address, the owner's name — and, for
@@ -1730,6 +1767,8 @@ begin
     'public.admin_user_gift(uuid, uuid, text, date, text)',
     'public.admin_user_discount(uuid, uuid, int, date, text, text)',
     'public.admin_user_suspend_check(uuid, uuid, boolean, text)',
+    'public.admin_staff_change(uuid, text, text, text, text)',
+    'public.admin_staff_drop(uuid, text, text)',
     'public.admin_invitations(uuid, jsonb)',
     'public.admin_invitation(uuid, uuid)',
     'public.admin_invitation_feature(uuid, uuid, text, boolean, text)',

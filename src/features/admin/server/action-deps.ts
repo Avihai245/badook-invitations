@@ -25,8 +25,8 @@ export function actionDeps(staff: Staff): ActionDeps {
     },
     audit: adminDb.auditAdd,
     feature: coreDb.feature,
-    staffSet: adminDb.staffSet,
-    staffRemove: adminDb.staffRemove,
+    staffSet: coreDb.staffChange,
+    staffRemove: coreDb.staffDrop,
     async renameChannel() {
       await rotateAdminChannel(staff);
     },

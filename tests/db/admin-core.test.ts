@@ -1139,6 +1139,70 @@ describe('the record of actions', () => {
   });
 });
 
+describe('the staff, with a reason', () => {
+  it('adds, changes and removes through the foundation’s rules, the reason in the same record', async () => {
+    expect(
+      await reason(call('admin_staff_change', [SUPPORT, 'x@example.com', 'viewer', null, 'a reason'])),
+    ).toBe('forbidden');
+    expect(await reason(call('admin_staff_change', [OWNER, 'x@example.com', 'viewer', null, 'no']))).toBe(
+      'invalid_reason',
+    );
+    expect(await reason(call('admin_staff_change', [ADMIN, 'x@example.com', 'owner', null, 'promote']))).toBe(
+      'forbidden',
+    );
+    expect(
+      await reason(call('admin_staff_change', [ADMIN, 'admin@example.com', 'viewer', null, 'myself'])),
+    ).toBe('self');
+    await c.query('begin');
+    try {
+      const m = (
+        await c.query(
+          `select public.admin_staff_change($1, 'helper@example.com', 'support', 'tickets', 'busy season') as r`,
+          [ADMIN],
+        )
+      ).rows[0].r;
+      expect(m).toMatchObject({ email: 'helper@example.com', role: 'support', note: 'tickets' });
+      await c.query(
+        `select public.admin_staff_change($1, 'helper@example.com', 'finance', null, 'moved to billing')`,
+        [OWNER],
+      );
+      expect(
+        (
+          await c.query(`select public.admin_staff_drop($1, 'helper@example.com', 'season over') as r`, [
+            ADMIN,
+          ])
+        ).rows[0].r,
+      ).toBe(true);
+      expect(
+        (await c.query(`select public.admin_staff_drop($1, 'nobody@example.com', 'not there') as r`, [ADMIN]))
+          .rows[0].r,
+      ).toBe(false);
+      const rows = await c.query(
+        `select actor_email, action, details from public.admin_audit where target_id = 'helper@example.com' order by id`,
+      );
+      expect(rows.rows).toEqual([
+        {
+          actor_email: 'admin@example.com',
+          action: 'staff.set',
+          details: { role: 'support', before: null, note: 'tickets', reason: 'busy season' },
+        },
+        {
+          actor_email: 'owner@example.com',
+          action: 'staff.set',
+          details: { role: 'finance', before: 'support', note: null, reason: 'moved to billing' },
+        },
+        {
+          actor_email: 'admin@example.com',
+          action: 'staff.remove',
+          details: { role: 'finance', reason: 'season over' },
+        },
+      ]);
+    } finally {
+      await c.query('rollback');
+    }
+  });
+});
+
 describe('the system', () => {
   it('the jobs, the queues, the seed version and the live channel (never its name)', async () => {
     await c.query('begin');

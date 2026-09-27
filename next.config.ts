@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import type { NextConfig } from 'next';
 import {
   IMAGE_DEVICE_SIZES,
@@ -59,6 +60,24 @@ const imageSources = (() => {
   return list;
 })();
 
+/**
+ * The build's commit, for the admin console's system page: Amplify's (AWS_COMMIT_ID, set in its
+ * builds), else git's, else "local". A public value — it names a commit, nothing more.
+ */
+const buildCommit = (() => {
+  const amplify = process.env.AWS_COMMIT_ID?.trim();
+  if (amplify) return amplify.slice(0, 12);
+  try {
+    return (
+      execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 })
+        .toString()
+        .trim() || 'local'
+    );
+  } catch {
+    return 'local';
+  }
+})();
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -74,7 +93,12 @@ const nextConfig: NextConfig = {
         remotePatterns: imageSources,
       }
     : { unoptimized: true },
-  env: { INVITES_IMAGE_SOURCES: imageSources ? JSON.stringify(imageSources) : 'off' },
+  env: {
+    INVITES_IMAGE_SOURCES: imageSources ? JSON.stringify(imageSources) : 'off',
+    // the running build (the admin console's system page)
+    NEXT_PUBLIC_BUILD_COMMIT: buildCommit,
+    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
+  },
   // The dev-tools badge would show up in Design QA screenshots.
   devIndicators: false,
   // Lets a second dev server run side by side (e.g. QA scripts) without clobbering `.next`.

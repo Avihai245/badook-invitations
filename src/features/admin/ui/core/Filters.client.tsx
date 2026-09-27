@@ -2,7 +2,7 @@
 
 import { Check, X } from 'lucide-react';
 import { useId } from 'react';
-import { Button, cn, Hint, Select } from '@/components/app';
+import { Button, cn, Hint, Input, Select } from '@/components/app';
 import { useAdminUi } from '../AdminUi.client';
 import { useQueryUpdater } from './query';
 
@@ -47,6 +47,44 @@ export function FilterSelect({
           </option>
         ))}
       </Select>
+    </div>
+  );
+}
+
+/** A date filter (YYYY-MM-DD), labelled; it writes its parameter into the address. */
+export function FilterDate({
+  label,
+  param,
+  value,
+  min,
+  max,
+  testId,
+}: {
+  label: string;
+  param: string;
+  value: string | undefined;
+  min?: string;
+  max?: string;
+  testId?: string;
+}) {
+  const { set, pending } = useQueryUpdater();
+  const id = useId();
+  return (
+    <div className="flex min-w-0 flex-col gap-1">
+      <label htmlFor={id} className="text-[12px] font-semibold text-muted">
+        {label}
+      </label>
+      <Input
+        id={id}
+        type="date"
+        value={value ?? ''}
+        min={min}
+        max={max}
+        disabled={pending}
+        data-testid={testId}
+        onChange={(e) => set({ [param]: e.target.value || null })}
+        className="h-9 text-[13.5px]"
+      />
     </div>
   );
 }

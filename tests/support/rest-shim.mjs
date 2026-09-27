@@ -238,6 +238,8 @@ const FUNCTIONS = new Set([
   'admin_user_gift',
   'admin_user_discount',
   'admin_user_suspend_check',
+  'admin_staff_change',
+  'admin_staff_drop',
   'admin_invitations',
   'admin_invitation',
   'admin_invitation_feature',

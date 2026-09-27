@@ -78,7 +78,8 @@ export const usersEn: typeof usersHe = {
     staffLine: '{role} ({source})',
     staffSources: { console: 'added in the console', env: 'from the settings' },
     platformOwner: 'One of the platform’s owners: everything is open to them',
-    suspendedLine: 'Sign-in suspended since {date}',
+    suspendedLine:
+      'The user can’t sign in until their sign-in is restored here. Invitations already live keep working.',
     plan: 'Plan and billing',
     planInForce: 'Plan in force',
     planStored: 'Plan on record',
