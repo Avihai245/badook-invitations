@@ -441,6 +441,8 @@ export const en: AppDict = {
     previewLanguage: 'Preview language',
     filterLabel: 'Filter by event type',
     all: 'All',
+    animated: 'Animated',
+    animatedBadge: 'Animated',
     results: { one: '1 design', other: '{n} designs' },
     playPreview: 'Play the {name} preview',
     noResults: 'No designs for this event type yet.',

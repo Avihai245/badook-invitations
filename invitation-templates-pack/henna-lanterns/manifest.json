@@ -1,0 +1,504 @@
+{
+  "id": "henna-lanterns",
+  "version": 1,
+  "name": {
+    "he": "ליל הפנסים",
+    "en": "Henna Lanterns"
+  },
+  "description": {
+    "he": "הזמנה שהיא ליל חינה: דלת מרוקאית מגולפת נפתחת אל חצר של קשתות ופנסים, אל מגש החינה והנרות, אל בדים אדומים ודרבוקה — ועד הגגות, מתחת לשרשראות של פנסים. עלי ורדים נושרים עם הגלילה.",
+    "en": "An invitation that is a henna night: a carved Moroccan door swings open onto a courtyard of arches and lanterns, to the henna tray and its candles, to red fabrics and a darbuka — and up to the rooftops under strings of lanterns. Rose petals fall as your guests scroll."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "henna"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/henna-lanterns/scene-door.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F6ECDD",
+      "surface": "#FCF6EC",
+      "ink": "#4A1520",
+      "inkMuted": "#7A5A55",
+      "accent": "#C99A3E",
+      "accentInk": "#2A0E12",
+      "line": "#E6D5BD",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.9,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#2A0E12",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב",
+        "en": "Gold"
+      },
+      "palette": {
+        "bg": "#F6ECDD",
+        "surface": "#FCF6EC",
+        "ink": "#4A1520",
+        "inkMuted": "#7A5A55",
+        "accent": "#C99A3E",
+        "accentInk": "#2A0E12",
+        "line": "#E6D5BD"
+      }
+    },
+    {
+      "id": "saffron",
+      "name": {
+        "he": "זעפרן",
+        "en": "Saffron"
+      },
+      "palette": {
+        "bg": "#F8EEDC",
+        "surface": "#FDF7EC",
+        "ink": "#4A1A12",
+        "inkMuted": "#7A5A48",
+        "accent": "#E3A72F",
+        "accentInk": "#2A0E12",
+        "line": "#EAD7B8"
+      }
+    },
+    {
+      "id": "ruby",
+      "name": {
+        "he": "אודם",
+        "en": "Ruby"
+      },
+      "palette": {
+        "bg": "#2A0E12",
+        "surface": "#3A151B",
+        "ink": "#F7E9D2",
+        "inkMuted": "#D1B9A0",
+        "accent": "#E3A72F",
+        "accentInk": "#2A0E12",
+        "line": "#56252C"
+      }
+    },
+    {
+      "id": "teal",
+      "name": {
+        "he": "טורקיז",
+        "en": "Teal"
+      },
+      "palette": {
+        "bg": "#EEF3F0",
+        "surface": "#F8FBF9",
+        "ink": "#123B39",
+        "inkMuted": "#4F6664",
+        "accent": "#1F6F6B",
+        "accentInk": "#FFFFFF",
+        "line": "#D3E0DC"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "riad",
+      "display": {
+        "latin": "Cinzel Decorative",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "souk",
+      "display": {
+        "latin": "Marcellus",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/henna-lanterns/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/henna-lanterns/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#8E1B2B",
+      "#C99A3E",
+      "#1F6F6B",
+      "#4A1520"
+    ],
+    "monogramFont": {
+      "latin": "Marcellus",
+      "hebrew": "Bellefair"
+    },
+    "opening": {
+      "preset": "gate",
+      "trigger": "scroll",
+      "motion": "swing",
+      "color": "#1F5E5B"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "door",
+        "name": {
+          "he": "הדלת המרוקאית",
+          "en": "The Moroccan door"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-door",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "courtyard",
+        "name": {
+          "he": "חצר הפנסים",
+          "en": "The lantern courtyard"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-courtyard",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#2A0E12",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "fireflies",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "petals",
+    "shade": "#2A0E12",
+    "tracking": 0.2
+  },
+  "assets": {
+    "scene-door": "/templates/henna-lanterns/scene-door.webp",
+    "scene-courtyard": "/templates/henna-lanterns/scene-courtyard.webp",
+    "scene-tray": "/templates/henna-lanterns/scene-tray.webp",
+    "scene-fabric": "/templates/henna-lanterns/scene-fabric.webp",
+    "scene-sky": "/templates/henna-lanterns/scene-sky.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-courtyard",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-tray",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-fabric",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-sky",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

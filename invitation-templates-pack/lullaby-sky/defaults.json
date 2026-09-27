@@ -1,0 +1,432 @@
+{
+  "templateId": "lullaby-sky",
+  "defaults": {
+    "brit": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בשמחה גדולה ובלב מלא, מזמינים אתכם",
+        "en": "With full hearts, we invite you"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "לברית המילה של בננו",
+          "en": "To our son’s Brit Milah"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד הברית",
+          "en": "Until the Brit"
+        },
+        "afterEvent": {
+          "he": "מזל טוב! תודה שחגגתם איתנו",
+          "en": "Mazal tov! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הכוכב הכי קטן שלנו",
+          "en": "Our littlest star"
+        },
+        "body": {
+          "he": "הוא קטן, רך ומתוק — וכבר מילא לנו את השמיים.\nב־{date} נכניס אותו בבריתו ונגלה לכולם את שמו.",
+          "en": "He is tiny, soft and sweet — and he has already filled our sky.\nOn {date} we will welcome him into the covenant and share his name."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הברית",
+          "en": "The Brit"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "09:00",
+          "label": {
+            "he": "התכנסות וכיבוד",
+            "en": "Welcome & refreshments"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "09:30",
+          "label": {
+            "he": "ברית המילה",
+            "en": "Brit Milah"
+          },
+          "icon": "baby"
+        },
+        {
+          "time": "10:00",
+          "label": {
+            "he": "סעודת מצווה",
+            "en": "Celebration meal"
+          },
+          "icon": "dinner"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה למשפחה",
+          "en": "A blessing for the family"
+        },
+        "successMessage": {
+          "he": "תודה! נשמח לראותכם",
+          "en": "Thank you! We look forward to seeing you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נחגוג יחד בהזדמנות",
+          "en": "Thanks for letting us know — we’ll celebrate together soon"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "kosher_mehadrin",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה, המשפחה",
+        "en": "With love, the family"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "כדור פורח קטן עולה אל שמיים ורודים.\nבשמחה גדולה אנו מזמינים אתכם\nלחגוג איתנו את הברית.",
+            "en": "A little hot-air balloon rises into a pink sky.\nWith great joy we invite you\nto celebrate the brit with us.",
+            "ru": "Маленький воздушный шар поднимается в розовое небо.\nС большой радостью мы приглашаем вас\nотпраздновать с нами брит-милу.",
+            "ar": "منطاد صغير يرتفع نحو سماء وردية.\nبفرح كبير ندعوكم\nلتحتفلوا معنا بالبريت ميلا.",
+            "fr": "Une petite montgolfière s’élève dans un ciel rose.\nC’est avec une grande joie que nous vous invitons\nà célébrer avec nous la brit-mila.",
+            "es": "Un pequeño globo aerostático sube hacia un cielo rosado.\nCon gran alegría los invitamos\na celebrar con nosotros el brit milá.",
+            "am": "ትንሽ የሙቅ አየር ፊኛ ወደ ሮዝ ሰማይ ይወጣል።\nበታላቅ ደስታ እንጋብዛችኋለን፤\nብሪት ሚላውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "baby_shower": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "כוכב קטן בדרך",
+        "en": "A little star is on its way"
+      },
+      "heroTitle": {
+        "mode": "custom",
+        "text": {
+          "he": "בייבי שאוור ל{primary}",
+          "en": "{primary}’s Baby Shower"
+        }
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנחגוג יחד",
+          "en": "Until we celebrate together"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו!",
+          "en": "Thank you for celebrating with us!"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד מעט בשמיים שלנו",
+          "en": "Soon in our sky"
+        },
+        "body": {
+          "he": "משהו קטן ומתוק עומד להגיע.\nבואו לחגוג איתנו את {primary} ב־{date}.",
+          "en": "Something small and sweet is on its way.\nJoin us to celebrate {primary} on {date}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הבראנץ׳",
+          "en": "The brunch"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "11:00",
+          "label": {
+            "he": "בראנץ׳",
+            "en": "Brunch"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "12:00",
+          "label": {
+            "he": "משאלות לתינוק",
+            "en": "Wishes for baby"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "12:45",
+          "label": {
+            "he": "מתנות",
+            "en": "Gifts"
+          },
+          "icon": "gift"
+        },
+        {
+          "time": "13:30",
+          "label": {
+            "he": "עוגה",
+            "en": "Cake"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה להורים לעתיד",
+          "en": "A note for the parents-to-be"
+        },
+        "successMessage": {
+          "he": "תודה! מחכים לראותכם",
+          "en": "Thank you! Can’t wait to see you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נתגעגע!",
+          "en": "Thanks for letting us know — you’ll be missed!"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "כדור פורח קטן עולה אל שמיים ורודים.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבייבי שאוור.",
+            "en": "A little hot-air balloon rises into a pink sky.\nWith great excitement we invite you\nto celebrate the baby shower with us.",
+            "ru": "Маленький воздушный шар поднимается в розовое небо.\nС большим волнением мы приглашаем вас\nна наш бэби-шауэр.",
+            "ar": "منطاد صغير يرتفع نحو سماء وردية.\nبكل حماس ندعوكم\nلتحتفلوا معنا بحفل استقبال المولود.",
+            "fr": "Une petite montgolfière s’élève dans un ciel rose.\nC’est avec une grande émotion que nous vous invitons\nà fêter avec nous la baby shower.",
+            "es": "Un pequeño globo aerostático sube hacia un cielo rosado.\nCon gran emoción los invitamos\na celebrar con nosotros el baby shower.",
+            "am": "ትንሽ የሙቅ አየር ፊኛ ወደ ሮዝ ሰማይ ይወጣል።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nየሕፃኑን መቀበያ ድግስ ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "יום הולדת ראשון! בואו לחגוג עם",
+        "en": "A first birthday! Come celebrate with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנכבה את הנר",
+          "en": "Until we blow out the candle"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו!",
+          "en": "Thank you for celebrating with us!"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שנה ראשונה בשמיים שלנו",
+          "en": "A first year in our sky"
+        },
+        "body": {
+          "he": "שנה של חיוכים ראשונים, צעדים ראשונים והמון אהבה.\nב־{date} חוגגים ל{primary} יום הולדת ראשון!",
+          "en": "A year of first smiles, first steps and so much love.\nOn {date} we celebrate {primary}’s first birthday!"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "10:30",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "11:00",
+          "label": {
+            "he": "בראנץ׳",
+            "en": "Brunch"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "12:00",
+          "label": {
+            "he": "עוגה ונר",
+            "en": "Cake & candle"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "12:30",
+          "label": {
+            "he": "תמונות",
+            "en": "Photos"
+          },
+          "icon": "camera"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "תבואו לחגוג?",
+          "en": "Will you come celebrate?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "תודה! מחכים לראותכם",
+          "en": "Thank you! Can’t wait to see you"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נתגעגע!",
+          "en": "Thanks for letting us know — you’ll be missed!"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "באהבה",
+        "en": "With love"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "כדור פורח קטן עולה אל שמיים ורודים.\nבשמחה גדולה אנו מזמינים אתכם\nלחגוג איתנו את יום ההולדת.",
+            "en": "A little hot-air balloon rises into a pink sky.\nWith great joy we invite you\nto celebrate the birthday with us.",
+            "ru": "Маленький воздушный шар поднимается в розовое небо.\nС большой радостью мы приглашаем вас\nотпраздновать с нами день рождения.",
+            "ar": "منطاد صغير يرتفع نحو سماء وردية.\nبفرح كبير ندعوكم\nلتحتفلوا معنا بعيد الميلاد.",
+            "fr": "Une petite montgolfière s’élève dans un ciel rose.\nC’est avec une grande joie que nous vous invitons\nà fêter l’anniversaire avec nous.",
+            "es": "Un pequeño globo aerostático sube hacia un cielo rosado.\nCon gran alegría los invitamos\na celebrar con nosotros el cumpleaños.",
+            "am": "ትንሽ የሙቅ አየር ፊኛ ወደ ሮዝ ሰማይ ይወጣል።\nበታላቅ ደስታ እንጋብዛችኋለን፤\nየልደት በዓሉን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -37,7 +37,11 @@ const fixtures = readdirSync(fixturesDir)
 
 const NOW = Date.parse('2026-09-23T10:00:00Z');
 /** Designs made with tokens v2: their manifests set type, spacing, motion and an opening. */
-const V2_DESIGNS: ReadonlySet<string> = new Set(['lumiere', 'celestial']);
+const V2_DESIGNS: ReadonlySet<string> = new Set([
+  'lumiere',
+  // the animated designs (scroll scenes)
+  ...TEMPLATE_IDS.filter((id) => requireTemplate(id).manifest.scene),
+]);
 const render = (doc: InvitationDocument, locale = doc.defaultLocale) =>
   renderToStaticMarkup(
     <InvitationSections

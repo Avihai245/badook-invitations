@@ -1,0 +1,158 @@
+{
+  "templateId": "henna-lanterns",
+  "defaults": {
+    "henna": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בואו לחגוג איתנו את ליל החינה של",
+        "en": "Join us for the henna night of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שנדליק את הפנסים",
+          "en": "Until the lanterns are lit"
+        },
+        "afterEvent": {
+          "he": "מברוק! תודה שחגגתם איתנו",
+          "en": "Mabrouk! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "לילה של חינה",
+          "en": "A night of henna"
+        },
+        "body": {
+          "he": "בין פנסים, תופים וריחות של הל, נחגוג מסורת עתיקה של אהבה.\nב־{date} — ערב של חינה, מתוקים וברכות.",
+          "en": "Among lanterns, drums and the scent of cardamom, we celebrate an ancient tradition of love.\nOn {date}: an evening of henna, sweets and blessings."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "ליל החינה",
+          "en": "The henna night"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "כניסת הזוג",
+            "en": "The couple’s entrance"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "טקס החינה",
+            "en": "Henna ceremony"
+          },
+          "icon": "heart"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "ארוחה ומתוקים",
+            "en": "Dinner & sweets"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:45",
+          "label": {
+            "he": "תופים וריקודים",
+            "en": "Drums & dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת אם תגיעו עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "מברוק! נתראה בליל החינה",
+          "en": "Mabrouk! See you at the henna night"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נשמור לכם מתוקים",
+          "en": "Thanks for letting us know — we’ll save you some sweets"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מברוק, ובאהבה",
+        "en": "Mabrouk, with love"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הפנסים דולקים, התופים מתחממים וריח של הל באוויר.\nבשמחה גדולה אנו מזמינים אתכם\nלחגוג איתנו את ליל החינה.",
+            "en": "The lanterns are lit, the drums are warming up and there is cardamom in the air.\nWith great joy we invite you\nto celebrate the henna night with us.",
+            "ru": "Фонари зажжены, барабаны разогреваются, и в воздухе пахнет кардамоном.\nС большой радостью мы приглашаем вас\nотпраздновать с нами вечер хны.",
+            "ar": "الفوانيس مضاءة، والطبول تستعد، ورائحة الهيل تملأ المكان.\nبفرح كبير ندعوكم\nلتحتفلوا معنا بليلة الحناء.",
+            "fr": "Les lanternes sont allumées, les tambours s’échauffent et la cardamome parfume l’air.\nC’est avec une grande joie que nous vous invitons\nà célébrer avec nous la soirée du henné.",
+            "es": "Los faroles están encendidos, los tambores se calientan y el aire huele a cardamomo.\nCon gran alegría los invitamos\na celebrar con nosotros la noche de henna.",
+            "am": "ፋኖሶቹ በርተዋል፣ ከበሮዎቹ ይሞቃሉ፣ አየሩም በኮረሪማ መዓዛ ተሞልቷል።\nበታላቅ ደስታ እንጋብዛችኋለን፤\nየሄና ምሽቱን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

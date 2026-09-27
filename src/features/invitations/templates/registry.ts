@@ -107,6 +107,31 @@ import grandPrixDefaults from '@pack/grand-prix/defaults.json';
 import grandPrixManifest from '@pack/grand-prix/manifest.json';
 import skateDefaults from '@pack/skate-graffiti/defaults.json';
 import skateManifest from '@pack/skate-graffiti/manifest.json';
+// the animated designs: scroll scenes, each a film of its own
+import jerusalemGoldDefaults from '@pack/jerusalem-gold/defaults.json';
+import jerusalemGoldManifest from '@pack/jerusalem-gold/manifest.json';
+import enchantedGardenDefaults from '@pack/enchanted-garden/defaults.json';
+import enchantedGardenManifest from '@pack/enchanted-garden/manifest.json';
+import parisNightsDefaults from '@pack/paris-nights/defaults.json';
+import parisNightsManifest from '@pack/paris-nights/manifest.json';
+import hennaLanternsDefaults from '@pack/henna-lanterns/defaults.json';
+import hennaLanternsManifest from '@pack/henna-lanterns/manifest.json';
+import forestLightsDefaults from '@pack/forest-lights/defaults.json';
+import forestLightsManifest from '@pack/forest-lights/manifest.json';
+import buzzerBeaterDefaults from '@pack/buzzer-beater/defaults.json';
+import buzzerBeaterManifest from '@pack/buzzer-beater/manifest.json';
+import goldenGoalDefaults from '@pack/golden-goal/defaults.json';
+import goldenGoalManifest from '@pack/golden-goal/manifest.json';
+import moonshotDefaults from '@pack/moonshot/defaults.json';
+import moonshotManifest from '@pack/moonshot/manifest.json';
+import lullabySkyDefaults from '@pack/lullaby-sky/defaults.json';
+import lullabySkyManifest from '@pack/lullaby-sky/manifest.json';
+import sunsetShoreDefaults from '@pack/sunset-shore/defaults.json';
+import sunsetShoreManifest from '@pack/sunset-shore/manifest.json';
+import galaNightDefaults from '@pack/gala-night/defaults.json';
+import galaNightManifest from '@pack/gala-night/manifest.json';
+import spotlightStageDefaults from '@pack/spotlight-stage/defaults.json';
+import spotlightStageManifest from '@pack/spotlight-stage/manifest.json';
 // the photographic flagship (unlisted until its real photos are in)
 import lumiereDefaults from '@pack/lumiere/defaults.json';
 import lumiereManifest from '@pack/lumiere/manifest.json';
@@ -117,7 +142,7 @@ export interface TemplateEntry {
 }
 
 /**
- * Gallery order: the 8 originals as in design-reference/app.html, the animated scroll-scene design,
+ * Gallery order: the 8 originals as in design-reference/app.html, the animated scroll-scene designs,
  * then the scene templates, their event types mixed so every filter has something near the top.
  */
 const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
@@ -131,6 +156,19 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: honeyManifest, defaults: honeyDefaults },
   // the scroll scene (renderer/scene): the invitation as one film
   { manifest: celestialManifest, defaults: celestialDefaults },
+  // the animated designs: a film each, some with a prop that travels the whole scroll
+  { manifest: jerusalemGoldManifest, defaults: jerusalemGoldDefaults },
+  { manifest: enchantedGardenManifest, defaults: enchantedGardenDefaults },
+  { manifest: parisNightsManifest, defaults: parisNightsDefaults },
+  { manifest: hennaLanternsManifest, defaults: hennaLanternsDefaults },
+  { manifest: forestLightsManifest, defaults: forestLightsDefaults },
+  { manifest: buzzerBeaterManifest, defaults: buzzerBeaterDefaults },
+  { manifest: goldenGoalManifest, defaults: goldenGoalDefaults },
+  { manifest: moonshotManifest, defaults: moonshotDefaults },
+  { manifest: lullabySkyManifest, defaults: lullabySkyDefaults },
+  { manifest: sunsetShoreManifest, defaults: sunsetShoreDefaults },
+  { manifest: galaNightManifest, defaults: galaNightDefaults },
+  { manifest: spotlightStageManifest, defaults: spotlightStageDefaults },
   { manifest: midnightManifest, defaults: midnightDefaults },
   { manifest: klafManifest, defaults: klafDefaults },
   { manifest: cocoaManifest, defaults: cocoaDefaults },

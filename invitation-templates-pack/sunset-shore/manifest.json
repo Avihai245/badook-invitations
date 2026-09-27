@@ -1,0 +1,504 @@
+{
+  "id": "sunset-shore",
+  "version": 1,
+  "name": {
+    "he": "חוף השקיעה",
+    "en": "Sunset Shore"
+  },
+  "description": {
+    "he": "הזמנה שהיא ערב על החוף: שביל בין הדיונות בשעת הזהב, השמש נוגעת בים, חופה של בד לבן מול הגלים, פנסים ונרות על החול — ועד שביל של אור ירח על המים. עלי כותרת נישאים ברוח, והפתיחה: אבק זהב שנושב מעל הדיונות.",
+    "en": "An invitation that is an evening on the beach: a path through the dunes at golden hour, the sun touching the sea, a chuppah of white fabric facing the waves, lanterns and candles on the sand — and at last a path of moonlight on the water. Petals ride the breeze, and it opens with gold dust blowing away over the dunes."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "wedding",
+    "engagement"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/sunset-shore/scene-sea.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F8F0E6",
+      "surface": "#FDFAF5",
+      "ink": "#1D3B4F",
+      "inkMuted": "#5B6D78",
+      "accent": "#E88E6E",
+      "accentInk": "#13263A",
+      "line": "#EADFD2",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.98,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#13263A",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "coral",
+      "name": {
+        "he": "אלמוג",
+        "en": "Coral"
+      },
+      "palette": {
+        "bg": "#F8F0E6",
+        "surface": "#FDFAF5",
+        "ink": "#1D3B4F",
+        "inkMuted": "#5B6D78",
+        "accent": "#E88E6E",
+        "accentInk": "#13263A",
+        "line": "#EADFD2"
+      }
+    },
+    {
+      "id": "turquoise",
+      "name": {
+        "he": "טורקיז",
+        "en": "Turquoise"
+      },
+      "palette": {
+        "bg": "#EFF6F5",
+        "surface": "#F9FCFC",
+        "ink": "#16343F",
+        "inkMuted": "#56696F",
+        "accent": "#3FA7A3",
+        "accentInk": "#0E2A3A",
+        "line": "#D6E6E4"
+      }
+    },
+    {
+      "id": "sand",
+      "name": {
+        "he": "חול",
+        "en": "Sand"
+      },
+      "palette": {
+        "bg": "#F9F2E7",
+        "surface": "#FEFBF6",
+        "ink": "#3A2E22",
+        "inkMuted": "#6E6252",
+        "accent": "#E3B062",
+        "accentInk": "#2E2418",
+        "line": "#ECDFCB"
+      }
+    },
+    {
+      "id": "moonlight",
+      "name": {
+        "he": "אור ירח",
+        "en": "Moonlight"
+      },
+      "palette": {
+        "bg": "#13263A",
+        "surface": "#1B3148",
+        "ink": "#F2ECE2",
+        "inkMuted": "#B5B7B8",
+        "accent": "#E3B062",
+        "accentInk": "#13263A",
+        "line": "#2A425C"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "shore",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "breeze",
+      "display": {
+        "latin": "Italiana",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/sunset-shore/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/sunset-shore/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#E88E6E",
+      "#1D4E6B",
+      "#3FA7A3",
+      "#B08D57"
+    ],
+    "monogramFont": {
+      "latin": "Cormorant Garamond",
+      "hebrew": "Bellefair"
+    },
+    "opening": {
+      "preset": "gold_dust",
+      "trigger": "tap",
+      "backdrop": "hero"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "dunes",
+        "name": {
+          "he": "שביל בדיונות",
+          "en": "A path through the dunes"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-dunes",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "sea",
+        "name": {
+          "he": "שקיעה על הים",
+          "en": "Sunset over the sea"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-sea",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#13263A",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "petals",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "petals",
+    "shade": "#13263A",
+    "tracking": 0.22
+  },
+  "assets": {
+    "scene-dunes": "/templates/sunset-shore/scene-dunes.webp",
+    "scene-sea": "/templates/sunset-shore/scene-sea.webp",
+    "scene-chuppah": "/templates/sunset-shore/scene-chuppah.webp",
+    "scene-lanterns": "/templates/sunset-shore/scene-lanterns.webp",
+    "scene-moon": "/templates/sunset-shore/scene-moon.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-sea",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-chuppah",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-lanterns",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-moon",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

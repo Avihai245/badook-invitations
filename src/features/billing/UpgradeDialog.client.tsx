@@ -6,7 +6,10 @@ import { Button, Dialog } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 
 export type UpgradeReason =
-  { code: 'plan_limit'; limit: number } | { code: 'premium_template' } | { code: 'guest_limit'; max: number };
+  | { code: 'plan_limit'; limit: number }
+  | { code: 'premium_template' }
+  | { code: 'premium_scene' }
+  | { code: 'guest_limit'; max: number };
 
 /** The API's 402 answer → what to show (null for anything else). */
 export function upgradeReason(status: number, body: unknown): UpgradeReason | null {
@@ -14,6 +17,7 @@ export function upgradeReason(status: number, body: unknown): UpgradeReason | nu
   const b = body as { code?: unknown; limit?: unknown; max?: unknown };
   if (b.code === 'plan_limit') return { code: 'plan_limit', limit: Number(b.limit) || 1 };
   if (b.code === 'premium_template') return { code: 'premium_template' };
+  if (b.code === 'premium_scene') return { code: 'premium_scene' };
   if (b.code === 'guest_limit') return { code: 'guest_limit', max: Number(b.max) || 0 };
   return null;
 }
@@ -25,15 +29,19 @@ export function UpgradeDialog({ reason, onClose }: { reason: UpgradeReason; onCl
   const title =
     reason.code === 'premium_template'
       ? u.premiumTitle
-      : reason.code === 'guest_limit'
-        ? u.guestsTitle
-        : u.planLimitTitle;
+      : reason.code === 'premium_scene'
+        ? u.sceneTitle
+        : reason.code === 'guest_limit'
+          ? u.guestsTitle
+          : u.planLimitTitle;
   const body =
     reason.code === 'plan_limit'
       ? fmt(u.planLimitBody, { limit: number(reason.limit) })
       : reason.code === 'guest_limit'
         ? fmt(u.guestsBody, { max: number(reason.max) })
-        : u.premiumBody;
+        : reason.code === 'premium_scene'
+          ? u.sceneBody
+          : u.premiumBody;
   return (
     <Dialog
       open

@@ -26,7 +26,8 @@ import { HelpFor } from '@/features/invitations/app/HelpFor';
 import { useReview } from '@/features/review/ui/host/ReviewProvider';
 import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
-import type { Locale } from '../contracts/types';
+import type { InvitationDocument, Locale, TemplateManifest } from '../contracts/types';
+import { sceneOn } from '../renderer/scene/model';
 import { isPremiumTemplate } from '../templates/tier';
 import type { Device } from './Canvas';
 import { hostsText } from './fields/fields';
@@ -213,20 +214,35 @@ export function Topbar({
   );
 }
 
-/** A premium design (manifest tier) — publishing it needs a paid plan (the 402 of the publish route). */
-export const premiumLocked = (template: object, features: { premiumTemplates: boolean }) =>
-  isPremiumTemplate(template) && !features.premiumTemplates;
+/**
+ * Publishing needs a paid plan: a premium design (manifest tier) — `design` — or an animated invitation
+ * (the scroll scene, on any design) — `scene`; null when the plan has them (the 402s of the publish route).
+ */
+export const premiumLocked = (
+  template: TemplateManifest,
+  doc: Pick<InvitationDocument, 'theme'>,
+  features: { premiumTemplates: boolean },
+): 'design' | 'scene' | null =>
+  features.premiumTemplates
+    ? null
+    : isPremiumTemplate(template)
+      ? 'design'
+      : sceneOn(doc, template, true)
+        ? 'scene'
+        : null;
 
 /**
  * A premium design on a plan without premium designs: a small "Premium" tag in the bar that says, as
  * early as the editor opens, that publishing it needs Pro or Business — editing goes on as usual.
  */
 function PremiumNotice() {
-  const { template, features } = useEditor();
+  const { template, doc, features } = useEditor();
   const { t } = useUi();
-  const p = t.editor.premium;
   const dir = useDir();
-  if (!premiumLocked(template, features)) return null;
+  const locked = premiumLocked(template, doc, features);
+  if (!locked) return null;
+  // a premium design, or an animated invitation on any design
+  const p = locked === 'scene' ? { ...t.editor.premium, ...t.editor.premium.scene } : t.editor.premium;
   return (
     <Popover.Root>
       <Popover.Trigger asChild>

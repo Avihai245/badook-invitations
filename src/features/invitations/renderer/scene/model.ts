@@ -4,6 +4,7 @@ import type {
   Palette,
   SceneDrift,
   SceneParticles,
+  SceneProp,
   SceneZoom,
   Section,
   TemplateManifest,
@@ -62,6 +63,8 @@ export interface SceneModel {
   tracking: number;
   /** the hero's own media stays in the hero (a video, a YouTube / Vimeo film): the scene starts under it */
   heroInline: boolean;
+  /** the design's prop, travelling across the whole film to its target (renderer/scene/props.ts) */
+  prop: SceneProp | null;
 }
 
 /** The scene's standard shade — the spec's gradient at full strength. */
@@ -97,6 +100,7 @@ export function templateScene(template: TemplateManifest): TemplateScene {
     template.scene ?? {
       enabled: false,
       particles: particlesFor(ambientFor(template)),
+      prop: null,
       shade: null,
       tracking: 0,
     }
@@ -231,5 +235,6 @@ export function sceneModel({ doc, template, bases }: ModelInput): SceneModel {
     text,
     tracking: own.tracking,
     heroInline,
+    prop: own.prop ?? null,
   };
 }

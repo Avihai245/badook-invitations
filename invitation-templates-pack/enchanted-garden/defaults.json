@@ -1,0 +1,292 @@
+{
+  "templateId": "enchanted-garden",
+  "defaults": {
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "גן קסום לכבוד הבת מצווה של",
+        "en": "A magical garden for the bat mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שהגן יתעורר",
+          "en": "Until the garden wakes"
+        },
+        "afterEvent": {
+          "he": "מזל טוב! תודה שחגגתם איתנו",
+          "en": "Mazal tov! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "פורחת בשתים עשרה",
+          "en": "Blooming at twelve"
+        },
+        "body": {
+          "he": "שתים עשרה שנים של צחוק, חלומות ולב פתוח.\nב־{date} נחגוג את {primary} בגן מלא פרחים ואורות.",
+          "en": "Twelve years of laughter, dreams and an open heart.\nOn {date} we celebrate {primary} in a garden full of flowers and lights."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הגן",
+          "en": "The garden"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ונרות",
+            "en": "Blessings"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "רוקדים וחוגגים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "מגיעים לגן?",
+          "en": "Coming to the garden?"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A wish for the bat mitzvah girl"
+        },
+        "successMessage": {
+          "he": "איזה כיף! נתראה בגן הקסום",
+          "en": "Wonderful! See you in the enchanted garden"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם פרח",
+          "en": "Too bad! We’ll save you a flower"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "נתראה בגן הקסום",
+        "en": "See you in the enchanted garden"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "השער הקטן נפתח אל גן קסום של פרחים ואורות.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבת מצווה.",
+            "en": "A little gate opens onto an enchanted garden of flowers and lights.\nWith great excitement we invite you\nto celebrate the bat mitzvah with us.",
+            "ru": "Маленькая калитка открывается в волшебный сад цветов и огней.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бат-мицву.",
+            "ar": "تنفتح بوابة صغيرة على حديقة ساحرة من الزهور والأضواء.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبات متسفا.",
+            "fr": "Une petite porte s’ouvre sur un jardin enchanté de fleurs et de lumières.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bat-mitsva avec nous.",
+            "es": "Una pequeña puerta se abre a un jardín encantado de flores y luces.\nCon gran emoción los invitamos\na celebrar con nosotros el bat mitzvá.",
+            "am": "ትንሽ በር በአበቦችና በብርሃናት ወደተሞላ አስማታዊ የአትክልት ስፍራ ይከፈታል።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባት ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בואו לחגוג בגן הקסום עם",
+        "en": "Come celebrate in the garden with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שהגן יתעורר",
+          "en": "Until the garden wakes"
+        },
+        "afterEvent": {
+          "he": "איזה ערב! תודה שבאתם",
+          "en": "What an evening! Thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד שנה של פריחה",
+          "en": "Another year in bloom"
+        },
+        "body": {
+          "he": "ב־{date} הגן מתמלא פרחים, אורות וחברים.\nבואו לחגוג איתנו את {primary}!",
+          "en": "On {date} the garden fills with flowers, lights and friends.\nCome celebrate {primary} with us!"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הגן",
+          "en": "The garden"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "הפתעות בגן",
+            "en": "Garden surprises"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "עוגה ונרות",
+            "en": "Cake & candles"
+          },
+          "icon": "cake"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "ריקודים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "מגיעים לגן?",
+          "en": "Coming to the garden?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "איזה כיף! נתראה בגן הקסום",
+          "en": "Wonderful! See you in the enchanted garden"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם פרח",
+          "en": "Too bad! We’ll save you a flower"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בגן הקסום",
+        "en": "See you in the enchanted garden"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "השער הקטן נפתח אל גן קסום של פרחים ואורות.\nבשמחה גדולה אנו מזמינים אתכם\nלחגוג איתנו את יום ההולדת.",
+            "en": "A little gate opens onto an enchanted garden of flowers and lights.\nWith great joy we invite you\nto celebrate the birthday with us.",
+            "ru": "Маленькая калитка открывается в волшебный сад цветов и огней.\nС большой радостью мы приглашаем вас\nотпраздновать с нами день рождения.",
+            "ar": "تنفتح بوابة صغيرة على حديقة ساحرة من الزهور والأضواء.\nبفرح كبير ندعوكم\nلتحتفلوا معنا بعيد الميلاد.",
+            "fr": "Une petite porte s’ouvre sur un jardin enchanté de fleurs et de lumières.\nC’est avec une grande joie que nous vous invitons\nà fêter l’anniversaire avec nous.",
+            "es": "Una pequeña puerta se abre a un jardín encantado de flores y luces.\nCon gran alegría los invitamos\na celebrar con nosotros el cumpleaños.",
+            "am": "ትንሽ በር በአበቦችና በብርሃናት ወደተሞላ አስማታዊ የአትክልት ስፍራ ይከፈታል።\nበታላቅ ደስታ እንጋብዛችኋለን፤\nየልደት በዓሉን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,502 @@
+{
+  "id": "golden-goal",
+  "version": 1,
+  "name": {
+    "he": "גול הזהב",
+    "en": "Golden Goal"
+  },
+  "description": {
+    "he": "הזמנה שהיא בעיטה אחת גדולה: הכדור יוצא מנקודת הפנדל, מתעקל מעל הדשא, מעל היציעים והזרקורים — ובסוף הגלילה נכנס לחיבורים, הרשת נמתחת והקונפטי עף. בפתיחה: זיקוקים מעל האצטדיון.",
+    "en": "An invitation that is one great kick: the ball leaves the penalty spot, curls over the pitch, the stands and the floodlights — and at the end of the scroll it flies into the top corner, the net bulges and the confetti flies. It opens with fireworks over the stadium."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "bar_mitzvah",
+    "bat_mitzvah",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/golden-goal/scene-stadium.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#0C1A2E",
+      "surface": "#12253F",
+      "ink": "#F2F7F2",
+      "inkMuted": "#A7B9B0",
+      "accent": "#C6F432",
+      "accentInk": "#081421",
+      "line": "#1F3A4F",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 12,
+      "button": 12,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 1.06,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#081421",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "lime",
+      "name": {
+        "he": "ליים",
+        "en": "Lime"
+      },
+      "palette": {
+        "bg": "#0C1A2E",
+        "surface": "#12253F",
+        "ink": "#F2F7F2",
+        "inkMuted": "#A7B9B0",
+        "accent": "#C6F432",
+        "accentInk": "#081421",
+        "line": "#1F3A4F"
+      }
+    },
+    {
+      "id": "gold",
+      "name": {
+        "he": "גביע זהב",
+        "en": "Golden cup"
+      },
+      "palette": {
+        "bg": "#0C1A2E",
+        "surface": "#12253F",
+        "ink": "#F2F7F2",
+        "inkMuted": "#A7B9B0",
+        "accent": "#FFD166",
+        "accentInk": "#081421",
+        "line": "#1F3A4F"
+      }
+    },
+    {
+      "id": "pitch",
+      "name": {
+        "he": "דשא",
+        "en": "Pitch green"
+      },
+      "palette": {
+        "bg": "#0C1A2E",
+        "surface": "#12253F",
+        "ink": "#F2F7F2",
+        "inkMuted": "#A7B9B0",
+        "accent": "#4CB050",
+        "accentInk": "#081421",
+        "line": "#1F3A4F"
+      }
+    },
+    {
+      "id": "day",
+      "name": {
+        "he": "משחק יום",
+        "en": "Day game"
+      },
+      "palette": {
+        "bg": "#F1F5EF",
+        "surface": "#FBFCFA",
+        "ink": "#13241A",
+        "inkMuted": "#56665A",
+        "accent": "#2E7D32",
+        "accentInk": "#FFFFFF",
+        "line": "#D9E2D6"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "stadium",
+      "display": {
+        "latin": "Oswald",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Secular One"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    },
+    {
+      "id": "matchday",
+      "display": {
+        "latin": "Bebas Neue",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Bebas Neue",
+        "hebrew": "Secular One"
+      },
+      "body": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "css3d",
+    "poster": "/templates/golden-goal/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Oswald",
+      "hebrew": "Secular One"
+    },
+    "opening": {
+      "preset": "fireworks",
+      "trigger": "tap",
+      "color": "#081421",
+      "backdrop": "hero"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "stadium",
+        "name": {
+          "he": "האצטדיון בלילה",
+          "en": "The stadium at night"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-stadium",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "pitch",
+        "name": {
+          "he": "הדשא",
+          "en": "The pitch"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-pitch",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#081421",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "confetti",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "none",
+    "prop": "football",
+    "shade": "#081421",
+    "tracking": 0.1
+  },
+  "assets": {
+    "scene-stadium": "/templates/golden-goal/scene-stadium.webp",
+    "scene-tunnel": "/templates/golden-goal/scene-tunnel.webp",
+    "scene-pitch": "/templates/golden-goal/scene-pitch.webp",
+    "scene-crowd": "/templates/golden-goal/scene-crowd.webp",
+    "scene-box": "/templates/golden-goal/scene-box.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-tunnel",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-pitch",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-crowd",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-box",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

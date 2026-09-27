@@ -1,0 +1,432 @@
+{
+  "templateId": "gala-night",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "ערב גאלה לכבוד יום ההולדת של",
+        "en": "A gala evening for the birthday of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שהדלתות ייפתחו",
+          "en": "Until the doors open"
+        },
+        "afterEvent": {
+          "he": "איזה ערב! תודה שחגגתם איתנו",
+          "en": "What an evening! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "ערב של זהב",
+          "en": "An evening of gold"
+        },
+        "body": {
+          "he": "שנים של צחוק, אהבה וסיפורים טובים — וזה רק הפרק הבא.\nב־{date} מרימים כוסית לכבוד {primary}.",
+          "en": "Years of laughter, love and good stories — and this is only the next chapter.\nOn {date} we raise a glass to {primary}."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הערב",
+          "en": "The evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:00",
+          "label": {
+            "he": "קבלת פנים ושמפניה",
+            "en": "Welcome & champagne"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:45",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "A toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:15",
+          "label": {
+            "he": "רוקדים עד הבוקר",
+            "en": "Dancing till late"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "תצטרפו אלינו?",
+          "en": "Will you join us?"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "נפלא! נתראה בערב הגאלה",
+          "en": "Wonderful! See you at the gala"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נרים כוסית גם בשבילכם",
+          "en": "Thanks for letting us know — we’ll raise a glass for you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בערב",
+        "en": "See you at the gala"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הדלתות נפתחות, הנברשות נדלקות והשמפניה מבעבעת.\nבשמחה גדולה אנו מזמינים אתכם\nלחגוג איתנו את יום ההולדת.",
+            "en": "The doors open, the chandeliers glow and the champagne sparkles.\nWith great joy we invite you\nto celebrate the birthday with us.",
+            "ru": "Двери открываются, люстры сияют, шампанское искрится.\nС большой радостью мы приглашаем вас\nотпраздновать с нами день рождения.",
+            "ar": "تنفتح الأبواب، وتتلألأ الثريات، وتفور الشمبانيا.\nبفرح كبير ندعوكم\nلتحتفلوا معنا بعيد الميلاد.",
+            "fr": "Les portes s’ouvrent, les lustres s’illuminent et le champagne pétille.\nC’est avec une grande joie que nous vous invitons\nà fêter l’anniversaire avec nous.",
+            "es": "Las puertas se abren, las lámparas brillan y el champán burbujea.\nCon gran alegría los invitamos\na celebrar con nosotros el cumpleaños.",
+            "am": "በሮቹ ይከፈታሉ፣ ሻንደሊየሮቹ ያበራሉ፣ ሻምፓኙም ይፈላል።\nበታላቅ ደስታ እንጋብዛችኋለን፤\nየልደት በዓሉን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "corporate": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "ערב הגאלה השנתי של",
+        "en": "The annual gala evening of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שהדלתות ייפתחו",
+          "en": "Until the doors open"
+        },
+        "afterEvent": {
+          "he": "תודה שהייתם איתנו הערב",
+          "en": "Thank you for joining us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שנה של עשייה",
+          "en": "A year of great work"
+        },
+        "body": {
+          "he": "מזמינים אתכם לערב של הוקרה, השראה ומפגש —\nב־{date}, לחגוג יחד את כל מה שבנינו.",
+          "en": "Join us for an evening of thanks, inspiration and good company —\non {date}, to celebrate everything we’ve built together."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הערב",
+          "en": "The evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "התכנסות ושמפניה",
+            "en": "Arrival & champagne"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "דברי פתיחה",
+            "en": "Opening words"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:30",
+          "label": {
+            "he": "מוזיקה ומפגש",
+            "en": "Music & mingling"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "אישור הגעה",
+          "en": "RSVP"
+        },
+        "subtitle": {
+          "he": "נשמח לדעת עד {deadline}",
+          "en": "Please let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "הערה למארגנים",
+          "en": "A note for the organizers"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בערב",
+          "en": "Thank you! See you there"
+        },
+        "declineMessage": {
+          "he": "תודה על העדכון — נתראה בפעם הבאה",
+          "en": "Thanks for letting us know — see you next time"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "kosher",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "nut_allergy",
+          "other_allergy"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "להתראות בערב",
+        "en": "See you there"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הדלתות נפתחות, הנברשות נדלקות והשמפניה מבעבעת.\nבשמחה אנו מזמינים אתכם\nלערב חגיגי של הוקרה, השראה ומפגש.",
+            "en": "The doors open, the chandeliers glow and the champagne sparkles.\nIt is our pleasure to invite you\nto a festive evening of thanks, inspiration and good company.",
+            "ru": "Двери открываются, люстры сияют, шампанское искрится.\nС радостью приглашаем вас\nна праздничный вечер благодарности, вдохновения и тёплых встреч.",
+            "ar": "تنفتح الأبواب، وتتلألأ الثريات، وتفور الشمبانيا.\nيسعدنا أن ندعوكم\nإلى أمسية احتفالية من التقدير والإلهام واللقاء.",
+            "fr": "Les portes s’ouvrent, les lustres s’illuminent et le champagne pétille.\nNous avons le plaisir de vous inviter\nà une soirée festive de gratitude, d’inspiration et de rencontres.",
+            "es": "Las puertas se abren, las lámparas brillan y el champán burbujea.\nTenemos el placer de invitarlos\na una velada festiva de agradecimiento, inspiración y encuentro.",
+            "am": "በሮቹ ይከፈታሉ፣ ሻንደሊየሮቹ ያበራሉ፣ ሻምፓኙም ይፈላል።\nበደስታ እንጋብዛችኋለን፤\nለምስጋና፣ ለመነሳሳትና ለመገናኘት የተዘጋጀ የበዓል ምሽት።"
+          }
+        }
+      ]
+    },
+    "wedding": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "אנחנו מתחתנים",
+        "en": "We are getting married"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שנגיד כן",
+          "en": "Until we say yes"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "ערב של זהב",
+          "en": "An evening of gold"
+        },
+        "body": {
+          "he": "התחלנו בסיפור קטן, והוא הפך לסיפור הכי יפה שלנו.\nב־{date} אנחנו מתחתנים — ורוצים אתכם איתנו.",
+          "en": "We began with a small story, and it became our most beautiful one.\nOn {date} we are getting married — and we want you with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החתונה",
+          "en": "The wedding"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים ושמפניה",
+            "en": "Welcome & champagne"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:30",
+          "label": {
+            "he": "חופה וקידושין",
+            "en": "The ceremony"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "רוקדים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נשמח לראותכם",
+          "en": "We would love to see you"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "נפלא! נתראה בחתונה",
+          "en": "Wonderful! See you at the wedding"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם. נתגעגע",
+          "en": "Thank you for letting us know. We will miss you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה, ונתראה בערב",
+        "en": "With love — see you there"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הדלתות נפתחות, הנברשות נדלקות והשמפניה מבעבעת.\nבשמחה ובהתרגשות אנו מזמינים אתכם\nלחגוג איתנו את היום שבו מתחיל הפרק היפה ביותר שלנו.",
+            "en": "The doors open, the chandeliers glow and the champagne sparkles.\nWith joy and excitement we invite you\nto celebrate the day our most beautiful chapter begins.",
+            "ru": "Двери открываются, люстры сияют, шампанское искрится.\nС радостью и волнением мы приглашаем вас\nотпраздновать с нами день, когда начнётся самая прекрасная глава нашей жизни.",
+            "ar": "تنفتح الأبواب، وتتلألأ الثريات، وتفور الشمبانيا.\nبكل فرح وحماس ندعوكم\nلتحتفلوا معنا باليوم الذي يبدأ فيه أجمل فصل في حياتنا.",
+            "fr": "Les portes s’ouvrent, les lustres s’illuminent et le champagne pétille.\nC’est avec joie et émotion que nous vous invitons\nà célébrer avec nous le jour où commence notre plus beau chapitre.",
+            "es": "Las puertas se abren, las lámparas brillan y el champán burbujea.\nCon alegría y emoción los invitamos\na celebrar con nosotros el día en que comienza nuestro capítulo más bonito.",
+            "am": "በሮቹ ይከፈታሉ፣ ሻንደሊየሮቹ ያበራሉ፣ ሻምፓኙም ይፈላል።\nበደስታና በጉጉት እንጋብዛችኋለን፤\nየሕይወታችን እጅግ ውብ ምዕራፍ የሚጀምርበትን ቀን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

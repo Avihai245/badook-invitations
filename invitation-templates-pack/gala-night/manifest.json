@@ -1,0 +1,507 @@
+{
+  "id": "gala-night",
+  "version": 1,
+  "name": {
+    "he": "ערב גאלה",
+    "en": "Gala Night"
+  },
+  "description": {
+    "he": "הזמנה שהיא ערב גאלה: דלתות ענק מוזהבות נפתחות אל שטיח אדום, מעל נברשת קריסטל, מגדל של כוסות שמפניה, אולם נשפים מואר — ועד מרפסת מעל אורות העיר וזיקוקים. אבק זהב מרחף, והפתיחה: מסך קטיפה שעולה.",
+    "en": "An invitation that is a gala evening: grand gilded doors open onto a red carpet, under a crystal chandelier, past a tower of champagne glasses and a glowing ballroom — and out onto a terrace above the city lights and the fireworks. Gold dust drifts, and it opens as a velvet curtain rises."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "birthday",
+    "corporate",
+    "wedding"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/gala-night/scene-doors.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#141110",
+      "surface": "#1D1916",
+      "ink": "#F4EEE2",
+      "inkMuted": "#BDB3A2",
+      "accent": "#C9A65A",
+      "accentInk": "#0A0806",
+      "line": "#2E2923",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 6,
+      "button": 4,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.94,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#0A0806",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב",
+        "en": "Gold"
+      },
+      "palette": {
+        "bg": "#141110",
+        "surface": "#1D1916",
+        "ink": "#F4EEE2",
+        "inkMuted": "#BDB3A2",
+        "accent": "#C9A65A",
+        "accentInk": "#0A0806",
+        "line": "#2E2923"
+      }
+    },
+    {
+      "id": "champagne",
+      "name": {
+        "he": "שמפניה",
+        "en": "Champagne"
+      },
+      "palette": {
+        "bg": "#141110",
+        "surface": "#1D1916",
+        "ink": "#F4EEE2",
+        "inkMuted": "#BDB3A2",
+        "accent": "#E8D5A8",
+        "accentInk": "#0A0806",
+        "line": "#2E2923"
+      }
+    },
+    {
+      "id": "burgundy",
+      "name": {
+        "he": "בורדו",
+        "en": "Burgundy"
+      },
+      "palette": {
+        "bg": "#1E0A10",
+        "surface": "#2A1018",
+        "ink": "#F6ECE4",
+        "inkMuted": "#C6AFA8",
+        "accent": "#C9A65A",
+        "accentInk": "#1E0A10",
+        "line": "#40202A"
+      }
+    },
+    {
+      "id": "ivory",
+      "name": {
+        "he": "שנהב",
+        "en": "Ivory"
+      },
+      "palette": {
+        "bg": "#F4EEE2",
+        "surface": "#FBF8F2",
+        "ink": "#1A1512",
+        "inkMuted": "#5E554C",
+        "accent": "#B08D57",
+        "accentInk": "#1A1512",
+        "line": "#E2D8C8"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "gala",
+      "display": {
+        "latin": "Bodoni Moda",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Bodoni Moda",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "grand",
+      "display": {
+        "latin": "Cinzel",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/gala-night/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/gala-night/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#C9A65A",
+      "#4A1420",
+      "#0B0A0A",
+      "#E8D5A8"
+    ],
+    "monogramFont": {
+      "latin": "Bodoni Moda",
+      "hebrew": "Frank Ruhl Libre"
+    },
+    "opening": {
+      "preset": "curtain",
+      "trigger": "scroll",
+      "motion": "rise",
+      "color": "#4A1420"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "doors",
+        "name": {
+          "he": "הדלתות הגדולות",
+          "en": "The grand doors"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-doors",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "terrace",
+        "name": {
+          "he": "זיקוקים מעל העיר",
+          "en": "Fireworks over the city"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-terrace",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0A0806",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "sparkles",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "gold_dust",
+    "shade": "#0A0806",
+    "tracking": 0.28
+  },
+  "assets": {
+    "scene-doors": "/templates/gala-night/scene-doors.webp",
+    "scene-chandelier": "/templates/gala-night/scene-chandelier.webp",
+    "scene-champagne": "/templates/gala-night/scene-champagne.webp",
+    "scene-ballroom": "/templates/gala-night/scene-ballroom.webp",
+    "scene-terrace": "/templates/gala-night/scene-terrace.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-chandelier",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in",
+          "drift": "down"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-champagne",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-ballroom",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-terrace",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

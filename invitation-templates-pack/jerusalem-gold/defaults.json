@@ -1,0 +1,150 @@
+{
+  "templateId": "jerusalem-gold",
+  "defaults": {
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "בשעה טובה ומוצלחת, הבר מצווה של",
+        "en": "With great joy, the bar mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שנעלה לתורה",
+          "en": "Until he is called to the Torah"
+        },
+        "afterEvent": {
+          "he": "מזל טוב! תודה שחגגתם איתנו",
+          "en": "Mazal tov! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלוש עשרה שנים של אור",
+          "en": "Thirteen years of light"
+        },
+        "body": {
+          "he": "שלוש עשרה שנים של צחוק, סקרנות ולב גדול.\nב־{date} {primary} עולה לתורה — ואנחנו רוצים אתכם איתנו.",
+          "en": "Thirteen years of laughter, curiosity and a big heart.\nOn {date}, {primary} is called to the Torah — and we want you with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החגיגה",
+          "en": "The celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "עלייה לתורה וברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "רוקדים וחוגגים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נשמח לראותכם",
+          "en": "We would love to see you"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the bar mitzvah boy"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בשמחה",
+          "en": "Thank you! See you at the celebration"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם. נתגעגע",
+          "en": "Thank you for letting us know. We will miss you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה בשמחות",
+        "en": "Mazal tov — see you at the celebration"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "שערי העיר העתיקה נפתחים, והאבן מוזהבת באור.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבר מצווה.",
+            "en": "The gates of the Old City open, and the stone glows gold.\nWith great excitement we invite you\nto celebrate the bar mitzvah with us.",
+            "ru": "Врата Старого города открываются, и камень сияет золотом.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бар-мицву.",
+            "ar": "تنفتح بوابات البلدة القديمة، ويتوهّج الحجر ذهبًا.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبار متسفا.",
+            "fr": "Les portes de la Vieille Ville s’ouvrent, et la pierre s’illumine d’or.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bar-mitsva avec nous.",
+            "es": "Las puertas de la Ciudad Vieja se abren y la piedra brilla como el oro.\nCon gran emoción los invitamos\na celebrar con nosotros el bar mitzvá.",
+            "am": "የጥንቷ ከተማ በሮች ይከፈታሉ፣ ድንጋዩም በወርቃማ ብርሃን ያበራል።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባር ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -51,7 +51,7 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
   const [phase, setPhase] = useState<'review' | 'publishing' | 'done'>('review');
   const [error, setError] = useState<string | null>(null);
   // the plan doesn't include this: a premium design, or turning off the credit
-  const [premium, setPremium] = useState<'premium' | 'branding' | null>(null);
+  const [premium, setPremium] = useState<'premium' | 'branding' | 'scene' | null>(null);
   const base = publicBaseUrl.replace(/\/+$/, '');
   const url = `${base}/i/${phase === 'done' ? meta.slug : slug}`;
 
@@ -130,7 +130,10 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
     else if (res.status === 422) setShowIssues(true);
     else if (res.status === 402 && failed?.code === 'languages')
       setError(fmt(p.languagesRefused, { languages: (failed.locales ?? []).map(nativeName).join(', ') }));
-    else if (res.status === 402) setPremium(failed?.code === 'branding' ? 'branding' : 'premium');
+    else if (res.status === 402)
+      setPremium(
+        failed?.code === 'branding' ? 'branding' : failed?.code === 'premium_scene' ? 'scene' : 'premium',
+      );
     else setError(p.failed);
   };
 
@@ -367,9 +370,18 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
             className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-input border border-brand-line bg-brand-soft px-3 py-2.5 text-[13px]"
           >
             <span className="font-semibold">
-              {premium === 'branding' ? t.billing.upgrade.brandingTitle : t.billing.upgrade.premiumTitle}:
+              {premium === 'branding'
+                ? t.billing.upgrade.brandingTitle
+                : premium === 'scene'
+                  ? t.billing.upgrade.sceneTitle
+                  : t.billing.upgrade.premiumTitle}
+              :
             </span>
-            {premium === 'branding' ? t.billing.upgrade.brandingBody : t.billing.upgrade.premiumBody}
+            {premium === 'branding'
+              ? t.billing.upgrade.brandingBody
+              : premium === 'scene'
+                ? t.billing.upgrade.sceneBody
+                : t.billing.upgrade.premiumBody}
             <Link href="/app/billing" className="font-semibold text-brand-deep underline">
               {t.billing.upgrade.cta}
             </Link>

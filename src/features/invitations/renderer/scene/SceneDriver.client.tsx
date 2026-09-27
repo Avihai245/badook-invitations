@@ -2,7 +2,9 @@
 
 import { useEffect } from 'react';
 import { motionAllowed } from '../fx/motion';
+import type { SceneProp } from '../../contracts/types';
 import { FADE_FROM, FADE_TO, SCENE_DRIFT, SCENE_ZOOM } from './model';
+import { PROPS, lenPx, poseAt } from './props';
 import {
   inPlayMargins,
   layerRanges,
@@ -237,12 +239,40 @@ export function SceneDriver() {
       }
     };
 
+    // the design's prop (SceneProp): where the browser can't play its flight, the driver does
+    const back = frame.querySelector<HTMLElement>('.sc-back');
+    const propEl = frame.querySelector<HTMLElement>('.sc-prop');
+    const propKind = propEl?.dataset.prop as SceneProp | undefined;
+    const prop = propEl && propKind && PROPS[propKind] ? { spec: PROPS[propKind], el: propEl } : null;
+    const paintProp = () => {
+      if (!prop || !back) return;
+      const max = inner
+        ? scroller.scrollHeight - scroller.clientHeight
+        : document.documentElement.scrollHeight - window.innerHeight;
+      const t = max > 0 ? Math.min(1, Math.max(0, (inner ? scroller.scrollTop : window.scrollY) / max)) : 0;
+      const [w, h] = [back.clientWidth, back.clientHeight];
+      const pose = poseAt(prop.spec, t);
+      const mover = prop.el.querySelector<HTMLElement>('.sc-mover');
+      if (mover) {
+        mover.style.translate = `calc(${lenPx(pose.x, w, h).toFixed(1)}px - 50%) calc(${lenPx(pose.y, w, h).toFixed(1)}px - 50%)`;
+        mover.style.rotate = `${pose.rotate.toFixed(1)}deg`;
+        mover.style.scale = pose.scale.toFixed(3);
+      }
+      const [ta, tb] = prop.spec.target.reveal;
+      const k = Math.min(1, Math.max(0, (t - ta) / (tb - ta)));
+      prop.el.querySelectorAll<HTMLElement>('.sc-target').forEach((el) => {
+        el.style.opacity = k.toFixed(3);
+        el.style.scale = (0.9 + 0.1 * k).toFixed(3);
+      });
+    };
+
     /**
      * The backdrop at the scroll position: which pictures are in play and loaded — and, where the
-     * browser doesn't play them, each one's cross-fade and motion.
+     * browser doesn't play them, each one's cross-fade and motion, and the prop's flight.
      */
     const paint = () => {
       raf = 0;
+      if (!css) paintProp();
       if (!layers.length) return;
       const y = position();
       layers.forEach((l, k) => {

@@ -64,6 +64,13 @@ export const editorEn: EditorDict = {
     body: 'Edit the invitation freely. Publishing it needs the Pro or Business plan.',
     cta: 'See the plans',
     newTab: '(opens in a new tab)',
+    /** an animated invitation (the scroll scene) on a plan without it */
+    scene: {
+      badge: 'Animated',
+      label: 'An animated invitation: what does it mean?',
+      title: 'An animated invitation',
+      body: 'Try it and edit freely. Publishing an animated invitation needs the Pro or Business plan — or turn off “The background moves as you scroll” (Design → Style & motion).',
+    },
   },
   rail: {
     label: 'Editor navigation',
@@ -342,6 +349,7 @@ export const editorEn: EditorDict = {
       onePicture:
         'The background is the main screen’s picture. To have it change as guests scroll, give parts pictures of their own (edit the part → Picture).',
       desktop: 'On a computer the invitation shows in a phone frame, over its first picture, blurred.',
+      plan: 'An animated invitation is part of Pro and Business: try it and preview it — publishing it needs an upgrade.',
     },
     style: {
       typeScale: 'Text size',

@@ -18,6 +18,7 @@ import {
   PALETTE_KEYS,
   SCENE_DRIFTS,
   SCENE_PARTICLES,
+  SCENE_PROPS,
   SCENE_ZOOMS,
   SCROLL_EFFECTS,
   SECTION_LAYOUTS,
@@ -567,6 +568,7 @@ export const OpeningConfigSchema = z.strictObject({
 export const TemplateSceneSchema = z.strictObject({
   enabled: z.boolean(),
   particles: z.enum(SCENE_PARTICLES),
+  prop: z.enum(SCENE_PROPS).nullable().default(null),
   shade: HexColorSchema.nullable(),
   tracking: z.number().min(0).max(0.4),
 });

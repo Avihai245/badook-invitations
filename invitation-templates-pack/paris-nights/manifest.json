@@ -1,0 +1,487 @@
+{
+  "id": "paris-nights",
+  "version": 1,
+  "name": {
+    "he": "לילות פריז",
+    "en": "Paris Nights"
+  },
+  "description": {
+    "he": "הזמנה שהיא ערב בפריז: רחוב של מרפסות ברזל ובית קפה מואר, מגדל הברזל בשקיעה, גשר של פנסים מעל הנהר — ועד טבעת בקופסה פתוחה, לאור נרות. עלי ורדים נושרים עם הגלילה, והיא נפתחת במעטפה עם חותם שעווה.",
+    "en": "An invitation that is an evening in Paris: a street of iron balconies and a glowing café, the iron tower at sunset, a bridge of lamps over the river — and at last a ring in an open box, by candlelight. Rose petals fall as your guests scroll, and it opens as an envelope stamped in wax."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "engagement",
+    "wedding"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/paris-nights/scene-sparkle.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F6EEEC",
+      "surface": "#FCF8F7",
+      "ink": "#1F2A44",
+      "inkMuted": "#5C6275",
+      "accent": "#D9C29A",
+      "accentInk": "#1F2A44",
+      "line": "#E6D8D4",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 10,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.98,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#1B1F33",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "champagne",
+      "name": {
+        "he": "שמפניה",
+        "en": "Champagne"
+      },
+      "palette": {
+        "bg": "#F6EEEC",
+        "surface": "#FCF8F7",
+        "ink": "#1F2A44",
+        "inkMuted": "#5C6275",
+        "accent": "#D9C29A",
+        "accentInk": "#1F2A44",
+        "line": "#E6D8D4"
+      }
+    },
+    {
+      "id": "rose",
+      "name": {
+        "he": "ורד מאובק",
+        "en": "Dusty rose"
+      },
+      "palette": {
+        "bg": "#F8EFEE",
+        "surface": "#FDF9F8",
+        "ink": "#3A2A33",
+        "inkMuted": "#6F5B63",
+        "accent": "#E3B7B0",
+        "accentInk": "#3A2A33",
+        "line": "#EBDAD8"
+      }
+    },
+    {
+      "id": "navy",
+      "name": {
+        "he": "כחול לילה",
+        "en": "Midnight"
+      },
+      "palette": {
+        "bg": "#1B1F33",
+        "surface": "#252B44",
+        "ink": "#F4ECE6",
+        "inkMuted": "#B9B3B8",
+        "accent": "#F2C27B",
+        "accentInk": "#1B1F33",
+        "line": "#353B57"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "paris",
+      "display": {
+        "latin": "Pinyon Script",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "boulevard",
+      "display": {
+        "latin": "Italiana",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Italiana",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/paris-nights/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/paris-nights/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#8C2E3C",
+      "#1F2A44",
+      "#B08D57",
+      "#C98F8A"
+    ],
+    "monogramFont": {
+      "latin": "Playfair Display",
+      "hebrew": "Bellefair"
+    },
+    "opening": {
+      "preset": "envelope",
+      "trigger": "tap"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "street",
+        "name": {
+          "he": "רחוב פריזאי",
+          "en": "A Paris street"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-street",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "tower",
+        "name": {
+          "he": "המגדל בשקיעה",
+          "en": "The tower at sunset"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-tower",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#1B1F33",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "sparkles",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "petals",
+    "shade": "#1B1F33",
+    "tracking": 0.24
+  },
+  "assets": {
+    "scene-street": "/templates/paris-nights/scene-street.webp",
+    "scene-tower": "/templates/paris-nights/scene-tower.webp",
+    "scene-bridge": "/templates/paris-nights/scene-bridge.webp",
+    "scene-sparkle": "/templates/paris-nights/scene-sparkle.webp",
+    "scene-ring": "/templates/paris-nights/scene-ring.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-tower",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-bridge",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-sparkle",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-ring",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

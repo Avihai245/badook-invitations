@@ -56,3 +56,23 @@ Install: the manifests and defaults are read from this folder by the app (src/fe
 | `ballet-rose` | bat_mitzvah, birthday | premium |
 | `vinyl-groove` | birthday, engagement, corporate, other | standard |
 | `retro-80s` | birthday, corporate, other | premium |
+
+## Animated designs (scroll scenes)
+
+Each is one film over a backdrop pinned to the screen (`manifest.scene`, `src/features/invitations/renderer/scene`): five pictures that cross-fade section by section, particles, and on some a prop that travels the whole scroll and arrives at the end (a basketball through the hoop, a football into the net, a rocket onto the moon, a balloon up to the moon). All are `premium`, and publishing any invitation with the animation on needs a paid plan. Their pictures ship as painted placeholders (`scripts/scene-art/<id>.mjs`) until the real ones are uploaded (each folder's `ASSETS.md`).
+
+| id | categories | opening | particles | prop |
+|---|---|---|---|---|
+| `celestial` | wedding, engagement, bar_mitzvah, bat_mitzvah | gatefold | butterflies | — |
+| `jerusalem-gold` | bar_mitzvah | gate | gold_dust | — |
+| `enchanted-garden` | bat_mitzvah, birthday | gatefold | butterflies | — |
+| `paris-nights` | engagement, wedding | envelope | petals | — |
+| `henna-lanterns` | henna | gate | petals | — |
+| `forest-lights` | wedding, engagement | gatefold | gold_dust | — |
+| `buzzer-beater` | bar_mitzvah, bat_mitzvah, birthday | fireworks | none | basketball |
+| `golden-goal` | bar_mitzvah, bat_mitzvah, birthday | fireworks | none | football |
+| `moonshot` | birthday, bar_mitzvah, bat_mitzvah | fireworks | gold_dust | rocket |
+| `lullaby-sky` | brit, baby_shower, birthday | envelope | gold_dust | balloon |
+| `sunset-shore` | wedding, engagement | gold_dust | petals | — |
+| `gala-night` | birthday, corporate, wedding | curtain | gold_dust | — |
+| `spotlight-stage` | bat_mitzvah, birthday | curtain | gold_dust | — |

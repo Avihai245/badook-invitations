@@ -1,0 +1,506 @@
+{
+  "id": "lullaby-sky",
+  "version": 1,
+  "name": {
+    "he": "שמיים של שיר ערש",
+    "en": "Lullaby Sky"
+  },
+  "description": {
+    "he": "הזמנה שהיא טיסה רכה בשמיים: כדור פורח קטן עולה מהשחר הוורוד, בין עננים רכים, מעל גבעות וכפר קטן — ובסוף הגלילה מגיע אל הירח, בשמיים מלאי כוכבים. אבקת כוכבים מרחפת, והיא נפתחת במעטפה עם חותם.",
+    "en": "An invitation that is a soft flight through the sky: a little hot-air balloon rises from a pink dawn, among soft clouds, over hills and a tiny village — and at the end of the scroll reaches the moon, in a sky full of stars. Stardust drifts, and it opens as an envelope stamped in wax."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "brit",
+    "baby_shower",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/lullaby-sky/scene-clouds.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F4F7FC",
+      "surface": "#FDFEFF",
+      "ink": "#2B2F52",
+      "inkMuted": "#636887",
+      "accent": "#BFD9EE",
+      "accentInk": "#2B2F52",
+      "line": "#DEE6F1",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 20,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.96,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#2B2F52",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "blue",
+      "name": {
+        "he": "תכלת",
+        "en": "Baby blue"
+      },
+      "palette": {
+        "bg": "#F4F7FC",
+        "surface": "#FDFEFF",
+        "ink": "#2B2F52",
+        "inkMuted": "#636887",
+        "accent": "#BFD9EE",
+        "accentInk": "#2B2F52",
+        "line": "#DEE6F1"
+      }
+    },
+    {
+      "id": "blush",
+      "name": {
+        "he": "ורוד",
+        "en": "Blush"
+      },
+      "palette": {
+        "bg": "#FCF3F4",
+        "surface": "#FFFBFB",
+        "ink": "#4A2E3A",
+        "inkMuted": "#7A6069",
+        "accent": "#F4D3D8",
+        "accentInk": "#4A2E3A",
+        "line": "#F1DEE2"
+      }
+    },
+    {
+      "id": "cream",
+      "name": {
+        "he": "שמנת",
+        "en": "Cream"
+      },
+      "palette": {
+        "bg": "#FBF3E6",
+        "surface": "#FFFCF6",
+        "ink": "#3D3222",
+        "inkMuted": "#6F6452",
+        "accent": "#E7C98E",
+        "accentInk": "#3D3222",
+        "line": "#EEE2CC"
+      }
+    },
+    {
+      "id": "lilac",
+      "name": {
+        "he": "לילך",
+        "en": "Lilac"
+      },
+      "palette": {
+        "bg": "#F5F3FC",
+        "surface": "#FDFCFF",
+        "ink": "#2F2B52",
+        "inkMuted": "#666287",
+        "accent": "#C9C3EC",
+        "accentInk": "#2F2B52",
+        "line": "#E2DEF3"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "lullaby",
+      "display": {
+        "latin": "Fredoka",
+        "hebrew": "Fredoka"
+      },
+      "heading": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Varela Round"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Varela Round"
+      }
+    },
+    {
+      "id": "storybook",
+      "display": {
+        "latin": "Fraunces",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Quicksand",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Quicksand",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/lullaby-sky/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/lullaby-sky/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#8E8FC4",
+      "#E7A9B4",
+      "#7FA9CF",
+      "#E7C98E"
+    ],
+    "monogramFont": {
+      "latin": "Quicksand",
+      "hebrew": "Varela Round"
+    },
+    "opening": {
+      "preset": "envelope",
+      "trigger": "tap"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "dawn",
+        "name": {
+          "he": "שחר ורוד",
+          "en": "A pink dawn"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-dawn",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "clouds",
+        "name": {
+          "he": "בין העננים",
+          "en": "Among the clouds"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-clouds",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#2B2F52",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "stars",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "gold_dust",
+    "prop": "balloon",
+    "shade": "#2B2F52",
+    "tracking": 0.16
+  },
+  "assets": {
+    "scene-dawn": "/templates/lullaby-sky/scene-dawn.webp",
+    "scene-clouds": "/templates/lullaby-sky/scene-clouds.webp",
+    "scene-meadow": "/templates/lullaby-sky/scene-meadow.webp",
+    "scene-dusk": "/templates/lullaby-sky/scene-dusk.webp",
+    "scene-moon": "/templates/lullaby-sky/scene-moon.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-clouds",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in",
+          "drift": "up"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-meadow",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-dusk",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-moon",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

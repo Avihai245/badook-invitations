@@ -1,0 +1,437 @@
+{
+  "templateId": "moonshot",
+  "defaults": {
+    "birthday": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "3… 2… 1… המראה! חוגגים עם",
+        "en": "3… 2… 1… Liftoff! Celebrating"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור לשיגור",
+          "en": "Countdown to launch"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until liftoff"
+        },
+        "afterEvent": {
+          "he": "נחיתה מוצלחת! תודה שבאתם",
+          "en": "Safe landing! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "משימה: הירח",
+          "en": "Mission: the moon"
+        },
+        "body": {
+          "he": "הטיל מתודלק, הצוות מוכן והכוכבים כבר נוצצים.\nב־{date} ממריאים יחד לחגוג את {primary}!",
+          "en": "The rocket is fuelled, the crew is ready and the stars are already shining.\nOn {date} we blast off together to celebrate {primary}!"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בסיס השיגור",
+          "en": "Launch pad"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "הגעה לבסיס",
+            "en": "Crew check-in"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "משימה בחלל",
+            "en": "Space mission"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "ארוחת אסטרונאוטים",
+            "en": "Astronaut dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ושירה",
+            "en": "Cake & singing"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למשימה?",
+          "en": "Joining the mission?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה בבסיס השיגור",
+          "en": "Awesome! See you at the launch pad"
+        },
+        "declineMessage": {
+          "he": "חבל! נשלח לכם גלויה מהירח",
+          "en": "Too bad! We’ll send you a postcard from the moon"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על הירח!",
+        "en": "See you on the moon!"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "3… 2… 1… המראה! הטיל בדרך לירח.\nבשמחה גדולה אנו מזמינים אתכם\nלחגוג איתנו את יום ההולדת.",
+            "en": "3… 2… 1… liftoff! The rocket is on its way to the moon.\nWith great joy we invite you\nto celebrate the birthday with us.",
+            "ru": "3… 2… 1… пуск! Ракета летит к Луне.\nС большой радостью мы приглашаем вас\nотпраздновать с нами день рождения.",
+            "ar": "3… 2… 1… انطلاق! الصاروخ في طريقه إلى القمر.\nبفرح كبير ندعوكم\nلتحتفلوا معنا بعيد الميلاد.",
+            "fr": "3… 2… 1… décollage ! La fusée file vers la Lune.\nC’est avec une grande joie que nous vous invitons\nà fêter l’anniversaire avec nous.",
+            "es": "3… 2… 1… ¡despegue! El cohete va camino de la Luna.\nCon gran alegría los invitamos\na celebrar con nosotros el cumpleaños.",
+            "am": "3… 2… 1… መነሳት! ሮኬቱ ወደ ጨረቃ እየሄደ ነው።\nበታላቅ ደስታ እንጋብዛችኋለን፤\nየልደት በዓሉን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "3… 2… 1… המראה לכבוד בר המצווה של",
+        "en": "3… 2… 1… Liftoff for the bar mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור לשיגור",
+          "en": "Countdown to launch"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until liftoff"
+        },
+        "afterEvent": {
+          "he": "נחיתה מוצלחת! מזל טוב ותודה שבאתם",
+          "en": "Safe landing! Mazal tov and thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלוש עשרה — עד הירח",
+          "en": "Thirteen — to the moon"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה — ואחר כך ממריאים לחגוג.\nבואו להצטרף למשימה הכי חשובה של השנה.",
+          "en": "On {date}, {primary} is called to the Torah — and then we blast off to celebrate.\nCome join the most important mission of the year."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בסיס השיגור",
+          "en": "Launch pad"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "הגעה לבסיס",
+            "en": "Crew check-in"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת אסטרונאוטים",
+            "en": "Astronaut dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "הרחבה נפתחת",
+            "en": "Dance floor opens"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למשימה?",
+          "en": "Joining the mission?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the bar mitzvah boy"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה בבסיס השיגור",
+          "en": "Awesome! See you at the launch pad"
+        },
+        "declineMessage": {
+          "he": "חבל! נשלח לכם גלויה מהירח",
+          "en": "Too bad! We’ll send you a postcard from the moon"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הירח!",
+        "en": "Mazal tov — see you on the moon!"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "3… 2… 1… המראה! הטיל בדרך לירח.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבר מצווה.",
+            "en": "3… 2… 1… liftoff! The rocket is on its way to the moon.\nWith great excitement we invite you\nto celebrate the bar mitzvah with us.",
+            "ru": "3… 2… 1… пуск! Ракета летит к Луне.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бар-мицву.",
+            "ar": "3… 2… 1… انطلاق! الصاروخ في طريقه إلى القمر.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبار متسفا.",
+            "fr": "3… 2… 1… décollage ! La fusée file vers la Lune.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bar-mitsva avec nous.",
+            "es": "3… 2… 1… ¡despegue! El cohete va camino de la Luna.\nCon gran emoción los invitamos\na celebrar con nosotros el bar mitzvá.",
+            "am": "3… 2… 1… መነሳት! ሮኬቱ ወደ ጨረቃ እየሄደ ነው።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባር ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "3… 2… 1… המראה לכבוד הבת מצווה של",
+        "en": "3… 2… 1… Liftoff for the bat mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור לשיגור",
+          "en": "Countdown to launch"
+        },
+        "subtitle": {
+          "he": "עד ההמראה",
+          "en": "Until liftoff"
+        },
+        "afterEvent": {
+          "he": "נחיתה מוצלחת! מזל טוב ותודה שבאתם",
+          "en": "Safe landing! Mazal tov and thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שתים עשרה — עד הירח",
+          "en": "Twelve — to the moon"
+        },
+        "body": {
+          "he": "ב־{date} חוגגים את {primary} — וממריאים לחגוג.\nבואו להצטרף למשימה הכי חשובה של השנה.",
+          "en": "On {date} we celebrate {primary} — and blast off to party.\nCome join the most important mission of the year."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "בסיס השיגור",
+          "en": "Launch pad"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "הגעה לבסיס",
+            "en": "Crew check-in"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ארוחת אסטרונאוטים",
+            "en": "Astronaut dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "הרחבה נפתחת",
+            "en": "Dance floor opens"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "מצטרפים למשימה?",
+          "en": "Joining the mission?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A wish for the bat mitzvah girl"
+        },
+        "successMessage": {
+          "he": "מעולה! נתראה בבסיס השיגור",
+          "en": "Awesome! See you at the launch pad"
+        },
+        "declineMessage": {
+          "he": "חבל! נשלח לכם גלויה מהירח",
+          "en": "Too bad! We’ll send you a postcard from the moon"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הירח!",
+        "en": "Mazal tov — see you on the moon!"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "3… 2… 1… המראה! הטיל בדרך לירח.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבת מצווה.",
+            "en": "3… 2… 1… liftoff! The rocket is on its way to the moon.\nWith great excitement we invite you\nto celebrate the bat mitzvah with us.",
+            "ru": "3… 2… 1… пуск! Ракета летит к Луне.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бат-мицву.",
+            "ar": "3… 2… 1… انطلاق! الصاروخ في طريقه إلى القمر.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبات متسفا.",
+            "fr": "3… 2… 1… décollage ! La fusée file vers la Lune.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bat-mitsva avec nous.",
+            "es": "3… 2… 1… ¡despegue! El cohete va camino de la Luna.\nCon gran emoción los invitamos\na celebrar con nosotros el bat mitzvá.",
+            "am": "3… 2… 1… መነሳት! ሮኬቱ ወደ ጨረቃ እየሄደ ነው።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባት ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

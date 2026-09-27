@@ -429,6 +429,9 @@ export const he = {
     previewLanguage: 'שפת התצוגה המקדימה',
     filterLabel: 'סינון לפי סוג אירוע',
     all: 'הכל',
+    /** the designs made as a film (their backdrop moves as guests scroll) */
+    animated: 'מונפשים',
+    animatedBadge: 'מונפשת',
     /** read out after the filter changes */
     results: { one: 'עיצוב אחד', other: '{n} עיצובים' },
     playPreview: 'הצגת התצוגה המקדימה של {name}',

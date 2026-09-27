@@ -78,6 +78,19 @@ export const FX_BY_TEMPLATE: Readonly<Record<string, AmbientKind | readonly [Amb
   lumiere: ['fireflies', 'sparkles'], // evening light — golden motes over the photo, gold glints
   // ── the scroll scene ──
   celestial: 'sparkles', // a gate among the clouds — gold glints (the scene's own: butterflies)
+  // ── the animated designs (without the film: the scene's own particles drift over it) ──
+  'jerusalem-gold': 'sparkles', // golden Jerusalem — gold glints on the stone
+  'enchanted-garden': 'petals', // an enchanted garden
+  'paris-nights': ['sparkles', 'confetti'], // an evening in Paris — the tower's sparkle
+  'henna-lanterns': 'fireflies', // a henna night — lantern light
+  'forest-lights': 'fireflies', // a path of lights through the forest
+  'buzzer-beater': 'confetti', // basketball
+  'golden-goal': 'confetti', // football
+  moonshot: 'stars', // a flight to the moon
+  'lullaby-sky': 'stars', // pastel skies, a balloon to the moon
+  'sunset-shore': 'petals', // the beach at sunset
+  'gala-night': ['sparkles', 'confetti'], // a gala evening — chandelier glints
+  'spotlight-stage': ['confetti', 'stars'], // the stage's finale
 };
 
 /** A template the table doesn't know yet: by its first event type. */

@@ -1,0 +1,506 @@
+{
+  "id": "spotlight-stage",
+  "version": 1,
+  "name": {
+    "he": "אור הזרקורים",
+    "en": "Spotlight"
+  },
+  "description": {
+    "he": "הזמנה שהיא הופעה גדולה: מהמראה המוארת מאחורי הקלעים, אל המסך האדום והזרקור, אל אלומות אור ורודות וזהובות, אל האולם המלא — ועד הקונפטי של הסוף. אבק זהב מרחף, והפתיחה: מסך קטיפה שנפתח לצדדים.",
+    "en": "An invitation that is a big show: from the lit mirror backstage, to the red curtain and the spotlight, through pink and gold beams of light and the full house — to the confetti of the finale. Gold dust drifts, and it opens as a velvet curtain parts."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "bat_mitzvah",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/spotlight-stage/scene-curtain.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#1A0E24",
+      "surface": "#261635",
+      "ink": "#FBEFF6",
+      "inkMuted": "#D0B8CC",
+      "accent": "#E0B84F",
+      "accentInk": "#1A0E24",
+      "line": "#3A2450",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.96,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#1A0E24",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב במה",
+        "en": "Stage gold"
+      },
+      "palette": {
+        "bg": "#1A0E24",
+        "surface": "#261635",
+        "ink": "#FBEFF6",
+        "inkMuted": "#D0B8CC",
+        "accent": "#E0B84F",
+        "accentInk": "#1A0E24",
+        "line": "#3A2450"
+      }
+    },
+    {
+      "id": "pink",
+      "name": {
+        "he": "ורוד",
+        "en": "Pink"
+      },
+      "palette": {
+        "bg": "#1A0E24",
+        "surface": "#261635",
+        "ink": "#FBEFF6",
+        "inkMuted": "#D0B8CC",
+        "accent": "#F0A6CA",
+        "accentInk": "#1A0E24",
+        "line": "#3A2450"
+      }
+    },
+    {
+      "id": "red",
+      "name": {
+        "he": "אדום קטיפה",
+        "en": "Velvet red"
+      },
+      "palette": {
+        "bg": "#1F0A12",
+        "surface": "#2C111B",
+        "ink": "#FBEFF2",
+        "inkMuted": "#D3B6BE",
+        "accent": "#E8707F",
+        "accentInk": "#1F0A12",
+        "line": "#45202C"
+      }
+    },
+    {
+      "id": "light",
+      "name": {
+        "he": "בהיר",
+        "en": "Light"
+      },
+      "palette": {
+        "bg": "#FBF1F5",
+        "surface": "#FFFAFC",
+        "ink": "#3A1830",
+        "inkMuted": "#74566A",
+        "accent": "#9E1B32",
+        "accentInk": "#FFFFFF",
+        "line": "#F0DCE5"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "stage",
+      "display": {
+        "latin": "Abril Fatface",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Playfair Display",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "marquee",
+      "display": {
+        "latin": "Yeseva One",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Yeseva One",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Josefin Sans",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/spotlight-stage/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/spotlight-stage/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#9E1B32",
+      "#E0B84F",
+      "#2A1640",
+      "#F0A6CA"
+    ],
+    "monogramFont": {
+      "latin": "Abril Fatface",
+      "hebrew": "Suez One"
+    },
+    "opening": {
+      "preset": "curtain",
+      "trigger": "scroll",
+      "motion": "part",
+      "color": "#8E1830"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "mirror",
+        "name": {
+          "he": "מאחורי הקלעים",
+          "en": "Backstage"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-mirror",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "curtain",
+        "name": {
+          "he": "המסך האדום",
+          "en": "The red curtain"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-curtain",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#1A0E24",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "confetti",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "gold_dust",
+    "shade": "#1A0E24",
+    "tracking": 0.18
+  },
+  "assets": {
+    "scene-mirror": "/templates/spotlight-stage/scene-mirror.webp",
+    "scene-curtain": "/templates/spotlight-stage/scene-curtain.webp",
+    "scene-beams": "/templates/spotlight-stage/scene-beams.webp",
+    "scene-seats": "/templates/spotlight-stage/scene-seats.webp",
+    "scene-finale": "/templates/spotlight-stage/scene-finale.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-curtain",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-beams",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-seats",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-finale",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in",
+          "drift": "down"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

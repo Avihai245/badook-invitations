@@ -1,0 +1,292 @@
+{
+  "templateId": "spotlight-stage",
+  "defaults": {
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "המסך עולה! הבת מצווה של",
+        "en": "Curtain up! The bat mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שהמסך עולה",
+          "en": "Until the curtain rises"
+        },
+        "afterEvent": {
+          "he": "איזו הופעה! מזל טוב ותודה שבאתם",
+          "en": "What a show! Mazal tov and thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "כוכבת בת שתים עשרה",
+          "en": "A star at twelve"
+        },
+        "body": {
+          "he": "שתים עשרה שנים של ריקוד, צחוק וחלומות גדולים.\nב־{date} {primary} עולה לבמה — ואתם בשורה הראשונה.",
+          "en": "Twelve years of dancing, laughter and big dreams.\nOn {date}, {primary} takes the stage — and you’re in the front row."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "הבמה",
+          "en": "The stage"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ונרות",
+            "en": "Blessings"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "הרחבה נפתחת",
+            "en": "Dance floor opens"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "באים להופעה?",
+          "en": "Coming to the show?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A wish for the bat mitzvah girl"
+        },
+        "successMessage": {
+          "he": "נפלא! שמרנו לכם מקום בשורה הראשונה",
+          "en": "Wonderful! Your front-row seat is saved"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד צעד גם בשבילכם",
+          "en": "Too bad! We’ll dance a step for you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה בשורה הראשונה!",
+        "en": "Mazal tov — see you in the front row!"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "המסך עולה, והזרקור כבר מחכה.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבת מצווה.",
+            "en": "The curtain rises, and the spotlight is waiting.\nWith great excitement we invite you\nto celebrate the bat mitzvah with us.",
+            "ru": "Занавес поднимается, и прожектор уже ждёт.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бат-мицву.",
+            "ar": "الستار يرتفع، وبقعة الضوء بانتظارنا.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبات متسفا.",
+            "fr": "Le rideau se lève, et le projecteur attend déjà.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bat-mitsva avec nous.",
+            "es": "Se levanta el telón y el foco ya está esperando.\nCon gran emoción los invitamos\na celebrar con nosotros el bat mitzvá.",
+            "am": "መጋረጃው ይነሳል፣ የመድረኩ ብርሃንም እየጠበቀ ነው።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባት ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "המסך עולה! בואו לחגוג עם",
+        "en": "Curtain up! Come celebrate with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שהמסך עולה",
+          "en": "Until the curtain rises"
+        },
+        "afterEvent": {
+          "he": "איזו הופעה! תודה שבאתם",
+          "en": "What a show! Thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "ההופעה של השנה",
+          "en": "The show of the year"
+        },
+        "body": {
+          "he": "ב־{date} המסך עולה, הזרקורים נדלקים ו{primary} במרכז הבמה.\nבואו לחגוג איתנו!",
+          "en": "On {date} the curtain rises, the spotlights come on and {primary} takes centre stage.\nCome celebrate with us!"
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "מגיעים",
+            "en": "Arrivals"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "סדנת ריקוד",
+            "en": "Dance workshop"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "המופע",
+            "en": "The show"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ונרות",
+            "en": "Cake & candles"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "באים להופעה?",
+          "en": "Coming to the show?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "נפלא! שמרנו לכם מקום בשורה הראשונה",
+          "en": "Wonderful! Your front-row seat is saved"
+        },
+        "declineMessage": {
+          "he": "חבל! נרקוד צעד גם בשבילכם",
+          "en": "Too bad! We’ll dance a step for you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה בשורה הראשונה!",
+        "en": "See you in the front row!"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "המסך עולה, והזרקור כבר מחכה.\nבשמחה גדולה אנו מזמינים אתכם\nלחגוג איתנו את יום ההולדת.",
+            "en": "The curtain rises, and the spotlight is waiting.\nWith great joy we invite you\nto celebrate the birthday with us.",
+            "ru": "Занавес поднимается, и прожектор уже ждёт.\nС большой радостью мы приглашаем вас\nотпраздновать с нами день рождения.",
+            "ar": "الستار يرتفع، وبقعة الضوء بانتظارنا.\nبفرح كبير ندعوكم\nلتحتفلوا معنا بعيد الميلاد.",
+            "fr": "Le rideau se lève, et le projecteur attend déjà.\nC’est avec une grande joie que nous vous invitons\nà fêter l’anniversaire avec nous.",
+            "es": "Se levanta el telón y el foco ya está esperando.\nCon gran alegría los invitamos\na celebrar con nosotros el cumpleaños.",
+            "am": "መጋረጃው ይነሳል፣ የመድረኩ ብርሃንም እየጠበቀ ነው።\nበታላቅ ደስታ እንጋብዛችኋለን፤\nየልደት በዓሉን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

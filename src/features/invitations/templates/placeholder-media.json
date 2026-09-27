@@ -56,6 +56,270 @@
         "hash": "3767f83093",
         "bytes": 111628
       }
+    },
+    "forest-lights": {
+      "scene-path.webp": {
+        "hash": "7541671f06",
+        "bytes": 125598
+      },
+      "scene-lanterns.webp": {
+        "hash": "ec5503275f",
+        "bytes": 115890
+      },
+      "scene-clearing.webp": {
+        "hash": "43e7a9961a",
+        "bytes": 130754
+      },
+      "scene-tables.webp": {
+        "hash": "83a201e2a8",
+        "bytes": 140776
+      },
+      "scene-canopy.webp": {
+        "hash": "a55103df3d",
+        "bytes": 118780
+      }
+    },
+    "enchanted-garden": {
+      "scene-gate.webp": {
+        "hash": "22962c58ce",
+        "bytes": 134664
+      },
+      "scene-path.webp": {
+        "hash": "0ca265aeef",
+        "bytes": 124950
+      },
+      "scene-swing.webp": {
+        "hash": "1679742459",
+        "bytes": 141820
+      },
+      "scene-gazebo.webp": {
+        "hash": "3b19300190",
+        "bytes": 112512
+      },
+      "scene-night.webp": {
+        "hash": "0429dbd76e",
+        "bytes": 116632
+      }
+    },
+    "sunset-shore": {
+      "scene-dunes.webp": {
+        "hash": "d30f60a607",
+        "bytes": 112790
+      },
+      "scene-sea.webp": {
+        "hash": "9c21e5d738",
+        "bytes": 117494
+      },
+      "scene-chuppah.webp": {
+        "hash": "017dcaa5ba",
+        "bytes": 109994
+      },
+      "scene-lanterns.webp": {
+        "hash": "dac86596c5",
+        "bytes": 109124
+      },
+      "scene-moon.webp": {
+        "hash": "3b228ab01e",
+        "bytes": 115048
+      }
+    },
+    "lullaby-sky": {
+      "scene-dawn.webp": {
+        "hash": "850ffc0333",
+        "bytes": 94372
+      },
+      "scene-clouds.webp": {
+        "hash": "b93e1ac582",
+        "bytes": 97122
+      },
+      "scene-meadow.webp": {
+        "hash": "74c153a439",
+        "bytes": 99926
+      },
+      "scene-dusk.webp": {
+        "hash": "54c4768938",
+        "bytes": 103280
+      },
+      "scene-moon.webp": {
+        "hash": "e00dcc6f6f",
+        "bytes": 100080
+      }
+    },
+    "buzzer-beater": {
+      "scene-tunnel.webp": {
+        "hash": "fdb0562ab9",
+        "bytes": 113592
+      },
+      "scene-court.webp": {
+        "hash": "5623c17bd3",
+        "bytes": 124684
+      },
+      "scene-arena.webp": {
+        "hash": "8e12d231f7",
+        "bytes": 135464
+      },
+      "scene-lines.webp": {
+        "hash": "f7d210c0e3",
+        "bytes": 110902
+      },
+      "scene-rim.webp": {
+        "hash": "a948cdcf1f",
+        "bytes": 119264
+      }
+    },
+    "golden-goal": {
+      "scene-stadium.webp": {
+        "hash": "dd41e7a7ed",
+        "bytes": 138222
+      },
+      "scene-tunnel.webp": {
+        "hash": "edd1d67b1b",
+        "bytes": 109528
+      },
+      "scene-pitch.webp": {
+        "hash": "ae8287d948",
+        "bytes": 117716
+      },
+      "scene-crowd.webp": {
+        "hash": "22ee68757e",
+        "bytes": 127924
+      },
+      "scene-box.webp": {
+        "hash": "d0f59fc66e",
+        "bytes": 134956
+      }
+    },
+    "moonshot": {
+      "scene-pad.webp": {
+        "hash": "2186899ea5",
+        "bytes": 109860
+      },
+      "scene-clouds.webp": {
+        "hash": "96c21e8be9",
+        "bytes": 106626
+      },
+      "scene-orbit.webp": {
+        "hash": "dad929c807",
+        "bytes": 101878
+      },
+      "scene-stars.webp": {
+        "hash": "c3e14f3a62",
+        "bytes": 113828
+      },
+      "scene-moon.webp": {
+        "hash": "1f52b53077",
+        "bytes": 109214
+      }
+    },
+    "spotlight-stage": {
+      "scene-mirror.webp": {
+        "hash": "38ab82a62a",
+        "bytes": 127398
+      },
+      "scene-curtain.webp": {
+        "hash": "705ec5ec9b",
+        "bytes": 124480
+      },
+      "scene-beams.webp": {
+        "hash": "68a3d63ad1",
+        "bytes": 106408
+      },
+      "scene-seats.webp": {
+        "hash": "a8267a5cf8",
+        "bytes": 122964
+      },
+      "scene-finale.webp": {
+        "hash": "2c252e39eb",
+        "bytes": 124968
+      }
+    },
+    "jerusalem-gold": {
+      "scene-gate.webp": {
+        "hash": "1450933783",
+        "bytes": 122048
+      },
+      "scene-alley.webp": {
+        "hash": "3db4872756",
+        "bytes": 107218
+      },
+      "scene-wall.webp": {
+        "hash": "0df41cff95",
+        "bytes": 83230
+      },
+      "scene-tallit.webp": {
+        "hash": "0c44cfc041",
+        "bytes": 113098
+      },
+      "scene-night.webp": {
+        "hash": "f5b76abd62",
+        "bytes": 111136
+      }
+    },
+    "paris-nights": {
+      "scene-street.webp": {
+        "hash": "de0b77319c",
+        "bytes": 158700
+      },
+      "scene-tower.webp": {
+        "hash": "b75bad7915",
+        "bytes": 102316
+      },
+      "scene-bridge.webp": {
+        "hash": "161924db0d",
+        "bytes": 104226
+      },
+      "scene-sparkle.webp": {
+        "hash": "7396a9abfd",
+        "bytes": 112152
+      },
+      "scene-ring.webp": {
+        "hash": "c6dd05eabd",
+        "bytes": 103838
+      }
+    },
+    "henna-lanterns": {
+      "scene-door.webp": {
+        "hash": "9c35e57165",
+        "bytes": 74718
+      },
+      "scene-courtyard.webp": {
+        "hash": "fa7fc4fa6f",
+        "bytes": 83896
+      },
+      "scene-tray.webp": {
+        "hash": "10f9d81bdb",
+        "bytes": 81106
+      },
+      "scene-fabric.webp": {
+        "hash": "c54c1ba281",
+        "bytes": 161606
+      },
+      "scene-sky.webp": {
+        "hash": "996ba37502",
+        "bytes": 130540
+      }
+    },
+    "gala-night": {
+      "scene-doors.webp": {
+        "hash": "a31e595513",
+        "bytes": 123876
+      },
+      "scene-chandelier.webp": {
+        "hash": "7bd8e02a81",
+        "bytes": 131454
+      },
+      "scene-champagne.webp": {
+        "hash": "855d6419dd",
+        "bytes": 124666
+      },
+      "scene-ballroom.webp": {
+        "hash": "6657d4fad0",
+        "bytes": 115976
+      },
+      "scene-terrace.webp": {
+        "hash": "711ff4b033",
+        "bytes": 151526
+      }
     }
   }
 }

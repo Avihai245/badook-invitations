@@ -1,0 +1,295 @@
+{
+  "templateId": "sunset-shore",
+  "defaults": {
+    "wedding": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "אנחנו מתחתנים",
+        "en": "We are getting married"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד השקיעה שלנו",
+          "en": "Until our sunset"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הים שלנו",
+          "en": "Our sea"
+        },
+        "body": {
+          "he": "הכל התחיל בשקיעה אחת על החוף.\nב־{date} אנחנו מתחתנים — ורוצים אתכם איתנו.",
+          "en": "It all began with one sunset on the beach.\nOn {date} we are getting married — and we want you with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החתונה",
+          "en": "The wedding"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "18:00",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:00",
+          "label": {
+            "he": "חופה בשקיעה",
+            "en": "The ceremony"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "רוקדים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נשמח לראותכם",
+          "en": "We would love to see you"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה על החוף",
+          "en": "Thank you! See you on the beach"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם. נתגעגע",
+          "en": "Thank you for letting us know. We will miss you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה, ונתראה בשקיעה",
+        "en": "With love — see you at sunset"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "השמש נוגעת בים, והחול עוד חם.\nבשמחה ובהתרגשות אנו מזמינים אתכם\nלחגוג איתנו את היום שבו מתחיל הפרק היפה ביותר שלנו.",
+            "en": "The sun touches the sea, and the sand is still warm.\nWith joy and excitement we invite you\nto celebrate the day our most beautiful chapter begins.",
+            "ru": "Солнце касается моря, а песок ещё тёплый.\nС радостью и волнением мы приглашаем вас\nотпраздновать с нами день, когда начнётся самая прекрасная глава нашей жизни.",
+            "ar": "الشمس تلامس البحر، والرمل ما زال دافئًا.\nبكل فرح وحماس ندعوكم\nلتحتفلوا معنا باليوم الذي يبدأ فيه أجمل فصل في حياتنا.",
+            "fr": "Le soleil effleure la mer, et le sable est encore chaud.\nC’est avec joie et émotion que nous vous invitons\nà célébrer avec nous le jour où commence notre plus beau chapitre.",
+            "es": "El sol toca el mar y la arena aún está tibia.\nCon alegría y emoción los invitamos\na celebrar con nosotros el día en que comienza nuestro capítulo más bonito.",
+            "am": "ፀሐይ ባሕሩን ትነካለች፣ አሸዋውም ገና ሞቃት ነው።\nበደስታና በጉጉት እንጋብዛችኋለን፤\nየሕይወታችን እጅግ ውብ ምዕራፍ የሚጀምርበትን ቀን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "engagement": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "אמרנו כן! בואו לחגוג איתנו",
+        "en": "We said yes! Come celebrate with us"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שנרים כוסית",
+          "en": "Until we raise a glass"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הים שלנו",
+          "en": "Our sea"
+        },
+        "body": {
+          "he": "הכל התחיל בשקיעה אחת על החוף.\nב־{date} נחגוג את האירוסין שלנו — ונשמח שתהיו איתנו.",
+          "en": "It all began with one sunset on the beach.\nOn {date} we celebrate our engagement — and we’d love you to be there."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המסיבה",
+          "en": "The party"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "A toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחה",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "מוזיקה וריקודים",
+            "en": "Music & dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "תבואו לחגוג איתנו?",
+          "en": "Will you celebrate with us?"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לזוג",
+          "en": "A wish for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה על החוף",
+          "en": "Thank you! See you on the beach"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם — נרים כוסית גם בשבילכם",
+          "en": "Thanks for letting us know — we’ll raise a glass for you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "באהבה, ונתראה בשקיעה",
+        "en": "With love — see you at sunset"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "השמש נוגעת בים, והחול עוד חם.\nאמרנו כן — ועכשיו אנחנו רוצים לחגוג את זה איתכם.",
+            "en": "The sun touches the sea, and the sand is still warm.\nWe said yes — and now we want to celebrate it with you.",
+            "ru": "Солнце касается моря, а песок ещё тёплый.\nМы сказали «да» — и теперь хотим отпраздновать это с вами.",
+            "ar": "الشمس تلامس البحر، والرمل ما زال دافئًا.\nقلنا نعم — والآن نريد أن نحتفل بذلك معكم.",
+            "fr": "Le soleil effleure la mer, et le sable est encore chaud.\nNous avons dit oui — et nous voulons le fêter avec vous.",
+            "es": "El sol toca el mar y la arena aún está tibia.\nDijimos que sí, y ahora queremos celebrarlo con ustedes.",
+            "am": "ፀሐይ ባሕሩን ትነካለች፣ አሸዋውም ገና ሞቃት ነው።\nአዎ ብለናል — አሁን ደግሞ ከእናንተ ጋር ልናከብረው እንፈልጋለን።"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -368,11 +368,26 @@ export const SCENE_ZOOMS = ['in', 'out', 'none'] as const satisfies readonly Sce
 /** A backdrop's vertical drift: `up` — the camera rises, the picture sinks; `down` — the reverse. */
 export type SceneDrift = 'up' | 'down';
 export const SCENE_DRIFTS = ['up', 'down'] as const satisfies readonly SceneDrift[];
+/**
+ * A scene's prop (renderer/scene/props.ts): one thing that travels across the whole invitation as the
+ * guest scrolls — pinned to the screen with the backdrop — and arrives at its target at the very end:
+ * a basketball thrown in one long arc that drops through the hoop, a football curled into the top
+ * corner of the net, a rocket that lands on the moon, a hot-air balloon that rises to the moon.
+ */
+export type SceneProp = 'basketball' | 'football' | 'rocket' | 'balloon';
+export const SCENE_PROPS = [
+  'basketball',
+  'football',
+  'rocket',
+  'balloon',
+] as const satisfies readonly SceneProp[];
 /** A template made as a scroll scene (manifest `scene`). */
 export interface TemplateScene {
   /** new invitations of the design start as a scene (the host may turn it off) */
   enabled: boolean;
   particles: SceneParticles;
+  /** the design's prop, travelling across the whole film (null: none) */
+  prop: SceneProp | null;
   /** the dark tone of the gradient laid over every picture (the texts are light on it); null → the design's */
   shade: string | null;
   /** extra letter spacing of the section titles in the scene, em (0: the design's own) */

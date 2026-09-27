@@ -294,6 +294,8 @@ export function InvitationBody({
               <Suspense fallback={null}>
                 {page}
                 {sceneRsvp(ctx) ? <SceneCta label={perLocale((l) => translate(l, 'scene.rsvp'))} /> : null}
+                {/* the very end of the film: where a prop arrives at its target (PropFinale) */}
+                {scene.prop ? <div className="sc-end" aria-hidden="true" /> : null}
                 <SceneDriver />
               </Suspense>
             </div>

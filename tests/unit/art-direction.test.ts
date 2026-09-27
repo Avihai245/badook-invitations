@@ -239,7 +239,9 @@ describe('the composer (no AI)', () => {
     const plain = input();
     const swatches = PHOTOS.flatMap((p) => p.swatches);
     expect(scoreTemplate(shore, words, swatches)).toBeGreaterThan(scoreTemplate(shore, plain, swatches));
-    expect(composeConcepts(words).map((c) => c.templateId)).toContain('caesarea-shore');
+    // the beach at sunset, a design made to carry photos, leads
+    expect(composeConcepts(words)[0]!.templateId).toBe('sunset-shore');
+    expect(composeConcepts(plain)[0]!.templateId).not.toBe('sunset-shore');
   });
 
   it('only what the host may use; with one design for the event, three looks of it', () => {

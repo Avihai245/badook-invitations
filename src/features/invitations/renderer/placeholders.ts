@@ -253,6 +253,107 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'hills',
     ornament: 'rings',
   },
+  // the animated designs (scroll scenes): their pictures ship with them
+  // (templates/placeholder-media.json) — this only stands in where one is missing, and draws the
+  // cover's paper when the host picks the design's own cover
+  'jerusalem-gold': film(['#7FA2C3', '#E8DCC4', '#8A7350'], {
+    shade: '#8A7350',
+    paper: ['#F8F2E6', '#EFE6D4', '#E2D5BC'],
+    bg: ['#EFE6D4', '#E6DAC4', '#D9C9AC'],
+    hint: '#5A4A33',
+    panorama: 'arches',
+    ornament: 'torah',
+  }),
+  'enchanted-garden': film(['#C9B6E4', '#F2D4D7', '#6F5A86'], {
+    shade: '#6F5A86',
+    paper: ['#FBF3F5', '#F4E6EA', '#EAD6DC'],
+    bg: ['#F4E6EA', '#EDDBE1', '#E2CBD3'],
+    hint: '#5E4A63',
+    panorama: 'garden',
+    ornament: 'peony',
+  }),
+  'paris-nights': film(['#E3B7B0', '#9A7D86', '#1F2A44'], {
+    shade: null,
+    paper: ['#FAF3F1', '#F1E4E1', '#E5D2CE'],
+    bg: ['#EFE0DD', '#E6D2CE', '#D9C1BC'],
+    hint: '#5C4A52',
+    panorama: 'skyline',
+    ornament: 'rings',
+  }),
+  'henna-lanterns': film(['#1F3C5C', '#8E1B2B', '#2A0E12'], {
+    shade: null,
+    paper: ['#F7EBD6', '#EEDCBF', '#E1C9A4'],
+    bg: ['#7A2A24', '#6A2320', '#561C1A'],
+    hint: DARK_HINT,
+    panorama: 'arches',
+    ornament: 'hamsa',
+  }),
+  'forest-lights': film(['#E0B566', '#6E8B5E', '#142019'], {
+    shade: null,
+    paper: ['#F6F1E6', '#ECE4D3', '#DED3BC'],
+    bg: ['#E6DECB', '#DBD1BA', '#CCBFA3'],
+    hint: '#4A4A3A',
+    panorama: 'garden',
+    ornament: 'olive-branch',
+  }),
+  'buzzer-beater': film(['#1C2A4F', '#0F1B33', '#0B1220'], {
+    shade: null,
+    paper: ['#FDF4E8', '#F3E4CF', '#E4CFB2'],
+    bg: ['#16264A', '#101D3B', '#0B1220'],
+    hint: DARK_HINT,
+    panorama: 'pitch',
+    ornament: 'basketball',
+    ticket: { paper: '#FFF6EA', edge: '#F26B1D' },
+  }),
+  'golden-goal': film(['#16304D', '#0C1A2E', '#1D3B2A'], {
+    shade: null,
+    paper: ['#F6FAF2', '#E6EFDD', '#D2DFC6'],
+    bg: ['#12253F', '#0E1F35', '#081421'],
+    hint: DARK_HINT,
+    panorama: 'pitch',
+    ornament: 'ball',
+    ticket: { paper: '#F7FBEF', edge: '#2E7D32' },
+  }),
+  moonshot: film(['#3B2A6B', '#141A45', '#070A1E'], {
+    shade: null,
+    paper: ['#EEF1FF', '#DDE2F5', '#C7CEE8'],
+    bg: ['#1C1F4A', '#151840', '#0B1030'],
+    hint: DARK_HINT,
+    panorama: 'stars',
+    ornament: 'rocket',
+  }),
+  'lullaby-sky': film(['#BFD9EE', '#F4D3D8', '#8E8FC4'], {
+    shade: '#8E8FC4',
+    paper: ['#FDFBF7', '#F5EFE6', '#EAE1D3'],
+    bg: ['#E8EEF7', '#DFE7F2', '#D2DCEB'],
+    hint: '#5A5E7E',
+    panorama: 'hills',
+    ornament: 'baby',
+  }),
+  'sunset-shore': film(['#E3B062', '#E88E6E', '#1D4E6B'], {
+    shade: '#1D4E6B',
+    paper: ['#FBF5EC', '#F2E6D5', '#E6D4BC'],
+    bg: ['#F0E2CF', '#E7D5BE', '#DAC4A8'],
+    hint: '#5A4A3A',
+    panorama: 'waves',
+    ornament: 'rings',
+  }),
+  'gala-night': film(['#3A2A1E', '#1D1916', '#0A0806'], {
+    shade: null,
+    paper: ['#F6EFE0', '#EADFC8', '#DACBAB'],
+    bg: ['#2A211A', '#201913', '#14100C'],
+    hint: DARK_HINT,
+    panorama: 'deco',
+    ornament: 'deco-fan',
+  }),
+  'spotlight-stage': film(['#4A1F3A', '#2A1640', '#1A0E24'], {
+    shade: null,
+    paper: ['#FBF1F5', '#F2E1EA', '#E6CDDA'],
+    bg: ['#4A1F3A', '#3C1830', '#2A1024'],
+    hint: DARK_HINT,
+    panorama: 'swags',
+    ornament: 'star',
+  }),
   // ── scene templates: a drawn scene over a base gradient ──
   'cloud-arch': drawn('cloud-arch', ['#F5F3EF', '#EFECE6', '#E6E1D8'], {
     bg: ['#F2F0EB', '#E9E5DE', '#DCD5CB'],
@@ -551,6 +652,44 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
  * link-preview image); the CSS cover's envelope is `paper` [light, mid, shade] on `bg`, and its card
  * shows the scene.
  */
+/**
+ * An animated design's stand-in (a scroll scene: its own pictures ship with it): its sky from the top
+ * down to its shade, and its paper for the envelope, the ticket and the cover's card.
+ */
+function film(
+  sky: [string, string, string],
+  o: {
+    shade: string | null;
+    paper: [string, string, string];
+    bg: [string, string, string];
+    hint: string;
+    panorama: PanoramaKind;
+    ornament: IconName;
+    ticket?: { paper: string; edge: string };
+  },
+): PlaceholderArt {
+  const [light, mid, deep] = o.paper;
+  return {
+    sky:
+      'radial-gradient(90% 50% at 50% 100%,rgba(0,0,0,.35),transparent 70%),' +
+      `linear-gradient(180deg,${sky[0]} 0%,${sky[1]} 50%,${sky[2]} 100%)`,
+    shade: o.shade,
+    cloud: 'rgba(255,255,255,.4)',
+    hills: [sky[1], sky[2], sky[2], sky[2]],
+    cover: {
+      bg: o.bg,
+      envelope: [light, mid],
+      pocket: [light, mid],
+      flap: [mid, deep],
+      card: `linear-gradient(180deg,${sky[0]},${sky[1]} 50%,${sky[2]})`,
+      hint: o.hint,
+      ...(o.ticket ? { ticket: o.ticket } : null),
+    },
+    panorama: o.panorama,
+    ornament: o.ornament,
+  };
+}
+
 function drawn(
   scene: SceneId,
   sky: [string, string, string],

@@ -1,0 +1,505 @@
+{
+  "id": "forest-lights",
+  "version": 1,
+  "name": {
+    "he": "שביל האורות",
+    "en": "Forest Lights"
+  },
+  "description": {
+    "he": "הזמנה שהיא הליכה ביער בשעת הזהב: שביל בין עצים גבוהים וקרני שמש, צנצנות ונרות לאורך הדרך, חופה מעץ בקרחת היער, שולחנות ארוכים תחת שרשראות אור — ועד חופה של אורות וכוכבים. אבק זהב מרחף, והפתיחה: חותם שעווה ירוק על נייר מובלט.",
+    "en": "An invitation that is a walk through the forest at golden hour: a path between tall trees and shafts of sun, jars and candles along the way, a wooden chuppah in the clearing, long tables under strings of light — and at last a canopy of lights and stars. Gold dust drifts, and it opens with embossed paper and a green wax stamp."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "wedding",
+    "engagement"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/forest-lights/scene-path.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F2EEE3",
+      "surface": "#FAF8F2",
+      "ink": "#22362B",
+      "inkMuted": "#5B6B5F",
+      "accent": "#E0B566",
+      "accentInk": "#1F2A22",
+      "line": "#DCD6C6",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.94,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#142019",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "אור זהב",
+        "en": "Golden light"
+      },
+      "palette": {
+        "bg": "#F2EEE3",
+        "surface": "#FAF8F2",
+        "ink": "#22362B",
+        "inkMuted": "#5B6B5F",
+        "accent": "#E0B566",
+        "accentInk": "#1F2A22",
+        "line": "#DCD6C6"
+      }
+    },
+    {
+      "id": "moss",
+      "name": {
+        "he": "טחב",
+        "en": "Moss"
+      },
+      "palette": {
+        "bg": "#EEF1EA",
+        "surface": "#F9FAF7",
+        "ink": "#22362B",
+        "inkMuted": "#5B6B5F",
+        "accent": "#86A276",
+        "accentInk": "#142019",
+        "line": "#D6DDD0"
+      }
+    },
+    {
+      "id": "cream",
+      "name": {
+        "he": "שמנת",
+        "en": "Cream"
+      },
+      "palette": {
+        "bg": "#F6F1E7",
+        "surface": "#FDFBF6",
+        "ink": "#2B2620",
+        "inkMuted": "#6A6155",
+        "accent": "#C9A66B",
+        "accentInk": "#2B2620",
+        "line": "#E6DCCB"
+      }
+    },
+    {
+      "id": "dusk",
+      "name": {
+        "he": "ערב ביער",
+        "en": "Forest dusk"
+      },
+      "palette": {
+        "bg": "#142019",
+        "surface": "#1D2C23",
+        "ink": "#EFE6D4",
+        "inkMuted": "#B8B4A2",
+        "accent": "#E0B566",
+        "accentInk": "#142019",
+        "line": "#2F4A3A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "forest",
+      "display": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "botanical",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Lora",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "css3d",
+    "poster": "/templates/forest-lights/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/forest-lights/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#3E5B46",
+      "#B08D57",
+      "#6E4B3A",
+      "#1F2A22"
+    ],
+    "monogramFont": {
+      "latin": "Cormorant Garamond",
+      "hebrew": "Bellefair"
+    },
+    "opening": {
+      "preset": "gatefold",
+      "trigger": "tap",
+      "color": "#F1EBDD"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "path",
+        "name": {
+          "he": "שביל ביער",
+          "en": "A forest path"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-path",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "canopy",
+        "name": {
+          "he": "חופת אורות",
+          "en": "A canopy of lights"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-canopy",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#142019",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "fireflies",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "gold_dust",
+    "shade": "#142019",
+    "tracking": 0.22
+  },
+  "assets": {
+    "scene-path": "/templates/forest-lights/scene-path.webp",
+    "scene-lanterns": "/templates/forest-lights/scene-lanterns.webp",
+    "scene-clearing": "/templates/forest-lights/scene-clearing.webp",
+    "scene-tables": "/templates/forest-lights/scene-tables.webp",
+    "scene-canopy": "/templates/forest-lights/scene-canopy.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-lanterns",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-clearing",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-tables",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-canopy",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in",
+          "drift": "up"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

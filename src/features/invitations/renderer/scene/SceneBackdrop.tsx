@@ -4,6 +4,7 @@ import { HeroPlaceholder } from '../../sections/hero/HeroView';
 import type { RenderContext } from '../context-core';
 import { SCENE_OVERLAY, type SceneModel } from './model';
 import { SceneParticles } from './SceneParticles.client';
+import { SceneProp } from './SceneProp';
 
 /**
  * The scroll scene's backdrop (renderer/scene): pinned behind the page (`.sc-back` is sticky, one
@@ -60,6 +61,7 @@ export function SceneBackdrop({ ctx, scene }: { ctx: RenderContext; scene: Scene
           <div className="sc-shade" />
         </div>
       ))}
+      {scene.prop ? <SceneProp kind={scene.prop} /> : null}
       {scene.particles !== 'none' ? (
         <SceneParticles
           kind={scene.particles}

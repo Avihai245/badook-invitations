@@ -1,6 +1,6 @@
 'use client';
 
-import { Crown, LayoutGrid } from 'lucide-react';
+import { Clapperboard, Crown, LayoutGrid } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { cn, PageHeader, PaletteDots, Segmented } from '@/components/app';
 import { StudioEntry } from '@/features/art-direction/ui/StudioEntry';
@@ -18,7 +18,8 @@ import { usePreviewVideos } from './preview-videos';
 import { EVENT_ICONS } from '../event-icons';
 import { HelpFor } from '../HelpFor';
 
-type Filter = EventType | 'all';
+/** Every design, the animated ones (made as a scroll scene — renderer/scene), or those of an event type. */
+type Filter = EventType | 'all' | 'animated';
 
 /**
  * The gallery's event-type chips: every type at least one design is made for, in the contract's
@@ -33,9 +34,12 @@ export function eventTypeFilters(
   })).filter((f) => f.count > 0);
 }
 
+/** A design made as a film: its backdrop moves as the guest scrolls (manifest `scene`). */
+export const isAnimated = (manifest: Pick<TemplateManifest, 'scene'>) => !!manifest.scene?.enabled;
+
 /** The designs a chip shows. */
-export const matchesFilter = (manifest: Pick<TemplateManifest, 'categories'>, filter: Filter) =>
-  filter === 'all' || manifest.categories.includes(filter);
+export const matchesFilter = (manifest: Pick<TemplateManifest, 'categories' | 'scene'>, filter: Filter) =>
+  filter === 'all' || (filter === 'animated' ? isAnimated(manifest) : manifest.categories.includes(filter));
 
 /** Dev/QA: the same fixture files on every card instead of the templates' own previews. */
 export interface DevPreviews {
@@ -87,13 +91,15 @@ export function TemplateGallery({
     [bases, previewLocale, devPreviews, admin],
   );
   const visible = templates.filter(({ manifest }) => matchesFilter(manifest, filter));
-  const chips = useMemo(
-    () => [
+  const chips = useMemo(() => {
+    const animated = templates.filter((x) => isAnimated(x.manifest)).length;
+    return [
       { type: 'all' as const, count: templates.length },
+      // the animated designs, right after "all" (a style, not an event type)
+      ...(animated ? [{ type: 'animated' as const, count: animated }] : []),
       ...eventTypeFilters(templates.map((x) => x.manifest)),
-    ],
-    [templates],
-  );
+    ];
+  }, [templates]);
 
   return (
     <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
@@ -124,7 +130,7 @@ export function TemplateGallery({
         className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
       >
         {chips.map(({ type, count }) => {
-          const Icon = type === 'all' ? LayoutGrid : EVENT_ICONS[type];
+          const Icon = type === 'all' ? LayoutGrid : type === 'animated' ? Clapperboard : EVENT_ICONS[type];
           const on = filter === type;
           return (
             <button
@@ -141,7 +147,7 @@ export function TemplateGallery({
               )}
             >
               <Icon aria-hidden className={cn('size-4 shrink-0', on ? 'text-white/85' : 'text-brand')} />
-              {type === 'all' ? t.gallery.all : t.eventTypes[type]}
+              {type === 'all' ? t.gallery.all : type === 'animated' ? t.gallery.animated : t.eventTypes[type]}
               <span
                 aria-hidden
                 className={cn(
@@ -165,6 +171,7 @@ export function TemplateGallery({
               <GalleryCard
                 name={manifest.name[locale as UiLocale] ?? manifest.name.en ?? manifest.id}
                 premium={manifest.tier === 'premium'}
+                animated={isAnimated(manifest)}
                 unlisted={!manifest.listed}
                 categories={manifest.categories.map((c) => t.eventTypes[c]).join(' · ')}
                 palette={manifest.tokens.palette}
@@ -195,7 +202,9 @@ export function TemplateGallery({
               ...choice,
               // the type the gallery was filtered by, when this design is made for it
               eventType:
-                filter !== 'all' && TEMPLATES.get(preview)?.manifest.categories.includes(filter)
+                filter !== 'all' &&
+                filter !== 'animated' &&
+                TEMPLATES.get(preview)?.manifest.categories.includes(filter)
                   ? filter
                   : null,
             });
@@ -212,6 +221,7 @@ export function TemplateGallery({
 function GalleryCard({
   name,
   premium,
+  animated = false,
   unlisted = false,
   categories,
   palette,
@@ -225,6 +235,7 @@ function GalleryCard({
 }: {
   name: string;
   premium: boolean;
+  animated?: boolean;
   unlisted?: boolean;
   categories: string;
   palette: { bg: string; accent: string; ink: string };
@@ -256,7 +267,11 @@ function GalleryCard({
       onClick={onOpen}
       onMouseEnter={() => videos.hover(ref.current, true)}
       onMouseLeave={() => videos.hover(ref.current, false)}
-      aria-label={fmt(t.gallery.playPreview, { name }) + (premium ? ` (${t.gallery.premium})` : '')}
+      aria-label={
+        fmt(t.gallery.playPreview, { name }) +
+        (animated ? ` (${t.gallery.animatedBadge})` : '') +
+        (premium ? ` (${t.gallery.premium})` : '')
+      }
       className="group block w-full text-start"
     >
       <TemplatePoster
@@ -266,8 +281,9 @@ function GalleryCard({
         image={image}
         play={!playing}
         badge={
-          premium || unlisted ? (
+          premium || animated || unlisted ? (
             <span className="flex flex-wrap gap-[1.5cqw]">
+              {animated ? <AnimatedBadge label={t.gallery.animatedBadge} /> : null}
               {premium ? <PremiumBadge label={t.gallery.premium} /> : null}
               {unlisted ? (
                 <span className="inline-flex items-center rounded-full bg-black/70 px-2 py-0.5 text-[11px] font-semibold text-white">
@@ -310,6 +326,19 @@ function GalleryCard({
         <div className="mt-0.5 text-[12px] text-muted">{categories}</div>
       </div>
     </button>
+  );
+}
+
+/** Animated designs (made as a film) wear a small tag on their poster. */
+function AnimatedBadge({ label }: { label: string }) {
+  return (
+    <span
+      data-animated=""
+      className="inline-flex h-[22px] items-center gap-1 rounded-full bg-black/60 px-2 text-[11px] font-semibold text-white shadow-sm backdrop-blur-[2px]"
+    >
+      <Clapperboard aria-hidden size={12} className="text-[#9CC3FF]" />
+      {label}
+    </span>
   );
 }
 

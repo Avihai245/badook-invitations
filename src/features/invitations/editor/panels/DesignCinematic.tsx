@@ -138,7 +138,7 @@ export function OpeningPicker() {
  * particles drifting over it. Any design can be one; a design made as one starts on.
  */
 export function ScenePanel() {
-  const { doc, template, apply } = useEditor();
+  const { doc, template, apply, features } = useEditor();
   const { t } = useUi();
   const s = t.editor.cine.scene;
   const own = templateScene(template);
@@ -170,6 +170,11 @@ export function ScenePanel() {
             {pictures > 1 ? fmt(s.pictures, { n: pictures }) : s.onePicture}
           </p>
           <p className="text-[12px] text-muted">{s.desktop}</p>
+          {features.premiumTemplates ? null : (
+            <p data-testid="scene-plan" className="text-[12px] font-semibold text-brand-deep">
+              {s.plan}
+            </p>
+          )}
         </>
       ) : null}
     </PanelCard>

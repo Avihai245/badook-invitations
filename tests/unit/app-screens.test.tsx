@@ -5,10 +5,14 @@ import { countdownState, daysUntilEvent } from '@/features/invitations/app/count
 import { eventTypeFilters, matchesFilter } from '@/features/invitations/app/gallery/TemplateGallery';
 import { overviewSteps } from '@/features/invitations/app/overview/InvitationOverview';
 import { publishHref, workspaceTab } from '@/features/invitations/app/workspace/paths';
-import { EVENT_TYPES } from '@/features/invitations/contracts/types';
+import {
+  EVENT_TYPES,
+  type InvitationDocument,
+  type TemplateManifest,
+} from '@/features/invitations/contracts/types';
 import { premiumLocked } from '@/features/invitations/editor/Topbar';
 import { trackLicense } from '@/features/invitations/editor/panels/GlobalPanels';
-import { TEMPLATES } from '@/features/invitations/templates/registry';
+import { TEMPLATES, requireTemplate } from '@/features/invitations/templates/registry';
 import { dictFor, plural } from '@/lib/i18n/app';
 
 describe('the countdown on an invitation', () => {
@@ -79,11 +83,23 @@ describe('the workspace’s addresses', () => {
 });
 
 describe('the editor', () => {
-  it('a premium design is locked only on a plan without premium designs (the publish route’s 402)', () => {
-    expect(premiumLocked({ tier: 'premium' }, { premiumTemplates: false })).toBe(true);
-    expect(premiumLocked({ tier: 'premium' }, { premiumTemplates: true })).toBe(false);
-    expect(premiumLocked({ tier: 'standard' }, { premiumTemplates: false })).toBe(false);
-    expect(premiumLocked({}, { premiumTemplates: false })).toBe(false);
+  it('a premium design, or an animated invitation on any design, is locked only on a plan without them (the publish route’s 402s)', () => {
+    const t = (over: Partial<TemplateManifest>) => ({
+      ...requireTemplate('sahar-bordeaux').manifest,
+      ...over,
+    });
+    const page = { theme: {} } as Pick<InvitationDocument, 'theme'>;
+    const film = { theme: { scene: { enabled: true } } } as Pick<InvitationDocument, 'theme'>;
+    expect(premiumLocked(t({ tier: 'premium' }), page, { premiumTemplates: false })).toBe('design');
+    expect(premiumLocked(t({ tier: 'premium' }), page, { premiumTemplates: true })).toBeNull();
+    expect(premiumLocked(t({ tier: 'standard' }), page, { premiumTemplates: false })).toBeNull();
+    // a page made a film by its host: the plan must have it too
+    expect(premiumLocked(t({ tier: 'standard' }), film, { premiumTemplates: false })).toBe('scene');
+    expect(premiumLocked(t({ tier: 'standard' }), film, { premiumTemplates: true })).toBeNull();
+    // a design made as a film is a premium design
+    expect(premiumLocked(requireTemplate('celestial').manifest, page, { premiumTemplates: false })).toBe(
+      'design',
+    );
   });
 
   it('never shows a placeholder music licence', () => {

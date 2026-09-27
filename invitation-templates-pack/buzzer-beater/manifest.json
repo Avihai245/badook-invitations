@@ -1,0 +1,503 @@
+{
+  "id": "buzzer-beater",
+  "version": 1,
+  "name": {
+    "he": "זריקה על הבאזר",
+    "en": "Buzzer Beater"
+  },
+  "description": {
+    "he": "הזמנה שהיא זריקה אחת ארוכה לסל: הכדור יוצא לדרך מהמנהרה, עף מעל הפרקט, מעל היציעים והזרקורים — ובסוף הגלילה נופל פנימה דרך הטבעת, הרשת רוקדת והקונפטי עף. בפתיחה: זיקוקים מעל האולם.",
+    "en": "An invitation that is one long shot at the basket: the ball sets off from the tunnel and flies over the court, the stands and the lights — and at the end of the scroll it drops through the hoop, the net dances and the confetti flies. It opens with fireworks over the arena."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "bar_mitzvah",
+    "bat_mitzvah",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/buzzer-beater/scene-court.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#0F1B33",
+      "surface": "#16264A",
+      "ink": "#F4F7FF",
+      "inkMuted": "#A9B6D6",
+      "accent": "#F26B1D",
+      "accentInk": "#0B1220",
+      "line": "#26365E",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 12,
+      "button": 12,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 1.06,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#0B1220",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "orange",
+      "name": {
+        "he": "כתום כדורסל",
+        "en": "Ball orange"
+      },
+      "palette": {
+        "bg": "#0F1B33",
+        "surface": "#16264A",
+        "ink": "#F4F7FF",
+        "inkMuted": "#A9B6D6",
+        "accent": "#F26B1D",
+        "accentInk": "#0B1220",
+        "line": "#26365E"
+      }
+    },
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב אליפות",
+        "en": "Championship gold"
+      },
+      "palette": {
+        "bg": "#0F1B33",
+        "surface": "#16264A",
+        "ink": "#F4F7FF",
+        "inkMuted": "#A9B6D6",
+        "accent": "#FFC53D",
+        "accentInk": "#0B1220",
+        "line": "#26365E"
+      }
+    },
+    {
+      "id": "sky",
+      "name": {
+        "he": "תכלת",
+        "en": "Sky blue"
+      },
+      "palette": {
+        "bg": "#0F1B33",
+        "surface": "#16264A",
+        "ink": "#F4F7FF",
+        "inkMuted": "#A9B6D6",
+        "accent": "#9CC3FF",
+        "accentInk": "#0B1220",
+        "line": "#26365E"
+      }
+    },
+    {
+      "id": "court",
+      "name": {
+        "he": "פרקט",
+        "en": "Court"
+      },
+      "palette": {
+        "bg": "#F6EFE6",
+        "surface": "#FFFBF6",
+        "ink": "#1A1D29",
+        "inkMuted": "#5D5F6B",
+        "accent": "#B8520F",
+        "accentInk": "#FFFFFF",
+        "line": "#E7DCCD"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "arena",
+      "display": {
+        "latin": "Big Shoulders Display",
+        "hebrew": "Karantina"
+      },
+      "heading": {
+        "latin": "Oswald",
+        "hebrew": "Secular One"
+      },
+      "body": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "court",
+      "display": {
+        "latin": "Unbounded",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Unbounded",
+        "hebrew": "Secular One"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "ticket",
+    "renderer": "css3d",
+    "poster": "/templates/buzzer-beater/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "ticket_text",
+      "image": null,
+      "recolor": false,
+      "size": 0.5,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "fade",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "print",
+        "maxGlyphs": 12
+      }
+    },
+    "sealColors": [],
+    "monogramFont": {
+      "latin": "Unbounded",
+      "hebrew": "Secular One"
+    },
+    "opening": {
+      "preset": "fireworks",
+      "trigger": "tap",
+      "color": "#0B1220",
+      "backdrop": "hero"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "tunnel",
+        "name": {
+          "he": "המנהרה לפרקט",
+          "en": "The tunnel to the court"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-tunnel",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "court",
+        "name": {
+          "he": "הפרקט",
+          "en": "The court"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-court",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#0B1220",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "confetti",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "none",
+    "prop": "basketball",
+    "shade": "#0B1220",
+    "tracking": 0.1
+  },
+  "assets": {
+    "scene-tunnel": "/templates/buzzer-beater/scene-tunnel.webp",
+    "scene-court": "/templates/buzzer-beater/scene-court.webp",
+    "scene-arena": "/templates/buzzer-beater/scene-arena.webp",
+    "scene-lines": "/templates/buzzer-beater/scene-lines.webp",
+    "scene-rim": "/templates/buzzer-beater/scene-rim.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-court",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-arena",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-lines",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-rim",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in",
+          "drift": "up"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

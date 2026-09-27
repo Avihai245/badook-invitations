@@ -1,0 +1,453 @@
+{
+  "templateId": "golden-goal",
+  "defaults": {
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "עולים למגרש לכבוד בר המצווה של",
+        "en": "Taking the pitch for the bar mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שריקת הפתיחה",
+          "en": "Until kick-off"
+        },
+        "afterEvent": {
+          "he": "גול בדקה ה־90! מזל טוב ותודה שבאתם",
+          "en": "A last-minute winner! Mazal tov and thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שלוש עשרה — גול זהב",
+          "en": "Thirteen — a golden goal"
+        },
+        "body": {
+          "he": "ב־{date} {primary} עולה לתורה — ואחר כך עולים למגרש.\nבואו לחגוג איתנו את המשחק הכי גדול של העונה.",
+          "en": "On {date}, {primary} is called to the Torah — and then we take the pitch.\nCome celebrate the biggest match of the season with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "האצטדיון",
+          "en": "The stadium"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "חימום וקבלת פנים",
+            "en": "Warm-up & welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "מחצית: ארוחה",
+            "en": "Half-time: dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "הרחבה נפתחת",
+            "en": "Dance floor opens"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "הארכה: קינוחים",
+            "en": "Extra time: dessert"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "עולים איתנו למגרש?",
+          "en": "Joining us on the pitch?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the bar mitzvah boy"
+        },
+        "successMessage": {
+          "he": "גול! נתראה באצטדיון",
+          "en": "Goal! See you at the stadium"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם מקום ביציע",
+          "en": "Too bad! We’ll save you a seat in the stands"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הדשא!",
+        "en": "Mazal tov — see you on the pitch!"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הזרקורים דולקים, היציעים שרים והכדור בדרך לרשת.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבר מצווה.",
+            "en": "The floodlights are on, the stands are singing and the ball is on its way to the net.\nWith great excitement we invite you\nto celebrate the bar mitzvah with us.",
+            "ru": "Прожекторы горят, трибуны поют, а мяч летит в сетку.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бар-мицву.",
+            "ar": "الأضواء الكاشفة مشتعلة، والمدرجات تغني، والكرة في طريقها إلى الشباك.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبار متسفا.",
+            "fr": "Les projecteurs sont allumés, les tribunes chantent et le ballon file vers le filet.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bar-mitsva avec nous.",
+            "es": "Los focos están encendidos, las gradas cantan y el balón va camino de la red.\nCon gran emoción los invitamos\na celebrar con nosotros el bar mitzvá.",
+            "am": "የስታዲየሙ መብራቶች በርተዋል፣ ተመልካቾቹ ይዘምራሉ፣ ኳሱም ወደ መረቡ እያመራ ነው።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባር ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "עולים למגרש לכבוד הבת מצווה של",
+        "en": "Taking the pitch for the bat mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שריקת הפתיחה",
+          "en": "Until kick-off"
+        },
+        "afterEvent": {
+          "he": "גול בדקה ה־90! מזל טוב ותודה שבאתם",
+          "en": "A last-minute winner! Mazal tov and thank you for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "שתים עשרה — גול זהב",
+          "en": "Twelve — a golden goal"
+        },
+        "body": {
+          "he": "ב־{date} חוגגים את {primary} — ועולים למגרש.\nבואו לחגוג איתנו את המשחק הכי גדול של העונה.",
+          "en": "On {date} we celebrate {primary} — and take the pitch.\nCome celebrate the biggest match of the season with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "האצטדיון",
+          "en": "The stadium"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:00",
+          "label": {
+            "he": "חימום וקבלת פנים",
+            "en": "Warm-up & welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "19:45",
+          "label": {
+            "he": "ברכות",
+            "en": "Blessings"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "מחצית: ארוחה",
+            "en": "Half-time: dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "הרחבה נפתחת",
+            "en": "Dance floor opens"
+          },
+          "icon": "music"
+        },
+        {
+          "time": "22:30",
+          "label": {
+            "he": "הארכה: קינוחים",
+            "en": "Extra time: dessert"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "עולים איתנו למגרש?",
+          "en": "Joining us on the pitch?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לבת המצווה",
+          "en": "A wish for the bat mitzvah girl"
+        },
+        "successMessage": {
+          "he": "גול! נתראה באצטדיון",
+          "en": "Goal! See you at the stadium"
+        },
+        "declineMessage": {
+          "he": "חבל! נשמור לכם מקום ביציע",
+          "en": "Too bad! We’ll save you a seat in the stands"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב, ונתראה על הדשא!",
+        "en": "Mazal tov — see you on the pitch!"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הזרקורים דולקים, היציעים שרים והכדור בדרך לרשת.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבת מצווה.",
+            "en": "The floodlights are on, the stands are singing and the ball is on its way to the net.\nWith great excitement we invite you\nto celebrate the bat mitzvah with us.",
+            "ru": "Прожекторы горят, трибуны поют, а мяч летит в сетку.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бат-мицву.",
+            "ar": "الأضواء الكاشفة مشتعلة، والمدرجات تغني، والكرة في طريقها إلى الشباك.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبات متسفا.",
+            "fr": "Les projecteurs sont allumés, les tribunes chantent et le ballon file vers le filet.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bat-mitsva avec nous.",
+            "es": "Los focos están encendidos, las gradas cantan y el balón va camino de la red.\nCon gran emoción los invitamos\na celebrar con nosotros el bat mitzvá.",
+            "am": "የስታዲየሙ መብራቶች በርተዋል፣ ተመልካቾቹ ይዘምራሉ፣ ኳሱም ወደ መረቡ እያመራ ነው።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባት ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "birthday": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "שריקת פתיחה! חוגגים יום הולדת עם",
+        "en": "Kick-off! Celebrating a birthday with"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "ספירה לאחור",
+          "en": "Countdown"
+        },
+        "subtitle": {
+          "he": "עד שריקת הפתיחה",
+          "en": "Until kick-off"
+        },
+        "afterEvent": {
+          "he": "איזה גול! תודה שבאתם",
+          "en": "What a goal! Thanks for coming"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "עוד שנה, עוד גול",
+          "en": "Another year, another goal"
+        },
+        "body": {
+          "he": "ב־{date} עולים למגרש לחגוג עם {primary}.\nמשחק, פיצה, עוגה והרבה חברים — ואתם בהרכב הפותח.",
+          "en": "On {date} we take the pitch to celebrate {primary}.\nA match, pizza, cake and lots of friends — and you’re in the starting eleven."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המגרש",
+          "en": "The pitch"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:00",
+          "label": {
+            "he": "חימום",
+            "en": "Warm-up"
+          },
+          "icon": "walk"
+        },
+        {
+          "time": "17:30",
+          "label": {
+            "he": "משחק",
+            "en": "The match"
+          },
+          "icon": "star"
+        },
+        {
+          "time": "18:15",
+          "label": {
+            "he": "מחצית: פיצה",
+            "en": "Half-time: pizza"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "18:45",
+          "label": {
+            "he": "עוגה ונרות",
+            "en": "Cake & candles"
+          },
+          "icon": "cake"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נכנסים להרכב?",
+          "en": "Joining the starting eleven?"
+        },
+        "subtitle": {
+          "he": "עדכנו אותנו עד {deadline}",
+          "en": "Let us know by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה ליום ההולדת",
+          "en": "Birthday wishes"
+        },
+        "successMessage": {
+          "he": "גול! נתראה על המגרש",
+          "en": "Goal! See you on the pitch"
+        },
+        "declineMessage": {
+          "he": "חבל! נבקיע גול בשבילכם",
+          "en": "Too bad! We’ll score one for you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": null
+      },
+      "closingLine": {
+        "he": "נתראה על המגרש!",
+        "en": "See you on the pitch!"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "הזרקורים דולקים, היציעים שרים והכדור בדרך לרשת.\nבשמחה גדולה אנו מזמינים אתכם\nלחגוג איתנו את יום ההולדת.",
+            "en": "The floodlights are on, the stands are singing and the ball is on its way to the net.\nWith great joy we invite you\nto celebrate the birthday with us.",
+            "ru": "Прожекторы горят, трибуны поют, а мяч летит в сетку.\nС большой радостью мы приглашаем вас\nотпраздновать с нами день рождения.",
+            "ar": "الأضواء الكاشفة مشتعلة، والمدرجات تغني، والكرة في طريقها إلى الشباك.\nبفرح كبير ندعوكم\nلتحتفلوا معنا بعيد الميلاد.",
+            "fr": "Les projecteurs sont allumés, les tribunes chantent et le ballon file vers le filet.\nC’est avec une grande joie que nous vous invitons\nà fêter l’anniversaire avec nous.",
+            "es": "Los focos están encendidos, las gradas cantan y el balón va camino de la red.\nCon gran alegría los invitamos\na celebrar con nosotros el cumpleaños.",
+            "am": "የስታዲየሙ መብራቶች በርተዋል፣ ተመልካቾቹ ይዘምራሉ፣ ኳሱም ወደ መረቡ እያመራ ነው።\nበታላቅ ደስታ እንጋብዛችኋለን፤\nየልደት በዓሉን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

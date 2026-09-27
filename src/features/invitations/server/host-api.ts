@@ -26,6 +26,7 @@ import { followUpDocument, followUpSlug, saveTheDateSlug } from '../templates/fo
 import { COUPLE_EVENTS } from '../templates/seed-copy';
 import type { TemplateEntry } from '../templates/registry';
 import { seedDocument } from '../templates/seed-document';
+import { sceneOn } from '../renderer/scene/model';
 import { isPremiumTemplate } from '../templates/tier';
 import { blockedLocales, type TranslationRow } from '../translate/fields';
 
@@ -385,6 +386,8 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
   if (deps.entitlements) {
     const e = await deps.entitlements();
     if (isPremiumTemplate(entry.manifest) && !e.premiumTemplates) return fail(402, 'premium_template');
+    // an animated invitation (the scroll scene) is part of the paid plans too, on any design
+    if (sceneOn(draft, entry.manifest, true) && !e.premiumTemplates) return fail(402, 'premium_scene');
     const creditOff = draft.sections.some((s) => s.type === 'footer' && s.enabled && !s.data.showCredit);
     if (creditOff && !e.removeBranding) return fail(402, 'branding');
   }

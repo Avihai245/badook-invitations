@@ -1,0 +1,507 @@
+{
+  "id": "moonshot",
+  "version": 1,
+  "name": {
+    "he": "טיסה לירח",
+    "en": "Moonshot"
+  },
+  "description": {
+    "he": "הזמנה שהיא שיגור אחד גדול: הטיל ממריא מכן השיגור עם הגלילה, עובר דרך העננים, חולף על פני כדור הארץ והכוכבים — ובסוף נוחת על הירח, המנוע נכבה ודגל מתנופף. בפתיחה: זיקוקים בשמי הלילה.",
+    "en": "An invitation that is one great launch: the rocket lifts off the pad as your guests scroll, climbs through the clouds, past the Earth and the stars — and at the end lands on the moon, its engine goes quiet and a flag goes up. It opens with fireworks in the night sky."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "birthday",
+    "bar_mitzvah",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/moonshot/scene-stars.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#0B1030",
+      "surface": "#141A45",
+      "ink": "#EEF1FF",
+      "inkMuted": "#AEB5DA",
+      "accent": "#5FD4F4",
+      "accentInk": "#070A1E",
+      "line": "#262E63",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 16,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 1.02,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#070A1E",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "cyan",
+      "name": {
+        "he": "תכלת חלל",
+        "en": "Space cyan"
+      },
+      "palette": {
+        "bg": "#0B1030",
+        "surface": "#141A45",
+        "ink": "#EEF1FF",
+        "inkMuted": "#AEB5DA",
+        "accent": "#5FD4F4",
+        "accentInk": "#070A1E",
+        "line": "#262E63"
+      }
+    },
+    {
+      "id": "flame",
+      "name": {
+        "he": "להבה",
+        "en": "Flame"
+      },
+      "palette": {
+        "bg": "#0B1030",
+        "surface": "#141A45",
+        "ink": "#EEF1FF",
+        "inkMuted": "#AEB5DA",
+        "accent": "#FF8A3D",
+        "accentInk": "#070A1E",
+        "line": "#262E63"
+      }
+    },
+    {
+      "id": "silver",
+      "name": {
+        "he": "כסף ירח",
+        "en": "Moon silver"
+      },
+      "palette": {
+        "bg": "#0B1030",
+        "surface": "#141A45",
+        "ink": "#EEF1FF",
+        "inkMuted": "#AEB5DA",
+        "accent": "#D9DDE6",
+        "accentInk": "#070A1E",
+        "line": "#262E63"
+      }
+    },
+    {
+      "id": "nebula",
+      "name": {
+        "he": "ערפילית",
+        "en": "Nebula"
+      },
+      "palette": {
+        "bg": "#150F33",
+        "surface": "#221A4A",
+        "ink": "#F3EEFF",
+        "inkMuted": "#BDB2DE",
+        "accent": "#B79CFF",
+        "accentInk": "#150F33",
+        "line": "#3B2A6B"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "orbit",
+      "display": {
+        "latin": "Unbounded",
+        "hebrew": "Secular One"
+      },
+      "heading": {
+        "latin": "Syne",
+        "hebrew": "Rubik"
+      },
+      "body": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Outfit",
+        "hebrew": "Rubik"
+      }
+    },
+    {
+      "id": "mission",
+      "display": {
+        "latin": "Righteous",
+        "hebrew": "Suez One"
+      },
+      "heading": {
+        "latin": "Righteous",
+        "hebrew": "Secular One"
+      },
+      "body": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      },
+      "ui": {
+        "latin": "Inter",
+        "hebrew": "Heebo"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/moonshot/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/moonshot/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#3B2A6B",
+      "#5FD4F4",
+      "#FF8A3D",
+      "#D9DDE6"
+    ],
+    "monogramFont": {
+      "latin": "Unbounded",
+      "hebrew": "Secular One"
+    },
+    "opening": {
+      "preset": "fireworks",
+      "trigger": "tap",
+      "color": "#070A1E"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "pad",
+        "name": {
+          "he": "כן השיגור",
+          "en": "The launch pad"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-pad",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "stars",
+        "name": {
+          "he": "חלל עמוק",
+          "en": "Deep space"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-stars",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#070A1E",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "stars",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "gold_dust",
+    "prop": "rocket",
+    "shade": "#070A1E",
+    "tracking": 0.14
+  },
+  "assets": {
+    "scene-pad": "/templates/moonshot/scene-pad.webp",
+    "scene-clouds": "/templates/moonshot/scene-clouds.webp",
+    "scene-orbit": "/templates/moonshot/scene-orbit.webp",
+    "scene-stars": "/templates/moonshot/scene-stars.webp",
+    "scene-moon": "/templates/moonshot/scene-moon.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-clouds",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in",
+          "drift": "up"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-orbit",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-stars",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-moon",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

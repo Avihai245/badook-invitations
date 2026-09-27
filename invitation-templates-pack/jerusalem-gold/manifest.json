@@ -1,0 +1,504 @@
+{
+  "id": "jerusalem-gold",
+  "version": 1,
+  "name": {
+    "he": "ירושלים של זהב",
+    "en": "Jerusalem of Gold"
+  },
+  "description": {
+    "he": "הזמנה שהיא מסע בירושלים: שער העיר העתיקה נפתח, והאורחים צועדים איתכם בסמטאות האבן, אל הכותל ואל הטלית — ועד החומות המוארות בלילה. הרקע זז ומתחלף עם כל גלילה, ואבק זהב מרחף באוויר.",
+    "en": "An invitation that walks through Jerusalem: the Old City gate swings open, and your guests walk with you through the stone alleys, to the Wall and the tallit — and on to the walls lit gold at night. The backdrop moves and changes as they scroll, with gold dust in the air."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "bar_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/jerusalem-gold/scene-gate.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F4EDE0",
+      "surface": "#FBF8F2",
+      "ink": "#23314A",
+      "inkMuted": "#5D687A",
+      "accent": "#C9A45C",
+      "accentInk": "#1B2436",
+      "line": "#E4D8C2",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 12,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.9,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#1B2436",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב ירושלמי",
+        "en": "Jerusalem gold"
+      },
+      "palette": {
+        "bg": "#F4EDE0",
+        "surface": "#FBF8F2",
+        "ink": "#23314A",
+        "inkMuted": "#5D687A",
+        "accent": "#C9A45C",
+        "accentInk": "#1B2436",
+        "line": "#E4D8C2"
+      }
+    },
+    {
+      "id": "stone",
+      "name": {
+        "he": "אבן",
+        "en": "Stone"
+      },
+      "palette": {
+        "bg": "#EFE8DA",
+        "surface": "#F9F6EF",
+        "ink": "#3A3226",
+        "inkMuted": "#6E6454",
+        "accent": "#B08D57",
+        "accentInk": "#1F1A12",
+        "line": "#DDD2BE"
+      }
+    },
+    {
+      "id": "sky",
+      "name": {
+        "he": "תכלת",
+        "en": "Sky blue"
+      },
+      "palette": {
+        "bg": "#EEF2F6",
+        "surface": "#FAFCFD",
+        "ink": "#1F2F4A",
+        "inkMuted": "#56647A",
+        "accent": "#7FA2C3",
+        "accentInk": "#14213A",
+        "line": "#D5DEE8"
+      }
+    },
+    {
+      "id": "night",
+      "name": {
+        "he": "לילה",
+        "en": "Night"
+      },
+      "palette": {
+        "bg": "#1B2436",
+        "surface": "#232E44",
+        "ink": "#F3EBDD",
+        "inkMuted": "#BDB6A8",
+        "accent": "#D9B56A",
+        "accentInk": "#1B2436",
+        "line": "#34405A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "jerusalem",
+      "display": {
+        "latin": "Cinzel",
+        "hebrew": "David Libre"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "stone",
+      "display": {
+        "latin": "Marcellus",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/jerusalem-gold/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/jerusalem-gold/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#B08D57",
+      "#2C3E5C",
+      "#8C2E3C",
+      "#3A3226"
+    ],
+    "monogramFont": {
+      "latin": "Cinzel",
+      "hebrew": "David Libre"
+    },
+    "opening": {
+      "preset": "gate",
+      "trigger": "scroll",
+      "motion": "swing",
+      "color": "#5A4632"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "gate",
+        "name": {
+          "he": "שער העיר העתיקה",
+          "en": "The Old City gate"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-gate",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.55
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "night",
+        "name": {
+          "he": "החומות בלילה",
+          "en": "The walls at night"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-night",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#1B2436",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "sparkles",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "gold_dust",
+    "shade": "#1B2436",
+    "tracking": 0.22
+  },
+  "assets": {
+    "scene-gate": "/templates/jerusalem-gold/scene-gate.webp",
+    "scene-alley": "/templates/jerusalem-gold/scene-alley.webp",
+    "scene-wall": "/templates/jerusalem-gold/scene-wall.webp",
+    "scene-tallit": "/templates/jerusalem-gold/scene-tallit.webp",
+    "scene-night": "/templates/jerusalem-gold/scene-night.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-alley",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-wall",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-tallit",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-night",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

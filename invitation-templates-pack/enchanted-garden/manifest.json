@@ -1,0 +1,504 @@
+{
+  "id": "enchanted-garden",
+  "version": 1,
+  "name": {
+    "he": "הגן הקסום",
+    "en": "Enchanted Garden"
+  },
+  "description": {
+    "he": "הזמנה שהיא טיול בגן קסום: שער לבן בין שיחי ורדים נפתח, ושביל של לבנדר ואדמוניות מוביל אל נדנדה עטופת פרחים, אל ביתן מואר — ואל הגן בלילה, מתחת לירח. פרפרים מרחפים, והפתיחה: חותם שעווה ורוד שנשבר על נייר מובלט.",
+    "en": "An invitation that is a walk through an enchanted garden: a white gate among the roses opens, and a path of lavender and peonies leads to a swing wrapped in flowers, to a lantern-lit gazebo — and to the garden at night, under the moon. Butterflies drift, and it opens with embossed paper, its blush wax stamp breaking in two."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "bat_mitzvah",
+    "birthday"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/enchanted-garden/scene-gate.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F7EEF1",
+      "surface": "#FDF8FA",
+      "ink": "#3A2B4A",
+      "inkMuted": "#6E5F7E",
+      "accent": "#C9B6E4",
+      "accentInk": "#2E2340",
+      "line": "#EADCE3",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 18,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.96,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#2E2340",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "lilac",
+      "name": {
+        "he": "לילך",
+        "en": "Lilac"
+      },
+      "palette": {
+        "bg": "#F7EEF1",
+        "surface": "#FDF8FA",
+        "ink": "#3A2B4A",
+        "inkMuted": "#6E5F7E",
+        "accent": "#C9B6E4",
+        "accentInk": "#2E2340",
+        "line": "#EADCE3"
+      }
+    },
+    {
+      "id": "blush",
+      "name": {
+        "he": "ורוד עדין",
+        "en": "Blush"
+      },
+      "palette": {
+        "bg": "#FAF0F1",
+        "surface": "#FFFAFA",
+        "ink": "#442C35",
+        "inkMuted": "#7A6068",
+        "accent": "#E8B4BC",
+        "accentInk": "#3A2230",
+        "line": "#F0DADD"
+      }
+    },
+    {
+      "id": "sage",
+      "name": {
+        "he": "מרווה",
+        "en": "Sage"
+      },
+      "palette": {
+        "bg": "#F1F4EE",
+        "surface": "#FAFBF8",
+        "ink": "#2E3B2E",
+        "inkMuted": "#5F6B5E",
+        "accent": "#A9C1A8",
+        "accentInk": "#1F2A1F",
+        "line": "#DCE3D8"
+      }
+    },
+    {
+      "id": "twilight",
+      "name": {
+        "he": "דמדומים",
+        "en": "Twilight"
+      },
+      "palette": {
+        "bg": "#2E2340",
+        "surface": "#3A2E4F",
+        "ink": "#F6EEF6",
+        "inkMuted": "#C8BCD6",
+        "accent": "#D8B26E",
+        "accentInk": "#2E2340",
+        "line": "#4B3F63"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "enchanted",
+      "display": {
+        "latin": "Great Vibes",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      },
+      "ui": {
+        "latin": "Quicksand",
+        "hebrew": "Varela Round"
+      }
+    },
+    {
+      "id": "fairytale",
+      "display": {
+        "latin": "Fraunces",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Fraunces",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      },
+      "ui": {
+        "latin": "Nunito",
+        "hebrew": "Rubik"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "css3d",
+    "poster": "/templates/enchanted-garden/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/enchanted-garden/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#D98FA0",
+      "#8E7AB5",
+      "#6F8F6E",
+      "#B08D57"
+    ],
+    "monogramFont": {
+      "latin": "Cormorant Garamond",
+      "hebrew": "Bellefair"
+    },
+    "opening": {
+      "preset": "gatefold",
+      "trigger": "tap",
+      "color": "#F7EEF0"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "gate",
+        "name": {
+          "he": "שער הגן",
+          "en": "The garden gate"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-gate",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.52
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "night",
+        "name": {
+          "he": "הגן בלילה",
+          "en": "The garden at night"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-night",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#2E2340",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "petals",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "butterflies",
+    "shade": "#2E2340",
+    "tracking": 0.18
+  },
+  "assets": {
+    "scene-gate": "/templates/enchanted-garden/scene-gate.webp",
+    "scene-path": "/templates/enchanted-garden/scene-path.webp",
+    "scene-swing": "/templates/enchanted-garden/scene-swing.webp",
+    "scene-gazebo": "/templates/enchanted-garden/scene-gazebo.webp",
+    "scene-night": "/templates/enchanted-garden/scene-night.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-path",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-swing",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-gazebo",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-night",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}
