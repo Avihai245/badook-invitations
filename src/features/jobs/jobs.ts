@@ -11,6 +11,7 @@ import { translationHousekeeping } from '@/features/invitations/translate/deps';
 import { processGalleryNoticeQueue } from '@/features/live-gallery/server/notify';
 import { galleryHousekeeping } from '@/features/live-gallery/server/sweep';
 import { studioHousekeeping } from '@/features/review/server/housekeeping';
+import { supportHousekeeping } from '@/features/support/tickets/server/housekeeping';
 import { voiceDeps } from '@/features/voice/server/deps';
 import { processVoice } from '@/features/voice/server/voice';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
@@ -70,6 +71,10 @@ export async function runDaily(now: Date) {
   const admin = await adminDb
     .maintenance()
     .catch((err) => (console.error('admin console housekeeping failed', err), null));
+  // support tickets: answered and left for 14 days close; closed ones go two years after closing
+  const support = await supportHousekeeping().catch(
+    (err) => (console.error('support tickets housekeeping failed', err), null),
+  );
   return {
     ...digests,
     purged: (purged as number | null) ?? null,
@@ -82,6 +87,7 @@ export async function runDaily(now: Date) {
     insights,
     faces,
     admin,
+    support,
   };
 }
 

@@ -297,6 +297,12 @@ test.describe('responses dashboard', () => {
     const faces = { expired: expect.any(Number), withoutFeature: expect.any(Number) };
     // …and the admin console's record of actions after two years
     const admin = { audit: expect.any(Number) };
+    // …and the support tickets': answered and left for 14 days close, closed ones go after two years
+    const support = {
+      autoClosed: expect.any(Number),
+      erased: expect.any(Number),
+      deleted: expect.any(Number),
+    };
     expect(await first.json()).toEqual({
       sent: 1,
       failed: 0,
@@ -310,6 +316,7 @@ test.describe('responses dashboard', () => {
       insights,
       faces,
       admin,
+      support,
     });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
@@ -325,6 +332,7 @@ test.describe('responses dashboard', () => {
       insights,
       faces,
       admin,
+      support,
     });
   });
 });

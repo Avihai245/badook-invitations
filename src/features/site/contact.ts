@@ -3,6 +3,8 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { normalizeGuestPhone } from '@/features/invitations/lib/guest-import';
 import { sendEmail } from '@/features/invitations/server/email';
+import { openContactTicket } from '@/features/support/tickets/server/contact';
+import { ticketRateHit } from '@/features/support/tickets/server/deps';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 
@@ -32,11 +34,23 @@ const RATE = { count: 5, windowSeconds: 3600 };
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-export type ContactResult = { status: number; body: { ok: boolean; code?: string; fields?: string[] } };
+export type ContactResult = {
+  status: number;
+  body: {
+    ok: boolean;
+    code?: string;
+    fields?: string[];
+    /** the ticket the message opened (mine: the signed-in visitor follows it in the app) */
+    ticket?: { id: string; number: number; mine: boolean };
+  };
+};
 
 /**
  * POST /api/contact: validates, drops what a bot filled in (quietly), limits each address, stores the
- * message and emails it to support (INVITES_SUPPORT_EMAIL) with the visitor as the reply-to address.
+ * message and opens a support ticket with it (features/support/tickets: the team answers from the
+ * console — a visitor by email, a signed-in visitor in the app too), which emails support
+ * (INVITES_SUPPORT_EMAIL) a link to it. Should the ticket fail, the message itself is emailed, with the
+ * visitor as the reply-to address.
  */
 export async function submitContact(
   raw: unknown,
@@ -69,6 +83,9 @@ export async function submitContact(
   });
   if (rateError) throw new Error(`support_rate_hit: ${rateError.message}`);
   if (allowed !== true) return { status: 429, body: { ok: false, code: 'rate' } };
+  // new support tickets an hour: the app's, the assistant's and this form's together
+  if (!(await ticketRateHit('ticket', userId ? `u:${userId}` : `ip:${ip ?? 'unknown'}`)))
+    return { status: 429, body: { ok: false, code: 'rate' } };
 
   const { data: id, error } = await db.rpc('contact_submit', {
     p_name: m.name,
@@ -80,6 +97,17 @@ export async function submitContact(
     p_user_id: userId,
   });
   if (error) throw new Error(`contact_submit: ${error.message}`);
+
+  const ticket = await openContactTicket({
+    userId,
+    name: m.name,
+    email: m.email,
+    phone: phone ?? '',
+    topic: m.topic,
+    message: m.message,
+    locale: m.locale,
+  }).catch((err) => (console.error('[contact] the ticket failed', err), null));
+  if (ticket) return { status: 200, body: { ok: true, ticket: { ...ticket, mine: !!userId } } };
 
   if (env.INVITES_SUPPORT_EMAIL) {
     const lines = [

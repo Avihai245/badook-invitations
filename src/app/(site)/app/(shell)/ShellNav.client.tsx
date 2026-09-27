@@ -6,6 +6,7 @@ import {
   CreditCard,
   FileText,
   LayoutGrid,
+  LifeBuoy,
   LogOut,
   Mail,
   MessageCircleQuestion,
@@ -22,7 +23,7 @@ import { useUi } from '@/lib/i18n/client';
 import { signOut } from '../../(auth)/actions';
 import { UiLanguageToggle } from '../../UiLanguageToggle';
 
-type Section = 'invitations' | 'new' | 'billing' | 'account' | null;
+type Section = 'invitations' | 'new' | 'billing' | 'account' | 'support' | null;
 
 /** Which part of the app a path belongs to (an invitation's own pages are part of "my invitations"). */
 export function sectionOf(path: string): Section {
@@ -30,6 +31,7 @@ export function sectionOf(path: string): Section {
   if (path === '/app/invitations' || path.startsWith('/app/invitations/')) return 'invitations';
   if (path.startsWith('/app/billing')) return 'billing';
   if (path.startsWith('/app/account')) return 'account';
+  if (path === '/app/support' || path.startsWith('/app/support/')) return 'support';
   return null;
 }
 
@@ -42,8 +44,17 @@ const LEGAL = ['privacy', 'terms', 'cookies', 'accessibility'] as const;
  * language, the account and the legal pages. The sidebar's middle stays clear: the accessibility
  * button floats over the left edge halfway down.
  */
-export function AppSidebar({ email, admin = false }: { email: string | null; admin?: boolean }) {
-  const { t } = useUi();
+export function AppSidebar({
+  email,
+  admin = false,
+  unread = 0,
+}: {
+  email: string | null;
+  admin?: boolean;
+  /** support tickets with an answer the user hasn't seen */
+  unread?: number;
+}) {
+  const { t, plural } = useUi();
   const n = t.shell.nav;
   const current = sectionOf(usePathname());
   return (
@@ -84,6 +95,14 @@ export function AppSidebar({ email, admin = false }: { email: string | null; adm
         <SideLink href="/app/account" icon={CircleUserRound} active={current === 'account'}>
           {n.account}
         </SideLink>
+        <SideLink
+          href="/app/support"
+          icon={LifeBuoy}
+          active={current === 'support'}
+          badge={unread ? { count: unread, label: plural(t.tickets.navUnread, unread) } : undefined}
+        >
+          {t.tickets.nav}
+        </SideLink>
         <button
           type="button"
           onClick={() => openSupport()}
@@ -104,10 +123,10 @@ export function AppSidebar({ email, admin = false }: { email: string | null; adm
           <span className="hidden text-[12px] text-muted lg:inline">{t.shell.uiLanguage}</span>
           <UiLanguageToggle />
         </div>
-        <UserMenu email={email} admin={admin} />
+        <UserMenu email={email} admin={admin} unread={unread} />
         <nav
           aria-label={t.shell.legal}
-          className="hidden flex-wrap gap-x-3 gap-y-1 px-2 text-[11.5px] leading-5 text-faint lg:flex"
+          className="hidden flex-wrap gap-x-3 gap-y-1 px-2 text-[11.5px] leading-5 text-muted lg:flex"
         >
           {LEGAL.map((key) => (
             <Link key={key} href={`/${key}`} className="rounded-[4px] hover:text-ink hover:underline">
@@ -124,11 +143,14 @@ function SideLink({
   href,
   icon: Icon,
   active,
+  badge,
   children,
 }: {
   href: string;
   icon: LucideIcon;
   active: boolean;
+  /** a count beside the name, and what it means for screen readers */
+  badge?: { count: number; label: string };
   children: ReactNode;
 }) {
   return (
@@ -147,6 +169,17 @@ function SideLink({
       ) : null}
       <Icon aria-hidden className="size-[19px] shrink-0" strokeWidth={1.75} />
       {children}
+      {badge ? (
+        <>
+          <span
+            aria-hidden
+            className="ms-auto grid h-5 min-w-5 place-items-center rounded-full bg-brand-deep px-1.5 text-[11px] font-bold text-white tabular-nums"
+          >
+            {badge.count > 99 ? '99+' : badge.count}
+          </span>
+          <span className="sr-only">({badge.label})</span>
+        </>
+      ) : null}
     </Link>
   );
 }
@@ -155,8 +188,8 @@ function SideLink({
  * Phones and tablets: the main places at the bottom, "new invitation" raised in the middle. The
  * bottom-end corner stays free for the assistant's floating button.
  */
-export function MobileTabBar() {
-  const { t } = useUi();
+export function MobileTabBar({ unread = 0 }: { unread?: number }) {
+  const { t, plural } = useUi();
   const s = t.shell.tabs;
   const current = sectionOf(usePathname());
   return (
@@ -184,6 +217,14 @@ export function MobileTabBar() {
         <TabLink href="/app/billing" icon={CreditCard} active={current === 'billing'}>
           {s.billing}
         </TabLink>
+        <TabLink
+          href="/app/support"
+          icon={LifeBuoy}
+          active={current === 'support'}
+          badge={unread ? plural(t.tickets.navUnread, unread) : undefined}
+        >
+          {t.tickets.nav}
+        </TabLink>
       </div>
     </nav>
   );
@@ -193,11 +234,14 @@ function TabLink({
   href,
   icon: Icon,
   active,
+  badge,
   children,
 }: {
   href: string;
   icon: LucideIcon;
   active: boolean;
+  /** a dot on the icon, and what it means for screen readers */
+  badge?: string;
   children: ReactNode;
 }) {
   return (
@@ -210,8 +254,17 @@ function TabLink({
       )}
     >
       {active ? <span aria-hidden className="absolute top-0 h-[3px] w-8 rounded-b-full bg-brand" /> : null}
-      <Icon aria-hidden className="size-[22px]" strokeWidth={1.75} />
+      <span className="relative">
+        <Icon aria-hidden className="size-[22px]" strokeWidth={1.75} />
+        {badge ? (
+          <span
+            aria-hidden
+            className="absolute -end-1 -top-0.5 size-2.5 rounded-full bg-brand-deep ring-2 ring-surface"
+          />
+        ) : null}
+      </span>
       {children}
+      {badge ? <span className="sr-only">({badge})</span> : null}
     </Link>
   );
 }
@@ -220,8 +273,16 @@ function TabLink({
  * The account menu: who is signed in, the account, billing, help, the legal pages and signing out.
  * A round avatar in the phones' top bar; a row with the avatar and the address in the sidebar.
  */
-export function UserMenu({ email, admin = false }: { email: string | null; admin?: boolean }) {
-  const { t } = useUi();
+export function UserMenu({
+  email,
+  admin = false,
+  unread = 0,
+}: {
+  email: string | null;
+  admin?: boolean;
+  unread?: number;
+}) {
+  const { t, plural } = useUi();
   const initial = (email ?? '?').trim()[0]?.toUpperCase() ?? '?';
   const items: MenuItem[] = [
     ...(email
@@ -240,6 +301,11 @@ export function UserMenu({ email, admin = false }: { email: string | null; admin
     { label: t.shell.nav.account, icon: <CircleUserRound />, href: '/app/account' },
     { label: t.shell.nav.billing, icon: <CreditCard />, href: '/app/billing' },
     { label: t.shell.nav.invitations, icon: <LayoutGrid />, href: '/app/invitations' },
+    {
+      label: unread ? `${t.tickets.nav} · ${plural(t.tickets.navUnread, unread)}` : t.tickets.nav,
+      icon: <LifeBuoy />,
+      href: '/app/support',
+    },
     { label: t.shell.nav.assistant, icon: <MessageCircleQuestion />, onSelect: () => openSupport() },
     { label: t.shell.nav.contact, icon: <Mail />, href: '/contact' },
     { type: 'separator' },

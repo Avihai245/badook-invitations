@@ -13,6 +13,7 @@ import { insightsHe } from './insights.he';
 import { galleryNotifyHe } from './gallery-notify.he';
 import { facesHe } from './faces.he';
 import { filmHe } from './film.he';
+import { ticketsHe } from './tickets.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -36,6 +37,7 @@ export const he = {
   galleryNotify: galleryNotifyHe,
   faces: facesHe,
   film: filmHe,
+  tickets: ticketsHe,
   common: {
     close: 'סגירה',
     cancel: 'ביטול',

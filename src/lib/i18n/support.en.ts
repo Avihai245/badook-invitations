@@ -52,7 +52,6 @@ export const supportEn: typeof supportHe = {
   stopped: 'The answer was stopped.',
   disclaimer:
     'Answers are written automatically and may contain mistakes. Never share passwords, card details or codes here.',
-  human: 'Contact the team',
   errors: {
     rate: 'You’ve asked a lot of questions in the last hour. Try again later, or write to us through the contact form.',
     tooLong: 'This conversation got too long. Start a new one and we’ll continue from there.',

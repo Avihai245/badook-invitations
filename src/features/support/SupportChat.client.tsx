@@ -13,9 +13,10 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
-import { cn } from '@/components/app';
+import { cn, Hint } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { SUPPORT_OPEN, openSupport, type SupportOpenDetail } from './open';
+import { ChatHandoff } from './tickets/ui/ChatHandoff.client';
 
 /**
  * The support assistant: a chat on every page of the site and the app (answers stream in from
@@ -224,6 +225,9 @@ export function SupportChat() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
+  // "talk to a person": a ticket for the team with this conversation (features/support/tickets)
+  // (shown; hidden while back in the chat, its draft kept; null: none)
+  const [handoff, setHandoff] = useState<'shown' | 'hidden' | null>(null);
   const abort = useRef<AbortController | null>(null);
   const panel = useRef<HTMLDivElement>(null);
   const log = useRef<HTMLDivElement>(null);
@@ -239,7 +243,10 @@ export function SupportChat() {
     if (!busy) save(messages);
   }, [messages, busy]);
 
-  const close = useCallback(() => setOpen(false), []);
+  const close = useCallback(() => {
+    setOpen(false);
+    setHandoff(null);
+  }, []);
 
   // closing gives the focus back to what opened the chat (once it is visible again)
   useEffect(() => {
@@ -354,6 +361,12 @@ export function SupportChat() {
     if (window.matchMedia('(max-width: 639px)').matches) setOpen(false);
   }, []);
 
+  /** Back to the conversation: `keep` the hand-off's draft for later, or start over (it was sent). */
+  const backToChat = (keep: boolean) => {
+    setHandoff(keep ? 'hidden' : null);
+    requestAnimationFrame(() => field.current?.focus({ preventScroll: true }));
+  };
+
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
     e.preventDefault();
@@ -362,6 +375,7 @@ export function SupportChat() {
 
   const restart = () => {
     abort.current?.abort();
+    setHandoff(null);
     setMessages([]);
     setInput('');
     field.current?.focus();
@@ -371,6 +385,8 @@ export function SupportChat() {
   if (path.startsWith('/app/admin')) return null;
   const suggestions = s.suggestions[areaOf(path)];
   const empty = messages.length === 0;
+  // what a ticket from here would carry: the conversation as the server gets it
+  const conversation = forServer(messages);
 
   return (
     <>
@@ -454,8 +470,18 @@ export function SupportChat() {
               </button>
             </header>
 
+            {handoff ? (
+              <ChatHandoff
+                conversation={conversation}
+                hidden={handoff === 'hidden'}
+                onBack={() => backToChat(true)}
+                onFinish={() => backToChat(false)}
+                onNavigate={onNavigate}
+              />
+            ) : null}
             <div
               ref={log}
+              hidden={handoff === 'shown'}
               role="log"
               aria-label={fmt(s.title, { brand })}
               aria-busy={busy}
@@ -518,6 +544,7 @@ export function SupportChat() {
             </div>
 
             <form
+              hidden={handoff === 'shown'}
               className="shrink-0 border-t border-line bg-surface px-3 pt-3 pb-[max(12px,env(safe-area-inset-bottom))]"
               onSubmit={(e) => {
                 e.preventDefault();
@@ -565,13 +592,26 @@ export function SupportChat() {
               </div>
               <p className="mt-2 px-1 text-[11.5px] leading-[1.45] text-muted">
                 {s.disclaimer}{' '}
-                <Link
-                  href="/contact"
-                  onClick={onNavigate}
-                  className="font-semibold text-ink underline underline-offset-2"
-                >
-                  {s.human}
-                </Link>
+                {conversation.some((m) => m.role === 'user') ? (
+                  <Hint text={t.tickets.handoff.buttonHint}>
+                    <button
+                      type="button"
+                      onClick={() => setHandoff('shown')}
+                      data-testid="support-human"
+                      className="font-semibold text-ink underline underline-offset-2"
+                    >
+                      {t.tickets.handoff.button}
+                    </button>
+                  </Hint>
+                ) : (
+                  <Link
+                    href="/app/support/new"
+                    onClick={onNavigate}
+                    className="font-semibold text-ink underline underline-offset-2"
+                  >
+                    {t.tickets.handoff.button}
+                  </Link>
+                )}
               </p>
             </form>
           </div>
