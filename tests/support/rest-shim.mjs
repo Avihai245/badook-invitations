@@ -226,6 +226,28 @@ const FUNCTIONS = new Set([
   'admin_channel_peek',
   'admin_channel_rotate',
   'admin_maintenance',
+  // support tickets: the customers' and the console's (supabase/migrations/*_support_tickets.sql)
+  'support_ticket_open',
+  'support_contact_ticket',
+  'support_ticket_list',
+  'support_ticket_get',
+  'support_ticket_reply',
+  'support_ticket_close',
+  'support_unread',
+  'support_notify_target',
+  'support_message_emailed',
+  'support_maintenance',
+  'admin_support_list',
+  'admin_support_get',
+  'admin_support_reply',
+  'admin_support_note',
+  'admin_support_status',
+  'admin_support_priority',
+  'admin_support_assign',
+  'admin_support_delete',
+  'admin_support_summary',
+  'admin_support_activity',
+  'admin_support_user_tickets',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
