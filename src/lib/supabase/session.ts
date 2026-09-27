@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { serverEnv } from '../env';
+import { isSuspended } from './auth-paths';
 
 export { safeNext } from './auth-paths';
 
@@ -32,11 +33,14 @@ export async function sessionDb(): Promise<SupabaseClient> {
   });
 }
 
-/** The signed-in user, verified with Supabase Auth (not just decoded from the cookie), or null. */
+/**
+ * The signed-in user, verified with Supabase Auth (not just decoded from the cookie), or null — also
+ * for a user whose sign-in the team suspended (their session ends at once, not when it expires).
+ */
 export const getSessionUser = cache(async (): Promise<User | null> => {
   const db = await sessionDb();
   const { data, error } = await db.auth.getUser();
-  return error ? null : data.user;
+  return error || isSuspended(data.user) ? null : data.user;
 });
 
 /** Pages: the signed-in user, or a redirect to /login that comes back to `next`. */

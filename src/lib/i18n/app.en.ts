@@ -247,6 +247,8 @@ export const en: AppDict = {
         'Signing in with Google didn’t finish. Try again, or sign in with your email and password.',
       session_missing: 'To choose a new password, open the link from the email.',
       generic: 'Something went wrong. Please try again in a moment.',
+      suspended:
+        'Sign-in to this account was suspended by the Badook team. To find out more, write to us through the contact page.',
     },
   },
   eventTypes: {

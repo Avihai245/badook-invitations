@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { authAnswerRedirect, signedInLanding } from '@/lib/supabase/auth-paths';
+import { authAnswerRedirect, isSuspended, loginPath, signedInLanding } from '@/lib/supabase/auth-paths';
 
 /**
  * Runs on the Node.js runtime — no Edge anywhere (MASTER_PROMPT §1.1 rule 4). Only the host app and the
@@ -49,8 +49,13 @@ export async function middleware(request: NextRequest) {
   });
   // getUser() verifies the token with Supabase Auth and refreshes an expired session.
   const {
-    data: { user },
+    data: { user: found },
   } = await supabase.auth.getUser();
+  // a user whose sign-in the team suspended (the admin console) is signed out now — Supabase Auth
+  // refuses them a new session, but the one they hold would last until its token expires
+  const suspended = isSuspended(found);
+  if (suspended) await supabase.auth.signOut().catch(() => undefined);
+  const user = suspended ? null : found;
 
   const redirectTo = (path: string) => {
     const target = NextResponse.redirect(new URL(path, request.url));
@@ -58,7 +63,11 @@ export async function middleware(request: NextRequest) {
     return target;
   };
   if (!user && pathname.startsWith('/app')) {
-    return redirectTo(`/login?next=${encodeURIComponent(pathname + search)}`);
+    return redirectTo(
+      suspended
+        ? loginPath({ error: 'suspended', next: pathname + search })
+        : `/login?next=${encodeURIComponent(pathname + search)}`,
+    );
   }
   if (user && (pathname === '/' || pathname === '/login' || pathname === '/signup'))
     return redirectTo(signedInLanding(pathname, searchParams));

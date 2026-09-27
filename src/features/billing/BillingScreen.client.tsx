@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AreaHelp, Badge, Button, Card, Dialog, Hint, KpiCard, PageTitle, useToast } from '@/components/app';
 import { PlanCards } from '@/features/site/PlanCards';
 import { useUi } from '@/lib/i18n/client';
-import type { PlanId, Product } from './plans';
+import { GIFT_PROVIDER, type PlanId, type Product } from './plans';
 import type { BillingPageData } from './server/billing';
 
 const post = async (url: string, body: unknown) => {
@@ -74,9 +74,21 @@ export function BillingScreen({
         timeZone: 'Asia/Jerusalem',
       })
     : null;
+  // a plan the Badook team gave as a gift (the admin console): no charge, no renewal, nothing to
+  // cancel — it ends by itself at the end of its last day
+  const gift = a.billingProvider === GIFT_PROVIDER && a.plan !== 'free' && !a.admin;
+  const giftLastDay =
+    gift && a.planRenewsAt
+      ? date(Date.parse(a.planRenewsAt) - 1, {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          timeZone: 'Asia/Jerusalem',
+        })
+      : '';
   // bought at a discount: its monthly price, which the renewals keep
   const boughtFor =
-    a.plan !== 'free' && !a.admin && a.planPrice !== null && a.planPrice < data.prices[a.plan]
+    a.plan !== 'free' && !a.admin && !gift && a.planPrice !== null && a.planPrice < data.prices[a.plan]
       ? Number(a.planPrice)
       : null;
 
@@ -141,15 +153,17 @@ export function BillingScreen({
     ? b.status.admin
     : a.plan === 'free'
       ? b.status.activeFree
-      : a.planStatus === 'canceled'
-        ? fmt(b.status.canceled, { date: renews })
-        : a.planStatus === 'past_due'
-          ? fmt(b.status.past_due, { date: renews })
-          : fmt(b.status.active, { date: renews });
+      : gift
+        ? fmt(b.status.gift, { date: giftLastDay })
+        : a.planStatus === 'canceled'
+          ? fmt(b.status.canceled, { date: renews })
+          : a.planStatus === 'past_due'
+            ? fmt(b.status.past_due, { date: renews })
+            : fmt(b.status.active, { date: renews });
 
   const planAction = (plan: PlanId) => {
     if (plan === 'free')
-      return a.plan !== 'free' && a.planStatus !== 'canceled' ? (
+      return a.plan !== 'free' && a.planStatus !== 'canceled' && !gift ? (
         <Hint text={b.help.toFree}>
           <Button fullWidth variant="secondary" onClick={() => setConfirmCancel(true)}>
             {b.toFree}
@@ -270,7 +284,11 @@ export function BillingScreen({
             <p className="text-[13px] font-semibold text-muted">{b.current}</p>
             <p className="mt-1 flex items-center gap-2 text-[26px] font-bold">
               {t.site.plans.names[a.effective]}
-              {a.planStatus === 'canceled' && a.plan !== 'free' ? (
+              {gift ? (
+                <Badge variant="live" data-testid="plan-gift">
+                  {b.history.statuses.gift}
+                </Badge>
+              ) : a.planStatus === 'canceled' && a.plan !== 'free' ? (
                 <Badge variant="warning">{b.history.statuses.canceled}</Badge>
               ) : null}
               {a.planStatus === 'past_due' ? (
@@ -284,7 +302,7 @@ export function BillingScreen({
               </p>
             ) : null}
           </div>
-          {a.plan !== 'free' && a.planStatus !== 'canceled' && !a.admin ? (
+          {a.plan !== 'free' && a.planStatus !== 'canceled' && !a.admin && !gift ? (
             <Hint text={b.help.cancel}>
               <Button variant="ghost" icon={<XCircle />} onClick={() => setConfirmCancel(true)}>
                 {b.cancel.button}
@@ -429,7 +447,9 @@ export function BillingScreen({
                   <li key={i} className="flex items-center justify-between gap-3 px-4 py-3">
                     <div className="min-w-0">
                       <p className="truncate">
-                        {b.history.reasons[c.reason as keyof typeof b.history.reasons] ?? c.reason}
+                        {c.reason === 'support' && c.delta < 0
+                          ? b.history.reasons.support_removed
+                          : (b.history.reasons[c.reason as keyof typeof b.history.reasons] ?? c.reason)}
                       </p>
                       <p className="text-[12px] text-muted">
                         {date(c.at, { day: 'numeric', month: 'short', year: 'numeric' })}

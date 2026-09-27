@@ -101,3 +101,15 @@ export function failedLinkPath(error: { code?: string; name?: string }, next: st
     ? '/auth/forgot?error=other_browser'
     : loginPath({ notice: 'email_confirmed', next });
 }
+
+/**
+ * A user whose sign-in the Badook team suspended (the admin console: a Supabase Auth ban). Supabase
+ * Auth refuses them a new session; a session they already hold would last until its access token
+ * expires — so the app treats it as signed out at once (getSessionUser, the middleware).
+ */
+export function isSuspended(
+  user: { banned_until?: string | null } | null | undefined,
+  now = Date.now(),
+): boolean {
+  return !!user?.banned_until && Date.parse(user.banned_until) > now;
+}

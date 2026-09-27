@@ -10,6 +10,7 @@ export const billingHe = {
     canceled: 'בוטלה: פעילה עד {date}, ואחר כך חינם',
     past_due: 'החיוב האחרון לא עבר. נסו שוב או עדכנו אמצעי תשלום עד {date}.',
     admin: 'חשבון מנהל: כל היכולות פתוחות',
+    gift: 'מתנה מצוות Badook עד {date} (כולל), בלי חיוב. אחר כך החשבון עובר לחבילה החינמית.',
   },
   usageTitle: 'השימוש בחבילה',
   usage: {
@@ -23,7 +24,10 @@ export const billingHe = {
   plans: 'החבילות',
   discount: {
     title: 'הנחה של {percent}% על החבילות',
-    sources: { 'partner:badook-events': 'בזכות Badook Events' } as Record<string, string>,
+    sources: {
+      'partner:badook-events': 'בזכות Badook Events',
+      admin: 'מצוות Badook',
+    } as Record<string, string>,
     until: 'לרכישה עד {date}',
     noEnd: 'ללא הגבלת זמן',
     body: 'המחירים כאן כבר כוללים את ההנחה. חבילה שנקנית בהנחה ממשיכה להתחדש כל חודש באותו מחיר, עד שמבטלים או מחליפים אותה.',
@@ -72,13 +76,15 @@ export const billingHe = {
     item: 'פריט',
     amount: 'סכום',
     status: 'סטטוס',
-    statuses: { paid: 'שולם', failed: 'נכשל', canceled: 'בוטל', pending: 'ממתין' },
+    statuses: { paid: 'שולם', failed: 'נכשל', canceled: 'בוטל', pending: 'ממתין', gift: 'מתנה' },
     reasons: {
       purchase: 'קנייה',
       plan_grant: 'קרדיטים חודשיים של החבילה',
       whatsapp_send: 'שליחה בוואטסאפ',
       whatsapp_refund: 'החזר על הודעה שלא נשלחה',
       admin: 'עדכון ידני',
+      support: 'נוסף על ידי צוות Badook',
+      support_removed: 'הוסר על ידי צוות Badook',
     },
   },
   products: {

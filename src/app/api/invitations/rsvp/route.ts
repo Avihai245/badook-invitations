@@ -1,4 +1,5 @@
 import { after } from 'next/server';
+import { nudgeAfter } from '@/features/admin/server/nudge';
 import { guestsDb } from '@/features/invitations/server/guests';
 import { notifyReply } from '@/features/invitations/server/notify';
 import { getPublishedInvitation } from '@/features/invitations/server/published';
@@ -68,6 +69,8 @@ export async function POST(request: Request) {
       ]);
       // guests' replies keep the app's recurring jobs going too (features/jobs)
       after(() => tick());
+      // the admin console's numbers and feed
+      nudgeAfter('rsvp');
     }
     return Response.json(body, { status, headers: NO_STORE });
   } catch (err) {

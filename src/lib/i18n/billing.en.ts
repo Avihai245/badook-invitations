@@ -12,6 +12,7 @@ export const billingEn: typeof billingHe = {
     canceled: 'Canceled: active until {date}, then free',
     past_due: 'The last charge didn’t go through. Try again or update your payment method by {date}.',
     admin: 'Admin account: everything is open',
+    gift: 'A gift from the Badook team until {date} (inclusive), with no charge. Then the account moves to the free plan.',
   },
   usageTitle: 'Your usage',
   usage: {
@@ -25,7 +26,10 @@ export const billingEn: typeof billingHe = {
   plans: 'Plans',
   discount: {
     title: '{percent}% off the plans',
-    sources: { 'partner:badook-events': 'Courtesy of Badook Events' } as Record<string, string>,
+    sources: {
+      'partner:badook-events': 'Courtesy of Badook Events',
+      admin: 'From the Badook team',
+    } as Record<string, string>,
     until: 'For purchases until {date}',
     noEnd: 'No end date',
     body: 'The prices here already include the discount. A plan bought with it keeps renewing every month at the same price, until it is canceled or replaced.',
@@ -75,13 +79,15 @@ export const billingEn: typeof billingHe = {
     item: 'Item',
     amount: 'Amount',
     status: 'Status',
-    statuses: { paid: 'Paid', failed: 'Failed', canceled: 'Canceled', pending: 'Pending' },
+    statuses: { paid: 'Paid', failed: 'Failed', canceled: 'Canceled', pending: 'Pending', gift: 'Gift' },
     reasons: {
       purchase: 'Purchase',
       plan_grant: 'Monthly plan credits',
       whatsapp_send: 'WhatsApp message',
       whatsapp_refund: 'Refund for an unsent message',
       admin: 'Manual update',
+      support: 'Added by the Badook team',
+      support_removed: 'Removed by the Badook team',
     },
   },
   products: {

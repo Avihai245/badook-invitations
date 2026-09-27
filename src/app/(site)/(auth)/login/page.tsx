@@ -9,8 +9,17 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getUi()).t.auth.loginTitle };
 }
 
-/** Messages other pages send here (?error=…): the callback's, Google's, a sign-in link's. */
-const ERRORS: readonly AuthErrorKey[] = ['link_invalid', 'link_expired', 'oauth_failed', 'generic'];
+/**
+ * Messages other pages send here (?error=…): the callback's, Google's, a sign-in link's — and the
+ * middleware's for a session whose sign-in the team suspended.
+ */
+const ERRORS: readonly AuthErrorKey[] = [
+  'link_invalid',
+  'link_expired',
+  'oauth_failed',
+  'generic',
+  'suspended',
+];
 
 export default async function LoginPage({
   searchParams,

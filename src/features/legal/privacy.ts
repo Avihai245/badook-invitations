@@ -105,6 +105,21 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           ],
         },
         {
+          id: 'team',
+          heading: '6A. What the Badook team can see and do',
+          body: [
+            'A small team runs the Service from an internal console. Each member has a role that decides what they can see and do there, and nothing beyond it:',
+            {
+              list: [
+                'Owners and admins run the Service and manage the team. Support answers support requests and can see customers’ contact details to do so. Finance handles payments and can see customers’ contact details for that. Other roles see the numbers only: emails and phone numbers are hidden from them.',
+                'What the team sees: hosts’ accounts (name, where the account came from, plan, credits, payments — and the email and phone only in the roles that need them) and, for each invitation, its details and its numbers: how many guests, replies, messages and visits. Not the guests’ own details or replies.',
+                'What the team can change, and only with a reason: add or remove message credits, give a plan for a limited time or a discount, turn on a feature for one invitation beyond its plan, and suspend or restore an account’s sign-in. A suspended account can’t sign in; its invitations already published keep working for its guests.',
+                'Every action of the team is recorded — who did it, what, when and why — and the record is kept for two years, then deleted.',
+              ],
+            },
+          ],
+        },
+        {
           id: 'retention',
           heading: '7. How long we keep it',
           body: [
@@ -356,6 +371,21 @@ export function privacyDoc(c: LegalContext): LegalDoc {
         heading: '6. אבטחת המידע',
         body: [
           'אנחנו פועלים לפי תקנות הגנת הפרטיות (אבטחת מידע), התשע״ז־2017: חיבור מוצפן (HTTPS), סיסמאות מוצפנות, הפרדה בין המידע של כל חשבון ברמת מסד הנתונים, הרשאות גישה מצומצמות לכל רכיב במערכת, וניטור. אין מערכת חסינה לחלוטין; אם יקרה אירוע אבטחה חמור, נפעל כפי שהדין מחייב, כולל הודעה למי שנפגע כשצריך.',
+        ],
+      },
+      {
+        id: 'team',
+        heading: '6א. מה צוות Badook רואה ויכול לעשות',
+        body: [
+          'צוות קטן מפעיל את השירות ממערכת ניהול פנימית. לכל חבר צוות יש תפקיד שקובע מה הוא רואה ומה הוא יכול לעשות בה, ולא יותר מזה:',
+          {
+            list: [
+              'בעלים ואדמינים מפעילים את השירות ומנהלים את הצוות. צוות התמיכה עונה לפניות, ובשביל זה רואה את פרטי הקשר של הלקוחות. צוות הכספים מטפל בתשלומים, ובשביל זה רואה את פרטי הקשר של הלקוחות. תפקידים אחרים רואים רק מספרים: המיילים ומספרי הטלפון מוסתרים מהם.',
+              'מה הצוות רואה: את חשבונות המארחים (שם, מאיפה החשבון הגיע, החבילה, הקרדיטים והתשלומים — ואת המייל והטלפון רק בתפקידים שצריכים אותם), ולכל הזמנה את הפרטים שלה ואת המספרים שלה: כמה מוזמנים, תשובות, הודעות וכניסות. לא את הפרטים של האורחים עצמם ולא את התשובות שלהם.',
+              'מה הצוות יכול לשנות, ורק עם סיבה: להוסיף או להוריד קרדיטים להודעות, לתת חבילה לזמן מוגבל או הנחה, לפתוח יכולת להזמנה אחת מעבר לחבילה, ולהשעות או להחזיר את הכניסה לחשבון. לחשבון מושעה אי אפשר להיכנס; ההזמנות שלו שכבר פורסמו ממשיכות לעבוד לאורחים.',
+              'כל פעולה של הצוות נרשמת — מי עשה אותה, מה, מתי ולמה — והרישום נשמר שנתיים, ואז נמחק.',
+            ],
+          },
         ],
       },
       {

@@ -1,3 +1,4 @@
+import { nudgeAfter } from '@/features/admin/server/nudge';
 import { payplusCallback } from '@/features/billing/server/billing';
 import { payplusConfigured } from '@/features/billing/server/payplus';
 
@@ -11,6 +12,8 @@ export async function POST(request: Request) {
   if (raw.length > 256 * 1024) return new Response('Too large', { status: 413 });
   try {
     const result = await payplusCallback(raw, request.headers.get('hash'));
+    // a payment or a monthly renewal: the admin console's money and feed
+    if (result.status === 200) nudgeAfter('payment');
     return new Response(result.body, { status: result.status, headers: { 'cache-control': 'no-store' } });
   } catch (err) {
     // PayPlus tries again later

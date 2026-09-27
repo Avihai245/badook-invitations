@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { nudgeAfter } from '@/features/admin/server/nudge';
 import type { AppDict } from '@/lib/i18n/app';
 import { requestBaseUrl } from '@/lib/request-url';
 import { loginPath, RESET_PATH } from '@/lib/supabase/auth-paths';
@@ -31,6 +32,9 @@ function errorKey(error: { code?: string; status?: number }): AuthErrorKey {
     case 'over_request_rate_limit':
     case 'over_email_send_rate_limit':
       return 'rate_limited';
+    // the Badook team suspended the account's sign-in (the admin console)
+    case 'user_banned':
+      return 'suspended';
   }
   return error.status === 429 ? 'rate_limited' : 'generic';
 }
@@ -67,6 +71,8 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
     options: { data: name ? { name } : {}, emailRedirectTo: await callbackUrl(next) },
   });
   if (error) return { error: errorKey(error), email };
+  // a new account: the admin console's numbers and feed
+  nudgeAfter('user');
   // Email confirmation off → signed in right away; on → "check your inbox".
   if (data.session) redirect(next);
   return { sent: true, email };
