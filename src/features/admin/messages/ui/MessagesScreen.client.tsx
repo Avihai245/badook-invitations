@@ -21,6 +21,7 @@ import {
   fmtNode,
   KpiGrid,
   PersonCell,
+  ScrollRegion,
   Section,
   useReportFormat,
   type Tile,
@@ -220,14 +221,15 @@ function ByKind({ data }: { data: MessagesPageData }) {
   ];
   return (
     <Section id="by-kind" title={B.title} intro={t.messages.period}>
-      <DataTable
-        className="-mx-4 sm:mx-0"
-        caption={B.title}
-        columns={columns}
-        rows={rows}
-        getRowKey={(r) => r.kind}
-        rowData={(r) => ({ 'data-kind': r.kind })}
-      />
+      <ScrollRegion label={B.title} className="-mx-4 sm:mx-0">
+        <DataTable
+          caption={B.title}
+          columns={columns}
+          rows={rows}
+          getRowKey={(r) => r.kind}
+          rowData={(r) => ({ 'data-kind': r.kind })}
+        />
+      </ScrollRegion>
     </Section>
   );
 }
@@ -267,14 +269,15 @@ function Queues({ queue }: { queue: QueueRow[] }) {
   return (
     <Section id="queues" title={Q.title}>
       <div data-testid="queues">
-        <DataTable
-          className="-mx-4 sm:mx-0"
-          caption={Q.title}
-          columns={columns}
-          rows={queue}
-          getRowKey={(r) => r.kind}
-          rowData={(r) => ({ 'data-kind': r.kind })}
-        />
+        <ScrollRegion label={Q.title} className="-mx-4 sm:mx-0">
+          <DataTable
+            caption={Q.title}
+            columns={columns}
+            rows={queue}
+            getRowKey={(r) => r.kind}
+            rowData={(r) => ({ 'data-kind': r.kind })}
+          />
+        </ScrollRegion>
       </div>
     </Section>
   );
@@ -463,14 +466,16 @@ function Emails({ data }: { data: MessagesPageData }) {
         />
         <div data-testid="emails-by-kind">
           <h3 className="mb-2 text-[14px] font-bold">{E.byKind}</h3>
-          <DataTable
-            caption={E.byKind}
-            columns={columns}
-            rows={totals}
-            getRowKey={(r) => r.kind}
-            rowData={(r) => ({ 'data-kind': r.kind })}
-            empty={<p className="px-3 py-6 text-center text-[13px] text-muted">{E.none}</p>}
-          />
+          <ScrollRegion label={E.byKind}>
+            <DataTable
+              caption={E.byKind}
+              columns={columns}
+              rows={totals}
+              getRowKey={(r) => r.kind}
+              rowData={(r) => ({ 'data-kind': r.kind })}
+              empty={<p className="px-3 py-6 text-center text-[13px] text-muted">{E.none}</p>}
+            />
+          </ScrollRegion>
         </div>
       </div>
     </Section>

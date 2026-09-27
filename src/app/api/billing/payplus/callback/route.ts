@@ -1,9 +1,12 @@
+import { after } from 'next/server';
+import { adminNudge } from '@/features/admin/server/live';
 import { payplusCallback } from '@/features/billing/server/billing';
 import { payplusConfigured } from '@/features/billing/server/payplus';
 
 /**
  * POST /api/billing/payplus/callback — PayPlus's server-to-server notice of a payment (refURL_callback)
- * and of every monthly renewal. Verified in features/billing/server/billing.ts.
+ * and of every monthly renewal. Verified in features/billing/server/billing.ts. The admin console's
+ * open pages hear of it (after the answer).
  */
 export async function POST(request: Request) {
   if (!payplusConfigured()) return new Response('Not found', { status: 404 });
@@ -11,6 +14,7 @@ export async function POST(request: Request) {
   if (raw.length > 256 * 1024) return new Response('Too large', { status: 413 });
   try {
     const result = await payplusCallback(raw, request.headers.get('hash'));
+    if (result.status === 200) after(() => adminNudge('payment'));
     return new Response(result.body, { status: result.status, headers: { 'cache-control': 'no-store' } });
   } catch (err) {
     // PayPlus tries again later

@@ -36,6 +36,7 @@ import {
   KpiGrid,
   Pager,
   PersonCell,
+  ScrollRegion,
   Section,
   useReportFormat,
   type Tile,
@@ -333,14 +334,15 @@ function Monthly({ data }: { data: FinancePageData }) {
   ];
   return (
     <Section id="monthly" title={M.title} intro={M.intro}>
-      <DataTable
-        className="-mx-4 sm:mx-0"
-        caption={M.title}
-        columns={columns}
-        rows={rows}
-        getRowKey={(row) => row.month}
-        rowData={(row) => ({ 'data-month': row.month })}
-      />
+      <ScrollRegion label={M.title} className="-mx-4 sm:mx-0">
+        <DataTable
+          caption={M.title}
+          columns={columns}
+          rows={rows}
+          getRowKey={(row) => row.month}
+          rowData={(row) => ({ 'data-month': row.month })}
+        />
+      </ScrollRegion>
     </Section>
   );
 }
@@ -355,29 +357,31 @@ function Subscriptions({ data }: { data: FinancePageData }) {
   const rows = (['pro', 'business'] as const).map((plan) => ({ plan, ...subs[plan] }));
   return (
     <Section id="subscriptions" title={S.title}>
-      <DataTable
-        caption={S.title}
-        columns={[
-          { key: 'plan', header: S.plan, cell: (r) => t.finance.plans[r.plan] },
-          { key: 'count', header: S.count, numeric: true, cell: (r) => f.count(r.count) },
-          { key: 'mrr', header: S.mrr, numeric: true, cell: (r) => f.exact(r.mrr) },
-          {
-            key: 'listPriced',
-            header: (
-              <Hint text={S.listPricedHelp}>
-                <span tabIndex={0} className="cursor-help underline decoration-dotted underline-offset-4">
-                  {S.listPriced}
-                </span>
-              </Hint>
-            ),
-            numeric: true,
-            cell: (r) => f.count(r.listPriced),
-          },
-        ]}
-        rows={rows}
-        getRowKey={(r) => r.plan}
-        rowData={(r) => ({ 'data-plan': r.plan })}
-      />
+      <ScrollRegion label={S.title}>
+        <DataTable
+          caption={S.title}
+          columns={[
+            { key: 'plan', header: S.plan, cell: (r) => t.finance.plans[r.plan] },
+            { key: 'count', header: S.count, numeric: true, cell: (r) => f.count(r.count) },
+            { key: 'mrr', header: S.mrr, numeric: true, cell: (r) => f.exact(r.mrr) },
+            {
+              key: 'listPriced',
+              header: (
+                <Hint text={S.listPricedHelp}>
+                  <span tabIndex={0} className="cursor-help underline decoration-dotted underline-offset-4">
+                    {S.listPriced}
+                  </span>
+                </Hint>
+              ),
+              numeric: true,
+              cell: (r) => f.count(r.listPriced),
+            },
+          ]}
+          rows={rows}
+          getRowKey={(r) => r.plan}
+          rowData={(r) => ({ 'data-plan': r.plan })}
+        />
+      </ScrollRegion>
     </Section>
   );
 }
@@ -399,14 +403,15 @@ function Credits({ data }: { data: FinancePageData }) {
   ];
   return (
     <Section id="credits" title={C.title} intro={C.intro}>
-      <DataTable
-        className="-mx-4 sm:mx-0"
-        caption={C.title}
-        columns={columns}
-        rows={[...data.view.credits].reverse()}
-        getRowKey={(r) => r.month}
-        rowData={(r) => ({ 'data-month': r.month })}
-      />
+      <ScrollRegion label={C.title} className="-mx-4 sm:mx-0">
+        <DataTable
+          caption={C.title}
+          columns={columns}
+          rows={[...data.view.credits].reverse()}
+          getRowKey={(r) => r.month}
+          rowData={(r) => ({ 'data-month': r.month })}
+        />
+      </ScrollRegion>
     </Section>
   );
 }

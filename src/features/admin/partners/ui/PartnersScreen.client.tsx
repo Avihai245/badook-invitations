@@ -21,6 +21,7 @@ import {
   KpiGrid,
   Pager,
   PersonCell,
+  ScrollRegion,
   Section,
   useReportFormat,
   type Tile,
@@ -158,15 +159,16 @@ function Openers({ overview }: { overview: PartnersRaw }) {
   return (
     <Section id="openers" title={O.title} intro={O.intro}>
       <div data-testid="openers">
-        <DataTable
-          className="-mx-4 sm:mx-0"
-          caption={O.title}
-          columns={columns}
-          rows={overview.openers}
-          getRowKey={(r) => r.id}
-          rowData={(r) => ({ 'data-opener': r.id })}
-          empty={<p className="px-3 py-6 text-center text-[13px] text-muted">{O.none}</p>}
-        />
+        <ScrollRegion label={O.title} className="-mx-4 sm:mx-0">
+          <DataTable
+            caption={O.title}
+            columns={columns}
+            rows={overview.openers}
+            getRowKey={(r) => r.id}
+            rowData={(r) => ({ 'data-opener': r.id })}
+            empty={<p className="px-3 py-6 text-center text-[13px] text-muted">{O.none}</p>}
+          />
+        </ScrollRegion>
         {overview.accounts.unknownOpener > 0 ? (
           <p className="mt-3 text-[12.5px] text-muted" data-testid="unknown-openers">
             <Hint text={O.unknownHelp}>
@@ -224,15 +226,16 @@ function Venues({ overview }: { overview: PartnersRaw }) {
   return (
     <Section id="venues" title={V.title}>
       <div data-testid="venues">
-        <DataTable
-          className="-mx-4 sm:mx-0"
-          caption={V.title}
-          columns={columns}
-          rows={overview.venues}
-          getRowKey={(r) => r.id}
-          rowData={(r) => ({ 'data-venue': r.id })}
-          empty={<p className="px-3 py-6 text-center text-[13px] text-muted">{V.none}</p>}
-        />
+        <ScrollRegion label={V.title} className="-mx-4 sm:mx-0">
+          <DataTable
+            caption={V.title}
+            columns={columns}
+            rows={overview.venues}
+            getRowKey={(r) => r.id}
+            rowData={(r) => ({ 'data-venue': r.id })}
+            empty={<p className="px-3 py-6 text-center text-[13px] text-muted">{V.none}</p>}
+          />
+        </ScrollRegion>
       </div>
     </Section>
   );
@@ -346,7 +349,7 @@ function AccountsList({ rows }: { rows: PartnerAccountRow[] }) {
       {r.userManaged ? (
         <Hint text={A.selfManagedHelp}>
           <span tabIndex={0} className="inline-flex">
-            <Badge variant="draft">{A.selfManaged}</Badge>
+            <Badge variant="neutral">{A.selfManaged}</Badge>
           </span>
         </Hint>
       ) : null}
@@ -474,32 +477,33 @@ function ApiHealth({ api }: { api: PartnersRaw['api'] }) {
         {api.endpoints.length ? (
           <div>
             <h3 className="mb-2 text-[14px] font-bold">{A.endpoints}</h3>
-            <DataTable
-              className="-mx-4 sm:mx-0"
-              caption={A.endpoints}
-              columns={[
-                {
-                  key: 'endpoint',
-                  header: A.endpoint,
-                  cell: (r) => (
-                    <bdi dir="ltr" className="font-mono text-[12.5px] whitespace-nowrap">
-                      {r.method} {r.endpoint}
-                    </bdi>
-                  ),
-                },
-                { key: 'calls', header: A.calls, numeric: true, cell: (r) => f.count(r.calls) },
-                { key: 'refused', header: A.refused, numeric: true, cell: (r) => f.count(r.refused) },
-                { key: 'failed', header: A.failed, numeric: true, cell: (r) => f.count(r.failed) },
-                {
-                  key: 'avgMs',
-                  header: A.avgMs,
-                  numeric: true,
-                  cell: (r) => fmt(A.ms, { n: f.count(r.avgMs) }),
-                },
-              ]}
-              rows={api.endpoints}
-              getRowKey={(r) => `${r.method} ${r.endpoint}`}
-            />
+            <ScrollRegion label={A.endpoints} className="-mx-4 sm:mx-0">
+              <DataTable
+                caption={A.endpoints}
+                columns={[
+                  {
+                    key: 'endpoint',
+                    header: A.endpoint,
+                    cell: (r) => (
+                      <bdi dir="ltr" className="font-mono text-[12.5px] whitespace-nowrap">
+                        {r.method} {r.endpoint}
+                      </bdi>
+                    ),
+                  },
+                  { key: 'calls', header: A.calls, numeric: true, cell: (r) => f.count(r.calls) },
+                  { key: 'refused', header: A.refused, numeric: true, cell: (r) => f.count(r.refused) },
+                  { key: 'failed', header: A.failed, numeric: true, cell: (r) => f.count(r.failed) },
+                  {
+                    key: 'avgMs',
+                    header: A.avgMs,
+                    numeric: true,
+                    cell: (r) => fmt(A.ms, { n: f.count(r.avgMs) }),
+                  },
+                ]}
+                rows={api.endpoints}
+                getRowKey={(r) => `${r.method} ${r.endpoint}`}
+              />
+            </ScrollRegion>
           </div>
         ) : null}
       </div>

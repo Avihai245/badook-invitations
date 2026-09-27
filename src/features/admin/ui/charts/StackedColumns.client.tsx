@@ -275,7 +275,13 @@ export function StackedColumns<K extends string>({
         <summary className="inline-flex cursor-pointer items-center gap-1 rounded-btn px-1 py-0.5 text-muted hover:text-ink">
           {tableLabel}
         </summary>
-        <div className="mt-2 max-h-[320px] overflow-auto rounded-[10px] border border-line">
+        {/* (it scrolls: a region a keyboard can reach) */}
+        <div
+          role="region"
+          aria-label={tableLabel}
+          tabIndex={0}
+          className="mt-2 max-h-[320px] overflow-auto rounded-[10px] border border-line focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
           <table className="w-full border-collapse text-[12.5px]">
             <caption className="sr-only">{tableLabel}</caption>
             <thead>

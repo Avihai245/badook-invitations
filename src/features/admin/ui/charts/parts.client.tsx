@@ -108,6 +108,34 @@ export function Section({
   );
 }
 
+/**
+ * A table that may scroll sideways on a phone, as a region a keyboard can reach (Tab, then the arrow
+ * keys): it scrolls here instead of in the table's own box.
+ */
+export function ScrollRegion({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      role="region"
+      aria-label={label}
+      tabIndex={0}
+      className={cn(
+        'overflow-x-auto rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand [&>div]:overflow-x-visible',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
 /** How the numbers on the screen are counted, one line each. */
 export function Definitions({ title, lines }: { title: string; lines: readonly string[] }) {
   return (
