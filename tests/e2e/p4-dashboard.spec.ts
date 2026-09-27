@@ -295,6 +295,8 @@ test.describe('responses dashboard', () => {
     // wherever the feature is off
     const insights = { visits: expect.any(Number) };
     const faces = { expired: expect.any(Number), withoutFeature: expect.any(Number) };
+    // …and the partner API's calls and the log of emails after 90 days
+    const logs = { partnerCalls: expect.any(Number), emails: expect.any(Number) };
     // …and the admin console's record of actions after two years
     const admin = { audit: expect.any(Number) };
     // …and the support tickets': answered and left for 14 days close, closed ones go after two years
@@ -315,6 +317,7 @@ test.describe('responses dashboard', () => {
       studio,
       insights,
       faces,
+      logs,
       admin,
       support,
     });
@@ -331,6 +334,7 @@ test.describe('responses dashboard', () => {
       studio,
       insights,
       faces,
+      logs,
       admin,
       support,
     });

@@ -37,7 +37,8 @@
   "fullName": "דנה לוי",
   "phone": "050-123-4567",
   "externalId": "be-12345",
-  "next": "/app/invitations/new"
+  "next": "/app/invitations/new",
+  "createdBy": { "id": "be-u-7", "name": "רונית כהן", "email": "ronit@venue.example.com", "role": "manager" }
 }
 ```
 
@@ -48,6 +49,7 @@
 | `phone` | לא | טלפון בכל פורמט ישראלי או בינלאומי. נשמר בפורמט E.164 (`+972501234567`). |
 | `externalId` | לא (מומלץ) | המזהה של המשתמש ב־Badook Events, לחיפוש ולקישורים בהמשך. |
 | `next` | לא | לאן הקישור מוביל אחרי הכניסה: נתיב באתר (ברירת מחדל `/app/invitations`). |
+| `createdBy` | לא (מומלץ) | מי ב־Badook Events פתח את המשתמש: בעל האולם או איש צוות שלו. ראו "מי פתח את החשבון". |
 
 תשובה: `201` למשתמש חדש, `200` למשתמש קיים שעודכן.
 
@@ -73,6 +75,22 @@
 
 `userManaged: true` אומר שהמשתמש כבר נכנס בעצמו (קבע סיסמה, או חיבר Google). ראו "משתמש שמנהל את הכניסה בעצמו".
 
+### מי פתח את החשבון: `createdBy`
+
+מפתח אחד משמש את כל הקריאות, ולכן בלי `createdBy` אנחנו לא יודעים מי מהמשתמשים ב־Badook Events פתח כל חשבון. עם `createdBy`, בממשק הניהול של Badook רואים ליד כל חשבון "נפתח דרך Badook Events על ידי רונית כהן (manager)", עם התאריך והאולם, ואפשר לראות כמה חשבונות פתח כל משתמש ב־Badook Events.
+
+| שדה | חובה | הסבר |
+|---|---|---|
+| `createdBy.id` | כן (כששולחים `createdBy`) | המזהה של המשתמש ב־Badook Events, עד 200 תווים. |
+| `createdBy.name` | לא | השם שלו, עד 120 תווים. |
+| `createdBy.email` | לא | המייל שלו. |
+| `createdBy.role` | לא | התפקיד שלו, עד 60 תווים (למשל `owner`, `manager`). |
+
+- **`createdBy` לא חובה.** קריאה בלעדיו עובדת בדיוק כמו קודם, והחשבון נרשם בלי פרטי הפותח. אם המשתמש משויך לאולם שנשלח עם `owner` (ראו "אולמות"), בעל האולם נחשב למי שפתח.
+- אפשר לשלוח את `createdBy` גם ב־`PATCH /users`. זה לא משנה את מי שפתח את החשבון: הקריאה נרשמת כעדכון, עם מי שעשה אותו.
+- **מי שפתח את החשבון** הוא מי שנשלח בקריאה הראשונה, זו שפתחה אותו. קריאות מאוחרות לא משנות אותו.
+- שם, מייל או תפקיד ריקים (`""`) נחשבים כאילו לא נשלחו. שדה שלא ברשימה, או `createdBy` בלי `id`, מחזירים `400 invalid` עם השדה ב־`fields` (למשל `createdBy.id`), ושום משתמש לא נוצר.
+
 ### קישור כניסה חדש: `POST /api/partner/v1/login-links`
 
 ```json
@@ -86,10 +104,10 @@
 כשהמייל של המשתמש משתנה ב־Badook Events:
 
 ```json
-{ "externalId": "be-12345", "email": "dana.levi@example.com" }
+{ "externalId": "be-12345", "email": "dana.levi@example.com", "createdBy": { "id": "be-u-7" } }
 ```
 
-שולחים `externalId` **או** `userId`, לא את שניהם. התשובה: `{ "ok": true, "user": { … } }` עם המייל החדש. המייל מתעדכן מיד, בלי מייל אישור. מתאים רק למשתמש שעוד לא מנהל את הכניסה בעצמו (אחרת `409 user_managed`: את המייל שלו הוא משנה בעצמו), ורק למייל שאין לו חשבון אחר (אחרת `409 email_taken`).
+שולחים `externalId` **או** `userId`, לא את שניהם. `createdBy` לא חובה (מי ב־Badook Events עשה את השינוי). התשובה: `{ "ok": true, "user": { … } }` עם המייל החדש. המייל מתעדכן מיד, בלי מייל אישור. מתאים רק למשתמש שעוד לא מנהל את הכניסה בעצמו (אחרת `409 user_managed`: את המייל שלו הוא משנה בעצמו), ורק למייל שאין לו חשבון אחר (אחרת `409 email_taken`).
 
 **לא** שולחים `POST /users` עם המייל החדש: זה ינסה לפתוח משתמש חדש, ויחזיר `409 external_id_taken` כי ה־`externalId` שייך למשתמש הקיים (בלי להשאיר משתמש חדש מאחור). עד שמעדכנים את המייל, הקישורים ממשיכים לעבוד לפי `externalId`.
 
@@ -138,6 +156,8 @@ Badook Events יכולה לתת הנחה באחוזים על החבילות (Pro
 | 429 | `rate_limited` | יותר מ־600 קריאות בשעה. |
 | 500 | `server_error` | תקלה אצלנו. אפשר לנסות שוב. |
 
+כל קריאה נרשמת אצלנו: נקודת הקצה, הסטטוס והקוד של התשובה, החשבון שהיא נוגעת בו ומשך הטיפול, בלי תוכן הבקשה. הרישום נשמר 90 יום, ובעזרתו אנחנו רואים בממשק הניהול אם החיבור תקין (כמה קריאות, כמה נדחו, השגיאה האחרונה).
+
 ## משתמש שמנהל את הכניסה בעצמו
 
 משתמש שנפתח דרך Badook Events יכול להתחיל להיכנס בעצמו: לקבוע סיסמה ב"שכחתי סיסמה", או להיכנס עם Google באותו מייל. מאותו רגע החשבון שלו בידיים שלו, ולכן:
@@ -168,7 +188,7 @@ Badook Events יכולה לתת הנחה באחוזים על החבילות (Pro
 curl -sS https://invitations.badooks.com/api/partner/v1/users \
   -H "Authorization: Bearer $INVITES_PARTNER_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","fullName":"בדיקה","externalId":"be-test-1"}'
+  -d '{"email":"test@example.com","fullName":"בדיקה","externalId":"be-test-1","createdBy":{"id":"be-u-7","name":"רונית כהן","role":"manager"}}'
 
 # 15% הנחה על החבילות לאותו משתמש, עד סוף השנה
 curl -sS https://invitations.badooks.com/api/partner/v1/discounts \
@@ -190,7 +210,8 @@ curl -sS https://invitations.badooks.com/api/partner/v1/discounts \
   "name": "אולמי הגן",
   "address": "הרצל 1, ראשון לציון",
   "widthMeters": 36.5,
-  "floorPlan": { "url": "https://files.badook-events.example/halls/17/plan.pdf" }
+  "floorPlan": { "url": "https://files.badook-events.example/halls/17/plan.pdf" },
+  "owner": { "id": "be-u-1", "name": "משה לוי", "role": "owner" }
 }
 ```
 
@@ -200,6 +221,7 @@ curl -sS https://invitations.badooks.com/api/partner/v1/discounts \
 | `address` | לא | כתובת, עד 300 תווים. |
 | `widthMeters` | לא (מומלץ) | כמה מטרים **רוחב התוכנית כולה** (מקצה התמונה לקצה). ממנו מחושב קנה המידה, והשולחנות מוצגים על התוכנית בגודל האמיתי. בלעדיו הלקוח יכול לכייל בעצמו. |
 | `floorPlan` | לא | התוכנית: `{ "url": "https://…" }` (השרת שלנו מוריד את הקובץ), או `{ "base64": "…" }` (אפשר גם `data:…;base64,…`). |
+| `owner` | לא | בעל האולם ב־Badook Events, באותו מבנה כמו `createdBy` (`id` חובה; `name`, `email`, `role` לא). כשקריאה שפותחת משתמש לאולם לא אומרת מי פתח אותו, בעל האולם נחשב למי שפתח. `null` מוחק. |
 
 - **קבצים:** PNG, JPEG, WebP או PDF (העמוד הראשון), עד **15MB**. הסוג נקבע לפי תוכן הקובץ, לא לפי השם או `contentType`. קובץ PDF הופך לתמונה בדפדפן של הלקוח בפעם הראשונה שהוא פותח את סידור השולחנות.
 - **`url`:** רק `https`, בפורט הרגיל (443), בלי שם משתמש וסיסמה בכתובת, וכתובת ציבורית באינטרנט (לא רשת פנימית). עד 3 הפניות (redirect), וההורדה צריכה להסתיים תוך 15 שניות. כתובת חתומה לזמן קצוב (למשל מ־S3) מתאימה, כי הקובץ נשמר אצלנו מיד.
@@ -225,6 +247,7 @@ curl -sS https://invitations.badooks.com/api/partner/v1/discounts \
       "bytes": 482113,
       "updatedAt": "2026-09-26T10:00:00Z"
     },
+    "owner": { "id": "be-u-1", "name": "משה לוי", "email": null, "role": "owner" },
     "users": 0,
     "createdAt": "2026-09-26T10:00:00Z",
     "updatedAt": "2026-09-26T10:00:00Z"
@@ -232,7 +255,7 @@ curl -sS https://invitations.badooks.com/api/partner/v1/discounts \
 }
 ```
 
-`width` ו־`height` הם גודל התמונה בפיקסלים (`null` ל־PDF). `users` הוא מספר המשתמשים שמשויכים לאולם.
+`width` ו־`height` הם גודל התמונה בפיקסלים (`null` ל־PDF). `owner` הוא בעל האולם, או `null` כשלא נשלח. `users` הוא מספר המשתמשים שמשויכים לאולם.
 
 ### פרטי אולם: `GET /api/partner/v1/venues/{venueId}`
 
@@ -263,11 +286,11 @@ curl -sS https://invitations.badooks.com/api/partner/v1/discounts \
 ### בדיקה מהירה (curl)
 
 ```bash
-# אולם עם תוכנית מכתובת, ורוחב של 36.5 מטר
+# אולם עם תוכנית מכתובת, רוחב של 36.5 מטר והבעלים שלו
 curl -sS -X PUT https://invitations.badooks.com/api/partner/v1/venues/hall-17 \
   -H "Authorization: Bearer $INVITES_PARTNER_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name":"אולמי הגן","widthMeters":36.5,"floorPlan":{"url":"https://files.example.com/hall-17.png"}}'
+  -d '{"name":"אולמי הגן","widthMeters":36.5,"floorPlan":{"url":"https://files.example.com/hall-17.png"},"owner":{"id":"be-u-1","name":"משה לוי","role":"owner"}}'
 
 # אותו אולם, תוכנית מקובץ מקומי
 curl -sS -X PUT https://invitations.badooks.com/api/partner/v1/venues/hall-17 \

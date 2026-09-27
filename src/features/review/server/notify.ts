@@ -28,6 +28,7 @@ async function send(p: PendingRow): Promise<boolean> {
   }
   const ok = await sendEmail({
     to: p.email,
+    kind: 'review',
     ...reviewEmail({
       locale,
       title,

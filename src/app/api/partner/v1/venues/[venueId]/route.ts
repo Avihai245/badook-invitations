@@ -38,7 +38,7 @@ async function readJson(request: Request, max: number): Promise<unknown | 'too_l
 export async function PUT(request: Request, { params }: Params) {
   const venueId = decode((await params).venueId);
   // the body is read only once the key checked out
-  return partnerRoute(request, async (deps) => {
+  return partnerRoute(request, '/venues/{venueId}', async (deps) => {
     const body = await readJson(request, MAX_BODY);
     if (body === 'too_large')
       return { status: 413, body: { ok: false, code: 'too_large', max: MAX_PLAN_BYTES } };
@@ -49,7 +49,7 @@ export async function PUT(request: Request, { params }: Params) {
 /** GET /api/partner/v1/venues/{venueId} — the venue and its floor plan. */
 export async function GET(request: Request, { params }: Params) {
   const venueId = decode((await params).venueId);
-  return partnerRoute(request, (deps) => getVenue(venueId, venueDeps(deps)));
+  return partnerRoute(request, '/venues/{venueId}', (deps) => getVenue(venueId, venueDeps(deps)));
 }
 
 /** The path's id as sent (a malformed escape is just an invalid id). */

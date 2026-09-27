@@ -1,13 +1,16 @@
 import { z } from 'zod';
+import { actorOf, PartnerActorSchema, type PartnerActor } from './actor';
 import type { ApiResult } from './api';
 import { PLAN_EXT, sniffPlan, type PlanFileType } from './plan-file';
 
 /**
  * The partner's venues (Badook Events → this app): a venue owner who opens users here for their
  * customers sends the venue's floor plan once, so a customer opening "seating" for their event starts
- * from it (supabase/migrations/*_seating.sql seating_state) and never has to deal with it.
+ * from it (supabase/migrations/*_seating.sql seating_state) and never has to deal with it. The venue may
+ * name its owner in Badook Events: who opened an account for the venue when the call didn't say.
  *
- *   PUT /api/partner/v1/venues/{venueId} { name, address?, widthMeters?, floorPlan?: { url } | { base64 } }
+ *   PUT /api/partner/v1/venues/{venueId}
+ *       { name, address?, widthMeters?, floorPlan?: { url } | { base64 }, owner?: { id, name?, email?, role? } }
  *   GET /api/partner/v1/venues/{venueId}
  *
  * Plain functions over injected dependencies; tested in tests/unit/partner-venues.test.ts; the contract
@@ -30,6 +33,8 @@ export interface VenueRecord {
     bytes: number;
     updatedAt: string;
   } | null;
+  /** the venue's owner in Badook Events (null: not said) */
+  owner?: PartnerActor | null;
   users: number;
   createdAt: string;
   updatedAt: string;
@@ -47,8 +52,13 @@ export interface VenueDeps {
   get(venueId: string): Promise<VenueRecord | null>;
   put(
     venueId: string,
-    fields: readonly ('name' | 'address' | 'widthMeters' | 'floorPlan')[],
-    values: { name: string | null; address: string | null; widthMeters: number | null },
+    fields: readonly VenueField[],
+    values: {
+      name: string | null;
+      address: string | null;
+      widthMeters: number | null;
+      owner: PartnerActor | null;
+    },
     plan: {
       path: string;
       contentType: PlanFileType;
@@ -67,7 +77,12 @@ export interface VenueDeps {
   /** a folder name for the venue's files: stable per venue, not its id */
   folder(venueId: string): string;
   newId(): string;
+  /** a venue changed: the admin console's open pages refresh */
+  changed?(): void;
 }
+
+/** What a PUT may set (only what it sends changes). */
+export type VenueField = 'name' | 'address' | 'widthMeters' | 'floorPlan' | 'owner';
 
 const fail = (status: number, code: string, extra: Record<string, unknown> = {}): ApiResult => ({
   status,
@@ -97,6 +112,8 @@ export const VenuePutSchema = z.strictObject({
   /** how many meters the plan's full width shows (its scale) */
   widthMeters: z.number().finite().gt(0).max(5000).nullable().optional(),
   floorPlan: PlanSchema.nullable().optional(),
+  /** the venue's owner in Badook Events: who opened an account for it when the call didn't say */
+  owner: PartnerActorSchema.nullable().optional(),
 });
 
 /** What the partner sees of a venue: its plan as a public URL, not our storage path. */
@@ -116,6 +133,7 @@ export function venueView(v: VenueRecord, deps: Pick<VenueDeps, 'planUrl'>) {
           updatedAt: v.floorPlan.updatedAt,
         }
       : null,
+    owner: v.owner ?? null,
     users: v.users,
     createdAt: v.createdAt,
     updatedAt: v.updatedAt,
@@ -145,7 +163,7 @@ export async function putVenue(venueIdRaw: string, raw: unknown, deps: VenueDeps
   const parsed = VenuePutSchema.safeParse(raw);
   if (!parsed.success) return invalid(parsed.error);
   const body = parsed.data;
-  const fields = (['name', 'address', 'widthMeters', 'floorPlan'] as const).filter(
+  const fields = (['name', 'address', 'widthMeters', 'floorPlan', 'owner'] as const).filter(
     (k) => body[k] !== undefined,
   );
   if (!fields.length) return fail(400, 'invalid', { fields: ['(body)'] });
@@ -189,7 +207,12 @@ export async function putVenue(venueIdRaw: string, raw: unknown, deps: VenueDeps
     answer = await deps.put(
       venueId.data,
       fields,
-      { name: body.name ?? null, address: body.address ?? null, widthMeters: body.widthMeters ?? null },
+      {
+        name: body.name ?? null,
+        address: body.address ?? null,
+        widthMeters: body.widthMeters ?? null,
+        owner: actorOf(body.owner),
+      },
       plan,
     );
   } catch (err) {
@@ -204,6 +227,7 @@ export async function putVenue(venueIdRaw: string, raw: unknown, deps: VenueDeps
   // the plan it replaced, when no event's seating uses it any more
   if (answer.replacedPlan)
     await deps.remove(answer.replacedPlan).catch((err) => console.error('[partner api] old plan', err));
+  deps.changed?.();
   return {
     status: answer.created ? 201 : 200,
     body: { ok: true, created: answer.created, venue: venueView(answer.venue, deps) },

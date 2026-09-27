@@ -1,5 +1,6 @@
 import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
+import { consoleLogsHousekeeping } from '@/features/admin/messages/server';
 import { adminDb } from '@/features/admin/server/db';
 import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
@@ -67,6 +68,8 @@ export async function runDaily(now: Date) {
   const faces = await facesHousekeeping().catch(
     (err) => (console.error('face search housekeeping failed', err), null),
   );
+  // the partner API's calls and the log of emails are kept 90 days
+  const logs = await consoleLogsHousekeeping();
   // the admin console's record of actions is kept two years
   const admin = await adminDb
     .maintenance()
@@ -86,6 +89,7 @@ export async function runDaily(now: Date) {
     studio,
     insights,
     faces,
+    logs,
     admin,
     support,
   };

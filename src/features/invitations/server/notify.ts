@@ -30,6 +30,7 @@ export async function notifyReply(saved: {
   const locale = hostLanguageOf(saved.doc);
   await sendEmail({
     to: target.email,
+    kind: 'rsvp_reply',
     ...replyEmail({
       locale,
       title: hostsLine(saved.doc.hosts, saved.doc.defaultLocale),
@@ -66,6 +67,7 @@ export async function sendDigests(now: Date): Promise<{ sent: number; failed: nu
     const locale = hostLanguageOf(doc);
     const ok = await sendEmail({
       to: item.email,
+      kind: 'rsvp_digest',
       ...digestEmail({
         locale,
         title: hostsLine(doc.hosts, doc.defaultLocale),

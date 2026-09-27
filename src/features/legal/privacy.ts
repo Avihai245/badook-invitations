@@ -39,7 +39,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           body: [
             {
               list: [
-                'Account details: name, email address, phone number (optional) and a password, stored only as a secure hash. Signing in with Google gives us your name, email and profile picture from Google. An account opened for you by Badook Events (our events system) comes with the name, email and phone you gave it.',
+                'Account details: name, email address, phone number (optional) and a password, stored only as a secure hash. Signing in with Google gives us your name, email and profile picture from Google. An account opened for you by Badook Events (our events system) comes with the name, email and phone you gave it. Badook Events also tells us which of its users opened the account for you (their name, their ID there, email and role), and we keep that with the account. We keep a record of the calls its system makes to ours (the kind of call, when, the result and the account it concerned — not the details sent) for 90 days.',
                 'What hosts create: event details, texts (and their translations into the invitation’s other languages), photos, videos, songs and links they add to an invitation, and their settings.',
                 'Guest lists: names, phone numbers and optionally email addresses, party size and group, uploaded from a file or typed in; plus each guest’s personal-link status (sent, delivered, read, opened).',
                 'A do-not-send list: phone numbers that asked our WhatsApp number to stop (a “STOP” reply, or turning off marketing messages from us in WhatsApp), with the date. We keep it so that no host sends to them again from that number.',
@@ -308,7 +308,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
         body: [
           {
             list: [
-              'פרטי חשבון: שם, כתובת מייל, מספר טלפון (לא חובה) וסיסמה, שנשמרת רק בצורה מוצפנת חד־כיוונית (hash). בכניסה עם Google אנחנו מקבלים מ־Google את השם, המייל ותמונת הפרופיל. חשבון שנפתח עבורכם דרך Badook Events (מערכת האירועים שלנו) מגיע עם השם, המייל והטלפון שמסרתם שם.',
+              'פרטי חשבון: שם, כתובת מייל, מספר טלפון (לא חובה) וסיסמה, שנשמרת רק בצורה מוצפנת חד־כיוונית (hash). בכניסה עם Google אנחנו מקבלים מ־Google את השם, המייל ותמונת הפרופיל. חשבון שנפתח עבורכם דרך Badook Events (מערכת האירועים שלנו) מגיע עם השם, המייל והטלפון שמסרתם שם. Badook Events גם מוסרת לנו מי מהמשתמשים שלה פתח עבורכם את החשבון (השם, המזהה שלו שם, המייל והתפקיד), ואנחנו שומרים את זה עם החשבון. את רישום הקריאות שהמערכת שלה שולחת אלינו (סוג הקריאה, מתי, התוצאה והחשבון שהיא נגעה בו, בלי הפרטים שנשלחו) אנחנו שומרים 90 יום.',
               'מה שמארחים יוצרים: פרטי האירוע, טקסטים (והתרגומים שלהם לשפות האחרות של ההזמנה), תמונות, סרטונים, שירים וקישורים שמוסיפים להזמנה, וההגדרות שלה.',
               'רשימות מוזמנים: שמות, מספרי טלפון ולפעמים מיילים, כמות מוזמנים וקבוצה, מקובץ או בהקלדה; וגם הסטטוס של הקישור האישי של כל מוזמן (נשלח, נמסר, נקרא, נפתח).',
               'רשימת ״לא לשלוח״: מספרי טלפון שביקשו מהמספר שלנו בוואטסאפ להפסיק (תשובת ״הסר״ או STOP, או כיבוי הודעות שיווק מאיתנו בוואטסאפ), עם התאריך. אנחנו שומרים אותה כדי שאף מארח לא ישלח אליהם שוב מהמספר הזה.',

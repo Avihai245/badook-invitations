@@ -1,5 +1,7 @@
 import 'server-only';
 import { createHash, randomUUID } from 'node:crypto';
+import { after } from 'next/server';
+import { adminNudge } from '@/features/admin/server/live';
 import { planBaseUrl, PLAN_BUCKET } from '@/features/seating/server';
 import { serviceDb } from '@/lib/supabase/server';
 import { PARTNER_SOURCE, type PartnerDeps } from './api';
@@ -31,6 +33,7 @@ export function venueDeps(partner: Pick<PartnerDeps, 'rateHit'>): VenueDeps {
         p_address: values.address,
         p_width_meters: values.widthMeters,
         p_plan: plan,
+        p_owner: values.owner,
       }),
     fetchPlan: async (url) => (await fetchPlanFile(url, { maxBytes: MAX_PLAN_BYTES })).bytes,
     async store(path, bytes, contentType) {
@@ -50,5 +53,7 @@ export function venueDeps(partner: Pick<PartnerDeps, 'rateHit'>): VenueDeps {
     folder: (venueId) =>
       createHash('sha256').update(`${PARTNER_SOURCE}:${venueId}`).digest('hex').slice(0, 32),
     newId: randomUUID,
+    // the admin console's open pages refresh, after the answer
+    changed: () => after(() => adminNudge('partner')),
   };
 }

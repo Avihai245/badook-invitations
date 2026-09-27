@@ -2,7 +2,9 @@
  * The partner API (Badook Events → this app, server to server): opens users remotely — name, email
  * and phone — hands out one-time sign-in links for them, gives a user's account a discount on the
  * plans, and links a user to one of the partner's venues (venues.ts: its floor plan is where the user's
- * seating starts). Plain functions over injected
+ * seating starts). A call that opens or updates a user may say which of the partner's users made it
+ * (createdBy: a venue owner, one of their staff): every provisioning is recorded with it, and the admin
+ * console shows where each account came from. Plain functions over injected
  * dependencies; the route files (app/api/partner/v1/…) wire Supabase in. Tested in
  * tests/unit/partner.test.ts; the contract for the partner is docs/partner-api.md.
  *
@@ -15,7 +17,10 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { MAX_DISCOUNT_PERCENT } from '../billing/plans';
 import { normalizeGuestPhone } from '../invitations/lib/guest-import';
+import { actorOf, PartnerActorSchema, type PartnerActor } from './actor';
 import { VenueIdSchema } from './venues';
+
+export { actorOf, PartnerActorSchema, type PartnerActor };
 
 export const PARTNER_SOURCE = 'partner:badook-events';
 /** Supabase's default one-time link lifetime (Auth → Email OTP expiration). */
@@ -56,6 +61,12 @@ export interface PartnerDiscount {
   until: string | null;
   note: string | null;
 }
+
+/**
+ * What a provisioning did: opened a user (created), claimed one the partner created before (linked),
+ * updated one of its users (POST or PATCH /users), or handed out a fresh sign-in link (login_link).
+ */
+export type ProvisionAction = 'created' | 'linked' | 'updated' | 'login_link';
 
 export interface PartnerDeps {
   /** the site's public origin, for the sign-in link */
@@ -100,6 +111,13 @@ export interface PartnerDeps {
    * admin console's staff (an account the partner can sign in to must never be one of theirs).
    */
   reservedEmail?(email: string): Promise<boolean>;
+  /**
+   * Records a provisioning of one of the partner's users, once done: what happened and which of the
+   * partner's users did it (null: the call didn't say). The account's venue is recorded with it.
+   */
+  record?(userId: string, action: ProvisionAction, by: PartnerActor | null): Promise<void>;
+  /** The partner's users changed (opened, updated): the admin console's open pages refresh. */
+  changed?(): void;
 }
 
 export class ExternalIdTaken extends Error {}
@@ -149,6 +167,8 @@ export const ProvisionSchema = z.strictObject({
   next: Next.optional(),
   /** the partner's venue the user belongs to (PUT /venues/{venueId} first): seating starts from its plan */
   venueId: VenueIdSchema.nullish(),
+  /** which of the partner's users opens (or updates) this one — a venue owner, one of their staff */
+  createdBy: PartnerActorSchema.nullish(),
 });
 
 const oneOf = (v: { userId?: string; externalId?: string }) => !!v.userId !== !!v.externalId;
@@ -165,6 +185,8 @@ export const EmailChangeSchema = z
     email: Email.optional(),
     /** the venue the user belongs to (null: none) */
     venueId: VenueIdSchema.nullable().optional(),
+    /** which of the partner's users made the change */
+    createdBy: PartnerActorSchema.nullish(),
   })
   .refine(oneOf, ONE_OF)
   .refine((v) => v.email !== undefined || v.venueId !== undefined, { message: 'email or venueId' });
@@ -211,6 +233,7 @@ export async function provisionUser(raw: unknown, deps: PartnerDeps): Promise<Ap
   if (!parsed.success) return invalid(parsed.error);
   const { email, fullName, next, venueId } = parsed.data;
   const externalId = parsed.data.externalId ?? null;
+  const by = actorOf(parsed.data.createdBy);
   // an unknown venue: nothing is created
   if (venueId && deps.venueExists && !(await deps.venueExists(venueId))) return fail(404, 'venue_not_found');
   let phone: string | null = null;
@@ -227,13 +250,15 @@ export async function provisionUser(raw: unknown, deps: PartnerDeps): Promise<Ap
     if ((await deps.find({ userId: existing }))?.userManaged) return userManaged(deps.site, next);
     return fail(409, 'account_exists');
   }
-  // one of the partner's users who signs in by themselves now: nothing to change or hand out
-  if (existing && (await deps.find({ userId: existing }))?.userManaged) return userManaged(deps.site, next);
+  // one of the partner's users already (updated), or a user it created before and never linked
+  // (claimed now); one who signs in by themselves now: nothing to change or hand out
+  const mine = existing ? await deps.find({ userId: existing }) : null;
+  if (mine?.userManaged) return userManaged(deps.site, next);
   const { id: userId, created } = existing
     ? { id: existing, created: false }
     : await deps.createUser({ email, fullName, phone });
-  // a user created here that can't be linked is deleted again: a retry starts over (no orphan
-  // blocking it with account_exists)
+  // a user created here that can't be linked (or recorded) is deleted again: a retry starts over (no
+  // orphan blocking it with account_exists, and its opening is recorded then)
   const undo = async () => {
     if (created) await deps.deleteUser(userId).catch((err) => console.error('[partner api] undo', err));
   };
@@ -251,7 +276,14 @@ export async function provisionUser(raw: unknown, deps: PartnerDeps): Promise<Ap
     return fail(409, 'account_exists');
   }
   if (user.userManaged) return userManaged(deps.site, next);
-  if (venueId !== undefined && deps.setVenue) await deps.setVenue(user.userId, venueId);
+  try {
+    if (venueId !== undefined && deps.setVenue) await deps.setVenue(user.userId, venueId);
+    await deps.record?.(user.userId, created ? 'created' : mine ? 'updated' : 'linked', by);
+  } catch (err) {
+    await undo();
+    throw err;
+  }
+  deps.changed?.();
   return ok(
     {
       created,
@@ -274,9 +306,11 @@ export async function createLoginLink(raw: unknown, deps: PartnerDeps): Promise<
   // (a staff email: no sign-in link — as for a user who signs in by themselves)
   if (deps.reservedEmail && (await deps.reservedEmail(user.email)))
     return userManaged(deps.site, parsed.data.next);
+  const token = await deps.loginToken(user.email);
+  await deps.record?.(user.userId, 'login_link', null);
   return ok({
     userId: user.userId,
-    loginUrl: loginUrl(deps.site, await deps.loginToken(user.email), parsed.data.next),
+    loginUrl: loginUrl(deps.site, token, parsed.data.next),
     loginUrlExpiresIn: LOGIN_LINK_SECONDS,
   });
 }
@@ -292,19 +326,25 @@ export async function changeEmail(raw: unknown, deps: PartnerDeps): Promise<ApiR
   const user = await deps.find({ userId: parsed.data.userId, externalId: parsed.data.externalId });
   if (!user) return fail(404, 'not_found');
   const { email, venueId } = parsed.data;
+  const by = actorOf(parsed.data.createdBy);
+  // the update is recorded with who made it, and the console hears of it
+  const updated = async (current: PartnerUser) => {
+    await deps.record?.(current.userId, 'updated', by);
+    deps.changed?.();
+    return ok({ user: await withVenue(current, deps) });
+  };
   // the venue first: it is the partner's to set, also for a user who signs in by themselves
   if (venueId !== undefined && deps.setVenue) {
     const linked = await deps.setVenue(user.userId, venueId);
     if (linked === 'venue_not_found') return fail(404, 'venue_not_found');
     if (linked === 'not_found') return fail(404, 'not_found');
   }
-  if (email === undefined || user.email.toLowerCase() === email)
-    return ok({ user: await withVenue(user, deps) });
+  if (email === undefined || user.email.toLowerCase() === email) return updated(user);
   if (user.userManaged) return fail(409, 'user_managed');
   // (a staff email is someone else's: taken)
   if (deps.reservedEmail && (await deps.reservedEmail(email))) return fail(409, 'email_taken');
   if (!(await deps.updateEmail(user.userId, email))) return fail(409, 'email_taken');
-  return ok({ user: await withVenue({ ...user, email }, deps) });
+  return updated({ ...user, email });
 }
 
 /**

@@ -1,11 +1,14 @@
 import 'server-only';
 import { createHash } from 'node:crypto';
+import { after } from 'next/server';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import { adminDb } from '../admin/server/db';
+import { adminNudge } from '../admin/server/live';
 import { discountActive, type PlanDiscount } from '../billing/plans';
 import { isAdminEmail } from '../billing/server/account';
 import { ExternalIdTaken, PARTNER_SOURCE, type PartnerDeps, type PartnerUser } from './api';
+import type { PartnerCall } from './calls';
 
 /** Requests an hour from the partner (a leaked key can't flood the system). */
 const PARTNER_LIMIT = { count: 600, windowSeconds: 3600 };
@@ -149,5 +152,34 @@ export function partnerDeps(site: string): PartnerDeps {
     },
     // the platform's owners and the admin console's staff (supabase/migrations/*_admin_console.sql)
     reservedEmail: async (email) => isAdminEmail(email) || (await adminDb.emailReserved(email)),
+    // where the account came from: which of the partner's users did what (*_partner_origin.sql)
+    async record(userId, action, by) {
+      await rpc<boolean>('partner_provision_record', {
+        p_source: PARTNER_SOURCE,
+        p_user_id: userId,
+        p_action: action,
+        p_by: by,
+      });
+    },
+    // the admin console's open pages refresh, after the answer
+    changed: () => after(() => adminNudge('partner')),
   };
+}
+
+/** Records one call of the partner API (after its answer). Never throws. */
+export async function logPartnerCall(call: PartnerCall): Promise<void> {
+  try {
+    const { error } = await serviceDb().rpc('partner_api_call_log', {
+      p_source: PARTNER_SOURCE,
+      p_method: call.method,
+      p_endpoint: call.endpoint,
+      p_status: call.status,
+      p_code: call.code,
+      p_user_id: call.userId,
+      p_duration_ms: call.durationMs,
+    });
+    if (error) console.error('[partner api] call log', error.message);
+  } catch (err) {
+    console.error('[partner api] call log', err);
+  }
 }
