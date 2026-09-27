@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { mayOpenConsole } from '@/features/admin/server/gate';
 import { getUi } from '@/lib/i18n/server';
 import { getSessionUser } from '@/lib/supabase/session';
 import { AppSidebar, MobileTabBar } from './ShellNav.client';
@@ -10,6 +11,8 @@ import { AppSidebar, MobileTabBar } from './ShellNav.client';
  */
 export default async function ShellLayout({ children }: { children: ReactNode }) {
   const [{ t }, user] = await Promise.all([getUi(), getSessionUser()]);
+  // the platform's staff: the way into the admin console
+  const admin = user ? await mayOpenConsole(user) : false;
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[264px_minmax(0,1fr)]">
       <a
@@ -18,7 +21,7 @@ export default async function ShellLayout({ children }: { children: ReactNode })
       >
         {t.shell.skipToContent}
       </a>
-      <AppSidebar email={user?.email ?? null} />
+      <AppSidebar email={user?.email ?? null} admin={admin} />
       {/* room for the floating buttons: the tab bar (phones) and the assistant (bottom corner), and on
           RTL wide screens the accessibility button on the left edge (content starts past it) */}
       <main id="main" className="min-w-0 pb-[calc(88px+env(safe-area-inset-bottom))] lg:pb-24 lg:rtl:pl-12">

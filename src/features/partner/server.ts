@@ -2,7 +2,9 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
+import { adminDb } from '../admin/server/db';
 import { discountActive, type PlanDiscount } from '../billing/plans';
+import { isAdminEmail } from '../billing/server/account';
 import { ExternalIdTaken, PARTNER_SOURCE, type PartnerDeps, type PartnerUser } from './api';
 
 /** Requests an hour from the partner (a leaked key can't flood the system). */
@@ -145,5 +147,7 @@ export function partnerDeps(site: string): PartnerDeps {
       });
       return !answer ? 'not_found' : answer.ok ? 'ok' : 'venue_not_found';
     },
+    // the platform's owners and the admin console's staff (supabase/migrations/*_admin_console.sql)
+    reservedEmail: async (email) => isAdminEmail(email) || (await adminDb.emailReserved(email)),
   };
 }

@@ -367,6 +367,8 @@ export function SupportChat() {
     field.current?.focus();
   };
 
+  // the admin console is the team's own screen: not the customers' assistant
+  if (path.startsWith('/app/admin')) return null;
   const suggestions = s.suggestions[areaOf(path)];
   const empty = messages.length === 0;
 

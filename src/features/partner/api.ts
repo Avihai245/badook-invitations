@@ -95,6 +95,11 @@ export interface PartnerDeps {
   venueExists?(venueId: string): Promise<boolean>;
   /** links one of the partner's users to one of its venues (null: unlinks) */
   setVenue?(userId: string, venueId: string | null): Promise<'ok' | 'venue_not_found' | 'not_found'>;
+  /**
+   * An email the partner may not open, sign in or move an account to: the platform's owners' and the
+   * admin console's staff (an account the partner can sign in to must never be one of theirs).
+   */
+  reservedEmail?(email: string): Promise<boolean>;
 }
 
 export class ExternalIdTaken extends Error {}
@@ -215,6 +220,13 @@ export async function provisionUser(raw: unknown, deps: PartnerDeps): Promise<Ap
   }
 
   const existing = await deps.findUserByEmail(email);
+  // the email of the platform's staff: never an account the partner opens or signs in to (the same
+  // answer as for an account its owner opened)
+  if (deps.reservedEmail && (await deps.reservedEmail(email))) {
+    if (!existing) return fail(409, 'account_exists');
+    if ((await deps.find({ userId: existing }))?.userManaged) return userManaged(deps.site, next);
+    return fail(409, 'account_exists');
+  }
   // one of the partner's users who signs in by themselves now: nothing to change or hand out
   if (existing && (await deps.find({ userId: existing }))?.userManaged) return userManaged(deps.site, next);
   const { id: userId, created } = existing
@@ -259,6 +271,9 @@ export async function createLoginLink(raw: unknown, deps: PartnerDeps): Promise<
   const user = await deps.find({ userId: parsed.data.userId, externalId: parsed.data.externalId });
   if (!user) return fail(404, 'not_found');
   if (user.userManaged) return userManaged(deps.site, parsed.data.next);
+  // (a staff email: no sign-in link — as for a user who signs in by themselves)
+  if (deps.reservedEmail && (await deps.reservedEmail(user.email)))
+    return userManaged(deps.site, parsed.data.next);
   return ok({
     userId: user.userId,
     loginUrl: loginUrl(deps.site, await deps.loginToken(user.email), parsed.data.next),
@@ -286,6 +301,8 @@ export async function changeEmail(raw: unknown, deps: PartnerDeps): Promise<ApiR
   if (email === undefined || user.email.toLowerCase() === email)
     return ok({ user: await withVenue(user, deps) });
   if (user.userManaged) return fail(409, 'user_managed');
+  // (a staff email is someone else's: taken)
+  if (deps.reservedEmail && (await deps.reservedEmail(email))) return fail(409, 'email_taken');
   if (!(await deps.updateEmail(user.userId, email))) return fail(409, 'email_taken');
   return ok({ user: await withVenue({ ...user, email }, deps) });
 }

@@ -387,6 +387,41 @@ describe('the partner API', () => {
     expect(userOf(removed).discount).toBeNull();
   });
 
+  it('never an account, a sign-in link or an email of the platform’s staff', async () => {
+    const { deps, users } = world();
+    const reserved = new Set(['staff@example.com', 'self@example.com', 'later@example.com']);
+    deps.reservedEmail = vi.fn(async (email: string) => reserved.has(email));
+    // no account yet: none is opened
+    const opened = await provisionUser({ email: 'Staff@Example.com', fullName: 'Staff' }, deps);
+    expect(opened.status).toBe(409);
+    expect(opened.body).toMatchObject({ code: 'account_exists' });
+    expect(users.has('staff@example.com')).toBe(false);
+    // the staff member's own account (not the partner's): as for anyone else's
+    const own = await provisionUser({ email: 'self@example.com', fullName: 'Self' }, deps);
+    expect(own.body).toMatchObject({ code: 'account_exists' });
+    // one of the partner's users whose email became a staff email later: no more sign-in links
+    reserved.delete('later@example.com');
+    const made = await provisionUser(
+      { email: 'later@example.com', fullName: 'Later', externalId: 'be-9' },
+      deps,
+    );
+    expect(made.status).toBe(201);
+    reserved.add('later@example.com');
+    const link = await createLoginLink({ externalId: 'be-9' }, deps);
+    expect(link.body).toMatchObject({ code: 'user_managed' });
+    expect(link.body).not.toHaveProperty('loginUrl');
+    expect((await provisionUser({ email: 'later@example.com', fullName: 'Later' }, deps)).body).toMatchObject(
+      {
+        code: 'account_exists',
+      },
+    );
+    // nor may a partner's user move to a staff email
+    const moved = await changeEmail({ externalId: 'be-9', email: 'staff@example.com' }, deps);
+    expect(moved.status).toBe(409);
+    expect(moved.body).toMatchObject({ code: 'email_taken' });
+    expect(deps.updateEmail).not.toHaveBeenCalled();
+  });
+
   it('a discount: what it refuses', async () => {
     const { deps } = world();
     const now = Date.parse('2026-09-25T10:00:00Z');

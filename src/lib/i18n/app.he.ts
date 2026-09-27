@@ -97,6 +97,8 @@ export const he = {
       contact: 'יצירת קשר',
       /** the sidebar's help entry: opens the assistant */
       help: 'עזרה והעוזר',
+      /** the admin console (staff only) */
+      admin: 'ניהול המערכת',
     },
     /** the phones' bottom bar (short labels) */
     tabs: {

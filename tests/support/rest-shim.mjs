@@ -213,6 +213,19 @@ const FUNCTIONS = new Set([
   'insight_hit',
   'insight_owner_report',
   'insight_maintenance',
+  // the admin console's staff, record of actions and live channel (supabase/migrations/*_admin_console.sql)
+  'admin_whoami',
+  'admin_is_staff',
+  'admin_email_reserved',
+  'admin_staff_list',
+  'admin_staff_set',
+  'admin_staff_remove',
+  'admin_audit_add',
+  'admin_audit_list',
+  'admin_channel',
+  'admin_channel_peek',
+  'admin_channel_rotate',
+  'admin_maintenance',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';

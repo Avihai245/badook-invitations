@@ -1,5 +1,6 @@
 import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
+import { adminDb } from '@/features/admin/server/db';
 import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
 import { facesHousekeeping } from '@/features/faces/server/deps';
@@ -65,6 +66,10 @@ export async function runDaily(now: Date) {
   const faces = await facesHousekeeping().catch(
     (err) => (console.error('face search housekeeping failed', err), null),
   );
+  // the admin console's record of actions is kept two years
+  const admin = await adminDb
+    .maintenance()
+    .catch((err) => (console.error('admin console housekeeping failed', err), null));
   return {
     ...digests,
     purged: (purged as number | null) ?? null,
@@ -76,6 +81,7 @@ export async function runDaily(now: Date) {
     studio,
     insights,
     faces,
+    admin,
   };
 }
 

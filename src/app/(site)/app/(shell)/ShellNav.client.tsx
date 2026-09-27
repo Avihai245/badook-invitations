@@ -10,6 +10,7 @@ import {
   Mail,
   MessageCircleQuestion,
   Plus,
+  ShieldCheck,
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -41,7 +42,7 @@ const LEGAL = ['privacy', 'terms', 'cookies', 'accessibility'] as const;
  * language, the account and the legal pages. The sidebar's middle stays clear: the accessibility
  * button floats over the left edge halfway down.
  */
-export function AppSidebar({ email }: { email: string | null }) {
+export function AppSidebar({ email, admin = false }: { email: string | null; admin?: boolean }) {
   const { t } = useUi();
   const n = t.shell.nav;
   const current = sectionOf(usePathname());
@@ -91,6 +92,11 @@ export function AppSidebar({ email }: { email: string | null }) {
           <MessageCircleQuestion aria-hidden className="size-[19px] shrink-0" strokeWidth={1.75} />
           {n.help}
         </button>
+        {admin ? (
+          <SideLink href="/app/admin" icon={ShieldCheck} active={false}>
+            {n.admin}
+          </SideLink>
+        ) : null}
       </nav>
 
       <div className="ms-auto flex items-center gap-2 lg:ms-0 lg:mt-auto lg:flex-col lg:items-stretch lg:gap-3 lg:px-3 lg:pb-4">
@@ -98,7 +104,7 @@ export function AppSidebar({ email }: { email: string | null }) {
           <span className="hidden text-[12px] text-muted lg:inline">{t.shell.uiLanguage}</span>
           <UiLanguageToggle />
         </div>
-        <UserMenu email={email} />
+        <UserMenu email={email} admin={admin} />
         <nav
           aria-label={t.shell.legal}
           className="hidden flex-wrap gap-x-3 gap-y-1 px-2 text-[11.5px] leading-5 text-faint lg:flex"
@@ -214,7 +220,7 @@ function TabLink({
  * The account menu: who is signed in, the account, billing, help, the legal pages and signing out.
  * A round avatar in the phones' top bar; a row with the avatar and the address in the sidebar.
  */
-export function UserMenu({ email }: { email: string | null }) {
+export function UserMenu({ email, admin = false }: { email: string | null; admin?: boolean }) {
   const { t } = useUi();
   const initial = (email ?? '?').trim()[0]?.toUpperCase() ?? '?';
   const items: MenuItem[] = [
@@ -230,6 +236,7 @@ export function UserMenu({ email }: { email: string | null }) {
           },
         ]
       : []),
+    ...(admin ? [{ label: t.shell.nav.admin, icon: <ShieldCheck />, href: '/app/admin' }] : []),
     { label: t.shell.nav.account, icon: <CircleUserRound />, href: '/app/account' },
     { label: t.shell.nav.billing, icon: <CreditCard />, href: '/app/billing' },
     { label: t.shell.nav.invitations, icon: <LayoutGrid />, href: '/app/invitations' },

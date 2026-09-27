@@ -31,6 +31,12 @@ create table if not exists auth.users (
   created_at timestamptz,
   updated_at timestamptz
 );
+-- the columns the admin console reads (Supabase has them all; users made in tests are confirmed, like
+-- the end-to-end tests' sign-ups)
+alter table auth.users add column if not exists email_confirmed_at timestamptz default now();
+alter table auth.users add column if not exists last_sign_in_at timestamptz;
+alter table auth.users add column if not exists banned_until timestamptz;
+alter table auth.users add column if not exists deleted_at timestamptz;
 create or replace function auth.uid() returns uuid language sql stable as $$
   select coalesce(
     nullif(current_setting('request.jwt.claim.sub', true), ''),

@@ -90,6 +90,7 @@ export const en: AppDict = {
       assistant: 'Ask the assistant',
       contact: 'Contact us',
       help: 'Help & assistant',
+      admin: 'Admin console',
     },
     tabs: {
       label: 'Navigation',

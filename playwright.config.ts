@@ -105,7 +105,9 @@ export default defineConfig({
             INVITES_WHATSAPP_TABLE_TEMPLATE: 'badook_table',
             INVITES_ADMIN_EMAILS:
               'wa-admin-mobile@example.com,wa-admin-desktop@example.com,' +
-              'i18n-admin-mobile@example.com,i18n-admin-desktop@example.com,i18n-translate-desktop@example.com',
+              'i18n-admin-mobile@example.com,i18n-admin-desktop@example.com,i18n-translate-desktop@example.com,' +
+              // the admin console's owners (tests/e2e/admin.spec.ts)
+              'admin-owner-mobile@example.com,admin-owner-desktop@example.com',
             // the languages the templates are set up in — Arabic among them, which the stand-in refuses
             INVITES_WHATSAPP_TEMPLATE_LANGS: 'he,en,ru,ar',
             // the gallery link's template (tests/e2e/gallery-section.spec.ts)
