@@ -226,6 +226,21 @@ const FUNCTIONS = new Set([
   'admin_channel_peek',
   'admin_channel_rotate',
   'admin_maintenance',
+  // where Badook Events accounts came from, the partner API's calls (supabase/migrations/*_partner_origin.sql)
+  'partner_provision_record',
+  'partner_api_call_log',
+  // the console's cash flow, messages and Badook Events, the emails' log (*_admin_money_messages.sql)
+  'email_log_add',
+  'admin_finance_overview',
+  'admin_finance_payments',
+  'admin_finance_export',
+  'admin_finance_summary',
+  'admin_messages_overview',
+  'admin_partners_overview',
+  'admin_partners_accounts',
+  'admin_partners_user_source',
+  'admin_partners_activity',
+  'admin_logs_maintenance',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
