@@ -101,7 +101,8 @@ test.describe('the cash flow', () => {
       page.waitForEvent('download'),
       page.getByTestId('finance-export-confirm').click(),
     ]);
-    await expect(page.getByText('הקובץ יורד.')).toBeVisible();
+    // (the toast; its words are also read out, in a live region)
+    await expect(page.getByText('הקובץ יורד.', { exact: true })).toBeVisible();
     expect(download.suggestedFilename()).toMatch(/^badook-payments-\d{4}-\d{2}-\d{2}\.csv$/);
     const csv = readFileSync((await download.path())!, 'utf8');
     expect(csv.startsWith('\uFEFF')).toBe(true);
