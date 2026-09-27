@@ -9,7 +9,8 @@ import {
   type FeatureInput,
   type Package,
 } from '@/features/flags/features';
-import type { InvitationDocument, Palette } from '@/features/invitations/contracts/types';
+import type { InvitationDocument, Locale, Palette } from '@/features/invitations/contracts/types';
+import type { FaceRequest } from '@/features/invitations/fonts';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { GALLERY, ORIGINAL_TYPES, PREVIEW_TYPES } from '@/features/live-gallery/config';
 import type { ApiResult } from '@/features/live-gallery/server/guest-api';
@@ -38,9 +39,6 @@ const fail = (status: number, code: string, extra: Record<string, unknown> = {})
 const notFound = fail(404, 'not_found');
 const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
 
-type UiLocale = 'he' | 'en';
-const isUiLocale = (v: unknown): v is UiLocale => v === 'he' || v === 'en';
-
 export interface FilmInvitation {
   slug: string;
   doc: InvitationDocument;
@@ -67,10 +65,17 @@ export interface FeatureState {
   plan: PlanId;
 }
 
+/**
+ * The cards' fonts, the invitation's own: per card language, a CSS font stack for the names (the
+ * display face) and one for the date and the end card's line (the heading face) — the face of that
+ * language's script first (a Cyrillic stand-in, the Arabic or Ethiopic face of the design's style
+ * where the pair doesn't write it), then the pair's and the other languages' faces (a name in another
+ * script keeps a designed face) — and the faces they use, for the page's @font-face rules.
+ */
 export interface FilmFonts {
-  /** the names (the display face) and the date (the heading face), per script */
-  display: { he: string; en: string };
-  heading: { he: string; en: string };
+  display: Partial<Record<Locale, string>>;
+  heading: Partial<Record<Locale, string>>;
+  faces: FaceRequest[];
 }
 
 export interface FilmItem {
@@ -102,9 +107,10 @@ export interface FilmView {
   /** when the signed URLs expire (ms) */
   expiresAt: number;
   event: {
-    locales: UiLocale[];
-    defaultLocale: UiLocale;
-    names: Partial<Record<UiLocale, string>>;
+    /** the invitation's languages: the cards can be in any of them */
+    locales: Locale[];
+    defaultLocale: Locale;
+    names: Partial<Record<Locale, string>>;
     date: string;
     palette: Pick<Palette, 'bg' | 'surface' | 'ink' | 'inkMuted' | 'accent' | 'accentInk' | 'line'>;
     fonts: FilmFonts;
@@ -174,10 +180,10 @@ export async function filmView(userId: string, id: string, deps: FilmDeps): Prom
       ? await signFilmItems((await deps.db.ownerFilm(id, userId, FILM.select.maxCandidates)) ?? [], deps)
       : { items: [], expiresAt: deps.now() };
   const doc = inv.doc;
-  const locales = doc.locales.filter(isUiLocale);
-  const defaultLocale = isUiLocale(doc.defaultLocale) ? doc.defaultLocale : (locales[0] ?? 'he');
-  const names: Partial<Record<UiLocale, string>> = {};
-  for (const l of locales.length ? locales : [defaultLocale]) {
+  const locales = doc.locales.length ? [...doc.locales] : [doc.defaultLocale];
+  const defaultLocale = locales.includes(doc.defaultLocale) ? doc.defaultLocale : locales[0]!;
+  const names: Partial<Record<Locale, string>> = {};
+  for (const l of locales) {
     const line = hostsLine(doc.hosts, l);
     if (line) names[l] = line;
   }
@@ -190,7 +196,7 @@ export async function filmView(userId: string, id: string, deps: FilmDeps): Prom
     items: signed.items,
     expiresAt: signed.expiresAt,
     event: {
-      locales: locales.length ? locales : [defaultLocale],
+      locales,
       defaultLocale,
       names,
       date: doc.event.date,

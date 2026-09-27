@@ -1,16 +1,22 @@
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Browser, type Page } from '@playwright/test';
 import { Client } from 'pg';
+import { reviewGuestAr } from '../../src/lib/i18n/review-guest.ar';
+import { reviewGuestEn } from '../../src/lib/i18n/review-guest.en';
+import { reviewGuestHe } from '../../src/lib/i18n/review-guest.he';
+import { reviewGuestRu } from '../../src/lib/i18n/review-guest.ru';
 import { stubExternalMedia } from '../support/external';
 
 // WCAG 2.1 AA on the guest's path (Phase 5C): an automated audit (axe-core) of what guests and family
 // open — the cover and the sections of several designs (photographic, drawn, dark, Lumière), the RSVP
 // form's errors and its thank-you, a save-the-date, the table guide, the entrance station, the live
 // gallery's upload page and the family's review page — on a phone and a desktop (the two projects),
-// in Hebrew and English. Violations known and accepted are listed in a11y-baseline.json (with the
-// reason); anything else fails. AXE_REPORT=1 keeps every page's findings in tests/.artifacts/axe.
+// in Hebrew and English, and in Arabic (right to left) and Russian: two designs' cover and sections,
+// the RSVP form, the table guide, the gallery's upload page and the review page. Violations known and
+// accepted are listed in a11y-baseline.json (with the reason); anything else fails. AXE_REPORT=1 keeps
+// every page's findings in tests/.artifacts/axe.
 
 const LOCAL = !process.env.PW_BASE_URL;
 test.skip(!LOCAL, 'sets plans and seats guests in the local stack');
@@ -175,6 +181,151 @@ test.describe('the invitation', () => {
     });
 });
 
+// ─── the invitation in Arabic (right to left) and Russian ────────────────────────────────────────
+
+/** The languages of the invitations these tests make: the two defaults, and Russian and Arabic. */
+const LANGS = ['he', 'en', 'ru', 'ar'] as const;
+type Lang = (typeof LANGS)[number];
+/** The hosts' names as each language writes them. */
+const NAMES: Record<Lang, [string, string]> = {
+  he: ['נועה', 'איתי'],
+  en: ['Noa', 'Itay'],
+  ru: ['Ноа', 'Итай'],
+  ar: ['نوعا', 'إيتاي'],
+};
+/** What the host writes for the place in each language (the publish check asks for it). */
+const PLACE: Record<Lang, string> = {
+  he: 'אחוזת הגפן, זכרון יעקב',
+  en: 'Ahuzat HaGefen, Zikhron Yaakov',
+  ru: 'Ахузат ха-Гефен, Зихрон-Яаков',
+  ar: 'أحوزات هجيفن، زخرون يعقوب',
+};
+
+/** Sets `value` at a dotted path of a JSON document. */
+function setPath(root: Record<string, unknown>, path: string, value: unknown) {
+  const parts = path.split('.');
+  let node: Record<string, unknown> = root;
+  for (const part of parts.slice(0, -1)) {
+    const next = node[part];
+    if (next === null || typeof next !== 'object') node[part] = {};
+    node = node[part] as Record<string, unknown>;
+  }
+  node[parts.at(-1)!] = value;
+}
+
+/**
+ * Publishes through the API as the signed-in host; what the publish check says is missing (the place,
+ * in each language) is written into the draft first — as the host would in the editor.
+ */
+async function publishFilled(page: Page, id: string): Promise<string> {
+  for (let round = 0; round < 4; round++) {
+    const res = await page.evaluate(async (invitationId) => {
+      const r = await fetch(`/api/invitations/${invitationId}/publish`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: '{}',
+      });
+      return {
+        status: r.status,
+        body: (await r.json()) as { slug?: string; issues?: { path: string; code: string }[] },
+      };
+    }, id);
+    if (res.status === 200) return res.body.slug!;
+    expect(res.status, JSON.stringify(res.body)).toBe(422);
+    const [row] = await sql<{ draft: Record<string, unknown>; updated: string }>(
+      `select draft, updated_at::text as updated from invitations where id = $1`,
+      [id],
+    );
+    for (const issue of res.body.issues ?? []) {
+      if (issue.code !== 'missing_translation' && issue.code !== 'required') continue;
+      const locale = issue.path.split('.').at(-1) as Lang;
+      setPath(row!.draft, issue.path, PLACE[locale] ?? PLACE.en);
+    }
+    const saved = await page.evaluate(
+      async ({ invitationId, draft, updatedAt }) =>
+        (
+          await fetch(`/api/invitations/${invitationId}`, {
+            method: 'PATCH',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ draft, updatedAt }),
+          })
+        ).status,
+      { invitationId: id, draft: row!.draft, updatedAt: row!.updated },
+    );
+    expect(saved).toBe(200);
+  }
+  throw new Error('could not publish');
+}
+
+/** A guest's own browser (the host's page stays signed in), the size of the host's. */
+async function guestPage(browser: Browser, page: Page) {
+  const context = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
+  const guest = await context.newPage();
+  await asGuest(guest);
+  return { context, guest };
+}
+
+/** The RSVP's question for the number of adults, as each language asks it. */
+const ADULTS: Record<Lang, string> = {
+  he: 'כמה מבוגרים?',
+  en: 'How many adults?',
+  ru: 'Сколько взрослых?',
+  ar: 'كم عدد البالغين؟',
+};
+
+test.describe('the invitation in Arabic and Russian', () => {
+  for (const design of ['sahar-bordeaux', 'midnight-bloom'])
+    test(`${design} · ar, ru: the cover, then the sections`, async ({ page, browser }) => {
+      test.setTimeout(240_000);
+      // a premium design among them: a plan that has it
+      const ev = await host(page, `a11y-${design.slice(0, 5)}`, 'business', design);
+      const slug = await publishFilled(page, ev.id);
+      const { context, guest } = await guestPage(browser, page);
+      for (const lang of ['ar', 'ru'] as const) {
+        await open(guest, `/i/${slug}?lang=${lang}`);
+        await expect(guest.locator('html')).toHaveAttribute('lang', lang);
+        await expect(guest.locator('html')).toHaveAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        const cover = guest.locator('.cover');
+        if (await cover.count()) {
+          await audit(guest, `invitation-cover-${design}-${lang}`);
+          await guest.locator('.cover > button.cover-tap').click();
+          await expect(cover).toHaveCount(0, { timeout: 10_000 });
+        }
+        await scrollThrough(guest);
+        await audit(guest, `invitation-sections-${design}-${lang}`);
+      }
+      await context.close();
+    });
+
+  test('the RSVP form: its errors, then its thank-you · ar, ru', async ({ page, browser }) => {
+    test.setTimeout(180_000);
+    const ev = await host(page, 'a11y-rsvp', 'free');
+    const slug = await publishFilled(page, ev.id);
+    for (const lang of ['ar', 'ru'] as const) {
+      // each reply from its own browser (a reply is remembered on the phone that sent it)
+      const { context, guest } = await guestPage(browser, page);
+      await guest.emulateMedia({ reducedMotion: 'reduce' });
+      await open(guest, `/i/${slug}?lang=${lang}&open=1`);
+      const form = guest.locator('.form');
+      await form.scrollIntoViewIfNeeded();
+      await form.locator('.opt').first().click();
+      await form.locator('button.btn-primary').click();
+      await expect(form.locator('[aria-invalid="true"]').first()).toBeVisible();
+      // the first error has the focus; each stepper is named by its question, in the guest's language
+      await expect(form.locator('[id$="-a0.firstName"]')).toBeFocused();
+      await expect(form.getByRole('group', { name: ADULTS[lang] })).toBeVisible();
+      await audit(guest, `rsvp-errors-${lang}`);
+      await form.locator('[id$="-a0.firstName"]').fill(lang === 'ar' ? 'دانا' : 'Дана');
+      await form.locator('[id$="-a0.lastName"]').fill(`A11y${randomUUID().slice(0, 6)}`);
+      await form.locator('[id$="-a0.phone"]').fill('050-123-4567');
+      await form.locator('button.btn-primary').click();
+      await expect(guest.locator('.success[role="status"]')).toBeVisible({ timeout: 10_000 });
+      await audit(guest, `rsvp-success-${lang}`);
+      await context.close();
+    }
+  });
+});
+
 // ─── the manual pass, kept: the keyboard under the cover, "pause the animations" ──────────────────
 
 /** Endless animations running now (a drawn scene's loop, the particles, the scroll cue). */
@@ -223,7 +374,11 @@ test.describe('by hand', () => {
 // ─── the event day and the live gallery ──────────────────────────────────────────────────────────
 
 type Plan = 'free' | 'pro' | 'business';
-async function host(page: Page, prefix: string, plan: Plan) {
+/**
+ * A new host signed in on `page`, on `plan`, with a wedding in `templateId` in Hebrew, English,
+ * Russian and Arabic (the design's own texts in each; the hosts' names written in each).
+ */
+async function host(page: Page, prefix: string, plan: Plan, templateId = 'sahar-bordeaux') {
   const email = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
   await page.goto('/signup');
   await page.fill('input[name=email]', email);
@@ -238,24 +393,29 @@ async function host(page: Page, prefix: string, plan: Plan) {
        set plan = excluded.plan, plan_status = 'active', plan_renews_at = excluded.plan_renews_at`,
     [email, plan],
   );
-  const inv = await page.evaluate(async () => {
-    const res = await fetch('/api/invitations', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        templateId: 'sahar-bordeaux',
-        eventType: 'wedding',
-        locales: ['he', 'en'],
-        defaultLocale: 'he',
-        hosts: { primary: { he: 'נועה', en: 'Noa' }, secondary: { he: 'איתי', en: 'Itay' } },
-        date: '2027-06-17',
-        startTime: '19:30',
-        timezone: 'Asia/Jerusalem',
-      }),
-    });
-    return (await res.json()) as { id: string; slug: string };
-  });
-  return { email, ...inv };
+  const pick = (i: 0 | 1) => Object.fromEntries(LANGS.map((l) => [l, NAMES[l][i]]));
+  const inv = await page.evaluate(
+    async (body) => {
+      const res = await fetch('/api/invitations', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return { status: res.status, ...((await res.json()) as { id: string; slug: string }) };
+    },
+    {
+      templateId,
+      eventType: 'wedding',
+      locales: LANGS,
+      defaultLocale: 'he',
+      hosts: { primary: pick(0), secondary: pick(1) },
+      date: '2027-06-17',
+      startTime: '19:30',
+      timezone: 'Asia/Jerusalem',
+    },
+  );
+  expect(inv.status, JSON.stringify(inv)).toBe(201);
+  return { email, id: inv.id, slug: inv.slug };
 }
 
 test.describe('the event day', () => {
@@ -336,10 +496,13 @@ test.describe('the event day', () => {
     const context = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
     const guest = await context.newPage();
     await asGuest(guest);
-    for (const lang of ['he', 'en'] as const) {
+    for (const lang of LANGS) {
       await guest.goto(`/e/${ev.slug}/table?g=${token}&lang=${lang}`);
+      await expect(guest.locator('html')).toHaveAttribute('lang', lang);
       await expect(guest.getByTestId('guide-table-number')).toHaveText('12');
       await audit(guest, `table-guide-${lang}`);
+      // the entrance station is the staff's: Hebrew and English
+      if (lang !== 'he' && lang !== 'en') continue;
       await guest.goto(`${stationUrl}&lang=${lang}`);
       await expect(guest.getByTestId('station')).toBeVisible();
       await audit(guest, `station-${lang}`);
@@ -359,10 +522,11 @@ test.describe('the live gallery', () => {
     const context = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
     const guest = await context.newPage();
     await asGuest(guest);
-    for (const lang of ['he', 'en'] as const) {
+    for (const lang of LANGS) {
       await guest.goto(`${link}&lang=${lang}`);
       // the queue is ready (IndexedDB opened, the uploader started)
       await expect(guest.getByTestId('gallery-files')).toBeAttached();
+      await expect(guest.locator('html')).toHaveAttribute('lang', lang);
       await audit(guest, `gallery-upload-${lang}`);
     }
     await context.close();
@@ -370,6 +534,17 @@ test.describe('the live gallery', () => {
 });
 
 // ─── the family's review link ────────────────────────────────────────────────────────────────────
+
+/** The review page's own words in each language, and what a family member writes in it. */
+const REVIEW: Record<
+  Lang,
+  { add: string; name: string; body: string; send: string; who: string; comment: string }
+> = {
+  he: { ...reviewGuestHe, who: 'דודה רותי', comment: 'השמות יותר גדולים' },
+  en: { ...reviewGuestEn, who: 'Aunt Ruth', comment: 'Bigger names' },
+  ru: { ...reviewGuestRu, who: 'Тётя Рут', comment: 'Имена покрупнее' },
+  ar: { ...reviewGuestAr, who: 'العمة راحيل', comment: 'أسماء أكبر' },
+};
 
 test.describe('the draft review', () => {
   test('the review page with a comment, its thread and the list', async ({ page, browser }) => {
@@ -387,9 +562,11 @@ test.describe('the draft review', () => {
     const context = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
     const guest = await context.newPage();
     await asGuest(guest);
-    for (const lang of ['he', 'en'] as const) {
+    for (const lang of LANGS) {
+      const R = REVIEW[lang];
       await guest.goto(`${url.pathname}/${lang}`);
       await expect(guest.getByTestId('review-banner')).toBeVisible();
+      await expect(guest.locator('html')).toHaveAttribute('lang', lang);
       if (await guest.locator('.cover').count()) {
         await audit(guest, `review-cover-${lang}`);
         await guest.locator('.cover > button.cover-tap').click();
@@ -398,34 +575,25 @@ test.describe('the draft review', () => {
       await scrollThrough(guest);
       await audit(guest, `review-page-${lang}`);
       // a comment on a spot (the keyboard's way: a part from the form's list)
-      await guest
-        .getByTestId('review-ui')
-        .getByRole('button', { name: lang === 'he' ? 'הוספת הערה' : 'Add a comment' })
-        .click();
+      await guest.getByTestId('review-ui').getByRole('button', { name: R.add }).click();
       await guest.locator('.rv-hint .rv-link').click();
       const compose = guest.getByTestId('review-compose');
       await expect(compose).toBeVisible();
       await audit(guest, `review-compose-${lang}`);
-      await compose
-        .getByLabel(lang === 'he' ? 'השם שלכם' : 'Your name')
-        .fill(lang === 'he' ? 'דודה רותי' : 'Aunt Ruth');
-      await compose
-        .getByLabel(lang === 'he' ? 'ההערה' : 'Comment')
-        .fill(lang === 'he' ? 'השמות יותר גדולים' : 'Bigger names');
-      await compose.getByRole('button', { name: lang === 'he' ? 'שליחת ההערה' : 'Send the comment' }).click();
+      await compose.getByLabel(R.name, { exact: true }).fill(R.who);
+      await compose.getByLabel(R.body, { exact: true }).fill(R.comment);
+      await compose.getByRole('button', { name: R.send }).click();
       const thread = guest.getByTestId('review-thread');
       await expect(thread).toBeVisible();
       await audit(guest, `review-thread-${lang}`);
       await guest.keyboard.press('Escape');
       // a comment's sheet closed without sending: the focus is back on "add a comment"
-      await guest.getByRole('button', { name: lang === 'he' ? 'הוספת הערה' : 'Add a comment' }).click();
+      await guest.getByRole('button', { name: R.add }).click();
       await guest.locator('.rv-hint .rv-link').click();
       await expect(compose).toBeVisible();
       await guest.keyboard.press('Escape');
       await expect(compose).toBeHidden();
-      await expect(
-        guest.getByRole('button', { name: lang === 'he' ? 'הוספת הערה' : 'Add a comment' }),
-      ).toBeFocused();
+      await expect(guest.getByRole('button', { name: R.add })).toBeFocused();
       await guest.getByTestId('review-list-button').click();
       await expect(guest.getByTestId('review-list')).toBeVisible();
       await audit(guest, `review-list-${lang}`);

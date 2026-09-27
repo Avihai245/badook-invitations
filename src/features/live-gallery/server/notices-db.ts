@@ -35,6 +35,8 @@ export interface ClaimedGalleryNotice {
   attempts: number | null;
   guestName: string | null;
   guestToken: string | null;
+  /** the language the host set for the guest (null: the invitation's default) */
+  guestLanguage?: string | null;
   slug: string;
   document: unknown;
   uploadTokenHash: string | null;

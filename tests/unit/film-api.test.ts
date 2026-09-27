@@ -5,8 +5,10 @@ import type { FilmDeps, FilmInvitation } from '@/features/film/server/api';
 import { GALLERY } from '@/features/live-gallery/config';
 import type { GallerySettings, ItemRow, OwnerGallery } from '@/features/live-gallery/server/db';
 import type { GalleryNotifyDeps } from '@/features/live-gallery/server/notices-api';
-import type { ClaimedGalleryNotice } from '@/features/live-gallery/server/notices-db';
+import type { ClaimedGalleryNotice, GalleryNoticeRow } from '@/features/live-gallery/server/notices-db';
 import type { GalleryStorage } from '@/features/live-gallery/server/storage';
+import { scriptFamily } from '@/features/invitations/fonts';
+import { resolveFontPair } from '@/features/invitations/renderer/theme';
 import { TEMPLATES } from '@/features/invitations/templates/registry';
 import { seedDocument } from '@/features/invitations/templates/seed-document';
 
@@ -29,11 +31,13 @@ const env = {
   INVITES_WHATSAPP_PHONE_NUMBER_ID: '100000000000001',
   INVITES_WHATSAPP_GALLERY_TEMPLATE: 'badook_gallery',
   INVITES_WHATSAPP_TEMPLATE_LANG: 'he',
+  INVITES_WHATSAPP_TEMPLATE_LANGS: '',
 };
 vi.mock('@/lib/env', () => ({ serverEnv: () => env }));
 vi.mock('@/lib/supabase/server', () => ({ serviceDb: () => ({}) }));
 
 const film = await import('@/features/film/server/api');
+const filmServer = await import('@/features/film/server/deps');
 const tokens = await import('@/features/live-gallery/server/tokens');
 const notices = await import('@/features/live-gallery/server/notices-api');
 const notify = await import('@/features/live-gallery/server/notify');
@@ -49,6 +53,21 @@ const doc = seedDocument(manifest, defaults, {
   locales: ['he', 'en'],
   defaultLocale: 'he',
   hosts: { primary: { he: 'נועה', en: 'Noa' }, secondary: { he: 'איתי', en: 'Itay' } },
+  date: '2027-06-17',
+  startTime: '19:30',
+  endTime: '01:00',
+  timezone: 'Asia/Jerusalem',
+});
+
+/** The same wedding in five languages, three scripts beyond Hebrew and Latin among them. */
+const doc5 = seedDocument(manifest, defaults, {
+  eventType: 'wedding',
+  locales: ['he', 'en', 'ru', 'ar', 'am'],
+  defaultLocale: 'he',
+  hosts: {
+    primary: { he: 'נועה', en: 'Noa', ru: 'Ноа', ar: 'نوعا', am: 'ኖዓ' },
+    secondary: { he: 'איתי', en: 'Itay', ru: 'Итай', ar: 'إيتاي', am: 'ኢታይ' },
+  },
   date: '2027-06-17',
   startTime: '19:30',
   endTime: '01:00',
@@ -122,7 +141,7 @@ function itemRow(over: Partial<FilmRow> = {}): FilmRow {
   };
 }
 
-function filmWorld(opts: { input?: Partial<FeatureInput>; gallery?: boolean } = {}) {
+function filmWorld(opts: { input?: Partial<FeatureInput>; gallery?: boolean; doc?: typeof doc } = {}) {
   const files = new Map<string, number>();
   const storage: GalleryStorage = {
     signUpload: vi.fn(async (bucket, path) => ({
@@ -157,9 +176,13 @@ function filmWorld(opts: { input?: Partial<FeatureInput>; gallery?: boolean } = 
   };
   const invitation: FilmInvitation = {
     slug: 'noa-itay',
-    doc,
+    doc: opts.doc ?? doc,
     palette: manifest.tokens.palette,
-    fonts: { display: { he: 'Suez One', en: 'Playfair' }, heading: { he: 'Heebo', en: 'Inter' } },
+    fonts: {
+      display: { he: '"Suez One", serif', en: '"Playfair", serif' },
+      heading: { he: '"Heebo", sans-serif', en: '"Inter", sans-serif' },
+      faces: [],
+    },
     musicUrl: 'https://db.test/templates/song.mp3',
   };
   const db = {
@@ -220,6 +243,46 @@ describe('the film studio’s view', () => {
     });
     expect(view!.music.url).toBe('https://db.test/templates/song.mp3');
     expect(view!.expiresAt).toBe(NOW + GALLERY.urls.signedTtlSeconds * 1000);
+  });
+
+  it('the cards can be in any of the invitation’s languages, each with its names', async () => {
+    const view = await film.filmView(OWNER, INV, filmWorld({ doc: doc5 }).deps);
+    expect(view!.event).toMatchObject({
+      locales: ['he', 'en', 'ru', 'ar', 'am'],
+      defaultLocale: 'he',
+      names: {
+        he: 'נועה & איתי',
+        en: 'Noa & Itay',
+        ru: 'Ноа & Итай',
+        ar: 'نوعا & إيتاي',
+        am: 'ኖዓ & ኢታይ',
+      },
+    });
+  });
+
+  it('the cards’ fonts are the invitation’s, for every script, and the page declares them', () => {
+    const pair = resolveFontPair(manifest, doc5);
+    const fonts = filmServer.filmFonts(manifest, doc5);
+    const first = (stack: string | undefined) => /^"([^"]+)"/.exec(stack ?? '')?.[1];
+    // each language's own script first: the pair's Hebrew and Latin faces, the design's Arabic and
+    // Ethiopic faces, and Russian in the Latin face or its Cyrillic stand-in
+    expect(first(fonts.display.he)).toBe(pair.display.hebrew);
+    expect(first(fonts.display.en)).toBe(pair.display.latin);
+    expect(first(fonts.display.ar)).toBe(scriptFamily(pair.display.latin, 'display', 'arabic'));
+    expect(first(fonts.display.am)).toBe(scriptFamily(pair.display.latin, 'display', 'ethiopic'));
+    expect(first(fonts.heading.ar)).toBe(scriptFamily(pair.heading.latin, 'heading', 'arabic'));
+    expect(first(fonts.display.ru)).toBe(pair.display.latin);
+    expect(fonts.display.ru).toContain(
+      `"${scriptFamily(pair.display.latin, 'display', 'cyrillic') ?? pair.display.latin}"`,
+    );
+    // a name in another script keeps a designed face: every stack has the others' faces too
+    expect(fonts.display.he).toContain(`"${scriptFamily(pair.display.latin, 'display', 'arabic')}"`);
+    // the page declares those faces — the Arabic one in its Arabic letters
+    const arabic = scriptFamily(pair.display.latin, 'display', 'arabic')!;
+    expect(fonts.faces).toContainEqual({ family: arabic, subsets: ['arabic'] });
+    expect(filmServer.filmFontCss(fonts)).toContain(`font-family:'${arabic}'`);
+    // a Hebrew and English invitation declares no other script's faces
+    expect(filmServer.filmFonts(manifest, doc).faces.map((f) => f.family)).not.toContain(arabic);
   });
 
   it('shows the package (and no photos) without the feature; nothing for someone else', async () => {
@@ -341,11 +404,13 @@ function noticesWorld(
     credits?: number;
     admin?: boolean;
     enabled?: boolean;
+    rows?: GalleryNoticeRow[];
+    languages?: Record<string, string | null>;
   } = {},
 ) {
   const settings = { ...gallerySettings(), enabled: opts.enabled ?? true };
   const db = {
-    state: vi.fn(async () => ({ gallery: true, rows: [] })),
+    state: vi.fn(async () => ({ gallery: true, rows: opts.rows ?? [] })),
     queue: vi.fn(async (_id: string, _o: string, ids: string[]) =>
       (opts.credits ?? 100) < ids.length
         ? { ok: false as const, code: 'credits' as const, needed: ids.length, balance: opts.credits ?? 0 }
@@ -366,7 +431,16 @@ function noticesWorld(
       })),
     },
     featureInput: vi.fn(async () => input({ plan: 'pro', ...opts.input })),
-    invitation: vi.fn(async () => ({ hosts: 'נועה & איתי', locale: 'he' as const })),
+    invitation: vi.fn(async () => ({
+      locale: 'he' as const,
+      locales: ['he' as const, 'en' as const],
+      hosts: { he: 'נועה & איתי', en: 'Noa & Itay' },
+    })),
+    guestLanguages: vi.fn(async (): Promise<Record<string, string | null>> => opts.languages ?? {}),
+    templateLanguages: () => [
+      { locale: 'he' as const, code: 'he' },
+      { locale: 'en' as const, code: 'en_US' },
+    ],
     ready: () => opts.ready ?? true,
     priceUsd: 0.04,
     send: vi.fn(async () => ({ sent: 2, failed: 0, retried: 0 })),
@@ -379,8 +453,22 @@ function noticesWorld(
 describe('sending guests the gallery link', () => {
   const guests = [randomUUID(), randomUUID()];
 
-  it('lists every guest with the gallery’s link, while the gallery is on', async () => {
-    const w = noticesWorld();
+  it('lists every guest with the gallery’s link and their language, while the gallery is on', async () => {
+    const row = (guestId: string, name: string): GalleryNoticeRow => ({
+      guestId,
+      name,
+      phone: '+972521111111',
+      token: `tok-${name}-0123456789`,
+      group: null,
+      reach: 'ok',
+      last: null,
+      queued: false,
+    });
+    const w = noticesWorld({
+      rows: [row(guests[0]!, 'Olga'), row(guests[1]!, 'דנה')],
+      // a language the invitation lists and one that isn't a language at all
+      languages: { [guests[0]!]: 'ru', [guests[1]!]: 'xx' },
+    });
     const res = await notices.galleryNoticesState(OWNER, INV, 'https://invitations.badooks.com', w.deps);
     const token = tokens.linkToken('upload', INV, w.settings.uploadTokenNonce, w.settings.uploadTokenHash);
     expect(res).toMatchObject({
@@ -388,9 +476,19 @@ describe('sending guests the gallery link', () => {
       body: {
         ready: true,
         link: `https://invitations.badooks.com/e/noa-itay/upload?t=${token}`,
-        own: { hosts: 'נועה & איתי' },
+        // the messages in each of the invitation's languages, and the template's languages
+        own: { locale: 'he', locales: ['he', 'en'], hosts: { he: 'נועה & איתי', en: 'Noa & Itay' } },
+        langs: [
+          { locale: 'he', code: 'he' },
+          { locale: 'en', code: 'en_US' },
+        ],
       },
     });
+    const rows = res.body.rows as { name: string; language: string | null }[];
+    expect(rows.map((r) => [r.name, r.language])).toEqual([
+      ['Olga', 'ru'],
+      ['דנה', null],
+    ]);
     const off = noticesWorld({ enabled: false });
     expect((await notices.galleryNoticesState(OWNER, INV, 'https://x', off.deps)).status).toBe(409);
     const plan = noticesWorld({ input: { plan: 'free' } });
@@ -473,6 +571,123 @@ describe('sending guests the gallery link', () => {
     });
     expect(notify.galleryNoticeMessage({ ...claimed, guestToken: null }, doc)).toBeNull();
     expect(notify.galleryNoticeMessage({ ...claimed, uploadTokenHash: null }, doc)).toBeNull();
+  });
+
+  describe('in each guest’s language', () => {
+    // the five-language invitation; the template approved in Hebrew, English, Russian and Arabic
+    const s = gallerySettings();
+    const upload = tokens.linkToken('upload', INV, s.uploadTokenNonce, s.uploadTokenHash)!;
+    const claimed = (guestLanguage: string | null, id: string = randomUUID()): ClaimedGalleryNotice => ({
+      id,
+      invitationId: INV,
+      toPhone: '972501234567',
+      attempts: 1,
+      guestName: 'Guest',
+      guestToken: 'GuestToken_0123456789',
+      guestLanguage,
+      slug: 'noa-itay',
+      document: doc5,
+      uploadTokenHash: s.uploadTokenHash,
+      uploadTokenNonce: s.uploadTokenNonce,
+    });
+    const button = (lang: string | null) =>
+      `noa-itay/upload?t=${upload}&g=GuestToken_0123456789${lang ? `&lang=${lang}` : ''}`;
+    const withLanguages = async (list: string, run: () => Promise<void> | void) => {
+      env.INVITES_WHATSAPP_TEMPLATE_LANGS = list;
+      try {
+        await run();
+      } finally {
+        env.INVITES_WHATSAPP_TEMPLATE_LANGS = '';
+      }
+    };
+
+    it('the template in their language when it is approved in it, the hosts in it, the gallery opening in it', () =>
+      withLanguages('he,en_US,ru,ar', () => {
+        expect(notify.galleryNoticeMessage(claimed('ru'), doc5)).toMatchObject({
+          lang: 'ru',
+          body: ['Guest', 'Ноа & Итай'],
+          button: button('ru'),
+        });
+        // Meta's own code for the language, as configured
+        expect(notify.galleryNoticeMessage(claimed('en'), doc5)).toMatchObject({
+          lang: 'en_US',
+          body: ['Guest', 'Noa & Itay'],
+          button: button('en'),
+        });
+        expect(notify.galleryNoticeMessage(claimed('ar'), doc5)).toMatchObject({
+          lang: 'ar',
+          body: ['Guest', 'نوعا & إيتاي'],
+          button: button('ar'),
+        });
+        // no language of their own: the invitation's, and its link without a language
+        expect(notify.galleryNoticeMessage(claimed(null), doc5)).toMatchObject({
+          lang: 'he',
+          body: ['Guest', 'נועה & איתי'],
+          button: button(null),
+        });
+        // Amharic has no Meta template: the message in the invitation's language, the gallery in Amharic
+        expect(notify.galleryNoticeMessage(claimed('am'), doc5)).toMatchObject({
+          lang: 'he',
+          body: ['Guest', 'נועה & איתי'],
+          button: button('am'),
+        });
+        // a language the invitation doesn't have (French): the invitation's, all of it
+        expect(notify.galleryNoticeMessage(claimed('fr'), doc5)).toMatchObject({
+          lang: 'he',
+          button: button(null),
+        });
+      }));
+
+    it('Meta has no template in their language yet (132001): the next language of the chain, at once', () =>
+      withLanguages('he,en,ru,ar', async () => {
+        const sent: { lang: string; body: string[]; button: string }[] = [];
+        const send = vi.fn(async (m: { lang: string; body: string[]; button: string; ref: string }) => {
+          sent.push(m);
+          return m.lang === 'ar'
+            ? ({
+                ok: false,
+                error: '132001 · Template name does not exist in the translation',
+                retryable: false,
+              } as const)
+            : ({ ok: true, id: `wamid.${m.ref}` } as const);
+        });
+        const ar = claimed('ar', 'notice-ar');
+        const ru = claimed('ru', 'notice-ru');
+        const db = {
+          claim: vi.fn(async () => [ar, ru]),
+          result: vi.fn(async () => undefined),
+          requeue: vi.fn(async () => true),
+        };
+        expect(await notify.processGalleryNoticeQueue(INV, 25, send as never, db as never)).toEqual({
+          sent: 2,
+          failed: 0,
+          retried: 0,
+        });
+        // Arabic refused → Hebrew (the invitation's): the hosts in Hebrew, the gallery still in Arabic
+        expect(sent.filter((m) => m.button === button('ar')).map((m) => [m.lang, m.body[1]])).toEqual([
+          ['ar', 'نوعا & إيتاي'],
+          ['he', 'נועה & איתי'],
+        ]);
+        expect(sent.filter((m) => m.button === button('ru')).map((m) => m.lang)).toEqual(['ru']);
+        expect(db.result).toHaveBeenCalledWith('notice-ar', 'wamid.notice-ar', null);
+        expect(db.result).toHaveBeenCalledWith('notice-ru', 'wamid.notice-ru', null);
+        // a refusal in every language fails the message (its credit comes back in the database)
+        sent.length = 0;
+        const none = vi.fn(async () => ({ ok: false, error: '132001 · no', retryable: false }) as const);
+        db.claim.mockResolvedValueOnce([claimed('ar', 'notice-none')]);
+        expect(await notify.processGalleryNoticeQueue(INV, 25, none as never, db as never)).toEqual({
+          sent: 0,
+          failed: 1,
+          retried: 0,
+        });
+        expect(none.mock.calls.map((c) => (c as unknown as [{ lang: string }])[0].lang)).toEqual([
+          'ar',
+          'he',
+          'en',
+          'ru',
+        ]);
+        expect(db.result).toHaveBeenCalledWith('notice-none', null, '132001 · no');
+      }));
   });
 
   it('the queue: sent, retried when it may help, failed (refunded by the database) otherwise', async () => {

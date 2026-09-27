@@ -45,6 +45,51 @@ export const TEMPLATE_TEXT: Record<Locale, { body: string; button: string; foote
   },
 };
 
-export function fillTemplate(body: string, values: [string, string, string, string]): string {
-  return body.replace(/\{\{([1-4])\}\}/g, (_, n: string) => values[Number(n) - 1] ?? '');
+/**
+ * The gallery link's template (badook_gallery, docs/whatsapp-setup.md §9) in each language, as the
+ * "send guests the gallery link" dialog previews it: {{1}} guest · {{2}} hosts; the button opens the
+ * guest's own gallery link. Amharic has no Meta template (Amharic guests get the invitation's
+ * language); its text is here for the day Meta adds it.
+ */
+export const GALLERY_TEMPLATE_TEXT: Record<Locale, { body: string; button: string; footer: string }> = {
+  he: {
+    body: 'שלום {{1}} 📸\nהגלריה של האירוע של {{2}} פתוחה: אפשר להעלות את התמונות והסרטונים שצילמתם ולראות את של כולם.\nלגלריה בכפתור 👇',
+    button: 'לגלריה',
+    footer: 'נשלח באמצעות Badook',
+  },
+  en: {
+    body: 'Hi {{1}} 📸\nThe gallery of {{2}}’s event is open: upload the photos and videos you took and see everyone’s.\nTap the button for the gallery 👇',
+    button: 'To the gallery',
+    footer: 'Sent with Badook',
+  },
+  ru: {
+    body: 'Здравствуйте, {{1}}! 📸\nГалерея праздника «{{2}}» открыта: загрузите фото и видео, которые вы сняли, и посмотрите снимки всех гостей.\nГалерея — по кнопке ниже 👇',
+    button: 'В галерею',
+    footer: 'Отправлено через Badook',
+  },
+  ar: {
+    body: 'مرحبًا {{1}} 📸\nمعرض مناسبة {{2}} مفتوح الآن: ارفعوا الصور والفيديوهات التي التقطتموها وشاهدوا صور الجميع.\nللدخول إلى المعرض اضغطوا على الزر 👇',
+    button: 'إلى المعرض',
+    footer: 'أُرسلت عبر Badook',
+  },
+  fr: {
+    body: 'Bonjour {{1}} 📸\nLa galerie de l’événement de {{2}} est ouverte : envoyez les photos et vidéos que vous avez prises, et découvrez celles de tout le monde.\nLa galerie, c’est par le bouton ci-dessous 👇',
+    button: 'Vers la galerie',
+    footer: 'Envoyé via Badook',
+  },
+  es: {
+    body: '¡Hola, {{1}}! 📸\nLa galería de la celebración de {{2}} ya está abierta: sube las fotos y vídeos que hiciste y mira los de todos.\nToca el botón para ir a la galería 👇',
+    button: 'Ir a la galería',
+    footer: 'Enviado con Badook',
+  },
+  am: {
+    body: 'ሰላም {{1}} 📸\nየ{{2}} ዝግጅት የፎቶ ማዕከል ተከፍቷል፦ ያነሷቸውን ፎቶዎችና ቪዲዮዎች ይስቀሉ፤ የሁሉንም ይመልከቱ።\nወደ ፎቶ ማዕከሉ ለመሄድ ከታች ያለውን ቁልፍ ይጫኑ 👇',
+    button: 'ወደ ፎቶ ማዕከሉ',
+    footer: 'በBadook የተላከ',
+  },
+};
+
+/** A template's body with its values: {{1}} is values[0], {{2}} values[1]… */
+export function fillTemplate(body: string, values: readonly string[]): string {
+  return body.replace(/\{\{([1-9])\}\}/g, (_, n: string) => values[Number(n) - 1] ?? '');
 }

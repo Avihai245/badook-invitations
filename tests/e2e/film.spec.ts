@@ -1,5 +1,9 @@
 import { stat } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
+import type { InvitationDocument } from '../../src/features/invitations/contracts/types';
+import { scriptFamily } from '../../src/features/invitations/fonts';
+import { resolveFontPair } from '../../src/features/invitations/renderer/theme';
+import { TEMPLATES } from '../../src/features/invitations/templates/registry';
 import {
   LOCAL,
   api,
@@ -156,4 +160,50 @@ test('a host makes a highlights film of the gallery: previewed, made, downloaded
   expect(feed.items.filter((i) => i.kind === 'video')).toHaveLength(1);
   await open(page, `/app/invitations/${host.id}/gallery`);
   await expect(page.getByRole('button', { name: /הסרט שלכם/ })).toBeVisible();
+});
+
+test('the cards speak the invitation’s languages: any of its four, Arabic right to left in its own face', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'the film is made on a computer');
+  test.setTimeout(120_000);
+  const host = await newHost(page, 'film-lang', 'business', { locales: ['he', 'en', 'ru', 'ar'] });
+  await galleryOn(page, host.id);
+  await seedPhotos(host.id, [
+    { color: [200, 60, 50] },
+    { color: [40, 120, 200] },
+    { color: [60, 170, 90] },
+    { color: [210, 170, 40] },
+  ]);
+  await open(page, `/app/invitations/${host.id}/gallery/film`);
+  await expect(page.getByTestId('film-studio')).toBeVisible();
+  // more than three languages: a list of them, each by its own name — the invitation's default first
+  const language = page.getByTestId('film-card-language');
+  await expect(language).toHaveValue('he');
+  await expect(language.locator('option')).toHaveText(['עברית', 'English', 'Русский', 'العربية']);
+  const canvas = page.getByTestId('film-preview-canvas');
+  await expect(canvas).toHaveAttribute('data-card-dir', 'rtl');
+  await language.selectOption('ru');
+  await expect(canvas).toHaveAttribute('data-card-dir', 'ltr');
+  // Arabic: right to left, the names in the design's own Arabic face (the invitation's), loaded for them
+  const [row] = await sql<{ draft: InvitationDocument }>(`select draft from invitations where id = $1`, [
+    host.id,
+  ]);
+  const pair = resolveFontPair(TEMPLATES.get('sahar-bordeaux')!.manifest, row!.draft);
+  const arabic = scriptFamily(pair.display.latin, 'display', 'arabic')!;
+  await language.selectOption('ar');
+  await expect(canvas).toHaveAttribute('data-card-dir', 'rtl');
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          (family) =>
+            [...document.fonts].some(
+              (f) => f.status === 'loaded' && f.family.replace(/["']/g, '') === family,
+            ),
+          arabic,
+        ),
+      { timeout: 10_000 },
+    )
+    .toBe(true);
 });

@@ -99,7 +99,7 @@ const ServerEnvSchema = z.object({
   INVITES_WHATSAPP_TEMPLATE: z.string().trim().min(1).default('badook_invitation'),
   // the languages the template is approved in, as Meta's codes ("he,en,ru,ar"; default he,en): each
   // guest gets theirs, else the invitation's (features/whatsapp/languages.ts) — the invitation's
-  // template and the table number's alike
+  // template, the table number's and the gallery link's alike
   INVITES_WHATSAPP_TEMPLATE_LANGS: z.string().trim().optional(),
   // the older single language (used only when INVITES_WHATSAPP_TEMPLATE_LANGS isn't set)
   INVITES_WHATSAPP_TEMPLATE_LANG: z.string().trim().optional(),

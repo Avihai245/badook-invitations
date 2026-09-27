@@ -1,11 +1,13 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { TEMPLATES } from '../../src/features/invitations/templates/registry';
+import { seedDocument } from '../../src/features/invitations/templates/seed-document';
 import { as, createTestDatabase } from './harness';
 
 // The studio layer (supabase/migrations/*_studio.sql): every save of a draft recoverable (the tracked
 // autosave and its coalescing, snapshots before a restore or a design concept, the history, restoring
-// any entry, the cap and the daily purge — publishes untouched); the draft review link (setup, rotate,
+// any entry in every language, the cap and the daily purge — publishes untouched); the draft review link (setup, rotate,
 // expiry, revoke, comments pinned by the link's hash with rate limits, replies both ways, handled /
 // open, removal, the host's emails, housekeeping); the voice queue (queue, claim, done, failed, the
 // guest page's tracks) — and nothing for anyone but the service role.
@@ -221,6 +223,82 @@ describe('snapshots, the history and restoring', () => {
     expect(await commit('restore_invitation_entry', [other, OWNER, publish.id, 60])).toBeNull();
     // the old restore by version still restores publishes
     expect(await commit('restore_invitation_version', [id, OWNER, 1])).toBe(true);
+  });
+
+  it('restoring keeps every language: the Russian, Arabic and Amharic texts come back whole', async () => {
+    const { manifest, defaults } = TEMPLATES.get('sahar-bordeaux')!;
+    const many = seedDocument(manifest, defaults, {
+      eventType: 'wedding',
+      locales: ['he', 'en', 'ru', 'ar', 'am'],
+      defaultLocale: 'he',
+      hosts: {
+        primary: { he: 'נועה', en: 'Noa', ru: 'Ноа', ar: 'نوعا', am: 'ኖዓ' },
+        secondary: { he: 'איתי', en: 'Itay', ru: 'Итай', ar: 'إيتاي', am: 'ኢታይ' },
+      },
+      date: '2027-06-17',
+      startTime: '19:30',
+      endTime: '01:00',
+      timezone: 'Asia/Jerusalem',
+    });
+    const slug = 'studio-languages';
+    const { id } = await commit<{ id: string }>('create_invitation', [
+      OWNER,
+      'sahar-bordeaux',
+      'wedding',
+      slug,
+      many,
+    ]);
+    const original: J = { ...many, share: { ...many.share, slug } };
+    const draftOf = async () =>
+      (await one<{ d: J }>(`select draft d from invitations where id = $1`, [id])).d;
+    expect(await draftOf()).toEqual(original);
+    await commit('publish_invitation', [id, OWNER]);
+
+    // the host edits: an Arabic text and an Amharic one, the hosts in Russian, and Amharic taken off
+    const changed: J = structuredClone(original);
+    const hero = changed.sections.find((s: J) => s.data?.title?.ar || s.data?.greeting?.ar);
+    expect(hero).toBeTruthy();
+    if (hero.data.title?.ar) hero.data.title.ar = 'عنوان آخر';
+    else hero.data.greeting.ar = 'تحية أخرى';
+    const withAmharic = changed.sections.find((s: J) => s.id !== hero.id && s.data?.title?.am);
+    if (withAmharic) withAmharic.data.title.am = 'ሌላ ርዕስ';
+    changed.hosts.primary.ru = 'Шира';
+    changed.locales = ['he', 'en', 'ru', 'ar'];
+    await save(id, changed, 0);
+    expect(await draftOf()).toEqual(changed);
+
+    // the publish, read from the history: every language as it was
+    const history = await commit<{ id: number; kind: string; reason: string | null }[]>(
+      'owner_invitation_history',
+      [id, OWNER, 100],
+    );
+    const publish = history.find((h) => h.kind === 'publish')!;
+    const entry = await commit<{ document: J }>('owner_invitation_entry', [id, OWNER, publish.id]);
+    expect(entry.document).toEqual(original);
+    // restored: the draft is the publish again — the Russian hosts, the Arabic and Amharic texts
+    const restored = await commit<{ ok: boolean; draft: J }>('restore_invitation_entry', [
+      id,
+      OWNER,
+      publish.id,
+      60,
+    ]);
+    expect(restored.ok).toBe(true);
+    expect(restored.draft).toEqual(original);
+    expect(await draftOf()).toEqual(original);
+    expect(restored.draft.locales).toEqual(['he', 'en', 'ru', 'ar', 'am']);
+    expect(restored.draft.hosts.primary).toEqual({ he: 'נועה', en: 'Noa', ru: 'Ноа', ar: 'نوعا', am: 'ኖዓ' });
+
+    // and back: the edited draft, kept before the restore, comes back with its own languages
+    const again = await commit<{ id: number; kind: string; reason: string | null }[]>(
+      'owner_invitation_history',
+      [id, OWNER, 100],
+    );
+    const kept = again.find((h) => h.kind === 'save' && h.reason === 'restore')!;
+    expect(kept).toBeTruthy();
+    const back = await commit<{ draft: J }>('restore_invitation_entry', [id, OWNER, kept.id, 60]);
+    expect(back.draft).toEqual(changed);
+    expect(back.draft.hosts.primary.ru).toBe('Шира');
+    expect(back.draft.locales).toEqual(['he', 'en', 'ru', 'ar']);
   });
 
   it('the daily purge: saves older than the keeping time and beyond the cap go; publishes stay', async () => {

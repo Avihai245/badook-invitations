@@ -68,7 +68,18 @@ export function LiveGalleryCard({
     const g = new URLSearchParams(window.location.search).get('g');
     if (g) setToken(g);
   }, []);
-  const href = url ? galleryHref(url, guest?.token ?? token) : null;
+  // the language the guest reads the invitation in (the page's, also after switching it in place):
+  // the gallery opens in it
+  const [lang, setLang] = useState<string | null>(null);
+  useEffect(() => {
+    const html = document.documentElement;
+    const read = () => setLang(html.lang || null);
+    read();
+    const watch = new MutationObserver(read);
+    watch.observe(html, { attributes: true, attributeFilter: ['lang'] });
+    return () => watch.disconnect();
+  }, []);
+  const href = url ? galleryHref(url, guest?.token ?? token, lang) : null;
 
   // the QR code: made for the address as it is now (the guest's personal link may arrive later)
   const full = href ? (href.startsWith('http') ? href : `${base}${href}`) : null;

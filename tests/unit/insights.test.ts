@@ -413,10 +413,15 @@ describe('the gallery section on the invitation', () => {
     expect(galleryPhase(start + 2 * H, start, start - H)).toBe('during');
   });
 
-  it('keeps the guest’s personal link on the gallery’s address', () => {
+  it('keeps the guest’s personal link on the gallery’s address, and the language they read in', () => {
     const url = 'https://invitations.badooks.com/e/noa-itay/upload?t=AbCdEfGhIjKlMnOpQrStUvWx';
     expect(galleryHref(url, 'GuestToken_0123456789')).toBe(`${url}&g=GuestToken_0123456789`);
     expect(galleryHref(url, null)).toBe(url);
     expect(galleryHref(url, 'bad token!')).toBe(url);
+    // the gallery opens in the invitation's language the guest reads
+    expect(galleryHref(url, 'GuestToken_0123456789', 'ar')).toBe(`${url}&g=GuestToken_0123456789&lang=ar`);
+    expect(galleryHref(url, null, 'ru')).toBe(`${url}&lang=ru`);
+    expect(galleryHref(url, null, 'de')).toBe(url);
+    expect(galleryHref(url, null, '')).toBe(url);
   });
 });

@@ -2,9 +2,12 @@ import 'server-only';
 import QRCode from 'qrcode';
 import { accountDb, loadAccount } from '@/features/billing/server/account';
 import { featureInput, featuresFor } from '@/features/flags/server';
+import type { Locale } from '@/features/invitations/contracts/types';
 import { hostsLine } from '@/features/invitations/lib/text';
+import { guestsDb } from '@/features/invitations/server/guests';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { hostDeps } from '@/features/invitations/server/host-route';
+import { configuredTemplateLanguages } from '@/features/whatsapp/sender';
 import { getSessionUser } from '@/lib/supabase/session';
 import { serverEnv } from '@/lib/env';
 import { realtimeInfo } from '@/lib/live/broadcast';
@@ -75,10 +78,17 @@ export function galleryNotifyDeps(): GalleryNotifyDeps {
     async invitation(id, userId) {
       const inv = await hostDb.get(id, userId);
       if (!inv) return null;
+      // as guests read it: the published invitation (the draft before it is published)
       const doc = inv.published ?? inv.draft;
-      const locale = doc.defaultLocale === 'en' ? 'en' : 'he';
-      return { hosts: hostsLine(doc.hosts, locale), locale };
+      const hosts: Partial<Record<Locale, string>> = {};
+      for (const l of doc.locales) hosts[l] = hostsLine(doc.hosts, l);
+      return { locale: doc.defaultLocale, locales: [...doc.locales], hosts };
     },
+    async guestLanguages(id, userId) {
+      const guests = await guestsDb.list(id, userId);
+      return Object.fromEntries((guests ?? []).map((g) => [g.id, g.language]));
+    },
+    templateLanguages: configuredTemplateLanguages,
     ready: galleryTemplateReady,
     priceUsd: serverEnv().INVITES_WHATSAPP_PRICE_USD,
     send: (invitationId, limit) => processGalleryNoticeQueue(invitationId, limit),

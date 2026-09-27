@@ -100,7 +100,10 @@ or 90 seconds; vertical or horizontal; 1080p (720p on weak devices). The music �
 an uploaded file that never leaves the computer — is read on the device (OfflineAudioContext, onset
 energy, tempo by autocorrelation, beats by dynamic programming): cuts land on beats, the film ends on a
 phrase and the music fades out. Photos move slowly toward the faces without cropping one out; transitions
-(cut, dissolve, whip) follow the tempo; title and end cards use the invitation's palette and fonts.
+(cut, dissolve, whip) follow the tempo; title and end cards use the invitation's palette and fonts —
+in any of the invitation's languages (its default first): the names, the date as the invitation writes it
+and the end card's line in all seven, right to left in Hebrew and Arabic, in the invitation's face for
+each script (its Arabic, Ethiopic and Cyrillic faces too), loaded before anything is painted.
 Rendering: WebCodecs H.264 (+ AAC, or Opus) muxed into an MP4 by `mp4-muxer`; where H.264 encoding is
 missing, the MediaRecorder fallback records in real time (MP4 or WebM, its duration written in). The
 result downloads, or joins the gallery as the host's own item (`gallery_items.source = 'host'`) through
@@ -114,13 +117,17 @@ only if the host ticks it. Off: the studio offers the package or the switch, the
   only when the event has the feature; the server refuses a draft that adds one without it (403
   `feature_off`). Before and during the event (from 3 hours before it starts until 6 hours after it ends,
   in the event's time zone) it shows a button — and a QR code on wide screens — to `/e/<slug>/upload`,
-  carrying the guest's personal link; after the event, "see the album". The ISR page renders the same
-  HTML for everyone; the phase is decided in the browser. Without a gallery (or the feature) the section
-  renders nothing.
+  carrying the guest's personal link and the language they read in; after the event, "see the album".
+  The ISR page renders the same HTML for everyone; the phase is decided in the browser. Without a gallery
+  (or the feature) the section renders nothing.
 - **Sending guests the gallery link** (gallery tab → share card): from the system's WhatsApp number once
   the third Meta template is approved and `INVITES_WHATSAPP_GALLERY_TEMPLATE` names it
-  (docs/whatsapp-setup.md §9); otherwise per-guest wa.me links and copied links. Credits and statuses work
-  like the other templates.
+  (docs/whatsapp-setup.md §9); otherwise per-guest wa.me links and copied messages. In each guest's
+  language, like the invitation and the table number: the template in their language when it is approved
+  in it (`INVITES_WHATSAPP_TEMPLATE_LANGS`; Meta's 132001 moves it to the next language at once), else in
+  the invitation's; the button, the wa.me text and the copied message open the gallery in their language.
+  The dialog counts the messages per language and previews each. Credits and statuses work like the other
+  templates.
 
 ## Insights (`analytics`)
 
@@ -203,7 +210,9 @@ says what restoring would change per section, and restores into the draft (one u
 
 WCAG 2.1 AA, audited by `tests/e2e/a11y.spec.ts` (axe-core over the cover and sections of several designs,
 the RSVP form, a save-the-date, the table guide, the entrance station, the gallery's upload page and the
-review page; phone and desktop, Hebrew and English; it fails on anything new). Every invitation with
+review page; phone and desktop, Hebrew and English — and Arabic (right to left) and Russian for two
+designs' cover and sections, the RSVP form, the table guide, the gallery's upload page and the review page;
+it fails on anything new). Every invitation with
 motion has a "pause the animations" button (the corner opposite the music; in the review page's toolbar),
 which stops its endless loops and background videos for the visit; with reduced motion nothing loops and
 the button isn't there. While the cover is up only it takes the keyboard's focus.

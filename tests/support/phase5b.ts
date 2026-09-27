@@ -76,12 +76,26 @@ export interface Host {
   slug: string;
 }
 
-/** A new host signed in on `page`, with a Hebrew-and-English wedding on `plan`. */
+/** The hosts' names as each language writes them (an invitation in more than Hebrew and English). */
+export const HOST_NAMES: Record<string, [string, string]> = {
+  he: ['נועה', 'איתי'],
+  en: ['Noa', 'Itay'],
+  ru: ['Ноа', 'Итай'],
+  ar: ['نوعا', 'إيتاي'],
+  fr: ['Noa', 'Itay'],
+  es: ['Noa', 'Itay'],
+  am: ['ኖዓ', 'ኢታይ'],
+};
+
+/**
+ * A new host signed in on `page`, with a wedding on `plan` — in Hebrew and English, or in `locales`
+ * (Hebrew first: the default), the hosts' names written in each.
+ */
 export async function newHost(
   page: Page,
   prefix: string,
   plan: Plan,
-  event: { date?: string; startTime?: string } = {},
+  event: { date?: string; startTime?: string; locales?: string[] } = {},
 ): Promise<Host> {
   const email = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
   await page.goto('/signup');
@@ -90,23 +104,28 @@ export async function newHost(
   await page.click('form:has(input[name=password]) button[type=submit]');
   await page.waitForURL(/\/app\/invitations$/);
   await hydrated(page);
-  const created = await page.evaluate(async (event) => {
-    const res = await fetch('/api/invitations', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        templateId: 'sahar-bordeaux',
-        eventType: 'wedding',
-        locales: ['he', 'en'],
-        defaultLocale: 'he',
-        hosts: { primary: { he: 'נועה', en: 'Noa' }, secondary: { he: 'איתי', en: 'Itay' } },
-        date: event.date ?? '2027-06-17',
-        startTime: event.startTime ?? '19:30',
-        timezone: 'Asia/Jerusalem',
-      }),
-    });
-    return (await res.json()) as { id: string; slug: string };
-  }, event);
+  const locales = event.locales ?? ['he', 'en'];
+  const names = (i: 0 | 1) => Object.fromEntries(locales.map((l) => [l, HOST_NAMES[l]![i]]));
+  const created = await page.evaluate(
+    async (body) => {
+      const res = await fetch('/api/invitations', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return (await res.json()) as { id: string; slug: string };
+    },
+    {
+      templateId: 'sahar-bordeaux',
+      eventType: 'wedding',
+      locales,
+      defaultLocale: locales[0],
+      hosts: { primary: names(0), secondary: names(1) },
+      date: event.date ?? '2027-06-17',
+      startTime: event.startTime ?? '19:30',
+      timezone: 'Asia/Jerusalem',
+    },
+  );
   await setPlan(email, plan);
   return { email, id: created.id, slug: created.slug };
 }

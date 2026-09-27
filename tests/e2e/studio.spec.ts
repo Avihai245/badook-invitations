@@ -178,18 +178,19 @@ test.describe('design it for me', () => {
     await expect(concepts).toHaveAttribute('data-source', 'ai');
     const cards = concepts.getByTestId('studio-concept');
     await expect(cards).toHaveCount(3);
-    // the stand-in saw the photos (small JPEGs made on the device) and the mood
+    // the stand-in saw the photos (small JPEGs made on the device) and the mood — this test's own
+    // request, found by its mood (the tests running alongside ask the stand-in too)
     const asked = (await (await page.request.get(`${MOCKS}/__ai/art`)).json()) as {
       images: number;
       mediaTypes: string[];
       bytes: number[];
       mood: string;
     }[];
-    const last = asked.at(-1)!;
-    expect(last.images).toBe(3);
-    expect(last.mediaTypes).toEqual(['image/jpeg', 'image/jpeg', 'image/jpeg']);
-    for (const b of last.bytes) expect(b).toBeLessThan(360 * 1024);
-    expect(last.mood).toBe('ים ושקיעה');
+    const last = asked.findLast((a) => a.mood === 'ים ושקיעה');
+    expect(last, 'the request with this mood').toBeTruthy();
+    expect(last!.images).toBe(3);
+    expect(last!.mediaTypes).toEqual(['image/jpeg', 'image/jpeg', 'image/jpeg']);
+    for (const b of last!.bytes) expect(b).toBeLessThan(360 * 1024);
     // each concept live in its own phone, on its own design
     const templates = await cards.evaluateAll((els) => els.map((el) => el.getAttribute('data-template')));
     expect(new Set(templates).size).toBe(3);

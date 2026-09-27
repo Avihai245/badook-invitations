@@ -155,3 +155,59 @@ test('a guest’s visit is counted once in the funnel, without cookies; a “do 
   ]);
   expect(daily!.visits).toBe(1);
 });
+
+test('an Arabic visit and a Russian one are counted apart, by language, on the Insights tab', async ({
+  page,
+  browser,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'the host on a computer, the guests on phones');
+  test.setTimeout(120_000);
+  const host = await newHost(page, 'insights-lang', 'free', { locales: ['he', 'en', 'ru', 'ar'] });
+  await publish(host.id);
+
+  // two guests, each on their own phone (and address), reading the invitation in their language
+  for (const [i, lang] of (['ar', 'ru'] as const).entries()) {
+    const phone = await browser.newContext({
+      ...PHONE,
+      extraHTTPHeaders: { 'x-forwarded-for': `10.9.${Math.floor(Math.random() * 250)}.${i + 1}` },
+    });
+    const guest = await phone.newPage();
+    // the language asked for (an Israeli phone's own would keep the page in Hebrew)
+    await guest.goto(`/i/${host.slug}?lang=${lang}&open=1`);
+    await expect(guest.locator('html')).toHaveAttribute('lang', lang);
+    await guest.mouse.wheel(0, 1500);
+    // counted: the page load's beacon reached the server (then the phone goes away)
+    await expect
+      .poll(
+        async () =>
+          (
+            await sql<{ n: number }>(
+              `select count(*)::int as n from insight_visits where invitation_id = $1 and lang = $2`,
+              [host.id, lang],
+            )
+          )[0]!.n,
+        { timeout: 20_000 },
+      )
+      .toBe(1);
+    await phone.close();
+  }
+  await expect
+    .poll(
+      async () =>
+        (
+          await sql<{ by_lang: unknown }>(`select by_lang from insight_daily where invitation_id = $1`, [
+            host.id,
+          ])
+        )[0]?.by_lang ?? null,
+      { timeout: 20_000 },
+    )
+    .toMatchObject({ ar: { visits: 1 }, ru: { visits: 1 } });
+
+  // the host's Insights tab: a row for each language, one visit each
+  await open(page, `/app/invitations/${host.id}/insights`);
+  const languages = page.getByTestId('insights-languages');
+  await expect(languages.locator('li')).toHaveCount(2);
+  await expect(languages.locator('li', { hasText: 'ערבית' })).toContainText('1');
+  await expect(languages.locator('li', { hasText: 'רוסית' })).toContainText('1');
+  await expect(page.getByTestId('insights-funnel')).toBeVisible();
+});
