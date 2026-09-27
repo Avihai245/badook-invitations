@@ -68,7 +68,7 @@ function customerDeps() {
   const later: (() => Promise<unknown>)[] = [];
   const deps = {
     db: {
-      open: vi.fn(async () => row()),
+      open: vi.fn(async (_userId: string, _ticket: unknown) => row()),
       list: vi.fn(async () => [row()]),
       get: vi.fn(async () => row()),
       reply: vi.fn(async () => row()),

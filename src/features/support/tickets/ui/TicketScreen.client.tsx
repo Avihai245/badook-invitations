@@ -18,6 +18,8 @@ import { ilDate, ilDateTime } from './when';
  * page listens on the ticket's own channel and shows the team's answer as it comes (no polling while
  * connected; every half minute when the connection is down).
  */
+const teamAnswers = (x: CustomerTicket) => x.messages.filter((m) => m.author === 'team').length;
+
 export function TicketScreen({ initial }: { initial: CustomerTicket }) {
   const { t, fmt, locale, plural } = useUi();
   const s = t.tickets;
@@ -41,7 +43,8 @@ export function TicketScreen({ initial }: { initial: CustomerTicket }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const teamAnswers = (x: CustomerTicket) => x.messages.filter((m) => m.author === 'team').length;
+  // how many answers of the team the page shows (a new one is announced to screen readers)
+  const answers = useRef(teamAnswers(initial));
 
   const reload = useCallback(async () => {
     // a page in the background doesn't mark the answers seen
@@ -54,10 +57,9 @@ export function TicketScreen({ initial }: { initial: CustomerTicket }) {
     const body = (await res?.json().catch(() => null)) as { ticket?: CustomerTicket } | null;
     const next = body?.ticket;
     if (!res?.ok || !next) return;
-    setTicket((prev) => {
-      if (teamAnswers(next) > teamAnswers(prev)) setAnnounce(k.newAnswer);
-      return next;
-    });
+    if (teamAnswers(next) > answers.current) setAnnounce(k.newAnswer);
+    answers.current = teamAnswers(next);
+    setTicket(next);
   }, [id, k.newAnswer]);
 
   const live = useLiveRefresh(ticket.realtime, () => void reload(), TICKETS.pollMs);
@@ -82,6 +84,7 @@ export function TicketScreen({ initial }: { initial: CustomerTicket }) {
     if (res?.status === 401)
       return window.location.assign(`/login?next=${encodeURIComponent(`/app/support/${id}`)}`);
     if (res?.ok && body?.ticket) {
+      answers.current = teamAnswers(body.ticket);
       setTicket(body.ticket);
       setReply('');
       toast({ title: k.sent, variant: 'success' });

@@ -33,7 +33,11 @@ export function TicketList({ tickets }: { tickets: CustomerTicketSummary[] }) {
 
   return (
     <div className="mx-auto max-w-[860px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
-      <PageHeader title={s.title} description={fmt(s.subtitle, { brand: t.brand })} actions={newTicket} />
+      <PageHeader
+        title={s.title}
+        description={fmt(s.subtitle, { brand: t.brand })}
+        actions={tickets.length ? newTicket : undefined}
+      />
 
       {tickets.length ? (
         <ul aria-label={s.label} className="mt-6 flex flex-col gap-3" data-testid="support-tickets">
