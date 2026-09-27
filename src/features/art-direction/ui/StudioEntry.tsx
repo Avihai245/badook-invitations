@@ -28,7 +28,7 @@ export function StudioEntry({
   return (
     <section
       aria-labelledby="studio-entry-title"
-      className="mt-5 flex flex-col gap-3 rounded-card border border-brand-line bg-[linear-gradient(135deg,#fffaf3,#fdf2f8)] dark:bg-[linear-gradient(135deg,#2b2219,#2a1f1b)] p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5"
+      className="mt-5 flex flex-col gap-3 rounded-card border border-brand-line bg-[linear-gradient(135deg,#fffaf3,#fdf2f8)] dark:bg-[linear-gradient(135deg,#1d1812,#1a1519)] p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5"
       data-testid="studio-entry"
     >
       <span

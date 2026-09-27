@@ -126,7 +126,11 @@ export function ItemTile({
         <Menu
           items={menu}
           trigger={
-            <IconButton label={g.menu} size="sm" className="bg-surface/90 text-ink shadow-sm hover:bg-surface">
+            <IconButton
+              label={g.menu}
+              size="sm"
+              className="bg-surface/90 text-ink shadow-sm hover:bg-surface"
+            >
               <Ellipsis />
             </IconButton>
           }

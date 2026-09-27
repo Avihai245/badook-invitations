@@ -99,42 +99,44 @@
 @media screen {
   html[data-theme='dark'] {
     color-scheme: dark;
-    --color-canvas: #12100e;
-    --color-surface: #1b1815;
-    --color-subtle: #26221e;
-    --color-line: #35302a;
-    --color-line-strong: #4b443c;
-    --color-ink: #f3efea;
-    --color-muted: #ada398;
-    --color-faint: #81776d;
-    --color-primary: #f3efea;
-    --color-primary-ink: #1b1815;
+    /* midnight and champagne: a neutral near-black in layered steps, hairlines instead of fills, the
+       brand's gold as a light champagne for text and accents */
+    --color-canvas: #09090b;
+    --color-surface: #121215;
+    --color-subtle: #1c1c21;
+    --color-line: #27272e;
+    --color-line-strong: #36363f;
+    --color-ink: #f4f4f5;
+    --color-muted: #a1a1aa;
+    --color-faint: #71717a;
+    --color-primary: #f4f4f5;
+    --color-primary-ink: #09090b;
     --color-primary-hover: #ffffff;
-    --color-focus: #7aa7ff;
+    --color-focus: #8ab4ff;
     --color-success: #4ade80;
-    --color-success-bg: #13261a;
+    --color-success-bg: #0d1f15;
     --color-warning: #fbbf24;
-    --color-warning-bg: #2a2110;
+    --color-warning-bg: #201a0a;
     --color-danger: #f87171;
-    --color-danger-bg: #2d1515;
-    --color-info-bg: #142033;
-    --color-success-line: #1f4a2e;
-    --color-warning-line: #5a4614;
-    --color-danger-line: #5a2424;
-    --color-info-line: #22406b;
+    --color-danger-bg: #261214;
+    --color-info-bg: #0e182b;
+    --color-success-line: #1c4a2e;
+    --color-warning-line: #4d3c12;
+    --color-danger-line: #552327;
+    --color-info-line: #1f3a66;
     --color-info: #93c5fd;
     --color-info-strong: #bfdbfe;
-    --color-wa-soft: #10261a;
-    --color-wa-soft-strong: #163521;
-    --color-wa-line: #1f4a2e;
+    --color-wa-soft: #0d1f15;
+    --color-wa-soft-strong: #12301f;
+    --color-wa-line: #1c4a2e;
     --color-wa-ink: #6ee7a2;
-    --color-row-hover: #221e1a;
-    --color-canvas-editor: #0d0c0a;
-    --color-brand-deep: #e3bc8c;
-    --color-brand-soft: #2b2219;
-    --color-brand-line: #4a3a28;
-    --color-blush: #2a1f1b;
-    --color-inverse: #4a443d;
+    --color-row-hover: #17171b;
+    --color-canvas-editor: #050506;
+    --color-brand-deep: #e8cb9f;
+    --color-brand-soft: #1d1812;
+    --color-brand-line: #3b3024;
+    --color-blush: #1f1618;
+    --color-inverse: #2e2e36;
     --color-chart-1-hover: #5a9cec;
     --color-chart-2-hover: #f08a5d;
     --color-funnel-1: #2a78d6;
@@ -144,10 +146,20 @@
     --color-chart-read: #b7d3f7;
     --color-chart-delivered: #6aa6ee;
     --color-chart-sent: #3987e5;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.55);
-    --shadow-ring: 0 0 0 3px rgba(243, 239, 234, 0.12);
+    /* depth by light, not by shadow alone: a hairline ring and a faint top highlight */
+    --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.02), 0 1px 2px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    --shadow-md: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 12px 32px -8px rgba(0, 0, 0, 0.65);
+    --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 28px 60px -12px rgba(0, 0, 0, 0.75);
+    --shadow-ring: 0 0 0 3px rgba(232, 203, 159, 0.16);
+  }
+  /* a faint champagne glow at the top of every page, fixed behind the content */
+  html[data-theme='dark'] body {
+    background:
+      radial-gradient(1100px 520px at 85% -12%, rgba(232, 203, 159, 0.07), transparent 60%),
+      radial-gradient(900px 480px at 5% -10%, rgba(138, 180, 255, 0.035), transparent 55%),
+      var(--color-canvas);
+    background-attachment: fixed;
   }
   /* the accessibility menu's high contrast, in the dark look */
   html[data-theme='dark'][data-a11y-contrast] {

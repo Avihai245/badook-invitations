@@ -229,6 +229,8 @@ test.describe('seating', () => {
     await expect(toast(page, 'תוכנית האולם עודכנה')).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId('seating-plan-image')).toHaveCount(1);
     await expect(page.getByText('קנה המידה של התוכנית עוד לא כויל')).toBeVisible();
+    // (on a phone the notice sits over the canvas's toolbar until it goes)
+    await expect(toast(page, 'תוכנית האולם עודכנה')).toBeHidden({ timeout: 15_000 });
     await page.getByTestId('plan-button').click();
     dialog = page.getByRole('dialog', { name: 'תוכנית האולם' });
     await expect(dialog.getByTestId('plan-scale')).toContainText('לא כויל');

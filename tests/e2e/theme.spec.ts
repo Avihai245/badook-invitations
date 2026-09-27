@@ -114,7 +114,7 @@ test.describe('the system’s look', () => {
     }
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(
-      'rgb(18, 16, 14)',
+      'rgb(9, 9, 11)',
     );
 
     // kept: the next visit is dark from its first paint
