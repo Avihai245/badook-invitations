@@ -46,14 +46,16 @@ export type AdminNavBadges = Partial<Record<AdminArea, number>>;
 export function AdminShell({ badges, children }: { badges: AdminNavBadges; children: ReactNode }) {
   const { t } = useAdminUi();
   return (
-    <div className="min-h-dvh bg-canvas lg:grid lg:grid-cols-[252px_minmax(0,1fr)]">
+    // the site's accessibility button floats at the left edge halfway down: in Hebrew over the page's
+    // start (it keeps room for it), in English over the sidebar — which then starts past it
+    <div className="min-h-dvh bg-canvas lg:grid lg:grid-cols-[252px_minmax(0,1fr)] lg:ltr:grid-cols-[312px_minmax(0,1fr)]">
       <a
         href="#admin-main"
         className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-3 focus:z-50 focus:rounded-btn focus:bg-surface focus:px-3 focus:py-2 focus:shadow-md"
       >
         {t.skipToContent}
       </a>
-      <aside className="sticky top-0 hidden h-dvh flex-col border-e border-line bg-surface lg:flex">
+      <aside className="sticky top-0 hidden h-dvh flex-col border-e border-line bg-surface lg:flex lg:ltr:ps-[60px]">
         <div className="flex items-center justify-between gap-2 px-5 pt-5 pb-4">
           <Link href="/app/admin" className="rounded-btn text-[17px]">
             <BrandLogo label={t.consoleName} />
