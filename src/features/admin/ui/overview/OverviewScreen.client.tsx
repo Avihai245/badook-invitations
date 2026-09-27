@@ -118,6 +118,7 @@ export function OverviewScreen({
               value={number(u.new[period])}
               delta={pick(u.new, period)}
               vs={o.vs[period]}
+              vsZero={o.vsZero[period]}
               sub={fmt(o.kpi.usersSub, { total: number(u.total), active: number(u.active7) })}
             >
               <p className="mt-2 text-[12px] text-muted">{o.kpi.sourcesLabel}</p>
@@ -136,6 +137,7 @@ export function OverviewScreen({
               value={number(inv.created[period])}
               delta={pick(inv.created, period)}
               vs={o.vs[period]}
+              vsZero={o.vsZero[period]}
               sub={fmt(o.kpi.invitationsSub, {
                 published: number(inv.published[period]),
                 live: number(inv.status.published),
@@ -148,6 +150,7 @@ export function OverviewScreen({
               value={number(data.rsvps.responses[period])}
               delta={pick(data.rsvps.responses, period)}
               vs={o.vs[period]}
+              vsZero={o.vsZero[period]}
               sub={fmt(o.kpi.rsvpsSub, { people: number(data.rsvps.people[period]) })}
             />
             <Stat
@@ -157,6 +160,7 @@ export function OverviewScreen({
               value={number(wa.sent[period])}
               delta={pick(wa.sent, period)}
               vs={o.vs[period]}
+              vsZero={o.vsZero[period]}
               sub={
                 <>
                   {fmt(o.kpi.whatsappSub, {
@@ -194,6 +198,7 @@ export function OverviewScreen({
                 label={o.kpi.money}
                 value={money(finance.revenueMonth)}
                 delta={{ now: finance.revenueMonth, before: finance.revenuePrevMonth }}
+                format={(n) => money(n)}
                 vs={fmt(o.kpi.moneyVs, { prev: money(finance.revenuePrevMonth) })}
                 sub={fmt(o.kpi.moneySub, {
                   mrr: money(finance.mrr),

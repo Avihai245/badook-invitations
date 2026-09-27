@@ -15,11 +15,17 @@ export const overviewHe = {
     d7: 'לעומת 7 הימים שלפני',
     d30: 'לעומת 30 הימים שלפני',
   },
+  /** when the period before had none ("+12 · ב־7 הימים שלפני: אפס") */
+  vsZero: {
+    today: 'אתמול עד אותה שעה: אפס',
+    d7: 'ב־7 הימים שלפני: אפס',
+    d30: 'ב־30 הימים שלפני: אפס',
+  },
   change: {
     up: 'עלייה של {pct}',
     down: 'ירידה של {pct}',
     same: 'ללא שינוי',
-    fromZero: '{n} לעומת אפס',
+    fromZero: '+{n}',
   },
   kpi: {
     users: 'משתמשים חדשים',

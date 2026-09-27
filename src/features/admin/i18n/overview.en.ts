@@ -16,11 +16,16 @@ export const overviewEn: typeof overviewHe = {
     d7: 'vs. the 7 days before',
     d30: 'vs. the 30 days before',
   },
+  vsZero: {
+    today: 'yesterday by this time: none',
+    d7: 'the 7 days before: none',
+    d30: 'the 30 days before: none',
+  },
   change: {
     up: 'Up {pct}',
     down: 'Down {pct}',
     same: 'No change',
-    fromZero: '{n} against zero',
+    fromZero: '+{n}',
   },
   kpi: {
     users: 'New users',

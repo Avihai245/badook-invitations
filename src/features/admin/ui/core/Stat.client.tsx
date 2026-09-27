@@ -31,6 +31,8 @@ export function Stat({
   sub,
   delta,
   vs,
+  vsZero,
+  format,
   upIsBad = false,
   children,
   testId,
@@ -43,18 +45,23 @@ export function Stat({
   delta?: { now: number; before: number } | null;
   /** what the change is against ("vs. the 7 days before") */
   vs?: string;
+  /** instead of `vs` when the period before had none ("the 7 days before: none") */
+  vsZero?: string;
+  /** how the rise from nothing is written (default: a number; money: ₪) */
+  format?: (n: number) => string;
   upIsBad?: boolean;
   children?: ReactNode;
   testId?: string;
 }) {
   const { t, number, fmt } = useAdminUi();
   const c = delta ? change(delta.now, delta.before) : null;
+  const fromZero = c?.pct === null;
   const good = c && c.dir !== 'same' ? (c.dir === 'up') !== upIsBad : null;
   const Arrow = c?.dir === 'up' ? ArrowUpRight : c?.dir === 'down' ? ArrowDownRight : Minus;
   const words = !c
     ? null
     : c.pct === null
-      ? fmt(t.overview.change.fromZero, { n: number(delta!.now) })
+      ? fmt(t.overview.change.fromZero, { n: (format ?? number)(delta!.now) })
       : c.dir === 'same'
         ? t.overview.change.same
         : fmt(c.dir === 'up' ? t.overview.change.up : t.overview.change.down, {
@@ -83,7 +90,11 @@ export function Stat({
         >
           <Arrow aria-hidden className="size-3.5 shrink-0 rtl:-scale-x-100" strokeWidth={2.25} />
           <span className="font-semibold">{words}</span>
-          {vs ? <span className="text-muted">{vs}</span> : null}
+          {fromZero && vsZero ? (
+            <span className="text-muted">· {vsZero}</span>
+          ) : vs ? (
+            <span className="text-muted">{vs}</span>
+          ) : null}
         </p>
       ) : null}
       {sub ? <p className="mt-1.5 text-[12.5px] leading-[1.5] text-muted">{sub}</p> : null}
