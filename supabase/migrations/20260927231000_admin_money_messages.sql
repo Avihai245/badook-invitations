@@ -44,17 +44,11 @@ $$;
 
 -- ─── indexes for the console's time ranges ─────────────────────────────────────────────────────
 
+-- (the messages' and the ledger's own — by time, and the failed ones — come with *_admin_core.sql:
+-- whatsapp_messages_created/_failed, seating_notices_whatsapp/_failed, gallery_notices_whatsapp/_failed,
+-- credit_ledger_created)
 create index billing_checkouts_settled on public.billing_checkouts ((coalesce(completed_at, created_at)));
 create index billing_events_type_created on public.billing_events (type, created_at);
-create index credit_ledger_created on public.credit_ledger (created_at);
-create index whatsapp_messages_created on public.whatsapp_messages (created_at);
-create index seating_notices_created on public.seating_notices (created_at) where channel = 'whatsapp';
-create index gallery_notices_created on public.gallery_notices (created_at) where channel = 'whatsapp';
-create index whatsapp_messages_failed on public.whatsapp_messages (updated_at) where status = 'failed';
-create index seating_notices_failed on public.seating_notices (updated_at)
-  where status = 'failed' and channel = 'whatsapp';
-create index gallery_notices_failed on public.gallery_notices (updated_at)
-  where status = 'failed' and channel = 'whatsapp';
 
 -- ─── helpers (the functions below only) ────────────────────────────────────────────────────────
 
