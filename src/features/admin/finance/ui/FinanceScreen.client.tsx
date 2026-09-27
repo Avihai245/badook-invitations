@@ -430,15 +430,17 @@ function Payments({ data }: { data: FinancePageData }) {
   const pages = Math.max(1, Math.ceil(payments.total / payments.pageSize));
   const query = filtersQuery(filters);
   const canExport = can('finance.export');
-  const exportButton = canExport ? (
-    <ExportDialog query={query} total={payments.total} />
-  ) : (
-    <Hint text={t.finance.export.help} disabledText={t.finance.export.denied}>
-      <Button variant="secondary" size="sm" icon={<Download />} disabled data-testid="finance-export">
-        {t.finance.export.button}
-      </Button>
-    </Hint>
-  );
+  // (nothing to export when no payment matches: said on the button)
+  const exportButton =
+    canExport && payments.total > 0 ? (
+      <ExportDialog query={query} total={payments.total} />
+    ) : (
+      <Hint text={t.finance.export.help} disabledText={canExport ? P.empty : t.finance.export.denied}>
+        <Button variant="secondary" size="sm" icon={<Download />} disabled data-testid="finance-export">
+          {t.finance.export.button}
+        </Button>
+      </Hint>
+    );
   return (
     <Section id="payments" title={P.title} intro={P.intro} actions={exportButton}>
       <PaymentFiltersForm key={query} filters={filters} providers={payments.providers} />

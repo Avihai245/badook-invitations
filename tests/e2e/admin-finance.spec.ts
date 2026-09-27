@@ -186,6 +186,8 @@ test.describe('the cash flow', () => {
     await openConsole(page, `/app/admin/finance?q=${encodeURIComponent(host)}`);
     await waitLive(page);
     await expect(shown(page)).toHaveCount(0);
+    // nothing to export yet
+    await expect(page.getByTestId('finance-export')).toBeDisabled();
     await page.evaluate(() => ((window as unknown as { __stay: boolean }).__stay = true));
 
     // a host buys 100 WhatsApp messages in another browser
@@ -215,6 +217,7 @@ test.describe('the cash flow', () => {
     await expect(shown(page)).toHaveCount(1, { timeout: 20_000 });
     await expect(shown(page).first()).toHaveAttribute('data-status', 'paid');
     await expect(page.getByTestId('payments')).toContainText('100');
+    await expect(page.getByTestId('finance-export')).toBeEnabled();
     expect(await page.evaluate(() => (window as unknown as { __stay?: boolean }).__stay)).toBe(true);
 
     // this month's income (Israel): what the database adds up — other tests pay at the same time
