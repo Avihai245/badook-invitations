@@ -22,8 +22,8 @@ export const supportEn: typeof supportHe = {
   },
   tabs: {
     label: 'Ticket status',
-    open: 'Waiting for the team',
-    waiting: 'Waiting for the customer',
+    open: 'To answer',
+    waiting: 'Answered',
     closed: 'Closed',
     all: 'All',
   },
