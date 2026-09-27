@@ -394,6 +394,7 @@ function venueWorld() {
         floorPlan: fields.includes('floorPlan')
           ? plan && { ...plan, updatedAt: '2026-09-26T10:00:00Z' }
           : v.floorPlan,
+        owner: fields.includes('owner') ? values.owner : (v.owner ?? null),
       };
       venues.set(id, next);
       return {
@@ -414,6 +415,7 @@ function venueWorld() {
     planUrl: (path) => `https://cdn.example.com/venue-plans/${path}`,
     folder: (id) => `f-${id}`,
     newId: () => `file-${++n}`,
+    changed: vi.fn(),
   };
   return { deps, venues, stored, removed };
 }
@@ -541,6 +543,46 @@ describe('PUT / GET /api/partner/v1/venues/{venueId}', () => {
     expect(removed).toEqual(['venues/f-v/file-1.png']);
   });
 
+  it('the venue’s owner in Badook Events: sent with it, kept when not sent, cleared by null, checked', async () => {
+    const { deps } = venueWorld();
+    const created = await putVenue(
+      'hall-17',
+      {
+        name: 'אולמי הגן',
+        owner: { id: ' be-u-1 ', name: 'משה לוי', email: 'Moshe@Venue.Example.com', role: 'owner' },
+      },
+      deps,
+    );
+    const MOSHE = { id: 'be-u-1', name: 'משה לוי', email: 'moshe@venue.example.com', role: 'owner' };
+    expect(created).toMatchObject({ status: 201, body: { venue: { owner: MOSHE } } });
+    expect(vi.mocked(deps.put).mock.calls[0]![1]).toEqual(['name', 'owner']);
+    // the console hears of it
+    expect(deps.changed).toHaveBeenCalledTimes(1);
+    // another field only: the owner stays
+    expect((await putVenue('hall-17', { address: 'הרצל 1' }, deps)).body).toMatchObject({
+      venue: { address: 'הרצל 1', owner: MOSHE },
+    });
+    // an owner alone updates an existing venue; null clears it
+    expect((await putVenue('hall-17', { owner: { id: 'be-u-9' } }, deps)).body).toMatchObject({
+      venue: { owner: { id: 'be-u-9', name: null, email: null, role: null } },
+    });
+    expect((await putVenue('hall-17', { owner: null }, deps)).body).toMatchObject({ venue: { owner: null } });
+    // a new venue still needs its name; the owner is checked like createdBy
+    expect(await putVenue('new', { owner: { id: 'x' } }, deps)).toMatchObject({ status: 400 });
+    expect(await putVenue('hall-17', { owner: { name: 'no id' } }, deps)).toMatchObject({
+      status: 400,
+      body: { fields: ['owner.id'] },
+    });
+    expect(await putVenue('hall-17', { owner: { id: 'x', email: 'nope' } }, deps)).toMatchObject({
+      status: 400,
+      body: { fields: ['owner.email'] },
+    });
+    expect(await putVenue('hall-17', { owner: { id: 'x', admin: true } }, deps)).toMatchObject({
+      status: 400,
+      body: { fields: ['owner'] },
+    });
+  });
+
   it('a rate-limited partner gets 429; GET returns the venue or 404', async () => {
     const { deps } = venueWorld();
     await putVenue('v', { name: 'A' }, deps);
@@ -589,9 +631,29 @@ describe('a partner’s user and their venue', () => {
         links.set(id, v);
         return 'ok' as const;
       }),
+      // (recorded after the venue is set: the record keeps the account's venue then)
+      record: vi.fn(async () => {}),
+      changed: vi.fn(),
     };
     return { deps, links, manage: () => (current = user({ userManaged: true })) };
   };
+
+  it('the provisioning is recorded after the user joined the venue; a venue the database refuses undoes the user', async () => {
+    const { deps } = world();
+    const order: string[] = [];
+    vi.mocked(deps.setVenue!).mockImplementation(async () => (order.push('venue'), 'ok'));
+    vi.mocked(deps.record!).mockImplementation(async (_id, action) => void order.push(action));
+    await provisionUser(
+      { email: 'dana@example.com', fullName: 'Dana', venueId: 'hall-17', createdBy: { id: 'be-u-1' } },
+      deps,
+    );
+    expect(order).toEqual(['venue', 'created']);
+    vi.mocked(deps.setVenue!).mockRejectedValueOnce(new Error('database down'));
+    await expect(
+      provisionUser({ email: 'dana@example.com', fullName: 'Dana', venueId: 'hall-17' }, deps),
+    ).rejects.toThrow('database down');
+    expect(deps.deleteUser).toHaveBeenCalledTimes(1);
+  });
 
   it('POST /users with venueId links the user; an unknown venue creates nothing', async () => {
     const { deps } = world();

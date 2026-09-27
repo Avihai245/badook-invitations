@@ -297,6 +297,8 @@ test.describe('responses dashboard', () => {
     const faces = { expired: expect.any(Number), withoutFeature: expect.any(Number) };
     // …and the admin console's record of actions after two years
     const admin = { audit: expect.any(Number) };
+    // …and the partner API's calls and the log of emails after 90 days
+    const logs = { partnerCalls: expect.any(Number), emails: expect.any(Number) };
     expect(await first.json()).toEqual({
       sent: 1,
       failed: 0,
@@ -310,6 +312,7 @@ test.describe('responses dashboard', () => {
       insights,
       faces,
       admin,
+      logs,
     });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
@@ -325,6 +328,7 @@ test.describe('responses dashboard', () => {
       insights,
       faces,
       admin,
+      logs,
     });
   });
 });

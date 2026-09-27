@@ -10,9 +10,12 @@ import {
   provisionUser,
   removeDiscount,
   setDiscount,
+  type PartnerActor,
   type PartnerDeps,
   type PartnerUser,
+  type ProvisionAction,
 } from '@/features/partner/api';
+import { callOf, UnauthorizedBudget } from '@/features/partner/calls';
 
 type AuthUser = { id: string; email: string; tagged: boolean; managed: boolean };
 
@@ -43,6 +46,8 @@ function world() {
   let n = 1;
   /** the next createUser finds the email already taken (its owner signed up at that moment) */
   let raceOwner: string | null = null;
+  /** every provisioning recorded (partner_provisions), in order */
+  const provisions: { userId: string; action: ProvisionAction; by: PartnerActor | null }[] = [];
   const deps: PartnerDeps = {
     site: 'https://invitations.example.com',
     findUserByEmail: async (email) => users.get(email)?.id ?? null,
@@ -106,11 +111,14 @@ function world() {
     }),
     loginToken: vi.fn(async (email) => `hash-of-${email}`),
     rateHit: vi.fn(async () => true),
+    record: vi.fn(async (userId, action, by) => void provisions.push({ userId, action, by })),
+    changed: vi.fn(),
   };
   return {
     deps,
     users,
     accounts,
+    provisions,
     race: (email: string) => (raceOwner = email),
     manage: (email: string) => (users.get(email)!.managed = true),
   };
@@ -461,6 +469,145 @@ describe('the partner API', () => {
     expect((await removeDiscount(new URLSearchParams(''), deps)).status).toBe(400);
     vi.mocked(deps.rateHit).mockResolvedValueOnce(false);
     expect((await setDiscount({ externalId: 'be-8', percent: 10 }, deps, now)).status).toBe(429);
+  });
+
+  it('records who in Badook Events opened, claimed or updated each user, and each sign-in link', async () => {
+    const { deps, users, provisions } = world();
+    const ronit = {
+      id: ' be-u-7 ',
+      name: ' רונית כהן ',
+      email: ' Ronit@Venue.Example.com ',
+      role: 'manager',
+    };
+    const made = await provisionUser(
+      { email: 'dana@example.com', fullName: 'Dana', externalId: 'be-1', createdBy: ronit },
+      deps,
+    );
+    expect(made.status).toBe(201);
+    const userId = userOf(made).userId;
+    // the same user again, by someone else; a call that doesn't say who
+    await provisionUser(
+      { email: 'dana@example.com', fullName: 'Dana L.', createdBy: { id: 'be-u-1', role: 'owner' } },
+      deps,
+    );
+    await provisionUser({ email: 'dana@example.com', fullName: 'Dana L.' }, deps);
+    // a user the partner created earlier and never linked: claimed now
+    users.set('orphan@example.com', {
+      id: '00000000-0000-4000-8000-000000000099',
+      email: 'orphan@example.com',
+      tagged: true,
+      managed: false,
+    });
+    await provisionUser(
+      { email: 'orphan@example.com', fullName: 'O', createdBy: { id: 'be-u-2', name: 'Avi' } },
+      deps,
+    );
+    // a fresh sign-in link; a new email and a venue change, each by whoever says so
+    await createLoginLink({ externalId: 'be-1' }, deps);
+    await changeEmail(
+      { externalId: 'be-1', email: 'dana.l@example.com', createdBy: { id: 'be-u-7', name: 'רונית כהן' } },
+      deps,
+    );
+    const RONIT = { id: 'be-u-7', name: 'רונית כהן', email: 'ronit@venue.example.com', role: 'manager' };
+    expect(provisions).toEqual([
+      { userId, action: 'created', by: RONIT },
+      { userId, action: 'updated', by: { id: 'be-u-1', name: null, email: null, role: 'owner' } },
+      { userId, action: 'updated', by: null },
+      {
+        userId: '00000000-0000-4000-8000-000000000099',
+        action: 'linked',
+        by: { id: 'be-u-2', name: 'Avi', email: null, role: null },
+      },
+      { userId, action: 'login_link', by: null },
+      { userId, action: 'updated', by: { id: 'be-u-7', name: 'רונית כהן', email: null, role: null } },
+    ]);
+    // the console hears of each account opened or updated (not of a sign-in link)
+    expect(deps.changed).toHaveBeenCalledTimes(5);
+  });
+
+  it('createdBy is optional; when sent it is checked (strict, an id, sizes, an email)', async () => {
+    const { deps, provisions } = world();
+    const bad = async (createdBy: unknown) =>
+      (await provisionUser({ email: 'x@example.com', fullName: 'X', createdBy }, deps)).body;
+    expect(await bad({ name: 'No id' })).toMatchObject({ code: 'invalid', fields: ['createdBy.id'] });
+    expect(await bad({ id: '' })).toMatchObject({ fields: ['createdBy.id'] });
+    expect(await bad({ id: 'x'.repeat(201) })).toMatchObject({ fields: ['createdBy.id'] });
+    expect(await bad({ id: 'u1', name: 'n'.repeat(121) })).toMatchObject({ fields: ['createdBy.name'] });
+    expect(await bad({ id: 'u1', role: 'r'.repeat(61) })).toMatchObject({ fields: ['createdBy.role'] });
+    expect(await bad({ id: 'u1', email: 'not-an-email' })).toMatchObject({ fields: ['createdBy.email'] });
+    expect(await bad({ id: 'u1', permissions: ['all'] })).toMatchObject({ fields: ['createdBy'] });
+    expect(await bad('u1')).toMatchObject({ fields: ['createdBy'] });
+    expect(provisions).toEqual([]);
+    expect(deps.createUser).not.toHaveBeenCalled();
+    // empty name, email and role: left out; null: nobody said
+    expect(await bad({ id: 'u1', name: ' ', email: '', role: '' })).toMatchObject({ ok: true });
+    expect(await bad(null)).toMatchObject({ ok: true });
+    expect(provisions.map((p) => p.by)).toEqual([{ id: 'u1', name: null, email: null, role: null }, null]);
+    // PATCH checks it the same way
+    expect(
+      (await changeEmail({ externalId: 'x', email: 'y@example.com', createdBy: { id: 1 } }, deps)).body,
+    ).toMatchObject({ fields: ['createdBy.id'] });
+  });
+
+  it('a user just opened whose provisioning can’t be recorded is deleted again (a retry records it)', async () => {
+    const { deps, users, provisions } = world();
+    vi.mocked(deps.record!).mockRejectedValueOnce(new Error('database down'));
+    await expect(
+      provisionUser({ email: 'dana@example.com', fullName: 'Dana', createdBy: { id: 'be-u-7' } }, deps),
+    ).rejects.toThrow('database down');
+    expect(deps.deleteUser).toHaveBeenCalledTimes(1);
+    expect(users.has('dana@example.com')).toBe(false);
+    expect(deps.changed).not.toHaveBeenCalled();
+    const retry = await provisionUser(
+      { email: 'dana@example.com', fullName: 'Dana', createdBy: { id: 'be-u-7' } },
+      deps,
+    );
+    expect(retry.status).toBe(201);
+    expect(provisions).toEqual([
+      {
+        userId: userOf(retry).userId,
+        action: 'created',
+        by: { id: 'be-u-7', name: null, email: null, role: null },
+      },
+    ]);
+  });
+
+  it('what it refuses records nothing', async () => {
+    const { deps, provisions } = world();
+    deps.reservedEmail = vi.fn(async (email: string) => email === 'staff@example.com');
+    await provisionUser({ email: 'self@example.com', fullName: 'X', createdBy: { id: 'u' } }, deps);
+    await provisionUser({ email: 'staff@example.com', fullName: 'X', createdBy: { id: 'u' } }, deps);
+    await createLoginLink({ externalId: 'nobody' }, deps);
+    await changeEmail({ externalId: 'nobody', email: 'z@example.com', createdBy: { id: 'u' } }, deps);
+    expect(provisions).toEqual([]);
+    expect(deps.changed).not.toHaveBeenCalled();
+  });
+
+  it('the record of calls keeps the route, the answer’s status and code, the account and the time — no more', () => {
+    const user = { userId: '00000000-0000-4000-8000-000000000042', email: 'dana@example.com' };
+    expect(callOf('post', '/users', { status: 201, body: { ok: true, user, loginUrl: 'x' } }, 12.4)).toEqual({
+      method: 'POST',
+      endpoint: '/users',
+      status: 201,
+      code: null,
+      userId: user.userId,
+      durationMs: 12,
+    });
+    expect(
+      callOf('POST', '/login-links', { status: 409, body: { ok: false, code: 'user_managed' } }, 3),
+    ).toMatchObject({ status: 409, code: 'user_managed', userId: null });
+    expect(
+      callOf('POST', '/login-links', { status: 200, body: { ok: true, userId: user.userId } }, 3),
+    ).toMatchObject({ userId: user.userId });
+    // what isn't an id or a code isn't kept
+    expect(
+      callOf('GET', '/users', { status: 400, body: { ok: false, code: 'Bad Code!', userId: 'x' } }, -1),
+    ).toMatchObject({ code: null, userId: null, durationMs: 0 });
+    // anyone can call without the key: a limited number an hour is recorded
+    const budget = new UnauthorizedBudget(2, 1000);
+    // two in any second; the first leaves the window at 1000
+    const taken = [0, 10, 20, 1005, 1006].map((t) => budget.take(t));
+    expect(taken).toEqual([true, true, false, true, false]);
   });
 
   it('a day’s end is midnight in Israel, summer or winter', () => {

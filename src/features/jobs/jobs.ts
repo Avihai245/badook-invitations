@@ -1,5 +1,6 @@
 import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
+import { consoleLogsHousekeeping } from '@/features/admin/messages/server';
 import { adminDb } from '@/features/admin/server/db';
 import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
@@ -70,6 +71,8 @@ export async function runDaily(now: Date) {
   const admin = await adminDb
     .maintenance()
     .catch((err) => (console.error('admin console housekeeping failed', err), null));
+  // the partner API's calls and the log of emails are kept 90 days
+  const logs = await consoleLogsHousekeeping();
   return {
     ...digests,
     purged: (purged as number | null) ?? null,
@@ -82,6 +85,7 @@ export async function runDaily(now: Date) {
     insights,
     faces,
     admin,
+    logs,
   };
 }
 

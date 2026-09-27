@@ -15,6 +15,7 @@ export async function alertSupport(subject: string, details: Record<string, unkn
     .join('\n');
   await sendEmail({
     to: env.INVITES_SUPPORT_EMAIL,
+    kind: 'billing_alert',
     subject: `[${env.INVITES_BRAND_NAME} billing] ${subject}`,
     text,
     html: `<pre>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</pre>`,

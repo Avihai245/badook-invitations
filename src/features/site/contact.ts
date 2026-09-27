@@ -93,6 +93,7 @@ export async function submitContact(
     ];
     await sendEmail({
       to: env.INVITES_SUPPORT_EMAIL,
+      kind: 'contact',
       replyTo: m.email,
       subject: `[${env.INVITES_BRAND_NAME}] ${m.topic}: ${m.name}`,
       text: `${lines.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\n${m.message}`,
