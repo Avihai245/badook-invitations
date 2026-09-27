@@ -58,7 +58,12 @@ export interface AccountPlanState {
   plan: PlanId;
   planStatus: 'active' | 'trialing' | 'past_due' | 'canceled';
   planRenewsAt: string | null;
+  /** who charges for the plan: 'payplus', 'test' — or 'gift' (the Badook team gave it, until planRenewsAt) */
+  billingProvider?: string | null;
 }
+
+/** A plan the Badook team gave as a gift: no charge, no renewal, it ends by itself (admin console). */
+export const GIFT_PROVIDER = 'gift';
 
 const DAY = 86_400_000;
 /** How long a paid plan stays after a renewal that never came (a failed charge, a lost notice). */
@@ -66,13 +71,16 @@ export const RENEWAL_GRACE_DAYS = 14;
 
 /**
  * The plan in force now: a canceled subscription keeps its plan until the end of the paid period; a
- * renewal that never came keeps it for a two-week grace; the platform's admins always have the top plan.
+ * gift from the team lasts until its date (no grace: nothing was going to renew it); a renewal that
+ * never came keeps it for a two-week grace; the platform's admins always have the top plan.
+ * (supabase/migrations/*_admin_core.sql admin_effective_plan: the same rules, for the console.)
  */
 export function effectivePlan(state: AccountPlanState, now: number, admin = false): PlanId {
   if (admin) return 'business';
   if (state.plan === 'free') return 'free';
   const renews = state.planRenewsAt ? Date.parse(state.planRenewsAt) : null;
-  if (state.planStatus === 'canceled') return renews && renews > now ? state.plan : 'free';
+  if (state.planStatus === 'canceled' || state.billingProvider === GIFT_PROVIDER)
+    return renews && renews > now ? state.plan : 'free';
   if (renews && renews + RENEWAL_GRACE_DAYS * DAY < now) return 'free';
   return state.plan;
 }
