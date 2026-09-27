@@ -1,4 +1,5 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { sql } from '../support/phase5b';
 
 // The partner API (Badook Events → here): opening a user with name, email and phone, the one-time
 // sign-in link it returns (a page with a "Continue" button: opening it — as a mail scanner would —
@@ -211,6 +212,105 @@ test.describe('the partner API', () => {
         })
       ).status(),
     ).toBe(404);
+  });
+
+  test('says which of its users opened an account (optional, checked); a venue names its owner; every call is recorded', async ({
+    request,
+  }, testInfo) => {
+    const tag = `${testInfo.project.name}-${Date.now()}`;
+    const venue = `hall-by-${tag}`;
+    const put = await request.put(`/api/partner/v1/venues/${venue}`, {
+      data: { name: 'אולם הבדיקה', owner: { id: `be-owner-${tag}`, name: 'משה לוי', role: 'owner' } },
+      headers: auth,
+    });
+    expect(put.status()).toBe(201);
+    expect(await put.json()).toMatchObject({
+      venue: { owner: { id: `be-owner-${tag}`, name: 'משה לוי', email: null, role: 'owner' } },
+    });
+
+    // opened by a manager there
+    const res = await provision(request, {
+      email: `by-${tag}@example.com`,
+      fullName: 'דנה כהן',
+      externalId: `be-by-${tag}`,
+      venueId: venue,
+      createdBy: { id: `be-u-${tag}`, name: 'רונית כהן', email: 'Ronit@Venue.Example.com', role: 'manager' },
+    });
+    expect(res.status()).toBe(201);
+    const { user } = (await res.json()) as { user: { userId: string } };
+    // updated later by someone else, and a fresh sign-in link
+    await request.patch('/api/partner/v1/users', {
+      data: { externalId: `be-by-${tag}`, venueId: venue, createdBy: { id: `be-u2-${tag}`, name: 'אבי' } },
+      headers: auth,
+    });
+    expect(
+      (
+        await request.post('/api/partner/v1/login-links', {
+          data: { externalId: `be-by-${tag}` },
+          headers: auth,
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      await sql(
+        `select p.action, p.created_by_id, p.created_by_name, p.created_by_email, p.created_by_role, v.external_id as venue
+         from public.partner_provisions p left join public.partner_venues v on v.id = p.venue_id
+         where p.user_id = $1 order by p.id`,
+        [user.userId],
+      ),
+    ).toEqual([
+      {
+        action: 'created',
+        created_by_id: `be-u-${tag}`,
+        created_by_name: 'רונית כהן',
+        created_by_email: 'ronit@venue.example.com',
+        created_by_role: 'manager',
+        venue,
+      },
+      {
+        action: 'updated',
+        created_by_id: `be-u2-${tag}`,
+        created_by_name: 'אבי',
+        created_by_email: null,
+        created_by_role: null,
+        venue,
+      },
+      {
+        action: 'login_link',
+        created_by_id: null,
+        created_by_name: null,
+        created_by_email: null,
+        created_by_role: null,
+        venue,
+      },
+    ]);
+
+    // without createdBy: as before; a createdBy without an id, or with what isn't in it: refused, nothing opened
+    expect((await provision(request, { email: `plain-${tag}@example.com`, fullName: 'X' })).status()).toBe(
+      201,
+    );
+    for (const createdBy of [
+      { name: 'no id' },
+      { id: 'x', admin: true },
+      { id: 'x', email: 'not-an-email' },
+    ]) {
+      const bad = await provision(request, { email: `bad-${tag}@example.com`, fullName: 'X', createdBy });
+      expect(bad.status()).toBe(400);
+      expect(((await bad.json()) as { code: string }).code).toBe('invalid');
+    }
+    expect(await sql(`select 1 from auth.users where email = $1`, [`bad-${tag}@example.com`])).toEqual([]);
+
+    // the record of calls: the route, the answer and the account — nothing sent
+    await expect
+      .poll(async () =>
+        (
+          await sql<{ method: string; endpoint: string; status: number; code: string | null }>(
+            `select method, endpoint, status, code from public.partner_api_calls where user_id = $1 order by id`,
+            [user.userId],
+          )
+        ).map((c) => `${c.method} ${c.endpoint} ${c.status}${c.code ? ` ${c.code}` : ''}`),
+      )
+      .toEqual(['POST /users 201', 'PATCH /users 200', 'POST /login-links 200']);
   });
 
   test('an account opened by its owner stays theirs', async ({ page, request }, testInfo) => {

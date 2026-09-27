@@ -633,7 +633,12 @@ function PaymentsList({ rows }: { rows: PaymentRow[] }) {
       <ul className="flex flex-col divide-y divide-line md:hidden">
         {rows.length === 0 ? <li>{empty}</li> : null}
         {rows.map((r) => (
-          <li key={`${r.kind}:${r.id}`} className="flex flex-col gap-1.5 py-3" data-payment={r.id}>
+          <li
+            key={`${r.kind}:${r.id}`}
+            className="flex flex-col gap-1.5 py-3"
+            data-payment={r.id}
+            data-status={r.status}
+          >
             <div className="flex items-start justify-between gap-3">
               {customer(r)}
               <span className="shrink-0 text-[15px] font-bold tabular-nums">{amount(r)}</span>
