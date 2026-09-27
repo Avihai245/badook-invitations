@@ -1,11 +1,9 @@
 import 'server-only';
 import { planPrices } from '@/features/billing/server/account';
 import { serverEnv } from '@/lib/env';
-import type { UiLocale } from '@/lib/i18n/app';
-import { adminDict } from '../i18n';
 import { adminRpc } from '../server/db';
 import type { Staff } from '../server/gate';
-import type { ExportDeps } from './api';
+import { paymentsCsvLabels, type ExportDeps } from './api';
 import {
   financeView,
   PAYMENTS_PAGE_SIZE,
@@ -13,7 +11,6 @@ import {
   type FinanceView,
   type PaymentFilters,
   type PaymentRow,
-  type PaymentsCsvLabels,
   type PaymentsPage,
 } from './model';
 
@@ -73,18 +70,6 @@ export async function loadFinance(
     view: financeView(raw, serverEnv().INVITES_USD_TO_ILS),
     payments: { ...payments, page, pageSize: PAYMENTS_PAGE_SIZE },
     filters,
-  };
-}
-
-/** The spreadsheet's words in the console's language. */
-export function paymentsCsvLabels(locale: UiLocale): PaymentsCsvLabels {
-  const f = adminDict(locale).finance;
-  return {
-    headers: f.csv,
-    kinds: f.kinds,
-    statuses: f.statuses,
-    products: f.products,
-    deleted: f.deletedAccount,
   };
 }
 

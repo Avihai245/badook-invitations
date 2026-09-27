@@ -1,4 +1,5 @@
 import type { UiLocale } from '@/lib/i18n/app';
+import { adminDict } from '../i18n';
 import { can, type StaffRole } from '../permissions';
 import {
   parsePaymentFilters,
@@ -19,6 +20,18 @@ export interface ExportDeps {
   rows(actor: string, filters: PaymentFilters): Promise<PaymentRow[]>;
   labels(locale: UiLocale): PaymentsCsvLabels;
   now(): number;
+}
+
+/** The spreadsheet's words in the console's language. */
+export function paymentsCsvLabels(locale: UiLocale): PaymentsCsvLabels {
+  const f = adminDict(locale).finance;
+  return {
+    headers: f.csv,
+    kinds: f.kinds,
+    statuses: f.statuses,
+    products: f.products,
+    deleted: f.deletedAccount,
+  };
 }
 
 /** A file to hand the browser, or why not. */
