@@ -211,6 +211,27 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'hills',
     ornament: 'heart',
   },
+  // the scroll scene: its pictures ship with it (templates/placeholder-media.json) — this only stands
+  // in where one is missing (and draws its cover card): a pale sky over banks of cloud and cream
+  celestial: {
+    sky:
+      'radial-gradient(40% 20% at 50% 26%,rgba(255,250,236,.9),rgba(255,244,220,0) 70%),' +
+      'radial-gradient(90% 50% at 50% 100%,rgba(30,42,62,.45),transparent 70%),' +
+      'linear-gradient(180deg,#6F93BD 0%,#93B3D6 28%,#BCD1E6 50%,#D9D4C8 72%,#8C8A86 88%,#4B5566 100%)',
+    shade: '#6E84A3',
+    cloud: 'rgba(255,255,255,.62)',
+    hills: ['#C9D6E4', '#B3C3D6', '#9DB0C7', '#7F93AD'],
+    cover: {
+      bg: ['#F4ECDD', '#EDE3D1', '#E4D8C3'],
+      envelope: ['#F7F1E6', '#EFE6D6'],
+      pocket: ['#F9F4EA', '#F0E8DA'],
+      flap: ['#EFE6D6', '#E6DAC6'],
+      card: 'linear-gradient(180deg,#93B3D6 0%,#BCD1E6 50%,#F4ECDD 100%)',
+      hint: '#5E5042',
+    },
+    panorama: 'hills',
+    ornament: 'rings',
+  },
   // a photographic design: its pictures ship with it (templates/placeholder-media.json) — this only
   // stands in where one is missing, a warm evening in its palette
   lumiere: {

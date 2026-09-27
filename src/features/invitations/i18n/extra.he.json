@@ -26,6 +26,7 @@
   "cover.hint.curtain": "לחצו לפתיחת המסך",
   "cover.hint.fireworks": "לחצו להדלקת הזיקוקים",
   "cover.hint.gold_dust": "לחצו לפתיחה",
+  "cover.hint.gatefold": "הקישו לפתיחה",
   "locale.menu": "שפה",
   "missing.metaTitle": "ההזמנה לא זמינה",
   "missing.title": "ההזמנה לא זמינה כרגע",
@@ -46,5 +47,6 @@
   "liveGallery.qr": "סרקו כדי להעלות מהטלפון",
   "liveGallery.qrAfter": "סרקו כדי לראות בטלפון",
   "liveGallery.qrLabel": "קוד QR לגלריה של האירוע",
-  "liveGallery.preview": "הכפתור יוביל לגלריה החיה של האירוע, כשהיא מופעלת"
+  "liveGallery.preview": "הכפתור יוביל לגלריה החיה של האירוע, כשהיא מופעלת",
+  "scene.rsvp": "אישור הגעה"
 }

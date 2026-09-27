@@ -26,6 +26,7 @@
   "cover.hint.curtain": "Tap to open the curtain",
   "cover.hint.fireworks": "Tap to light up the sky",
   "cover.hint.gold_dust": "Tap to open",
+  "cover.hint.gatefold": "Tap to open",
   "locale.menu": "Language",
   "missing.metaTitle": "Invitation not available",
   "missing.title": "This invitation isn’t available right now",
@@ -46,5 +47,6 @@
   "liveGallery.qr": "Scan to upload from your phone",
   "liveGallery.qrAfter": "Scan to see it on your phone",
   "liveGallery.qrLabel": "QR code to the event’s gallery",
-  "liveGallery.preview": "The button leads to the event’s live gallery once it is on"
+  "liveGallery.preview": "The button leads to the event’s live gallery once it is on",
+  "scene.rsvp": "RSVP"
 }

@@ -1,0 +1,681 @@
+{
+  "templateId": "celestial",
+  "defaults": {
+    "wedding": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "אנחנו מתחתנים",
+        "en": "We are getting married"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שנגיד כן",
+          "en": "Until we say yes"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הסיפור שלנו",
+          "en": "Our story"
+        },
+        "body": {
+          "he": "נפגשנו מתחת לשמיים הכי רגילים,\nומאז כל יום יחד מרגיש קצת כמו מעל העננים.\nב־{date} אנחנו מתחילים את הפרק הבא — ורוצים אתכם איתנו.",
+          "en": "We met under the most ordinary sky,\nand every day together has felt a little like above the clouds.\nOn {date} we begin the next chapter — and we want you with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המקום",
+          "en": "The venue"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:30",
+          "label": {
+            "he": "חופה וקידושין",
+            "en": "The chuppah"
+          },
+          "icon": "chuppah"
+        },
+        {
+          "time": "21:15",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "רוקדים עד הבוקר",
+            "en": "Dancing till dawn"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נשמח לראותכם",
+          "en": "We would love to see you"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כמה מילים לזוג",
+          "en": "A few words for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בין העננים",
+          "en": "Thank you — see you above the clouds"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם. נתגעגע",
+          "en": "Thank you for letting us know. We will miss you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "נתראה בין העננים",
+        "en": "See you above the clouds"
+      },
+      "when": {
+        "title": {
+          "he": "התאריך",
+          "en": "The date",
+          "ru": "Дата",
+          "ar": "الموعد",
+          "fr": "La date",
+          "es": "La fecha",
+          "am": "ቀኑ"
+        },
+        "note": null
+      },
+      "parents": {
+        "title": {
+          "he": "באהבה, ההורים",
+          "en": "With love, our parents",
+          "ru": "С любовью, наши родители",
+          "ar": "مع محبة والدينا",
+          "fr": "Avec l’amour de nos parents",
+          "es": "Con cariño, nuestros padres",
+          "am": "በፍቅር፣ ወላጆቻችን"
+        },
+        "note": null
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "השער נפתח, והעננים מחכים.\nבשמחה ובהתרגשות אנו מזמינים אתכם\nלחגוג איתנו את היום שבו מתחיל הפרק היפה ביותר שלנו.",
+            "en": "The gate is open, and the clouds are waiting.\nWith joy and excitement we invite you\nto celebrate the day our most beautiful chapter begins.",
+            "ru": "Врата открыты, и облака ждут.\nС радостью и волнением мы приглашаем вас\nотпраздновать с нами день, когда начнётся самая прекрасная глава нашей жизни.",
+            "ar": "البوابة مفتوحة، والغيوم بانتظارنا.\nبكل فرح وحماس ندعوكم\nلتحتفلوا معنا باليوم الذي يبدأ فيه أجمل فصل في حياتنا.",
+            "fr": "Le portail s’ouvre, les nuages nous attendent.\nC’est avec joie et émotion que nous vous invitons\nà célébrer avec nous le jour où commence notre plus beau chapitre.",
+            "es": "La puerta se abre y las nubes nos esperan.\nCon alegría y emoción los invitamos\na celebrar con nosotros el día en que comienza nuestro capítulo más bonito.",
+            "am": "በሩ ተከፍቷል፣ ደመናዎቹም ይጠብቃሉ።\nበደስታና በጉጉት እንጋብዛችኋለን፤\nየሕይወታችን እጅግ ውብ ምዕራፍ የሚጀምርበትን ቀን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "engagement": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "אנחנו מתארסים",
+        "en": "We are engaged"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד שנרים כוסית",
+          "en": "Until we raise a glass"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "הסיפור שלנו",
+          "en": "Our story"
+        },
+        "body": {
+          "he": "מתחת לשמיים הכי רגילים מצאנו אחד את השנייה.\nעכשיו זה רשמי — ב־{date} אנחנו חוגגים את זה איתכם.",
+          "en": "Under the most ordinary sky we found each other.\nNow it is official — on {date} we celebrate it with you."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המקום",
+          "en": "The venue"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:30",
+          "label": {
+            "he": "הרמת כוסית",
+            "en": "A toast"
+          },
+          "icon": "toast"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "22:00",
+          "label": {
+            "he": "חוגגים",
+            "en": "Celebrating"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נשמח לראותכם",
+          "en": "We would love to see you"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "כמה מילים לזוג",
+          "en": "A few words for the couple"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בין העננים",
+          "en": "Thank you — see you above the clouds"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם. נתגעגע",
+          "en": "Thank you for letting us know. We will miss you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "נתראה בין העננים",
+        "en": "See you above the clouds"
+      },
+      "when": {
+        "title": {
+          "he": "התאריך",
+          "en": "The date",
+          "ru": "Дата",
+          "ar": "الموعد",
+          "fr": "La date",
+          "es": "La fecha",
+          "am": "ቀኑ"
+        },
+        "note": null
+      },
+      "parents": {
+        "title": {
+          "he": "באהבה, ההורים",
+          "en": "With love, our parents",
+          "ru": "С любовью, наши родители",
+          "ar": "مع محبة والدينا",
+          "fr": "Avec l’amour de nos parents",
+          "es": "Con cariño, nuestros padres",
+          "am": "በፍቅር፣ ወላጆቻችን"
+        },
+        "note": null
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "אמרנו כן — ועכשיו אנחנו רוצים לחגוג את זה איתכם.\nבואו להרים איתנו כוסית מעל העננים.",
+            "en": "We said yes — and now we want to celebrate it with you.\nCome raise a glass with us above the clouds.",
+            "ru": "Мы сказали «да» — и теперь хотим отпраздновать это с вами.\nПоднимите с нами бокал над облаками.",
+            "ar": "قلنا نعم — والآن نريد أن نحتفل بذلك معكم.\nتعالوا نرفع الكؤوس معًا فوق الغيوم.",
+            "fr": "Nous avons dit oui — et nous voulons le fêter avec vous.\nVenez lever un verre avec nous au-dessus des nuages.",
+            "es": "Dijimos que sí, y ahora queremos celebrarlo con ustedes.\nVengan a brindar con nosotros por encima de las nubes.",
+            "am": "አዎ ብለናል — አሁን ደግሞ ከእናንተ ጋር ልናከብረው እንፈልጋለን።\nከደመናዎች በላይ አብረን ጽዋ እናንሳ።"
+          }
+        }
+      ]
+    },
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "הבר מצווה של",
+        "en": "The bar mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד היום הגדול",
+          "en": "Until the big day"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "קצת עליו",
+          "en": "A little about him"
+        },
+        "body": {
+          "he": "שלוש עשרה שנים של צחוק, סקרנות ולב גדול.\nב־{date} אנחנו חוגגים את הרגע הזה — ורוצים אתכם איתנו.",
+          "en": "Thirteen years of laughter, curiosity and a big heart.\nOn {date} we celebrate this moment — and we want you with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המקום",
+          "en": "The venue"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "עלייה לתורה וברכות",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "רוקדים וחוגגים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נשמח לראותכם",
+          "en": "We would love to see you"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה קטנה",
+          "en": "A few kind words"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בין העננים",
+          "en": "Thank you — see you above the clouds"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם. נתגעגע",
+          "en": "Thank you for letting us know. We will miss you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "נתראה בין העננים",
+        "en": "See you above the clouds"
+      },
+      "when": {
+        "title": {
+          "he": "התאריך",
+          "en": "The date",
+          "ru": "Дата",
+          "ar": "الموعد",
+          "fr": "La date",
+          "es": "La fecha",
+          "am": "ቀኑ"
+        },
+        "note": null
+      },
+      "parents": {
+        "title": {
+          "he": "באהבה, ההורים",
+          "en": "With love, the parents",
+          "ru": "С любовью, родители",
+          "ar": "مع محبة الوالدين",
+          "fr": "Avec l’amour des parents",
+          "es": "Con cariño, los padres",
+          "am": "በፍቅር፣ ወላጆች"
+        },
+        "note": null
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "השער נפתח, והשמיים מלאים שמחה.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבר מצווה.",
+            "en": "The gate is open, and the sky is full of joy.\nWith great excitement we invite you\nto celebrate the bar mitzvah with us.",
+            "ru": "Врата открыты, и небо полно радости.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бар-мицву.",
+            "ar": "البوابة مفتوحة، والسماء مليئة بالفرح.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبار متسفا.",
+            "fr": "Le portail s’ouvre, et le ciel est plein de joie.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bar-mitsva avec nous.",
+            "es": "La puerta se abre y el cielo se llena de alegría.\nCon gran emoción los invitamos\na celebrar con nosotros el bar mitzvá.",
+            "am": "በሩ ተከፍቷል፣ ሰማዩም በደስታ ተሞልቷል።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባር ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    },
+    "bat_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "הבת מצווה של",
+        "en": "The bat mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד היום הגדול",
+          "en": "Until the big day"
+        },
+        "afterEvent": {
+          "he": "תודה שחגגתם איתנו",
+          "en": "Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "קצת עליה",
+          "en": "A little about her"
+        },
+        "body": {
+          "he": "שתים עשרה שנים של צחוק, סקרנות ולב גדול.\nב־{date} אנחנו חוגגים את הרגע הזה — ורוצים אתכם איתנו.",
+          "en": "Twelve years of laughter, curiosity and a big heart.\nOn {date} we celebrate this moment — and we want you with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "המקום",
+          "en": "The venue"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ונרות",
+            "en": "Blessings and candles"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "רוקדים וחוגגים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נשמח לראותכם",
+          "en": "We would love to see you"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה קטנה",
+          "en": "A few kind words"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בין העננים",
+          "en": "Thank you — see you above the clouds"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם. נתגעגע",
+          "en": "Thank you for letting us know. We will miss you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "נתראה בין העננים",
+        "en": "See you above the clouds"
+      },
+      "when": {
+        "title": {
+          "he": "התאריך",
+          "en": "The date",
+          "ru": "Дата",
+          "ar": "الموعد",
+          "fr": "La date",
+          "es": "La fecha",
+          "am": "ቀኑ"
+        },
+        "note": null
+      },
+      "parents": {
+        "title": {
+          "he": "באהבה, ההורים",
+          "en": "With love, the parents",
+          "ru": "С любовью, родители",
+          "ar": "مع محبة الوالدين",
+          "fr": "Avec l’amour des parents",
+          "es": "Con cariño, los padres",
+          "am": "በፍቅር፣ ወላጆች"
+        },
+        "note": null
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "השער נפתח, והשמיים מלאים שמחה.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבת מצווה.",
+            "en": "The gate is open, and the sky is full of joy.\nWith great excitement we invite you\nto celebrate the bat mitzvah with us.",
+            "ru": "Врата открыты, и небо полно радости.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бат-мицву.",
+            "ar": "البوابة مفتوحة، والسماء مليئة بالفرح.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبات متسفا.",
+            "fr": "Le portail s’ouvre, et le ciel est plein de joie.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bat-mitsva avec nous.",
+            "es": "La puerta se abre y el cielo se llena de alegría.\nCon gran emoción los invitamos\na celebrar con nosotros el bat mitzvá.",
+            "am": "በሩ ተከፍቷል፣ ሰማዩም በደስታ ተሞልቷል።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባት ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ]
+    }
+  }
+}

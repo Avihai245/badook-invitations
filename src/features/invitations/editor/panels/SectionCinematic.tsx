@@ -10,6 +10,8 @@ import {
   DEFAULT_SECTION_ANIMATION,
   type MotionEasing,
   type Palette,
+  type SceneDrift,
+  type SceneZoom,
   type ScrollEffect,
   type Section,
   type SectionLayout,
@@ -25,9 +27,17 @@ import {
   scrimForPhoto,
   type PhotoPalette,
 } from '../../lib/photo-palette';
+import { sceneOn } from '../../renderer/scene/model';
 import { resolvePalette, scrimOf } from '../../renderer/theme';
 import { HelpFor } from '../../app/HelpFor';
-import { FieldFrame, L10nField, PanelCard, RangeField, usePreviewControls } from '../fields/fields';
+import {
+  FieldFrame,
+  L10nField,
+  PanelCard,
+  RangeField,
+  SegmentedField,
+  usePreviewControls,
+} from '../fields/fields';
 import { SectionMediaField } from '../fields/SectionMedia';
 import {
   ENTER_CHOICES,
@@ -52,6 +62,8 @@ import { useEditor } from '../state/EditorProvider';
  * picture is its own form's). The form shows them after the section's content.
  */
 export function SectionCinematic({ section, index }: { section: Section; index: number }) {
+  const { doc, template } = useEditor();
+  const film = sceneOn(doc, template, true);
   if (section.type === 'hero')
     return (
       <>
@@ -68,7 +80,8 @@ export function SectionCinematic({ section, index }: { section: Section; index: 
           <MediaExtras section={section} index={index} />
         </PanelCard>
       ) : null}
-      {media ? <LayoutCard section={section} index={index} /> : null}
+      {/* an animated invitation: the picture is the part's background — no layout to choose */}
+      {media && !film ? <LayoutCard section={section} index={index} /> : null}
       <MotionCard section={section} index={index} />
       <ColorsCard section={section} index={index} />
     </>
@@ -95,20 +108,50 @@ function CardTitleWithHelp({
 
 const ON_MEDIA: readonly SectionLayout[] = ['full_bleed', 'parallax', 'video_bg'];
 
-/** The scrim slider (text on the picture) and the description (a framed picture). */
+/**
+ * The scrim slider (text on the picture) and the description (a framed picture) — or, in an animated
+ * invitation (renderer/scene), how the picture moves as the part's background.
+ */
 function MediaExtras({ section, index }: { section: Section; index: number }) {
-  const { template, apply } = useEditor();
+  const { doc, template, apply } = useEditor();
   const { t } = useUi();
   const c = t.editor.cine.media;
   const media = section.type === 'hero' ? null : section.media;
   if (!media) return null;
+  const film = sceneOn(doc, template, true);
   const layout = layoutOf(section);
   const path = `sections.${index}.media`;
-  const auto = scrimOf(template).opacity;
+  const auto = film ? 0.5 : scrimOf(template).opacity;
   const value = media.overlay ?? null;
   return (
     <>
-      {ON_MEDIA.includes(layout) ? (
+      {film ? (
+        <>
+          <p className="text-[12px] text-muted">{c.sceneNote}</p>
+          <SegmentedField<SceneZoom>
+            path={`${path}.kenBurns`}
+            label={c.sceneZoom}
+            value={media.kenBurns ?? 'in'}
+            onValueChange={(v) =>
+              apply(
+                (d) => patchSectionMedia(d, index, { kenBurns: v === 'in' ? null : v }),
+                `${path}.kenBurns`,
+              )
+            }
+            options={(['in', 'out', 'none'] as const).map((v) => ({ value: v, label: c.sceneZooms[v] }))}
+          />
+          <SegmentedField<SceneDrift | 'none'>
+            path={`${path}.drift`}
+            label={c.sceneDrift}
+            value={media.drift ?? 'none'}
+            onValueChange={(v) =>
+              apply((d) => patchSectionMedia(d, index, { drift: v === 'none' ? null : v }), `${path}.drift`)
+            }
+            options={(['none', 'up', 'down'] as const).map((v) => ({ value: v, label: c.sceneDrifts[v] }))}
+          />
+        </>
+      ) : null}
+      {film || ON_MEDIA.includes(layout) ? (
         <div className="flex flex-col gap-1.5">
           <RangeField
             path={`${path}.overlay`}

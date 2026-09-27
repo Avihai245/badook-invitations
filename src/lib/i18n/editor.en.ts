@@ -175,7 +175,7 @@ export const editorEn: EditorDict = {
     palette: 'Pick a ready palette or fine-tune every color.',
     fonts: 'A pair of fonts for names, headings and text — in Hebrew and English.',
     music: 'Plays from the moment guests open the invitation.',
-    style: 'Text size, spacing and how much things move — for the whole invitation.',
+    style: 'An animated invitation, text size, spacing and how much things move — for the whole invitation.',
     studio: 'Three complete, different designs from your photos — pick one and keep editing.',
     event: 'Names, date and time — updated everywhere in the invitation.',
     languages: 'Which languages the invitation has, and which one opens first.',
@@ -205,6 +205,12 @@ export const editorEn: EditorDict = {
       stillMissing: 'The video has no still — it shows until the video plays.',
       addStill: 'Upload a still',
       overlay: 'Darken the picture',
+      sceneNote:
+        'In an animated invitation the picture is this part’s background — it gently takes over as guests reach the part.',
+      sceneZoom: 'The picture in the background',
+      sceneZooms: { in: 'Zooms in', out: 'Zooms out', none: 'No zoom' },
+      sceneDrift: 'Direction',
+      sceneDrifts: { none: 'In place', up: 'Rising', down: 'Descending' },
       overlayAuto: 'Automatic ({percent})',
       overlayAutoButton: 'Automatic',
       overlayHelp:
@@ -246,6 +252,7 @@ export const editorEn: EditorDict = {
         slide_start: 'From the side',
         slide_end: 'From the other side',
         tilt: 'Tilt',
+        rise_blur: 'Rise from blur',
       },
       scroll: 'While scrolling',
       scrolls: { none: 'None', parallax: 'Parallax', ken_burns: 'Slow zoom' },
@@ -304,6 +311,7 @@ export const editorEn: EditorDict = {
         curtain: 'Curtain',
         fireworks: 'Fireworks',
         gold_dust: 'Gold dust',
+        gatefold: 'Wax seal',
       },
       hints: {
         envelope: 'The design’s own envelope or card',
@@ -311,10 +319,29 @@ export const editorEn: EditorDict = {
         curtain: 'A theatre curtain parts — scrolling opens it too',
         fireworks: 'Fireworks in the night sky',
         gold_dust: 'A veil of gold dust blown away',
+        gatefold: 'Embossed paper and a wax seal — the seal breaks and the sheet opens to the sides',
       },
       hintNote:
         'With the hint text empty, each opening says its own call to action (“Tap to open the gate”).',
       photo: 'Over the main screen’s picture',
+    },
+    scene: {
+      title: 'Animated invitation',
+      enabled: 'The background moves as guests scroll',
+      enabledHelp:
+        'The whole invitation as one film: the background stays in place, gently changes from picture to picture and slowly zooms while guests scroll, and every line rises out of a soft haze.',
+      particles: 'What drifts over the background',
+      particleNames: {
+        none: 'Nothing',
+        butterflies: 'Butterflies',
+        petals: 'Petals',
+        gold_dust: 'Gold dust',
+      },
+      pictures:
+        'The background changes between {n} pictures. Give any part a picture of its own (edit the part → Picture) — a part without one continues the background before it.',
+      onePicture:
+        'The background is the main screen’s picture. To have it change as guests scroll, give parts pictures of their own (edit the part → Picture).',
+      desktop: 'On a computer the invitation shows in a phone frame, over its first picture, blurred.',
     },
     style: {
       typeScale: 'Text size',

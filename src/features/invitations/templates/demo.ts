@@ -267,6 +267,22 @@ export function demoDocument(
             }),
           },
         };
+      case 'where': {
+        // one place, told big: the first sample venue
+        const sample = VENUES[0]!;
+        return {
+          ...s,
+          data: {
+            ...s.data,
+            venue: {
+              ...s.data.venue,
+              name: pick(sample.name, locales),
+              address: pick(sample.address, locales),
+              geo: sample.geo,
+            },
+          },
+        };
+      }
       case 'faq':
         return {
           ...s,

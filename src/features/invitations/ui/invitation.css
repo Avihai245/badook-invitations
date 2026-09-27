@@ -261,6 +261,8 @@ a {
   width: 100%;
   overflow: hidden;
   cursor: pointer;
+  /* no flash of the browser's tap color over the whole cover (Android draws it on the tapped box) */
+  -webkit-tap-highlight-color: transparent;
   background: radial-gradient(
     120% 80% at 50% 35%,
     var(--cv-1, #f3ede4) 0%,
@@ -1279,6 +1281,187 @@ a {
   transition: opacity 1.3s ease 0.15s;
 }
 
+/* ── gatefold: a sheet of embossed paper sealed with wax; the seal breaks and the two halves swing
+   open to the sides onto the invitation (Openings.client.tsx, ~1.2 s) ── */
+.co[data-opening='gatefold'] .cover-tap {
+  container-type: size;
+  --seal: min(40cqmin, 168px);
+  --ring: calc(var(--seal) * 1.5);
+  --ridge: rgb(255 255 255 / 0.82);
+  --groove: color-mix(in srgb, var(--co-color) 70%, rgb(96 74 44 / 0.5));
+}
+.co-leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.2%;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 70% at 50% 42%, var(--co-light), transparent 70%),
+    repeating-linear-gradient(90deg, rgb(120 100 70 / 0.05) 0 1px, transparent 1px 5px),
+    linear-gradient(180deg, var(--co-color), color-mix(in srgb, var(--co-color) 92%, #8a7454));
+  backface-visibility: hidden;
+  transition: transform 0.95s cubic-bezier(0.62, 0.02, 0.3, 1) 0.18s;
+}
+.co-leaf.l {
+  left: 0;
+  transform-origin: 0 50%;
+  /* the fold: a soft shadow where the halves meet */
+  box-shadow: inset -10px 0 18px -14px rgb(96 74 44 / 0.35);
+}
+.co-leaf.r {
+  right: 0;
+  transform-origin: 100% 50%;
+  box-shadow: inset 10px 0 18px -14px rgb(96 74 44 / 0.35);
+}
+/* the paper's grain */
+.co-leaf::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.09;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+/* the half of the pressed ring the seal sits in */
+.co-leaf::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(var(--ring) / 2);
+  height: var(--ring);
+  margin-top: calc(var(--ring) / -2);
+  border: 1.5px solid var(--ridge);
+  box-shadow:
+    1px 1px 0 var(--groove),
+    inset 1px 1px 0 var(--groove);
+}
+.co-leaf.l::after {
+  right: -1px;
+  border-right: 0;
+  border-radius: var(--ring) 0 0 var(--ring);
+}
+.co-leaf.r::after {
+  left: -1px;
+  border-left: 0;
+  border-radius: 0 var(--ring) var(--ring) 0;
+}
+/* an embossed double frame around the sheet — each half carries its side of it */
+.co-emboss {
+  position: absolute;
+  inset: 22px 0;
+  border: 1.5px solid var(--ridge);
+  box-shadow:
+    1px 1px 0 var(--groove),
+    inset 1px 1px 0 var(--groove);
+}
+.co-emboss::before {
+  content: '';
+  position: absolute;
+  inset: 9px 0;
+  border: 1px solid var(--ridge);
+  box-shadow:
+    1px 1px 0 var(--groove),
+    inset 1px 1px 0 var(--groove);
+}
+.co-leaf.l .co-emboss {
+  left: 22px;
+  border-right: 0;
+}
+.co-leaf.l .co-emboss::before {
+  left: 9px;
+  border-right: 0;
+}
+.co-leaf.r .co-emboss {
+  right: 22px;
+  border-left: 0;
+}
+.co-leaf.r .co-emboss::before {
+  right: 9px;
+  border-left: 0;
+}
+.co-seal {
+  --inv-seal: var(--co-seal);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: var(--seal);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  animation: pulse-flat 2.4s ease-in-out infinite;
+}
+.co-seal svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.co-seal .half {
+  position: absolute;
+  inset: 0;
+  transition:
+    transform 0.5s var(--ease),
+    opacity 0.45s var(--ease) 0.05s;
+}
+.co-seal .half.l {
+  clip-path: inset(0 50% 0 0);
+}
+.co-seal .half.r {
+  clip-path: inset(0 0 0 50%);
+}
+/* the flash as it breaks */
+.co-seal::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 320%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(255 250 236),
+    rgb(255 232 184 / 0.7) 26%,
+    color-mix(in srgb, var(--co-seal) 18%, rgb(255 220 160 / 0.28)) 50%,
+    transparent
+  );
+  opacity: 0;
+  transform: scale(0.2);
+  pointer-events: none;
+}
+.co[data-opening='gatefold'] .cover-hint {
+  bottom: max(13vh, 76px);
+  color: #5e5042;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.6);
+}
+.co[data-opening='gatefold'] .cover-skip {
+  color: #5e5042;
+  background: rgb(255 255 255 / 0.55);
+}
+.co.opening[data-opening='gatefold'] .co-seal {
+  animation: none;
+}
+.co.opening[data-opening='gatefold'] .co-seal::before {
+  animation: coverFlash 1.1s var(--ease-out) both;
+}
+.co.opening[data-opening='gatefold'] .co-seal .half.l {
+  transform: translate(-22px, 42px) rotate(-14deg);
+  opacity: 0;
+}
+.co.opening[data-opening='gatefold'] .co-seal .half.r {
+  transform: translate(22px, 42px) rotate(14deg);
+  opacity: 0;
+}
+.co.opening[data-opening='gatefold'] .co-leaf.l {
+  transform: rotateY(104deg);
+}
+.co.opening[data-opening='gatefold'] .co-leaf.r {
+  transform: rotateY(-104deg);
+}
+
 /* ── a photo-led opening (the template's cover.opening.backdrop 'hero'): the invitation's first
    picture under the veil or the night sky, at the scale the hero's settle starts from — the cover
    fades onto that very picture, which then settles (the hero's entrance) ── */
@@ -1329,7 +1512,20 @@ a {
   pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .co :is(.co-door, .co-drape, .co-valance, .co-mono, .co-veil, .co-stars i, .co-motes i, .co-scroll svg) {
+  .co
+    :is(
+      .co-door,
+      .co-drape,
+      .co-valance,
+      .co-mono,
+      .co-veil,
+      .co-stars i,
+      .co-motes i,
+      .co-scroll svg,
+      .co-leaf,
+      .co-seal,
+      .co-seal .half
+    ) {
     animation: none !important;
     transition: none !important;
   }
@@ -1596,6 +1792,7 @@ html[data-framed] body::-webkit-scrollbar {
 /* The guest's language is on its way (live/detect.ts → LiveLocale) and no cover hides the swap: the
    sections wait for it, unseen — never long (the animation shows them anyway after 2.5s). */
 :root[data-locale-hide] .inv > main,
+:root[data-locale-hide] .inv .sc-track main,
 :root[data-locale-hide] .inv .fab,
 :root[data-locale-hide] .inv .lang-menu {
   visibility: hidden;
@@ -2809,7 +3006,9 @@ html[data-framed] body::-webkit-scrollbar {
   transition-duration: 0.8s, 1.3s, 0.8s;
   transition-timing-function: var(--ease), var(--spring-pop), var(--ease);
 }
-.reveal.in {
+.reveal.in,
+/* (the card's lift above is more specific than .reveal.in: once in, it lands flat too) */
+.card.reveal.in:not(.rv-card) {
   opacity: 1;
   transform: none;
   filter: none;
@@ -5037,10 +5236,21 @@ footer.sec {
 .cine[data-enter='tilt'] .reveal {
   transform-origin: 50% 100%;
 }
+/* rise_blur: up out of a soft blur, the letters settling (a slight horizontal scale, not the layout) */
+.cine[data-enter='rise_blur'] {
+  --en-from: translate3d(0, var(--en-dist, 40px), 0) scale(1.05, 1);
+}
 @keyframes cineEnter {
   from {
     opacity: 0;
     transform: var(--en-from);
+  }
+}
+@keyframes cineEnterBlur {
+  from {
+    opacity: 0;
+    transform: var(--en-from);
+    filter: blur(6px);
   }
 }
 @keyframes cineParallax {
@@ -5192,6 +5402,38 @@ footer.sec {
   }
 }
 
+/* rise_blur keeps its blur: its own keyframes where the scroll drives it, a filter transition elsewhere */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter='rise_blur'][data-enter]
+      .reveal:not([data-en-time]) {
+      animation-name: cineEnterBlur;
+    }
+  }
+  :root:not(.no-js):not([data-motion='none'])
+    .inv:not([data-mode='editor'])
+    .cine[data-enter='rise_blur'][data-enter]
+    .reveal:is([data-en-time], :not(.in)) {
+    transition-property: opacity, transform, filter;
+  }
+  @supports not (animation-timeline: view()) {
+    :root:not(.no-js):not([data-motion='none'])
+      .inv:not([data-mode='editor'])
+      .cine[data-enter='rise_blur'][data-enter]
+      .reveal:not(.in) {
+      filter: blur(6px);
+    }
+  }
+  :root:not(.no-js):not([data-motion='none'])
+    .inv:not([data-mode='editor'])
+    .cine[data-enter='rise_blur'][data-enter]
+    .reveal[data-en-time]:not(.in) {
+    filter: blur(6px);
+  }
+}
+
 /* ── text reveal (letters · words · lines): the text stays in the DOM, read once; a copy of it in
    pieces, hidden from assistive technology, plays over it, then goes (ScrollEngine.client.tsx) ── */
 .tr-on {
@@ -5276,6 +5518,490 @@ footer.sec {
   opacity: 1;
 }
 
+/* ============ 6c. THE SCROLL SCENE (renderer/scene — v2, feature `cinematic`) ============
+   The invitation as one continuous film: <div class="inv" data-film> › .sc-frame › .sc-scroll ›
+   .sc-track › [ .sc-back (the backdrop: sticky, one screen tall, pointer-events none) + main (the
+   sections, transparent, over it) ]. The backdrop never uses background-attachment: fixed (iOS ignores
+   it): it is a sticky box whose negative margin lets the sections start on top of it. SceneDriver
+   cross-fades its pictures (.sc-layer opacity) and zooms them (.sc-pic transform) from the scroll —
+   transform and opacity only. On a phone the page scrolls; from 600px wide (and tall enough) the
+   invitation is a phone frame in the middle of the screen, which scrolls itself. Tones (set on .inv):
+   --sc-shade (the gradient's dark), --sc-text (the texts' light), --sc-track (the titles' tracking),
+   --sc-desk (the first picture, around the frame). */
+.inv[data-film] {
+  /* the backdrop: the tallest the screen gets (no jump as a phone's address bar hides) */
+  --sc-h: 100vh;
+  --sc-h: 100lvh;
+  /* the first screen of text: the smallest (its cue is never under the toolbar) */
+  --sc-first: 100vh;
+  --sc-first: 100svh;
+  --sr-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  background: var(--sc-shade);
+}
+.sc-frame,
+.sc-scroll,
+.sc-track {
+  position: relative;
+}
+.sc-scroll {
+  container-type: inline-size;
+}
+.sc-scroll:focus {
+  outline: none;
+}
+.sc-track {
+  isolation: isolate;
+}
+.sc-back {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: var(--sc-h);
+  margin-bottom: calc(var(--sc-h) * -1);
+  overflow: hidden;
+  /* clipped, never a scroll container: the pictures' scroll-driven animations follow the page's (or
+     the frame's) scroll — scroll(nearest) — past it */
+  overflow: clip;
+  pointer-events: none;
+  contain: layout paint;
+  background: var(--sc-shade);
+}
+.sc-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.sc-layer[data-i='0'] {
+  opacity: 1;
+}
+.sc-pic {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 50% 50%;
+}
+img.sc-pic {
+  display: block;
+  user-select: none;
+}
+/* a drifting picture reaches past the screen by its travel, so no edge ever shows */
+.sc-layer[data-drift] .sc-pic {
+  top: -4%;
+  height: 108%;
+}
+/* the design's own art as the backdrop: the hero's sky, clouds and hills (its placeholder) or its scene —
+   drawn like the hero's, without the hero's own motion (the driver moves it) */
+.sc-art {
+  overflow: hidden;
+  background: var(--hero-sky);
+}
+.sc-art .scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--hero-scrim);
+  mix-blend-mode: multiply;
+}
+/* the gradient that keeps the light texts readable: darker at the top and the bottom, lighter a fifth
+   of the way down (a little firmer through the middle than the classic .52 / .14 / .60, where the
+   texts pass over bright skies) — the scene's standard shade × the picture's own strength (--sc-k) */
+.sc-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--sc-shade) min(100%, calc(52% * var(--sc-k, 1))), transparent) 0%,
+    color-mix(in srgb, var(--sc-shade) min(100%, calc(22% * var(--sc-k, 1))), transparent) 22%,
+    color-mix(in srgb, var(--sc-shade) min(100%, calc(32% * var(--sc-k, 1))), transparent) 58%,
+    color-mix(in srgb, var(--sc-shade) min(100%, calc(60% * var(--sc-k, 1))), transparent) 100%
+  );
+}
+.sc-dust {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+/* Where the browser has scroll-driven animations, the scroll itself plays the backdrop — on the
+   compositor, in step with the scroll however busy the page is. SceneDriver measured, once per layout,
+   where each picture's cross-fade and passage start and end (px of scroll: --sc-fa/--sc-fb,
+   --sc-ma/--sc-mb) and its zoom and drift at either end (--sc-s0/--sc-s1, --sc-y0/--sc-y1), then set
+   data-scene-css. The cross-fade eases at both ends (this curve is exactly layerState's smoothstep); the
+   zoom and the drift are linear. Elsewhere the driver writes the same timeline itself, frame by frame.
+   With reduced motion (or the host's motion at 0) the pictures only cross-fade. */
+@supports (animation-timeline: scroll()) {
+  .sc-frame[data-scene-css] .sc-layer:not([data-i='0']) {
+    animation: scFade linear both;
+    animation-timing-function: cubic-bezier(0.3333, 0, 0.6667, 1);
+    animation-timeline: scroll(nearest);
+    /* (no ranges yet — a picture the editor just added: not shown until it is measured) */
+    animation-range: var(--sc-fa, 1000000px) var(--sc-fb, 1000001px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    :root:not([data-motion='none']) .sc-frame[data-scene-css] .sc-pic {
+      animation: scMove linear both;
+      animation-timeline: scroll(nearest);
+      animation-range: var(--sc-ma, 0px) var(--sc-mb, 1px);
+    }
+  }
+}
+@keyframes scFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scMove {
+  from {
+    transform: translate3d(0, var(--sc-y0, 0px), 0) scale(var(--sc-s0, 1));
+  }
+  to {
+    transform: translate3d(0, var(--sc-y1, 0px), 0) scale(var(--sc-s1, 1));
+  }
+}
+.sc-track main {
+  position: relative;
+  z-index: 10;
+}
+/* the end of the invitation scrolls clear of the RSVP button */
+.inv[data-film] .sc-track main > .sc-sec:last-child {
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+}
+
+/* ── the sections over the film: transparent, light text with a soft shadow, glass surfaces ── */
+.sc-sec {
+  position: relative;
+  --inv-ink: var(--sc-text);
+  --inv-heading: var(--sc-text);
+  --inv-accent-text: var(--sc-text);
+  --inv-hero-text: var(--sc-text);
+  --inv-ink-muted: color-mix(in srgb, var(--sc-text) 86%, transparent);
+  --inv-line: color-mix(in srgb, var(--sc-text) 34%, transparent);
+  --inv-surface: color-mix(in srgb, var(--sc-shade) 48%, transparent);
+  --inv-bg: color-mix(in srgb, var(--sc-shade) 36%, transparent);
+  --inv-field: color-mix(in srgb, var(--sc-shade) 58%, transparent);
+  --inv-popover: color-mix(in srgb, var(--sc-shade) 94%, #000);
+  --accent-08: color-mix(in srgb, var(--sc-text) 10%, transparent);
+  --accent-12: color-mix(in srgb, var(--sc-text) 16%, transparent);
+  --scrim: var(--sc-shade);
+  --sc-shadow:
+    0 1px 3px color-mix(in srgb, var(--sc-shade) 42%, transparent),
+    0 2px 20px color-mix(in srgb, var(--sc-shade) 55%, transparent);
+  color: var(--inv-ink);
+  text-shadow: var(--sc-shadow);
+}
+.sc-sec :is(.btn, .card, .form, .cd-cell, input, textarea, select, .dd-menu, .map) {
+  text-shadow: none;
+}
+.sc-sec .sec {
+  background: none;
+  padding-block: calc(var(--sec-pad) * 1.35);
+}
+/* the film is its own boundary: no divider lines or line-art over the pictures */
+.sc-sec :is(.divider, .deco) {
+  display: none;
+}
+/* the titles: wide tracking (the scene's own — never in Arabic, whose letters join), a soft shadow,
+   and a hairline under them that draws in after the title */
+.sc-sec .sec-title {
+  letter-spacing: calc(var(--sc-track, 0em) + var(--ls-display, 0em));
+  padding-inline-start: var(--sc-track, 0em);
+  text-shadow:
+    0 1px 3px color-mix(in srgb, var(--sc-shade) 38%, transparent),
+    0 2px 24px color-mix(in srgb, var(--sc-shade) 60%, transparent);
+}
+/* Hebrew and Ethiopic letters stand apart already: a little less tracking, and more between words */
+:root:is(:lang(he), :lang(am)) .sc-sec .sec-title {
+  letter-spacing: calc(var(--sc-track, 0em) * 0.64);
+  word-spacing: calc(var(--sc-track, 0em) * 1.2);
+  padding-inline-start: calc(var(--sc-track, 0em) * 0.64);
+}
+:root:lang(ar) .sc-sec .sec-title {
+  padding-inline-start: 0;
+}
+.sc-sec .sec-title::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 1px;
+  margin: 18px auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--sc-text) 82%, transparent),
+    transparent
+  );
+  transform-origin: 50% 50%;
+  transition: transform 0.7s var(--sr-ease) var(--sr-step, 90ms);
+}
+
+/* the cover screen: the names over the first picture, and "scroll to enter" */
+.sc-sec .hero {
+  height: var(--sc-first);
+  min-height: min(560px, var(--sc-first));
+  color: var(--sc-text);
+  /* clipped, never a scroll container: its names' lift follows the scroll past it (scroll(nearest)) */
+  overflow: clip;
+}
+.sc-sec .hero[data-backdrop] .hero-inner {
+  text-shadow:
+    0 1px 3px color-mix(in srgb, var(--sc-shade) 40%, transparent),
+    0 2px 26px color-mix(in srgb, var(--sc-shade) 62%, transparent);
+}
+.inv[data-film] .names {
+  font-size: calc(clamp(64px, 19cqw, 112px) * var(--display-scale) * var(--ty-display, 1));
+}
+.inv[data-film] .names .n {
+  font-size: min(
+    1em,
+    calc((min(100cqw, 640px) - 2 * var(--gutter)) / (var(--chars, 1) * var(--name-em, 0.55)))
+  );
+}
+/* the names lift away as the guest scrolls — with the frame's scroll on a computer too */
+@supports (animation-timeline: scroll()) {
+  .inv[data-film] .hero-inner {
+    animation-timeline: scroll(nearest);
+  }
+}
+.inv[data-film] .hero .cue {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.cue-label {
+  font-family: var(--f-ui);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  padding-inline-start: 0.1em;
+  white-space: nowrap;
+}
+:root:is(:lang(en), :lang(fr), :lang(es), :lang(ru)) .cue-label {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  padding-inline-start: 0.18em;
+}
+:root:lang(ar) .cue-label {
+  padding-inline-start: 0;
+}
+
+/* the countdown: frosted glass, pinned to the top while its section scrolls by */
+.sc-sec :is(.wh, .countdown) .wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.sc-sec[data-type='when'] .sec {
+  min-height: calc(var(--sc-h) * 1.15);
+}
+.sc-sec .cd {
+  order: -1;
+  position: sticky;
+  top: calc(12px + env(safe-area-inset-top));
+  z-index: 5;
+  width: 100%;
+  margin: 0 auto calc(34px * var(--block));
+  padding: 8px;
+  gap: 4px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--sc-text) 26%, transparent);
+  background: color-mix(in srgb, var(--sc-text) 10%, color-mix(in srgb, var(--sc-shade) 18%, transparent));
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--sc-shade) 32%, transparent);
+}
+/* under the language button, where there is one */
+.inv[data-film]:has(.fab-lang) .sc-sec .cd {
+  top: calc(68px + env(safe-area-inset-top));
+}
+.sc-sec .cd .cd-cell {
+  border: 0;
+  background: none;
+  padding: 10px 0 8px;
+}
+.sc-sec .cd .cd-num {
+  color: var(--sc-text);
+}
+
+/* ── the texts come in: each one as it reaches a quarter of the screen (ScrollEngine adds .in) — up
+   24px out of a 6px blur, its letters settling (a slight horizontal scale: tracking, without moving
+   the layout), 700 ms, one stagger step (90 ms) after the one before; title → rule → subtitle →
+   details. Once in, they stay in. Cards, forms and pictures rise without the blur (a costly paint). ── */
+.sc-sec .reveal {
+  transition:
+    opacity 0.7s var(--sr-ease),
+    transform 0.7s var(--sr-ease),
+    filter 0.7s var(--sr-ease);
+  transition-delay: calc((var(--i, 0) + min(var(--i, 0), 1)) * var(--sr-step, 90ms));
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.no-js):not([data-motion='none']) .inv:not([data-mode='editor']) .sc-sec .reveal:not(.in) {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0) scale(1.05, 1);
+    filter: blur(6px);
+  }
+  :root:not(.no-js):not([data-motion='none'])
+    .inv:not([data-mode='editor'])
+    .sc-sec
+    :is(.card, .form, .map, .gallery, .cd, .actions, .illus, .illus-img, .faq).reveal:not(.in) {
+    transform: translate3d(0, 24px, 0);
+    filter: none;
+  }
+  :root:not(.no-js):not([data-motion='none'])
+    .inv:not([data-mode='editor'])
+    .sc-sec[data-reveal='rise']
+    .reveal:not(.in) {
+    transform: translate3d(0, 24px, 0);
+    filter: none;
+  }
+  :root:not(.no-js):not([data-motion='none'])
+    .inv:not([data-mode='editor'])
+    .sc-sec[data-reveal='fade']
+    .reveal:not(.in) {
+    transform: none;
+    filter: none;
+  }
+  :root:not(.no-js):not([data-motion='none'])
+    .inv:not([data-mode='editor'])
+    .sc-sec
+    .sec-title.reveal:not(.in)::after {
+    transform: scaleX(0);
+  }
+}
+.sc-sec .reveal.in,
+.sc-sec[data-reveal='none'] .reveal {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.sc-sec[data-reveal='none'] .reveal {
+  transition: none;
+}
+
+/* ── "RSVP": pinned to the bottom once the first screen has gone ── */
+.sc-cta {
+  position: fixed;
+  z-index: 30;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 28px;
+  border-radius: 999px;
+  font-family: var(--f-ui);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--inv-accent-ink);
+  background: var(--inv-accent);
+  box-shadow:
+    0 12px 32px color-mix(in srgb, var(--sc-shade) 42%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition:
+    opacity 0.45s var(--sr-ease),
+    transform 0.6s var(--spring);
+  -webkit-tap-highlight-color: transparent;
+}
+.sc-cta[data-shown] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.sc-cta:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--sc-text) 80%, transparent);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sc-cta {
+    transition: opacity 0.2s linear;
+    transform: none;
+  }
+}
+/* inside another page's frame the scene's own cue and button say it all */
+body:has(.inv[data-film]) .frame-cue {
+  display: none;
+}
+
+/* ── a computer (or a tablet): the invitation in a phone frame in the middle of the screen, over its
+   first picture blurred; the frame scrolls itself (the editor's preview keeps the page scrolling) ── */
+@media (min-width: 600px) and (min-height: 560px) {
+  .inv[data-film]:not([data-mode='editor']) {
+    --fw: min(30rem, calc(100vw - 48px));
+    --fh: min(calc(100dvh - 48px), 940px);
+    --sc-h: var(--fh);
+    --sc-first: var(--fh);
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .inv[data-film]:not([data-mode='editor'])::before {
+    content: '';
+    position: absolute;
+    inset: -60px;
+    background: var(--sc-desk, var(--hero-sky)) center / cover no-repeat;
+    filter: blur(30px) saturate(1.05) brightness(0.72);
+    pointer-events: none;
+  }
+  .inv[data-film]:not([data-mode='editor']) .sc-frame {
+    width: var(--fw);
+    height: var(--fh);
+    border-radius: 44px;
+    overflow: hidden;
+    /* the containing block of the fixed controls inside it (the music, the language, "RSVP") */
+    contain: layout paint;
+    background: var(--sc-shade);
+    box-shadow:
+      0 0 0 10px #0b0d12,
+      0 0 0 11px rgb(255 255 255 / 0.14),
+      0 40px 100px rgb(0 0 0 / 0.5);
+  }
+  .inv[data-film]:not([data-mode='editor']) .sc-scroll {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+  .inv[data-film]:not([data-mode='editor']) .sc-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  body.locked .inv[data-film] .sc-scroll {
+    overflow: hidden;
+  }
+  /* the cover opens inside the frame */
+  .inv[data-film]:not([data-mode='editor']) > .cover {
+    inset: auto;
+    top: calc(50% - var(--fh) / 2);
+    left: calc(50% - var(--fw) / 2);
+    width: var(--fw);
+    height: var(--fh);
+    border-radius: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sc-scroll {
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ============ 7b. PRINT ============
    A printed invitation is its final state: no cover, controls or particles, everything revealed. */
 @media print {
@@ -5297,6 +6023,24 @@ footer.sec {
   }
   body.locked {
     overflow: visible;
+  }
+  /* a scroll scene prints as its texts: no backdrop, no frame, no button */
+  .sc-back,
+  .sc-cta {
+    display: none !important;
+  }
+  .inv[data-film],
+  .inv[data-film] .sc-frame,
+  .inv[data-film] .sc-scroll {
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    contain: none !important;
+  }
+  .sc-sec {
+    --sc-text: #1f1b17;
+    text-shadow: none !important;
   }
   *,
   *::before,

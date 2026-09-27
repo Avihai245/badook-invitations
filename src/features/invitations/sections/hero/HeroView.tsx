@@ -27,7 +27,7 @@ const CLOUDS: [number, number, number, number][] = [
  * pale skies, a scrim that keeps the white hero text legible. A scene template draws its scene
  * instead (its centre is kept calm for the names).
  */
-function HeroPlaceholder({ art, date }: { art: PlaceholderArt; date: string }) {
+export function HeroPlaceholder({ art, date }: { art: PlaceholderArt; date: string }) {
   if (art.scene) return <Scene id={art.scene} place="hero" date={date} />;
   const { hills } = art;
   const scrim = art.shade !== null;
@@ -144,14 +144,24 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
   const customTitle = d.title.mode === 'custom' ? ctx.text(d.title.text) : '';
   // the template's particles (renderer/fx) — drawn in the browser only, after the cover opens
   const fx = fxTheme(ctx.template, doc);
+  // a scroll scene (renderer/scene): the hero's picture is the backdrop's first, under the scene's
+  // gradient and particles — only a video stays in the hero itself
+  const scene = ctx.scene;
+  const inBackdrop = !!scene && !scene.heroInline;
   return (
-    <header className="hero" data-edit-path={path}>
-      <div className="hero-media" aria-hidden="true">
-        {placeholder ? <HeroPlaceholder art={ctx.art} date={doc.event.date} /> : null}
-        {media}
-      </div>
-      <div className="hero-overlay" style={{ '--ov': d.overlayOpacity } as CSSProperties} />
-      <Ambient kind={fx.ambient} colors={fx.ambientColors} seed={`${ctx.template.id}:${doc.share.slug}`} />
+    <header className="hero" data-edit-path={path} data-backdrop={inBackdrop ? '' : undefined}>
+      {inBackdrop ? null : (
+        <>
+          <div className="hero-media" aria-hidden="true">
+            {placeholder ? <HeroPlaceholder art={ctx.art} date={doc.event.date} /> : null}
+            {media}
+          </div>
+          <div className="hero-overlay" style={{ '--ov': d.overlayOpacity } as CSSProperties} />
+        </>
+      )}
+      {scene ? null : (
+        <Ambient kind={fx.ambient} colors={fx.ambientColors} seed={`${ctx.template.id}:${doc.share.slug}`} />
+      )}
       <div className="hero-inner hero-enter">
         {/* one child for the entrance's stagger: the guest's greeting (personal links) + the eyebrow */}
         <div className="hero-lead">
@@ -214,6 +224,7 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
         )}
       </div>
       <span className="cue" aria-hidden="true">
+        {scene ? <span className="cue-label">{ctx.t('cover.scroll')}</span> : null}
         <Icon name="chevron-down" size={28} strokeWidth={1.2} />
       </span>
     </header>

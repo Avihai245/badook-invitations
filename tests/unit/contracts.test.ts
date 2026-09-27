@@ -26,6 +26,7 @@ describe('template pack', () => {
       'nitzan',
       'rooftop-dusk',
       'honey-meadow',
+      'celestial',
       'midnight-bloom',
       'klaf',
       'cocoa-teddy',
@@ -82,6 +83,7 @@ describe('template pack', () => {
     expect(TemplateManifestSchema.safeParse({ ...manifest, tier: 'gold' }).success).toBe(false);
     const premium = TEMPLATE_IDS.filter((id) => TEMPLATES.get(id)!.manifest.tier === 'premium');
     expect(premium).toEqual([
+      'celestial',
       'midnight-bloom',
       'klaf',
       'neon-night',

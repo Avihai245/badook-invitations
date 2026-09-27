@@ -76,6 +76,8 @@ export const FX_BY_TEMPLATE: Readonly<Record<string, AmbientKind | readonly [Amb
   'grandma-garden': 'petals', // English cottage garden — petals
   // ── the photographic designs ──
   lumiere: ['fireflies', 'sparkles'], // evening light — golden motes over the photo, gold glints
+  // ── the scroll scene ──
+  celestial: 'sparkles', // a gate among the clouds — gold glints (the scene's own: butterflies)
 };
 
 /** A template the table doesn't know yet: by its first event type. */

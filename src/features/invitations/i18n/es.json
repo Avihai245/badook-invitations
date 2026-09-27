@@ -100,6 +100,7 @@
   "cover.hint.curtain": "Toca para abrir el telón",
   "cover.hint.fireworks": "Toca para encender los fuegos artificiales",
   "cover.hint.gold_dust": "Toca para abrir",
+  "cover.hint.gatefold": "Toca para abrir",
   "locale.menu": "Idioma",
   "missing.metaTitle": "Invitación no disponible",
   "missing.title": "Esta invitación no está disponible en este momento",
@@ -120,5 +121,6 @@
   "liveGallery.qr": "Escanea para subir desde tu móvil",
   "liveGallery.qrAfter": "Escanea para verlo en tu móvil",
   "liveGallery.qrLabel": "Código QR de la galería de la celebración",
-  "liveGallery.preview": "El botón lleva a la galería en directo de la celebración cuando esté activada"
+  "liveGallery.preview": "El botón lleva a la galería en directo de la celebración cuando esté activada",
+  "scene.rsvp": "Confirmar asistencia"
 }

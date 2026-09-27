@@ -37,7 +37,7 @@ const fixtures = readdirSync(fixturesDir)
 
 const NOW = Date.parse('2026-09-23T10:00:00Z');
 /** Designs made with tokens v2: their manifests set type, spacing, motion and an opening. */
-const V2_DESIGNS: ReadonlySet<string> = new Set(['lumiere']);
+const V2_DESIGNS: ReadonlySet<string> = new Set(['lumiere', 'celestial']);
 const render = (doc: InvitationDocument, locale = doc.defaultLocale) =>
   renderToStaticMarkup(
     <InvitationSections
@@ -240,14 +240,21 @@ describe('schema v2 contract', () => {
     }
   });
 
-  it('the designs made with tokens v2 set them within the ranges, with an opening over their photo', () => {
+  it('the designs made with tokens v2 set them within the ranges, with an opening of their own', () => {
     for (const id of V2_DESIGNS) {
-      const { tokens, motion, cover } = requireTemplate(id).manifest;
+      const { tokens, cover } = requireTemplate(id).manifest;
       expect(tokens.typography.display.size).not.toBe(1);
       expect(tokens.spacing.section).toBeGreaterThan(1);
-      expect(motion.intensity).toBeLessThan(1);
-      expect(cover.opening).toMatchObject({ preset: 'gold_dust', backdrop: 'hero' });
+      expect(cover.opening).not.toBeNull();
     }
+    // the photographic one: a calmer motion, gold dust over its own photo
+    const lumiere = requireTemplate('lumiere').manifest;
+    expect(lumiere.motion.intensity).toBeLessThan(1);
+    expect(lumiere.cover.opening).toMatchObject({ preset: 'gold_dust', backdrop: 'hero' });
+    // the scroll scene: a wax-sealed gatefold, then one film
+    const celestial = requireTemplate('celestial').manifest;
+    expect(celestial.cover.opening).toMatchObject({ preset: 'gatefold', trigger: 'tap' });
+    expect(celestial.scene).toMatchObject({ enabled: true, particles: 'butterflies' });
   });
 
   it('a manifest may set tokens v2 and an opening', () => {

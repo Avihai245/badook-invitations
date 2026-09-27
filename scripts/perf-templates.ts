@@ -17,6 +17,7 @@
  *
  *   npm run perf:templates [-- --base http://127.0.0.1:3000] [--tpl a,b] [--docs demo,cinematic]
  *                             [--lang he] [--out test-results/perf] [--port 3520] [--profile old-phone]
+ *                             [--query scene=1]
  *
  * `--profile old-phone`: an older, smaller phone — 360×640 @2x, a 6× slower CPU, the same network —
  * with its own budget (LCP < 4 s, CLS < 0.1, ≥ 50 fps): the invitation still opens, comes in and
@@ -42,6 +43,8 @@ const PORT = Number(arg('port', process.env.PERF_PORT || '3520'));
 const BASE = arg('base', process.env.PERF_BASE_URL || '');
 const OUT = resolve(arg('out', 'test-results/perf'));
 const LANG = arg('lang', 'he');
+/** Extra query for every page (the render route's switches: `scene=1` — any design as a scroll scene). */
+const QUERY = arg('query', '').replace(/^\?/, '');
 const DOCS = arg('docs', 'demo,cinematic')
   .split(',')
   .map((d) => d.trim())
@@ -496,7 +499,8 @@ async function main() {
   try {
     for (const template of TEMPLATES) {
       for (const doc of DOCS) {
-        const url = `${base}/dev/invitations/render/${template}/${LANG}/${doc}`;
+        const page = `${base}/dev/invitations/render/${template}/${LANG}/${doc}`;
+        const url = QUERY ? `${page}?${QUERY}` : page;
         // warm the server (the render, the optimized images at the phone's widths), not the browser
         const warm = await browser.newContext({
           viewport: { width: PHONE.width, height: PHONE.height },
@@ -505,7 +509,7 @@ async function main() {
           hasTouch: true,
         });
         const wp = await warm.newPage();
-        await wp.goto(`${url}?open=1`, { waitUntil: 'load', timeout: 90_000 });
+        await wp.goto(`${url}${QUERY ? '&' : '?'}open=1`, { waitUntil: 'load', timeout: 90_000 });
         await wp.evaluate(async () => {
           for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight) {
             window.scrollTo(0, y);
@@ -527,7 +531,7 @@ async function main() {
             failures = againFailures;
           }
         }
-        const row: Row = { template, doc, url, attempts, failures, ...m };
+        const row: Row = { template, doc: QUERY ? `${doc}?${QUERY}` : doc, url, attempts, failures, ...m };
         rows.push(row);
         console.log(
           `${failures.length ? 'FAIL' : 'ok  '} ${template.padEnd(22)} ${doc.padEnd(10)} LCP ${

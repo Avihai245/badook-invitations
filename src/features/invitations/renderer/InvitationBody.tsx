@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, type CSSProperties } from 'react';
 import type { Locale } from '../contracts/types';
 import { t as translate, type DictKey } from '../i18n/dictionary';
 import type { RenderContext } from './context-core';
@@ -11,15 +11,19 @@ import { FloatingControls, type MusicProps } from './FloatingControls.client';
 import { nativeName } from '../lib/locales';
 import type { MotionLabels } from './MotionPause.client';
 import { fxTheme } from './fx/theme';
-import { imageSet } from './images';
+import { imageAt, imageSet } from './images';
 import { InvitationSections } from './InvitationSections';
 import { GuestLink } from './guest.client';
 import { Insights } from './Insights.client';
 import { LiveLocale } from './live/LiveLocale.client';
 import type { LivePayload } from './live/payload';
 import { ScrollEngine } from './motion/ScrollEngine.client';
+import { SceneBackdrop } from './scene/SceneBackdrop';
+import { SceneCta } from './scene/SceneCta.client';
+import { SceneDriver } from './scene/SceneDriver.client';
 import { Scene } from './scenes';
 import { resolvePalette } from './theme';
+import { endOfDayUtc } from '../lib/dates';
 
 /**
  * A tap on the cover before React has taken over (its scripts still loading on a slow connection)
@@ -57,6 +61,7 @@ const OPENING_HINT = {
   curtain: 'cover.hint.curtain',
   fireworks: 'cover.hint.fireworks',
   gold_dust: 'cover.hint.gold_dust',
+  gatefold: 'cover.hint.gatefold',
 } as const satisfies Record<Opening['preset'], DictKey>;
 
 /**
@@ -76,8 +81,35 @@ function heroBackdrop(ctx: RenderContext) {
 }
 
 /**
+ * The scroll scene's tones on the invitation (renderer/scene): the gradient's dark, the texts' light,
+ * the titles' tracking — and, around the desktop's phone frame, its first picture blurred.
+ */
+function sceneVars(ctx: RenderContext): CSSProperties | undefined {
+  const scene = ctx.scene;
+  if (!scene) return undefined;
+  const first = scene.layers[0]?.picture;
+  return {
+    '--sc-shade': scene.shade,
+    '--sc-text': scene.text,
+    '--sc-track': `${scene.tracking}em`,
+    ...(first ? { '--sc-desk': `url("${imageAt(first.fallback ?? first.src, 640)}")` } : {}),
+  } as CSSProperties;
+}
+
+/** The scene's "RSVP" button: while the event takes replies (none after the deadline, none in the editor). */
+function sceneRsvp(ctx: RenderContext): boolean {
+  if (!ctx.scene || ctx.mode === 'editor') return false;
+  if (!ctx.doc.sections.some((s) => s.type === 'rsvp' && s.enabled)) return false;
+  const deadline = ctx.doc.event.rsvpDeadline;
+  return !deadline || ctx.now <= endOfDayUtc(deadline, ctx.doc.timezone).getTime();
+}
+
+/**
  * The single renderer body used by the public page, the preview link, the editor preview frame and
- * the kitchen sink (§5 — the same renderer everywhere). Section order = document order.
+ * the kitchen sink (§5 — the same renderer everywhere). Section order = document order. As a scroll
+ * scene (renderer/scene) the sections scroll over a pinned backdrop: `.sc-frame` (the phone frame on
+ * a computer) › `.sc-scroll` (the frame's scroll container there; a plain box on a phone, where the
+ * page scrolls) › `.sc-track` (the backdrop, sticky, and the sections over it).
  */
 export function InvitationBody({
   ctx,
@@ -156,8 +188,53 @@ export function InvitationBody({
   // over ~12.8 KB) separately, and reveals it only a moment after the first paint (≥ 300 ms, React
   // 19.2) — moving it into place, which restarts its CSS animations. So the cover, small for most
   // designs, comes with the shell and paints at once; the sections under it follow.
+  const scene = ctx.scene;
+  const page = (
+    <>
+      {live && doc.locales.length > 1 ? (
+        <LiveLocale
+          initial={ctx.locale}
+          payload={live}
+          music={music}
+          listen={Object.fromEntries(doc.locales.map((l) => [l, listenIn(l)]))}
+          motion={Object.fromEntries(doc.locales.map((l) => [l, motionIn(l)]))}
+        >
+          <InvitationSections ctx={ctx} />
+        </LiveLocale>
+      ) : (
+        <>
+          <FloatingControls
+            language={
+              doc.locales.length > 1 && langHrefs
+                ? {
+                    current: ctx.locale,
+                    menuLabel: ctx.t('locale.menu'),
+                    options: doc.locales.map((l) => ({
+                      locale: l,
+                      label: nativeName(l),
+                      href: langHrefs[l] ?? '',
+                    })),
+                  }
+                : null
+            }
+            music={music}
+            listen={listenIn(ctx.locale)}
+            motion={motionIn(ctx.locale)}
+          />
+          <InvitationSections ctx={ctx} />
+        </>
+      )}
+      <ScrollEngine />
+      <FitNames />
+      {/* a guest's personal link — never on the review link's draft (nobody is identified there) */}
+      {ctx.mode === 'live' && !ctx.review ? <GuestLink slug={doc.share.slug} /> : null}
+      {/* how guests use the invitation (feature analytics): fetched once the page is interactive —
+          never on the review link's draft (nobody is counted there) */}
+      {ctx.mode === 'live' && ctx.insights && !ctx.review ? <Insights slug={doc.share.slug} /> : null}
+    </>
+  );
   return (
-    <div className="inv" data-mode={ctx.mode}>
+    <div className="inv" data-mode={ctx.mode} data-film={scene ? '' : undefined} style={sceneVars(ctx)}>
       {coverOn ? (
         <script dangerouslySetInnerHTML={{ __html: skipCoverFromUrl ? SKIP_OR_LOCK : LOCK }} />
       ) : (
@@ -206,48 +283,25 @@ export function InvitationBody({
           />
         </Suspense>
       ) : null}
-      <Suspense fallback={null}>
-        {live && doc.locales.length > 1 ? (
-          <LiveLocale
-            initial={ctx.locale}
-            payload={live}
-            music={music}
-            listen={Object.fromEntries(doc.locales.map((l) => [l, listenIn(l)]))}
-            motion={Object.fromEntries(doc.locales.map((l) => [l, motionIn(l)]))}
-          >
-            <InvitationSections ctx={ctx} />
-          </LiveLocale>
-        ) : (
-          <>
-            <FloatingControls
-              language={
-                doc.locales.length > 1 && langHrefs
-                  ? {
-                      current: ctx.locale,
-                      menuLabel: ctx.t('locale.menu'),
-                      options: doc.locales.map((l) => ({
-                        locale: l,
-                        label: nativeName(l),
-                        href: langHrefs[l] ?? '',
-                      })),
-                    }
-                  : null
-              }
-              music={music}
-              listen={listenIn(ctx.locale)}
-              motion={motionIn(ctx.locale)}
-            />
-            <InvitationSections ctx={ctx} />
-          </>
-        )}
-        <ScrollEngine />
-        <FitNames />
-        {/* a guest's personal link — never on the review link's draft (nobody is identified there) */}
-        {ctx.mode === 'live' && !ctx.review ? <GuestLink slug={doc.share.slug} /> : null}
-        {/* how guests use the invitation (feature analytics): fetched once the page is interactive —
-            never on the review link's draft (nobody is counted there) */}
-        {ctx.mode === 'live' && ctx.insights && !ctx.review ? <Insights slug={doc.share.slug} /> : null}
-      </Suspense>
+      {scene ? (
+        <div className="sc-frame">
+          {/* the frame's own scroll container on a computer (focusable: the keyboard scrolls it) */}
+          <div className="sc-scroll" tabIndex={-1}>
+            <div className="sc-track">
+              {/* the backdrop comes with the shell: its first picture paints with the first frame, the
+                  sections come in over it */}
+              <SceneBackdrop ctx={ctx} scene={scene} />
+              <Suspense fallback={null}>
+                {page}
+                {sceneRsvp(ctx) ? <SceneCta label={perLocale((l) => translate(l, 'scene.rsvp'))} /> : null}
+                <SceneDriver />
+              </Suspense>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <Suspense fallback={null}>{page}</Suspense>
+      )}
     </div>
   );
 }

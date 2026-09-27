@@ -14,12 +14,14 @@ import {
   type L10n,
   type OpeningPreset,
   type Palette,
+  type SceneSettings,
   type Section,
   type SectionAnimation,
   type SectionLayout,
   type SectionMedia,
   type SectionType,
   type TemplateDefaults,
+  type TemplateManifest,
   type ThemeOverrides,
   type ThemeTokens,
 } from '../contracts/types';
@@ -181,6 +183,7 @@ export const ENTER_CHOICES: readonly EnterPreset[] = [
   'auto',
   'fade',
   'rise',
+  'rise_blur',
   'sink',
   'zoom',
   'zoom_out',
@@ -338,6 +341,26 @@ export function seededHints(defaults: TemplateDefaults): L10n[] {
  * cover ("tap to open the envelope"): picking another opening clears it, so the opening's own call to
  * action shows; a hint the host wrote stays.
  */
+/**
+ * The scroll scene (v2 `theme.scene`): on or off, and what drifts over it. A value back at the
+ * design's own (its `scene`) is removed: a design made as a scene stays one unless the host says no.
+ */
+export function setScene(
+  doc: InvitationDocument,
+  patch: Partial<SceneSettings>,
+  template: Pick<TemplateManifest, 'scene'>,
+  ownParticles: SceneSettings['particles'],
+): InvitationDocument {
+  const enabled = patch.enabled ?? doc.theme.scene?.enabled ?? template.scene?.enabled ?? false;
+  const particles = patch.particles !== undefined ? patch.particles : (doc.theme.scene?.particles ?? null);
+  const scene: SceneSettings = { enabled };
+  if (particles && particles !== ownParticles) scene.particles = particles;
+  const theme = { ...doc.theme };
+  if (enabled === (template.scene?.enabled ?? false) && !scene.particles) delete theme.scene;
+  else theme.scene = scene;
+  return { ...doc, theme };
+}
+
 export function setOpening(
   doc: InvitationDocument,
   preset: OpeningPreset | null,

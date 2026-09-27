@@ -260,6 +260,8 @@ export function cinematicDocument(
   return {
     ...doc,
     share: { ...doc.share, slug: `cinematic-${templateId}` },
+    // the showcase of every layout is a page — a design made as a scroll scene shows them too
+    theme: manifest.scene?.enabled ? { ...doc.theme, scene: { enabled: false } } : doc.theme,
     cover: { ...doc.cover, opening },
     sections: sections.filter((s) => !(s.type === 'venues' && firstVenue)),
   };

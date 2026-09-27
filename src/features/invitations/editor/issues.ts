@@ -13,6 +13,7 @@ const PANEL_BY_PREFIX: readonly [string, PanelId][] = [
   ['theme.palette', 'palette'],
   ['theme.fontPairId', 'fonts'],
   ['theme.tokens', 'style'],
+  ['theme.scene', 'style'],
   ['cover', 'cover'],
   ['music', 'music'],
   ['share', 'share'],

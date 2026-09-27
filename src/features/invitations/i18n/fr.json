@@ -100,6 +100,7 @@
   "cover.hint.curtain": "Touchez pour lever le rideau",
   "cover.hint.fireworks": "Touchez pour lancer le feu d’artifice",
   "cover.hint.gold_dust": "Touchez pour ouvrir",
+  "cover.hint.gatefold": "Touchez pour ouvrir",
   "locale.menu": "Langue",
   "missing.metaTitle": "Invitation indisponible",
   "missing.title": "Cette invitation n’est pas disponible pour le moment",
@@ -120,5 +121,6 @@
   "liveGallery.qr": "Scannez pour envoyer depuis votre téléphone",
   "liveGallery.qrAfter": "Scannez pour le voir sur votre téléphone",
   "liveGallery.qrLabel": "Code QR de la galerie de l’événement",
-  "liveGallery.preview": "Le bouton mène à la galerie en direct de l’événement une fois activée"
+  "liveGallery.preview": "Le bouton mène à la galerie en direct de l’événement une fois activée",
+  "scene.rsvp": "Confirmer ma présence"
 }

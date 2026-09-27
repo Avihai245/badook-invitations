@@ -1,0 +1,544 @@
+{
+  "id": "celestial",
+  "version": 1,
+  "name": {
+    "he": "שער השמיים",
+    "en": "Celestial"
+  },
+  "description": {
+    "he": "הזמנה שהיא סרט אחד: שער מוזהב בין העננים נפתח, והאורחים עולים איתכם אל מעל העננים ויורדים אל המקום. הרקע זז ומתחלף עם כל גלילה, פרפרים מרחפים והטקסטים עולים מתוך ערפל — ובפתיחה חותם שעווה נשבר ונייר מובלט נפתח לצדדים.",
+    "en": "An invitation that plays as one film: a gate among the clouds opens, and your guests rise with you above the clouds, then descend to the venue. The backdrop moves and changes as they scroll, butterflies drift and every line rises out of a soft haze — and it opens with a wax seal breaking on embossed paper."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "wedding",
+    "engagement",
+    "bar_mitzvah",
+    "bat_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/celestial/scene-gate.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#EDF2F8",
+      "surface": "#FAFCFE",
+      "ink": "#1E2A3E",
+      "inkMuted": "#56647A",
+      "accent": "#D6B97F",
+      "accentInk": "#1E2A3E",
+      "line": "#D3DDE8",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 14,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.92,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#10182A",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "sky",
+      "name": {
+        "he": "תכלת",
+        "en": "Sky"
+      },
+      "palette": {
+        "bg": "#EDF2F8",
+        "surface": "#FAFCFE",
+        "ink": "#1E2A3E",
+        "inkMuted": "#56647A",
+        "accent": "#D6B97F",
+        "accentInk": "#1E2A3E",
+        "line": "#D3DDE8"
+      }
+    },
+    {
+      "id": "cream",
+      "name": {
+        "he": "שמנת",
+        "en": "Cream"
+      },
+      "palette": {
+        "bg": "#F6F1E7",
+        "surface": "#FDFBF6",
+        "ink": "#2B2620",
+        "inkMuted": "#6A6155",
+        "accent": "#C9A66B",
+        "accentInk": "#2B2620",
+        "line": "#E6DCCB"
+      }
+    },
+    {
+      "id": "dawn",
+      "name": {
+        "he": "שחר",
+        "en": "Dawn"
+      },
+      "palette": {
+        "bg": "#F7EEF0",
+        "surface": "#FDF9FA",
+        "ink": "#33242B",
+        "inkMuted": "#6F5A63",
+        "accent": "#E2B7A6",
+        "accentInk": "#33242B",
+        "line": "#EBD9DD"
+      }
+    },
+    {
+      "id": "silver",
+      "name": {
+        "he": "כסף",
+        "en": "Silver"
+      },
+      "palette": {
+        "bg": "#EEF1F4",
+        "surface": "#FBFCFD",
+        "ink": "#1F2733",
+        "inkMuted": "#5B6573",
+        "accent": "#C8D0DA",
+        "accentInk": "#1F2733",
+        "line": "#DAE0E7"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "celestial",
+      "display": {
+        "latin": "Cinzel",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "romance",
+      "display": {
+        "latin": "Pinyon Script",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "gatefold",
+    "renderer": "css3d",
+    "poster": "/templates/celestial/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/celestial/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#5E7C9E",
+      "#8C2E3C",
+      "#1E2A3E",
+      "#B08D57"
+    ],
+    "monogramFont": {
+      "latin": "Cinzel",
+      "hebrew": "Bellefair"
+    },
+    "opening": {
+      "preset": "gatefold",
+      "trigger": "tap",
+      "color": "#F4ECDD"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "gate",
+        "name": {
+          "he": "שער בין העננים",
+          "en": "A gate among the clouds"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-gate",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.52
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "above",
+        "name": {
+          "he": "מעל העננים",
+          "en": "Above the clouds"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-above",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#10182A",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "sparkles",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "butterflies",
+    "shade": "#10182A",
+    "tracking": 0.25
+  },
+  "assets": {
+    "scene-gate": "/templates/celestial/scene-gate.webp",
+    "scene-threshold": "/templates/celestial/scene-threshold.webp",
+    "scene-ascent": "/templates/celestial/scene-ascent.webp",
+    "scene-above": "/templates/celestial/scene-above.webp",
+    "scene-descent": "/templates/celestial/scene-descent.webp",
+    "scene-venue": "/templates/celestial/scene-venue.webp",
+    "scene-garden": "/templates/celestial/scene-garden.webp",
+    "scene-dusk": "/templates/celestial/scene-dusk.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-threshold",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-ascent",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in",
+          "drift": "up"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-above",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.55
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-descent",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in",
+          "drift": "down"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-venue",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-garden",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.55
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-dusk",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

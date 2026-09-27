@@ -286,6 +286,7 @@ test.describe('support tickets', () => {
     await expect(page.getByText('לקוחה ותיקה')).toHaveCount(0);
     await page.goBack();
     await page.reload();
+    await hydrated(page);
     await expect(page.getByTestId('support-ticket').filter({ hasText: subject })).not.toHaveAttribute(
       'data-unread',
       '1',

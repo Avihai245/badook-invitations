@@ -68,6 +68,7 @@ export function briefText(input: ConceptInput): string {
       curtain: 'a theatre curtain parts',
       fireworks: 'a night sky bursts into fireworks',
       gold_dust: 'a veil of gold dust blows away',
+      gatefold: 'a sheet of embossed paper sealed with wax: the seal breaks and it opens to the sides',
     },
     slots: Object.fromEntries(PHOTO_SLOTS.map((s) => [s, slotLayouts(s)])),
     layouts: {

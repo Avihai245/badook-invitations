@@ -30,6 +30,8 @@ export interface Opening {
    * opaque).
    */
   backdrop: boolean;
+  /** the gatefold's wax: the host's seal color, else the design's first */
+  seal: string;
 }
 
 /** The openings that can play over the hero's picture. */
@@ -54,6 +56,9 @@ function colorFor(preset: Opening['preset'], palette: Palette): string {
       return mixHex(dark, '#0B0D1C', 0.72);
     case 'gold_dust':
       return mixHex(dark, '#120C08', 0.6);
+    case 'gatefold':
+      // paper: the design's own when it is light, else a warm ivory
+      return relativeLuminance(palette.bg) > 0.72 ? mixHex(palette.bg, '#FFFDF8', 0.35) : '#F3EBDD';
   }
 }
 
@@ -83,5 +88,9 @@ export function resolveOpening(
     gold: mixHex('#D4AF63', palette.accent, 0.12),
     // a photographic design's own setting, whichever sheer opening the host picks
     backdrop: own?.backdrop === 'hero' && SHEER.includes(preset),
+    seal:
+      (doc.cover.sealColor && HEX.test(doc.cover.sealColor) ? doc.cover.sealColor : null) ??
+      template.cover.sealColors.find((c) => HEX.test(c)) ??
+      '#8C2E3C',
   };
 }

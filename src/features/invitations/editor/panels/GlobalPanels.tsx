@@ -50,7 +50,7 @@ import {
 import { LibraryFontPairs } from '../fields/font-library';
 import { AUDIO_TYPES, ImageField, UploadTile, useUploader } from '../fields/media';
 import { useEditor, type PanelId } from '../state/EditorProvider';
-import { FontSuggestions, OpeningPicker, PhotoPaletteCard, StylePanel } from './DesignCinematic';
+import { FontSuggestions, OpeningPicker, PhotoPaletteCard, ScenePanel, StylePanel } from './DesignCinematic';
 import { HebrewDateLanguages, LanguagesPanel } from './LanguagesPanel';
 
 /**
@@ -73,7 +73,12 @@ export function GlobalPanel({ panel }: { panel: PanelId }) {
     case 'fonts':
       return <FontsPanel />;
     case 'style':
-      return <StylePanel />;
+      return (
+        <>
+          <ScenePanel />
+          <StylePanel />
+        </>
+      );
     case 'music':
       return <MusicPanel />;
     case 'event':

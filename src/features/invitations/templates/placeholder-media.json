@@ -22,6 +22,40 @@
         "hash": "faaed775ab",
         "bytes": 167346
       }
+    },
+    "celestial": {
+      "scene-gate.webp": {
+        "hash": "e4b2f9c52b",
+        "bytes": 141176
+      },
+      "scene-threshold.webp": {
+        "hash": "742d4d52c2",
+        "bytes": 132092
+      },
+      "scene-ascent.webp": {
+        "hash": "24afa5cfec",
+        "bytes": 98946
+      },
+      "scene-above.webp": {
+        "hash": "f73e88edb6",
+        "bytes": 95642
+      },
+      "scene-descent.webp": {
+        "hash": "f3f3545e32",
+        "bytes": 95110
+      },
+      "scene-venue.webp": {
+        "hash": "856edd228e",
+        "bytes": 114844
+      },
+      "scene-garden.webp": {
+        "hash": "3e4d069f24",
+        "bytes": 131146
+      },
+      "scene-dusk.webp": {
+        "hash": "3767f83093",
+        "bytes": 111628
+      }
     }
   }
 }

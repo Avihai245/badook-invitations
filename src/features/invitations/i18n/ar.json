@@ -112,6 +112,7 @@
   "cover.hint.curtain": "اضغطوا لفتح الستارة",
   "cover.hint.fireworks": "اضغطوا لإطلاق الألعاب النارية",
   "cover.hint.gold_dust": "اضغطوا للفتح",
+  "cover.hint.gatefold": "اضغطوا للفتح",
   "locale.menu": "اللغة",
   "missing.metaTitle": "الدعوة غير متاحة",
   "missing.title": "هذه الدعوة غير متاحة حاليًا",
@@ -132,5 +133,6 @@
   "liveGallery.qr": "امسحوا الرمز للرفع من الهاتف",
   "liveGallery.qrAfter": "امسحوا الرمز للمشاهدة على الهاتف",
   "liveGallery.qrLabel": "رمز QR لمعرض المناسبة",
-  "liveGallery.preview": "يقود الزر إلى المعرض المباشر للمناسبة عند تفعيله"
+  "liveGallery.preview": "يقود الزر إلى المعرض المباشر للمناسبة عند تفعيله",
+  "scene.rsvp": "تأكيد الحضور"
 }

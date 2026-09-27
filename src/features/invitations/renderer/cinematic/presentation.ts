@@ -65,10 +65,16 @@ export function hasPresentation(section: Section): boolean {
 export const hasThemeTokens = (doc: Pick<InvitationDocument, 'theme'>): boolean =>
   Object.values(doc.theme.tokens ?? {}).some((v) => typeof v === 'number' && v !== 1);
 
-/** Whether the document uses the v2 presentation anywhere (sections, the host's opening, its tokens). */
+/**
+ * Whether the document uses the v2 presentation anywhere (sections, the host's opening, its tokens, its
+ * scroll scene).
+ */
 export function usesCinematic(doc: Pick<InvitationDocument, 'sections' | 'cover' | 'theme'>): boolean {
   return (
-    !!doc.cover.opening || hasThemeTokens(doc) || doc.sections.some((s) => s.enabled && hasPresentation(s))
+    !!doc.cover.opening ||
+    hasThemeTokens(doc) ||
+    !!doc.theme.scene ||
+    doc.sections.some((s) => s.enabled && hasPresentation(s))
   );
 }
 
@@ -97,6 +103,7 @@ function cinematicValues(doc: CinematicDoc): { path: string; key: string }[] {
   };
   add('cover.opening', 'opening', doc.cover.opening);
   if (hasThemeTokens(doc)) add('theme.tokens', 'tokens', doc.theme.tokens);
+  add('theme.scene', 'scene', doc.theme.scene);
   for (const [i, s] of doc.sections.entries()) {
     const own = (kind: string) => `${kind}@${s.id}`;
     if (s.type !== 'hero') {
@@ -147,12 +154,12 @@ function resolveMedia(section: Section, ctx: RenderContext): CineMedia | null {
 const isLight = (hex: string) => (/^#[0-9A-Fa-f]{6}$/.test(hex) ? relativeLuminance(hex) > 0.45 : true);
 
 /** A dark scrim in the design's own hues: the hero's overlay when it is dark, else its ink, deepened. */
-function darkScrim(template: TemplateManifest, palette: Palette): string {
+export function darkScrim(template: TemplateManifest, palette: Palette): string {
   if (!isLight(template.hero.overlayColor)) return template.hero.overlayColor;
   return relativeLuminance(palette.ink) < 0.05 ? palette.ink : mixHex(palette.ink, '#000000', 0.45);
 }
 /** Light text in the design's own hues: its paper when it is light enough, else white. */
-const lightText = (palette: Palette) => (relativeLuminance(palette.bg) > 0.7 ? palette.bg : '#FFFFFF');
+export const lightText = (palette: Palette) => (relativeLuminance(palette.bg) > 0.7 ? palette.bg : '#FFFFFF');
 
 /**
  * The scrim over a section's media and the text on it (`text`: set when it isn't the hero's). Light

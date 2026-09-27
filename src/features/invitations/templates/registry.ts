@@ -10,6 +10,8 @@ import ataraManifest from '@pack/atara/manifest.json';
 import bukharaDefaults from '@pack/bukhara/defaults.json';
 import bukharaManifest from '@pack/bukhara/manifest.json';
 import caesareaDefaults from '@pack/caesarea-shore/defaults.json';
+import celestialDefaults from '@pack/celestial/defaults.json';
+import celestialManifest from '@pack/celestial/manifest.json';
 import caesareaManifest from '@pack/caesarea-shore/manifest.json';
 import cloudArchDefaults from '@pack/cloud-arch/defaults.json';
 import cloudArchManifest from '@pack/cloud-arch/manifest.json';
@@ -115,8 +117,8 @@ export interface TemplateEntry {
 }
 
 /**
- * Gallery order: the 8 originals as in design-reference/app.html, then the scene templates, their
- * event types mixed so every filter has something near the top.
+ * Gallery order: the 8 originals as in design-reference/app.html, the animated scroll-scene design,
+ * then the scene templates, their event types mixed so every filter has something near the top.
  */
 const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: saharManifest, defaults: saharDefaults },
@@ -127,6 +129,8 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: nitzanManifest, defaults: nitzanDefaults },
   { manifest: rooftopManifest, defaults: rooftopDefaults },
   { manifest: honeyManifest, defaults: honeyDefaults },
+  // the scroll scene (renderer/scene): the invitation as one film
+  { manifest: celestialManifest, defaults: celestialDefaults },
   { manifest: midnightManifest, defaults: midnightDefaults },
   { manifest: klafManifest, defaults: klafDefaults },
   { manifest: cocoaManifest, defaults: cocoaDefaults },

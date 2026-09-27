@@ -3,9 +3,11 @@ import {
   DEFAULT_SECTION_ANIMATION,
   ENTER_PRESETS,
   OPENING_PRESETS,
+  SCENE_PARTICLES,
   type EnterPreset,
   type Locale,
   type OpeningPreset,
+  type SceneParticles,
   type Section,
 } from '@/features/invitations/contracts/types';
 import { isLocale, loadDevDocument } from '@/features/invitations/dev/load-dev-document';
@@ -44,6 +46,8 @@ export const dynamic = 'force-dynamic';
  *   videoSound=1           the hero video's sound instead of a track (the host's "video sound" option)
  *   opening=gate|curtain|fireworks|gold_dust|envelope   the host's cinematic opening (cover.opening)
  *   cinematic=0            the event without the `cinematic` feature: the plain rendering
+ *   scene=1|0              the invitation as a scroll scene (renderer/scene), or as a page, whatever
+ *                          the design's own choice (scene particles: sceneParticles=butterflies|…)
  *   motion=<enter preset>  every section comes in with that preset (rise, zoom, tilt…) — the scroll-
  *                          driven entrances on any document
  * Document `cinematic` (every v2 layout and motion) reads its pictures from /dev/media.
@@ -171,7 +175,24 @@ export default async function RenderPage({ params, searchParams }: { params: Par
   const env = serverEnv();
   // another opening than the document's: its own call to action, not the template's seeded one
   const hint = opening && opening !== 'envelope' && opening !== doc.cover.opening ? null : doc.cover.hint;
-  const rendered = { ...doc, sections, music, cover: { ...doc.cover, opening, hint } };
+  const sceneParam = one(sp.scene);
+  const particlesParam = one(sp.sceneParticles);
+  const scene =
+    sceneParam === '1' || sceneParam === '0'
+      ? {
+          enabled: sceneParam === '1',
+          ...((SCENE_PARTICLES as readonly string[]).includes(particlesParam ?? '')
+            ? { particles: particlesParam as SceneParticles }
+            : {}),
+        }
+      : doc.theme.scene;
+  const rendered = {
+    ...doc,
+    sections,
+    music,
+    cover: { ...doc.cover, opening, hint },
+    theme: { ...doc.theme, scene },
+  };
   const options: Omit<RenderOptions, 'mode'> = {
     brand: env.INVITES_BRAND_NAME,
     cinematic: one(sp.cinematic) !== '0',

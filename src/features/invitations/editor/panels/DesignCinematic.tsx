@@ -7,21 +7,32 @@ import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import {
   OPENING_PRESETS,
+  SCENE_PARTICLES,
   THEME_TOKEN_RANGES,
   dirOf,
   type Locale,
   type OpeningPreset,
   type Palette,
+  type SceneParticles,
 } from '../../contracts/types';
 import generatedFaces from '../../fonts/font-faces.generated.json';
 import { fontFor } from '../../fonts';
 import { suggestFontPairs } from '../../lib/font-suggest';
 import { extractSwatches, photoPalettes, pixelsOf, type PhotoPalette } from '../../lib/photo-palette';
+import { templateScene } from '../../renderer/scene/model';
 import { docScale, resolvePalette } from '../../renderer/theme';
 import { HelpFor } from '../../app/HelpFor';
-import { FieldFrame, PanelCard, RangeField, hostsText, usePreviewControls } from '../fields/fields';
+import {
+  FieldFrame,
+  PanelCard,
+  RangeField,
+  SegmentedField,
+  SwitchRow,
+  hostsText,
+  usePreviewControls,
+} from '../fields/fields';
 import { invitationPictures } from '../fields/SectionMedia';
-import { applyDocPalette, seededHints, setOpening, setThemeTokens } from '../presentation';
+import { applyDocPalette, seededHints, setOpening, setScene, setThemeTokens } from '../presentation';
 import { useEditor } from '../state/EditorProvider';
 import { PaletteChoices } from './SectionCinematic';
 
@@ -115,6 +126,52 @@ export function OpeningPicker() {
         </p>
         {!doc.cover.hint ? <p className="mt-1 text-[12px] text-muted">{c.hintNote}</p> : null}
       </FieldFrame>
+    </PanelCard>
+  );
+}
+
+// ─── the scroll scene (theme.scene) ─────────────────────────────────────────────────────────────
+
+/**
+ * "Animated invitation" (v2 `theme.scene`, renderer/scene): the whole invitation as one film — the
+ * background pinned, cross-fading between the sections' pictures and slowly zooming as guests scroll,
+ * particles drifting over it. Any design can be one; a design made as one starts on.
+ */
+export function ScenePanel() {
+  const { doc, template, apply } = useEditor();
+  const { t } = useUi();
+  const s = t.editor.cine.scene;
+  const own = templateScene(template);
+  const on = doc.theme.scene?.enabled ?? own.enabled;
+  const particles: SceneParticles = doc.theme.scene?.particles ?? own.particles;
+  // the pictures the backdrop changes between: the hero's, then each part's own
+  const pictures = 1 + doc.sections.filter((x) => x.enabled && x.type !== 'hero' && x.media).length;
+  const change = (patch: { enabled?: boolean; particles?: SceneParticles }, key: string) =>
+    apply((d) => setScene(d, patch, template, own.particles), key);
+  return (
+    <PanelCard title={s.title}>
+      <SwitchRow
+        path="theme.scene.enabled"
+        label={s.enabled}
+        help={s.enabledHelp}
+        checked={on}
+        onCheckedChange={(v) => change({ enabled: v }, 'theme.scene.enabled')}
+      />
+      {on ? (
+        <>
+          <SegmentedField<SceneParticles>
+            path="theme.scene.particles"
+            label={s.particles}
+            value={particles}
+            onValueChange={(v) => change({ particles: v }, 'theme.scene.particles')}
+            options={SCENE_PARTICLES.map((p) => ({ value: p, label: s.particleNames[p] }))}
+          />
+          <p className="text-[12px] text-muted">
+            {pictures > 1 ? fmt(s.pictures, { n: pictures }) : s.onePicture}
+          </p>
+          <p className="text-[12px] text-muted">{s.desktop}</p>
+        </>
+      ) : null}
     </PanelCard>
   );
 }

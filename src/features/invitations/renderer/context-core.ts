@@ -14,6 +14,7 @@ import { interpolate, localize, type TokenValues } from '../lib/l10n';
 import { resolveAsset, type AssetBases } from './assets';
 import { coverMedia, musicUrl, type CoverMedia } from './cover/media';
 import { placeholderArt, type PlaceholderArt } from './placeholders';
+import { sceneModel, sceneOn, type SceneModel } from './scene/model';
 
 export type RenderMode = 'live' | 'preview' | 'editor';
 
@@ -78,6 +79,11 @@ export interface RenderContext {
   liveGallery: { url: string } | null;
   /** The event measures how guests use the invitation (feature `analytics`): the live page's beacon. */
   insights: boolean;
+  /**
+   * The invitation as one scroll scene (renderer/scene: the host's choice or the design's, with the
+   * `cinematic` feature) — its pictures, particles and tones; null: a page.
+   */
+  scene: SceneModel | null;
 }
 
 export interface RenderOptions {
@@ -162,5 +168,8 @@ export function createRenderContext(
     review: options.review ?? false,
     liveGallery: options.liveGallery ?? null,
     insights: options.insights ?? false,
+    scene: sceneOn(doc, template, options.cinematic ?? true)
+      ? sceneModel({ doc, template, bases: options.bases })
+      : null,
   };
 }

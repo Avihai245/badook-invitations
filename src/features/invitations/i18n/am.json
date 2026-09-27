@@ -96,6 +96,7 @@
   "cover.hint.curtain": "መጋረጃውን ለመክፈት ይንኩ",
   "cover.hint.fireworks": "ርችቱን ለማብራት ይንኩ",
   "cover.hint.gold_dust": "ለመክፈት ይንኩ",
+  "cover.hint.gatefold": "ለመክፈት ይንኩ",
   "locale.menu": "ቋንቋ",
   "missing.metaTitle": "ግብዣው አይገኝም",
   "missing.title": "ይህ ግብዣ አሁን አይገኝም",
@@ -116,5 +117,6 @@
   "liveGallery.qr": "ከስልክዎ ለመስቀል ይቃኙ",
   "liveGallery.qrAfter": "በስልክዎ ለማየት ይቃኙ",
   "liveGallery.qrLabel": "ወደ ዝግጅቱ የፎቶ ማዕከል የሚወስድ QR ኮድ",
-  "liveGallery.preview": "ቁልፉ የቀጥታ የፎቶ ማዕከሉ ሲበራ ወደ እሱ ይወስዳል"
+  "liveGallery.preview": "ቁልፉ የቀጥታ የፎቶ ማዕከሉ ሲበራ ወደ እሱ ይወስዳል",
+  "scene.rsvp": "መገኘትዎን ያረጋግጡ"
 }

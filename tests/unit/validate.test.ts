@@ -64,12 +64,11 @@ describe('fixtures, demos and wizard seeds', () => {
         ),
       ).toBe(true);
       for (const s of doc.sections)
-        if (s.type === 'venues')
-          for (const v of s.data.items)
-            for (const l of locales) {
-              v.name[l] = 'Ahuzat HaGefen';
-              v.address[l] = '12 Derech HaKramim';
-            }
+        for (const v of s.type === 'venues' ? s.data.items : s.type === 'where' ? [s.data.venue] : [])
+          for (const l of locales) {
+            v.name[l] = 'Ahuzat HaGefen';
+            v.address[l] = '12 Derech HaKramim';
+          }
       expect(brief(check(doc).errors)).toEqual([]);
     },
   );

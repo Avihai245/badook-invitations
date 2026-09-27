@@ -16,6 +16,9 @@ import {
   MOTION_EASINGS,
   OPENING_PRESETS,
   PALETTE_KEYS,
+  SCENE_DRIFTS,
+  SCENE_PARTICLES,
+  SCENE_ZOOMS,
   SCROLL_EFFECTS,
   SECTION_LAYOUTS,
   SECTION_TYPES,
@@ -30,12 +33,14 @@ import {
   type RsvpConfig,
   type RsvpResult,
   type RsvpSubmission,
+  type SceneSettings,
   type Section,
   type SectionAnimation,
   type SectionMedia,
   type SectionPresentation,
   type TemplateDefaults,
   type TemplateManifest,
+  type TemplateScene,
   type ThemeOverrides,
   type ThemeTokens,
   type TypographyTokens,
@@ -122,6 +127,15 @@ export const OpeningPresetSchema = z.enum(OPENING_PRESETS);
 export const SectionMediaSchema = MediaSchema.extend({
   alt: L10nSchema.nullable().optional(),
   overlay: z.number().min(0).max(0.85).nullable().optional(),
+  // the scroll scene: how the picture moves while it is the backdrop
+  kenBurns: z.enum(SCENE_ZOOMS).nullable().optional(),
+  drift: z.enum(SCENE_DRIFTS).nullable().optional(),
+});
+
+/** The scroll scene (v2): the invitation as one continuous film (renderer/scene). */
+export const SceneSettingsSchema = z.strictObject({
+  enabled: z.boolean(),
+  particles: z.enum(SCENE_PARTICLES).nullable().optional(),
 });
 
 const A = DEFAULT_SECTION_ANIMATION;
@@ -485,6 +499,8 @@ export const InvitationDocumentSchema = z.strictObject({
     palette: PartialPaletteSchema.nullable(),
     // v2: the host's type scale, spacing density and motion intensity (feature `cinematic`)
     tokens: ThemeTokensSchema.nullable().optional(),
+    // v2: the invitation as one scroll scene (feature `cinematic`); absent / null → the template's
+    scene: SceneSettingsSchema.nullable().optional(),
   }),
   cover: z.strictObject({
     enabled: z.boolean(),
@@ -546,6 +562,13 @@ export const OpeningConfigSchema = z.strictObject({
   color: HexColorSchema.nullable().optional(),
   // a photo-led opening: the fireworks' sky / the gold dust's veil over the hero's picture
   backdrop: z.literal('hero').nullable().optional(),
+});
+
+export const TemplateSceneSchema = z.strictObject({
+  enabled: z.boolean(),
+  particles: z.enum(SCENE_PARTICLES),
+  shade: HexColorSchema.nullable(),
+  tracking: z.number().min(0).max(0.4),
 });
 
 export const TemplateManifestSchema = z.strictObject({
@@ -647,6 +670,8 @@ export const TemplateManifestSchema = z.strictObject({
     // added in v2 (tokens v2): × every travel of the motion engine
     intensity: z.number().min(0).max(2).default(1),
   }),
+  // added with the scroll scene: a design made as one scene (null — a page, the default)
+  scene: TemplateSceneSchema.nullable().default(null),
   assets: z.record(z.string().regex(/^[A-Za-z0-9._-]+$/), TemplatePathSchema),
   decorations: z.partialRecord(z.enum(DECORATION_SLOTS), AssetRefSchema.nullable()),
   sectionDefaults: z.strictObject({
@@ -785,6 +810,8 @@ export type _ContractChecks = [
   Assert<MutuallyAssignable<z.infer<typeof SectionPresentationSchema>, SectionPresentation>>,
   Assert<MutuallyAssignable<z.infer<typeof TypographySchema>, TypographyTokens>>,
   Assert<MutuallyAssignable<z.infer<typeof OpeningConfigSchema>, OpeningConfig>>,
+  Assert<MutuallyAssignable<z.infer<typeof SceneSettingsSchema>, SceneSettings>>,
+  Assert<MutuallyAssignable<z.infer<typeof TemplateSceneSchema>, TemplateScene>>,
   Assert<MutuallyAssignable<z.infer<typeof VenueSchema>, Venue>>,
   Assert<MutuallyAssignable<z.infer<typeof RsvpConfigSchema>, RsvpConfig>>,
   Assert<MutuallyAssignable<z.infer<typeof SectionSchema>, Section>>,

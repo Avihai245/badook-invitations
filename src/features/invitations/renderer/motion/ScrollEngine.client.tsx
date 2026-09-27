@@ -121,15 +121,16 @@ export function ScrollEngine() {
       return;
     }
 
-    // ── the reveal ──
+    // ── the reveal ── (a quarter of it in view in a scroll scene — renderer/scene — a fifth elsewhere)
+    const share = inv?.dataset.film !== undefined ? 0.25 : 0.2;
     const reveal = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (!e.isIntersecting) continue;
           // a 1px divider is either in or out: any intersection counts
           if (
-            e.intersectionRatio >= 0.2 ||
-            e.intersectionRect.height >= window.innerHeight * 0.2 ||
+            e.intersectionRatio >= share ||
+            e.intersectionRect.height >= window.innerHeight * share ||
             e.target.classList.contains('divider')
           ) {
             e.target.classList.add('in');
@@ -137,7 +138,7 @@ export function ScrollEngine() {
           }
         }
       },
-      { threshold: [0, 0.2, 0.5] },
+      { threshold: [0, share, 0.5] },
     );
     cleanups.push(() => reveal.disconnect());
 

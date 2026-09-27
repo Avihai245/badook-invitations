@@ -2,11 +2,13 @@
 
 import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react';
 import { visibleGlyphCount } from '../../lib/text';
+import { burstFrom } from '../fx/burst';
 import { seeded } from '../fx/motion';
 import { fireworks, goldDust } from '../fx/sparks';
 import { Localized, coverName, type Variant } from './localized';
 import type { Opening } from './opening';
 import { announceOpen, reducedMotion, useOpening, type PhaseProps } from './phase';
+import { SealArt } from './SealArt';
 
 export interface CinematicCoverProps extends PhaseProps {
   opening: Opening;
@@ -41,8 +43,9 @@ const SWIPE_TO_OPEN = 150;
 /**
  * The cinematic openings (v2 — feature `cinematic`; the template's cover.opening or the host's
  * choice): a gate of two doors that swing or slide open, a theatre curtain that parts or rises,
- * fireworks bursting over a night sky, a veil of gold dust blown away. CSS and SVG, and a small canvas
- * for the light (fx/sparks.ts). The gate and the curtain also open by scrolling or swiping — they
+ * fireworks bursting over a night sky, a veil of gold dust blown away, a gatefold of embossed paper
+ * whose wax seal breaks before its two halves open to the sides (~1.2 s). CSS and SVG, and a small
+ * canvas for the light (fx/sparks.ts). The gate and the curtain also open by scrolling or swiping — they
  * follow the finger / the wheel a little, then open (a swipe's lift is a gesture, so the music may
  * start in it; a wheel isn't, so the music button asks for its tap). With reduced motion: a plain
  * fade. Like the classic cover, one big button (tap, Enter, Space) with a Skip beside it, and the
@@ -84,6 +87,17 @@ export function CinematicCover({
       case 'fireworks':
         fireworks(fx?.colors.length ? [...fx.colors.slice(0, 4), opening.gold] : colors);
         later(() => finish(1000), 1250);
+        break;
+      case 'gatefold':
+        // the seal breaks (a spark of light), the halves open, the invitation comes in behind them
+        burstFrom(
+          root.current?.querySelector('.co-seal') ?? null,
+          'sparkles',
+          ['#FFF6DA', '#FFE3A1', opening.gold],
+          undefined,
+          0.45,
+        );
+        later(() => finish(360), 880);
         break;
       case 'gold_dust': {
         const r = root.current?.querySelector('.co-mono')?.getBoundingClientRect();
@@ -176,6 +190,7 @@ export function CinematicCover({
     '--co-light': opening.light,
     '--co-deep': opening.deep,
     '--co-gold': opening.gold,
+    '--co-seal': opening.seal,
     // a longer monogram (a name and an age: "DANA 30") sets smaller on the medal and the crest — the
     // longest of its languages
     '--co-glyphs': Math.max(3, ...monogram.map((v) => visibleGlyphCount(v.text))),
@@ -221,6 +236,27 @@ export function CinematicCover({
           <Specks className="co-stars" count={34} seed="stars" top={0.04} bottom={0.7} />
           <span className="co-center" aria-hidden="true">
             {mono}
+          </span>
+        </>
+      );
+      break;
+    case 'gatefold':
+      art = (
+        <>
+          <span className="co-glow" aria-hidden="true" />
+          {(['l', 'r'] as const).map((side) => (
+            <span key={side} className={`co-leaf ${side}`} aria-hidden="true">
+              <span className="co-emboss" />
+            </span>
+          ))}
+          {/* the wax seal across the seam, twice — clipped at the middle, its halves part as it breaks */}
+          <span className="co-seal" aria-hidden="true">
+            <span className="half l">
+              <SealArt variants={monogram} shape="wax_seal" />
+            </span>
+            <span className="half r">
+              <SealArt variants={monogram} shape="wax_seal" />
+            </span>
           </span>
         </>
       );

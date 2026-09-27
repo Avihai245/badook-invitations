@@ -64,12 +64,29 @@ interface Anchor {
   y: number;
 }
 
-const mainChildren = () => Array.from(document.querySelector('.inv > main')?.children ?? []) as HTMLElement[];
+const mainChildren = () =>
+  Array.from(document.querySelector('.inv > main, .inv .sc-track main')?.children ?? []) as HTMLElement[];
+
+/**
+ * What scrolls: the page — or, in a scroll scene's phone frame on a computer (renderer/scene), the
+ * frame (`.sc-scroll`, then a scroll container).
+ */
+function scrolling(): { y: number; to: (y: number) => void; style: CSSStyleDeclaration } {
+  const frame = document.querySelector<HTMLElement>('.inv .sc-scroll');
+  const o = frame ? getComputedStyle(frame).overflowY : 'visible';
+  if (frame && o !== 'visible' && o !== 'clip')
+    return { y: frame.scrollTop, to: (y) => frame.scrollTo(0, y), style: frame.style };
+  return {
+    y: window.scrollY,
+    to: (y) => window.scrollTo(0, y),
+    style: document.documentElement.style,
+  };
+}
 
 /** Where the guest is: the first section still on screen, and how far into it. */
 function captureAnchor(): Anchor {
   const kids = mainChildren();
-  const y = window.scrollY;
+  const y = scrolling().y;
   for (let i = 0; i < kids.length; i++) {
     const r = kids[i]!.getBoundingClientRect();
     if (r.height > 0 && r.bottom > 0) {
@@ -84,15 +101,15 @@ function restoreAnchor(a: Anchor) {
   const kids = mainChildren();
   const el = a.index >= 0 && kids.length === a.count ? kids[a.index] : undefined;
   let y = a.y;
+  const scroll = scrolling();
   if (el) {
     const r = el.getBoundingClientRect();
-    y = window.scrollY + r.top - (a.top >= 0 ? a.top : -a.ratio * r.height);
+    y = scroll.y + r.top - (a.top >= 0 ? a.top : -a.ratio * r.height);
   }
-  const root = document.documentElement;
-  const behavior = root.style.scrollBehavior;
-  root.style.scrollBehavior = 'auto'; // <html> scrolls smoothly (anchor links) — not this jump
-  window.scrollTo(0, Math.max(0, Math.round(y)));
-  root.style.scrollBehavior = behavior;
+  const behavior = scroll.style.scrollBehavior;
+  scroll.style.scrollBehavior = 'auto'; // <html> scrolls smoothly (anchor links) — not this jump
+  scroll.to(Math.max(0, Math.round(y)));
+  scroll.style.scrollBehavior = behavior;
 }
 
 /** The new locale's nodes on (or above) the screen appear as they are — no entrance animation again. */
@@ -261,9 +278,9 @@ export function LiveLocale({
     if (a && visible) {
       restoreAnchor(a);
       // fonts still arriving change the texts' height: settle again, unless the guest scrolled meanwhile
-      const settled = window.scrollY;
+      const settled = scrolling().y;
       void document.fonts?.ready.then(() => {
-        if (Math.abs(window.scrollY - settled) < 2) restoreAnchor(a);
+        if (Math.abs(scrolling().y - settled) < 2) restoreAnchor(a);
       });
     }
     if (visible) revealInView();

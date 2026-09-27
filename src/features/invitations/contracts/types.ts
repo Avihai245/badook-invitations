@@ -78,6 +78,8 @@ export interface InvitationDocument {
     palette: Partial<Palette> | null; // only template.editablePaletteKeys
     /** v2 (cinematic): the host's scale of the design's type, spacing and motion; absent / null → as designed */
     tokens?: ThemeTokens | null;
+    /** v2 (cinematic): the invitation as one scroll scene (renderer/scene); absent / null → the template's */
+    scene?: SceneSettings | null;
   };
   cover: {
     // the cover design itself comes from the template
@@ -145,14 +147,32 @@ export interface SectionMedia extends Media {
   alt?: L10n | null;
   /** the scrim over media that text sits on, 0..0.85; null → the template's (tokens.overlay) */
   overlay?: number | null;
+  /**
+   * The scroll scene (theme.scene): how the picture moves while it is the invitation's backdrop — a
+   * slow zoom in (the default) or out as the guest scrolls through its sections, or none.
+   */
+  kenBurns?: SceneZoom | null;
+  /** The scroll scene: the picture drifts up (the camera rises) or down as the guest scrolls past it. */
+  drift?: SceneDrift | null;
 }
 
 /**
  * How a section's blocks come in: `auto` is the template's own reveal (§9A.6); the others are
- * transform/opacity presets — `slide_start` comes from the reading side, `tilt` lifts in tipped back.
+ * transform/opacity presets — `slide_start` comes from the reading side, `tilt` lifts in tipped back,
+ * `rise_blur` rises out of a soft blur, its letters settling (the scroll scene's own reveal).
  */
 export type EnterPreset =
-  'auto' | 'none' | 'fade' | 'rise' | 'sink' | 'zoom' | 'zoom_out' | 'slide_start' | 'slide_end' | 'tilt';
+  | 'auto'
+  | 'none'
+  | 'fade'
+  | 'rise'
+  | 'sink'
+  | 'zoom'
+  | 'zoom_out'
+  | 'slide_start'
+  | 'slide_end'
+  | 'tilt'
+  | 'rise_blur';
 export const ENTER_PRESETS = [
   'auto',
   'none',
@@ -164,6 +184,7 @@ export const ENTER_PRESETS = [
   'slide_start',
   'slide_end',
   'tilt',
+  'rise_blur',
 ] as const satisfies readonly EnterPreset[];
 /** What the media does while the section scrolls by: drifts slower than the page, or slowly zooms. */
 export type ScrollEffect = 'none' | 'parallax' | 'ken_burns';
@@ -288,15 +309,17 @@ export interface SectionPresentation {
 /**
  * The cinematic openings (renderer/cover): `envelope` is the template's own cover (envelope, ticket,
  * pouch… or its opening video); `gate` two doors swing open; `curtain` a theatre curtain parts or
- * rises; `fireworks` a night sky bursts into fireworks; `gold_dust` a veil of gold dust blows away.
+ * rises; `fireworks` a night sky bursts into fireworks; `gold_dust` a veil of gold dust blows away;
+ * `gatefold` a sheet of embossed paper sealed with wax — the seal breaks and its two halves open.
  */
-export type OpeningPreset = 'envelope' | 'gate' | 'curtain' | 'fireworks' | 'gold_dust';
+export type OpeningPreset = 'envelope' | 'gate' | 'curtain' | 'fireworks' | 'gold_dust' | 'gatefold';
 export const OPENING_PRESETS = [
   'envelope',
   'gate',
   'curtain',
   'fireworks',
   'gold_dust',
+  'gatefold',
 ] as const satisfies readonly OpeningPreset[];
 /** The template's opening (manifest cover.opening, v2). */
 export interface OpeningConfig {
@@ -316,6 +339,44 @@ export interface OpeningConfig {
    * openings whichever the host picks; null / absent → the opening's own sky or veil.
    */
   backdrop?: 'hero' | null;
+}
+
+/**
+ * The scroll scene (v2 — feature `cinematic`; renderer/scene): the invitation as one continuous film.
+ * A backdrop stays pinned behind the page while the texts scroll over it: it cross-fades from picture
+ * to picture as the guest moves from section to section — each section's `media` (one without media
+ * continues the picture before it; the first is the hero's, or the design's own art) — every picture
+ * slowly zooming, a few particles drifting over it, each text rising into view. Only transform and
+ * opacity move; with reduced motion the pictures only cross-fade.
+ */
+export interface SceneSettings {
+  enabled: boolean;
+  /** what drifts over the backdrop; null / absent → the template's (TemplateScene.particles) */
+  particles?: SceneParticles | null;
+}
+/** The scene's particles (one canvas, 8–15 of them): butterflies, falling petals, gold dust — or none. */
+export type SceneParticles = 'none' | 'butterflies' | 'petals' | 'gold_dust';
+export const SCENE_PARTICLES = [
+  'none',
+  'butterflies',
+  'petals',
+  'gold_dust',
+] as const satisfies readonly SceneParticles[];
+/** A backdrop's slow zoom as the guest scrolls through its sections (Ken Burns, 1 → 1.08). */
+export type SceneZoom = 'in' | 'out' | 'none';
+export const SCENE_ZOOMS = ['in', 'out', 'none'] as const satisfies readonly SceneZoom[];
+/** A backdrop's vertical drift: `up` — the camera rises, the picture sinks; `down` — the reverse. */
+export type SceneDrift = 'up' | 'down';
+export const SCENE_DRIFTS = ['up', 'down'] as const satisfies readonly SceneDrift[];
+/** A template made as a scroll scene (manifest `scene`). */
+export interface TemplateScene {
+  /** new invitations of the design start as a scene (the host may turn it off) */
+  enabled: boolean;
+  particles: SceneParticles;
+  /** the dark tone of the gradient laid over every picture (the texts are light on it); null → the design's */
+  shade: string | null;
+  /** extra letter spacing of the section titles in the scene, em (0: the design's own) */
+  tracking: number;
 }
 
 interface Base<T extends string, D, M extends SectionMedia | null = SectionMedia | null, L = SectionLayout> {
@@ -672,6 +733,8 @@ export interface TemplateManifest {
     /** v2: × every travel of the motion engine (reveal distance, parallax depth, zoom), 0..2; default 1 */
     intensity: number;
   };
+  /** v2: a design made as a scroll scene (renderer/scene) — null: a page (the host may still make it one) */
+  scene: TemplateScene | null;
   assets: Record<string, string>; // referenced as 'template:<key>'
   decorations: Partial<
     Record<'afterHero' | 'betweenVenues' | 'afterTimeline' | 'beforeRsvp' | 'footer', AssetRef | null>

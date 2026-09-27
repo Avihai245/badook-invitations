@@ -31,7 +31,7 @@ import { TEMPLATE_IDS, requireTemplate } from '@/features/invitations/templates/
 
 const NOW = Date.parse('2026-09-23T10:00:00Z');
 /** Designs made with tokens v2: their manifests set type, spacing and motion. */
-const V2_DESIGNS: ReadonlySet<string> = new Set(['lumiere']);
+const V2_DESIGNS: ReadonlySet<string> = new Set(['lumiere', 'celestial']);
 const sahar = () => requireTemplate('sahar-bordeaux').manifest;
 const ctxOf = (doc: InvitationDocument, options: { cinematic?: boolean; locale?: 'he' | 'en' } = {}) =>
   buildRenderContext(doc, requireTemplate(doc.templateId).manifest, options.locale ?? 'he', {
