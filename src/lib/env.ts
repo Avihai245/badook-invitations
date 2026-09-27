@@ -11,7 +11,7 @@ const flag = (fallback: boolean) =>
 
 /**
  * Server-side configuration (every name matches amplify.yml's
- * `^(NEXT_PUBLIC_|SUPABASE_|INVITES_|ANTHROPIC_API_KEY=)`). Documented in .env.example.
+ * `^(NEXT_PUBLIC_|SUPABASE_|INVITES_|ANTHROPIC_API_KEY=|OPENAI_API_KEY=)`). Documented in .env.example.
  */
 const ServerEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().default(''),
@@ -70,6 +70,15 @@ const ServerEnvSchema = z.object({
     .transform((u) => u.replace(/\/+$/, '')),
   // questions a day for the whole site (a cost ceiling); past it the assistant answers from the guide
   INVITES_AI_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(2000),
+  // the chat only can answer through OpenAI instead: with this key and INVITES_AI_MODEL_OPENAI both
+  // set, it takes over just the chat (chat.completions) — every other AI feature above (gallery_ai,
+  // translate_ai, art_direction) stays on ANTHROPIC_API_KEY + INVITES_AI_MODEL regardless
+  OPENAI_API_KEY: z.string().default(''),
+  INVITES_AI_MODEL_OPENAI: z.string().trim().default(''),
+  INVITES_AI_API_BASE_OPENAI: z
+    .url()
+    .default('https://api.openai.com')
+    .transform((u) => u.replace(/\/+$/, '')),
   // design concepts made by the AI a day per account ("design it for me"); past it they are composed
   // from the photos without it. The site's ceiling for them is INVITES_AI_DAILY_LIMIT.
   INVITES_ART_DIRECTION_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(12),

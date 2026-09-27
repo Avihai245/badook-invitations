@@ -23,6 +23,7 @@ export interface Deployment {
     email: boolean;
     supportEmail: boolean;
     ai: boolean;
+    aiChat: boolean;
     tts: boolean;
     partnerApi: boolean;
     faceAlbums: boolean;
@@ -59,6 +60,11 @@ export function deployment(now = new Date()): Deployment {
       email: !!(env.INVITES_EMAIL_API_KEY && env.INVITES_EMAIL_FROM),
       supportEmail: !!env.INVITES_SUPPORT_EMAIL,
       ai: !!(env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL),
+      // the chat only: either provider (support/chat.ts) — true even when only OpenAI is set up
+      aiChat: !!(
+        (env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL) ||
+        (env.OPENAI_API_KEY && env.INVITES_AI_MODEL_OPENAI)
+      ),
       tts: !!(env.INVITES_TTS_AZURE_KEY && env.INVITES_TTS_AZURE_REGION),
       partnerApi: !!env.INVITES_PARTNER_API_KEY,
       faceAlbums: env.INVITES_FACE_ALBUMS,

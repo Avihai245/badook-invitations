@@ -37,6 +37,19 @@ const delta = (text: string) => ({
 });
 const read = async (stream: ReadableStream<Uint8Array>) => new Response(stream).text();
 
+/** An OpenAI-style SSE body: an object becomes `data: <json>`, the string '[DONE]' becomes `data: [DONE]`. */
+function sseOpenAi(events: (object | string)[], cut = 7): ReadableStream<Uint8Array> {
+  const text = events.map((e) => `data: ${typeof e === 'string' ? e : JSON.stringify(e)}\n\n`).join('');
+  return new ReadableStream({
+    start(controller) {
+      for (let i = 0; i < text.length; i += cut) controller.enqueue(encoder.encode(text.slice(i, i + cut)));
+      controller.close();
+    },
+  });
+}
+const oaiDelta = (text: string) => ({ choices: [{ delta: { content: text }, finish_reason: null }] });
+const oaiFinish = (finish_reason: string) => ({ choices: [{ delta: {}, finish_reason }] });
+
 describe('the support assistant', () => {
   it('knows which screen, without the ids in the address', async () => {
     const { screenOf } = await import('@/features/support/chat');
@@ -272,5 +285,97 @@ describe('the support assistant', () => {
     );
     expect(fetchImpl).not.toHaveBeenCalled();
     expect('stream' in result && (await read(result.stream))).toContain('מהמדריך');
+  });
+
+  it('reads the streamed answer from OpenAI, whatever the pieces', async () => {
+    const { textFromOpenAiEvents } = await import('@/features/support/chat');
+    const body = sseOpenAi([oaiDelta('שלום, '), oaiDelta('כך מעלים רשימה 📋'), oaiFinish('stop'), '[DONE]']);
+    expect(await read(textFromOpenAiEvents(body, () => 'fallback'))).toBe('שלום, כך מעלים רשימה 📋');
+    // an error before any text, or the stream ending with no text at all: the fallback
+    expect(
+      await read(textFromOpenAiEvents(sseOpenAi([{ error: { message: 'overloaded' } }]), () => 'F')),
+    ).toBe('F');
+    expect(await read(textFromOpenAiEvents(sseOpenAi(['[DONE]']), () => 'F'))).toBe('F');
+    // an error after some text: what was said stays, without the fallback
+    expect(
+      await read(
+        textFromOpenAiEvents(sseOpenAi([oaiDelta('חלק'), { error: { message: 'overloaded' } }]), () => 'F'),
+      ),
+    ).toBe('חלק');
+  });
+
+  it('an OpenAI answer that stops early says so', async () => {
+    const { textFromOpenAiEvents } = await import('@/features/support/chat');
+    const cut = () => ' [cut]';
+    // the length limit
+    expect(
+      await read(
+        textFromOpenAiEvents(sseOpenAi([oaiDelta('ארוך'), oaiFinish('length'), '[DONE]']), () => 'F', cut),
+      ),
+    ).toBe('ארוך [cut]');
+    // the stream ends without [DONE], or the API fails midway
+    expect(await read(textFromOpenAiEvents(sseOpenAi([oaiDelta('חצי')]), () => 'F', cut))).toBe('חצי [cut]');
+    expect(
+      await read(
+        textFromOpenAiEvents(
+          sseOpenAi([oaiDelta('חלק'), { error: { message: 'overloaded' } }]),
+          () => 'F',
+          cut,
+        ),
+      ),
+    ).toBe('חלק [cut]');
+    // a complete answer has no note
+    expect(
+      await read(
+        textFromOpenAiEvents(sseOpenAi([oaiDelta('שלם'), oaiFinish('stop'), '[DONE]']), () => 'F', cut),
+      ),
+    ).toBe('שלם');
+  });
+
+  it('prefers OpenAI for the chat when it is configured, with the same rules, manual and screen note', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'oa-test-key');
+    vi.stubEnv('INVITES_AI_MODEL_OPENAI', 'oa-test-model');
+    vi.stubEnv('INVITES_AI_API_BASE_OPENAI', 'https://oa.test');
+    vi.resetModules();
+    const freshRpc = vi.fn().mockResolvedValue({ data: true, error: null });
+    vi.doMock('@/lib/supabase/server', () => ({ serviceDb: () => ({ rpc: freshRpc }) }));
+    const { supportChat } = await import('@/features/support/chat');
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(sseOpenAi([oaiDelta('תשובה'), oaiFinish('stop'), '[DONE]']), {
+          status: 200,
+          headers: { 'content-type': 'text/event-stream' },
+        }),
+    );
+    const result = await supportChat(
+      {
+        messages: [{ role: 'user', content: 'איך שולחים בוואטסאפ?' }],
+        page: '/app/invitations/0b6f1a4e-6c1e-4d0e-9a3a-2f1d8c7b6a50/guests',
+        locale: 'he',
+      },
+      { userId: 'user-2', ip: '203.0.113.10' },
+      fetchImpl as unknown as typeof fetch,
+    );
+    expect(result.status).toBe(200);
+    expect('stream' in result && (await read(result.stream))).toBe('תשובה');
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('https://oa.test/v1/chat/completions');
+    const headers = init.headers as Record<string, string>;
+    expect(headers.authorization).toBe('Bearer oa-test-key');
+    expect(headers['x-api-key']).toBeUndefined();
+    const body = JSON.parse(String(init.body));
+    expect(body).toMatchObject({ model: 'oa-test-model', stream: true, max_tokens: 1024 });
+    // the manual first (a stable prefix, for OpenAI's own prompt caching), then the screen, then the
+    // conversation only — no Anthropic-shaped `system` array here
+    expect(body.system).toBeUndefined();
+    expect(body.messages[0]).toEqual({ role: 'system', content: expect.stringContaining('<manual>') });
+    expect(body.messages[1]).toEqual({
+      role: 'system',
+      content: expect.stringContaining('/app/invitations/:id/guests'),
+    });
+    expect(body.messages[2]).toEqual({ role: 'user', content: 'איך שולחים בוואטסאפ?' });
+    vi.unstubAllEnvs();
+    vi.doUnmock('@/lib/supabase/server');
+    vi.resetModules();
   });
 });

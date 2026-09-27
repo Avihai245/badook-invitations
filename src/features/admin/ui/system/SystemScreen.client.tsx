@@ -118,6 +118,7 @@ export function SystemScreen({ state, deployment: dep }: { state: SystemState; d
     [S.services.names.email, dep.services.email],
     [S.services.names.supportEmail, dep.services.supportEmail],
     [S.services.names.ai, dep.services.ai],
+    [S.services.names.aiChat, dep.services.aiChat],
     [S.services.names.tts, dep.services.tts],
     [S.services.names.partnerApi, dep.services.partnerApi],
     [S.services.names.faceAlbums, dep.services.faceAlbums],

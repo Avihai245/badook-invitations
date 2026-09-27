@@ -8,11 +8,13 @@ import { serviceDb } from '@/lib/supabase/server';
 import { knowledgeBase, type KnowledgeContext } from './knowledge';
 
 /**
- * The support assistant: questions about the product only, answered from its manual (knowledge.ts)
- * by Claude through the Anthropic API — streamed back as plain text. Nothing about the user is sent
- * (only the question and which screen they are on, without ids), and nothing is stored but a hashed
- * per-user/per-address counter for the rate limit. Without an API key and a model (ANTHROPIC_API_KEY,
- * INVITES_AI_MODEL) it answers from the manual by keywords.
+ * The support assistant: questions about the product only, answered from its manual (knowledge.ts) by
+ * an LLM — streamed back as plain text. Anthropic's Claude by default (ANTHROPIC_API_KEY,
+ * INVITES_AI_MODEL); OpenAI instead when OPENAI_API_KEY and INVITES_AI_MODEL_OPENAI are both set — this
+ * chat only, every other AI feature (translate_ai, gallery_ai, art_direction) stays on Anthropic. Nothing
+ * about the user is sent (only the question and which screen they are on, without ids), and nothing is
+ * stored but a hashed per-user/per-address counter for the rate limit. Without either provider's key and
+ * model it answers from the manual by keywords.
  */
 
 export const ChatSchema = z.strictObject({
@@ -240,6 +242,81 @@ export function textFromEvents(
   });
 }
 
+/**
+ * OpenAI's server-sent events (chat.completions, `stream: true`) → the answer's text, as it comes —
+ * the OpenAI-shaped twin of textFromEvents above, with the same guarantee: an answer that stops early
+ * ends with onCut()'s note. It finishes on `data: [DONE]` (Anthropic's `message_stop`) or a
+ * `finish_reason` of `length` or `content_filter` (Anthropic's `stop_reason: 'max_tokens'`).
+ */
+export function textFromOpenAiEvents(
+  body: ReadableStream<Uint8Array>,
+  onError: () => string,
+  onCut: () => string = () => '',
+): ReadableStream<Uint8Array> {
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let sent = false;
+  let finished = false;
+  let cut = false;
+  const reader = body.getReader();
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      for (;;) {
+        const { value, done } = await reader.read().catch(() => {
+          cut = true;
+          return { value: undefined, done: true as const };
+        });
+        if (done) {
+          if (!sent) controller.enqueue(encoder.encode(onError()));
+          else if (cut || !finished) controller.enqueue(encoder.encode(onCut()));
+          controller.close();
+          return;
+        }
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split('\n\n');
+        buffer = events.pop() ?? '';
+        let out = '';
+        for (const event of events) {
+          const data = event
+            .split('\n')
+            .filter((l) => l.startsWith('data:'))
+            .map((l) => l.slice(5).trim())
+            .join('');
+          if (!data) continue;
+          if (data === '[DONE]') {
+            finished = true;
+            continue;
+          }
+          try {
+            const json = JSON.parse(data) as {
+              choices?: { delta?: { content?: string }; finish_reason?: string | null }[];
+              error?: unknown;
+            };
+            if (json.error) {
+              if (sent || out) cut = true;
+              else out += onError();
+              continue;
+            }
+            const choice = json.choices?.[0];
+            if (choice?.delta?.content) out += choice.delta.content;
+            if (choice?.finish_reason === 'length' || choice?.finish_reason === 'content_filter') cut = true;
+          } catch {
+            // a partial or unknown event
+          }
+        }
+        if (out) {
+          sent = true;
+          controller.enqueue(encoder.encode(out));
+          return;
+        }
+      }
+    },
+    cancel() {
+      void reader.cancel();
+    },
+  });
+}
+
 /** POST /api/support/chat. */
 export async function supportChat(
   raw: unknown,
@@ -260,21 +337,45 @@ export async function supportChat(
   const env = serverEnv();
   const k = knowledgeContext(site);
   const question = messages.at(-1)!.content;
-  // not set up, or past the site's daily ceiling: the guide answers
-  if (
-    !env.ANTHROPIC_API_KEY ||
-    !env.INVITES_AI_MODEL ||
-    !(await rateHit(rateKey('global'), env.INVITES_AI_DAILY_LIMIT, 24 * 3600))
-  )
+  // OpenAI when it's set up for this chat (OPENAI_API_KEY, INVITES_AI_MODEL_OPENAI); else Anthropic
+  // (ANTHROPIC_API_KEY, INVITES_AI_MODEL); else — or past the site's daily ceiling — the guide answers
+  const provider =
+    env.OPENAI_API_KEY && env.INVITES_AI_MODEL_OPENAI
+      ? ('openai' as const)
+      : env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL
+        ? ('anthropic' as const)
+        : null;
+  if (!provider || !(await rateHit(rateKey('global'), env.INVITES_AI_DAILY_LIMIT, 24 * 3600)))
     return { status: 200, stream: textStream(manualAnswer(question, k, locale)) };
 
   const fallback = () =>
     locale === 'en'
       ? `Sorry, I couldn't answer right now. Please try again in a moment, or write to us: ${k.site}/contact`
       : `סליחה, לא הצלחתי לענות כרגע. נסו שוב בעוד רגע, או כתבו לנו: ${k.site}/contact`;
-  let res: Response;
-  try {
-    res = await fetchImpl(`${env.INVITES_AI_API_BASE}/v1/messages`, {
+  const screen = screenNote(screenOf(page));
+  let url: string;
+  let init: RequestInit;
+  if (provider === 'openai') {
+    url = `${env.INVITES_AI_API_BASE_OPENAI}/v1/chat/completions`;
+    init = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${env.OPENAI_API_KEY}` },
+      body: JSON.stringify({
+        model: env.INVITES_AI_MODEL_OPENAI,
+        max_tokens: 1024,
+        stream: true,
+        // the manual is the same for every question: OpenAI caches a long shared prefix on its own
+        messages: [
+          { role: 'system', content: systemPrompt(k) },
+          { role: 'system', content: screen },
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
+      }),
+      signal: AbortSignal.timeout(60_000),
+    };
+  } else {
+    url = `${env.INVITES_AI_API_BASE}/v1/messages`;
+    init = {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -288,12 +389,16 @@ export async function supportChat(
         // the manual is the same for every question: cached by the API
         system: [
           { type: 'text', text: systemPrompt(k), cache_control: { type: 'ephemeral' } },
-          { type: 'text', text: screenNote(screenOf(page)) },
+          { type: 'text', text: screen },
         ],
         messages: messages.map((m) => ({ role: m.role, content: m.content })),
       }),
       signal: AbortSignal.timeout(60_000),
-    });
+    };
+  }
+  let res: Response;
+  try {
+    res = await fetchImpl(url, init);
   } catch (err) {
     console.error('[support chat] request failed', err);
     return { status: 200, stream: textStream(fallback()) };
@@ -310,5 +415,11 @@ export async function supportChat(
     locale === 'en'
       ? '\n\n(The answer was cut short — ask me to go on, or ask a shorter question.)'
       : '\n\n(התשובה נקטעה — בקשו ממני להמשיך, או שאלו שאלה קצרה יותר.)';
-  return { status: 200, stream: textFromEvents(res.body, fallback, cutNote) };
+  return {
+    status: 200,
+    stream:
+      provider === 'openai'
+        ? textFromOpenAiEvents(res.body, fallback, cutNote)
+        : textFromEvents(res.body, fallback, cutNote),
+  };
 }
