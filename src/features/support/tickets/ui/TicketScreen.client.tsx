@@ -140,7 +140,7 @@ export function TicketScreen({ initial }: { initial: CustomerTicket }) {
         : null;
 
   return (
-    <div className="mx-auto max-w-[860px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8" data-testid="ticket-page">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8" data-testid="ticket-page">
       <Link
         href="/app/support"
         className="mb-3 inline-flex items-center gap-1 rounded-btn text-[13px] text-muted hover:text-ink"
@@ -204,7 +204,7 @@ export function TicketScreen({ initial }: { initial: CustomerTicket }) {
                 ref={last ? lastMessage : undefined}
                 data-author={m.author}
                 className={cn(
-                  'flex max-w-[88%] flex-col gap-1',
+                  'flex max-w-[min(88%,760px)] flex-col gap-1',
                   mine ? 'items-end self-end' : 'items-start self-start',
                 )}
               >
@@ -219,7 +219,7 @@ export function TicketScreen({ initial }: { initial: CustomerTicket }) {
                   className={cn(
                     'rounded-[18px] px-4 py-3 text-start text-[14.5px] leading-[1.6] break-words whitespace-pre-wrap',
                     mine
-                      ? 'rounded-ee-[6px] bg-brand-deep text-white'
+                      ? 'rounded-ee-[6px] bg-brand-strong text-white'
                       : 'rounded-es-[6px] border border-line bg-surface text-ink shadow-sm',
                   )}
                 >

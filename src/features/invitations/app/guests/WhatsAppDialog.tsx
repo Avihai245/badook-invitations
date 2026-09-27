@@ -305,14 +305,14 @@ export function WhatsAppDialog({
           {!data.whatsapp.configured ? (
             <p
               role="alert"
-              className="rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+              className="rounded-card border border-warning-line bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
             >
               {w.notConfigured}
             </p>
           ) : !data.published ? (
             <p
               role="alert"
-              className="rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+              className="rounded-card border border-warning-line bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
             >
               {w.notPublished}
             </p>

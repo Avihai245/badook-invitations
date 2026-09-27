@@ -96,7 +96,7 @@ export function TemplateGallery({
   );
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
       <style dangerouslySetInnerHTML={{ __html: fontCss }} />
       <PageHeader
         title={t.gallery.title}
@@ -136,7 +136,7 @@ export function TemplateGallery({
               className={cn(
                 'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border ps-3 pe-2 text-[13px] font-medium whitespace-nowrap transition-colors duration-150 motion-reduce:transition-none',
                 on
-                  ? 'border-ink bg-ink text-white shadow-sm'
+                  ? 'border-ink bg-inverse text-white shadow-sm'
                   : 'border-line bg-surface text-ink hover:border-line-strong hover:bg-subtle',
               )}
             >
@@ -146,7 +146,7 @@ export function TemplateGallery({
                 aria-hidden
                 className={cn(
                   'min-w-5 rounded-full px-1.5 text-center text-[11px] leading-5 font-semibold tabular-nums',
-                  on ? 'bg-white/20 text-white' : 'bg-subtle text-muted',
+                  on ? 'bg-white/20 text-white' : 'bg-subtle text-ink/70',
                 )}
               >
                 {number(count)}

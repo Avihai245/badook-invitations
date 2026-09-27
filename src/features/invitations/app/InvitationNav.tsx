@@ -41,7 +41,7 @@ export function InvitationNav({
   ] as const;
   return (
     <div className="border-b border-line bg-surface/70">
-      <div className="mx-auto max-w-[1200px] px-4 pt-5 sm:px-6">
+      <div className="mx-auto max-w-[1760px] px-4 pt-5 sm:px-6">
         <Link
           href="/app/invitations"
           className="inline-flex items-center gap-1 rounded-btn text-[13px] text-muted hover:text-ink"

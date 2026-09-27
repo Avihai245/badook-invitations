@@ -62,73 +62,82 @@ export function AccountScreen({ data }: { data: AccountScreenData }) {
   };
 
   return (
-    <div className="mx-auto max-w-[760px] px-4 pt-8 pb-16 sm:px-6">
+    <div className="mx-auto max-w-[1760px] px-4 pt-8 pb-16 sm:px-6">
       <div className="flex items-center gap-1">
         <PageTitle>{a.title}</PageTitle>
         <HelpFor area="account" />
       </div>
       <p className="mt-1 text-muted">{a.subtitle}</p>
 
-      <Card padding="lg" className="mt-6">
-        <h2 className="text-[17px] font-bold">{a.profile}</h2>
-        <form onSubmit={(e) => void save(e)} className="mt-4 flex flex-col gap-4" data-testid="profile-form">
-          <Field label={a.fullName}>
-            <Input name="fullName" defaultValue={data.fullName} maxLength={120} autoComplete="name" />
-          </Field>
-          <Field label={a.phone} help={a.phoneHint} error={phoneError ?? undefined}>
-            <Input
-              name="phone"
-              type="tel"
-              dir="ltr"
-              defaultValue={data.phone}
-              maxLength={40}
-              autoComplete="tel"
-            />
-          </Field>
-          <Field label={a.email}>
-            <Input value={data.email} readOnly dir="ltr" />
-          </Field>
-          <p className="text-[14px]">
-            <span className="text-muted">{a.signIn}: </span>
-            <span className="font-semibold">{a.providers[data.provider]}</span>
-          </p>
-          <div>
-            <Hint text={a.help.save}>
-              <Button type="submit" icon={<Save />} loading={saving}>
-                {a.save}
+      {/* wide screens: the details beside the plan, the password and deleting — the page's full width */}
+      <div className="mt-6 grid items-start gap-4 xl:grid-cols-2 xl:gap-6">
+        <Card padding="lg">
+          <h2 className="text-[17px] font-bold">{a.profile}</h2>
+          <form
+            onSubmit={(e) => void save(e)}
+            className="mt-4 flex flex-col gap-4"
+            data-testid="profile-form"
+          >
+            <Field label={a.fullName}>
+              <Input name="fullName" defaultValue={data.fullName} maxLength={120} autoComplete="name" />
+            </Field>
+            <Field label={a.phone} help={a.phoneHint} error={phoneError ?? undefined}>
+              <Input
+                name="phone"
+                type="tel"
+                dir="ltr"
+                defaultValue={data.phone}
+                maxLength={40}
+                autoComplete="tel"
+              />
+            </Field>
+            <Field label={a.email}>
+              <Input value={data.email} readOnly dir="ltr" />
+            </Field>
+            <p className="text-[14px]">
+              <span className="text-muted">{a.signIn}: </span>
+              <span className="font-semibold">{a.providers[data.provider]}</span>
+            </p>
+            <div>
+              <Hint text={a.help.save}>
+                <Button type="submit" icon={<Save />} loading={saving}>
+                  {a.save}
+                </Button>
+              </Hint>
+            </div>
+          </form>
+        </Card>
+
+        <div className="flex flex-col gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card padding="lg" className="flex flex-col items-start gap-2">
+              <p className="text-[13px] font-semibold text-muted">{a.plan}</p>
+              <p className="text-[20px] font-bold">{data.plan}</p>
+              <Button variant="secondary" size="sm" icon={<CreditCard />} asChild>
+                <Link href="/app/billing">{a.planLink}</Link>
+              </Button>
+            </Card>
+            {data.provider === 'email' ? (
+              <Card padding="lg" className="flex flex-col items-start gap-2">
+                <p className="text-[13px] font-semibold text-muted">{a.password}</p>
+                <Button variant="secondary" size="sm" icon={<KeyRound />} asChild>
+                  <Link href="/auth/update-password">{a.passwordLink}</Link>
+                </Button>
+              </Card>
+            ) : null}
+          </div>
+
+          <Card padding="lg" className="mt-4 border-danger-line xl:mt-2">
+            <h2 className="text-[17px] font-bold text-danger">{a.danger}</h2>
+            <p className="mt-2 text-[14px] text-pretty text-muted">{a.dangerBody}</p>
+            <Hint text={a.help.delete}>
+              <Button variant="danger" className="mt-4" icon={<Trash2 />} onClick={() => setConfirming(true)}>
+                {a.delete}
               </Button>
             </Hint>
-          </div>
-        </form>
-      </Card>
-
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <Card padding="lg" className="flex flex-col items-start gap-2">
-          <p className="text-[13px] font-semibold text-muted">{a.plan}</p>
-          <p className="text-[20px] font-bold">{data.plan}</p>
-          <Button variant="secondary" size="sm" icon={<CreditCard />} asChild>
-            <Link href="/app/billing">{a.planLink}</Link>
-          </Button>
-        </Card>
-        {data.provider === 'email' ? (
-          <Card padding="lg" className="flex flex-col items-start gap-2">
-            <p className="text-[13px] font-semibold text-muted">{a.password}</p>
-            <Button variant="secondary" size="sm" icon={<KeyRound />} asChild>
-              <Link href="/auth/update-password">{a.passwordLink}</Link>
-            </Button>
           </Card>
-        ) : null}
+        </div>
       </div>
-
-      <Card padding="lg" className="mt-8 border-[#fecaca]">
-        <h2 className="text-[17px] font-bold text-danger">{a.danger}</h2>
-        <p className="mt-2 text-[14px] text-pretty text-muted">{a.dangerBody}</p>
-        <Hint text={a.help.delete}>
-          <Button variant="danger" className="mt-4" icon={<Trash2 />} onClick={() => setConfirming(true)}>
-            {a.delete}
-          </Button>
-        </Hint>
-      </Card>
 
       {confirming ? (
         <Dialog

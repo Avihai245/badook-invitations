@@ -115,6 +115,8 @@ export const he = {
     signedInAs: 'מחוברים בתור',
     userMenu: 'תפריט החשבון',
     uiLanguage: 'שפת הממשק',
+    /** the system's look (light / dark / as the device is set) */
+    theme: { label: 'מראה', light: 'בהיר', dark: 'כהה', system: 'לפי המכשיר' },
     account: 'החשבון שלי',
     signOut: 'יציאה',
     skipToContent: 'דילוג לתוכן',

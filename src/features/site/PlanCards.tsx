@@ -66,7 +66,7 @@ export function PlanCards({
             )}
           >
             {popular ? (
-              <span className="absolute -top-3 start-6 inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-[12px] font-bold text-white">
+              <span className="absolute -top-3 start-6 inline-flex items-center gap-1 rounded-full bg-brand-strong px-3 py-1 text-[12px] font-bold text-white">
                 <Sparkles aria-hidden className="size-3.5" />
                 {p.popular}
               </span>

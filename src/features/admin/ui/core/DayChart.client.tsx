@@ -173,7 +173,7 @@ export function DayChart({
       </div>
       {tip ? (
         <div
-          className="pointer-events-none absolute top-0 z-10 rounded-[10px] bg-ink px-3 py-1.5 text-[12.5px] whitespace-nowrap text-white shadow-lg"
+          className="pointer-events-none absolute top-0 z-10 rounded-[10px] bg-inverse px-3 py-1.5 text-[12.5px] whitespace-nowrap text-white shadow-lg"
           style={{ left: `${tipAt}%`, transform: `translateX(-${tipAt}%)` }}
         >
           {tipText}

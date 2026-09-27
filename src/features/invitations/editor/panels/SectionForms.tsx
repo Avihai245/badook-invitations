@@ -810,8 +810,8 @@ export function ReviewTextsNote() {
   return (
     <Card padding="sm" tone="info" className="mt-4">
       <div className="flex items-start gap-3">
-        <Info aria-hidden size={18} strokeWidth={1.75} className="shrink-0 text-[#1d4ed8]" />
-        <p className="flex-1 text-[12px] text-[#1e3a8a]">{e.reviewTexts}</p>
+        <Info aria-hidden size={18} strokeWidth={1.75} className="shrink-0 text-info" />
+        <p className="flex-1 text-[12px] text-info-strong">{e.reviewTexts}</p>
       </div>
     </Card>
   );

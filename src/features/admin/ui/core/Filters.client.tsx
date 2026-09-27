@@ -114,7 +114,7 @@ export function FilterToggle({
         onClick={() => set({ [param]: on ? null : '1' })}
         className={cn(
           'inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors',
-          on ? 'border-ink bg-ink text-white' : 'border-line bg-surface text-ink hover:bg-subtle',
+          on ? 'border-ink bg-inverse text-white' : 'border-line bg-surface text-ink hover:bg-subtle',
         )}
       >
         {on ? <Check aria-hidden className="size-3.5" /> : null}

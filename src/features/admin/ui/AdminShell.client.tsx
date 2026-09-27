@@ -20,6 +20,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Badge, BrandLogo, cn, Drawer, Hint } from '@/components/app';
 import { UiLanguageToggle } from '@/app/(site)/UiLanguageToggle';
+import { ThemeToggle } from '@/features/site/Theme.client';
 import { ADMIN_NAV, adminAreaOf, type AdminArea } from '../nav';
 import { useAdminUi } from './AdminUi.client';
 
@@ -104,7 +105,7 @@ function AdminNavList({ badges, onNavigate }: { badges: AdminNavBadges; onNaviga
             <Icon aria-hidden className="size-[18px] shrink-0" strokeWidth={1.75} />
             <span className="min-w-0 flex-1 truncate">{t.nav[item.key]}</span>
             {count > 0 ? (
-              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-deep px-1.5 text-[11px] font-bold text-white tabular-nums">
+              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-strong px-1.5 text-[11px] font-bold text-white tabular-nums">
                 {count > 99 ? '99+' : count}
               </span>
             ) : null}
@@ -128,8 +129,9 @@ function SidebarFooter() {
           {t.nav.backToApp}
         </Link>
       </Hint>
-      <div className="flex items-center justify-between gap-2 px-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-2">
         <UiLanguageToggle />
+        <ThemeToggle />
       </div>
       <div className="rounded-[12px] border border-line bg-canvas px-3 py-2.5">
         <span className="block text-[11px] text-muted">{t.signedInAs}</span>

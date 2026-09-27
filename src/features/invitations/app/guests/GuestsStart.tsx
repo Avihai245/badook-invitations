@@ -89,7 +89,7 @@ function StepLabel({
         aria-hidden
         className={cn(
           'grid size-7 shrink-0 place-items-center rounded-full [&_svg]:size-[15px]',
-          tone === 'brand' ? 'bg-brand-soft text-brand-deep' : 'bg-[#e7f8ee] text-[#128c4a]',
+          tone === 'brand' ? 'bg-brand-soft text-brand-deep' : 'bg-wa-soft text-wa-ink',
         )}
       >
         {icon}

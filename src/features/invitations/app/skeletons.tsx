@@ -32,7 +32,7 @@ function ScreenHead({ actions = 0 }: { actions?: number }) {
 /** /app/invitations: the greeting header, then invitation cards (two columns on wide screens). */
 export function ListSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-5 pb-16 sm:px-6 sm:pt-8">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-5 pb-16 sm:px-6 sm:pt-8">
       <div className="list-hero rounded-[24px] border border-brand-line px-5 py-6 sm:px-8 sm:py-7">
         <Line w={110} h={14} />
         <Line w={220} h={30} className="mt-3" />
@@ -41,7 +41,7 @@ export function ListSkeleton() {
           <Skeleton width={96} height={28} radius={999} />
         </div>
       </div>
-      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5">
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5 min-[1900px]:grid-cols-3">
         {[0, 1, 2, 3].map((i) => (
           <CardSkeleton key={i} />
         ))}
@@ -75,7 +75,7 @@ function CardSkeleton() {
 /** /app/invitations/new: the head, the event-type chips and the posters. */
 export function GallerySkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
       <ScreenHead actions={1} />
       <div className="mt-5 flex gap-2 overflow-hidden">
         {[64, 84, 90, 70, 96, 88, 76].map((w, i) => (
@@ -98,7 +98,7 @@ export function GallerySkeleton() {
 /** An invitation's header and tabs (while the workspace layout loads). */
 export function WorkspaceHeaderSkeleton() {
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-4 sm:px-6 sm:pt-6">
+    <div className="mx-auto max-w-[1760px] px-4 pt-4 sm:px-6 sm:pt-6">
       <Line w={90} h={12} />
       <div className="list-hero mt-2.5 rounded-[24px] border border-brand-line px-4 pt-4 sm:px-7 sm:pt-6">
         <div className="flex items-center gap-4">
@@ -141,7 +141,7 @@ function SectionHead({ actions = 0 }: { actions?: number }) {
 /** /app/invitations/[id]: five numbers, the two big cards, the steps and the link. */
 export function OverviewSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
       <SectionHead />
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {[0, 1, 2, 3, 4].map((i) => (
@@ -194,7 +194,7 @@ export function OverviewSkeleton() {
 /** /app/invitations/[id]/responses: head, 4 KPI cards, 2 bar cards, the replies. */
 export function ResponsesSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
       <SectionHead actions={2} />
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
@@ -224,7 +224,7 @@ export function ResponsesSkeleton() {
 /** /app/invitations/[id]/share: head, the guests card, then the message and preview cards. */
 export function ShareSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
       <SectionHead />
       <Skeleton className="mt-4 h-[74px] w-full" />
       <div className="mt-6 grid gap-5 min-[900px]:grid-cols-[1.2fr_1fr]">
@@ -301,7 +301,7 @@ export function EditorSkeleton() {
 /** /app/billing: head, the current plan with three numbers, the plans and the credit packs. */
 export function BillingSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 sm:px-6">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-8 pb-16 sm:px-6">
       <ScreenHead />
       <div className="mt-6 rounded-card border border-line bg-surface p-5 shadow-sm">
         <Line w={90} h={12} />
@@ -325,24 +325,28 @@ export function BillingSkeleton() {
 /** /app/account: head, the profile form, the plan and password cards, the danger zone. */
 export function AccountSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[760px] px-4 pt-8 pb-16 sm:px-6">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-8 pb-16 sm:px-6">
       <ScreenHead />
-      <div className="mt-6 flex flex-col gap-4 rounded-card border border-line bg-surface p-5 shadow-sm">
-        <Line w={70} h={16} />
-        {[0, 1, 2].map((i) => (
-          <div key={i}>
-            <Line w={80} h={10} />
-            <Skeleton height={40} radius={10} className="mt-2" />
+      <div className="mt-6 grid items-start gap-4 xl:grid-cols-2 xl:gap-6">
+        <div className="flex flex-col gap-4 rounded-card border border-line bg-surface p-5 shadow-sm">
+          <Line w={70} h={16} />
+          {[0, 1, 2].map((i) => (
+            <div key={i}>
+              <Line w={80} h={10} />
+              <Skeleton height={40} radius={10} className="mt-2" />
+            </div>
+          ))}
+          <Skeleton width={110} height={40} radius={8} />
+        </div>
+        <div className="flex flex-col gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[0, 1].map((i) => (
+              <Skeleton key={i} height={120} radius={12} />
+            ))}
           </div>
-        ))}
-        <Skeleton width={110} height={40} radius={8} />
+          <Skeleton height={150} radius={12} className="mt-4 xl:mt-2" />
+        </div>
       </div>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        {[0, 1].map((i) => (
-          <Skeleton key={i} height={120} radius={12} />
-        ))}
-      </div>
-      <Skeleton height={150} radius={12} className="mt-8" />
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { UiProvider } from '@/lib/i18n/client';
 import { getUiLocale } from '@/lib/i18n/server';
 import { A11Y_BOOT } from '@/features/site/a11y';
 import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';
+import { ThemeSync } from '@/features/site/Theme.client';
+import { THEME_BOOT } from '@/features/site/theme';
 import '@/styles/app.css';
 
 export const metadata: Metadata = {
@@ -23,13 +25,14 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
   return (
     <html lang={locale} dir={uiDir(locale)} suppressHydrationWarning>
       <head>
-        {/* the accessibility menu's settings, before the first paint */}
-        <script dangerouslySetInnerHTML={{ __html: A11Y_BOOT }} />
+        {/* the accessibility menu's settings and the system's look (light / dark), before the first paint */}
+        <script dangerouslySetInnerHTML={{ __html: A11Y_BOOT + THEME_BOOT }} />
       </head>
       <body>
         <UiProvider locale={locale}>
           {children}
           <AccessibilityMenu />
+          <ThemeSync />
         </UiProvider>
       </body>
     </html>

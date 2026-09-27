@@ -58,7 +58,7 @@ function CountChip({
         onClick={onClick}
         className={cn(
           'inline-flex h-8 items-center gap-2 rounded-full border px-3 text-[13px] transition-colors',
-          pressed ? 'border-ink bg-ink text-white' : 'border-line bg-surface hover:bg-subtle',
+          pressed ? 'border-ink bg-inverse text-white' : 'border-line bg-surface hover:bg-subtle',
         )}
       >
         <span className="max-w-[160px] truncate">{label}</span>

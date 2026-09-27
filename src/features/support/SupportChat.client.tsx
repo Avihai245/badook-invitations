@@ -398,7 +398,7 @@ export function SupportChat() {
           aria-label={s.open}
           aria-haspopup="dialog"
           data-testid="support-launcher"
-          className="support-launcher fixed end-4 bottom-4 z-[55] flex h-13 items-center gap-2.5 rounded-full bg-linear-to-br from-brand to-brand-deep ps-1.5 pe-5 text-white shadow-[0_14px_34px_-10px_rgba(122,82,48,0.75)] transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus max-sm:w-13 max-sm:justify-center max-sm:p-0 print:hidden sm:end-6 sm:bottom-6"
+          className="support-launcher fixed end-4 bottom-4 z-[55] flex h-13 items-center gap-2.5 rounded-full bg-linear-to-br from-brand to-brand-strong ps-1.5 pe-5 text-white shadow-[0_14px_34px_-10px_rgba(122,82,48,0.75)] transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus max-sm:w-13 max-sm:justify-center max-sm:p-0 print:hidden sm:end-6 sm:bottom-6"
         >
           <span aria-hidden className="grid size-10 place-items-center rounded-full bg-white/15">
             <Sparkles className="size-5" />
@@ -427,7 +427,7 @@ export function SupportChat() {
               'sm:inset-x-auto sm:end-6 sm:bottom-6 sm:h-[min(640px,calc(100dvh-48px))] sm:w-[400px] sm:rounded-[22px]',
             )}
           >
-            <header className="relative flex shrink-0 items-center gap-3 overflow-hidden bg-linear-to-br from-brand-deep via-brand to-[#c08a55] px-4 py-3.5 text-white">
+            <header className="relative flex shrink-0 items-center gap-3 overflow-hidden bg-linear-to-br from-brand-strong via-brand to-[#c08a55] px-4 py-3.5 text-white">
               <span
                 aria-hidden
                 className="support-orb pointer-events-none absolute -top-10 -end-6 size-32 rounded-full bg-white/10"
@@ -573,7 +573,7 @@ export function SupportChat() {
                     onClick={() => abort.current?.abort()}
                     aria-label={s.stop}
                     title={s.stop}
-                    className="grid size-9 shrink-0 place-items-center rounded-full bg-ink text-white transition-colors hover:bg-primary-hover"
+                    className="grid size-9 shrink-0 place-items-center rounded-full bg-inverse text-white transition-colors hover:bg-primary-hover"
                   >
                     <Square aria-hidden className="size-3.5 fill-current" />
                   </button>
@@ -584,7 +584,7 @@ export function SupportChat() {
                     title={s.send}
                     disabled={!input.trim()}
                     data-testid="support-send"
-                    className="grid size-9 shrink-0 place-items-center rounded-full bg-brand text-white transition-colors hover:bg-brand-deep disabled:bg-line-strong"
+                    className="grid size-9 shrink-0 place-items-center rounded-full bg-brand text-white transition-colors hover:bg-brand-strong disabled:bg-line-strong"
                   >
                     <ArrowUp aria-hidden className="size-[18px]" />
                   </button>

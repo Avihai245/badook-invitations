@@ -589,7 +589,7 @@ function Confirm({
           <button
             type="button"
             onClick={onConfirm}
-            className="h-11 rounded-[10px] bg-danger font-semibold text-white"
+            className="h-11 rounded-[10px] bg-danger-strong font-semibold text-white"
             data-testid="face-confirm-yes"
           >
             {confirm}

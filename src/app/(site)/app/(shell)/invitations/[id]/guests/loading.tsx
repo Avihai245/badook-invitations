@@ -3,7 +3,7 @@ import { KpiCard, Skeleton } from '@/components/app';
 /** Shaped like the guest list: the title, the two main actions, 6 KPI cards, the greeting, table rows. */
 export default function GuestsLoading() {
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6" aria-busy="true">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6" aria-busy="true">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <Skeleton className="h-7 w-48" />

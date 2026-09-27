@@ -105,6 +105,8 @@ export const en: AppDict = {
     signedInAs: 'Signed in as',
     userMenu: 'Account menu',
     uiLanguage: 'Interface language',
+    /** the system's look (light / dark / as the device is set) */
+    theme: { label: 'Appearance', light: 'Light', dark: 'Dark', system: 'Match device' },
     account: 'My account',
     signOut: 'Sign out',
     skipToContent: 'Skip to content',

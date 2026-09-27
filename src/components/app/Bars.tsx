@@ -54,7 +54,7 @@ export function Bars({
               <span className="truncate">{row.label}</span>
               <span aria-hidden className="flex h-2 overflow-hidden rounded-full bg-subtle">
                 <span
-                  className="h-full rounded-full bg-ink transition-[width] duration-500 motion-reduce:transition-none"
+                  className="h-full rounded-full bg-inverse transition-[width] duration-500 motion-reduce:transition-none"
                   style={{ width: `${pct}%` }}
                 />
               </span>

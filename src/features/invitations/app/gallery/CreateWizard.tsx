@@ -260,7 +260,7 @@ export function CreateWizard({
                   key={n}
                   className={cn(
                     'h-1.5 rounded-full transition-[width,background-color] duration-200 motion-reduce:transition-none',
-                    n === step ? 'w-5 bg-ink' : n < step ? 'w-1.5 bg-ink/60' : 'w-1.5 bg-line',
+                    n === step ? 'w-5 bg-inverse' : n < step ? 'w-1.5 bg-ink/60' : 'w-1.5 bg-line',
                   )}
                 />
               ))}

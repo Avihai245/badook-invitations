@@ -743,7 +743,7 @@ function SharePanel() {
           // the link is only live once published (guests would get "not available yet")
           <div
             role="status"
-            className="flex flex-wrap items-center justify-between gap-2 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-card border border-warning-line bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
           >
             <span>{s.notLive}</span>
             <Button size="sm" onClick={openPublishDialog}>

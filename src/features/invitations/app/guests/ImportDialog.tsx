@@ -266,7 +266,7 @@ export function ImportDialog({
         ) : null}
 
         {preview?.issues.length ? (
-          <div className="rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px]">
+          <div className="rounded-card border border-warning-line bg-warning-bg px-3 py-2.5 text-[13px]">
             <p className="flex items-center gap-2 font-semibold text-warning">
               <AlertTriangle aria-hidden className="size-4" />
               {plural(im.issues, preview.issues.length, { n: number(preview.issues.length) })}
@@ -294,7 +294,7 @@ export function ImportDialog({
         {preview?.truncated ? (
           <p
             role="status"
-            className="flex items-start gap-2 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+            className="flex items-start gap-2 rounded-card border border-warning-line bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
           >
             <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" />
             {fmt(im.truncated, { n: number(preview.truncated), max: number(MAX_IMPORT_ROWS) })}

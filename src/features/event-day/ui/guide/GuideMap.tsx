@@ -258,7 +258,7 @@ export function GuideMap({
             type="button"
             aria-pressed={compass.state === 'on'}
             onClick={() => (compass.state === 'on' ? compass.stop() : void compass.start())}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-3.5 text-[13.5px] font-semibold aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-3.5 text-[13.5px] font-semibold aria-pressed:border-ink aria-pressed:bg-inverse aria-pressed:text-white"
             data-testid="guide-compass"
           >
             <Compass aria-hidden className="size-[18px]" />

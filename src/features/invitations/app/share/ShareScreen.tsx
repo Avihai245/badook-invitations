@@ -44,11 +44,11 @@ export function ShareScreen({ id, slug, data }: { id: string; slug: string; data
     );
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
       <PageHeader size="section" title={s.title} help={<HelpFor area="share" />} description={s.subtitle} />
 
       {data.unpublishedChanges ? (
-        <p className="mt-4 rounded-card border border-[#fde68a] bg-warning-bg px-4 py-3 text-[13px] text-warning">
+        <p className="mt-4 rounded-card border border-warning-line bg-warning-bg px-4 py-3 text-[13px] text-warning">
           {s.unpublishedChanges}
         </p>
       ) : null}

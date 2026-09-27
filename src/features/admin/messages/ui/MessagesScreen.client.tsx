@@ -303,7 +303,7 @@ function Errors({ data }: { data: MessagesPageData }) {
                 <span className="shrink-0 font-semibold tabular-nums">{f.count(e.n)}</span>
               </span>
               <span aria-hidden className="flex h-1.5 overflow-hidden rounded-full bg-subtle">
-                <span className="h-full rounded-full bg-ink" style={{ width: `${(e.n / top) * 100}%` }} />
+                <span className="h-full rounded-full bg-inverse" style={{ width: `${(e.n / top) * 100}%` }} />
               </span>
               <span className="text-[12px] text-muted">
                 {WA_KINDS.filter((k) => e[k] > 0)

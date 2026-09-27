@@ -24,6 +24,21 @@
   --color-danger: #b91c1c;
   --color-danger-bg: #fef2f2;
   --color-info-bg: #eff6ff;
+  /* a status box's border, and the blue of an informative text */
+  --color-success-line: #bbf7d0;
+  --color-warning-line: #fde68a;
+  --color-danger-line: #fecaca;
+  --color-info-line: #bfdbfe;
+  --color-info: #1d4ed8;
+  --color-info-strong: #1e3a8a;
+  /* WhatsApp's greens (the send buttons and boxes): a soft ground, a stronger one, its text */
+  --color-wa-soft: #e6f6ec;
+  --color-wa-soft-strong: #d4efdf;
+  --color-wa-line: #c9ecd7;
+  --color-wa-ink: #0f6b39;
+  /* fills that carry white text in both looks: WhatsApp's deep green (5.2:1), a red action (6.5:1) */
+  --color-wa-strong: #0f7d41;
+  --color-danger-strong: #b91c1c;
   --color-whatsapp: #25d366;
   --color-row-hover: #fcfcfb;
   --color-canvas-editor: #efedea; /* editor canvas behind the phone */
@@ -33,6 +48,10 @@
   --color-brand-soft: #f6ede1;
   --color-brand-line: #ead8c0;
   --color-blush: #f8ebe4;
+  /* a fill that carries white text: the deep gold (badges, "new invitation") and the ink-dark chip
+     (tooltips, the chosen pill) — dark in both looks, where brand-deep and ink turn light */
+  --color-brand-strong: #7a5230;
+  --color-inverse: #1c1917;
 
   --radius-btn: 8px;
   --radius-input: 10px;
@@ -50,6 +69,78 @@
   --font-sans-en: 'Inter', 'Heebo', 'Cairo', 'Noto Sans Ethiopic', system-ui, sans-serif;
   /* headlines of the home and sign-in pages (font-display): a serif per script */
   --font-display: 'Frank Ruhl Libre', 'Fraunces', 'Cairo', 'Noto Sans Ethiopic', Georgia, serif;
+}
+
+/* `dark:` — the system's dark look (features/site/theme.ts puts data-theme on <html>, /app only);
+   on screen only: whatever is printed (seating plans, table cards) prints light */
+@custom-variant dark {
+  @media screen {
+    &:where([data-theme='dark'], [data-theme='dark'] *) {
+      @slot;
+    }
+  }
+}
+
+/* The dark look: the same tokens, redefined (every screen reads them). Warm, not pure black; text
+   15:1 on surfaces, secondary text 6.4:1 or more, each status color 6:1 or more on its own ground. */
+@media screen {
+  html[data-theme='dark'] {
+    color-scheme: dark;
+    --color-canvas: #12100e;
+    --color-surface: #1b1815;
+    --color-subtle: #26221e;
+    --color-line: #35302a;
+    --color-line-strong: #4b443c;
+    --color-ink: #f3efea;
+    --color-muted: #ada398;
+    --color-faint: #81776d;
+    --color-primary: #f3efea;
+    --color-primary-ink: #1b1815;
+    --color-primary-hover: #ffffff;
+    --color-focus: #7aa7ff;
+    --color-success: #4ade80;
+    --color-success-bg: #13261a;
+    --color-warning: #fbbf24;
+    --color-warning-bg: #2a2110;
+    --color-danger: #f87171;
+    --color-danger-bg: #2d1515;
+    --color-info-bg: #142033;
+    --color-success-line: #1f4a2e;
+    --color-warning-line: #5a4614;
+    --color-danger-line: #5a2424;
+    --color-info-line: #22406b;
+    --color-info: #93c5fd;
+    --color-info-strong: #bfdbfe;
+    --color-wa-soft: #10261a;
+    --color-wa-soft-strong: #163521;
+    --color-wa-line: #1f4a2e;
+    --color-wa-ink: #6ee7a2;
+    --color-row-hover: #221e1a;
+    --color-canvas-editor: #0d0c0a;
+    --color-brand-deep: #e3bc8c;
+    --color-brand-soft: #2b2219;
+    --color-brand-line: #4a3a28;
+    --color-blush: #2a1f1b;
+    --color-inverse: #3b352f;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.55);
+    --shadow-ring: 0 0 0 3px rgba(243, 239, 234, 0.12);
+  }
+  /* the accessibility menu's high contrast, in the dark look */
+  html[data-theme='dark'][data-a11y-contrast] {
+    --color-canvas: #000000;
+    --color-surface: #0f0d0b;
+    --color-subtle: #1f1c19;
+    --color-line: #8a8076;
+    --color-line-strong: #c9c0b6;
+    --color-muted: #e7e2dc;
+    --color-faint: #cfc8c0;
+    --color-brand-deep: #f2d4ae;
+  }
+  html[data-theme='dark'][data-a11y-contrast] body {
+    color: #ffffff;
+  }
 }
 
 @layer base {

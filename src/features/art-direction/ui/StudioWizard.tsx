@@ -292,7 +292,7 @@ export function StudioWizard({
                     key={n}
                     className={cn(
                       'h-1.5 rounded-full transition-[width,background-color] duration-200 motion-reduce:transition-none',
-                      n === shownStep ? 'w-5 bg-ink' : n < shownStep ? 'w-1.5 bg-ink/60' : 'w-1.5 bg-line',
+                      n === shownStep ? 'w-5 bg-inverse' : n < shownStep ? 'w-1.5 bg-ink/60' : 'w-1.5 bg-line',
                     )}
                   />
                 ))}

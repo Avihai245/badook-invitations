@@ -127,7 +127,7 @@ export function InvitationsList({ items, name }: { items: InvitationSummary[]; n
     : [];
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-5 pb-16 sm:px-6 sm:pt-8">
+    <div className="mx-auto max-w-[1760px] px-4 pt-5 pb-16 sm:px-6 sm:pt-8">
       <section className="list-hero relative overflow-hidden rounded-[24px] border border-brand-line px-5 py-6 sm:px-8 sm:py-7">
         <EnvelopeDecor />
         <div className="relative flex flex-wrap items-end justify-between gap-5">
@@ -175,7 +175,7 @@ export function InvitationsList({ items, name }: { items: InvitationSummary[]; n
       </section>
 
       {visible.length ? (
-        <ul className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5">
+        <ul className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5 min-[1900px]:grid-cols-3">
           {visible.map((item, i) => (
             <li
               key={item.id}
@@ -475,7 +475,7 @@ function InvitationCard({
                 className={cn(
                   'flex min-h-11 flex-col items-center justify-center gap-1 rounded-[10px] px-1 py-1.5 text-center text-[11.5px] leading-tight font-semibold transition-colors sm:flex-row sm:gap-1.5 sm:text-[12.5px]',
                   key === 'guests'
-                    ? 'bg-[#e6f6ec] text-[#0f6b39] hover:bg-[#d4efdf]'
+                    ? 'bg-wa-soft text-wa-ink hover:bg-wa-soft-strong'
                     : 'text-ink/75 hover:bg-subtle hover:text-ink',
                 )}
               >

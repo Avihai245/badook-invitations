@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/app';
 /** Shaped like the film studio, under the invitation's header (§9B.3-H: skeletons, not spinners). */
 export default function FilmLoading() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
       <Skeleton shape="line" width={180} height={24} />
       <Skeleton shape="line" width={420} height={12} className="mt-3 max-w-full" />
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px]">

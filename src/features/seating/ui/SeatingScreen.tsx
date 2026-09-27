@@ -592,7 +592,7 @@ export function SeatingScreen({
   const editorHeight = full ? 'min-h-0 flex-1' : 'h-[72dvh] min-h-[460px] lg:h-[min(76dvh,860px)]';
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
       <PageHeader
         size="section"
         title={s.title}
@@ -680,14 +680,14 @@ export function SeatingScreen({
         {stats.over.slice(0, 3).map((x) => (
           <p
             key={x.id}
-            className="flex items-start gap-2 rounded-card border border-[#fecaca] bg-danger-bg px-3 py-2 text-[13px] text-danger"
+            className="flex items-start gap-2 rounded-card border border-danger-line bg-danger-bg px-3 py-2 text-[13px] text-danger"
           >
             <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
             {fmt(s.warnings.over, { number: x.number, seated: taken.get(x.id) ?? 0, capacity: x.capacity })}
           </p>
         ))}
         {stats.declinedSeated.length ? (
-          <p className="flex flex-wrap items-center gap-2 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2 text-[13px] text-warning">
+          <p className="flex flex-wrap items-center gap-2 rounded-card border border-warning-line bg-warning-bg px-3 py-2 text-[13px] text-warning">
             <CircleAlert aria-hidden className="size-4 shrink-0" />
             {plural(s.warnings.declined, stats.declinedSeated.length)}
             <Button
@@ -719,7 +719,7 @@ export function SeatingScreen({
             className={cn(
               'rounded-card border px-3 py-2 text-[13px]',
               converting === 'failed'
-                ? 'border-[#fecaca] bg-danger-bg text-danger'
+                ? 'border-danger-line bg-danger-bg text-danger'
                 : 'border-line bg-info-bg',
             )}
           >
@@ -854,7 +854,7 @@ export function SeatingScreen({
                 onCalibrated={(a, b) => setDialog({ kind: 'line', a, b })}
               />
               {calibrating ? (
-                <div className="absolute inset-x-2 top-2 z-10 flex flex-wrap items-center gap-2 rounded-card border border-[#bfdbfe] bg-info-bg px-3 py-2 text-[13px] shadow-sm sm:inset-x-auto sm:start-3">
+                <div className="absolute inset-x-2 top-2 z-10 flex flex-wrap items-center gap-2 rounded-card border border-info-line bg-info-bg px-3 py-2 text-[13px] shadow-sm sm:inset-x-auto sm:start-3">
                   {s.canvas.calibrating}
                   <Button size="sm" variant="secondary" onClick={() => setCalibrating(false)}>
                     {s.canvas.calibrateCancel}
@@ -923,8 +923,8 @@ export function SeatingScreen({
             drag.over
               ? drag.over.ok
                 ? 'bg-success text-white'
-                : 'bg-danger text-white'
-              : 'bg-ink text-white',
+                : 'bg-danger-strong text-white'
+              : 'bg-inverse text-white',
           )}
           // follows the pointer: physical screen coordinates
           style={{ left: 0, top: 0, transform: `translate(${drag.x + 14}px, ${drag.y + 14}px)` }}

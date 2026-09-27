@@ -293,7 +293,7 @@ export default async function HomePage() {
         {/* ── every kind of event, drifting by ──────────────────────────────────────────────── */}
         <section
           aria-label={s.eventsLabel}
-          className="site-marquee overflow-hidden border-b border-line bg-ink py-4 text-white/85"
+          className="site-marquee overflow-hidden border-b border-line bg-inverse py-4 text-white/85"
         >
           <div className="site-marquee-track">
             {[0, 1].map((copy) => (
@@ -496,7 +496,7 @@ export default async function HomePage() {
 
         {/* ── last call ─────────────────────────────────────────────────────────────────────── */}
         <section className="px-5 py-20 sm:px-6">
-          <Reveal className="relative isolate mx-auto max-w-[1100px] overflow-hidden rounded-[28px] bg-ink px-6 py-16 text-center text-white sm:py-20">
+          <Reveal className="relative isolate mx-auto max-w-[1100px] overflow-hidden rounded-[28px] bg-inverse px-6 py-16 text-center text-white sm:py-20">
             <div
               aria-hidden
               className="site-glow absolute inset-0 -z-10"

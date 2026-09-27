@@ -9,7 +9,7 @@ const Line = ({ w, h = 12, className }: { w: number | string; h?: number; classN
 /** /app/support: the title and a few tickets. */
 export function TicketListSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[860px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <Line w={140} h={30} />
@@ -35,7 +35,7 @@ export function TicketListSkeleton() {
 /** /app/support/new: the title and the form. */
 export function NewTicketSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[760px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
+    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
       <Line w={90} />
       <Line w={240} h={30} className="mt-4" />
       <Line w={320} className="mt-3 max-w-full" />
@@ -52,7 +52,7 @@ export function NewTicketSkeleton() {
 /** /app/support/:id: the subject, the conversation and the answer box. */
 export function TicketSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[860px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
       <Line w={90} />
       <Line w="60%" h={24} className="mt-4" />
       <Line w={220} className="mt-3" />

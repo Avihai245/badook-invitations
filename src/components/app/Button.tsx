@@ -11,8 +11,8 @@ const VARIANT: Record<ButtonVariant, { base: string; hover: string }> = {
   primary: { base: 'bg-primary text-primary-ink', hover: 'hover:bg-primary-hover' },
   secondary: { base: 'border border-line bg-surface text-ink shadow-sm', hover: 'hover:bg-subtle' },
   ghost: { base: 'text-muted', hover: 'hover:bg-subtle hover:text-ink' },
-  danger: { base: 'bg-danger text-white', hover: 'hover:bg-[#991b1b]' },
-  whatsapp: { base: 'bg-whatsapp text-white', hover: 'hover:bg-[#1fbd59]' },
+  danger: { base: 'bg-danger-strong text-white', hover: 'hover:bg-[#991b1b]' },
+  whatsapp: { base: 'bg-wa-strong text-white', hover: 'hover:bg-[#0c6e38]' },
 };
 
 // `.btn` 40px · 0 16px · 14px — `.btn-sm` 32px · 0 12px · 13px — `.btn-lg` 48px · 0 20px · 15px.

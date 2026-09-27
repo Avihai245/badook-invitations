@@ -110,7 +110,7 @@ export function ItemTile({
       <label
         className={cn(
           'absolute end-1.5 top-1.5 grid size-7 cursor-pointer place-items-center rounded-full border border-white/80 bg-black/35 text-white shadow-sm transition-opacity focus-within:opacity-100 group-hover:opacity-100',
-          selected ? 'bg-ink opacity-100' : 'opacity-0 max-sm:opacity-100',
+          selected ? 'bg-inverse opacity-100' : 'opacity-0 max-sm:opacity-100',
         )}
       >
         <input
@@ -126,7 +126,7 @@ export function ItemTile({
         <Menu
           items={menu}
           trigger={
-            <IconButton label={g.menu} size="sm" className="bg-white/90 text-ink shadow-sm hover:bg-white">
+            <IconButton label={g.menu} size="sm" className="bg-surface/90 text-ink shadow-sm hover:bg-surface">
               <Ellipsis />
             </IconButton>
           }

@@ -369,7 +369,7 @@ export function ItemsSection({
                     key={a}
                     type="button"
                     onClick={() => void act([item.id], a)}
-                    className={`inline-flex h-9 items-center rounded-full px-3.5 text-[13px] font-semibold ${a === 'delete' ? 'bg-danger text-white' : 'bg-white/14 text-white hover:bg-white/24'}`}
+                    className={`inline-flex h-9 items-center rounded-full px-3.5 text-[13px] font-semibold ${a === 'delete' ? 'bg-danger-strong text-white' : 'bg-white/14 text-white hover:bg-white/24'}`}
                   >
                     {actionLabel(item, a)}
                   </button>

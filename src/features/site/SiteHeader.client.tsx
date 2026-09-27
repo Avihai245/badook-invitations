@@ -51,7 +51,7 @@ export function SiteHeader({ overHero = false }: { overHero?: boolean }) {
     >
       <a
         href="#main"
-        className="sr-only rounded-btn bg-ink px-3 py-2 text-[14px] font-semibold text-white focus:not-sr-only focus:absolute focus:start-4 focus:top-3 focus:z-50"
+        className="sr-only rounded-btn bg-inverse px-3 py-2 text-[14px] font-semibold text-white focus:not-sr-only focus:absolute focus:start-4 focus:top-3 focus:z-50"
       >
         {t.shell.skipToContent}
       </a>

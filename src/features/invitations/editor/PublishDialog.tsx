@@ -277,7 +277,7 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
                 return (
                   <li
                     key={l}
-                    className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-card border border-[#fde68a] bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-card border border-warning-line bg-warning-bg px-3 py-2.5 text-[13px] text-warning"
                   >
                     <TriangleAlert aria-hidden size={16} strokeWidth={1.75} className="shrink-0" />
                     <span className="min-w-0 flex-1">

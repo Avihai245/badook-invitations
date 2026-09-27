@@ -28,7 +28,7 @@ export function Card({
     <Comp
       className={cn(
         'rounded-card border shadow-sm',
-        tone === 'info' ? 'border-[#bfdbfe] bg-info-bg' : 'border-line bg-surface',
+        tone === 'info' ? 'border-info-line bg-info-bg' : 'border-line bg-surface',
         PADDING[padding],
         className,
       )}

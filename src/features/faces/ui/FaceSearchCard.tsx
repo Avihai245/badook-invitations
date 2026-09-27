@@ -121,7 +121,7 @@ export function FaceSearchCard({ id, initial }: { id: string; initial: FaceHostV
             </p>
             <span aria-hidden className="mt-2 flex h-2 overflow-hidden rounded-full bg-subtle">
               <span
-                className="h-full rounded-full bg-ink transition-[width] duration-500"
+                className="h-full rounded-full bg-inverse transition-[width] duration-500"
                 style={{ width: `${percent}%` }}
               />
             </span>

@@ -13,6 +13,8 @@ export type SegmentedOption<V extends string> = {
   disabled?: boolean;
   /** Accessible name when the label is not descriptive enough (e.g. "EN"). */
   ariaLabel?: string;
+  /** A tooltip (an option shown as an icon only). */
+  title?: string;
 };
 
 export type SegmentedProps<V extends string> = {
@@ -69,6 +71,7 @@ export function Segmented<V extends string>({
             role="radio"
             aria-checked={checked}
             aria-label={option.ariaLabel}
+            title={option.title}
             disabled={off}
             tabIndex={option.value === tabStop ? 0 : -1}
             data-roving-item=""

@@ -218,7 +218,7 @@ export function FilmStudio({ initial }: { initial: FilmView }) {
     <PageHeader size="section" title={F.title} help={help} description={F.subtitle} actions={back} />
   );
   const wrap = (children: React.ReactNode) => (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6" data-testid="film-studio">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6" data-testid="film-studio">
       {header}
       {children}
     </div>

@@ -727,7 +727,7 @@ function Banner({ text }: { text: string }) {
   return (
     <p
       role="status"
-      className="mt-6 rounded-[14px] border border-[#fde68a] bg-warning-bg px-4 py-3 text-[14px] text-warning"
+      className="mt-6 rounded-[14px] border border-warning-line bg-warning-bg px-4 py-3 text-[14px] text-warning"
     >
       {text}
     </p>
@@ -847,7 +847,7 @@ function ConfirmSheet({
           <button
             type="button"
             onClick={onConfirm}
-            className="h-11 rounded-[10px] bg-danger font-semibold text-white"
+            className="h-11 rounded-[10px] bg-danger-strong font-semibold text-white"
           >
             {confirm}
           </button>

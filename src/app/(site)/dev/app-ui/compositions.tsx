@@ -533,7 +533,7 @@ export function EditorComposition({ t, locale }: { t: Copy; locale: Locale }) {
                       {current && (
                         <span
                           aria-hidden
-                          className="absolute inset-y-2 start-0 w-[3px] rounded-[3px] bg-ink"
+                          className="absolute inset-y-2 start-0 w-[3px] rounded-[3px] bg-inverse"
                         />
                       )}
                       {section.locked ? (

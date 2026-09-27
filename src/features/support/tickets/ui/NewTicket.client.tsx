@@ -79,7 +79,7 @@ export function NewTicket({
   };
 
   return (
-    <div className="mx-auto max-w-[760px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
+    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6 sm:pt-8">
       <Link
         href="/app/support"
         className="mb-3 inline-flex items-center gap-1 rounded-btn text-[13px] text-muted hover:text-ink"

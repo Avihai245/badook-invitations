@@ -324,7 +324,7 @@ export function LiveHall({ initial, planBase }: { initial: DayView; planBase: st
   );
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6" data-testid="live-hall">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6" data-testid="live-hall">
       <PageHeader
         size="section"
         title={E.title}
@@ -412,7 +412,7 @@ export function LiveHall({ initial, planBase }: { initial: DayView; planBase: st
 
       {alerts.length ? (
         <section
-          className="mt-4 rounded-card border border-[#fcd34d] bg-warning-bg p-4"
+          className="mt-4 rounded-card border border-warning-line bg-warning-bg p-4"
           aria-labelledby="live-alerts-title"
           data-testid="live-alerts"
         >
@@ -426,7 +426,7 @@ export function LiveHall({ initial, planBase }: { initial: DayView; planBase: st
                 <button
                   type="button"
                   onClick={() => setSheet({ tableId: f.table.id })}
-                  className="inline-flex items-center gap-2 rounded-full border border-[#fcd34d] bg-surface px-3 py-1.5 text-[13px] font-semibold hover:bg-subtle"
+                  className="inline-flex items-center gap-2 rounded-full border border-warning-line bg-surface px-3 py-1.5 text-[13px] font-semibold hover:bg-subtle"
                   data-alert-table={f.table.number}
                 >
                   {fmt(E.alerts.item, {

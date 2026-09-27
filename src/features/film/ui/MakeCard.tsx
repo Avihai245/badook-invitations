@@ -265,7 +265,7 @@ export function MakeCard({
       <CardTitle as="h2">{P.title}</CardTitle>
       <div className="flex flex-col items-center gap-3">
         <div
-          className={`relative overflow-hidden rounded-card bg-ink shadow-sm ${shape === 'vertical' ? 'w-[min(100%,236px)]' : 'w-full'}`}
+          className={`relative overflow-hidden rounded-card bg-inverse shadow-sm ${shape === 'vertical' ? 'w-[min(100%,236px)]' : 'w-full'}`}
           style={{ aspectRatio: `${previewSize.width} / ${previewSize.height}` }}
         >
           <canvas
@@ -307,7 +307,7 @@ export function MakeCard({
               src={making.result.url}
               controls
               playsInline
-              className={`mx-auto rounded-card bg-ink ${shape === 'vertical' ? 'max-h-[420px]' : 'w-full'}`}
+              className={`mx-auto rounded-card bg-inverse ${shape === 'vertical' ? 'max-h-[420px]' : 'w-full'}`}
               data-testid="film-video"
             />
             <p className="text-[12.5px] text-muted">
@@ -402,7 +402,7 @@ export function MakeCard({
               aria-label={M.cta}
             >
               <span
-                className="h-full rounded-full bg-ink transition-[width] duration-200"
+                className="h-full rounded-full bg-inverse transition-[width] duration-200"
                 style={{ width: `${pct}%` }}
               />
             </span>

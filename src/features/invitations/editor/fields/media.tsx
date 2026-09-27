@@ -397,7 +397,7 @@ export function HeroMediaField({ path, label }: { path: string; label: string })
             <button
               type="button"
               onClick={() => setFocal(true)}
-              className="absolute start-1.5 top-1.5 grid size-7 place-items-center rounded-full bg-white/90 text-ink shadow-sm"
+              className="absolute start-1.5 top-1.5 grid size-7 place-items-center rounded-full bg-surface/90 text-ink shadow-sm"
               aria-label={u.focal}
             >
               <Crosshair aria-hidden size={14} strokeWidth={1.75} />

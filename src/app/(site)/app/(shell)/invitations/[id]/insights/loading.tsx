@@ -3,7 +3,7 @@ import { KpiCard, Skeleton } from '@/components/app';
 /** Shaped like the insights tab, under the invitation's header (§9B.3-H: skeletons, not spinners). */
 export default function InsightsLoading() {
   return (
-    <div aria-busy="true" className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+    <div aria-busy="true" className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
       <Skeleton shape="line" width={160} height={24} />
       <Skeleton shape="line" width={460} height={12} className="mt-3 max-w-full" />
       <Skeleton shape="line" width={300} height={34} className="mt-5 max-w-full" />

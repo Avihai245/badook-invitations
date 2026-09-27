@@ -179,7 +179,7 @@ export function Feed({ items }: { items: ActivityItem[] }) {
                     item.kind === 'payment'
                       ? 'bg-success-bg text-success'
                       : item.kind === 'staff' || item.kind === 'credits' || item.kind === 'team_action'
-                        ? 'bg-info-bg text-[#1d4ed8]'
+                        ? 'bg-info-bg text-info'
                         : 'bg-brand-soft text-brand-deep',
                   )}
                 >

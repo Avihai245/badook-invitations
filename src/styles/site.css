@@ -217,6 +217,14 @@
     radial-gradient(90% 120% at 0% 100%, #f8ebe4 0%, rgba(248, 235, 228, 0) 60%),
     linear-gradient(120deg, #fbf4ea 0%, #f6ede1 100%);
 }
+@media screen {
+  html[data-theme='dark'] .list-hero {
+    background:
+      radial-gradient(120% 140% at 100% 0%, #3a2a1b 0%, rgba(58, 42, 27, 0) 55%),
+      radial-gradient(90% 120% at 0% 100%, #2a1f1b 0%, rgba(42, 31, 27, 0) 60%),
+      linear-gradient(120deg, #221a13 0%, #1b1815 100%);
+  }
+}
 .list-hero-art {
   animation: list-float 7s ease-in-out infinite alternate;
 }

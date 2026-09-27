@@ -178,7 +178,7 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
   // ── not in the plan / switched off / not offered here ──
   if (!f.on && !g) {
     return (
-      <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+      <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
         <PageHeader size="section" title={L.title} help={help} description={L.subtitle} />
         {f.why === 'plan' ? (
           <Card
@@ -244,7 +244,7 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
   // ── not on yet ──
   if (!g) {
     return (
-      <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+      <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
         <PageHeader size="section" title={L.title} help={help} description={L.subtitle} />
         <Card
           padding="lg"
@@ -292,7 +292,7 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
   const projector = view.features.projector;
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6" data-testid="gallery-screen">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6" data-testid="gallery-screen">
       <PageHeader
         size="section"
         title={L.title}
@@ -353,7 +353,7 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
         onModerate={moderate}
       />
 
-      <Card padding="lg" className="mt-10 border-[#fecaca]" data-testid="gallery-danger">
+      <Card padding="lg" className="mt-10 border-danger-line" data-testid="gallery-danger">
         <CardTitle as="h2" className="mb-1 text-danger">
           {L.danger.title}
         </CardTitle>

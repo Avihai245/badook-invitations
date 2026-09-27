@@ -64,7 +64,7 @@ export function PhotoPicker({
                     type="button"
                     onClick={() => studio.makeFirst(p.key)}
                     aria-label={fmt(a.makeFirst, { n: i + 1 })}
-                    className="absolute bottom-1 start-1 grid size-7 place-items-center rounded-full bg-white/90 text-ink shadow-sm hover:bg-white"
+                    className="absolute bottom-1 start-1 grid size-7 place-items-center rounded-full bg-surface/90 text-ink shadow-sm hover:bg-surface"
                   >
                     <Star aria-hidden className="size-3.5" />
                   </button>
@@ -75,7 +75,7 @@ export function PhotoPicker({
                 onClick={() => studio.remove(p.key)}
                 aria-label={fmt(a.remove, { n: i + 1 })}
                 title={fmt(a.remove, { n: i + 1 })}
-                className="absolute end-1 top-1 grid size-7 place-items-center rounded-full bg-white/90 text-ink shadow-sm hover:bg-white"
+                className="absolute end-1 top-1 grid size-7 place-items-center rounded-full bg-surface/90 text-ink shadow-sm hover:bg-surface"
               >
                 <X aria-hidden className="size-3.5" />
               </button>
@@ -127,7 +127,7 @@ export function PhotoPicker({
                 >
                   <img src={url} alt="" loading="lazy" className="aspect-square w-full object-cover" />
                   {on ? (
-                    <span className="absolute end-1 top-1 grid size-5 place-items-center rounded-full bg-ink text-[11px] font-bold text-white">
+                    <span className="absolute end-1 top-1 grid size-5 place-items-center rounded-full bg-inverse text-[11px] font-bold text-white">
                       ✓
                     </span>
                   ) : null}

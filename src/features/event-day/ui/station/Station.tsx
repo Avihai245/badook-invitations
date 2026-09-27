@@ -632,7 +632,7 @@ function ScanPanel({ onText, onClose }: { onText(text: string): void; onClose():
     };
   }, []);
   return (
-    <section className="mt-4 overflow-hidden rounded-[18px] bg-ink text-white" data-testid="station-camera">
+    <section className="mt-4 overflow-hidden rounded-[18px] bg-inverse text-white" data-testid="station-camera">
       <div className="relative aspect-[4/3] w-full">
         <video
           ref={video}

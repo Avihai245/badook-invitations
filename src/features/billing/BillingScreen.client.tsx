@@ -232,7 +232,7 @@ export function BillingScreen({
             : 'failure';
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-16 sm:px-6">
+    <div className="mx-auto max-w-[1760px] px-4 pt-8 pb-16 sm:px-6">
       <div className="flex items-center gap-1">
         <PageTitle>{b.title}</PageTitle>
         <AreaHelp
@@ -249,6 +249,23 @@ export function BillingScreen({
         />
       </div>
       <p className="mt-1 text-muted">{b.subtitle}</p>
+      <p className="mt-1 text-[13px] text-muted" data-testid="billing-terms">
+        {b.terms.before}
+        <Link
+          href="/terms#plans"
+          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
+        >
+          {b.terms.terms}
+        </Link>
+        {b.terms.middle}
+        <Link
+          href="/terms#cancel"
+          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
+        >
+          {b.terms.cancel}
+        </Link>
+        {b.terms.after}
+      </p>
 
       {returned ? (
         <p
@@ -256,10 +273,10 @@ export function BillingScreen({
           data-testid="billing-returned"
           className={
             returned === 'success'
-              ? 'mt-5 flex items-center gap-2 rounded-card border border-[#bbf7d0] bg-success-bg px-4 py-3 text-[14px] text-success'
+              ? 'mt-5 flex items-center gap-2 rounded-card border border-success-line bg-success-bg px-4 py-3 text-[14px] text-success'
               : returned === 'pending'
                 ? 'mt-5 flex items-center gap-2 rounded-card border border-line bg-subtle px-4 py-3 text-[14px]'
-                : 'mt-5 flex items-center gap-2 rounded-card border border-[#fecaca] bg-danger-bg px-4 py-3 text-[14px] text-danger'
+                : 'mt-5 flex items-center gap-2 rounded-card border border-danger-line bg-danger-bg px-4 py-3 text-[14px] text-danger'
           }
         >
           {returned === 'success' ? (
@@ -272,7 +289,7 @@ export function BillingScreen({
       ) : null}
 
       {off ? (
-        <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-card border border-[#fde68a] bg-warning-bg px-4 py-3 text-[14px] text-warning">
+        <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-card border border-warning-line bg-warning-bg px-4 py-3 text-[14px] text-warning">
           {b.off}
           <Link href="/contact?topic=billing" className="font-semibold underline">
             {b.contact}

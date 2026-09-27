@@ -1,5 +1,6 @@
 'use client';
 
+import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { DropdownMenu } from 'radix-ui';
 import type { ReactElement, ReactNode } from 'react';
@@ -18,7 +19,15 @@ export type MenuItem =
       danger?: boolean;
       disabled?: boolean;
     }
-  | { type: 'separator' };
+  | { type: 'separator' }
+  | {
+      /** A choice of one (menuitemradio): a small heading, then its options with a check on the current. */
+      type: 'radio';
+      label: ReactNode;
+      value: string;
+      options: readonly { value: string; label: ReactNode; icon?: ReactNode }[];
+      onValueChange: (value: string) => void;
+    };
 
 export type MenuProps = {
   /** The trigger, usually an `<IconButton label="…">` (⋯). */
@@ -58,6 +67,35 @@ export function Menu({ trigger, items, align = 'end', dir: dirProp, className }:
             {items.map((entry, i) => {
               if (entry.type === 'separator')
                 return <DropdownMenu.Separator key={`sep-${i}`} className="mx-1 my-1 h-px bg-line" />;
+              if (entry.type === 'radio')
+                return (
+                  <DropdownMenu.Group key={`radio-${i}`}>
+                    <DropdownMenu.Label className="px-2.5 pt-1.5 pb-1 text-[12px] font-medium text-muted">
+                      {entry.label}
+                    </DropdownMenu.Label>
+                    <DropdownMenu.RadioGroup value={entry.value} onValueChange={entry.onValueChange}>
+                      {entry.options.map((option) => (
+                        <DropdownMenu.RadioItem
+                          key={option.value}
+                          value={option.value}
+                          // choosing keeps the menu open: the change shows at once
+                          onSelect={(e) => e.preventDefault()}
+                          className={item}
+                        >
+                          {option.icon != null ? (
+                            <span aria-hidden className={cn(iconSlot, 'text-muted [&_svg]:size-4')}>
+                              {option.icon}
+                            </span>
+                          ) : null}
+                          <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                          <DropdownMenu.ItemIndicator>
+                            <Check aria-hidden className="size-4 text-brand-deep" />
+                          </DropdownMenu.ItemIndicator>
+                        </DropdownMenu.RadioItem>
+                      ))}
+                    </DropdownMenu.RadioGroup>
+                  </DropdownMenu.Group>
+                );
               const content = (
                 <>
                   {entry.icon != null ? (

@@ -137,7 +137,7 @@ export function InsightsScreen({ initial }: { initial: InsightsPageData }) {
   if (!view) {
     const off = initial.off;
     return (
-      <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6" data-testid="insights-off">
+      <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6" data-testid="insights-off">
         {header}
         {off?.why === 'plan' ? (
           <Card padding="lg" className="mt-6 flex flex-col items-start gap-3 border-brand-line bg-brand-soft">
@@ -213,7 +213,7 @@ export function InsightsScreen({ initial }: { initial: InsightsPageData }) {
   // ── not published yet ──
   if (v.status === 'draft') {
     return (
-      <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6" data-testid="insights-screen">
+      <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6" data-testid="insights-screen">
         {header}
         <EmptyState
           className="mt-6 py-14"
@@ -252,7 +252,7 @@ export function InsightsScreen({ initial }: { initial: InsightsPageData }) {
 
   const empty = T.visits === 0;
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6" data-testid="insights-screen">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6" data-testid="insights-screen">
       {header}
       {rangeFilter}
 

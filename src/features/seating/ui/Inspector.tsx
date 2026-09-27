@@ -240,7 +240,7 @@ export function TableInspector({
                 type="button"
                 aria-pressed={table.zones.includes(z)}
                 onClick={() => toggleZone(z)}
-                className="h-8 rounded-full border border-line bg-surface px-3 text-[12.5px] font-medium text-ink/80 hover:bg-subtle aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white"
+                className="h-8 rounded-full border border-line bg-surface px-3 text-[12.5px] font-medium text-ink/80 hover:bg-subtle aria-pressed:border-ink aria-pressed:bg-inverse aria-pressed:text-white"
               >
                 {i.zones[z]}
               </button>

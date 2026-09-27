@@ -54,4 +54,5 @@ export {
   type ToastProviderProps,
   type ToastVariant,
 } from './Toast';
+export { useMedia } from './useMedia';
 export { cn, iconSlot } from './utils';

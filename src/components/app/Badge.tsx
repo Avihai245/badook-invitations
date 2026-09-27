@@ -10,7 +10,7 @@ const VARIANT: Record<BadgeVariant, string> = {
   warning: 'bg-warning-bg text-warning',
   danger: 'bg-danger-bg text-danger',
   neutral: 'bg-subtle text-ink',
-  info: 'bg-info-bg text-[#1d4ed8]',
+  info: 'bg-info-bg text-info',
 };
 
 export type BadgeProps = ComponentProps<'span'> & {

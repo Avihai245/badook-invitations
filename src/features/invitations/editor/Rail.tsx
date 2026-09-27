@@ -154,36 +154,38 @@ export function Rail({ onNavigate }: { onNavigate?: () => void }) {
   ];
   return (
     <aside aria-label={r.label} className="flex min-h-0 flex-col bg-surface">
-      <div
-        role="tablist"
-        aria-label={r.label}
-        onKeyDown={rovingKeyDown}
-        className="flex gap-1 border-b border-line px-3 py-2.5 lg:max-xl:flex-col lg:max-xl:px-2"
-      >
-        {tabs.map(({ value, label, Icon }) => {
-          const on = railTab === value;
-          return (
-            <button
-              key={value}
-              type="button"
-              role="tab"
-              id={`${id}-tab-${value}`}
-              aria-selected={on}
-              aria-controls={`${id}-panel-${value}`}
-              tabIndex={on ? 0 : -1}
-              data-roving-item=""
-              title={label}
-              onClick={() => setRailTab(value)}
-              className={cn(
-                'inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-btn text-[13px] lg:max-xl:h-9 lg:max-xl:flex-none',
-                on ? 'bg-subtle font-semibold text-ink' : 'text-muted hover:text-ink',
-              )}
-            >
-              <Icon aria-hidden size={15} strokeWidth={1.75} className="shrink-0" />
-              <span className={COMPACT_SR}>{label}</span>
-            </button>
-          );
-        })}
+      <div className="flex gap-1 border-b border-line px-3 py-2.5 lg:max-xl:flex-col lg:max-xl:px-2">
+        <div
+          role="tablist"
+          aria-label={r.label}
+          onKeyDown={rovingKeyDown}
+          className="flex flex-1 gap-1 lg:max-xl:flex-col"
+        >
+          {tabs.map(({ value, label, Icon }) => {
+            const on = railTab === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                role="tab"
+                id={`${id}-tab-${value}`}
+                aria-selected={on}
+                aria-controls={`${id}-panel-${value}`}
+                tabIndex={on ? 0 : -1}
+                data-roving-item=""
+                title={label}
+                onClick={() => setRailTab(value)}
+                className={cn(
+                  'inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-btn text-[13px] lg:max-xl:h-9 lg:max-xl:flex-none',
+                  on ? 'bg-subtle font-semibold text-ink' : 'text-muted hover:text-ink',
+                )}
+              >
+                <Icon aria-hidden size={15} strokeWidth={1.75} className="shrink-0" />
+                <span className={COMPACT_SR}>{label}</span>
+              </button>
+            );
+          })}
+        </div>
         <HelpFor
           area="rail"
           hide={review?.access === 'on' ? [] : ['comments']}
@@ -235,12 +237,12 @@ function RowShell({
       className={cn(
         'relative flex h-11 items-center gap-2.5 rounded-btn px-2.5 hover:bg-subtle lg:max-xl:justify-center lg:max-xl:px-0',
         selected && 'bg-subtle font-semibold',
-        off && 'text-faint',
+        off && 'text-muted',
         className,
       )}
     >
       {selected ? (
-        <span aria-hidden className="absolute inset-y-2 start-0 w-[3px] rounded-[3px] bg-ink" />
+        <span aria-hidden className="absolute inset-y-2 start-0 w-[3px] rounded-[3px] bg-inverse" />
       ) : null}
       {children}
     </li>
@@ -490,7 +492,12 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
         collisionDetection={closestCenter}
         modifiers={[restrictToVerticalAxis]}
         onDragEnd={onDragEnd}
-        accessibility={{ announcements, screenReaderInstructions: { draggable: d.instructions } }}
+        accessibility={{
+          announcements,
+          screenReaderInstructions: { draggable: d.instructions },
+          // its live region beside the page, not inside the list (a list holds items only)
+          container: typeof document === 'undefined' ? undefined : document.body,
+        }}
       >
         <SortableContext items={middle.map((s) => s.id)} strategy={verticalListSortingStrategy}>
           {middle.map((s) => {

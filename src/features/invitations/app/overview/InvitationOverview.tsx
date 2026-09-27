@@ -147,7 +147,7 @@ export function InvitationOverview({
   const doneCount = steps.filter((s) => done[s.key]).length;
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+    <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
       <PageHeader
         size="section"
         title={o.title}
@@ -248,7 +248,7 @@ export function InvitationOverview({
             <span className="flex items-center gap-2 text-[12.5px] font-semibold text-muted">
               <span aria-hidden className="h-1.5 w-20 overflow-hidden rounded-full bg-subtle">
                 <span
-                  className="block h-full rounded-full bg-linear-to-l from-brand to-brand-deep transition-[width] duration-500"
+                  className="block h-full rounded-full bg-linear-to-l from-brand to-brand-strong transition-[width] duration-500"
                   style={{ width: `${(doneCount / steps.length) * 100}%` }}
                 />
               </span>
@@ -290,7 +290,10 @@ export function InvitationOverview({
                       {s.title}
                       {isDone ? <span className="sr-only"> ({o.steps.done})</span> : null}
                     </p>
-                    <p className="text-[12.5px] text-muted">{note ?? s.body}</p>
+                    {/* (on the next step's tinted row, muted would be a hair under AA) */}
+                    <p className={cn('text-[12.5px]', isNext ? 'text-ink/70' : 'text-muted')}>
+                      {note ?? s.body}
+                    </p>
                   </div>
                   {isNext ? (
                     <Button size="sm" asChild>
@@ -355,16 +358,16 @@ export function InvitationOverview({
 
 const TONES = {
   excel: {
-    ring: 'border-[#cfe6d8]',
-    glow: 'from-[#e8f5ee] via-surface to-surface',
+    ring: 'border-wa-line',
+    glow: 'from-wa-soft via-surface to-surface',
     icon: 'bg-[#1d6f42] text-white shadow-[0_10px_22px_-10px_rgba(29,111,66,0.9)]',
-    note: 'text-[#1d6f42]',
+    note: 'text-wa-ink',
   },
   whatsapp: {
-    ring: 'border-[#c9ecd7]',
-    glow: 'from-[#e7f8ee] via-surface to-surface',
+    ring: 'border-wa-line',
+    glow: 'from-wa-soft via-surface to-surface',
     icon: 'bg-whatsapp text-white shadow-[0_10px_22px_-10px_rgba(37,211,102,0.95)]',
-    note: 'text-[#128c4a]',
+    note: 'text-wa-ink',
   },
 } as const;
 

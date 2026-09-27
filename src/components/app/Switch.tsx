@@ -43,7 +43,7 @@ export function Switch({
       }}
       className={cn(
         'relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-150 motion-reduce:transition-none',
-        on ? 'bg-ink' : 'bg-line-strong',
+        on ? 'bg-inverse' : 'bg-line-strong',
         disabled && 'cursor-not-allowed opacity-50',
         className,
       )}

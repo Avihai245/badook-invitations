@@ -3,6 +3,14 @@ export const billingHe = {
   metaTitle: 'חבילה וחיובים',
   title: 'חבילה וחיובים',
   subtitle: 'החבילה שלכם, קרדיטים להודעות וואטסאפ, והיסטוריית התשלומים.',
+  /** before any purchase: what it is subject to (consumer protection: the terms before a distance sale) */
+  terms: {
+    before: 'כל רכישה כפופה ל',
+    terms: 'תנאי השימוש',
+    middle: ', כולל ',
+    cancel: 'ביטול עסקה והחזרים',
+    after: '.',
+  },
   current: 'החבילה שלכם',
   status: {
     active: 'מתחדשת ב־{date}',

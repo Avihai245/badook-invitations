@@ -239,7 +239,7 @@ export function StackedColumns<K extends string>({
         <div
           role="status"
           className={cn(
-            'pointer-events-none absolute top-1 z-10 max-w-[240px] rounded-[10px] bg-ink px-3 py-2 text-[12.5px] text-white shadow-lg',
+            'pointer-events-none absolute top-1 z-10 max-w-[240px] rounded-[10px] bg-inverse px-3 py-2 text-[12.5px] text-white shadow-lg',
             !tip && 'sr-only',
           )}
           style={tip ? { left: `${tipAt}%`, transform: `translateX(-${tipAt}%)` } : undefined}

@@ -114,7 +114,7 @@ function Notice({ notice }: { notice: AuthNoticeKey }) {
     <p
       role="status"
       data-testid="auth-notice"
-      className="mb-5 flex items-start gap-2 rounded-card border border-[#bbf7d0] bg-success-bg px-3.5 py-3 text-[13.5px] text-success"
+      className="mb-5 flex items-start gap-2 rounded-card border border-success-line bg-success-bg px-3.5 py-3 text-[13.5px] text-success"
     >
       <CircleCheck aria-hidden className="mt-0.5 size-4 shrink-0" />
       <span>

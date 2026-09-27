@@ -229,7 +229,7 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
   return (
     <>
       {/* the invitation's header and tabs come from its workspace layout */}
-      <div className="mx-auto max-w-[1200px] px-4 pt-6 pb-16 sm:px-6">
+      <div className="mx-auto max-w-[1760px] px-4 pt-6 pb-16 sm:px-6">
         <PageHeader
           size="section"
           title={r.title}
@@ -410,7 +410,7 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
                     >
                       {r.filter}
                       {menuFilters.length ? (
-                        <span className="grid min-w-5 place-items-center rounded-full bg-ink px-1 text-[11px] leading-5 text-white tabular-nums">
+                        <span className="grid min-w-5 place-items-center rounded-full bg-inverse px-1 text-[11px] leading-5 text-white tabular-nums">
                           {number(menuFilters.length)}
                         </span>
                       ) : null}

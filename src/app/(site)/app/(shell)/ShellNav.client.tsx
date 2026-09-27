@@ -4,20 +4,25 @@ import {
   ChevronsUpDown,
   CircleUserRound,
   CreditCard,
-  FileText,
   LayoutGrid,
   LifeBuoy,
   LogOut,
   Mail,
   MessageCircleQuestion,
+  Monitor,
+  Moon,
   Plus,
   ShieldCheck,
+  Sun,
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { BrandLogo, cn, Menu, type MenuItem } from '@/components/app';
+import { BrandLogo, cn, Menu, useMedia, type MenuItem } from '@/components/app';
+import { ThemeToggle, useThemePref } from '@/features/site/Theme.client';
+import { LEGAL_PAGES } from '@/features/legal/links';
+import { isThemePref } from '@/features/site/theme';
 import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import { signOut } from '../../(auth)/actions';
@@ -35,14 +40,12 @@ export function sectionOf(path: string): Section {
   return null;
 }
 
-const LEGAL = ['privacy', 'terms', 'cookies', 'accessibility'] as const;
-
 /**
  * The app's frame, one element for every screen size (so the account menu exists once): on phones
- * and tablets a compact top bar (brand, language, account); from 1024px the sidebar on the start
- * side — brand, "new invitation", the main places, help (the assistant) and, at the bottom, the
- * language, the account and the legal pages. The sidebar's middle stays clear: the accessibility
- * button floats over the left edge halfway down.
+ * and tablets a compact top bar (brand, language, account — the look is in the account menu); from
+ * 1024px the sidebar on the start side — brand, "new invitation", the main places, help (the
+ * assistant) and, at the bottom, the language, the look, the account and the legal pages. The
+ * sidebar's middle stays clear: the accessibility button floats over the left edge halfway down.
  */
 export function AppSidebar({
   email,
@@ -75,7 +78,7 @@ export function AppSidebar({
         <Link
           href="/app/invitations/new"
           aria-current={current === 'new' ? 'page' : undefined}
-          className="group flex h-11 items-center justify-center gap-2 rounded-[12px] bg-linear-to-br from-brand to-brand-deep px-4 text-[14.5px] font-semibold text-white shadow-[0_10px_24px_-12px_rgba(122,82,48,0.9)] transition-[transform,box-shadow] hover:-translate-y-px hover:shadow-[0_14px_28px_-12px_rgba(122,82,48,0.95)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+          className="group flex h-11 items-center justify-center gap-2 rounded-[12px] bg-linear-to-br from-brand to-brand-strong px-4 text-[14.5px] font-semibold text-white shadow-[0_10px_24px_-12px_rgba(122,82,48,0.9)] transition-[transform,box-shadow] hover:-translate-y-px hover:shadow-[0_14px_28px_-12px_rgba(122,82,48,0.95)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         >
           <Plus
             aria-hidden
@@ -123,12 +126,16 @@ export function AppSidebar({
           <span className="hidden text-[12px] text-muted lg:inline">{t.shell.uiLanguage}</span>
           <UiLanguageToggle />
         </div>
+        <div className="hidden items-center justify-between gap-2 px-2 lg:flex">
+          <span className="text-[12px] text-muted">{t.shell.theme.label}</span>
+          <ThemeToggle />
+        </div>
         <UserMenu email={email} admin={admin} unread={unread} />
         <nav
           aria-label={t.shell.legal}
           className="hidden flex-wrap gap-x-3 gap-y-1 px-2 text-[11.5px] leading-5 text-muted lg:flex"
         >
-          {LEGAL.map((key) => (
+          {LEGAL_PAGES.map((key) => (
             <Link key={key} href={`/${key}`} className="rounded-[4px] hover:text-ink hover:underline">
               {t.site.footer[key]}
             </Link>
@@ -173,7 +180,7 @@ function SideLink({
         <>
           <span
             aria-hidden
-            className="ms-auto grid h-5 min-w-5 place-items-center rounded-full bg-brand-deep px-1.5 text-[11px] font-bold text-white tabular-nums"
+            className="ms-auto grid h-5 min-w-5 place-items-center rounded-full bg-brand-strong px-1.5 text-[11px] font-bold text-white tabular-nums"
           >
             {badge.count > 99 ? '99+' : badge.count}
           </span>
@@ -208,7 +215,7 @@ export function MobileTabBar({ unread = 0 }: { unread?: number }) {
         >
           <span
             aria-hidden
-            className="grid size-12 place-items-center rounded-full bg-linear-to-br from-brand to-brand-deep text-white shadow-[0_10px_22px_-8px_rgba(122,82,48,0.9)] ring-4 ring-surface"
+            className="grid size-12 place-items-center rounded-full bg-linear-to-br from-brand to-brand-strong text-white shadow-[0_10px_22px_-8px_rgba(122,82,48,0.9)] ring-4 ring-surface"
           >
             <Plus className="size-6" />
           </span>
@@ -259,7 +266,7 @@ function TabLink({
         {badge ? (
           <span
             aria-hidden
-            className="absolute -end-1 -top-0.5 size-2.5 rounded-full bg-brand-deep ring-2 ring-surface"
+            className="absolute -end-1 -top-0.5 size-2.5 rounded-full bg-brand-strong ring-2 ring-surface"
           />
         ) : null}
       </span>
@@ -270,8 +277,9 @@ function TabLink({
 }
 
 /**
- * The account menu: who is signed in, the account, billing, help, the legal pages and signing out.
- * A round avatar in the phones' top bar; a row with the avatar and the address in the sidebar.
+ * The account menu: who is signed in, the account, billing, help and signing out — and on phones and
+ * tablets the look (the sidebar has it from 1024px). A round avatar in the phones' top bar; a row
+ * with the avatar and the address in the sidebar. (The legal pages aren't here: the sidebar's foot, and on phones the page's own — layout.tsx.)
  */
 export function UserMenu({
   email,
@@ -283,6 +291,8 @@ export function UserMenu({
   unread?: number;
 }) {
   const { t, plural } = useUi();
+  const wide = useMedia('(min-width: 1024px)');
+  const [theme, chooseTheme] = useThemePref();
   const initial = (email ?? '?').trim()[0]?.toUpperCase() ?? '?';
   const items: MenuItem[] = [
     ...(email
@@ -309,8 +319,24 @@ export function UserMenu({
     { label: t.shell.nav.assistant, icon: <MessageCircleQuestion />, onSelect: () => openSupport() },
     { label: t.shell.nav.contact, icon: <Mail />, href: '/contact' },
     { type: 'separator' },
-    ...LEGAL.map((key) => ({ label: t.site.footer[key], icon: <FileText />, href: `/${key}` })),
-    { type: 'separator' },
+    ...(wide
+      ? []
+      : ([
+          {
+            type: 'radio',
+            label: t.shell.theme.label,
+            value: theme,
+            options: [
+              { value: 'light', label: t.shell.theme.light, icon: <Sun /> },
+              { value: 'dark', label: t.shell.theme.dark, icon: <Moon /> },
+              { value: 'system', label: t.shell.theme.system, icon: <Monitor /> },
+            ],
+            onValueChange: (value: string) => {
+              if (isThemePref(value)) chooseTheme(value);
+            },
+          },
+          { type: 'separator' },
+        ] satisfies MenuItem[])),
     { label: t.shell.signOut, icon: <LogOut className="icon-dir" />, onSelect: () => void signOut() },
   ];
   return (
@@ -325,7 +351,7 @@ export function UserMenu({
         >
           <span
             aria-hidden
-            className="grid size-8 shrink-0 place-items-center rounded-full bg-linear-to-br from-brand to-brand-deep text-[14px] font-bold text-white"
+            className="grid size-8 shrink-0 place-items-center rounded-full bg-linear-to-br from-brand to-brand-strong text-[14px] font-bold text-white"
           >
             {initial}
           </span>

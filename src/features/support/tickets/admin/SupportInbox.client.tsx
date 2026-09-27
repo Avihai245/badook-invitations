@@ -103,7 +103,7 @@ export function SupportInbox({
                 data-testid={`inbox-count-${tab}`}
                 className={cn(
                   'grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11.5px] font-bold tabular-nums',
-                  active ? 'bg-ink text-white' : 'bg-subtle text-ink',
+                  active ? 'bg-inverse text-white' : 'bg-subtle text-ink',
                 )}
               >
                 {number(list.counts[tab])}

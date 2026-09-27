@@ -101,7 +101,7 @@ export function Hint({
           sideOffset={6}
           collisionPadding={12}
           dir={dir}
-          className="z-[80] max-w-[280px] rounded-[10px] bg-ink px-3 py-2 text-[12.5px] leading-[1.45] text-white shadow-lg data-[state=delayed-open]:animate-app-fade-in motion-reduce:animate-none"
+          className="z-[80] max-w-[280px] rounded-[10px] bg-inverse px-3 py-2 text-[12.5px] leading-[1.45] text-white shadow-lg data-[state=delayed-open]:animate-app-fade-in motion-reduce:animate-none"
         >
           {disabled && disabledText != null ? disabledText : text}
           <Tooltip.Arrow className="fill-ink" width={10} height={5} />

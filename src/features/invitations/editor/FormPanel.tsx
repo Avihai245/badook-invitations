@@ -194,8 +194,8 @@ export function FormPanel({ className }: { className?: string }) {
       <div key={key}>{body}</div>
       <Card padding="sm" tone="info" className="mt-4">
         <div className="flex items-start gap-3">
-          <Sparkles aria-hidden size={18} strokeWidth={1.75} className="shrink-0 text-[#1d4ed8]" />
-          <p className="flex-1 text-[12px] text-[#1e3a8a]">{e.tip}</p>
+          <Sparkles aria-hidden size={18} strokeWidth={1.75} className="shrink-0 text-info" />
+          <p className="flex-1 text-[12px] text-info-strong">{e.tip}</p>
         </div>
       </Card>
     </div>

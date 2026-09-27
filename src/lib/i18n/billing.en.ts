@@ -5,6 +5,14 @@ export const billingEn: typeof billingHe = {
   metaTitle: 'Plan & billing',
   title: 'Plan & billing',
   subtitle: 'Your plan, credits for WhatsApp messages, and your payment history.',
+  /** before any purchase: what it is subject to (consumer protection: the terms before a distance sale) */
+  terms: {
+    before: 'Every purchase is subject to the ',
+    terms: 'terms of use',
+    middle: ', including ',
+    cancel: 'cancelling and refunds',
+    after: '.',
+  },
   current: 'Your plan',
   status: {
     active: 'Renews on {date}',

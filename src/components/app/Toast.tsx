@@ -167,7 +167,7 @@ function ToastCard({
       type={variant === 'danger' ? 'foreground' : 'background'}
       className={cn(
         'slide-from-end pointer-events-auto relative flex w-full max-w-[400px] items-start gap-3 rounded-card border bg-surface p-3.5 shadow-lg',
-        variant === 'danger' ? 'border-[#fecaca]' : 'border-line',
+        variant === 'danger' ? 'border-danger-line' : 'border-line',
         // Animations only with motion-safe (a data-state selector would out-specify motion-reduce:animate-none);
         // the swipe-follow translate is direct manipulation, so it stays.
         'motion-safe:data-[state=open]:animate-app-toast-in motion-safe:data-[state=closed]:animate-app-toast-out',

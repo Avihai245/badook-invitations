@@ -521,7 +521,7 @@ function Conversation({ ticket }: { ticket: AdminTicket }) {
                 className={cn(
                   'rounded-[18px] px-4 py-3 text-start text-[14.5px] leading-[1.6] break-words whitespace-pre-wrap',
                   team
-                    ? 'rounded-ee-[6px] bg-brand-deep text-white'
+                    ? 'rounded-ee-[6px] bg-brand-strong text-white'
                     : 'rounded-es-[6px] border border-line bg-surface text-ink shadow-sm',
                 )}
               >

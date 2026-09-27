@@ -121,7 +121,7 @@ export function InvitationWorkspace({
 
   return (
     <InWorkspace.Provider value>
-      <div className="mx-auto max-w-[1200px] px-4 pt-4 sm:px-6 sm:pt-6">
+      <div className="mx-auto max-w-[1760px] px-4 pt-4 sm:px-6 sm:pt-6">
         <Link
           href="/app/invitations"
           className="inline-flex items-center gap-1 rounded-btn text-[13px] font-medium text-muted hover:text-ink"
@@ -219,10 +219,10 @@ export function InvitationWorkspace({
                         'inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13.5px] font-semibold whitespace-nowrap transition-[background-color,color,box-shadow] duration-150 motion-reduce:transition-none sm:h-10 sm:gap-2 sm:px-4 sm:text-[14px]',
                         active
                           ? guests
-                            ? 'bg-[#128c4a] text-white shadow-[0_8px_18px_-10px_rgba(18,140,74,0.9)]'
-                            : 'bg-ink text-white shadow-sm'
+                            ? 'bg-wa-strong text-white shadow-[0_8px_18px_-10px_rgba(18,140,74,0.9)]'
+                            : 'bg-inverse text-white shadow-sm'
                           : guests
-                            ? 'bg-[#e6f6ec] text-[#0f6b39] ring-1 ring-[#bfe6cc] hover:bg-[#d7f0e0]'
+                            ? 'bg-wa-soft text-wa-ink ring-1 ring-wa-line hover:bg-wa-soft-strong'
                             : 'bg-surface/70 text-ink/75 hover:bg-surface hover:text-ink',
                       )}
                     >
@@ -234,7 +234,7 @@ export function InvitationWorkspace({
                             aria-hidden
                             className={cn(
                               'min-w-5 rounded-full px-1.5 text-center text-[11.5px] leading-5 tabular-nums',
-                              active ? 'bg-white/20' : guests ? 'bg-[#0f6b39]/10' : 'bg-ink/8',
+                              active ? 'bg-white/20' : guests ? 'bg-wa-ink/10' : 'bg-ink/8',
                             )}
                           >
                             {number(countOf(key))}

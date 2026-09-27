@@ -143,7 +143,7 @@ export function Timeline({
       {tip ? (
         <div
           role="status"
-          className="pointer-events-none absolute top-6 rounded-[10px] bg-ink px-3 py-2 text-[12.5px] whitespace-nowrap text-white shadow-lg"
+          className="pointer-events-none absolute top-6 rounded-[10px] bg-inverse px-3 py-2 text-[12.5px] whitespace-nowrap text-white shadow-lg"
           style={{ left: `${tipAt}%`, transform: `translateX(-${tipAt}%)` }}
         >
           {label(tip)}

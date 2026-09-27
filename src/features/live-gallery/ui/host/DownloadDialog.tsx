@@ -145,7 +145,7 @@ export function DownloadDialog({
             <div role="status" aria-live="polite" data-testid="gallery-download-progress">
               <div className="h-2 overflow-hidden rounded-full bg-subtle">
                 <div
-                  className="h-full rounded-full bg-ink transition-[width] duration-300 motion-reduce:transition-none"
+                  className="h-full rounded-full bg-inverse transition-[width] duration-300 motion-reduce:transition-none"
                   style={{ width: `${phase === 'done' ? 100 : pct}%` }}
                 />
               </div>
