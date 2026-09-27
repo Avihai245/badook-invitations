@@ -14,7 +14,9 @@ export type ActivityKind =
   | 'ticket_opened'
   | 'ticket_reply'
   | 'partner_provision'
-  | 'staff';
+  | 'staff'
+  /** the team acted on a customer: a plan as a gift, a discount, sign-in suspended or restored, a feature */
+  | 'team_action';
 
 export interface ActivityItem {
   /** unique across the kinds (e.g. "rsvp:<id>") */
@@ -31,4 +33,10 @@ export interface ActivityItem {
   userId: string | null;
   invitationId: string | null;
   ticketId: string | null;
+  /**
+   * What the line needs besides (optional): signup { source }, rsvp { attending }, whatsapp_batch
+   * { channel: 'invitation' | 'table' | 'gallery' }, payment { renewal }, staff and team_action
+   * { action, role, before, plan, percent, feature, grant }.
+   */
+  detail?: Record<string, string | number | boolean | null>;
 }

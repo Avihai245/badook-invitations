@@ -80,4 +80,20 @@ export const coreHe = {
     updated: 'עודכן',
     reason: 'סיבה',
   },
+  /** the console's shared pieces: the reason every action asks for, paging, empty results */
+  kit: {
+    reasonHelp: 'חובה, 3 עד 200 תווים. נשמרת ביומן הפעולות עם שמך.',
+    reasonPlaceholder: 'למשל: פיצוי על תקלה בשליחה',
+    page: 'עמוד {page} מתוך {pages}',
+    results: { one: 'תוצאה אחת', other: '{count} תוצאות' },
+    noResults: 'לא נמצא כלום. נסו חיפוש אחר או הסירו סינון.',
+    clearFilters: 'ניקוי הסינון',
+    clearFiltersHelp: 'מציג שוב את כל הרשימה',
+    previousHelp: 'העמוד הקודם ברשימה',
+    nextHelp: 'העמוד הבא ברשימה',
+    pagesLabel: 'מעבר בין העמודים',
+    noPermission: 'לתפקיד שלך אין הרשאה לפעולה הזו.',
+    never: 'אף פעם',
+    cancelHelp: 'סוגר בלי לשנות כלום',
+  },
 };
