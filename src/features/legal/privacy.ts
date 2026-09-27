@@ -221,7 +221,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               list: [
                 'What is kept: the ticket — its subject, its type, the invitation it is about when the customer chose one — and every message in it; the name, email address and phone number given in the contact form; and, for a ticket opened from the support assistant, the conversation with the assistant that the customer saw and chose to attach.',
                 'Who sees it: the customer, in the app (a visitor without an account gets the team’s answers by email); and the members of our team whose role includes support, in our admin console, together with the customer’s account details (the plan, message credits, the number of invitations). The team’s internal notes on a ticket are not shown to the customer. What the team does on a ticket is recorded (who, what and when).',
-                'Emails: the team’s answer is sent to the customer’s email address (through Resend, section 5); our team is told of a new ticket by email with its subject only, not the conversation.',
+                'Emails: the team’s answer is sent to the customer’s email address (through Resend, section 5); our team is told of a new ticket, or of a customer’s answer, by email with the ticket’s subject only, not the conversation.',
                 'How long: an answered ticket the customer doesn’t come back to closes by itself after 14 days (writing in it opens it again); a closed ticket and all its messages are erased two years after it was closed; a ticket our team deletes as spam is erased within 30 days.',
               ],
             },
@@ -490,7 +490,7 @@ export function privacyDoc(c: LegalContext): LegalDoc {
             list: [
               'מה נשמר: הפנייה — הנושא שלה, הסוג, וההזמנה שהיא עוסקת בה כשהלקוח בחר אחת — וכל ההודעות שבה; השם, כתובת המייל ומספר הטלפון שנמסרו בטופס יצירת הקשר; ובפנייה שנפתחה מעוזר התמיכה, השיחה עם העוזר שהלקוח ראה ובחר לצרף.',
               'מי רואה אותה: הלקוח, באפליקציה (מבקר בלי חשבון מקבל את תשובות הצוות במייל); וחברי הצוות שלנו שהתפקיד שלהם כולל תמיכה, במערכת הניהול שלנו, יחד עם פרטי החשבון של הלקוח (החבילה, קרדיטים להודעות, מספר ההזמנות). הערות פנימיות של הצוות על פנייה לא מוצגות ללקוח. מה שהצוות עושה בפנייה נרשם (מי, מה ומתי).',
-              'מיילים: תשובת הצוות נשלחת לכתובת המייל של הלקוח (דרך Resend, סעיף 5); הצוות שלנו מקבל על פנייה חדשה מייל עם הנושא שלה בלבד, בלי השיחה.',
+              'מיילים: תשובת הצוות נשלחת לכתובת המייל של הלקוח (דרך Resend, סעיף 5); הצוות שלנו מקבל על פנייה חדשה, או על תשובה של לקוח, מייל עם נושא הפנייה בלבד, בלי השיחה.',
               'כמה זמן: פנייה שנענתה והלקוח לא חזר אליה נסגרת מעצמה אחרי 14 יום (כתיבה בה פותחת אותה מחדש); פנייה סגורה וכל ההודעות שבה נמחקות שנתיים אחרי שנסגרה; פנייה שהצוות מוחק כספאם נמחקת תוך 30 יום.',
             ],
           },
