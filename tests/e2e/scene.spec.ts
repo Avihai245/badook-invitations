@@ -242,6 +242,110 @@ test('any design becomes a film: its own art behind the whole invitation', async
   expect(errors).toEqual([]);
 });
 
+/** The scene's whole scroll: the page's on a phone, the frame's on a computer. */
+const scrollMax = (page: Page) =>
+  page.evaluate(() => {
+    const frame = document.querySelector<HTMLElement>('.sc-scroll')!;
+    const o = getComputedStyle(frame).overflowY;
+    const el = o !== 'visible' && o !== 'clip' ? frame : document.scrollingElement!;
+    return el.scrollHeight - el.clientHeight;
+  });
+
+/** The prop's mover (its centre) and its target (its box), in shares of the backdrop's box. */
+const propGeometry = (page: Page) =>
+  page.evaluate(() => {
+    const back = document.querySelector('.sc-back')!.getBoundingClientRect();
+    const rel = (r: DOMRect) => ({
+      x: (r.left + r.width / 2 - back.left) / back.width,
+      y: (r.top + r.height / 2 - back.top) / back.height,
+      left: (r.left - back.left) / back.width,
+      right: (r.right - back.left) / back.width,
+      top: (r.top - back.top) / back.height,
+      bottom: (r.bottom - back.top) / back.height,
+    });
+    const target = document.querySelector('.sc-target')!;
+    return {
+      mover: rel(document.querySelector('.sc-mover')!.getBoundingClientRect()),
+      target: rel(target.getBoundingClientRect()),
+      shown: Number(getComputedStyle(target).opacity),
+    };
+  });
+
+test.describe('a prop that travels the whole film', () => {
+  test('the basketball: one long shot — at the very end it drops through the hoop, and plays again', async ({
+    page,
+  }) => {
+    const errors = collectErrors(page);
+    await open(page, demo('buzzer-beater', 'open=1'));
+    const prop = page.locator('.sc-prop[data-prop="basketball"]');
+    await expect(prop).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('.sc-frame')).toHaveAttribute('data-scene-css', '');
+    // the shot starts low on the left; the hoop isn't there yet
+    let g = await propGeometry(page);
+    expect(g.mover.x).toBeLessThan(0.3);
+    expect(g.mover.y).toBeGreaterThan(0.7);
+    expect(g.shown).toBeLessThan(0.05);
+    // halfway: high in the air
+    const max = await scrollMax(page);
+    await scrollTo(page, max / 2);
+    await expect.poll(async () => (await propGeometry(page)).mover.y).toBeLessThan(0.4);
+    // the end: the hoop in the upper right, the ball in it — it scores
+    await scrollTo(page, max);
+    await expect.poll(async () => (await propGeometry(page)).shown).toBe(1);
+    g = await propGeometry(page);
+    expect(g.target.left).toBeGreaterThan(0.45);
+    expect(g.target.bottom).toBeLessThan(0.55);
+    expect(g.mover.x).toBeGreaterThan(g.target.left);
+    expect(g.mover.x).toBeLessThan(g.target.right);
+    expect(g.mover.y).toBeGreaterThan(g.target.top);
+    expect(g.mover.y).toBeLessThan(g.target.bottom);
+    await expect(prop).toHaveAttribute('data-scored', '');
+    // back up the page it resets, to score again
+    await scrollTo(page, max / 3);
+    await expect(prop).not.toHaveAttribute('data-scored', '');
+    expect(errors).toEqual([]);
+  });
+
+  test('where the browser can’t play the scroll, the driver flies the football into the net', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const supports = CSS.supports.bind(CSS) as (...args: string[]) => boolean;
+      CSS.supports = ((...args: string[]) =>
+        args.join(':').includes('animation-timeline') ? false : supports(...args)) as typeof CSS.supports;
+    });
+    const errors = collectErrors(page);
+    await open(page, demo('golden-goal', 'open=1'));
+    await expect(page.locator('.sc-frame')).toHaveAttribute('data-scene-ready', '');
+    const prop = page.locator('.sc-prop[data-prop="football"]');
+    const max = await scrollMax(page);
+    await scrollTo(page, max);
+    await expect.poll(async () => (await propGeometry(page)).shown).toBe(1);
+    const g = await propGeometry(page);
+    // in the top right corner of the goal, which stands in the upper middle
+    expect(g.mover.x).toBeGreaterThan((g.target.left + g.target.right) / 2);
+    expect(g.mover.x).toBeLessThan(g.target.right);
+    expect(g.mover.y).toBeGreaterThan(g.target.top);
+    expect(g.mover.y).toBeLessThan((g.target.top + g.target.bottom) / 2);
+    // written by the driver
+    expect(await page.locator('.sc-mover').evaluate((el) => el.style.translate)).not.toBe('');
+    await expect(prop).toHaveAttribute('data-scored', '');
+    expect(errors).toEqual([]);
+  });
+
+  test('with reduced motion the rocket rests on the moon from the start', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const errors = collectErrors(page);
+    await open(page, demo('moonshot', 'open=1'));
+    const g = await propGeometry(page);
+    expect(g.shown).toBe(1);
+    expect(g.mover.x).toBeGreaterThan(g.target.left);
+    expect(g.mover.x).toBeLessThan(g.target.right);
+    expect(g.mover.y).toBeLessThan(0.45);
+    expect(errors).toEqual([]);
+  });
+});
+
 test('reads for everyone: no WCAG 2.1 AA violations in the film', async ({ page }) => {
   await open(page, demo('celestial', 'open=1'));
   // every text in (the reveal is decoration: a text in its first state is not what a guest reads)

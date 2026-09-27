@@ -57,6 +57,11 @@ test.describe('host: create → edit → publish', () => {
     // filter chips narrow the gallery
     await page.getByRole('button', { name: 'ברית', exact: true }).click();
     await expect(page.getByRole('button', { name: /סהר בורדו/ })).toHaveCount(0);
+    // "Animated": the designs made as a film, each with its badge
+    await page.getByRole('button', { name: 'מונפשים', exact: true }).click();
+    await expect(page.getByRole('button', { name: /זריקה על הבאזר/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /שער השמיים/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /סהר בורדו/ })).toHaveCount(0);
     await page.getByRole('button', { name: 'הכל', exact: true }).click();
 
     // preview → use this design

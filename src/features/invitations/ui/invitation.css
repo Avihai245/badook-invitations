@@ -5738,25 +5738,25 @@ img.sc-pic {
     animation: scFlicker 0.12s ease-in-out infinite alternate;
   }
   /* the finale: through the net, into the net, engine off and a flag, a bob by the moon */
-  .sc-prop[data-scored][data-prop='basketball'] .sc-inner {
+  :root:not([data-motion='none']) .sc-prop[data-scored][data-prop='basketball'] .sc-inner {
     animation: scSink 0.9s cubic-bezier(0.45, 0, 0.85, 0.45) forwards;
   }
-  .sc-prop[data-scored][data-prop='basketball'] .sc-net {
+  :root:not([data-motion='none']) .sc-prop[data-scored][data-prop='basketball'] .sc-net {
     animation: scSwish 0.9s ease-out;
   }
-  .sc-prop[data-scored][data-prop='football'] .sc-inner {
+  :root:not([data-motion='none']) .sc-prop[data-scored][data-prop='football'] .sc-inner {
     animation: scNestle 0.7s ease-out forwards;
   }
-  .sc-prop[data-scored][data-prop='football'] .sc-net {
+  :root:not([data-motion='none']) .sc-prop[data-scored][data-prop='football'] .sc-net {
     animation: scBulge 0.9s ease-out;
   }
-  .sc-prop[data-scored][data-prop='rocket'] .sc-flame {
+  :root:not([data-motion='none']) .sc-prop[data-scored][data-prop='rocket'] .sc-flame {
     animation: scFlameOff 0.5s ease-in forwards;
   }
-  .sc-prop[data-scored][data-prop='rocket'] .sc-flag {
+  :root:not([data-motion='none']) .sc-prop[data-scored][data-prop='rocket'] .sc-flag {
     animation: scFlagUp 0.5s 0.35s ease-out both;
   }
-  .sc-prop[data-scored][data-prop='balloon'] .sc-inner {
+  :root:not([data-motion='none']) .sc-prop[data-scored][data-prop='balloon'] .sc-inner {
     animation: scBob 3.2s ease-in-out infinite;
   }
 }
@@ -5771,6 +5771,15 @@ img.sc-pic {
   .sc-prop[data-prop='rocket'] .sc-flag {
     scale: 1;
   }
+}
+:root[data-motion='none'] .sc-target {
+  opacity: 1 !important;
+}
+:root[data-motion='none'] .sc-prop[data-prop='rocket'] .sc-flame {
+  opacity: 0;
+}
+:root[data-motion='none'] .sc-prop[data-prop='rocket'] .sc-flag {
+  scale: 1;
 }
 @keyframes scFlicker {
   from {
@@ -5833,6 +5842,14 @@ img.sc-pic {
 .sc-track main {
   position: relative;
   z-index: 10;
+}
+/* the very end of the film, where the prop arrives (PropFinale watches it): a pixel a little above the
+   bottom, so a scroll that stops a few pixels short still arrives */
+.sc-end {
+  position: relative;
+  height: 1px;
+  margin-top: -48px;
+  pointer-events: none;
 }
 /* the end of the invitation scrolls clear of the RSVP button */
 .inv[data-film] .sc-track main > .sc-sec:last-child {
@@ -6101,6 +6118,16 @@ img.sc-pic {
 /* inside another page's frame the scene's own cue and button say it all */
 body:has(.inv[data-film]) .frame-cue {
   display: none;
+}
+/* in the phone frame on a computer a burst (the RSVP's, the prop's finale) stays inside the frame: its
+   canvas covers the window, so it is clipped to the frame's box (the frame's own sizes, below) */
+@media (min-width: 600px) and (min-height: 560px) {
+  body:has(.inv[data-film]:not([data-mode='editor'])) .fx-burst {
+    clip-path: inset(
+      calc(50% - min(calc(100dvh - 48px), 940px) / 2) calc(50% - min(30rem, calc(100vw - 48px)) / 2) round
+        44px
+    );
+  }
 }
 
 /* ── a computer (or a tablet): the invitation in a phone frame in the middle of the screen, over its

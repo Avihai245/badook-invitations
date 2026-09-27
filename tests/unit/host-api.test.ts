@@ -586,6 +586,27 @@ describe('the plan’s limits', () => {
     expect((await publish(USER, ID, {}, pro)).status).toBe(200);
   });
 
+  it('an animated invitation (the scroll scene) is published only on a paid plan, on any design', async () => {
+    const animated = () =>
+      invitation({}, (doc) => {
+        doc.theme.scene = { enabled: true };
+      });
+    const free = {
+      ...deps({ get: vi.fn(async () => animated()) }),
+      entitlements: limits({ premiumTemplates: false }),
+    };
+    expect(await publish(USER, ID, {}, free)).toEqual({
+      status: 402,
+      body: { ok: false, code: 'premium_scene' },
+    });
+    expect(free.db.publish).not.toHaveBeenCalled();
+    // the same design as a page publishes on the free plan
+    const still = { ...free, ...deps({ get: vi.fn(async () => invitation()) }) };
+    expect((await publish(USER, ID, {}, { ...still, entitlements: free.entitlements })).status).toBe(200);
+    const pro = { ...free, entitlements: limits({ premiumTemplates: true }) };
+    expect((await publish(USER, ID, {}, pro)).status).toBe(200);
+  });
+
   it('the "made with" credit comes off only on a plan that includes it', async () => {
     const noCredit = () =>
       invitation({}, (doc) => {

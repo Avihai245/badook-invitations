@@ -23,10 +23,12 @@ export function SceneProp({ kind }: { kind: Kind }) {
     '--sc-tb': `${spec.target.reveal[1] * 100}%`,
   } as CSSProperties;
   const sel = `.sc-prop[data-prop='${kind}']`;
+  // at rest (reduced motion, or the host's motion at 0): at its target from the start
+  const rest = `${sel} .sc-mover{translate:${end.translate}!important;rotate:${end.rotate}!important;scale:${end.scale}!important}`;
   const css =
     propKeyframes(kind) +
-    `@media (prefers-reduced-motion:no-preference){@supports (animation-timeline:scroll()){${sel} .sc-mover{animation:scProp-${kind} linear both;animation-timeline:scroll(nearest)}}}` +
-    `@media (prefers-reduced-motion:reduce){${sel} .sc-mover{translate:${end.translate}!important;rotate:${end.rotate}!important;scale:${end.scale}!important}}`;
+    `@media (prefers-reduced-motion:no-preference){@supports (animation-timeline:scroll()){:root:not([data-motion='none']) ${sel} .sc-mover{animation:scProp-${kind} linear both;animation-timeline:scroll(nearest)}}}` +
+    `@media (prefers-reduced-motion:reduce){${rest}}:root[data-motion='none'] ${rest}`;
   const [back, mover, front] = ART[kind];
   return (
     <div className="sc-prop" data-prop={kind} aria-hidden="true">
@@ -94,7 +96,8 @@ const RIM = { cx: 170, cy: 230, rx: 90, ry: 17 };
 const NET_BOTTOM = { cx: 170, cy: 336, rx: 54, ry: 10 };
 
 const basketball: [ReactNode, ReactNode, ReactNode] = [
-  // the backboard, the rim's far half and the net's far side
+  // the backboard (glass, as in an arena — the texts that pass over it stay legible), the rim's far
+  // half and the net's far side
   <svg key="back" viewBox="0 0 340 360">
     <rect
       x="25"
@@ -102,10 +105,11 @@ const basketball: [ReactNode, ReactNode, ReactNode] = [
       width="290"
       height="196"
       rx="10"
-      fill="#F8FBFF"
-      fillOpacity=".92"
-      stroke="#C9D4E2"
-      strokeWidth="4"
+      fill="#DCEBFF"
+      fillOpacity=".14"
+      stroke="#F8FBFF"
+      strokeOpacity=".85"
+      strokeWidth="5"
     />
     <rect x="118" y="104" width="104" height="84" fill="none" stroke="#F26B1D" strokeWidth="7" />
     <rect x="158" y="206" width="24" height="18" rx="2" fill="#C94A0C" />
