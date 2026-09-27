@@ -346,6 +346,107 @@ test.describe('a prop that travels the whole film', () => {
   });
 });
 
+/** The tefillin's parts: where each is (shares of the backdrop's box) and how far it shows. */
+const tefillin = (page: Page) =>
+  page.evaluate(() => {
+    const back = document.querySelector('.sc-back')!;
+    const b = back.getBoundingClientRect();
+    const at = (sel: string) => {
+      const el = document.querySelector(sel)!;
+      const r = el.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      return {
+        x: (r.left + r.width / 2 - b.left) / b.width,
+        y: (r.top + r.height / 2 - b.top) / b.height,
+        top: (r.top - b.top) / b.height,
+        bottom: (r.bottom - b.top) / b.height,
+        left: (r.left - b.left) / b.width,
+        right: (r.right - b.left) / b.width,
+        shown: style.visibility === 'hidden' ? 0 : Number(style.opacity),
+      };
+    };
+    return {
+      screen: back.clientHeight,
+      mover: at('.sc-mover'),
+      boy: at('.sc-target-back'),
+      bag: at('.sc-origin'),
+      strap: at('.sc-trail-in').shown * at('.sc-trail').shown,
+      straps: Number(
+        getComputedStyle(document.querySelector('.sc-strap')!).strokeDashoffset.replace('px', ''),
+      ),
+      cta: document.querySelector('.sc-cta')?.hasAttribute('data-shown') ?? false,
+    };
+  });
+
+test.describe('the head tefillin', () => {
+  test('out of their velvet bag at the start; on the last screen they come down onto the boy’s head', async ({
+    page,
+  }) => {
+    const errors = collectErrors(page);
+    await open(page, demo('first-tefillin', 'open=1'));
+    const prop = page.locator('.sc-prop[data-prop="tefillin"]');
+    await expect(prop).toHaveAttribute('data-rest', 'end');
+    await expect(page.locator('.sc-frame')).toHaveAttribute('data-scene-css', '');
+    // the start: the box in its bag at the lower left, its strap still inside, no boy yet
+    let g = await tefillin(page);
+    expect(g.bag.shown).toBe(1);
+    expect(g.bag.right).toBeLessThan(0.5);
+    expect(g.bag.bottom).toBeGreaterThan(0.85);
+    expect(g.mover.x).toBeGreaterThan(g.bag.left);
+    expect(g.mover.x).toBeLessThan(g.bag.right);
+    expect(g.strap).toBe(0);
+    expect(g.boy.shown).toBe(0);
+    // half a screen on: out of the bag, the strap hanging from it, the bag gone
+    await scrollTo(page, 0.5 * g.screen);
+    await expect.poll(async () => (await tefillin(page)).bag.shown).toBe(0);
+    g = await tefillin(page);
+    expect(g.strap).toBe(1);
+    expect(g.mover.y).toBeLessThan(0.8);
+    // the film's own last screen, after the last text: nothing over it, and no RSVP button
+    const stage = page.locator('.sc-track > .sc-stage');
+    await expect(stage).toHaveCount(1);
+    expect(await stage.evaluate((el) => el.getBoundingClientRect().height)).toBeCloseTo(g.screen, 0);
+    const max = await scrollMax(page);
+    await scrollTo(page, max - 0.5 * g.screen);
+    await expect.poll(async () => (await tefillin(page)).cta).toBe(false);
+    // the end: the boy in the light, the box on his head — its base on his hairline — and the straps on
+    await scrollTo(page, max);
+    await expect.poll(async () => (await tefillin(page)).boy.shown).toBe(1);
+    g = await tefillin(page);
+    expect(g.strap).toBe(0);
+    expect(g.boy.bottom).toBeCloseTo(1, 1);
+    const hairline = g.boy.top + (144 / 600) * (g.boy.bottom - g.boy.top);
+    const face = g.boy.left + (226 / 400) * (g.boy.right - g.boy.left);
+    // (the art's centre: 8 of its 100 left of the base's front edge, 2 below it)
+    expect(Math.abs(g.mover.x - face)).toBeLessThan(0.03);
+    expect(Math.abs(g.mover.y - hairline)).toBeLessThan(0.01);
+    await expect(prop).toHaveAttribute('data-scored', '');
+    await expect.poll(async () => (await tefillin(page)).straps).toBeLessThan(0.01);
+    // back up the page the finale resets
+    await scrollTo(page, max / 2);
+    await expect(prop).not.toHaveAttribute('data-scored', '');
+    expect(errors).toEqual([]);
+  });
+
+  test('with reduced motion they come in with the boy at the end, on his head', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const errors = collectErrors(page);
+    await open(page, demo('first-tefillin', 'open=1'));
+    let g = await tefillin(page);
+    expect(g.bag.shown).toBe(0);
+    expect(g.mover.shown).toBe(0);
+    expect(g.boy.shown).toBe(0);
+    await scrollTo(page, await scrollMax(page));
+    await expect.poll(async () => (await tefillin(page)).mover.shown).toBe(1);
+    g = await tefillin(page);
+    expect(g.boy.shown).toBe(1);
+    expect(g.mover.y).toBeGreaterThan(g.boy.top);
+    expect(g.mover.y).toBeLessThan(g.boy.top + 0.3 * (g.boy.bottom - g.boy.top));
+    expect(g.straps).toBe(0);
+    expect(errors).toEqual([]);
+  });
+});
+
 test('reads for everyone: no WCAG 2.1 AA violations in the film', async ({ page }) => {
   await open(page, demo('celestial', 'open=1'));
   // every text in (the reveal is decoration: a text in its first state is not what a guest reads)

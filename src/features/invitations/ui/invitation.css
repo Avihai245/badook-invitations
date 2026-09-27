@@ -5667,22 +5667,48 @@ img.sc-pic {
 }
 
 /* ── the scene's prop (renderer/scene/props.ts, SceneProp.tsx): one thing that travels across the whole
-   film, pinned with the backdrop — its flight is keyframes in the backdrop's own lengths (cqw, cqh),
-   played by the scroll (SceneProp writes them; SceneDriver plays them where the browser can't); its
-   target fades in on the way (--sc-ta → --sc-tb of the scroll) and the finale plays at the very end
-   (PropFinale: data-scored). Transform and opacity only. ── */
+   film, pinned with the backdrop — its flight is keyframes in the prop's own lengths (cqw, cqh), played
+   by the scroll (SceneProp writes them; SceneDriver plays them where the browser can't); its target
+   fades in on the way (--sc-ta → --sc-tb of the scroll), what it starts in fades as it leaves
+   (--sc-oa → --sc-ob), and the finale plays at the very end (PropFinale: data-scored). The prop's box
+   is the backdrop — on a wide screen (a phone on its side, a short window), a portrait column in its
+   middle, so its flight and its target keep their shape. Transform and opacity only. ── */
 .sc-back {
   container-type: size;
 }
 .sc-prop {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(100%, 62cqh);
+  translate: -50% 0;
+  container-type: size;
   pointer-events: none;
 }
 .sc-mover {
   position: absolute;
   left: 0;
   top: 0;
+}
+.sc-inner {
+  position: relative;
+}
+.sc-origin {
+  position: absolute;
+}
+.sc-origin svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* the part of the mover that only travels with it (the tefillin's strap): over the mover's own box,
+   in before its first scroll range (--sc-ia → --sc-ib) and gone after its second (--sc-ra → --sc-rb) */
+.sc-trail-in {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
 }
 .sc-mover svg,
 .sc-target svg {
@@ -5722,6 +5748,56 @@ img.sc-pic {
     animation-timeline: scroll(nearest);
     animation-range: var(--sc-ta, 40%) var(--sc-tb, 60%);
   }
+  /* a target on its own stage (the bar mitzvah boy) comes in by fading alone */
+  .sc-prop[data-rest='end'] .sc-target {
+    animation-name: scFade;
+  }
+  .sc-origin {
+    animation: scFadeOut linear both;
+    animation-timeline: scroll(nearest);
+    animation-range: var(--sc-oa, 0%) var(--sc-ob, 5%);
+  }
+  .sc-trail-in {
+    animation: scFade linear both;
+    animation-timeline: scroll(nearest);
+    animation-range: var(--sc-ia, 0%) var(--sc-ib, 5%);
+  }
+  .sc-trail {
+    animation: scFadeOut linear both;
+    animation-timeline: scroll(nearest);
+    animation-range: var(--sc-ra, 95%) var(--sc-rb, 100%);
+  }
+}
+@keyframes scFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* the tefillin: the light behind the boy, and the straps — drawn on once the box has come to rest */
+.sc-halo {
+  position: absolute;
+  left: 0.5%;
+  top: -7.33%;
+  width: 110%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(255 244 214 / 0.82),
+    rgb(255 232 180 / 0.36) 42%,
+    rgb(255 227 168 / 0.1) 72%,
+    rgb(255 227 168 / 0)
+  );
+}
+.sc-halo + svg {
+  position: relative;
+}
+.sc-strap {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
 }
 @keyframes scTargetIn {
   from {
@@ -5759,10 +5835,24 @@ img.sc-pic {
   :root:not([data-motion='none']) .sc-prop[data-scored][data-prop='balloon'] .sc-inner {
     animation: scBob 3.2s ease-in-out infinite;
   }
+  /* the tefillin on his head: the strap goes round it, its ends fall over his shoulders, the light
+     behind him breathes */
+  :root:not([data-motion='none']) .sc-prop[data-scored] .sc-strap {
+    animation: scStrap 0.7s cubic-bezier(0.3, 0.6, 0.4, 1) forwards;
+  }
+  :root:not([data-motion='none']) .sc-prop[data-scored] .sc-strap-hang .sc-strap {
+    animation-duration: 0.9s;
+    animation-delay: 0.45s;
+  }
+  :root:not([data-motion='none']) .sc-prop[data-scored] .sc-halo {
+    animation: scHalo 3.6s 0.4s ease-in-out infinite alternate;
+  }
 }
-/* with reduced motion (or the host's motion at 0) the prop rests at its target: landed, the flag up */
+/* with reduced motion (or the host's motion at 0) the prop rests at its target: landed, the flag up —
+   or, resting at the end (the tefillin), it comes in with its target: nothing in the bag, no strap
+   travelling, the straps on */
 @media (prefers-reduced-motion: reduce) {
-  .sc-target {
+  .sc-prop:not([data-rest='end']) .sc-target {
     opacity: 1 !important;
   }
   .sc-prop[data-prop='rocket'] .sc-flame {
@@ -5771,8 +5861,18 @@ img.sc-pic {
   .sc-prop[data-prop='rocket'] .sc-flag {
     scale: 1;
   }
+  .sc-prop[data-rest='end'] .sc-mover {
+    opacity: 0;
+  }
+  .sc-origin,
+  .sc-trail-in {
+    visibility: hidden;
+  }
+  .sc-strap {
+    stroke-dashoffset: 0;
+  }
 }
-:root[data-motion='none'] .sc-target {
+:root[data-motion='none'] .sc-prop:not([data-rest='end']) .sc-target {
   opacity: 1 !important;
 }
 :root[data-motion='none'] .sc-prop[data-prop='rocket'] .sc-flame {
@@ -5780,6 +5880,40 @@ img.sc-pic {
 }
 :root[data-motion='none'] .sc-prop[data-prop='rocket'] .sc-flag {
   scale: 1;
+}
+:root[data-motion='none'] .sc-prop[data-rest='end'] .sc-mover {
+  opacity: 0;
+}
+:root[data-motion='none'] :is(.sc-origin, .sc-trail-in) {
+  visibility: hidden;
+}
+:root[data-motion='none'] .sc-strap {
+  stroke-dashoffset: 0;
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: reduce) {
+    .sc-prop[data-rest='end'] .sc-mover {
+      animation: scFade linear both;
+      animation-timeline: scroll(nearest);
+      animation-range: var(--sc-ta) var(--sc-tb);
+    }
+  }
+  :root[data-motion='none'] .sc-prop[data-rest='end'] .sc-mover {
+    animation: scFade linear both;
+    animation-timeline: scroll(nearest);
+    animation-range: var(--sc-ta) var(--sc-tb);
+  }
+}
+@keyframes scStrap {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes scHalo {
+  to {
+    scale: 1.06;
+    opacity: 0.82;
+  }
 }
 @keyframes scFlicker {
   from {
@@ -5842,6 +5976,11 @@ img.sc-pic {
 .sc-track main {
   position: relative;
   z-index: 10;
+}
+/* the finale's own stage (a prop's `stage`): screens of film after the last text, with nothing over it */
+.sc-stage {
+  height: calc(var(--sc-h) * var(--sc-stage, 1));
+  pointer-events: none;
 }
 /* the very end of the film, where the prop arrives (PropFinale watches it): a pixel a little above the
    bottom, so a scroll that stops a few pixels short still arrives */

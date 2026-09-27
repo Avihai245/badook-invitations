@@ -21,6 +21,7 @@ import { ScrollEngine } from './motion/ScrollEngine.client';
 import { SceneBackdrop } from './scene/SceneBackdrop';
 import { SceneCta } from './scene/SceneCta.client';
 import { SceneDriver } from './scene/SceneDriver.client';
+import { PROPS } from './scene/props';
 import { Scene } from './scenes';
 import { resolvePalette } from './theme';
 import { endOfDayUtc } from '../lib/dates';
@@ -294,6 +295,14 @@ export function InvitationBody({
               <Suspense fallback={null}>
                 {page}
                 {sceneRsvp(ctx) ? <SceneCta label={perLocale((l) => translate(l, 'scene.rsvp'))} /> : null}
+                {/* the finale's own stage (the tefillin coming to rest on the boy's head): nothing over it */}
+                {scene.prop && PROPS[scene.prop].stage ? (
+                  <div
+                    className="sc-stage"
+                    aria-hidden="true"
+                    style={{ '--sc-stage': PROPS[scene.prop].stage } as CSSProperties}
+                  />
+                ) : null}
                 {/* the very end of the film: where a prop arrives at its target (PropFinale) */}
                 {scene.prop ? <div className="sc-end" aria-hidden="true" /> : null}
                 <SceneDriver />

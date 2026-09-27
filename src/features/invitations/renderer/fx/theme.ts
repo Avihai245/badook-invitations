@@ -91,6 +91,7 @@ export const FX_BY_TEMPLATE: Readonly<Record<string, AmbientKind | readonly [Amb
   'sunset-shore': 'petals', // the beach at sunset
   'gala-night': ['sparkles', 'confetti'], // a gala evening — chandelier glints
   'spotlight-stage': ['confetti', 'stars'], // the stage's finale
+  'first-tefillin': 'sparkles', // the first tefillin — gold glints in the morning light
 };
 
 /** A template the table doesn't know yet: by its first event type. */

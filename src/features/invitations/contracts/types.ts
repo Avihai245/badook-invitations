@@ -372,14 +372,16 @@ export const SCENE_DRIFTS = ['up', 'down'] as const satisfies readonly SceneDrif
  * A scene's prop (renderer/scene/props.ts): one thing that travels across the whole invitation as the
  * guest scrolls — pinned to the screen with the backdrop — and arrives at its target at the very end:
  * a basketball thrown in one long arc that drops through the hoop, a football curled into the top
- * corner of the net, a rocket that lands on the moon, a hot-air balloon that rises to the moon.
+ * corner of the net, a rocket that lands on the moon, a hot-air balloon that rises to the moon, the
+ * head tefillin lifted out of their bag that come to rest on the bar mitzvah boy's head.
  */
-export type SceneProp = 'basketball' | 'football' | 'rocket' | 'balloon';
+export type SceneProp = 'basketball' | 'football' | 'rocket' | 'balloon' | 'tefillin';
 export const SCENE_PROPS = [
   'basketball',
   'football',
   'rocket',
   'balloon',
+  'tefillin',
 ] as const satisfies readonly SceneProp[];
 /** A template made as a scroll scene (manifest `scene`). */
 export interface TemplateScene {

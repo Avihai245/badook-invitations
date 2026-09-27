@@ -354,6 +354,14 @@ const PLACEHOLDERS: Record<string, PlaceholderArt> = {
     panorama: 'swags',
     ornament: 'star',
   }),
+  'first-tefillin': film(['#9DB7D1', '#EFE6D4', '#8A7350'], {
+    shade: '#8A7350',
+    paper: ['#F8F2E6', '#EFE6D4', '#E2D5BC'],
+    bg: ['#EFE6D4', '#E6DAC4', '#D9C9AC'],
+    hint: '#5A4A33',
+    panorama: 'arches',
+    ornament: 'torah',
+  }),
   // ── scene templates: a drawn scene over a base gradient ──
   'cloud-arch': drawn('cloud-arch', ['#F5F3EF', '#EFECE6', '#E6E1D8'], {
     bg: ['#F2F0EB', '#E9E5DE', '#DCD5CB'],

@@ -132,6 +132,8 @@ import galaNightDefaults from '@pack/gala-night/defaults.json';
 import galaNightManifest from '@pack/gala-night/manifest.json';
 import spotlightStageDefaults from '@pack/spotlight-stage/defaults.json';
 import spotlightStageManifest from '@pack/spotlight-stage/manifest.json';
+import firstTefillinDefaults from '@pack/first-tefillin/defaults.json';
+import firstTefillinManifest from '@pack/first-tefillin/manifest.json';
 // the photographic flagship (unlisted until its real photos are in)
 import lumiereDefaults from '@pack/lumiere/defaults.json';
 import lumiereManifest from '@pack/lumiere/manifest.json';
@@ -169,6 +171,7 @@ const PACK: readonly { manifest: unknown; defaults: unknown }[] = [
   { manifest: sunsetShoreManifest, defaults: sunsetShoreDefaults },
   { manifest: galaNightManifest, defaults: galaNightDefaults },
   { manifest: spotlightStageManifest, defaults: spotlightStageDefaults },
+  { manifest: firstTefillinManifest, defaults: firstTefillinDefaults },
   { manifest: midnightManifest, defaults: midnightDefaults },
   { manifest: klafManifest, defaults: klafDefaults },
   { manifest: cocoaManifest, defaults: cocoaDefaults },

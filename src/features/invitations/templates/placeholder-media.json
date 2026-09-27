@@ -320,6 +320,28 @@
         "hash": "711ff4b033",
         "bytes": 151526
       }
+    },
+    "first-tefillin": {
+      "scene-table.webp": {
+        "hash": "b12735bad8",
+        "bytes": 120192
+      },
+      "scene-shul.webp": {
+        "hash": "ea816f0d5e",
+        "bytes": 134510
+      },
+      "scene-torah.webp": {
+        "hash": "f19d70f54b",
+        "bytes": 130764
+      },
+      "scene-city.webp": {
+        "hash": "7cb8f905c3",
+        "bytes": 116464
+      },
+      "scene-dawn.webp": {
+        "hash": "3c4341e062",
+        "bytes": 86228
+      }
     }
   }
 }

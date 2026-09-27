@@ -59,7 +59,7 @@ Install: the manifests and defaults are read from this folder by the app (src/fe
 
 ## Animated designs (scroll scenes)
 
-Each is one film over a backdrop pinned to the screen (`manifest.scene`, `src/features/invitations/renderer/scene`): five pictures that cross-fade section by section, particles, and on some a prop that travels the whole scroll and arrives at the end (a basketball through the hoop, a football into the net, a rocket onto the moon, a balloon up to the moon). All are `premium`, and publishing any invitation with the animation on needs a paid plan. Their pictures ship as painted placeholders (`scripts/scene-art/<id>.mjs`) until the real ones are uploaded (each folder's `ASSETS.md`).
+Each is one film over a backdrop pinned to the screen (`manifest.scene`, `src/features/invitations/renderer/scene`): five pictures that cross-fade section by section, particles, and on some a prop that travels the whole scroll and arrives at the end (a basketball through the hoop, a football into the net, a rocket onto the moon, a balloon up to the moon, the head tefillin from their velvet bag onto the bar mitzvah boy's head). All are `premium`, and publishing any invitation with the animation on needs a paid plan. Their pictures ship as painted placeholders (`scripts/scene-art/<id>.mjs`) until the real ones are uploaded (each folder's `ASSETS.md`).
 
 | id | categories | opening | particles | prop |
 |---|---|---|---|---|
@@ -76,3 +76,4 @@ Each is one film over a backdrop pinned to the screen (`manifest.scene`, `src/fe
 | `sunset-shore` | wedding, engagement | gold_dust | petals | — |
 | `gala-night` | birthday, corporate, wedding | curtain | gold_dust | — |
 | `spotlight-stage` | bat_mitzvah, birthday | curtain | gold_dust | — |
+| `first-tefillin` | bar_mitzvah | curtain | gold_dust | tefillin |

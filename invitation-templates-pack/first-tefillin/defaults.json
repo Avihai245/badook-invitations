@@ -1,0 +1,170 @@
+{
+  "templateId": "first-tefillin",
+  "defaults": {
+    "bar_mitzvah": {
+      "coverHint": {
+        "he": "הקישו לפתיחה",
+        "en": "Tap to open"
+      },
+      "eyebrow": {
+        "he": "התפילין הראשונות — הבר מצווה של",
+        "en": "First tefillin — the bar mitzvah of"
+      },
+      "heroTitle": {
+        "mode": "hosts"
+      },
+      "countdown": {
+        "title": {
+          "he": "הספירה לאחור",
+          "en": "Counting down"
+        },
+        "subtitle": {
+          "he": "עד הרגע הגדול",
+          "en": "Until the big moment"
+        },
+        "afterEvent": {
+          "he": "מזל טוב! תודה שחגגתם איתנו",
+          "en": "Mazal tov! Thank you for celebrating with us"
+        }
+      },
+      "story": {
+        "title": {
+          "he": "מצווה ראשונה",
+          "en": "A first mitzvah"
+        },
+        "body": {
+          "he": "שלוש עשרה שנים של צחוק, סקרנות ולב גדול.\n{primary} מתחיל להניח תפילין, וב־{date} נחגוג איתו — ואנחנו רוצים אתכם איתנו.",
+          "en": "Thirteen years of laughter, curiosity and a big heart.\n{primary} is beginning to put on tefillin, and on {date} we celebrate with him — we want you with us."
+        }
+      },
+      "venueLabels": [
+        {
+          "he": "החגיגה",
+          "en": "The celebration"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "19:30",
+          "label": {
+            "he": "קבלת פנים",
+            "en": "Welcome"
+          },
+          "icon": "glass"
+        },
+        {
+          "time": "20:15",
+          "label": {
+            "he": "ברכות ודברי תורה",
+            "en": "Blessings"
+          },
+          "icon": "torah"
+        },
+        {
+          "time": "21:00",
+          "label": {
+            "he": "ארוחת ערב",
+            "en": "Dinner"
+          },
+          "icon": "dinner"
+        },
+        {
+          "time": "21:45",
+          "label": {
+            "he": "רוקדים וחוגגים",
+            "en": "Dancing"
+          },
+          "icon": "music"
+        }
+      ],
+      "extraSections": [],
+      "rsvp": {
+        "title": {
+          "he": "נשמח לראותכם",
+          "en": "We would love to see you"
+        },
+        "subtitle": {
+          "he": "אנא אשרו הגעה עד {deadline}",
+          "en": "Kindly reply by {deadline}"
+        },
+        "messageLabel": {
+          "he": "ברכה לחתן בר המצווה",
+          "en": "A blessing for the bar mitzvah boy"
+        },
+        "successMessage": {
+          "he": "תודה! נתראה בשמחה",
+          "en": "Thank you! See you at the celebration"
+        },
+        "declineMessage": {
+          "he": "תודה שעדכנתם. נתגעגע",
+          "en": "Thank you for letting us know. We will miss you"
+        },
+        "closedMessage": {
+          "he": "אישורי ההגעה נסגרו. לכל שאלה — דברו איתנו ישירות.",
+          "en": "RSVPs are now closed. For anything at all, please reach out to us directly."
+        },
+        "dietaryOptions": [
+          "none",
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "kosher_mehadrin",
+          "nut_allergy",
+          "other_allergy",
+          "kids_meal"
+        ],
+        "dietaryNote": {
+          "he": "כל האוכל באירוע כשר. מי שצריך כשר למהדרין — סמנו כאן.",
+          "en": "All food at the event is kosher. If you need a Mehadrin meal, please tick it."
+        }
+      },
+      "closingLine": {
+        "he": "מזל טוב! נתראה בשמחה",
+        "en": "Mazal tov! See you at the celebration"
+      },
+      "custom": [
+        {
+          "title": {
+            "he": "ברוכים הבאים",
+            "en": "Welcome",
+            "ru": "Добро пожаловать",
+            "ar": "أهلًا وسهلًا",
+            "fr": "Bienvenue",
+            "es": "Bienvenidos",
+            "am": "እንኳን ደህና መጡ"
+          },
+          "subtitle": null,
+          "body": {
+            "he": "נרתיק הקטיפה נפתח, והתפילין הראשונות מחכות לו.\nבהתרגשות רבה אנו מזמינים אתכם\nלחגוג איתנו את הבר מצווה.",
+            "en": "The velvet bag opens, and his first tefillin are waiting for him.\nWith great excitement we invite you\nto celebrate the bar mitzvah with us.",
+            "ru": "Бархатный мешочек открывается — его первые тфилин ждут его.\nС большим волнением мы приглашаем вас\nотпраздновать с нами бар-мицву.",
+            "ar": "ينفتح الكيس المخملي، وتفيلينه الأولى بانتظاره.\nبكل حماس ندعوكم\nلتحتفلوا معنا بالبار متسفا.",
+            "fr": "La pochette de velours s’ouvre, et ses premiers tefillin l’attendent.\nC’est avec une grande émotion que nous vous invitons\nà célébrer la bar-mitsva avec nous.",
+            "es": "La bolsa de terciopelo se abre y sus primeros tefilín lo esperan.\nCon gran emoción los invitamos\na celebrar con nosotros el bar mitzvá.",
+            "am": "የቬልቬቱ ከረጢት ይከፈታል፤ የመጀመሪያዎቹ ተፊሊኖቹም ይጠብቁታል።\nበታላቅ ጉጉት እንጋብዛችኋለን፤\nባር ሚትስቫውን ከእኛ ጋር ለማክበር።"
+          }
+        }
+      ],
+      "quote": {
+        "text": {
+          "he": "וּקְשַׁרְתָּם לְאוֹת עַל יָדֶךָ, וְהָיוּ לְטֹטָפֹת בֵּין עֵינֶיךָ",
+          "en": "Bind them as a sign upon your hand, and they shall be frontlets between your eyes",
+          "ru": "И навяжи их в знак на руку твою, и да будут они повязкою над глазами твоими",
+          "ar": "واربطها علامةً على يدك، ولتكن عصائب بين عينيك",
+          "fr": "Tu les lieras comme un signe sur ta main, et ils seront comme des fronteaux entre tes yeux",
+          "es": "Y las atarás como una señal en tu mano, y estarán como frontales entre tus ojos",
+          "am": "በእጅህ ላይ ምልክት አድርገህ እሰራቸው፤ በዓይኖችህም መካከል እንደ ክታብ ይሁኑ"
+        },
+        "attribution": {
+          "he": "דברים ו, ח",
+          "en": "Deuteronomy 6:8",
+          "ru": "Второзаконие 6:8",
+          "ar": "التثنية 6: 8",
+          "fr": "Deutéronome 6:8",
+          "es": "Deuteronomio 6:8",
+          "am": "ዘዳግም 6፥8"
+        }
+      }
+    }
+  }
+}

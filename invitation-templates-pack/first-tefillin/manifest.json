@@ -1,0 +1,521 @@
+{
+  "id": "first-tefillin",
+  "version": 1,
+  "name": {
+    "he": "התפילין הראשונות",
+    "en": "First Tefillin"
+  },
+  "description": {
+    "he": "הזמנה שהיא הבוקר הראשון עם התפילין: הן עולות מתוך נרתיק הקטיפה ומרחפות לאורך כל ההזמנה — דרך בית הכנסת, ספר התורה וירושלים בזריחה — ובסוף הגלילה יורדות ונחות על ראשו של חתן בר המצווה, בדיוק במקומן, והרצועות נכרכות. בפתיחה: פרוכת נפתחת, ואבק זהב באוויר.",
+    "en": "An invitation that is the first morning with the tefillin: they rise from their velvet bag and float through the whole invitation — past the synagogue, the Torah and Jerusalem at sunrise — and at the end of the scroll they come down onto the bar mitzvah boy’s head, exactly in place, as the straps wrap around. It opens as the Ark’s curtain parts, with gold dust in the air."
+  },
+  "tier": "premium",
+  "listed": true,
+  "categories": [
+    "bar_mitzvah"
+  ],
+  "supportsLocales": [
+    "he",
+    "en",
+    "ru",
+    "ar",
+    "fr",
+    "es",
+    "am"
+  ],
+  "previewImage": "/templates/first-tefillin/preview.webp",
+  "previewVideo": null,
+  "tokens": {
+    "palette": {
+      "bg": "#F3ECDF",
+      "surface": "#FBF8F1",
+      "ink": "#1B2A4A",
+      "inkMuted": "#56627A",
+      "accent": "#C9A45C",
+      "accentInk": "#182238",
+      "line": "#E2D6BF",
+      "heroText": "#FFFFFF"
+    },
+    "editablePaletteKeys": [
+      "bg",
+      "surface",
+      "ink",
+      "inkMuted",
+      "accent",
+      "accentInk",
+      "line",
+      "heroText"
+    ],
+    "radius": {
+      "card": 12,
+      "button": 999,
+      "media": 0
+    },
+    "divider": "gradient_line",
+    "typography": {
+      "display": {
+        "size": 0.9,
+        "lineHeight": 1.05,
+        "letterSpacing": 0
+      },
+      "heading": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.08
+      },
+      "body": {
+        "size": 0.98,
+        "lineHeight": 1.04,
+        "letterSpacing": 0
+      },
+      "caption": {
+        "size": 1,
+        "lineHeight": 1,
+        "letterSpacing": 0.14
+      }
+    },
+    "spacing": {
+      "section": 1.1,
+      "gutter": 1.05,
+      "block": 1.1
+    },
+    "overlay": {
+      "color": "#182238",
+      "opacity": 0.5
+    }
+  },
+  "palettePresets": [
+    {
+      "id": "gold",
+      "name": {
+        "he": "זהב וכחול",
+        "en": "Gold & navy"
+      },
+      "palette": {
+        "bg": "#F3ECDF",
+        "surface": "#FBF8F1",
+        "ink": "#1B2A4A",
+        "inkMuted": "#56627A",
+        "accent": "#C9A45C",
+        "accentInk": "#182238",
+        "line": "#E2D6BF"
+      }
+    },
+    {
+      "id": "burgundy",
+      "name": {
+        "he": "בורדו",
+        "en": "Burgundy"
+      },
+      "palette": {
+        "bg": "#F4ECE6",
+        "surface": "#FBF7F4",
+        "ink": "#3A1620",
+        "inkMuted": "#6C585C",
+        "accent": "#6B1F2E",
+        "accentInk": "#FFFFFF",
+        "line": "#E6D5CF"
+      }
+    },
+    {
+      "id": "sky",
+      "name": {
+        "he": "תכלת",
+        "en": "Sky blue"
+      },
+      "palette": {
+        "bg": "#EEF2F6",
+        "surface": "#FAFCFD",
+        "ink": "#1F2F4A",
+        "inkMuted": "#56647A",
+        "accent": "#9DB7D1",
+        "accentInk": "#14213A",
+        "line": "#D5DEE8"
+      }
+    },
+    {
+      "id": "night",
+      "name": {
+        "he": "לילה",
+        "en": "Night"
+      },
+      "palette": {
+        "bg": "#182238",
+        "surface": "#202C46",
+        "ink": "#F3EBDD",
+        "inkMuted": "#BDB6A8",
+        "accent": "#D9B56A",
+        "accentInk": "#182238",
+        "line": "#34405A"
+      }
+    }
+  ],
+  "fontPairs": [
+    {
+      "id": "sofer",
+      "display": {
+        "latin": "Cinzel",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "heading": {
+        "latin": "Cormorant Garamond",
+        "hebrew": "David Libre"
+      },
+      "body": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    },
+    {
+      "id": "parchment",
+      "display": {
+        "latin": "Marcellus",
+        "hebrew": "Bellefair"
+      },
+      "heading": {
+        "latin": "Marcellus",
+        "hebrew": "Frank Ruhl Libre"
+      },
+      "body": {
+        "latin": "Lora",
+        "hebrew": "Assistant"
+      },
+      "ui": {
+        "latin": "Jost",
+        "hebrew": "Assistant"
+      }
+    }
+  ],
+  "cover": {
+    "style": "envelope_seal",
+    "renderer": "css3d",
+    "poster": "/templates/first-tefillin/cover-poster.webp",
+    "posterDesktop": null,
+    "openVideo": null,
+    "openVideoDesktop": null,
+    "holdMs": 0,
+    "overlay": {
+      "kind": "wax_seal",
+      "image": "/templates/first-tefillin/seal-blank.png",
+      "recolor": true,
+      "size": 0.3,
+      "offset": {
+        "x": 0,
+        "y": 0
+      },
+      "exit": "crack",
+      "text": {
+        "color": "#FFFFFF",
+        "effect": "emboss",
+        "maxGlyphs": 3
+      }
+    },
+    "sealColors": [
+      "#C9A45C",
+      "#1B2A4A",
+      "#6B1F2E",
+      "#3A3226"
+    ],
+    "monogramFont": {
+      "latin": "Cinzel",
+      "hebrew": "Frank Ruhl Libre"
+    },
+    "opening": {
+      "preset": "curtain",
+      "trigger": "scroll",
+      "motion": "part",
+      "color": "#1B2A4A"
+    }
+  },
+  "hero": {
+    "options": [
+      {
+        "id": "table",
+        "name": {
+          "he": "הבוקר בבית",
+          "en": "Morning at home"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-table",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.55
+          }
+        },
+        "mediaDesktop": null
+      },
+      {
+        "id": "shul",
+        "name": {
+          "he": "בית הכנסת",
+          "en": "The synagogue"
+        },
+        "media": {
+          "kind": "image",
+          "src": "template:scene-shul",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        "mediaDesktop": null
+      }
+    ],
+    "textColor": "#FFFFFF",
+    "overlayColor": "#182238",
+    "defaultOverlay": 0.3
+  },
+  "music": {
+    "defaultTrackId": null,
+    "tracks": []
+  },
+  "motion": {
+    "preset": "soft",
+    "revealDistance": 24,
+    "revealBlur": true,
+    "stagger": 0.09,
+    "ambient": "sparkles",
+    "intensity": 1
+  },
+  "scene": {
+    "enabled": true,
+    "particles": "gold_dust",
+    "prop": "tefillin",
+    "shade": "#182238",
+    "tracking": 0.2
+  },
+  "assets": {
+    "scene-table": "/templates/first-tefillin/scene-table.webp",
+    "scene-shul": "/templates/first-tefillin/scene-shul.webp",
+    "scene-torah": "/templates/first-tefillin/scene-torah.webp",
+    "scene-city": "/templates/first-tefillin/scene-city.webp",
+    "scene-dawn": "/templates/first-tefillin/scene-dawn.webp"
+  },
+  "decorations": {
+    "afterHero": null,
+    "betweenVenues": null,
+    "afterTimeline": null,
+    "beforeRsvp": null,
+    "footer": null
+  },
+  "sectionDefaults": {
+    "order": [
+      "hero",
+      "custom",
+      "quote",
+      "parents",
+      "when",
+      "where",
+      "timeline",
+      "rsvp",
+      "gifts",
+      "footer"
+    ],
+    "variants": {
+      "timeline": "vertical"
+    },
+    "presentation": {
+      "hero": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "custom": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-shul",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "quote": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-torah",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "out"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "words",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "parents": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "when": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "where": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-city",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "timeline": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 110,
+          "intensity": 1
+        }
+      },
+      "rsvp": {
+        "layout": "full_bleed",
+        "media": {
+          "kind": "image",
+          "src": "template:scene-dawn",
+          "poster": null,
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "kenBurns": "in"
+        },
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "gifts": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 90,
+          "intensity": 1
+        }
+      },
+      "footer": {
+        "animation": {
+          "enter": {
+            "preset": "rise_blur",
+            "duration": 700,
+            "delay": 0,
+            "distance": 24,
+            "easing": "gentle"
+          },
+          "scroll": "ken_burns",
+          "text": "none",
+          "stagger": 120,
+          "intensity": 1
+        }
+      }
+    }
+  }
+}

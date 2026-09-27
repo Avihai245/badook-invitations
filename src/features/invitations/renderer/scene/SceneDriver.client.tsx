@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { motionAllowed } from '../fx/motion';
 import type { SceneProp } from '../../contracts/types';
 import { FADE_FROM, FADE_TO, SCENE_DRIFT, SCENE_ZOOM } from './model';
-import { PROPS, lenPx, poseAt } from './props';
+import { PROPS, lenPx, propFades, propPose } from './props';
 import {
   inPlayMargins,
   layerRanges,
@@ -249,21 +249,35 @@ export function SceneDriver() {
       const max = inner
         ? scroller.scrollHeight - scroller.clientHeight
         : document.documentElement.scrollHeight - window.innerHeight;
-      const t = max > 0 ? Math.min(1, Math.max(0, (inner ? scroller.scrollTop : window.scrollY) / max)) : 0;
-      const [w, h] = [back.clientWidth, back.clientHeight];
-      const pose = poseAt(prop.spec, t);
+      const u = max > 0 ? Math.min(1, Math.max(0, (inner ? scroller.scrollTop : window.scrollY) / max)) : 0;
+      // the scroll in screens (the backdrop's height: its lift and its landing are measured in them), and
+      // the prop's own box — the backdrop, or a column in its middle on a wide screen
+      const screens = max / Math.max(1, back.clientHeight);
+      const [w, h] = [prop.el.clientWidth, prop.el.clientHeight];
+      const pose = propPose(prop.spec, u, screens);
+      const fades = propFades(prop.spec, u, screens);
+      const atEnd = prop.spec.rest === 'end';
       const mover = prop.el.querySelector<HTMLElement>('.sc-mover');
       if (mover) {
         mover.style.translate = `calc(${lenPx(pose.x, w, h).toFixed(1)}px - 50%) calc(${lenPx(pose.y, w, h).toFixed(1)}px - 50%)`;
         mover.style.rotate = `${pose.rotate.toFixed(1)}deg`;
         mover.style.scale = pose.scale.toFixed(3);
+        // at rest at the end (reduced motion): it comes in with its target
+        mover.style.opacity = atEnd && !moving ? fades.target.toFixed(3) : '';
       }
-      const [ta, tb] = prop.spec.target.reveal;
-      const k = Math.min(1, Math.max(0, (t - ta) / (tb - ta)));
+      const k = fades.target;
       prop.el.querySelectorAll<HTMLElement>('.sc-target').forEach((el) => {
         el.style.opacity = k.toFixed(3);
-        el.style.scale = (0.9 + 0.1 * k).toFixed(3);
+        // (a target on its own stage comes in by fading alone)
+        el.style.scale = atEnd ? '' : (0.9 + 0.1 * k).toFixed(3);
       });
+      prop.el.querySelectorAll<HTMLElement>('.sc-origin').forEach((el) => {
+        el.style.opacity = (1 - fades.origin).toFixed(3);
+      });
+      const trailIn = prop.el.querySelector<HTMLElement>('.sc-trail-in');
+      const trail = prop.el.querySelector<HTMLElement>('.sc-trail');
+      if (trailIn) trailIn.style.opacity = fades.trailIn.toFixed(3);
+      if (trail) trail.style.opacity = (1 - fades.trailOut).toFixed(3);
     };
 
     /**
