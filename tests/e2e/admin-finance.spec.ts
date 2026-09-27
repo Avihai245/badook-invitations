@@ -1,7 +1,16 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { hydrated, LOCAL, sql } from '../support/phase5b';
-import { audit, numberIn, openConsole, signInStaff, uiLanguage, unique, waitLive } from '../support/admin-c';
+import {
+  audit,
+  nudgeConsole,
+  numberIn,
+  openConsole,
+  signInStaff,
+  uiLanguage,
+  unique,
+  waitLive,
+} from '../support/admin-c';
 
 // The admin console's cash flow (/app/admin/finance, features/admin/finance): seeded payments show the
 // right numbers, the spreadsheet downloads (in the console's language), a viewer sees the numbers
@@ -198,6 +207,9 @@ test.describe('the cash flow', () => {
     await hydrated(buyer);
     await buyer.waitForLoadState('networkidle');
     await other.close();
+    // the server's hint that money came in: what the billing routes send once a payment or a renewal
+    // is recorded (adminNudge('payment')), sent here the way the server sends it
+    await nudgeConsole('payment');
 
     // the open page, without reloading
     await expect(shown(page)).toHaveCount(1, { timeout: 20_000 });
