@@ -75,8 +75,10 @@ export function BillingScreen({
       })
     : null;
   // a plan the Badook team gave as a gift (the admin console): no charge, no renewal, nothing to
-  // cancel — it ends by itself at the end of its last day
-  const gift = a.billingProvider === GIFT_PROVIDER && a.plan !== 'free' && !a.admin;
+  // cancel — it ends by itself at the end of its last day, and then the account is simply on Free
+  const giftPlan = a.billingProvider === GIFT_PROVIDER && a.plan !== 'free' && !a.admin;
+  const gift = giftPlan && a.effective !== 'free';
+  const giftEnded = giftPlan && !gift;
   const giftLastDay =
     gift && a.planRenewsAt
       ? date(Date.parse(a.planRenewsAt) - 1, {
@@ -88,7 +90,7 @@ export function BillingScreen({
       : '';
   // bought at a discount: its monthly price, which the renewals keep
   const boughtFor =
-    a.plan !== 'free' && !a.admin && !gift && a.planPrice !== null && a.planPrice < data.prices[a.plan]
+    a.plan !== 'free' && !a.admin && !giftPlan && a.planPrice !== null && a.planPrice < data.prices[a.plan]
       ? Number(a.planPrice)
       : null;
 
@@ -151,7 +153,7 @@ export function BillingScreen({
 
   const statusLine = a.admin
     ? b.status.admin
-    : a.plan === 'free'
+    : a.plan === 'free' || giftEnded
       ? b.status.activeFree
       : gift
         ? fmt(b.status.gift, { date: giftLastDay })
@@ -288,7 +290,7 @@ export function BillingScreen({
                 <Badge variant="live" data-testid="plan-gift">
                   {b.history.statuses.gift}
                 </Badge>
-              ) : a.planStatus === 'canceled' && a.plan !== 'free' ? (
+              ) : a.planStatus === 'canceled' && a.plan !== 'free' && !giftEnded ? (
                 <Badge variant="warning">{b.history.statuses.canceled}</Badge>
               ) : null}
               {a.planStatus === 'past_due' ? (

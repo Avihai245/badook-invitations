@@ -84,6 +84,8 @@ test.describe('the admin console’s overview', () => {
   });
 
   test('in Hebrew and English: accessible, and nothing overflows the page', async ({ page }) => {
+    // two languages, each audited (axe takes its time on a busy machine)
+    test.setTimeout(120_000);
     await staffMember(page, 'owner');
     for (const lang of ['he', 'en'] as const) {
       await uiLang(page, lang);

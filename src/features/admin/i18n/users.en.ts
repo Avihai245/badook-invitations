@@ -37,6 +37,7 @@ export const usersEn: typeof usersHe = {
     canceled: 'Canceled',
   },
   gift: 'Gift',
+  giftEnded: 'The gift ended',
   columns: {
     name: 'Name',
     email: 'Email',

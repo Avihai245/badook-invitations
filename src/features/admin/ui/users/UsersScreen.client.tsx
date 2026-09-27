@@ -37,7 +37,7 @@ function UserBadges({ row }: { row: UserRow }) {
           {fmt(t.users.discountBadge, { percent: row.discount.percent })}
         </Badge>
       ) : null}
-      {row.gift ? (
+      {row.gift && row.effectivePlan !== 'free' ? (
         <Badge variant="live" icon={<Gift />}>
           {t.users.gift}
         </Badge>
@@ -116,7 +116,9 @@ export function UsersScreen({ data, query }: { data: Paged<UserRow>; query: User
           {row.plan !== 'free' ? (
             <span className="text-[12px] text-muted">
               {row.gift
-                ? u.gift
+                ? row.effectivePlan !== 'free'
+                  ? u.gift
+                  : u.giftEnded
                 : row.planStatus === 'active' && row.planRenewsAt
                   ? fmt(u.renews, { date: date(row.planRenewsAt) })
                   : u.planStatus[row.planStatus]}

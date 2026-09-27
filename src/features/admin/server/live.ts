@@ -31,7 +31,10 @@ let cached: { channel: string | null; at: number } | null = null;
 
 async function channel(): Promise<string | null> {
   const now = Date.now();
-  if (cached && now - cached.at < CHANNEL_TTL_MS) return cached.channel;
+  // "no channel yet" isn't kept: the first console page makes one at any moment, and each part of the
+  // server (pages, routes, actions) keeps its own copy of this — one that remembered "none" would stay
+  // silent for minutes
+  if (cached?.channel && now - cached.at < CHANNEL_TTL_MS) return cached.channel;
   const value = await adminDb.channelPeek();
   cached = { channel: value, at: now };
   return value;

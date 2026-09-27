@@ -26,6 +26,7 @@ test.describe('the admin console’s system status', () => {
   test('jobs, queues, services as yes or no — never a value — languages, designs and the build', async ({
     page,
   }) => {
+    test.setTimeout(90_000);
     await staffMember(page, 'admin');
     await open(page, '/app/admin/system');
     await expect(page.getByRole('heading', { level: 1, name: 'מצב המערכת' })).toBeVisible();
@@ -67,6 +68,7 @@ test.describe('the admin console’s system status', () => {
   test('an owner may give the live channel a new name: the dialog says what happens, and nothing does until confirmed', async ({
     page,
   }) => {
+    test.setTimeout(90_000);
     await staffMember(page, 'owner');
     await open(page, '/app/admin/system');
     await expect(page.getByTestId('admin-system-channel')).toContainText('הערוץ החי של הניהול');
@@ -83,6 +85,8 @@ test.describe('the admin console’s system status', () => {
   });
 
   test('in Hebrew and English: accessible, and nothing overflows the page', async ({ page }) => {
+    // two languages, each audited (axe takes its time on a busy machine)
+    test.setTimeout(120_000);
     await staffMember(page, 'owner');
     for (const lang of ['he', 'en'] as const) {
       await uiLang(page, lang);

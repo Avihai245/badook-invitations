@@ -36,6 +36,7 @@ export const usersHe = {
     canceled: 'בוטלה',
   },
   gift: 'מתנה',
+  giftEnded: 'המתנה הסתיימה',
   columns: {
     name: 'שם',
     email: 'מייל',

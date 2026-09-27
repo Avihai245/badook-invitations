@@ -99,6 +99,13 @@ describe('a plan the Badook team gave as a gift', () => {
     };
     expect(effectivePlan(state, Date.parse(GIFT_ENDS) - 1)).toBe('business');
     expect(effectivePlan(state, Date.parse(GIFT_ENDS) + 1)).toBe('free');
+    // and the screen says Free: no gift, nothing "canceled", no monthly price of ₪0
+    const html = render(page({ ...gift, planRenewsAt: '2026-09-20T21:00:00.000Z' }));
+    expect(html).toContain('Free, with no time limit');
+    expect(html).not.toContain('data-testid="plan-gift"');
+    expect(html).not.toContain('Canceled');
+    expect(html).not.toContain('data-testid="plan-price"');
+    expect(html).not.toContain('Cancel subscription');
   });
 });
 

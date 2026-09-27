@@ -77,13 +77,14 @@ test.describe('the admin console’s staff', () => {
     await expect(row(page, email)).toHaveCount(0);
     expect((await mp.goto('/app/admin'))?.status()).toBe(404);
 
-    // all three in the record of actions, with their reasons
+    // all three in the record of actions, with their reasons (a member with an account by their name)
     await open(page, `/app/admin/audit?targetType=staff&targetId=${encodeURIComponent(email)}`);
     const list = page.getByTestId('admin-audit-list');
-    await expect(list).toContainText(`אביחי צירף את ${email} לצוות בתפקיד תמיכה`);
-    await expect(list).toContainText(`אביחי שינה את התפקיד של ${email}: תמיכה ← כספים`);
-    await expect(list).toContainText(`אביחי הסיר את ${email} מהצוות (כספים)`);
+    await expect(list).toContainText('אביחי צירף את נועם לצוות בתפקיד תמיכה');
+    await expect(list).toContainText('אביחי שינה את התפקיד של נועם: תמיכה ← כספים');
+    await expect(list).toContainText('אביחי הסיר את נועם מהצוות (כספים)');
     await expect(list).toContainText('סיבה: מצטרף לצוות התמיכה');
+    await expect(list).toContainText('הערה: עונה לפניות בערבים');
     await member.close();
   });
 
@@ -151,6 +152,8 @@ test.describe('the admin console’s staff', () => {
   test('in Hebrew and English: accessible, the roles’ table included, and nothing overflows the page', async ({
     page,
   }) => {
+    // two languages, each audited (axe takes its time on a busy machine)
+    test.setTimeout(120_000);
     await staffMember(page, 'owner');
     for (const lang of ['he', 'en'] as const) {
       await uiLang(page, lang);

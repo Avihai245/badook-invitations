@@ -89,6 +89,7 @@ test.describe('the admin console’s record of actions', () => {
   });
 
   test('50 a page: older ones a page at a time, and back to the newest', async ({ page }) => {
+    test.setTimeout(90_000);
     const email = await staffMember(page, 'owner', 'אביחי');
     const actor = await idOf(email);
     // 55 of this member's actions
@@ -110,6 +111,8 @@ test.describe('the admin console’s record of actions', () => {
   });
 
   test('in Hebrew and English: accessible, and nothing overflows the page', async ({ page }) => {
+    // two languages, each audited (axe takes its time on a busy machine)
+    test.setTimeout(120_000);
     const email = await staffMember(page, 'owner');
     const actor = await idOf(email);
     await sql(

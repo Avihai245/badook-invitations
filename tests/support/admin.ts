@@ -194,8 +194,14 @@ export async function done(page: Page, text: string) {
  */
 export async function offBecause(page: Page, control: Locator, why: string) {
   await expect(control).toBeDisabled();
-  await control.locator('xpath=ancestor::*[@data-disabled-hint][1]').focus();
-  await expect(page.getByRole('tooltip')).toContainText(why);
+  const stand = control.locator('xpath=ancestor::*[@data-disabled-hint][1]');
+  // on screen first: a hint closes when the page (or its table) scrolls under it, and focus scrolls
+  await stand.scrollIntoViewIfNeeded();
+  await expect(async () => {
+    await stand.blur();
+    await stand.focus();
+    await expect(page.getByRole('tooltip')).toContainText(why, { timeout: 1_000 });
+  }).toPass({ timeout: 10_000 });
   await page.keyboard.press('Escape');
   await expect(page.getByRole('tooltip')).toHaveCount(0);
 }

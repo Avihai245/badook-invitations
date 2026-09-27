@@ -64,6 +64,8 @@ export function UserScreen({
   const Back = dir === 'rtl' ? ArrowRight : ArrowLeft;
   const plan = user.plan;
   const lastGiftDay = plan.gift && plan.renewsAt ? date(lastDayOf(plan.renewsAt)) : null;
+  // a gift in force (after its last day the account is on Free, the gift stays on record)
+  const giftNow = plan.gift && plan.effective !== 'free';
 
   const invitationColumns: DataTableColumn<Invitation>[] = [
     {
@@ -234,7 +236,7 @@ export function UserScreen({
                 {u.suspended}
               </Badge>
             ) : null}
-            {plan.gift ? (
+            {giftNow ? (
               <Badge variant="live" icon={<Gift />}>
                 {u.gift}
               </Badge>
@@ -320,7 +322,8 @@ export function UserScreen({
               {plan.plan !== 'free' ? (
                 <>
                   <Row label={P.planStored}>
-                    {planLabel(t, plan.plan)} · {plan.gift ? u.gift : u.planStatus[plan.status]}
+                    {planLabel(t, plan.plan)} ·{' '}
+                    {plan.gift ? (giftNow ? u.gift : u.giftEnded) : u.planStatus[plan.status]}
                   </Row>
                   {plan.renewsAt ? (
                     <Row label={plan.gift || plan.status === 'canceled' ? P.endsAt : P.renewsAt}>

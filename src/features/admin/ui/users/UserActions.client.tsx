@@ -105,7 +105,7 @@ export function UserActions({ user, self, today }: { user: UserDetail; self: boo
           onClick={() => setOpen('credits')}
           testId="admin-action-credits"
         />
-        {user.plan.gift ? (
+        {user.plan.gift && user.plan.effective !== 'free' ? (
           <ActionButton
             label={u.giftDialog.remove}
             help={u.giftDialog.removeConfirmHelp}
