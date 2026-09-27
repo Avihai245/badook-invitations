@@ -689,11 +689,12 @@ begin
         'paid', x.paid, 'venues', x.venues, 'lastAt', x.last_at
       ) order by x.accounts desc, x.last_at desc)
       from (
+        -- (each detail as the latest call that gave it said it; 'call' when any account's call named them)
         select opener ->> 'id' as id,
-               (array_agg(opener ->> 'name' order by opened_at desc))[1] as name,
-               (array_agg(opener ->> 'role' order by opened_at desc))[1] as role,
-               (array_agg(opener ->> 'email' order by opened_at desc))[1] as email,
-               (array_agg(opener ->> 'via' order by opened_at desc))[1] as via,
+               (array_agg(opener ->> 'name' order by opened_at desc) filter (where opener ->> 'name' is not null))[1] as name,
+               (array_agg(opener ->> 'role' order by opened_at desc) filter (where opener ->> 'role' is not null))[1] as role,
+               (array_agg(opener ->> 'email' order by opened_at desc) filter (where opener ->> 'email' is not null))[1] as email,
+               case when bool_or(opener ->> 'via' = 'call') then 'call' else 'venue' end as via,
                count(*) as accounts,
                count(*) filter (where paid_plan) as paid,
                coalesce(jsonb_agg(distinct venue_name) filter (where venue_name is not null), '[]'::jsonb) as venues,
