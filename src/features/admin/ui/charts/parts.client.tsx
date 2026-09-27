@@ -176,7 +176,7 @@ export function useReportFormat() {
     /** to the agora: ₪39.20 */
     exact: (n: number) =>
       number(n, { style: 'currency', currency: 'ILS', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-    /** a tile's value: whole shekels, short above ₪100K */
+    /** a tile's value: the console's money (whole shekels from ₪1,000), short above ₪100K */
     money: (n: number) => (Math.abs(n) >= 100_000 ? compactMoney(n) : money(n)),
     compactMoney,
     usd: (n: number) =>
