@@ -79,7 +79,7 @@ export function SupportInbox({
 
       <nav
         aria-label={s.tabs.label}
-        className="-mx-4 flex gap-1 overflow-x-auto border-b border-line px-4 sm:mx-0 sm:px-0"
+        className="grid grid-cols-2 gap-2 sm:flex sm:gap-1 sm:overflow-x-auto sm:border-b sm:border-line"
         data-testid="inbox-tabs"
       >
         {TABS.map((tab) => {
@@ -91,13 +91,14 @@ export function SupportInbox({
               aria-current={active ? 'page' : undefined}
               data-testid={`inbox-tab-${tab}`}
               className={cn(
-                '-mb-px flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-[14px] whitespace-nowrap transition-colors',
+                'flex min-w-0 items-center justify-between gap-2 rounded-[10px] border px-3 py-2 text-[13.5px] transition-colors',
+                'sm:-mb-px sm:shrink-0 sm:justify-start sm:rounded-none sm:border-0 sm:border-b-2 sm:px-3 sm:py-2.5 sm:text-[14px] sm:whitespace-nowrap',
                 active
-                  ? 'border-brand font-semibold text-ink'
-                  : 'border-transparent font-medium text-muted hover:text-ink',
+                  ? 'border-brand bg-brand-soft font-semibold text-ink sm:border-brand sm:bg-transparent'
+                  : 'border-line bg-surface font-medium text-muted hover:text-ink sm:border-transparent sm:bg-transparent',
               )}
             >
-              {s.tabs[tab]}
+              <span className="min-w-0 truncate">{s.tabs[tab]}</span>
               <span
                 data-testid={`inbox-count-${tab}`}
                 className={cn(
@@ -115,9 +116,9 @@ export function SupportInbox({
       <div
         role="search"
         aria-label={s.filters.label}
-        className="mt-4 grid grid-cols-1 items-end gap-3 sm:grid-cols-2 xl:flex xl:flex-wrap"
+        className="mt-4 grid grid-cols-2 items-end gap-3 xl:flex xl:flex-wrap"
       >
-        <Field label={s.filters.scope}>
+        <Field label={s.filters.scope} className="col-span-2 xl:col-span-1">
           <Segmented<InboxScope>
             value={query.scope}
             onValueChange={(scope) => go({ scope })}
@@ -152,7 +153,7 @@ export function SupportInbox({
           </Select>
         </Field>
         <form
-          className="flex items-end gap-2 sm:col-span-2 xl:min-w-[280px] xl:flex-1"
+          className="col-span-2 flex items-end gap-2 xl:min-w-[280px] xl:flex-1"
           onSubmit={(e) => {
             e.preventDefault();
             go({ q: search.trim() });
@@ -321,16 +322,23 @@ function Waiting({ item }: { item: AdminTicketItem }) {
 
 function Customer({ item }: { item: AdminTicketItem }) {
   const { t } = useAdminUi();
+  const { name, email } = item.customer;
   return (
     <span className="flex min-w-0 flex-col">
-      <span dir="auto" className="truncate text-start font-medium">
-        {item.customer.name ?? t.support.list.noName}
-      </span>
-      {item.customer.email ? (
-        <span dir="ltr" className="truncate text-start text-[12px] text-muted">
-          {item.customer.email}
+      {name ? (
+        <span className="truncate font-medium">
+          <bdi>{name}</bdi>
         </span>
       ) : null}
+      {email ? (
+        <span
+          dir="ltr"
+          className={cn('truncate text-start rtl:text-end', name ? 'text-[12px] text-muted' : 'font-medium')}
+        >
+          {email}
+        </span>
+      ) : null}
+      {!name && !email ? <span className="text-muted">{t.support.list.noName}</span> : null}
     </span>
   );
 }
@@ -378,12 +386,8 @@ function InboxTable({ items }: { items: AdminTicketItem[] }) {
                 className="cursor-pointer transition-colors hover:bg-row-hover has-[:focus-visible]:bg-row-hover"
               >
                 <td className="max-w-[340px] border-b border-line px-3 py-3 align-middle">
-                  <Link
-                    href={href}
-                    dir="auto"
-                    className="block truncate text-start font-semibold text-ink hover:underline"
-                  >
-                    {item.subject}
+                  <Link href={href} className="block truncate font-semibold text-ink hover:underline">
+                    <bdi>{item.subject}</bdi>
                   </Link>
                   <span className="mt-0.5 block text-[12px] text-muted tabular-nums">
                     {fmt(s.list.number, { n: item.number })} · {s.sources[item.source]}
@@ -439,8 +443,8 @@ function InboxCard({ item }: { item: AdminTicketItem }) {
         className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4 shadow-sm transition-colors hover:bg-row-hover"
       >
         <span className="flex items-start justify-between gap-3">
-          <span dir="auto" className="min-w-0 text-start text-[15px] font-semibold break-words">
-            {item.subject}
+          <span className="min-w-0 text-[15px] font-semibold break-words">
+            <bdi>{item.subject}</bdi>
           </span>
           <span className="shrink-0 text-[12px] text-muted tabular-nums">
             {fmt(s.list.number, { n: item.number })}

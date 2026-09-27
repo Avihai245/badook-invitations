@@ -7,7 +7,7 @@ import { Badge, Button, Card, EmptyState, Hint, PageHeader, cn } from '@/compone
 import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import { useLiveRefresh } from '@/lib/live/client';
-import { TICKETS } from '../config';
+import { isolate, TICKETS } from '../config';
 import type { CustomerTicketSummary } from '../types';
 import { TicketStatusBadge } from './StatusBadge';
 import { relativeTime } from './when';
@@ -91,14 +91,8 @@ function TicketRow({ ticket }: { ticket: CustomerTicketSummary }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             {ticket.unread ? <span aria-hidden className="size-2.5 shrink-0 rounded-full bg-brand" /> : null}
-            <p
-              dir="auto"
-              className={cn(
-                'min-w-0 truncate text-start text-[15px]',
-                ticket.unread ? 'font-bold' : 'font-semibold',
-              )}
-            >
-              {ticket.subject}
+            <p className={cn('min-w-0 truncate text-[15px]', ticket.unread ? 'font-bold' : 'font-semibold')}>
+              <bdi>{ticket.subject}</bdi>
             </p>
           </div>
           <p className="mt-1 text-[12.5px] text-muted tabular-nums">
@@ -109,7 +103,7 @@ function TicketRow({ ticket }: { ticket: CustomerTicketSummary }) {
           </p>
           {ticket.invitation ? (
             <p className="mt-0.5 truncate text-[12.5px] text-muted">
-              {fmt(s.list.about, { title: ticket.invitation.title ?? ticket.invitation.slug })}
+              {fmt(s.list.about, { title: isolate(ticket.invitation.title ?? ticket.invitation.slug) })}
             </p>
           ) : null}
         </div>

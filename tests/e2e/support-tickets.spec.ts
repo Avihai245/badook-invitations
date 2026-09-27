@@ -104,6 +104,8 @@ async function noOverflow(page: Page, key: string) {
 
 async function shot(page: Page, name: string) {
   mkdirSync(SHOTS, { recursive: true });
+  // from the top: a sticky bar never lands over the content in the full-page picture
+  await page.evaluate(() => window.scrollTo(0, 0));
   await settle(page);
   await page.screenshot({ path: `${SHOTS}/adm-b-${name}-${test.info().project.name}.png`, fullPage: true });
 }
@@ -187,7 +189,8 @@ test.describe('support tickets', () => {
     const ticketId = ticketIdOf(page);
     await expect(page.getByRole('heading', { level: 1, name: subject })).toBeVisible();
     await expect(page.getByTestId('ticket-status')).toContainText('ממתינה לצוות');
-    await expect(page.getByText('על ההזמנה: נועה & איתי')).toBeVisible();
+    // (the title isolated from the sentence's direction)
+    await expect(page.getByText(/על ההזמנה: \u2068?נועה & איתי/)).toBeVisible();
     await expect(page.getByTestId('ticket-live')).toHaveAttribute('data-state', 'live', { timeout: 15_000 });
     await newWindowMark(page);
 
@@ -420,7 +423,10 @@ test.describe('support tickets', () => {
     await expect(panel.getByTestId('admin-customer-link')).toHaveCount(0);
     await agent.getByTestId('admin-composer-text').fill('כן! נשמח לעזור. שלחנו לך פרטים.');
     await agent.getByTestId('admin-send').click();
-    await expect(agent.getByRole('dialog')).toContainText(`תישלח במייל ל־רינה ${tag} (${visitorEmail})`);
+    const confirm = agent.getByRole('dialog');
+    await expect(confirm).toContainText('התשובה תישלח במייל');
+    await expect(confirm).toContainText(`רינה ${tag}`);
+    await expect(confirm).toContainText(visitorEmail);
     await agent.getByTestId('admin-reply-confirm').click();
     await expect(toast(agent, 'התשובה נשלחה ללקוח')).toBeVisible();
     await expect.poll(() => emailed(ticket!.id), { timeout: 10_000 }).toBe('sent');

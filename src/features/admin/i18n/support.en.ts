@@ -5,15 +5,15 @@ export const supportEn: typeof supportHe = {
   intro: 'Tickets from customers and visitors, and replying to them.',
   kpi: {
     label: 'Tickets in numbers',
-    open: 'Waiting for the team',
+    open: 'To answer',
     openHelp: 'Tickets where the customer wrote and we haven’t answered yet.',
     oldest: 'The oldest has waited {time}',
-    waiting: 'Waiting for the customer',
+    waiting: 'Answered',
     waitingHelp:
       'We answered and are waiting for the customer. Without a reply for {days} days, they close by themselves.',
     today: 'Opened today',
     todayHelp: 'New tickets since midnight, Israel time.',
-    firstReply: 'Time to first answer',
+    firstReply: 'First answer',
     firstReplyHelp:
       'The median over the last 30 days: how long from a ticket opening to the team’s first answer.',
     unassigned: { one: 'One unassigned', other: '{n} unassigned' },

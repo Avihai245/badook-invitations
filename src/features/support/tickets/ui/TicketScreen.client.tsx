@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type Keyboard
 import { Button, Card, Dialog, Field, Hint, PAGE_TITLE, Textarea, cn, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { useLiveRefresh } from '@/lib/live/client';
-import { TICKETS } from '../config';
+import { isolate, TICKETS } from '../config';
 import type { CustomerMessage, CustomerTicket } from '../types';
 import { TicketStatusBadge } from './StatusBadge';
 import { ilDate, ilDateTime } from './when';
@@ -150,8 +150,8 @@ export function TicketScreen({ initial }: { initial: CustomerTicket }) {
       </Link>
 
       <header className="flex flex-col gap-2">
-        <h1 dir="auto" className={cn(PAGE_TITLE.section, 'text-start break-words')}>
-          {ticket.subject}
+        <h1 className={cn(PAGE_TITLE.section, 'break-words')}>
+          <bdi>{ticket.subject}</bdi>
         </h1>
         <p className="text-[13px] text-muted tabular-nums">
           {fmt(k.number, { n: ticket.number })} ·{' '}
@@ -162,7 +162,7 @@ export function TicketScreen({ initial }: { initial: CustomerTicket }) {
         </p>
         {ticket.invitation ? (
           <p className="text-[13px] text-muted">
-            {fmt(k.about, { title: ticket.invitation.title ?? ticket.invitation.slug })}
+            {fmt(k.about, { title: isolate(ticket.invitation.title ?? ticket.invitation.slug) })}
           </p>
         ) : null}
         <div className="mt-1 flex flex-wrap items-center gap-2" data-testid="ticket-status">

@@ -52,6 +52,15 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const isUuid = (v: unknown): v is string => typeof v === 'string' && UUID.test(v);
 
 /**
+ * A name, an address or a title inside a sentence of the other direction (an email in Hebrew, a Hebrew
+ * title in English), kept whole: Unicode's first-strong isolate around it (FSI … PDI).
+ */
+export const isolate = (text: string) => `\u2068${text}\u2069`;
+
+/** A team member as the conversation shows them: their address's name part (the whole one on hover). */
+export const staffName = (email: string) => email.split('@')[0] || email;
+
+/**
  * A subject from the message (the contact form has no subject field; the assistant's first question):
  * its first line, cut at a word within `max` characters.
  */

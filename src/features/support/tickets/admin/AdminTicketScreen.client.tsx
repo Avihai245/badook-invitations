@@ -7,7 +7,14 @@ import { useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Badge, Button, Card, Field, Hint, Segmented, Select, Textarea, cn } from '@/components/app';
 import { AdminPageHeader } from '@/features/admin/ui/AdminShell.client';
 import { useAdminUi } from '@/features/admin/ui/AdminUi.client';
-import { TICKET_STATUSES, TICKETS, type TicketPriority, type TicketStatus } from '../config';
+import {
+  isolate,
+  staffName,
+  TICKET_STATUSES,
+  TICKETS,
+  type TicketPriority,
+  type TicketStatus,
+} from '../config';
 import type { AdminTicket, AdminTicketMessage } from '../types';
 import { AdminStatusBadge, ConfirmDialog, PriorityBadge, useAdminAction } from './shared';
 
@@ -109,7 +116,7 @@ export function AdminTicketScreen({ ticket }: { ticket: AdminTicket }) {
             : c2.replyAccount;
         return {
           title: c.close ? c2.replyCloseTitle : c2.replyTitle,
-          body: fmt(body, { name, email }),
+          body: fmt(body, { name: isolate(name), email: isolate(email) }),
           confirm: c.close ? c2.sendClose : c2.send,
         };
       }
@@ -134,8 +141,8 @@ export function AdminTicketScreen({ ticket }: { ticket: AdminTicket }) {
       case 'assign':
         return c.to
           ? {
-              title: fmt(c2.assignTitle, { who: c.to.email }),
-              body: fmt(c2.assignBody, { who: c.to.email }),
+              title: fmt(c2.assignTitle, { who: isolate(c.to.email) }),
+              body: fmt(c2.assignBody, { who: isolate(c.to.email) }),
               confirm: c2.assign,
             }
           : { title: c2.unassignTitle, body: c2.unassignBody, confirm: t.common.confirm };
@@ -157,11 +164,7 @@ export function AdminTicketScreen({ ticket }: { ticket: AdminTicket }) {
         {s.ticket.back}
       </Link>
       <AdminPageHeader
-        title={
-          <span dir="auto" className="block text-start break-words">
-            {ticket.subject}
-          </span>
-        }
+        title={<bdi className="break-words">{ticket.subject}</bdi>}
         intro={
           <span className="tabular-nums">
             {fmt(s.ticket.number, { n: ticket.number })} ·{' '}
@@ -396,7 +399,7 @@ export function AdminTicketScreen({ ticket }: { ticket: AdminTicket }) {
 function eventLine(m: AdminTicketMessage, t: ReturnType<typeof useAdminUi>): string {
   const s = t.t.support;
   const e = s.ticket.events;
-  const who = m.authorEmail ?? s.customer.none;
+  const who = isolate(m.authorEmail ? staffName(m.authorEmail) : s.ticket.team);
   const to = m.meta.to ?? null;
   switch (m.event) {
     case 'closed':
@@ -410,7 +413,7 @@ function eventLine(m: AdminTicketMessage, t: ReturnType<typeof useAdminUi>): str
     case 'status':
       return t.fmt(e.status, { who, to: to ? s.status[to as TicketStatus] : '' });
     case 'assigned':
-      return to ? t.fmt(e.assigned, { who, to }) : t.fmt(e.unassigned, { who });
+      return to ? t.fmt(e.assigned, { who, to: isolate(staffName(to)) }) : t.fmt(e.unassigned, { who });
     case 'priority':
       return t.fmt(e.priority, { who, to: to ? s.priority[to as TicketPriority] : '' });
     default:
@@ -459,7 +462,12 @@ function Conversation({ ticket }: { ticket: AdminTicket }) {
                 <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-ink">
                   <Lock aria-hidden className="size-3.5 text-warning" />
                   <span className="font-semibold text-warning">{s.ticket.note}</span>
-                  <span dir="ltr">{m.authorEmail}</span> · {when}
+                  {m.authorEmail ? (
+                    <span dir="ltr" title={m.authorEmail}>
+                      {staffName(m.authorEmail)}
+                    </span>
+                  ) : null}{' '}
+                  · {when}
                 </p>
                 <p
                   dir="auto"
@@ -481,7 +489,9 @@ function Conversation({ ticket }: { ticket: AdminTicket }) {
             >
               <span className="flex flex-wrap items-center gap-x-2 gap-y-1 px-1 text-[12px] text-muted">
                 {team ? (
-                  <span dir="ltr">{m.authorEmail ?? s.ticket.team}</span>
+                  <span dir="ltr" title={m.authorEmail ?? undefined}>
+                    {m.authorEmail ? staffName(m.authorEmail) : s.ticket.team}
+                  </span>
                 ) : (
                   <span>{s.ticket.customer}</span>
                 )}
@@ -562,12 +572,12 @@ function CustomerCard({ ticket }: { ticket: AdminTicket }) {
           ? s.sources.google
           : s.sources.signup;
   const rows: { label: string; value: ReactNode }[] = [
-    { label: s.name, value: <span dir="auto">{c.name ?? t.support.list.noName}</span> },
+    { label: s.name, value: c.name ? <bdi>{c.name}</bdi> : s.none },
     {
       label: s.email,
       value: c.email ? (
         <span className="flex flex-wrap items-center gap-1.5">
-          <span dir="ltr" className="break-all">
+          <span dir="ltr" className="text-start [overflow-wrap:anywhere] rtl:text-end">
             {c.email}
           </span>
           {masked(c.email) ? <MaskedMark /> : null}
@@ -641,8 +651,8 @@ function InvitationCard({ ticket }: { ticket: AdminTicket }) {
   return (
     <Card padding="lg" data-testid="admin-invitation">
       <h2 className="text-[15px] font-bold">{s.invitation}</h2>
-      <p dir="auto" className="mt-2 text-start text-[14px] font-semibold break-words">
-        {i.title ?? i.slug}
+      <p className="mt-2 text-[14px] font-semibold break-words">
+        <bdi>{i.title ?? i.slug}</bdi>
       </p>
       <p className="mt-0.5 text-[12.5px] text-muted">
         <span dir="ltr">/i/{i.slug}</span> · {status}

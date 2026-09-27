@@ -28,8 +28,8 @@ export function UserTicketsCard({ tickets }: { tickets: AdminTicketItem[] }) {
                   data-ticket={ticket.number}
                 >
                   <span className="min-w-0 flex-1">
-                    <span dir="auto" className="block truncate text-start text-[14px] font-semibold">
-                      {ticket.subject}
+                    <span className="block truncate text-[14px] font-semibold">
+                      <bdi>{ticket.subject}</bdi>
                     </span>
                     <span className="block text-[12px] text-muted tabular-nums">
                       {fmt(s.list.number, { n: ticket.number })} · {s.categories[ticket.category]} ·{' '}
