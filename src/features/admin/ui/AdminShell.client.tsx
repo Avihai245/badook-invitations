@@ -59,7 +59,7 @@ export function AdminShell({ badges, children }: { badges: AdminNavBadges; child
       <aside className="sticky top-0 hidden h-dvh flex-col border-e border-line bg-surface lg:flex lg:ltr:ps-[60px]">
         <div className="flex items-center justify-between gap-2 px-5 pt-5 pb-4">
           <Link href="/app/admin" className="rounded-btn text-[17px]">
-            <BrandLogo label={t.consoleName} />
+            <BrandLogo label={t.consoleName} suffix={<span aria-hidden>{t.consoleBadge}</span>} />
           </Link>
         </div>
         <div className="px-5 pb-3">
@@ -193,7 +193,7 @@ function MobileBar({ badges }: { badges: AdminNavBadges }) {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-surface/95 px-4 backdrop-blur lg:hidden">
       <Link href="/app/admin" className="rounded-btn text-[16px]">
-        <BrandLogo label={t.consoleName} />
+        <BrandLogo label={t.consoleName} suffix={<span aria-hidden>{t.consoleBadge}</span>} />
       </Link>
       <LiveBadge className="ms-auto" />
       <Drawer

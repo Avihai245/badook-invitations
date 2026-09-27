@@ -69,11 +69,11 @@ export function MessagesScreen({ data }: { data: MessagesPageData }) {
       <AdminPageHeader title={M.title} intro={`${M.intro} ${M.period}.`} />
       <Kpis data={data} />
       <Daily data={data} />
-      <div className="grid min-w-0 gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-2">
         <ByKind data={data} />
         <Queues queue={data.queue} />
       </div>
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <Errors data={data} />
         <Failures rows={data.failures} />
       </div>
@@ -450,7 +450,7 @@ function Emails({ data }: { data: MessagesPageData }) {
   ];
   return (
     <Section id="emails" title={E.title} intro={E.intro}>
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <StackedColumns
           testId="emails-chart"
           rows={rows}

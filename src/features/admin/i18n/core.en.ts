@@ -2,6 +2,8 @@ import type { coreHe } from './core.he';
 
 export const coreEn: typeof coreHe = {
   consoleName: 'Badook admin',
+  /** the word beside the logo (the logo's alt is consoleName) */
+  consoleBadge: 'Admin',
   skipToContent: 'Skip to content',
   nav: {
     label: 'Admin areas',

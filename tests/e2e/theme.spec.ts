@@ -113,9 +113,7 @@ test.describe('the system’s look', () => {
       await expect(look.getByRole('radio', { name: 'כהה' })).toHaveAttribute('aria-checked', 'true');
     }
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(
-      'rgb(9, 9, 11)',
-    );
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(9, 9, 11)');
 
     // kept: the next visit is dark from its first paint
     await page.goto('/app/billing', { waitUntil: 'commit' });
@@ -169,6 +167,36 @@ test.describe('the system’s look', () => {
     await expect(
       page.getByTestId('billing-terms').getByRole('link', { name: 'ביטול עסקה והחזרים' }),
     ).toHaveAttribute('href', '/terms#cancel');
+  });
+
+  test('the brand: the logo in either look, the tab’s icon, and the way to Badook Events', async ({
+    page,
+  }) => {
+    await signUpAs(page, unique('theme-brand'), 'Dana Levi');
+    // the logo (its name is the image's alt): the dark-lined one on light, the light-lined one on dark
+    const visibleLogo = () => page.locator('img[alt="Badook"]:visible').first().getAttribute('src');
+    expect(await visibleLogo()).toBe('/brand/badook-logo.png');
+    await page.evaluate((key) => localStorage.setItem(key, 'dark'), THEME_KEY);
+    await page.reload();
+    await hydrated(page);
+    expect(await visibleLogo()).toBe('/brand/badook-logo-light.png');
+    // the browser tab's icon
+    const icon = await page.locator('link[rel="icon"]').first().getAttribute('href');
+    expect(icon).toBeTruthy();
+    expect((await page.request.get(icon!)).headers()['content-type']).toContain('image/png');
+    // Badook Events, in a new tab: the sidebar's, or on phones the account menu's
+    if (phone(page)) {
+      await page.getByTestId('user-menu').click();
+      const item = page.getByRole('menuitem', { name: 'מחפשים מקום לאירוע?' });
+      await expect(item).toHaveAttribute('href', 'https://event.badooks.com/');
+      await expect(item).toHaveAttribute('target', '_blank');
+      await page.keyboard.press('Escape');
+    } else {
+      const link = page.getByTestId('nav-venues');
+      await expect(link).toHaveAttribute('href', 'https://event.badooks.com/');
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAccessibleName('מחפשים מקום לאירוע? (נפתח בלשונית חדשה)');
+    }
   });
 
   for (const theme of THEMES) {

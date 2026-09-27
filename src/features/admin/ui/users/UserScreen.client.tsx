@@ -250,7 +250,7 @@ export function UserScreen({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)]">
         <div className="flex min-w-0 flex-col gap-4">
           <Section title={P.identity} testId="admin-user-identity">
             <dl>

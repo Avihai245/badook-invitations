@@ -57,7 +57,7 @@ export function SiteHeader({ overHero = false }: { overHero?: boolean }) {
       </a>
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-5 sm:px-6">
         <Link href="/" className="rounded-btn text-[19px]" onClick={() => setOpen(false)}>
-          <BrandLogo label={t.brand} />
+          <BrandLogo label={t.brand} tone={light ? 'onDark' : 'auto'} />
         </Link>
         <nav aria-label={s.label} className="max-lg:hidden">
           <ul className="flex items-center gap-1">

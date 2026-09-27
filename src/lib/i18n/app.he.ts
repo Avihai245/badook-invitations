@@ -101,6 +101,10 @@ export const he = {
       help: 'עזרה והעוזר',
       /** the admin console (staff only) */
       admin: 'ניהול המערכת',
+      /** Badook Events, where hosts find a venue (opens in a new tab) */
+      venues: 'מחפשים מקום לאירוע?',
+      venuesHelp: 'אולמות, גנים ומקומות לאירועים ב־Badook Events. נפתח בלשונית חדשה.',
+      newTab: '(נפתח בלשונית חדשה)',
     },
     /** the phones' bottom bar (short labels) */
     tabs: {

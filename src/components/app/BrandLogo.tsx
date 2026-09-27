@@ -1,27 +1,52 @@
+/* eslint-disable @next/next/no-img-element -- the logo is a small static PNG already sized for 2x, in two versions the look switches between by CSS: nothing for the image optimizer to add */
+import type { ReactNode } from 'react';
 import { cn } from './utils';
 
+const LOGO = {
+  src: '/brand/badook-logo.png',
+  light: '/brand/badook-logo-light.png',
+  width: 480,
+  height: 161,
+};
+
 /**
- * The Badook mark: an envelope closed with a wax seal (what every invitation opens with) and the
- * wordmark. Decorative mark, readable name.
+ * The Badook logo (public/brand): the orange wordmark and its line "בדוק וסגרתם אירוע". Its height
+ * follows the font size around it (2.1em). On a dark ground — the dark look, or `tone="onDark"` (the
+ * home page's hero) — the line under the name is light; the orange is the same. The name is the
+ * image's alt text; `suffix` is a word beside it (the admin console's "ניהול").
  */
-export function BrandLogo({ label, className }: { label: string; className?: string }) {
+export function BrandLogo({
+  label,
+  className,
+  tone = 'auto',
+  suffix,
+}: {
+  label: string;
+  className?: string;
+  tone?: 'auto' | 'onDark';
+  suffix?: ReactNode;
+}) {
+  const img = (src: string, extra?: string) => (
+    <img
+      src={src}
+      alt={label}
+      width={LOGO.width}
+      height={LOGO.height}
+      decoding="async"
+      className={cn('h-[2.1em] w-auto max-w-none shrink-0', extra)}
+    />
+  );
   return (
-    <span className={cn('inline-flex items-center gap-2', className)}>
-      <svg viewBox="0 0 32 32" aria-hidden className="size-[1.6em] shrink-0">
-        <rect x="2.5" y="7" width="27" height="19" rx="4" fill="#F6EDE1" stroke="#A0703F" strokeWidth="1.6" />
-        <path
-          d="M3.8 9.2 16 18.2 28.2 9.2"
-          fill="none"
-          stroke="#A0703F"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-        <circle cx="16" cy="18.2" r="4.3" fill="#B5523B" />
-        <circle cx="16" cy="18.2" r="2.1" fill="none" stroke="#F3C9B8" strokeWidth=".9" opacity=".8" />
-      </svg>
-      <span className="font-bold tracking-tight" dir="ltr">
-        {label}
-      </span>
+    <span className={cn('inline-flex items-center gap-2.5', className)}>
+      {tone === 'onDark' ? (
+        img(LOGO.light)
+      ) : (
+        <>
+          {img(LOGO.src, 'dark:hidden')}
+          {img(LOGO.light, 'hidden dark:block')}
+        </>
+      )}
+      {suffix ? <span className="text-[0.8em] font-bold tracking-tight">{suffix}</span> : null}
     </span>
   );
 }

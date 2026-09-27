@@ -8,6 +8,7 @@ import {
   LifeBuoy,
   LogOut,
   Mail,
+  MapPinned,
   MessageCircleQuestion,
   Monitor,
   Moon,
@@ -22,6 +23,7 @@ import type { ReactNode } from 'react';
 import { BrandLogo, cn, Menu, useMedia, type MenuItem } from '@/components/app';
 import { ThemeToggle, useThemePref } from '@/features/site/Theme.client';
 import { LEGAL_PAGES } from '@/features/legal/links';
+import { BADOOK_EVENTS_URL } from '@/features/site/links';
 import { isThemePref } from '@/features/site/theme';
 import { openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
@@ -114,6 +116,19 @@ export function AppSidebar({
           <MessageCircleQuestion aria-hidden className="size-[19px] shrink-0" strokeWidth={1.75} />
           {n.help}
         </button>
+        {/* Badook Events: where hosts find a venue — another site, in a new tab */}
+        <a
+          href={BADOOK_EVENTS_URL}
+          target="_blank"
+          rel="noopener"
+          title={n.venuesHelp}
+          data-testid="nav-venues"
+          className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-[14px] font-medium text-brand-deep transition-colors hover:bg-brand-soft"
+        >
+          <MapPinned aria-hidden className="size-[19px] shrink-0" strokeWidth={1.75} />
+          {n.venues}
+          <span className="sr-only">{n.newTab}</span>
+        </a>
         {admin ? (
           <SideLink href="/app/admin" icon={ShieldCheck} active={false}>
             {n.admin}
@@ -318,6 +333,10 @@ export function UserMenu({
     },
     { label: t.shell.nav.assistant, icon: <MessageCircleQuestion />, onSelect: () => openSupport() },
     { label: t.shell.nav.contact, icon: <Mail />, href: '/contact' },
+    // phones: the sidebar's way to Badook Events is here
+    ...(wide
+      ? []
+      : [{ label: t.shell.nav.venues, icon: <MapPinned />, href: BADOOK_EVENTS_URL, external: true }]),
     { type: 'separator' },
     ...(wide
       ? []

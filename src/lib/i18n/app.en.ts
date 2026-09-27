@@ -93,6 +93,10 @@ export const en: AppDict = {
       contact: 'Contact us',
       help: 'Help & assistant',
       admin: 'Admin console',
+      /** Badook Events, where hosts find a venue (opens in a new tab) */
+      venues: 'Looking for a venue?',
+      venuesHelp: 'Halls, gardens and event venues on Badook Events. Opens in a new tab.',
+      newTab: '(opens in a new tab)',
     },
     tabs: {
       label: 'Navigation',

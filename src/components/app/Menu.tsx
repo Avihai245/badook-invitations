@@ -16,6 +16,8 @@ export type MenuItem =
       onSelect?: () => void;
       /** Renders the item as a Next link. */
       href?: string;
+      /** `href` is another site's: a plain link, in a new tab. */
+      external?: boolean;
       danger?: boolean;
       disabled?: boolean;
     }
@@ -117,7 +119,15 @@ export function Menu({ trigger, items, align = 'end', dir: dirProp, className }:
                   asChild={!!entry.href}
                   className={cn(item, entry.danger && 'text-danger')}
                 >
-                  {entry.href ? <Link href={entry.href}>{content}</Link> : content}
+                  {entry.href && entry.external ? (
+                    <a href={entry.href} target="_blank" rel="noopener">
+                      {content}
+                    </a>
+                  ) : entry.href ? (
+                    <Link href={entry.href}>{content}</Link>
+                  ) : (
+                    content
+                  )}
                 </DropdownMenu.Item>
               );
             })}

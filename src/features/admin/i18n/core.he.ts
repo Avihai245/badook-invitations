@@ -4,6 +4,8 @@
  */
 export const coreHe = {
   consoleName: 'ניהול Badook',
+  /** the word beside the logo (the logo's alt is consoleName) */
+  consoleBadge: 'ניהול',
   skipToContent: 'דילוג לתוכן',
   nav: {
     label: 'אזורי הניהול',

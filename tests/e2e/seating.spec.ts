@@ -155,6 +155,16 @@ function planPdf(): Buffer {
 }
 
 const toast = (page: Page, text: string | RegExp) => page.locator('li').filter({ hasText: text });
+/**
+ * The floor plan's dialog, from its toolbar button by the keyboard: on a phone the canvas's toolbar can
+ * sit under a floating layer for a moment (a notice, the tab bar, the accessibility button).
+ */
+async function openPlan(page: Page) {
+  const button = page.getByTestId('plan-button');
+  await button.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog', { name: 'תוכנית האולם' })).toBeVisible();
+}
 const saved = (page: Page) =>
   expect(page.getByRole('status').filter({ hasText: 'כל השינויים נשמרו' })).toBeVisible({ timeout: 15_000 });
 const tableOnMap = (page: Page, n: number) =>
@@ -221,7 +231,7 @@ test.describe('seating', () => {
     await inspector.getByRole('button', { name: 'סגירת חלון השולחן' }).click();
 
     // the floor plan: an image, then its width in meters
-    await page.getByTestId('plan-button').click();
+    await openPlan(page);
     let dialog = page.getByRole('dialog', { name: 'תוכנית האולם' });
     await dialog
       .getByTestId('plan-file')
@@ -229,9 +239,7 @@ test.describe('seating', () => {
     await expect(toast(page, 'תוכנית האולם עודכנה')).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId('seating-plan-image')).toHaveCount(1);
     await expect(page.getByText('קנה המידה של התוכנית עוד לא כויל')).toBeVisible();
-    // (on a phone the notice sits over the canvas's toolbar until it goes)
-    await expect(toast(page, 'תוכנית האולם עודכנה')).toBeHidden({ timeout: 15_000 });
-    await page.getByTestId('plan-button').click();
+    await openPlan(page);
     dialog = page.getByRole('dialog', { name: 'תוכנית האולם' });
     await expect(dialog.getByTestId('plan-scale')).toContainText('לא כויל');
     await dialog.getByTestId('plan-width').fill('40');

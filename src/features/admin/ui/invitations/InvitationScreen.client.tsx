@@ -163,7 +163,7 @@ export function InvitationScreen({
         {inv.status === 'published' ? P.readOnly : `${P.readOnly} ${P.notPublished}`}
       </p>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card padding="md" className="min-w-0" data-testid="admin-invitation-summary">
           <h2 className="mb-2 text-[15px] font-bold">{P.summary}</h2>
           <dl>

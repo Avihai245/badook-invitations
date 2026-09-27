@@ -307,7 +307,7 @@ export function StaffScreen({ members }: { members: StaffMember[] }) {
             </table>
           </ScrollArea>
         </Card>
-        <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {STAFF_ROLES.map((r) => (
             <li key={r} className="rounded-card border border-line bg-surface p-3">
               <p className="text-[13.5px] font-semibold">{t.roles[r]}</p>

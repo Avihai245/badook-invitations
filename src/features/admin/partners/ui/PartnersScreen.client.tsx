@@ -54,7 +54,7 @@ export function PartnersScreen({ data }: { data: PartnersPageData }) {
     <div className="flex flex-col gap-6" data-testid="admin-partners">
       <AdminPageHeader title={P.title} intro={P.intro} />
       <Kpis overview={data.overview} />
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <Openers overview={data.overview} />
         <Venues overview={data.overview} />
       </div>

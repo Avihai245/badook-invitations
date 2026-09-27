@@ -78,11 +78,11 @@ export function FinanceScreen({ data }: { data: FinancePageData }) {
     <div className="flex flex-col gap-6" data-testid="admin-finance">
       <AdminPageHeader title={F.title} intro={F.intro} />
       <Kpis data={data} />
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <DailyIncome data={data} />
         <Forecast data={data} />
       </div>
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <Subscriptions data={data} />
         <AtRisk data={data} />
       </div>
