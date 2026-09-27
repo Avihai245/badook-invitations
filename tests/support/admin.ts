@@ -55,6 +55,12 @@ export async function open(page: Page, url: string) {
   return res;
 }
 
+/** Reloads the page and waits until it is the hydrated page (a streamed part keeps a hidden copy until then). */
+export async function reloaded(page: Page) {
+  await page.reload();
+  await hydrated(page);
+}
+
 /** The console's page follows the system live. */
 export async function live(page: Page) {
   await expect(page.getByTestId('admin-live').first()).toHaveAttribute('data-state', 'live', {

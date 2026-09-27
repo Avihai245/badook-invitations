@@ -10,6 +10,7 @@ import {
   live,
   mark,
   noSideScroll,
+  reloaded,
   offBecause,
   open,
   openListed,
@@ -128,7 +129,7 @@ test.describe('the admin console’s users', () => {
     await done(page, 'הנחה של 20% ל־יעל מתנה');
     await expect(page.getByTestId('admin-user-discount')).toContainText('20% בלי תאריך סיום · מהצוות');
     await expect(page.getByTestId('admin-user-discount')).toContainText('הערה: סוכם בטלפון');
-    await host.page.reload();
+    await reloaded(host.page);
     const discount = host.page.getByTestId('discount');
     await expect(discount).toContainText('הנחה של 20% על החבילות');
     await expect(discount).toContainText('מצוות Badook');
@@ -140,7 +141,7 @@ test.describe('the admin console’s users', () => {
     await act(page, 'admin-ungift-dialog', 'ניתנה בטעות');
     await done(page, 'המתנה של יעל מתנה בוטלה');
     await expect(page.getByTestId('admin-user-effective-plan')).toHaveText('Free');
-    await host.page.reload();
+    await reloaded(host.page);
     await expect(host.page.getByTestId('plan-gift')).toHaveCount(0);
     await expect(host.page.getByTestId('current-plan')).toContainText('חינם, בלי הגבלת זמן');
 
@@ -148,7 +149,7 @@ test.describe('the admin console’s users', () => {
     await page.getByTestId('admin-action-undiscount').click();
     await act(page, 'admin-undiscount-dialog', 'ההנחה הסתיימה');
     await done(page, 'ההנחה של יעל מתנה הוסרה');
-    await host.page.reload();
+    await reloaded(host.page);
     await expect(host.page.getByTestId('discount')).toHaveCount(0);
     await host.context.close();
   });
@@ -170,7 +171,7 @@ test.describe('the admin console’s users', () => {
     // the session they still hold opens nothing: the API first, then their next page
     const api = await host.page.request.post('/api/invitations', { data: {} });
     expect(api.status()).toBe(401);
-    await host.page.reload();
+    await reloaded(host.page);
     await host.page.waitForURL(/\/login\?/);
     await expect(host.page.getByText('הכניסה לחשבון הזה הושעתה על ידי צוות Badook')).toBeVisible();
     // and signing in again is refused, with the reason
