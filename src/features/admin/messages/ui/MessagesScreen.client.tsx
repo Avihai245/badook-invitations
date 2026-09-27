@@ -1,12 +1,30 @@
 'use client';
 
-import { BellOff, CircleCheck, CircleX, Eye, Hourglass, MessageCircle, Wallet } from 'lucide-react';
-import Link from 'next/link';
+import {
+  BellOff,
+  ChevronDown,
+  ChevronUp,
+  CircleCheck,
+  CircleX,
+  Eye,
+  Hourglass,
+  MessageCircle,
+  Wallet,
+} from 'lucide-react';
 import { useState } from 'react';
-import { Badge, DataTable, Hint, KpiCard, Segmented, type DataTableColumn } from '@/components/app';
+import { Badge, Button, DataTable, Hint, Segmented, type DataTableColumn } from '@/components/app';
 import { AdminPageHeader } from '../../ui/AdminShell.client';
 import { useAdminUi } from '../../ui/AdminUi.client';
-import { Definitions, PersonCell, Section, useReportFormat } from '../../ui/charts/parts.client';
+import {
+  Ago,
+  Definitions,
+  fmtNode,
+  KpiGrid,
+  PersonCell,
+  Section,
+  useReportFormat,
+  type Tile,
+} from '../../ui/charts/parts.client';
 import { StackedColumns } from '../../ui/charts/StackedColumns.client';
 import {
   EMAIL_GROUPS,
@@ -67,7 +85,7 @@ export function MessagesScreen({ data }: { data: MessagesPageData }) {
 }
 
 function Kpis({ data }: { data: MessagesPageData }) {
-  const { t, fmt, relative } = useAdminUi();
+  const { t, fmt } = useAdminUi();
   const f = useReportFormat();
   const K = t.messages.kpi;
   const all = waTotals(data.totals);
@@ -78,7 +96,7 @@ function Kpis({ data }: { data: MessagesPageData }) {
     .filter((v): v is string => !!v)
     .sort()[0];
   const usd30 = all.usd;
-  const tiles = [
+  const tiles: Tile[] = [
     {
       id: 'total',
       icon: <MessageCircle />,
@@ -119,18 +137,13 @@ function Kpis({ data }: { data: MessagesPageData }) {
       icon: <Hourglass />,
       label: K.queue,
       value: f.count(pending),
-      // (a relative time: the browser's clock may be a minute past the server's)
-      sub: oldest ? (
-        <span suppressHydrationWarning>{fmt(K.queueOldest, { since: relative(oldest) })}</span>
-      ) : (
-        K.queueEmpty
-      ),
+      sub: oldest ? fmtNode(K.queueOldest, { since: <Ago at={oldest} /> }) : K.queueEmpty,
     },
     {
       id: 'cost',
       icon: <Wallet />,
       label: K.cost,
-      value: f.exact(data.monthIls),
+      value: f.money(data.monthIls),
       sub: fmt(K.costSub, { usd: f.usd(data.monthUsd), cost30: f.exact(usd30 * data.usdRate) }),
     },
     {
@@ -141,23 +154,7 @@ function Kpis({ data }: { data: MessagesPageData }) {
       sub: fmt(K.optOutsSub, { n: f.count(data.optOuts.last30) }),
     },
   ];
-  return (
-    <section aria-label={t.messages.period}>
-      <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 lg:grid-cols-4">
-        {tiles.map((tile) => (
-          <div key={tile.id} data-testid={`kpi-${tile.id}`} className="min-w-0">
-            <KpiCard
-              className="h-full"
-              icon={tile.icon}
-              label={tile.label}
-              value={tile.value}
-              sub={tile.sub}
-            />
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+  return <KpiGrid tiles={tiles} label={t.messages.period} />;
 }
 
 function Daily({ data }: { data: MessagesPageData }) {
@@ -236,7 +233,7 @@ function ByKind({ data }: { data: MessagesPageData }) {
 }
 
 function Queues({ queue }: { queue: QueueRow[] }) {
-  const { t, relative, dateTime } = useAdminUi();
+  const { t } = useAdminUi();
   const f = useReportFormat();
   const Q = t.messages.queue;
   const columns: DataTableColumn<QueueRow>[] = [
@@ -261,9 +258,7 @@ function Queues({ queue }: { queue: QueueRow[] }) {
       header: Q.oldest,
       cell: (r) =>
         r.oldestAt ? (
-          <span title={dateTime(r.oldestAt)} className="whitespace-nowrap" suppressHydrationWarning>
-            {relative(r.oldestAt)}
-          </span>
+          <Ago at={r.oldestAt} className="whitespace-nowrap" />
         ) : (
           <span className="text-muted">{Q.empty}</span>
         ),
@@ -320,17 +315,29 @@ function Errors({ data }: { data: MessagesPageData }) {
   );
 }
 
-function Failures({ rows }: { rows: FailureRow[] }) {
-  const { t, dateTime, can } = useAdminUi();
+/** How many of the latest failures show before "show all". */
+const FAILURES_FIRST = 10;
+
+function Failures({ rows: all }: { rows: FailureRow[] }) {
+  const { t, fmt, dateTime, can } = useAdminUi();
   const F = t.messages.failures;
+  const [open, setOpen] = useState(false);
+  const rows = open ? all : all.slice(0, FAILURES_FIRST);
   const invitation = (r: FailureRow) => (
-    <Link
-      href={`/app/admin/invitations/${r.invitationId}`}
-      title={F.openInvitation}
-      className="rounded-[4px] font-medium underline-offset-2 hover:underline"
-    >
-      <bdi>{r.title}</bdi>
-    </Link>
+    <span className="flex min-w-0 flex-col">
+      <bdi className="truncate font-medium">{r.title}</bdi>
+      {r.slug ? (
+        <bdi dir="ltr" className="truncate text-start text-[12px] text-muted">
+          /i/{r.slug}
+        </bdi>
+      ) : null}
+    </span>
+  );
+  const when = (r: FailureRow) => (
+    <span className="flex flex-col items-start gap-1">
+      <span className="whitespace-nowrap tabular-nums">{dateTime(r.at)}</span>
+      <Badge variant="neutral">{t.messages.kinds[r.kind]}</Badge>
+    </span>
   );
   const owner = (r: FailureRow) => (
     <PersonCell
@@ -348,11 +355,10 @@ function Failures({ rows }: { rows: FailureRow[] }) {
       <span className="text-muted">{t.messages.errors.noText}</span>
     );
   const columns: DataTableColumn<FailureRow>[] = [
-    { key: 'at', header: F.at, cell: (r) => dateTime(r.at), className: 'whitespace-nowrap tabular-nums' },
-    { key: 'kind', header: F.kind, cell: (r) => <Badge variant="neutral">{t.messages.kinds[r.kind]}</Badge> },
-    { key: 'invitation', header: F.invitation, cell: invitation, className: 'max-w-[180px] truncate' },
+    { key: 'at', header: F.at, cell: when },
+    { key: 'invitation', header: F.invitation, cell: invitation, className: 'max-w-[180px]' },
     { key: 'owner', header: F.owner, cell: owner, className: 'max-w-[200px]' },
-    { key: 'error', header: F.error, cell: error, className: 'min-w-[160px]' },
+    { key: 'error', header: F.error, cell: error, className: 'min-w-[180px]' },
   ];
   const empty = <p className="px-3 py-8 text-center text-[13px] text-muted">{F.none}</p>;
   return (
@@ -387,6 +393,22 @@ function Failures({ rows }: { rows: FailureRow[] }) {
             </li>
           ))}
         </ul>
+        {all.length > FAILURES_FIRST ? (
+          <div className="mt-3 flex justify-center">
+            <Hint text={open ? F.showFewerHelp : F.showAllHelp}>
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={open ? <ChevronUp /> : <ChevronDown />}
+                aria-expanded={open}
+                onClick={() => setOpen((v) => !v)}
+                data-testid="failures-more"
+              >
+                {open ? F.showFewer : fmt(F.showAll, { n: all.length })}
+              </Button>
+            </Hint>
+          </div>
+        ) : null}
       </div>
     </Section>
   );

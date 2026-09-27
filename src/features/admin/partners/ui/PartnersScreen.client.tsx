@@ -10,13 +10,21 @@ import {
   Field,
   Hint,
   Input,
-  KpiCard,
   type BadgeVariant,
   type DataTableColumn,
 } from '@/components/app';
 import { AdminPageHeader } from '../../ui/AdminShell.client';
 import { useAdminUi } from '../../ui/AdminUi.client';
-import { Definitions, Pager, PersonCell, Section, useReportFormat } from '../../ui/charts/parts.client';
+import {
+  Ago,
+  Definitions,
+  KpiGrid,
+  Pager,
+  PersonCell,
+  Section,
+  useReportFormat,
+  type Tile,
+} from '../../ui/charts/parts.client';
 import { StackedColumns } from '../../ui/charts/StackedColumns.client';
 import type { ApiCall, Opener, PartnerAccountRow, PartnersRaw } from '../model';
 import type { PartnersPageData } from '../server';
@@ -61,7 +69,7 @@ function Kpis({ overview }: { overview: PartnersRaw }) {
   const f = useReportFormat();
   const K = t.partners.kpi;
   const a = overview.accounts;
-  const tiles = [
+  const tiles: Tile[] = [
     {
       id: 'total',
       icon: <UsersRound />,
@@ -85,23 +93,7 @@ function Kpis({ overview }: { overview: PartnersRaw }) {
       sub: fmt(K.revenueSub, { amount: f.exact(a.revenueMonth) }),
     },
   ];
-  return (
-    <section aria-label={t.partners.title}>
-      <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 lg:grid-cols-4">
-        {tiles.map((tile) => (
-          <div key={tile.id} data-testid={`kpi-${tile.id}`} className="min-w-0">
-            <KpiCard
-              className="h-full"
-              icon={tile.icon}
-              label={tile.label}
-              value={tile.value}
-              sub={tile.sub}
-            />
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+  return <KpiGrid tiles={tiles} label={t.partners.title} />;
 }
 
 /** "Ronit Cohen (manager)", with the venue-owner note when the call didn't say. */
@@ -124,7 +116,7 @@ function OpenerName({ opener }: { opener: Pick<Opener, 'id' | 'name' | 'role' | 
 }
 
 function Openers({ overview }: { overview: PartnersRaw }) {
-  const { t, fmt, plural, relative } = useAdminUi();
+  const { t, fmt, plural } = useAdminUi();
   const f = useReportFormat();
   const O = t.partners.openers;
   type Row = PartnersRaw['openers'][number];
@@ -159,7 +151,7 @@ function Openers({ overview }: { overview: PartnersRaw }) {
     {
       key: 'last',
       header: O.last,
-      cell: (r) => <span suppressHydrationWarning>{relative(r.lastAt)}</span>,
+      cell: (r) => <Ago at={r.lastAt} />,
       className: 'whitespace-nowrap',
     },
   ];
@@ -408,15 +400,10 @@ function AccountsList({ rows }: { rows: PartnerAccountRow[] }) {
 // ─── the API's health ──────────────────────────────────────────────────────────────────────────
 
 function CallLine({ call, label }: { call: ApiCall; label: string }) {
-  const { dateTime, relative } = useAdminUi();
   return (
     <p className="text-[13px]">
       <span className="font-semibold">{label}: </span>
-      {/* (a relative time: the browser's clock may be a minute past the server's) */}
-      <span className="tabular-nums" title={dateTime(call.at)} suppressHydrationWarning>
-        {relative(call.at)}
-      </span>{' '}
-      ·{' '}
+      <Ago at={call.at} className="tabular-nums" /> ·{' '}
       <bdi dir="ltr" className="font-mono text-[12.5px]">
         {call.method} {call.endpoint} → {call.status}
         {call.code ? ` ${call.code}` : ''}

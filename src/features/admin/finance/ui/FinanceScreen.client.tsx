@@ -23,7 +23,6 @@ import {
   Field,
   Hint,
   Input,
-  KpiCard,
   Segmented,
   Select,
   type BadgeVariant,
@@ -32,7 +31,15 @@ import {
 import { PRODUCTS } from '@/features/billing/plans';
 import { AdminPageHeader } from '../../ui/AdminShell.client';
 import { useAdminUi } from '../../ui/AdminUi.client';
-import { Definitions, Pager, PersonCell, Section, useReportFormat } from '../../ui/charts/parts.client';
+import {
+  Definitions,
+  KpiGrid,
+  Pager,
+  PersonCell,
+  Section,
+  useReportFormat,
+  type Tile,
+} from '../../ui/charts/parts.client';
 import { StackedColumns } from '../../ui/charts/StackedColumns.client';
 import {
   filtersQuery,
@@ -71,11 +78,12 @@ export function FinanceScreen({ data }: { data: FinancePageData }) {
         <DailyIncome data={data} />
         <Forecast data={data} />
       </div>
-      <Monthly data={data} />
       <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <Subscriptions data={data} />
-        <Credits data={data} />
+        <AtRisk data={data} />
       </div>
+      <Monthly data={data} />
+      <Credits data={data} />
       <Payments data={data} />
       <Definitions
         title={F.definitions.title}
@@ -93,7 +101,7 @@ function Kpis({ data }: { data: FinancePageData }) {
   const F = t.finance.kpi;
   const k = data.view.kpis;
   const subs = data.view.subscriptions;
-  const tiles = [
+  const tiles: Tile[] = [
     {
       id: 'income',
       icon: <Wallet />,
@@ -118,7 +126,7 @@ function Kpis({ data }: { data: FinancePageData }) {
       id: 'arpu',
       icon: <UserRound />,
       label: F.arpu,
-      value: k.arpu === null ? '—' : f.exact(k.arpu),
+      value: k.arpu === null ? '—' : f.money(k.arpu),
       sub: k.arpu === null ? F.arpuNone : plural(F.arpuSub, k.payingCustomers),
     },
     {
@@ -132,7 +140,7 @@ function Kpis({ data }: { data: FinancePageData }) {
       id: 'whatsapp',
       icon: <MessageCircle />,
       label: F.whatsapp,
-      value: f.exact(k.whatsappIls),
+      value: f.money(k.whatsappIls),
       sub: fmt(F.whatsappSub, { usd: f.usd(k.whatsappUsd), rate: number(data.view.usdRate) }),
     },
     {
@@ -157,26 +165,7 @@ function Kpis({ data }: { data: FinancePageData }) {
       sub: F.cancellationsSub,
     },
   ];
-  return (
-    <section aria-labelledby="finance-kpis">
-      <h2 id="finance-kpis" className="sr-only">
-        {t.finance.kpis}
-      </h2>
-      <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 lg:grid-cols-4">
-        {tiles.map((tile) => (
-          <div key={tile.id} data-testid={`kpi-${tile.id}`} className="min-w-0">
-            <KpiCard
-              className="h-full"
-              icon={tile.icon}
-              label={tile.label}
-              value={<span className="break-words">{tile.value}</span>}
-              sub={tile.sub}
-            />
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+  return <KpiGrid tiles={tiles} label={t.finance.kpis} />;
 }
 
 // ─── income per day ────────────────────────────────────────────────────────────────────────────
@@ -225,63 +214,89 @@ function DailyIncome({ data }: { data: FinancePageData }) {
 // ─── what renews, what is at risk ──────────────────────────────────────────────────────────────
 
 function Forecast({ data }: { data: FinancePageData }) {
-  const { t, plural, date } = useAdminUi();
+  const { t, plural } = useAdminUi();
   const f = useReportFormat();
   const F = t.finance.forecast;
   const fc = data.view.forecast;
-  const k = data.view.kpis;
+  const top = Math.max(1, ...fc.weeks.map((w) => w.amount));
   return (
     <Section id="forecast" title={F.title}>
       <div data-testid="forecast" className="flex flex-col gap-4">
         <div>
           <p className="text-[13px] text-muted">{F.renewals}</p>
-          <p className="text-[26px] font-bold tabular-nums">{f.exact(fc.amount)}</p>
+          <p className="text-[28px] font-bold">{f.exact(fc.amount)}</p>
           <p className="text-[12.5px] text-muted">{plural(F.renewalsSub, fc.count)}</p>
         </div>
-        <ul className="flex flex-col gap-1.5">
+        <ul className="flex flex-col gap-2.5">
           {fc.weeks.map((w, i) => (
-            <li key={i} className="flex items-center justify-between gap-3 text-[13px]">
-              <span className="text-muted">{F.weeks[i]}</span>
-              <span className="tabular-nums">
-                {f.exact(w.amount)} <span className="text-muted">· {f.count(w.count)}</span>
+            <li key={i} className="flex flex-col gap-1 text-[13px]">
+              <span className="flex items-center justify-between gap-3">
+                <span className="text-muted">{F.weeks[i]}</span>
+                <span className="tabular-nums">
+                  {f.exact(w.amount)} <span className="text-muted">· {f.count(w.count)}</span>
+                </span>
+              </span>
+              <span aria-hidden className="flex h-1.5 overflow-hidden rounded-full bg-subtle">
+                <span
+                  className="h-full rounded-full"
+                  style={{ width: `${(w.amount / top) * 100}%`, background: INCOME }}
+                />
               </span>
             </li>
           ))}
         </ul>
-        <div className="border-t border-line pt-3">
-          <p className="text-[13px] font-semibold">{F.atRisk}</p>
-          <p className="mt-0.5 text-[12.5px] text-muted tabular-nums">
-            {F.pastDue}: {f.count(k.pastDue)} · {f.exact(k.pastDueMonthly)} — {F.late}: {f.count(k.late)} ·{' '}
-            {f.exact(k.lateMonthly)}
-          </p>
-          {data.view.atRisk.length ? (
-            <ul className="mt-2 flex flex-col divide-y divide-line" data-testid="at-risk">
-              {data.view.atRisk.map((r: AtRiskRow) => (
-                <li key={r.userId} className="flex items-center justify-between gap-3 py-2 text-[13px]">
-                  <PersonCell
-                    userId={r.userId}
-                    name={r.name}
-                    email={r.email}
-                    fallback={t.common.unknown}
-                    openLabel={t.finance.payments.open}
-                  />
-                  <span className="flex shrink-0 flex-col items-end gap-0.5">
-                    <Badge variant={r.why === 'past_due' ? 'danger' : 'warning'}>
-                      {r.why === 'past_due' ? F.pastDue : F.late}
-                    </Badge>
-                    <span className="text-[12px] text-muted tabular-nums">
-                      {t.finance.plans[r.plan]} · {f.exact(r.monthly)}
-                      {r.renewsAt ? ` · ${date(r.renewsAt)}` : ''}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-2 text-[13px] text-muted">{F.atRiskNone}</p>
-          )}
-        </div>
       </div>
+    </Section>
+  );
+}
+
+function AtRisk({ data }: { data: FinancePageData }) {
+  const { t, date } = useAdminUi();
+  const f = useReportFormat();
+  const F = t.finance.forecast;
+  const k = data.view.kpis;
+  return (
+    <Section
+      id="at-risk"
+      title={F.atRisk}
+      intro={
+        <span className="tabular-nums">
+          {F.pastDue}: {f.count(k.pastDue)} · {f.exact(k.pastDueMonthly)} — {F.late}: {f.count(k.late)} ·{' '}
+          {f.exact(k.lateMonthly)}
+        </span>
+      }
+    >
+      {data.view.atRisk.length ? (
+        <ul
+          className="-my-2 flex max-h-[360px] flex-col divide-y divide-line overflow-y-auto"
+          data-testid="at-risk"
+        >
+          {data.view.atRisk.map((r: AtRiskRow) => (
+            <li key={r.userId} className="flex items-center justify-between gap-3 py-2.5 text-[13px]">
+              <PersonCell
+                userId={r.userId}
+                name={r.name}
+                email={r.email}
+                fallback={t.common.unknown}
+                openLabel={t.finance.payments.open}
+              />
+              <span className="flex shrink-0 flex-col items-end gap-0.5">
+                <Badge variant={r.why === 'past_due' ? 'danger' : 'warning'}>
+                  {r.why === 'past_due' ? F.pastDue : F.late}
+                </Badge>
+                <span className="text-[12px] text-muted tabular-nums">
+                  {t.finance.plans[r.plan]} · {f.exact(r.monthly)}
+                  {r.renewsAt ? ` · ${date(r.renewsAt)}` : ''}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-[13px] text-muted" data-testid="at-risk">
+          {F.atRiskNone}
+        </p>
+      )}
     </Section>
   );
 }

@@ -2,9 +2,73 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
-import { Button, Card, cn, Hint } from '@/components/app';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
+import { Button, Card, cn, Hint, KpiCard } from '@/components/app';
 import { useAdminUi } from '../AdminUi.client';
+
+/**
+ * "5 minutes ago", counted in the browser: the page from the server has the exact time (the server's
+ * clock and its ICU differ from the browser's — Node writes "לפני שעה (1)"), the browser then says how
+ * long ago, and keeps it current every minute.
+ */
+export function Ago({ at, className }: { at: string; className?: string }) {
+  const { relative, dateTime } = useAdminUi();
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    const tick = () => setNow(Date.now());
+    const first = setTimeout(tick, 0);
+    const every = setInterval(tick, 60_000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(every);
+    };
+  }, []);
+  return (
+    <time dateTime={at} title={dateTime(at)} className={className}>
+      {now === null ? dateTime(at) : relative(at, now)}
+    </time>
+  );
+}
+
+/** A '{name}' template with elements in its places (the words around them stay text). */
+export function fmtNode(template: string, parts: Record<string, ReactNode>): ReactNode {
+  return template.split(/(\{\w+\})/).map((piece, i) => {
+    const key = /^\{(\w+)\}$/.exec(piece)?.[1];
+    return <Fragment key={i}>{key && key in parts ? parts[key] : piece}</Fragment>;
+  });
+}
+
+export interface Tile {
+  id: string;
+  icon: ReactNode;
+  label: string;
+  value: ReactNode;
+  sub?: ReactNode;
+}
+
+/**
+ * A screen's numbers as tiles: two a row on a phone (like the host app's insights), four from 1024px.
+ * A label too long for a phone's tile wraps instead of being cut (KpiCard truncates its label line).
+ */
+export function KpiGrid({ tiles, label }: { tiles: readonly Tile[]; label: string }) {
+  return (
+    <section aria-label={label}>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {tiles.map((tile) => (
+          <div key={tile.id} data-testid={`kpi-${tile.id}`} className="min-w-0">
+            <KpiCard
+              className="h-full"
+              icon={tile.icon}
+              label={<span className="whitespace-normal">{tile.label}</span>}
+              value={<span className="break-words">{tile.value}</span>}
+              sub={tile.sub}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 /**
  * The pieces the console's report screens share (cash flow, messages, Badook Events): a titled section
@@ -92,8 +156,8 @@ export function useReportFormat() {
       number(n, { notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 1 }),
     /** 27.9 */
     dayShort: (day: string) => date(day, { day: 'numeric', month: 'numeric' }),
-    /** Sun, 27 Sep */
-    dayLong: (day: string) => date(day, { weekday: 'short', day: 'numeric', month: 'short' }),
+    /** 27 Sep (no weekday: the server's and the browser's ICU punctuate it differently) */
+    dayLong: (day: string) => date(day, { day: 'numeric', month: 'short' }),
     /** Sep 2026 */
     month: (month: string) => date(`${month}-01`, { month: 'short', year: 'numeric' }),
   };
