@@ -274,7 +274,7 @@ describe('the spreadsheet', () => {
 
   it('Excel opens the Hebrew right: a BOM, Hebrew headers, Israel’s time, CRLF rows', () => {
     const csv = paymentsCsv(rows, paymentsCsvLabels('he'));
-    expect(csv.startsWith('﻿')).toBe(true);
+    expect(csv.startsWith('\uFEFF')).toBe(true);
     const lines = csv.slice(1).split('\r\n');
     expect(lines).toEqual([
       'תאריך,סוג,לקוח,מייל,מוצר,סכום (₪ כולל מע״מ),סטטוס,ספק,אסמכתה',

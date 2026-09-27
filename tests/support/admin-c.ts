@@ -72,11 +72,11 @@ const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
  * WCAG 2.1 AA (axe-core) on the console page's own content (#admin-main — the frame around it, its menu
  * and language switch, is the console's foundation): no violations.
  */
-export async function audit(page: Page, key: string) {
+export async function audit(page: Page, key: string, scope = '#admin-main') {
   // animations settled (the tiles' and the toasts')
   await page.waitForTimeout(300);
   const results = await new AxeBuilder({ page })
-    .include('#admin-main')
+    .include(scope)
     .options({ resultTypes: ['violations'] })
     .withTags(TAGS)
     .analyze();

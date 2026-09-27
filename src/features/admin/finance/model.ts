@@ -378,7 +378,7 @@ export function paymentsCsv(rows: readonly PaymentRow[], labels: PaymentsCsvLabe
     r.provider,
     r.ref ?? '',
   ]);
-  return '﻿' + [header, ...body].map((cells) => cells.map(csvCell).join(',')).join('\r\n') + '\r\n';
+  return '\uFEFF' + [header, ...body].map((cells) => cells.map(csvCell).join(',')).join('\r\n') + '\r\n';
 }
 
 /** badook-payments-2026-09-27.csv (an ASCII name: browsers keep it). */

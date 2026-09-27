@@ -15,16 +15,18 @@ import {
   X,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition, type FormEvent, type ReactNode } from 'react';
+import { useRef, useState, useTransition, type FormEvent, type ReactNode } from 'react';
 import {
   Badge,
   Button,
   DataTable,
+  Dialog,
   Field,
   Hint,
   Input,
   Segmented,
   Select,
+  useToast,
   type BadgeVariant,
   type DataTableColumn,
 } from '@/components/app';
@@ -429,17 +431,7 @@ function Payments({ data }: { data: FinancePageData }) {
   const query = filtersQuery(filters);
   const canExport = can('finance.export');
   const exportButton = canExport ? (
-    <Hint text={t.finance.export.help}>
-      <Button asChild variant="secondary" size="sm" icon={<Download />}>
-        <a
-          href={`/api/admin/finance/export${query ? `?${query}` : ''}`}
-          download
-          data-testid="finance-export"
-        >
-          {t.finance.export.button}
-        </a>
-      </Button>
-    </Hint>
+    <ExportDialog query={query} total={payments.total} />
   ) : (
     <Hint text={t.finance.export.help} disabledText={t.finance.export.denied}>
       <Button variant="secondary" size="sm" icon={<Download />} disabled data-testid="finance-export">
@@ -466,6 +458,77 @@ function Payments({ data }: { data: FinancePageData }) {
         nextHelp={t.common.next}
       />
     </Section>
+  );
+}
+
+/** At most this many rows go into one spreadsheet (admin_finance_export). */
+const EXPORT_MAX = 10_000;
+
+/**
+ * The export, said first: how many payments the file will hold, whether with the customers' contact
+ * details, and that it is recorded; then the download, and a toast.
+ */
+function ExportDialog({ query, total }: { query: string; total: number }) {
+  const { t, fmt, plural, number, can, dir } = useAdminUi();
+  const X = t.finance.export;
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const button = useRef<HTMLButtonElement>(null);
+  // (the dialog opens from this button: the focus goes back to it)
+  const close = () => {
+    setOpen(false);
+    requestAnimationFrame(() => button.current?.focus());
+  };
+  return (
+    <>
+      <Hint text={X.help}>
+        <Button
+          ref={button}
+          variant="secondary"
+          size="sm"
+          icon={<Download />}
+          aria-haspopup="dialog"
+          onClick={() => setOpen(true)}
+          data-testid="finance-export"
+        >
+          {X.button}
+        </Button>
+      </Hint>
+      <Dialog
+        open={open}
+        onOpenChange={(next) => (next ? setOpen(true) : close())}
+        dir={dir}
+        title={X.confirmTitle}
+        description={plural(X.confirmRows, Math.min(total, EXPORT_MAX))}
+        closeLabel={t.common.close}
+        footer={
+          <>
+            <Button variant="ghost" onClick={close}>
+              {t.common.cancel}
+            </Button>
+            <Button asChild icon={<Download />}>
+              <a
+                href={`/api/admin/finance/export${query ? `?${query}` : ''}`}
+                download
+                data-testid="finance-export-confirm"
+                onClick={() => {
+                  close();
+                  toast({ title: X.started, variant: 'success' });
+                }}
+              >
+                {X.confirm}
+              </a>
+            </Button>
+          </>
+        }
+      >
+        <ul className="flex list-disc flex-col gap-1.5 ps-5 text-[14px] text-ink">
+          <li>{can('users.pii') ? X.withContacts : X.withoutContacts}</li>
+          <li>{X.recorded}</li>
+          {total > EXPORT_MAX ? <li>{fmt(X.capped, { max: number(EXPORT_MAX) })}</li> : null}
+        </ul>
+      </Dialog>
+    </>
   );
 }
 

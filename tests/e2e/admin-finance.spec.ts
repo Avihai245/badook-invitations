@@ -74,15 +74,28 @@ test.describe('the cash flow', () => {
     await openConsole(page, `${march(tag)}&status=paid`);
     await expect(shown(page)).toHaveCount(4);
 
-    // the spreadsheet: every payment the filters match, Hebrew headers, Israel's time
+    // the spreadsheet: said first (how many, with contact details, recorded), then every payment the
+    // filters match, Hebrew headers, Israel's time
     await openConsole(page, march(tag));
+    await page.getByTestId('finance-export').click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toContainText('להוריד את התשלומים כקובץ?');
+    await expect(dialog).toContainText('בקובץ יהיו 5 תשלומים');
+    await expect(dialog).toContainText('כולל השם והמייל של כל לקוח');
+    await expect(dialog).toContainText('ההורדה נרשמת ביומן הפעולות');
+    // canceled: nothing, and back on the button
+    await dialog.getByRole('button', { name: 'ביטול' }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByTestId('finance-export')).toBeFocused();
+    await page.getByTestId('finance-export').click();
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.getByTestId('finance-export').click(),
+      page.getByTestId('finance-export-confirm').click(),
     ]);
+    await expect(page.getByText('הקובץ יורד.')).toBeVisible();
     expect(download.suggestedFilename()).toMatch(/^badook-payments-\d{4}-\d{2}-\d{2}\.csv$/);
     const csv = readFileSync((await download.path())!, 'utf8');
-    expect(csv.startsWith('﻿')).toBe(true);
+    expect(csv.startsWith('\uFEFF')).toBe(true);
     const lines = csv.slice(1).trim().split('\r\n');
     expect(lines[0]).toBe('תאריך,סוג,לקוח,מייל,מוצר,סכום (₪ כולל מע״מ),סטטוס,ספק,אסמכתה');
     expect(lines.slice(1)).toEqual([
@@ -109,9 +122,11 @@ test.describe('the cash flow', () => {
     await uiLanguage(page, 'en');
     await openConsole(page, march(tag));
     await expect(page.getByRole('heading', { level: 1, name: 'Cash flow' })).toBeVisible();
+    await page.getByTestId('finance-export').click();
+    await expect(page.getByRole('dialog')).toContainText('The file will hold 5 payments');
     const [english] = await Promise.all([
       page.waitForEvent('download'),
-      page.getByTestId('finance-export').click(),
+      page.getByTestId('finance-export-confirm').click(),
     ]);
     const en = readFileSync((await english.path())!, 'utf8')
       .slice(1)
@@ -222,5 +237,9 @@ test.describe('the cash flow', () => {
       await page.getByRole('radio', { name: lang === 'he' ? '90 ימים' : '90 days' }).click();
       await page.locator('#daily summary').click();
       await audit(page, `finance-${lang}-table`);
+      // the export's dialog
+      await page.getByTestId('finance-export').click();
+      await expect(page.getByRole('dialog')).toBeVisible();
+      await audit(page, `finance-${lang}-export`, '[role="dialog"]');
     });
 });
