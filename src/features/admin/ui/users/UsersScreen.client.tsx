@@ -10,6 +10,7 @@ import { AdminPageHeader } from '../AdminShell.client';
 import { useAdminUi } from '../AdminUi.client';
 import { ClearFilters, FilterSelect, FilterToggle } from '../core/Filters.client';
 import { Pager } from '../core/Pager.client';
+import { ScrollArea } from '../core/ScrollArea.client';
 import { SearchBox } from '../core/SearchBox.client';
 import { TimeAgo } from '../core/TimeAgo.client';
 import { planLabel, sourceLabel } from './labels';
@@ -93,7 +94,7 @@ export function UsersScreen({ data, query }: { data: Paged<UserRow>; query: User
             {row.phone}
           </span>
         ) : (
-          <span className="text-faint">{u.noPhone}</span>
+          <span className="text-muted">{u.noPhone}</span>
         ),
     },
     {
@@ -148,7 +149,7 @@ export function UsersScreen({ data, query }: { data: Paged<UserRow>; query: User
         row.lastSignInAt ? (
           <TimeAgo at={row.lastSignInAt} className="whitespace-nowrap" />
         ) : (
-          <span className="text-faint">{t.kit.never}</span>
+          <span className="text-muted">{t.kit.never}</span>
         ),
     },
   ];
@@ -237,13 +238,15 @@ export function UsersScreen({ data, query }: { data: Paged<UserRow>; query: User
       ) : (
         <>
           <Card className="hidden overflow-hidden md:block">
-            <DataTable
-              caption={u.title}
-              columns={columns}
-              rows={data.rows}
-              getRowKey={(row) => row.id}
-              rowData={(row) => ({ 'data-user': row.id })}
-            />
+            <ScrollArea label={u.title}>
+              <DataTable
+                caption={u.title}
+                columns={columns}
+                rows={data.rows}
+                getRowKey={(row) => row.id}
+                rowData={(row) => ({ 'data-user': row.id })}
+              />
+            </ScrollArea>
           </Card>
           <ul className="flex flex-col gap-2 md:hidden" data-testid="admin-users-cards">
             {data.rows.map((row) => (

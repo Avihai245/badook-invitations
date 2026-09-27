@@ -9,6 +9,7 @@ import { AdminPageHeader } from '../AdminShell.client';
 import { useAdminUi } from '../AdminUi.client';
 import { ActionDialog } from '../core/ActionDialog.client';
 import { adminCall } from '../core/post';
+import { ScrollArea } from '../core/ScrollArea.client';
 import { TimeAgo } from '../core/TimeAgo.client';
 
 const KINDS: readonly MessageKind[] = ['invitation', 'table', 'gallery'];
@@ -135,7 +136,7 @@ export function SystemScreen({ state, deployment: dep }: { state: SystemState; d
         </Section>
 
         <Section title={S.queues.title} intro={S.queues.intro} testId="admin-system-queues">
-          <div className="-mx-[18px] overflow-x-auto">
+          <ScrollArea label={S.queues.title} className="-mx-[18px]">
             <table className="w-full border-collapse text-[13px]">
               <caption className="sr-only">{S.queues.title}</caption>
               <thead>
@@ -181,7 +182,7 @@ export function SystemScreen({ state, deployment: dep }: { state: SystemState; d
                 })}
               </tbody>
             </table>
-          </div>
+          </ScrollArea>
         </Section>
 
         <Section title={S.services.title} intro={S.services.intro} testId="admin-system-services">

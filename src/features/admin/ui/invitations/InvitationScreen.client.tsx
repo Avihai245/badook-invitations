@@ -6,10 +6,12 @@ import { useState, type ReactNode } from 'react';
 import { Badge, Button, Card, DataTable, Hint, type DataTableColumn } from '@/components/app';
 import type { Feature, Package } from '@/features/flags/features';
 import { useUi } from '@/lib/i18n/client';
-import type { InvitationDetail, MessageKind, StatusCounts } from '../../server/core-db';
+import type { InvitationDetail } from '../../server/core-db';
 import { useAdminUi } from '../AdminUi.client';
 import { ActionDialog } from '../core/ActionDialog.client';
+import { anyMessages, MessagesTable } from '../core/MessagesTable.client';
 import { adminCall } from '../core/post';
+import { ScrollArea } from '../core/ScrollArea.client';
 import { STATUS_BADGE } from './InvitationsScreen.client';
 
 export interface FeatureItem {
@@ -20,16 +22,6 @@ export interface FeatureItem {
   /** the team turned it on beyond the plan */
   granted: boolean;
 }
-
-const KINDS: readonly MessageKind[] = ['invitation', 'table', 'gallery'];
-const STATUSES: readonly (keyof StatusCounts)[] = [
-  'queued',
-  'sending',
-  'sent',
-  'delivered',
-  'read',
-  'failed',
-];
 
 function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
@@ -65,8 +57,6 @@ export function InvitationScreen({
   const [open, setOpen] = useState(false);
   const featureName = (f: string) => F.names[f] ?? f;
   const eventName = (e: string) => (app.eventTypes as Record<string, string>)[e] ?? e;
-  const messages = KINDS.map((kind) => ({ kind, counts: inv.counts.messages[kind] }));
-  const anyMessages = messages.some((m) => STATUSES.some((s) => m.counts[s] > 0));
   const allowed = can('invitations.features');
 
   const columns: DataTableColumn<FeatureItem>[] = [
@@ -81,7 +71,7 @@ export function InvitationScreen({
       cell: (f) => (
         <span className="flex flex-col gap-1">
           <span className="flex flex-wrap gap-1">
-            <Badge variant={f.on ? 'live' : 'draft'}>{f.on ? F.on : F.off}</Badge>
+            <Badge variant={f.on ? 'live' : 'neutral'}>{f.on ? F.on : F.off}</Badge>
             {f.granted ? <Badge variant="info">{F.granted}</Badge> : null}
           </span>
           {!f.on && f.why ? <span className="text-[12px] text-muted">{F.why[f.why]}</span> : null}
@@ -168,7 +158,7 @@ export function InvitationScreen({
           </Hint>
         </div>
       </div>
-      <p className="mb-4 flex items-start gap-2 rounded-[12px] border border-line bg-subtle px-4 py-3 text-[13.5px] text-muted">
+      <p className="mb-4 flex items-start gap-2 rounded-[12px] border border-line bg-surface px-4 py-3 text-[13.5px] text-muted">
         <Lock aria-hidden className="mt-0.5 size-4 shrink-0" />
         {inv.status === 'published' ? P.readOnly : `${P.readOnly} ${P.notPublished}`}
       </p>
@@ -262,48 +252,8 @@ export function InvitationScreen({
 
       <Card padding="md" className="mt-4 min-w-0" data-testid="admin-invitation-messages">
         <h2 className="mb-2 text-[15px] font-bold">{P.messages}</h2>
-        {anyMessages ? (
-          <div className="-mx-[18px] overflow-x-auto">
-            <table className="w-full border-collapse text-[13px]">
-              <caption className="sr-only">{P.messages}</caption>
-              <thead>
-                <tr>
-                  <th
-                    scope="col"
-                    className="border-b border-line bg-canvas px-3 py-2.5 text-start font-semibold text-muted"
-                  >
-                    {P.kind}
-                  </th>
-                  {STATUSES.map((s) => (
-                    <th
-                      key={s}
-                      scope="col"
-                      className="border-b border-line bg-canvas px-3 py-2.5 text-center font-semibold whitespace-nowrap text-muted"
-                    >
-                      {P.statuses[s]}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {messages.map((m) => (
-                  <tr key={m.kind}>
-                    <th
-                      scope="row"
-                      className="border-b border-line px-3 py-2.5 text-start font-medium whitespace-nowrap"
-                    >
-                      {P.kinds[m.kind]}
-                    </th>
-                    {STATUSES.map((s) => (
-                      <td key={s} className="border-b border-line px-3 py-2.5 text-center tabular-nums">
-                        {number(m.counts[s])}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {anyMessages(inv.counts.messages) ? (
+          <MessagesTable counts={inv.counts.messages} caption={P.messages} className="-mx-[18px]" />
         ) : (
           <p className="py-2 text-[13.5px] text-muted">{P.noMessages}</p>
         )}
@@ -313,14 +263,15 @@ export function InvitationScreen({
         <Card padding="md" className="mt-4 min-w-0" data-testid="admin-invitation-features">
           <h2 className="text-[15px] font-bold">{F.title}</h2>
           <p className="mb-3 text-[13px] text-muted">{F.intro}</p>
-          <DataTable
-            caption={F.title}
-            columns={columns}
-            rows={features}
-            getRowKey={(f) => f.feature}
-            rowData={(f) => ({ 'data-feature': f.feature, 'data-on': String(f.on) })}
-            className="-mx-[18px]"
-          />
+          <ScrollArea label={F.title} className="-mx-[18px]">
+            <DataTable
+              caption={F.title}
+              columns={columns}
+              rows={features}
+              getRowKey={(f) => f.feature}
+              rowData={(f) => ({ 'data-feature': f.feature, 'data-on': String(f.on) })}
+            />
+          </ScrollArea>
         </Card>
       ) : null}
 

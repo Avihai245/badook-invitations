@@ -20,6 +20,7 @@ import { useAdminUi } from '../AdminUi.client';
 import { ClearFilters, FilterDate, FilterSelect } from '../core/Filters.client';
 import { Pager } from '../core/Pager.client';
 import { useQueryUpdater } from '../core/query';
+import { ScrollArea } from '../core/ScrollArea.client';
 import { SearchBox } from '../core/SearchBox.client';
 
 const FILTERS = ['q', 'status', 'eventType', 'template', 'lang', 'from', 'to', 'sort'] as const;
@@ -27,10 +28,11 @@ const LANGS = ['he', 'en', 'ru', 'ar', 'fr', 'es', 'am'] as const;
 /** Designs shown as counts on top (the rest: "and N more"). */
 const TOP_TEMPLATES = 8;
 
+/** An invitation's status pill (a draft is the neutral pill: the 'draft' pill's grey on grey is under 4.5:1). */
 export const STATUS_BADGE: Record<InvitationRow['status'], BadgeVariant> = {
-  draft: 'draft',
+  draft: 'neutral',
   published: 'live',
-  archived: 'neutral',
+  archived: 'warning',
 };
 
 /** A count on top that is also a filter: pressed while the list shows only its kind. */
@@ -334,13 +336,15 @@ export function InvitationsScreen({
       ) : (
         <>
           <Card className="hidden overflow-hidden md:block">
-            <DataTable
-              caption={I.title}
-              columns={columns}
-              rows={data.rows}
-              getRowKey={(row) => row.id}
-              rowData={(row) => ({ 'data-invitation': row.id })}
-            />
+            <ScrollArea label={I.title}>
+              <DataTable
+                caption={I.title}
+                columns={columns}
+                rows={data.rows}
+                getRowKey={(row) => row.id}
+                rowData={(row) => ({ 'data-invitation': row.id })}
+              />
+            </ScrollArea>
           </Card>
           <ul className="flex flex-col gap-2 md:hidden" data-testid="admin-invitations-cards">
             {data.rows.map((row) => (

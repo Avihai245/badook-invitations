@@ -20,6 +20,7 @@ import { AdminPageHeader } from '../AdminShell.client';
 import { useAdminUi } from '../AdminUi.client';
 import { ActionDialog } from '../core/ActionDialog.client';
 import { adminCall } from '../core/post';
+import { ScrollArea } from '../core/ScrollArea.client';
 import { TimeAgo } from '../core/TimeAgo.client';
 
 type State = 'active' | 'pending' | 'unconfirmed' | 'partner' | 'suspended';
@@ -33,9 +34,10 @@ export function memberState(m: StaffMember): State {
   return 'active';
 }
 
+// (not the 'draft' pill: its grey on grey is under 4.5:1)
 const STATE_BADGE: Record<State, BadgeVariant> = {
   active: 'live',
-  pending: 'draft',
+  pending: 'neutral',
   unconfirmed: 'warning',
   partner: 'danger',
   suspended: 'danger',
@@ -164,7 +166,7 @@ export function StaffScreen({ members }: { members: StaffMember[] }) {
             {m.addedBy}
           </span>
         ) : (
-          <span className="text-faint">—</span>
+          <span className="text-muted">—</span>
         ),
     },
     {
@@ -244,13 +246,15 @@ export function StaffScreen({ members }: { members: StaffMember[] }) {
         {plural(S.count, members.length, { count: number(members.length) })}
       </p>
       <Card className="overflow-hidden" data-testid="admin-staff-list">
-        <DataTable
-          caption={S.title}
-          columns={columns}
-          rows={members}
-          getRowKey={(m) => m.email}
-          rowData={(m) => ({ 'data-email': m.email, 'data-role': m.role })}
-        />
+        <ScrollArea label={S.title}>
+          <DataTable
+            caption={S.title}
+            columns={columns}
+            rows={members}
+            getRowKey={(m) => m.email}
+            rowData={(m) => ({ 'data-email': m.email, 'data-role': m.role })}
+          />
+        </ScrollArea>
       </Card>
 
       <section aria-labelledby="admin-roles" className="mt-8">
@@ -259,7 +263,7 @@ export function StaffScreen({ members }: { members: StaffMember[] }) {
         </h2>
         <p className="mb-3 text-[13px] text-muted">{S.matrix.intro}</p>
         <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
+          <ScrollArea label={S.matrix.title}>
             <table className="w-full border-collapse text-[13px]" data-testid="admin-permissions">
               <caption className="sr-only">{S.matrix.title}</caption>
               <thead>
@@ -291,12 +295,13 @@ export function StaffScreen({ members }: { members: StaffMember[] }) {
                       <td key={r} className="border-b border-line px-3 py-2.5 text-center">
                         {roleCan(r, p) ? (
                           <Check
+                            role="img"
                             aria-label={S.matrix.yes}
                             className="mx-auto size-4 text-success"
                             strokeWidth={2.5}
                           />
                         ) : (
-                          <Minus aria-label={S.matrix.no} className="mx-auto size-4 text-faint" />
+                          <Minus role="img" aria-label={S.matrix.no} className="mx-auto size-4 text-muted" />
                         )}
                       </td>
                     ))}
@@ -304,7 +309,7 @@ export function StaffScreen({ members }: { members: StaffMember[] }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollArea>
         </Card>
         <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {STAFF_ROLES.map((r) => (

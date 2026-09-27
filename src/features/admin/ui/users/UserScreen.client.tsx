@@ -3,32 +3,20 @@
 import { ArrowLeft, ArrowRight, ExternalLink, Gift, Percent, ShieldCheck, UserX } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Badge, Card, DataTable, Hint, type BadgeVariant, type DataTableColumn } from '@/components/app';
-import type { MessageKind, StatusCounts, UserDetail } from '../../server/core-db';
+import { Badge, Card, DataTable, Hint, type DataTableColumn } from '@/components/app';
+import type { UserDetail } from '../../server/core-db';
 import { useAdminUi } from '../AdminUi.client';
 import { describeAudit } from '../audit/describe';
 import { lastDayOf } from '../core/dates';
+import { anyMessages, MessagesTable } from '../core/MessagesTable.client';
+import { ScrollArea } from '../core/ScrollArea.client';
 import { TimeAgo } from '../core/TimeAgo.client';
+import { STATUS_BADGE } from '../invitations/InvitationsScreen.client';
 import { planLabel, sourceLabel } from './labels';
 import { UserActions } from './UserActions.client';
 
 type Invitation = UserDetail['invitations'][number];
 type LedgerRow = UserDetail['credits']['ledger'][number];
-
-const STATUS_BADGE: Record<Invitation['status'], BadgeVariant> = {
-  draft: 'draft',
-  published: 'live',
-  archived: 'neutral',
-};
-const KINDS: readonly MessageKind[] = ['invitation', 'table', 'gallery'];
-const STATUSES: readonly (keyof StatusCounts)[] = [
-  'queued',
-  'sending',
-  'sent',
-  'delivered',
-  'read',
-  'failed',
-];
 
 /** A labelled value of the details (a description list's row). */
 function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
@@ -211,9 +199,6 @@ export function UserScreen({
     })),
   ].sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
 
-  const messages = KINDS.map((kind) => ({ kind, counts: user.messages[kind] }));
-  const anyMessages = messages.some((m) => STATUSES.some((s) => m.counts[s] > 0));
-
   return (
     <>
       <Link
@@ -281,7 +266,7 @@ export function UserScreen({
                     {user.phone}
                   </span>
                 ) : (
-                  <span className="text-faint">{u.noPhone}</span>
+                  <span className="text-muted">{u.noPhone}</span>
                 )}
               </Row>
               <Row label={P.source}>
@@ -398,13 +383,14 @@ export function UserScreen({
       <div className="mt-4 flex flex-col gap-4">
         <Section title={P.ledger} testId="admin-user-ledger">
           {user.credits.ledger.length ? (
-            <DataTable
-              caption={P.ledger}
-              columns={ledgerColumns}
-              rows={user.credits.ledger}
-              getRowKey={(l) => l.id}
-              className="-mx-[18px]"
-            />
+            <ScrollArea label={P.ledger} className="-mx-[18px]">
+              <DataTable
+                caption={P.ledger}
+                columns={ledgerColumns}
+                rows={user.credits.ledger}
+                getRowKey={(l) => l.id}
+              />
+            </ScrollArea>
           ) : (
             <p className="py-2 text-[13.5px] text-muted">{P.ledgerEmpty}</p>
           )}
@@ -412,61 +398,22 @@ export function UserScreen({
 
         <Section title={P.invitations} testId="admin-user-invitations">
           {user.invitations.length ? (
-            <DataTable
-              caption={P.invitations}
-              columns={invitationColumns}
-              rows={user.invitations}
-              getRowKey={(i) => i.id}
-              className="-mx-[18px]"
-            />
+            <ScrollArea label={P.invitations} className="-mx-[18px]">
+              <DataTable
+                caption={P.invitations}
+                columns={invitationColumns}
+                rows={user.invitations}
+                getRowKey={(i) => i.id}
+              />
+            </ScrollArea>
           ) : (
             <p className="py-2 text-[13.5px] text-muted">{P.invitationsEmpty}</p>
           )}
         </Section>
 
         <Section title={P.messages} testId="admin-user-messages">
-          {anyMessages ? (
-            <div className="-mx-[18px] overflow-x-auto">
-              <table className="w-full border-collapse text-[13px]">
-                <caption className="sr-only">{P.messages}</caption>
-                <thead>
-                  <tr>
-                    <th
-                      scope="col"
-                      className="border-b border-line bg-canvas px-3 py-2.5 text-start font-semibold text-muted"
-                    >
-                      {t.invitations.page.kind}
-                    </th>
-                    {STATUSES.map((s) => (
-                      <th
-                        key={s}
-                        scope="col"
-                        className="border-b border-line bg-canvas px-3 py-2.5 text-center font-semibold whitespace-nowrap text-muted"
-                      >
-                        {t.invitations.page.statuses[s]}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {messages.map((m) => (
-                    <tr key={m.kind}>
-                      <th
-                        scope="row"
-                        className="border-b border-line px-3 py-2.5 text-start font-medium whitespace-nowrap"
-                      >
-                        {t.invitations.page.kinds[m.kind]}
-                      </th>
-                      {STATUSES.map((s) => (
-                        <td key={s} className="border-b border-line px-3 py-2.5 text-center tabular-nums">
-                          {number(m.counts[s])}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          {anyMessages(user.messages) ? (
+            <MessagesTable counts={user.messages} caption={P.messages} className="-mx-[18px]" />
           ) : (
             <p className="py-2 text-[13.5px] text-muted">{P.messagesEmpty}</p>
           )}
@@ -523,7 +470,7 @@ export function UserScreen({
                             {fmt(t.audit.reason, { reason: line.reason })}
                           </p>
                         ) : null}
-                        <p className="text-[12px] text-faint">
+                        <p className="text-[12px] text-muted">
                           <TimeAgo at={row.at} />
                         </p>
                       </li>
