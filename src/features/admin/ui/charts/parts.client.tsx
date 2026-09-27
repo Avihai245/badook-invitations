@@ -65,8 +65,15 @@ export function Definitions({ title, lines }: { title: string; lines: readonly s
 /** Money, percentages, days and months as the console writes them. */
 export function useReportFormat() {
   const { number, money, date } = useAdminUi();
+  // (the fraction digits spelled out: ICU builds differ in the currency's default, server and browser)
   const compactMoney = (n: number) =>
-    number(n, { style: 'currency', currency: 'ILS', notation: 'compact', maximumFractionDigits: 1 });
+    number(n, {
+      style: 'currency',
+      currency: 'ILS',
+      notation: 'compact',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    });
   return {
     /** to the agora: ₪39.20 */
     exact: (n: number) =>
@@ -81,7 +88,8 @@ export function useReportFormat() {
     signedPct: (x: number) =>
       number(x, { style: 'percent', maximumFractionDigits: 0, signDisplay: 'exceptZero' }),
     count: (n: number) => number(n),
-    compactCount: (n: number) => number(n, { notation: 'compact', maximumFractionDigits: 1 }),
+    compactCount: (n: number) =>
+      number(n, { notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 1 }),
     /** 27.9 */
     dayShort: (day: string) => date(day, { day: 'numeric', month: 'numeric' }),
     /** Sun, 27 Sep */

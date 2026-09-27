@@ -156,7 +156,12 @@ function Openers({ overview }: { overview: PartnersRaw }) {
       cell: (r) => (r.venues.length ? r.venues.join(', ') : '—'),
       className: 'max-w-[200px] truncate',
     },
-    { key: 'last', header: O.last, cell: (r) => relative(r.lastAt), className: 'whitespace-nowrap' },
+    {
+      key: 'last',
+      header: O.last,
+      cell: (r) => <span suppressHydrationWarning>{relative(r.lastAt)}</span>,
+      className: 'whitespace-nowrap',
+    },
   ];
   return (
     <Section id="openers" title={O.title} intro={O.intro}>
@@ -407,7 +412,8 @@ function CallLine({ call, label }: { call: ApiCall; label: string }) {
   return (
     <p className="text-[13px]">
       <span className="font-semibold">{label}: </span>
-      <span className="tabular-nums" title={dateTime(call.at)}>
+      {/* (a relative time: the browser's clock may be a minute past the server's) */}
+      <span className="tabular-nums" title={dateTime(call.at)} suppressHydrationWarning>
         {relative(call.at)}
       </span>{' '}
       ·{' '}

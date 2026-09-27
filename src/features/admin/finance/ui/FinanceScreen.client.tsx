@@ -466,77 +466,74 @@ function PaymentFiltersForm({ filters, providers }: { filters: PaymentFilters; p
   };
   const any = Object.values(filters).some((v) => v !== undefined);
   return (
-    <form
-      onSubmit={submit}
-      aria-label={F.label}
-      className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8"
-      data-testid="payment-filters"
-    >
-      <Field label={F.kind}>
-        <Select value={draft.kind ?? ''} onChange={(e) => set('kind', e.target.value)} name="kind">
-          <option value="">{F.all}</option>
-          <option value="purchase">{t.finance.kinds.purchase}</option>
-          <option value="renewal">{t.finance.kinds.renewal}</option>
-        </Select>
-      </Field>
-      <Field label={F.status}>
-        <Select value={draft.status ?? ''} onChange={(e) => set('status', e.target.value)} name="status">
-          <option value="">{F.allStatuses}</option>
-          {(['paid', 'failed', 'canceled', 'pending'] as const).map((s) => (
-            <option key={s} value={s}>
-              {t.finance.statuses[s]}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <Field label={F.product}>
-        <Select value={draft.product ?? ''} onChange={(e) => set('product', e.target.value)} name="product">
-          <option value="">{F.all}</option>
-          {PRODUCTS.map((p) => (
-            <option key={p} value={p}>
-              {t.finance.products[p]}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <Field label={F.provider}>
-        <Select
-          value={draft.provider ?? ''}
-          onChange={(e) => set('provider', e.target.value)}
-          name="provider"
-        >
-          <option value="">{F.all}</option>
-          {providers.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <Field label={F.from}>
-        <Input
-          type="date"
-          value={draft.from ?? ''}
-          onChange={(e) => set('from', e.target.value)}
-          name="from"
-        />
-      </Field>
-      <Field label={F.to}>
-        <Input type="date" value={draft.to ?? ''} onChange={(e) => set('to', e.target.value)} name="to" />
-      </Field>
-      <Field label={F.search} className="col-span-2 md:col-span-1 xl:col-span-1">
-        <Input
-          type="search"
-          value={draft.q ?? ''}
-          onChange={(e) => set('q', e.target.value)}
-          placeholder={can('users.pii') ? F.searchPlaceholderPii : F.searchPlaceholder}
-          maxLength={100}
-          name="q"
-        />
-      </Field>
-      <div className="col-span-2 flex items-end gap-2 md:col-span-1">
+    <form onSubmit={submit} aria-label={F.label} data-testid="payment-filters">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 2xl:grid-cols-7">
+        <Field label={F.kind}>
+          <Select value={draft.kind ?? ''} onChange={(e) => set('kind', e.target.value)} name="kind">
+            <option value="">{F.all}</option>
+            <option value="purchase">{t.finance.kinds.purchase}</option>
+            <option value="renewal">{t.finance.kinds.renewal}</option>
+          </Select>
+        </Field>
+        <Field label={F.status}>
+          <Select value={draft.status ?? ''} onChange={(e) => set('status', e.target.value)} name="status">
+            <option value="">{F.allStatuses}</option>
+            {(['paid', 'failed', 'canceled', 'pending'] as const).map((s) => (
+              <option key={s} value={s}>
+                {t.finance.statuses[s]}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label={F.product}>
+          <Select value={draft.product ?? ''} onChange={(e) => set('product', e.target.value)} name="product">
+            <option value="">{F.all}</option>
+            {PRODUCTS.map((p) => (
+              <option key={p} value={p}>
+                {t.finance.products[p]}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label={F.provider}>
+          <Select
+            value={draft.provider ?? ''}
+            onChange={(e) => set('provider', e.target.value)}
+            name="provider"
+          >
+            <option value="">{F.all}</option>
+            {providers.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label={F.from}>
+          <Input
+            type="date"
+            value={draft.from ?? ''}
+            onChange={(e) => set('from', e.target.value)}
+            name="from"
+          />
+        </Field>
+        <Field label={F.to}>
+          <Input type="date" value={draft.to ?? ''} onChange={(e) => set('to', e.target.value)} name="to" />
+        </Field>
+        <Field label={F.search} className="col-span-2 md:col-span-2 2xl:col-span-1">
+          <Input
+            type="search"
+            value={draft.q ?? ''}
+            onChange={(e) => set('q', e.target.value)}
+            placeholder={can('users.pii') ? F.searchPlaceholderPii : F.searchPlaceholder}
+            maxLength={100}
+            name="q"
+          />
+        </Field>
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <Hint text={F.applyHelp}>
-          <Button type="submit" size="md" icon={<Filter />} loading={pending} className="flex-1">
+          <Button type="submit" size="md" icon={<Filter />} loading={pending}>
             {F.apply}
           </Button>
         </Hint>

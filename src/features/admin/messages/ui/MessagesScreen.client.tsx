@@ -119,7 +119,12 @@ function Kpis({ data }: { data: MessagesPageData }) {
       icon: <Hourglass />,
       label: K.queue,
       value: f.count(pending),
-      sub: oldest ? fmt(K.queueOldest, { since: relative(oldest) }) : K.queueEmpty,
+      // (a relative time: the browser's clock may be a minute past the server's)
+      sub: oldest ? (
+        <span suppressHydrationWarning>{fmt(K.queueOldest, { since: relative(oldest) })}</span>
+      ) : (
+        K.queueEmpty
+      ),
     },
     {
       id: 'cost',
@@ -256,7 +261,7 @@ function Queues({ queue }: { queue: QueueRow[] }) {
       header: Q.oldest,
       cell: (r) =>
         r.oldestAt ? (
-          <span title={dateTime(r.oldestAt)} className="whitespace-nowrap">
+          <span title={dateTime(r.oldestAt)} className="whitespace-nowrap" suppressHydrationWarning>
             {relative(r.oldestAt)}
           </span>
         ) : (
