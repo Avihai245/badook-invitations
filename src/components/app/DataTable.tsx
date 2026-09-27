@@ -19,7 +19,13 @@ export type DataTableColumn<T> = {
   width?: number | string;
   /** Extra classes for this column's cells (e.g. truncation). */
   className?: string;
+  /** A column of less weight, shown only from this width (a wide table stays whole on smaller screens). */
+  hideBelow?: 'xl' | '2xl';
 };
+
+/** (static class names, for Tailwind to see) */
+const HIDE_BELOW = { xl: 'max-xl:hidden', '2xl': 'max-2xl:hidden' } as const;
+const hideOf = <T,>(c: DataTableColumn<T>) => (c.hideBelow ? HIDE_BELOW[c.hideBelow] : undefined);
 
 export type DataTableProps<T> = {
   columns: readonly DataTableColumn<T>[];
@@ -89,6 +95,7 @@ export function DataTable<T>({
                 className={cn(
                   'border-b border-line bg-canvas px-3 py-2.5 font-semibold whitespace-nowrap text-muted',
                   alignOf(c),
+                  hideOf(c),
                 )}
               >
                 {c.header}
@@ -101,7 +108,7 @@ export function DataTable<T>({
             Array.from({ length: skeletonRows }, (_, i) => (
               <tr key={`skeleton-${i}`}>
                 {columns.map((c, ci) => (
-                  <td key={c.key} className="border-b border-line p-3 align-middle">
+                  <td key={c.key} className={cn('border-b border-line p-3 align-middle', hideOf(c))}>
                     <Skeleton
                       shape="line"
                       width={c.numeric ? 20 : ci === 0 ? '70%' : '50%'}
@@ -139,6 +146,7 @@ export function DataTable<T>({
                       alignOf(c),
                       c.numeric && 'tabular-nums',
                       c.className,
+                      hideOf(c),
                     )}
                   >
                     {onRowClick && ci === 0 ? (

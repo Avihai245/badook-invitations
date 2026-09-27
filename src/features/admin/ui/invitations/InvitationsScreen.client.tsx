@@ -135,6 +135,7 @@ export function InvitationsScreen({
     },
     {
       key: 'template',
+      hideBelow: '2xl',
       header: I.columns.template,
       cell: (row) => <span className="whitespace-nowrap">{templateName(row.templateId)}</span>,
     },
@@ -152,11 +153,13 @@ export function InvitationsScreen({
     },
     {
       key: 'created',
+      hideBelow: '2xl',
       header: I.columns.created,
       cell: (row) => <span className="whitespace-nowrap">{date(row.createdAt)}</span>,
     },
     {
       key: 'published',
+      hideBelow: '2xl',
       header: I.columns.published,
       cell: (row) => (
         <span className="whitespace-nowrap">{row.publishedAt ? date(row.publishedAt) : I.never}</span>

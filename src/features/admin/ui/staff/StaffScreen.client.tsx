@@ -95,12 +95,8 @@ export function StaffScreen({ members }: { members: StaffMember[] }) {
       header: S.columns.member,
       cell: (m) => (
         <span className="flex min-w-[180px] flex-col">
-          <span
-            dir="ltr"
-            className="text-start font-semibold [overflow-wrap:anywhere]"
-            data-testid="admin-staff-email"
-          >
-            {m.email}
+          <span className="font-semibold [overflow-wrap:anywhere]" data-testid="admin-staff-email">
+            <bdi dir="ltr">{m.email}</bdi>
           </span>
           {m.email === staff.email ? <span className="text-[12px] text-muted">{S.you}</span> : null}
           {m.note ? <span className="text-[12px] text-muted">{m.note}</span> : null}

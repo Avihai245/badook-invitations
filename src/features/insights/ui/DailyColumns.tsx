@@ -10,9 +10,9 @@ const TOP = 10;
 const BOTTOM = 24;
 
 /** Chart chrome (the app's hairlines and muted ink — see features/event-day/ui/live/Timeline.tsx). */
-const GRID = '#e7e5e4';
-const BASELINE = '#d6d3d1';
-const AXIS_TEXT = '#78716c';
+const GRID = 'var(--color-line)';
+const BASELINE = 'var(--color-line-strong)';
+const AXIS_TEXT = 'var(--color-muted)';
 
 export interface DailyPoint {
   day: string;
@@ -91,7 +91,7 @@ export function DailyColumns({
                 x2={W - RIGHT}
                 y1={y}
                 y2={y}
-                stroke={v === 0 ? BASELINE : GRID}
+                style={{ stroke: v === 0 ? BASELINE : GRID }}
                 strokeWidth={1}
               />
               <text
@@ -100,7 +100,7 @@ export function DailyColumns({
                 fontSize={11}
                 textAnchor="end"
                 dominantBaseline="central"
-                fill={AXIS_TEXT}
+                style={{ fill: AXIS_TEXT }}
               >
                 {number(v)}
               </text>
@@ -129,7 +129,7 @@ export function DailyColumns({
               {p.value > 0 ? (
                 <path
                   d={`M ${x} ${TOP + plotH} V ${y + r} Q ${x} ${y} ${x + r} ${y} H ${x + barW - r} Q ${x + barW} ${y} ${x + barW} ${y + r} V ${TOP + plotH} Z`}
-                  fill={hover === i ? hoverColor : color}
+                  style={{ fill: hover === i ? hoverColor : color }}
                 />
               ) : null}
               {i % labelEvery === 0 ? (
@@ -138,7 +138,7 @@ export function DailyColumns({
                   y={H - 7}
                   fontSize={11}
                   textAnchor="middle"
-                  fill={AXIS_TEXT}
+                  style={{ fill: AXIS_TEXT }}
                 >
                   {dayLabel(p.day)}
                 </text>

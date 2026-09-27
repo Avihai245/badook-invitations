@@ -50,7 +50,7 @@ export function SearchBox({
       maxLength={100}
       onChange={(e) => setValue(e.target.value)}
       icon={<Search />}
-      wrapperClassName="min-w-0 flex-1 sm:min-w-[260px]"
+      wrapperClassName="min-w-full flex-1 sm:min-w-[260px]"
       data-testid={testId}
     />
   );

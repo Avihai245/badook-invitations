@@ -277,7 +277,7 @@ export function UnitDialog({
               checked={settings.accessible}
               onCheckedChange={(accessible) => onSettings({ accessible })}
             />
-            <Accessibility aria-hidden className="size-4 text-[#2563eb]" />
+            <Accessibility aria-hidden className="size-4 text-info" />
             {u.accessible}
           </label>
         </fieldset>

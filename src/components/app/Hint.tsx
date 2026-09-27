@@ -104,7 +104,7 @@ export function Hint({
           className="z-[80] max-w-[280px] rounded-[10px] bg-inverse px-3 py-2 text-[12.5px] leading-[1.45] text-white shadow-lg data-[state=delayed-open]:animate-app-fade-in motion-reduce:animate-none"
         >
           {disabled && disabledText != null ? disabledText : text}
-          <Tooltip.Arrow className="fill-ink" width={10} height={5} />
+          <Tooltip.Arrow className="fill-inverse" width={10} height={5} />
         </Tooltip.Content>
       </Tooltip.Portal>
     </Tooltip.Root>

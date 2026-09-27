@@ -503,7 +503,7 @@ function ProjectorCard({
 function GalleryArt({ large = false }: { large?: boolean }) {
   return (
     <svg viewBox="0 0 120 120" fill="none" className={large ? 'size-40' : undefined} aria-hidden>
-      <circle cx="60" cy="60" r="44" fill="#F6EDE1" />
+      <circle cx="60" cy="60" r="44" style={{ fill: 'var(--color-brand-soft)' }} />
       <rect
         x="30"
         y="34"
@@ -511,7 +511,7 @@ function GalleryArt({ large = false }: { large?: boolean }) {
         height="54"
         rx="4"
         transform="rotate(-8 52 61)"
-        fill="#fff"
+        style={{ fill: 'var(--color-surface)' }}
         stroke="#A0703F"
         strokeWidth="2"
       />
@@ -522,12 +522,16 @@ function GalleryArt({ large = false }: { large?: boolean }) {
         height="54"
         rx="4"
         transform="rotate(7 68 57)"
-        fill="#fff"
+        style={{ fill: 'var(--color-surface)' }}
         stroke="#A0703F"
         strokeWidth="2"
       />
-      <path d="M54 70l8-10 7 8 5-5 9 11H54z" fill="#EAD8C0" transform="rotate(7 68 57)" />
-      <circle cx="78" cy="46" r="4" fill="#EAD8C0" transform="rotate(7 68 57)" />
+      <path
+        d="M54 70l8-10 7 8 5-5 9 11H54z"
+        style={{ fill: 'var(--color-brand-line)' }}
+        transform="rotate(7 68 57)"
+      />
+      <circle cx="78" cy="46" r="4" style={{ fill: 'var(--color-brand-line)' }} transform="rotate(7 68 57)" />
     </svg>
   );
 }

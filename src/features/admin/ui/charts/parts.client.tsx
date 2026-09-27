@@ -137,8 +137,9 @@ export function ScrollRegion({
 }
 
 /**
- * For a Segmented switch on these screens: its options not chosen in a darker gray (stone-600, 7:1 on
- * the track — the muted gray reaches only 4.4:1 there, under WCAG AA's 4.5:1 for text this size).
+ * For a Segmented switch on these screens: its options not chosen a step darker than muted (ink at
+ * 75%, 7:1 on the track in either look — the muted gray reaches only 4.4:1 there, under WCAG AA's 4.5:1
+ * for text this size).
  */
 export const SWITCH_CONTRAST = '[&>[aria-checked=false]]:text-ink/75';
 

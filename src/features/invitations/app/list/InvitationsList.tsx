@@ -429,7 +429,7 @@ function InvitationCard({
                 className={cn(
                   'mt-3 inline-flex max-w-full items-center gap-1.5 self-start rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors',
                   next.key === 'republish'
-                    ? 'bg-warning-bg text-warning hover:bg-[#fef3c7]'
+                    ? 'bg-warning-bg text-warning hover:bg-[#fef3c7] dark:hover:bg-warning-line'
                     : 'bg-brand-soft text-brand-deep hover:bg-brand hover:text-white',
                 )}
               >

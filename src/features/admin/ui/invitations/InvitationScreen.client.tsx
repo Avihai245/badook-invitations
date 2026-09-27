@@ -212,8 +212,9 @@ export function InvitationScreen({
           <h2 className="mb-2 text-[15px] font-bold">{P.numbers}</h2>
           <dl>
             <Row label={P.guests}>
-              <span className="tabular-nums">{number(inv.counts.guests)}</span>
-              <span className="ms-2 text-[12.5px] text-muted">
+              <bdi className="tabular-nums">{number(inv.counts.guests)}</bdi>
+              {/* (an inline-block of its own: its number never runs into the one before it) */}
+              <span className="ms-2 inline-block text-[12.5px] text-muted">
                 {fmt(P.withPhone, { n: number(inv.counts.guestsWithPhone) })}
               </span>
             </Row>

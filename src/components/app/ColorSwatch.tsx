@@ -17,7 +17,7 @@ export type ColorSwatchProps = Omit<ComponentProps<'button'>, 'color' | 'childre
 // Selected = 2px ink ring with a 2px surface gap; the focus outline sits outside the ring.
 const swatchClass = (selected: boolean) =>
   cn(
-    'inline-block shrink-0 rounded-full border border-black/8 transition-shadow duration-150 motion-reduce:transition-none',
+    'inline-block shrink-0 rounded-full border border-black/8 transition-shadow dark:border-white/25 duration-150 motion-reduce:transition-none',
     'focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-50',
     selected && 'ring-2 ring-ink ring-offset-2 ring-offset-surface',
   );
@@ -119,7 +119,7 @@ export function PaletteDots({ palette, label, size = 14, className }: PaletteDot
       {[palette.bg, palette.accent, palette.ink].map((color, index) => (
         <span
           key={index}
-          className="shrink-0 rounded-full border border-black/8"
+          className="shrink-0 rounded-full border border-black/8 dark:border-white/25"
           style={{ backgroundColor: color, width: size, height: size }}
         />
       ))}

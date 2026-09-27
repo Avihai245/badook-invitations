@@ -45,10 +45,15 @@ import type { InsightsView } from '../server/api';
 import { DailyColumns } from './DailyColumns';
 
 /** The chart colors, validated for this white surface (the dataviz method's slots 1 and 2). */
-const VISITS = { color: '#2a78d6', hover: '#1c5cab' };
-const REPLIES = { color: '#eb6834', hover: '#c24d1f' };
+const VISITS = { color: 'var(--color-chart-1)', hover: 'var(--color-chart-1-hover)' };
+const REPLIES = { color: 'var(--color-chart-2)', hover: 'var(--color-chart-2-hover)' };
 /** The funnel's ordered steps: one hue, light → dark (validated as an ordinal ramp). */
-const FUNNEL_RAMP = ['#86b6ef', '#5598e7', '#2a78d6', '#1c5cab'] as const;
+const FUNNEL_RAMP = [
+  'var(--color-funnel-1)',
+  'var(--color-funnel-2)',
+  'var(--color-funnel-3)',
+  'var(--color-funnel-4)',
+] as const;
 
 export interface InsightsPageData {
   id: string;
@@ -590,13 +595,22 @@ export function InsightsScreen({ initial }: { initial: InsightsPageData }) {
 function InsightsArt() {
   return (
     <svg viewBox="0 0 120 120" fill="none" aria-hidden>
-      <circle cx="60" cy="60" r="44" fill="#F6EDE1" />
-      <rect x="32" y="40" width="56" height="42" rx="5" fill="#fff" stroke="#A0703F" strokeWidth="2" />
+      <circle cx="60" cy="60" r="44" style={{ fill: 'var(--color-brand-soft)' }} />
+      <rect
+        x="32"
+        y="40"
+        width="56"
+        height="42"
+        rx="5"
+        style={{ fill: 'var(--color-surface)' }}
+        stroke="#A0703F"
+        strokeWidth="2"
+      />
       <path d="M32 44l28 20 28-20" stroke="#A0703F" strokeWidth="2" strokeLinejoin="round" />
-      <rect x="40" y="74" width="6" height="14" rx="2" fill="#86b6ef" />
-      <rect x="52" y="66" width="6" height="22" rx="2" fill="#5598e7" />
-      <rect x="64" y="58" width="6" height="30" rx="2" fill="#2a78d6" />
-      <rect x="76" y="70" width="6" height="18" rx="2" fill="#1c5cab" />
+      <rect x="40" y="74" width="6" height="14" rx="2" style={{ fill: 'var(--color-funnel-1)' }} />
+      <rect x="52" y="66" width="6" height="22" rx="2" style={{ fill: 'var(--color-funnel-2)' }} />
+      <rect x="64" y="58" width="6" height="30" rx="2" style={{ fill: 'var(--color-funnel-3)' }} />
+      <rect x="76" y="70" width="6" height="18" rx="2" style={{ fill: 'var(--color-funnel-4)' }} />
     </svg>
   );
 }

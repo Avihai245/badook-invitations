@@ -58,7 +58,7 @@ export function HeatMap({
     );
   return (
     <figure className="m-0">
-      <div className="overflow-hidden rounded-card border border-line bg-[#f4f2ee]">
+      <div className="overflow-hidden rounded-card border border-line bg-[#f4f2ee] dark:bg-canvas-editor">
         <svg
           ref={svg}
           viewBox={`${box.x - pad} ${box.y - pad} ${viewW} ${viewH}`}
@@ -67,7 +67,9 @@ export function HeatMap({
           aria-label={h.mapLabel}
           data-testid="live-heatmap"
         >
-          {size ? <rect x={0} y={0} width={size.w} height={size.h} fill="#ffffff" /> : null}
+          {size ? (
+            <rect x={0} y={0} width={size.w} height={size.h} style={{ fill: 'var(--color-surface)' }} />
+          ) : null}
           {planUrl && size ? (
             <image
               href={planUrl}

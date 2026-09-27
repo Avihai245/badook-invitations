@@ -148,7 +148,7 @@ export function InvitationWorkspace({
                     }),
                   }}
                   joiner={item.hosts.joiner?.[loc] || '&'}
-                  className="w-[60px] shrink-0 rounded-[12px]! shadow-[0_12px_24px_-14px_rgba(60,35,15,0.7)]! ring-2 ring-white/80 sm:w-[78px] sm:rounded-[16px]!"
+                  className="w-[60px] shrink-0 rounded-[12px]! shadow-[0_12px_24px_-14px_rgba(60,35,15,0.7)]! ring-2 ring-white/80 dark:ring-line-strong sm:w-[78px] sm:rounded-[16px]!"
                 />
               ) : null}
               <div className="min-w-0">
@@ -204,7 +204,7 @@ export function InvitationWorkspace({
             aria-label={w.label}
             className="-mx-4 mt-5 overflow-x-auto px-4 [scrollbar-width:none] sm:-mx-7 sm:px-7 [&::-webkit-scrollbar]:hidden"
           >
-            <ul className="flex w-max gap-1.5 pb-4 sm:pb-5">
+            <ul className="flex w-max gap-1.5 pb-4 sm:pb-5 lg:w-auto lg:flex-wrap">
               {tabs.map(({ key, href, icon: Icon, label, count }) => {
                 const active = current === key;
                 const guests = key === 'guests';

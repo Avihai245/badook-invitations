@@ -83,7 +83,7 @@ export function Segmented<V extends string>({
               'transition-[background-color,color,box-shadow] duration-150 motion-reduce:transition-none',
               fullWidth && 'flex-1',
               // (muted text on the subtle track is under 4.5:1: a step darker keeps it AA)
-              checked ? 'bg-surface font-semibold text-ink shadow-sm' : 'text-ink/65',
+              checked ? 'bg-surface font-semibold text-ink shadow-sm dark:bg-line-strong' : 'text-ink/65',
               off ? 'cursor-not-allowed opacity-50' : !checked && 'hover:text-ink',
             )}
           >

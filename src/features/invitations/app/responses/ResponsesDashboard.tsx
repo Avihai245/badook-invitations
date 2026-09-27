@@ -338,7 +338,7 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
             </div>
 
             {diet.length || breakdowns.length ? (
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="mt-4 grid gap-4 md:grid-cols-[repeat(auto-fit,minmax(340px,1fr))]">
                 {diet.length ? (
                   <Card padding="md">
                     <Bars
@@ -752,18 +752,40 @@ function ResponseDrawer({
 function RepliesArt() {
   return (
     <svg viewBox="0 0 120 120" fill="none">
-      <rect x="30" y="22" width="64" height="80" rx="10" fill="#F6EDE1" stroke="#EAD8C0" strokeWidth="2" />
-      <rect x="22" y="30" width="64" height="80" rx="10" fill="#fff" stroke="#EAD8C0" strokeWidth="2" />
-      <circle cx="54" cy="58" r="14" fill="#F0FDF4" stroke="#86EFAC" strokeWidth="2" />
+      <rect
+        x="30"
+        y="22"
+        width="64"
+        height="80"
+        rx="10"
+        style={{ fill: 'var(--color-brand-soft)', stroke: 'var(--color-brand-line)' }}
+        strokeWidth="2"
+      />
+      <rect
+        x="22"
+        y="30"
+        width="64"
+        height="80"
+        rx="10"
+        style={{ fill: 'var(--color-surface)', stroke: 'var(--color-brand-line)' }}
+        strokeWidth="2"
+      />
+      <circle
+        cx="54"
+        cy="58"
+        r="14"
+        style={{ fill: 'var(--color-success-bg)', stroke: 'var(--color-success-line)' }}
+        strokeWidth="2"
+      />
       <path
         d="m47.5 58 4.5 4.5 9-9"
-        stroke="#15803D"
+        style={{ stroke: 'var(--color-success)' }}
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <rect x="38" y="82" width="32" height="5" rx="2.5" fill="#EAD8C0" />
-      <rect x="44" y="92" width="20" height="5" rx="2.5" fill="#F3E7D6" />
+      <rect x="38" y="82" width="32" height="5" rx="2.5" style={{ fill: 'var(--color-brand-line)' }} />
+      <rect x="44" y="92" width="20" height="5" rx="2.5" style={{ fill: 'var(--color-brand-soft)' }} />
       <path d="M96 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#A0703F" />
     </svg>
   );

@@ -199,8 +199,14 @@ export function Topbar({
             ]}
           />
         </div>
-        <Button size="sm" icon={<Send className="icon-dir" />} onClick={onPublish}>
-          {published ? e.publishChanges : e.publish}
+        {/* phones: the icon only (still named for screen readers), so the invitation's name keeps its room */}
+        <Button
+          size="sm"
+          icon={<Send className="icon-dir" />}
+          onClick={onPublish}
+          title={published ? e.publishChanges : e.publish}
+        >
+          <span className="max-sm:sr-only">{published ? e.publishChanges : e.publish}</span>
         </Button>
       </div>
     </header>

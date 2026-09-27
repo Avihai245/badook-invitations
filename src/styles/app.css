@@ -39,6 +39,19 @@
   /* fills that carry white text in both looks: WhatsApp's deep green (5.2:1), a red action (6.5:1) */
   --color-wa-strong: #0f7d41;
   --color-danger-strong: #b91c1c;
+  /* charts: the validated blue and orange slots and their hover step; the funnel's and the
+     WhatsApp statuses' blue ramps (the strongest step the most important — reversed in dark) */
+  --color-chart-1: #2a78d6;
+  --color-chart-1-hover: #1c5cab;
+  --color-chart-2: #eb6834;
+  --color-chart-2-hover: #c24d1f;
+  --color-funnel-1: #86b6ef;
+  --color-funnel-2: #5598e7;
+  --color-funnel-3: #2a78d6;
+  --color-funnel-4: #1c5cab;
+  --color-chart-read: #104281;
+  --color-chart-delivered: #3987e5;
+  --color-chart-sent: #86b6ef;
   --color-whatsapp: #25d366;
   --color-row-hover: #fcfcfb;
   --color-canvas-editor: #efedea; /* editor canvas behind the phone */
@@ -121,7 +134,16 @@
     --color-brand-soft: #2b2219;
     --color-brand-line: #4a3a28;
     --color-blush: #2a1f1b;
-    --color-inverse: #3b352f;
+    --color-inverse: #4a443d;
+    --color-chart-1-hover: #5a9cec;
+    --color-chart-2-hover: #f08a5d;
+    --color-funnel-1: #2a78d6;
+    --color-funnel-2: #5598e7;
+    --color-funnel-3: #86b6ef;
+    --color-funnel-4: #b7d3f7;
+    --color-chart-read: #b7d3f7;
+    --color-chart-delivered: #6aa6ee;
+    --color-chart-sent: #3987e5;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.55);

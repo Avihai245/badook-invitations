@@ -360,7 +360,7 @@ export function SeatingCanvas({
   return (
     <div
       ref={box}
-      className="relative h-full w-full overflow-hidden bg-[#ebe8e3] select-none"
+      className="relative h-full w-full overflow-hidden bg-[#ebe8e3] select-none dark:bg-canvas-editor"
       style={{ touchAction: 'none' }}
       data-testid="seating-canvas"
     >
@@ -385,13 +385,13 @@ export function SeatingCanvas({
             <path
               d={`M ${gridStep} 0 L 0 0 0 ${gridStep}`}
               fill="none"
-              stroke="#d6d3d1"
+              style={{ stroke: 'var(--color-line)' }}
               strokeWidth={1 / view.scale}
             />
           </pattern>
         </defs>
         <g transform={`translate(${view.tx} ${view.ty}) scale(${view.scale})`}>
-          <rect x={0} y={0} width={room.w} height={room.h} fill="#ffffff" />
+          <rect x={0} y={0} width={room.w} height={room.h} style={{ fill: 'var(--color-surface)' }} />
           {planUrl && planDims ? (
             <image
               href={planUrl}
@@ -418,10 +418,9 @@ export function SeatingCanvas({
             width={room.w}
             height={room.h}
             fill="none"
-            stroke="#a8a29e"
             strokeWidth={1}
             vectorEffect="non-scaling-stroke"
-            style={{ pointerEvents: 'none' }}
+            style={{ stroke: 'var(--color-faint)', pointerEvents: 'none' }}
           />
           {plan.layout.landmarks.map((m) => {
             const label = m.label || s.landmarks[m.kind];

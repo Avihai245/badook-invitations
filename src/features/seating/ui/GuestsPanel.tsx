@@ -285,7 +285,7 @@ export function GuestsPanel({
                           />
                         ))}
                         {accessible ? (
-                          <Accessibility aria-label={s.unit.accessible} className="size-3.5 text-[#2563eb]" />
+                          <Accessibility aria-label={s.unit.accessible} className="size-3.5 text-info" />
                         ) : null}
                       </span>
                     ) : null}
@@ -295,7 +295,7 @@ export function GuestsPanel({
                   <button
                     type="button"
                     onClick={() => onShowTable(table.id)}
-                    className="shrink-0 rounded-full border border-brand-line bg-brand-soft px-2.5 py-1 text-[12px] font-semibold text-brand-deep hover:bg-[#efe0cc]"
+                    className="shrink-0 rounded-full border border-brand-line bg-brand-soft px-2.5 py-1 text-[12px] font-semibold text-brand-deep hover:bg-brand-line"
                     data-testid="unit-table"
                   >
                     {fmt(g.atTable, { number: table.number })}

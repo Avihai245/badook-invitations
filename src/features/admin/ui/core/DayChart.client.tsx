@@ -10,11 +10,11 @@ const TOP = 10;
 const BOTTOM = 22;
 
 /** The chart's chrome: the app's hairlines and muted ink (features/insights/ui/DailyColumns.tsx). */
-const GRID = '#e7e5e4';
-const BASELINE = '#d6d3d1';
-const AXIS_TEXT = '#78716c';
+const GRID = 'var(--color-line)';
+const BASELINE = 'var(--color-line-strong)';
+const AXIS_TEXT = 'var(--color-muted)';
 /** One series: the validated first slot (blue), a darker step on hover. */
-export const SERIES = { color: '#2a78d6', hover: '#1c5cab' };
+export const SERIES = { color: 'var(--color-chart-1)', hover: 'var(--color-chart-1-hover)' };
 
 export interface DayPoint {
   /** YYYY-MM-DD (Israel's day) */
@@ -123,7 +123,7 @@ export function DayChart({
                   x2={W - RIGHT}
                   y1={y}
                   y2={y}
-                  stroke={v === 0 ? BASELINE : GRID}
+                  style={{ stroke: v === 0 ? BASELINE : GRID }}
                   strokeWidth={1}
                 />
                 <text
@@ -132,7 +132,7 @@ export function DayChart({
                   fontSize={11}
                   textAnchor="end"
                   dominantBaseline="central"
-                  fill={AXIS_TEXT}
+                  style={{ fill: AXIS_TEXT }}
                 >
                   {number(v, { notation: 'compact', maximumFractionDigits: 1 })}
                 </text>
@@ -151,7 +151,7 @@ export function DayChart({
                 {p.value > 0 ? (
                   <path
                     d={`M ${x} ${TOP + plotH} V ${y + r} Q ${x} ${y} ${x + r} ${y} H ${x + barW - r} Q ${x + barW} ${y} ${x + barW} ${y + r} V ${TOP + plotH} Z`}
-                    fill={active === i ? SERIES.hover : SERIES.color}
+                    style={{ fill: active === i ? SERIES.hover : SERIES.color }}
                   />
                 ) : null}
                 {/* labels counted back from today, so today always has one */}
@@ -161,7 +161,7 @@ export function DayChart({
                     y={H - 6}
                     fontSize={11}
                     textAnchor="middle"
-                    fill={AXIS_TEXT}
+                    style={{ fill: AXIS_TEXT }}
                   >
                     {short(p.day)}
                   </text>

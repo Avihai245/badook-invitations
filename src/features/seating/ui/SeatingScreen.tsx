@@ -922,7 +922,7 @@ export function SeatingScreen({
             'pointer-events-none fixed z-[90] rounded-full px-3 py-1.5 text-[13px] font-semibold shadow-lg',
             drag.over
               ? drag.over.ok
-                ? 'bg-success text-white'
+                ? 'bg-wa-strong text-white'
                 : 'bg-danger-strong text-white'
               : 'bg-inverse text-white',
           )}

@@ -122,7 +122,7 @@ export function AutoDialog({
             step={10}
             value={Math.round(settings.minFill * 100)}
             onChange={(e) => onSettings({ minFill: Number(e.target.value) / 100 })}
-            className="w-full accent-[#1c1917]"
+            className="w-full accent-ink"
           />
           <span className="text-[12px] text-muted">{a.minFillHint}</span>
         </label>

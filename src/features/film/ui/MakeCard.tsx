@@ -402,7 +402,7 @@ export function MakeCard({
               aria-label={M.cta}
             >
               <span
-                className="h-full rounded-full bg-inverse transition-[width] duration-200"
+                className="h-full rounded-full bg-ink transition-[width] duration-200"
                 style={{ width: `${pct}%` }}
               />
             </span>

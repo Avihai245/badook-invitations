@@ -47,9 +47,9 @@ import type { FailureRow, MessagesPageData } from '../server';
  * pairs validated for color vision deficiencies on this surface.
  */
 const WA_COLORS = {
-  read: '#104281',
-  delivered: '#3987e5',
-  sent: '#86b6ef',
+  read: 'var(--color-chart-read)',
+  delivered: 'var(--color-chart-delivered)',
+  sent: 'var(--color-chart-sent)',
   failed: '#d03b3b',
   pending: '#78716c',
 } as const;
@@ -303,7 +303,7 @@ function Errors({ data }: { data: MessagesPageData }) {
                 <span className="shrink-0 font-semibold tabular-nums">{f.count(e.n)}</span>
               </span>
               <span aria-hidden className="flex h-1.5 overflow-hidden rounded-full bg-subtle">
-                <span className="h-full rounded-full bg-inverse" style={{ width: `${(e.n / top) * 100}%` }} />
+                <span className="h-full rounded-full bg-ink" style={{ width: `${(e.n / top) * 100}%` }} />
               </span>
               <span className="text-[12px] text-muted">
                 {WA_KINDS.filter((k) => e[k] > 0)

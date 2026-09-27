@@ -242,7 +242,7 @@ function RowShell({
       )}
     >
       {selected ? (
-        <span aria-hidden className="absolute inset-y-2 start-0 w-[3px] rounded-[3px] bg-inverse" />
+        <span aria-hidden className="absolute inset-y-2 start-0 w-[3px] rounded-[3px] bg-ink" />
       ) : null}
       {children}
     </li>

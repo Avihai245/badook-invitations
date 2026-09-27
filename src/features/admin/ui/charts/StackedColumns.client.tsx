@@ -5,9 +5,9 @@ import { cn } from '@/components/app';
 import { useAdminUi } from '../AdminUi.client';
 
 /** Chart chrome: the app's hairlines and muted ink (see features/insights/ui/DailyColumns.tsx). */
-const GRID = '#e7e5e4';
-const BASELINE = '#d6d3d1';
-const AXIS_TEXT = '#78716c';
+const GRID = 'var(--color-line)';
+const BASELINE = 'var(--color-line-strong)';
+const AXIS_TEXT = 'var(--color-muted)';
 const TOP = 12;
 const BOTTOM = 26;
 const RIGHT = 8;
@@ -168,7 +168,7 @@ export function StackedColumns<K extends string>({
                 x2={W - RIGHT}
                 y1={y(v)}
                 y2={y(v)}
-                stroke={v === 0 ? BASELINE : GRID}
+                style={{ stroke: v === 0 ? BASELINE : GRID }}
                 strokeWidth={1}
               />
               <text
@@ -177,7 +177,7 @@ export function StackedColumns<K extends string>({
                 fontSize={11}
                 textAnchor="end"
                 dominantBaseline="central"
-                fill={AXIS_TEXT}
+                style={{ fill: AXIS_TEXT }}
                 className="tabular-nums"
               >
                 {formatAxis(v)}
@@ -190,8 +190,8 @@ export function StackedColumns<K extends string>({
               y={TOP}
               width={slot}
               height={plotH}
-              fill="#1c1917"
-              opacity={0.05}
+              style={{ fill: 'var(--color-ink)' }}
+              opacity={0.06}
             />
           ) : null}
           {rows.map((r, i) => {
@@ -216,7 +216,7 @@ export function StackedColumns<K extends string>({
                     <path
                       key={s.key}
                       d={`M ${x} ${bottom} V ${topY + rr} Q ${x} ${topY} ${x + rr} ${topY} H ${x + barW - rr} Q ${x + barW} ${topY} ${x + barW} ${topY + rr} V ${bottom} Z`}
-                      fill={s.color}
+                      style={{ fill: s.color }}
                       opacity={active === null || active === i ? 1 : 0.55}
                     />
                   );
@@ -227,7 +227,7 @@ export function StackedColumns<K extends string>({
                     y={H - 8}
                     fontSize={11}
                     textAnchor="middle"
-                    fill={AXIS_TEXT}
+                    style={{ fill: AXIS_TEXT }}
                   >
                     {dayLabel(r.day)}
                   </text>

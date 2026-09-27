@@ -43,7 +43,7 @@ export function Switch({
       }}
       className={cn(
         'relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-150 motion-reduce:transition-none',
-        on ? 'bg-inverse' : 'bg-line-strong',
+        on ? 'bg-ink' : 'bg-line-strong',
         disabled && 'cursor-not-allowed opacity-50',
         className,
       )}
@@ -52,7 +52,9 @@ export function Switch({
       <span
         aria-hidden
         className={cn(
-          'absolute top-0.5 size-4 rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,0.2)]',
+          'absolute top-0.5 size-4 rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.2)]',
+          // (the knob stands out on either track, in either look)
+          on ? 'bg-canvas' : 'bg-white',
           'transition-[inset-inline-start] duration-150 motion-reduce:transition-none',
           on ? 'start-[18px]' : 'start-0.5',
         )}

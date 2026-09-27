@@ -9,9 +9,9 @@ export const financeHe = {
     incomeSubFlat: '{net} בלי מע״מ · בחודש שעבר עד היום: {last}',
     mrr: 'הכנסה חודשית חוזרת (MRR)',
     mrrSub: {
-      one: 'מנוי פעיל אחד · Pro {pro} · Business {business}',
-      two: 'שני מנויים פעילים · Pro {pro} · Business {business}',
-      other: '{n} מנויים פעילים · Pro {pro} · Business {business}',
+      one: 'מנוי פעיל אחד · Pro {pro}\u200f · Business {business}\u200f',
+      two: 'שני מנויים פעילים · Pro {pro}\u200f · Business {business}\u200f',
+      other: '{n} מנויים פעילים · Pro {pro}\u200f · Business {business}\u200f',
     },
     arpu: 'ARPU (ללקוח משלם)',
     arpuSub: { one: 'לקוח אחד שילם החודש', two: 'שני לקוחות שילמו החודש', other: '{n} לקוחות שילמו החודש' },

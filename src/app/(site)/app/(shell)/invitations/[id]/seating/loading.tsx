@@ -30,7 +30,7 @@ export default function SeatingLoading() {
               <Skeleton key={i} className="h-9 w-12" />
             ))}
           </div>
-          <div className="flex-1 bg-[#ebe8e3]" />
+          <div className="flex-1 bg-[#ebe8e3] dark:bg-canvas-editor" />
         </div>
       </div>
     </div>

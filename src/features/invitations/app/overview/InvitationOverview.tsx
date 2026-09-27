@@ -272,7 +272,7 @@ export function InvitationOverview({
                     className={cn(
                       'grid size-9 shrink-0 place-items-center rounded-full text-[13px] font-bold',
                       isDone
-                        ? 'bg-success text-white'
+                        ? 'bg-success text-white dark:text-success-bg'
                         : isNext
                           ? 'bg-brand text-white shadow-[0_6px_14px_-6px_rgba(122,82,48,0.8)]'
                           : 'bg-subtle text-muted',

@@ -84,7 +84,7 @@ export function Timeline({
                 x2={W - RIGHT}
                 y1={y}
                 y2={y}
-                stroke={v === 0 ? '#d6d3d1' : '#e7e5e4'}
+                style={{ stroke: v === 0 ? 'var(--color-line-strong)' : 'var(--color-line)' }}
                 strokeWidth={1}
               />
               <text
@@ -93,7 +93,7 @@ export function Timeline({
                 fontSize={11}
                 textAnchor="end"
                 dominantBaseline="central"
-                fill="#78716c"
+                style={{ fill: 'var(--color-muted)' }}
               >
                 {number(v)}
               </text>
@@ -122,7 +122,7 @@ export function Timeline({
               {b.people > 0 ? (
                 <path
                   d={`M ${x} ${TOP + plotH} V ${y + r} Q ${x} ${y} ${x + r} ${y} H ${x + barW - r} Q ${x + barW} ${y} ${x + barW} ${y + r} V ${TOP + plotH} Z`}
-                  fill={hover === i ? '#15803d' : '#22c55e'}
+                  style={{ fill: hover === i ? 'var(--color-success)' : '#22c55e' }}
                 />
               ) : null}
               {i % labelEvery === 0 ? (
@@ -131,7 +131,7 @@ export function Timeline({
                   y={H - 7}
                   fontSize={11}
                   textAnchor="middle"
-                  fill="#78716c"
+                  style={{ fill: 'var(--color-muted)' }}
                 >
                   {time(b.at)}
                 </text>
