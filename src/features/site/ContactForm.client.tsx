@@ -1,6 +1,7 @@
 'use client';
 
 import { CheckCircle2, Send } from 'lucide-react';
+import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { Button, Field, Input, Select, Textarea } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
@@ -11,10 +12,13 @@ type Errors = Partial<Record<'name' | 'email' | 'phone' | 'message' | 'form', st
 
 /** The contact form: name, email, optional phone, topic and message; errors in words, focus on the first. */
 export function ContactForm({ defaultTopic = 'support' }: { defaultTopic?: Topic }) {
-  const { t, locale } = useUi();
+  const { t, locale, fmt } = useUi();
   const c = t.site.contact;
+  const k = t.tickets.contactSent;
   const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [errors, setErrors] = useState<Errors>({});
+  // the support ticket the message opened (the team answers it; a signed-in visitor follows it in the app)
+  const [ticket, setTicket] = useState<{ id: string; number: number; mine: boolean } | null>(null);
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,8 +41,15 @@ export function ContactForm({ defaultTopic = 'support' }: { defaultTopic?: Topic
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ ...data, locale }),
     }).catch(() => null);
-    const body = (await res?.json().catch(() => null)) as { code?: string; fields?: string[] } | null;
-    if (res?.ok) return setState('sent');
+    const body = (await res?.json().catch(() => null)) as {
+      code?: string;
+      fields?: string[];
+      ticket?: { id: string; number: number; mine: boolean };
+    } | null;
+    if (res?.ok) {
+      setTicket(body?.ticket ?? null);
+      return setState('sent');
+    }
     setState('idle');
     if (res?.status === 429) return setErrors({ form: c.errors.rate });
     if (body?.fields?.includes('phone')) return setErrors({ phone: c.errors.phone });
@@ -54,6 +65,20 @@ export function ContactForm({ defaultTopic = 'support' }: { defaultTopic?: Topic
       >
         <CheckCircle2 aria-hidden className="size-10 text-success" />
         <p className="text-[16px] font-semibold">{c.sent}</p>
+        {ticket ? (
+          <div className="flex flex-col gap-1 text-[14px]" data-testid="contact-ticket">
+            <p className="font-semibold tabular-nums">{fmt(k.number, { n: ticket.number })}</p>
+            <p className="text-muted">{ticket.mine ? k.mine : k.visitor}</p>
+            {ticket.mine ? (
+              <Link
+                href={`/app/support/${ticket.id}`}
+                className="font-semibold text-brand-deep underline underline-offset-2"
+              >
+                {k.open}
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
         <Button variant="secondary" onClick={() => setState('idle')}>
           {c.again}
         </Button>

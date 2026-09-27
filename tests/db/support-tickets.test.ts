@@ -206,9 +206,12 @@ describe('the customer’s tickets', () => {
     expect(await bad('app', chat)).toContain('invalid_chat');
     expect(await bad('chat', [{ role: 'system', content: 'x' }])).toContain('invalid_chat');
     expect(await bad('chat', [{ role: 'user', content: 'x'.repeat(2001) }])).toContain('invalid_chat');
-    expect(await bad('chat', Array.from({ length: 21 }, () => ({ role: 'user', content: 'x' })))).toContain(
-      'invalid_chat',
-    );
+    expect(
+      await bad(
+        'chat',
+        Array.from({ length: 21 }, () => ({ role: 'user', content: 'x' })),
+      ),
+    ).toContain('invalid_chat');
     expect(await bad('chat', { role: 'user', content: 'x' })).toContain('invalid_chat');
   });
 
@@ -231,7 +234,14 @@ describe('the customer’s tickets', () => {
     await commit('admin_support_priority', [AGENT, t.id, 'high']);
     let seen = await call<CustomerTicket>('support_ticket_get', [DANA, t.id, false]);
     expect(seen.messages).toEqual([
-      { id: expect.any(Number), author: 'customer', body: 'first', event: null, by: null, at: expect.any(String) },
+      {
+        id: expect.any(Number),
+        author: 'customer',
+        body: 'first',
+        event: null,
+        by: null,
+        at: expect.any(String),
+      },
     ]);
     expect(seen.status).toBe('open');
     expect(seen.unread).toBe(false);
@@ -256,7 +266,8 @@ describe('the customer’s tickets', () => {
 describe('the statuses', () => {
   it('open → answered (waiting) → the customer’s answer opens it → answered and closed → reopened by writing', async () => {
     const t = await open(YOSSI, 'Statuses');
-    const status = async () => (await call<CustomerTicket>('support_ticket_get', [YOSSI, t.id, false])).status;
+    const status = async () =>
+      (await call<CustomerTicket>('support_ticket_get', [YOSSI, t.id, false])).status;
     expect(await commit('admin_support_reply', [AGENT, t.id, 'Try this', false])).toMatchObject({
       status: 'waiting',
     });
@@ -329,6 +340,7 @@ describe('the console', () => {
         ['admin_support_list', [actor, 'all', 'all', null, null, null, 10, 0]],
         ['admin_support_get', [actor, t.id]],
         ['admin_support_summary', [actor]],
+        ['admin_support_reply_time', [actor, 30]],
         ['admin_support_activity', [actor, 10]],
         ['admin_support_user_tickets', [actor, YOSSI]],
         ['admin_support_reply', [actor, t.id, 'x', false]],
@@ -383,9 +395,16 @@ describe('the console', () => {
       '+14XXXXXX123',
     );
     const masked = (
-      await c.query(`select public.admin_support_item(t, false) as r from support_tickets t where id = $1`, [t.id])
+      await c.query(`select public.admin_support_item(t, false) as r from support_tickets t where id = $1`, [
+        t.id,
+      ])
     ).rows[0].r;
-    expect(masked.customer).toEqual({ kind: 'account', userId: DANA, name: 'דנה כהן', email: 'd***@example.com' });
+    expect(masked.customer).toEqual({
+      kind: 'account',
+      userId: DANA,
+      name: 'דנה כהן',
+      email: 'd***@example.com',
+    });
     expect(JSON.stringify(masked)).not.toContain('dana@example.com');
   });
 
@@ -408,7 +427,10 @@ describe('the console', () => {
       0,
     ]);
     expect(mine.items.map((i) => i.id)).toContain(t.id);
-    expect(await commit('admin_support_assign', [OWNER, t.id, null])).toEqual({ assignee: null, changed: true });
+    expect(await commit('admin_support_assign', [OWNER, t.id, null])).toEqual({
+      assignee: null,
+      changed: true,
+    });
   });
 
   it('a visitor’s ticket (the contact form): answered by email; a signed-in visitor’s is theirs in the app', async () => {
@@ -427,7 +449,13 @@ describe('the console', () => {
       source: 'contact',
       locale: 'en',
       category: 'business',
-      customer: { kind: 'visitor', userId: null, name: 'Rina Visitor', email: 'rina@example.com', phone: '+972521112233' },
+      customer: {
+        kind: 'visitor',
+        userId: null,
+        name: 'Rina Visitor',
+        email: 'rina@example.com',
+        phone: '+972521112233',
+      },
     });
     expect(await call('support_notify_target', [visitor.id])).toMatchObject({
       userId: null,
@@ -445,17 +473,23 @@ describe('the console', () => {
       'A question',
       'he',
     ]);
-    expect((await call<CustomerTicket[]>('support_ticket_list', [RONI])).map((t) => t.id)).toEqual([signedIn.id]);
+    expect((await call<CustomerTicket[]>('support_ticket_list', [RONI])).map((t) => t.id)).toEqual([
+      signedIn.id,
+    ]);
     // the answer goes to the address the form was sent with
     expect(await call('support_notify_target', [signedIn.id])).toMatchObject({
       userId: RONI,
       email: 'other-address@example.com',
     });
     expect(
-      await reason(call('support_contact_ticket', [null, 'x', 'not-an-email', '', 's', 'support', 'b', 'he'])),
+      await reason(
+        call('support_contact_ticket', [null, 'x', 'not-an-email', '', 's', 'support', 'b', 'he']),
+      ),
     ).toContain('invalid_email');
     expect(
-      await reason(call('support_contact_ticket', [null, 'x', 'a@example.com', '0501234567', 's', 'support', 'b', 'he'])),
+      await reason(
+        call('support_contact_ticket', [null, 'x', 'a@example.com', '0501234567', 's', 'support', 'b', 'he']),
+      ),
     ).toContain('invalid_phone');
   });
 
@@ -495,7 +529,9 @@ describe('the console', () => {
     expect(await commit('admin_support_delete', [AGENT, t.id, 'spam'])).toBe(false);
     expect(await call('support_ticket_get', [YOSSI, t.id, true])).toBeNull();
     expect(await call('admin_support_get', [OWNER, t.id])).toBeNull();
-    expect((await call<CustomerTicket[]>('support_ticket_list', [YOSSI])).map((x) => x.id)).not.toContain(t.id);
+    expect((await call<CustomerTicket[]>('support_ticket_list', [YOSSI])).map((x) => x.id)).not.toContain(
+      t.id,
+    );
     expect(await reason(call('admin_support_reply', [AGENT, t.id, 'x', false]))).toContain('not_found');
     const [log] = await call<{ action: string; details: Record<string, unknown> }[]>('admin_audit_list', [
       OWNER,
@@ -509,9 +545,17 @@ describe('the console', () => {
 
   it('marks whether a team answer’s email went out', async () => {
     const t = await open(YOSSI, 'Email');
-    const { messageId } = await commit<{ messageId: number }>('admin_support_reply', [AGENT, t.id, 'Hi', false]);
+    const { messageId } = await commit<{ messageId: number }>('admin_support_reply', [
+      AGENT,
+      t.id,
+      'Hi',
+      false,
+    ]);
     expect(await commit('support_message_emailed', [messageId, true])).toBe(true);
-    const got = await call<{ messages: { id: number; emailed: string | null }[] }>('admin_support_get', [AGENT, t.id]);
+    const got = await call<{ messages: { id: number; emailed: string | null }[] }>('admin_support_get', [
+      AGENT,
+      t.id,
+    ]);
     expect(got.messages.find((m) => m.id === messageId)?.emailed).toBe('sent');
     // a note is never emailed
     const note = await commit<{ messageId: number }>('admin_support_note', [AGENT, t.id, 'n']);
@@ -633,7 +677,7 @@ describe('the numbers, exact on a known inbox', () => {
     await answer('c2', 5);
   });
 
-  it('the summary: open, waiting, unassigned, high, the oldest, today, the first answer’s median', async () => {
+  it('the summary: open, waiting, unassigned, high, the oldest, today', async () => {
     const s = await call<Record<string, unknown>>('admin_support_summary', [AGENT]);
     expect(s).toEqual({
       open: 3,
@@ -642,14 +686,27 @@ describe('the numbers, exact on a known inbox', () => {
       highOpen: 1,
       oldestOpenAt: expect.any(String),
       openedToday: 1,
-      // 10, 30, 90 minutes (the 40-day-old one is outside the 30 days)
-      firstReplyMedianMinutes: 30,
     });
     expect(new Date(s.oldestOpenAt as string).getTime()).toBe(threeDaysAgo.getTime());
   });
 
+  it('the time to the team’s first answer: the median over the days asked', async () => {
+    // 10, 30, 90 minutes (the 40-day-old one is outside the 30 days; a note isn't an answer)
+    expect(await call('admin_support_reply_time', [AGENT, 30])).toEqual({ medianMinutes: 30, answered: 3 });
+    expect(await call('admin_support_reply_time', [AGENT, 60])).toEqual({ medianMinutes: 20, answered: 4 });
+    expect(await call('admin_support_reply_time', [AGENT, 1])).toEqual({ medianMinutes: null, answered: 0 });
+  });
+
   it('the inbox: a tab, its counts under the filters, the newest activity first, the waiting time', async () => {
-    const list = (status: string, scope = 'all', category: string | null = null, priority: string | null = null, q: string | null = null, limit = 50, offset = 0) =>
+    const list = (
+      status: string,
+      scope = 'all',
+      category: string | null = null,
+      priority: string | null = null,
+      q: string | null = null,
+      limit = 50,
+      offset = 0,
+    ) =>
       call<{
         items: { id: string; subject: string; waitingSince: string | null; customer: { email: string } }[];
         counts: Record<string, number>;
@@ -711,15 +768,15 @@ describe('the numbers, exact on a known inbox', () => {
   });
 
   it('the purge: answered and silent for 14 days closes; closed two years ago and deleted 30 days ago go', async () => {
-    await c.query(
-      `update support_tickets set last_team_at = now() - interval '15 days' where id = $1`,
-      [ids.w2],
-    );
-    await c.query(
-      `update support_tickets set closed_at = now() - interval '2 years 1 day' where id = $1`,
-      [ids.c2],
-    );
-    await c.query(`update support_tickets set deleted_at = now() - interval '31 days' where id = $1`, [ids.c1]);
+    await c.query(`update support_tickets set last_team_at = now() - interval '15 days' where id = $1`, [
+      ids.w2,
+    ]);
+    await c.query(`update support_tickets set closed_at = now() - interval '2 years 1 day' where id = $1`, [
+      ids.c2,
+    ]);
+    await c.query(`update support_tickets set deleted_at = now() - interval '31 days' where id = $1`, [
+      ids.c1,
+    ]);
     expect(await commit('support_maintenance', [])).toEqual({ autoClosed: 1, erased: 1, deleted: 1 });
     const left = (await c.query('select id, status from support_tickets order by number')).rows;
     expect(left.map((r) => r.id)).not.toContain(ids.c2);
@@ -727,8 +784,11 @@ describe('the numbers, exact on a known inbox', () => {
     expect(left.find((r) => r.id === ids.w2)?.status).toBe('closed');
     // their messages went with them
     expect(
-      (await c.query('select count(*)::int as n from support_messages where ticket_id = any($1)', [[ids.c1, ids.c2]]))
-        .rows[0].n,
+      (
+        await c.query('select count(*)::int as n from support_messages where ticket_id = any($1)', [
+          [ids.c1, ids.c2],
+        ])
+      ).rows[0].n,
     ).toBe(0);
     const auto = await call<CustomerTicket>('support_ticket_get', [YOSSI, ids.w2, false]);
     expect(auto.messages?.at(-1)).toMatchObject({ author: 'system', event: 'closed', by: 'auto' });

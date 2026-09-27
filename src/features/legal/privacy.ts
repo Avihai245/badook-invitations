@@ -213,6 +213,21 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           ],
         },
         {
+          id: 'support',
+          heading: '7E. Support tickets: writing to our team',
+          body: [
+            'A customer can write to our team from the app (“Support”), from the support assistant (“Talk to a person”) or through the site’s contact form, which opens a ticket too.',
+            {
+              list: [
+                'What is kept: the ticket — its subject, its type, the invitation it is about when the customer chose one — and every message in it; the name, email address and phone number given in the contact form; and, for a ticket opened from the support assistant, the conversation with the assistant that the customer saw and chose to attach.',
+                'Who sees it: the customer, in the app (a visitor without an account gets the team’s answers by email); and the members of our team whose role includes support, in our admin console, together with the customer’s account details (the plan, message credits, the number of invitations). The team’s internal notes on a ticket are not shown to the customer. What the team does on a ticket is recorded (who, what and when).',
+                'Emails: the team’s answer is sent to the customer’s email address (through Resend, section 5); our team is told of a new ticket by email with its subject only, not the conversation.',
+                'How long: an answered ticket the customer doesn’t come back to closes by itself after 14 days (writing in it opens it again); a closed ticket and all its messages are erased two years after it was closed; a ticket our team deletes as spam is erased within 30 days.',
+              ],
+            },
+          ],
+        },
+        {
           id: 'rights',
           heading: '8. Your rights',
           body: [
@@ -462,6 +477,21 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'הצעות עיצוב ("עצבו לי"): התמונות שהמארח בוחר מוקטנות במכשיר שלו, וכשהחבילה כוללת את זה נשלחות ל־Anthropic יחד עם סוג האירוע, השפות ומצב הרוח שהמארח הקליד (בלי שמות ובלי פרטים אחרים), כדי להציע שלושה עיצובים. אנחנו לא שומרים דבר מהבקשה הזו, והתמונות לא נכתבות ליומנים שלנו. עיצוב שהמארח בוחר מעלה להזמנה את התמונות שהוא משתמש בהן, כמו כל תמונה שהמארח מוסיף.',
               'גרסאות: מלבד כל גרסה שפורסמה, אנחנו שומרים עותקים של טיוטת ההזמנה בזמן העריכה (לכל היותר פעם ב־10 דקות, ולפני שחזור או עיצוב חדש), כדי שאפשר יהיה לשחזר כל אחד מהם. הם נשמרים 90 יום, עד 60 להזמנה; גרסאות שפורסמו נשמרות עם ההזמנה.',
               'הקראת ההזמנה: כשהחבילה כוללת את זה, הטקסטים של ההזמנה עצמה (השמות, התאריך, המקומות והטקסטים של המארח — לעולם לא פרטים של אורחים) נשלחים ל־Microsoft (Azure AI Speech, באיחוד האירופי) פעם אחת לכל שפה כשהמארח מפרסם, וההקראה שמתקבלת נשמרת עם הקבצים של ההזמנה עד שהטקסטים משתנים או שההזמנה או החשבון נמחקים. אורח שמאזין כשאין הקראה כזו, המכשיר שלו עצמו מקריא את הטקסט. ההאזנה לא נרשמת בשום מקום.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'support',
+        heading: '7ה. פניות לצוות: כשכותבים לנו',
+        body: [
+          'אפשר לכתוב לצוות שלנו מהאפליקציה (״תמיכה״), מעוזר התמיכה (״לדבר עם נציג״), או בטופס יצירת הקשר באתר, שגם הוא פותח פנייה.',
+          {
+            list: [
+              'מה נשמר: הפנייה — הנושא שלה, הסוג, וההזמנה שהיא עוסקת בה כשהלקוח בחר אחת — וכל ההודעות שבה; השם, כתובת המייל ומספר הטלפון שנמסרו בטופס יצירת הקשר; ובפנייה שנפתחה מעוזר התמיכה, השיחה עם העוזר שהלקוח ראה ובחר לצרף.',
+              'מי רואה אותה: הלקוח, באפליקציה (מבקר בלי חשבון מקבל את תשובות הצוות במייל); וחברי הצוות שלנו שהתפקיד שלהם כולל תמיכה, במערכת הניהול שלנו, יחד עם פרטי החשבון של הלקוח (החבילה, קרדיטים להודעות, מספר ההזמנות). הערות פנימיות של הצוות על פנייה לא מוצגות ללקוח. מה שהצוות עושה בפנייה נרשם (מי, מה ומתי).',
+              'מיילים: תשובת הצוות נשלחת לכתובת המייל של הלקוח (דרך Resend, סעיף 5); הצוות שלנו מקבל על פנייה חדשה מייל עם הנושא שלה בלבד, בלי השיחה.',
+              'כמה זמן: פנייה שנענתה והלקוח לא חזר אליה נסגרת מעצמה אחרי 14 יום (כתיבה בה פותחת אותה מחדש); פנייה סגורה וכל ההודעות שבה נמחקות שנתיים אחרי שנסגרה; פנייה שהצוות מוחק כספאם נמחקת תוך 30 יום.',
             ],
           },
         ],

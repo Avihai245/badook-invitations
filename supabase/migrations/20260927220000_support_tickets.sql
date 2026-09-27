@@ -345,21 +345,23 @@ language sql stable security definer set search_path = '' as $$
 $$;
 
 -- One of the customer's tickets with its conversation (null: not theirs). p_seen: they are looking at
--- it — the team's answers are no longer new.
+-- it — the team's answers are no longer new from now on (`unread` says whether they were until now).
 create function public.support_ticket_get(p_user_id uuid, p_id uuid, p_seen boolean) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare
   v public.support_tickets;
+  v_view jsonb;
 begin
   select * into v from public.support_tickets
   where id = p_id and user_id = p_user_id and deleted_at is null;
   if not found then
     return null;
   end if;
+  v_view := public.support_ticket_view(v, true);
   if p_seen then
-    update public.support_tickets set customer_seen_at = now() where id = p_id returning * into v;
+    update public.support_tickets set customer_seen_at = now() where id = p_id;
   end if;
-  return public.support_ticket_view(v, true);
+  return v_view;
 end $$;
 
 -- The customer answers: a closed ticket opens again, an answered one goes back to the team. null: not
@@ -806,9 +808,9 @@ begin
   return true;
 end $$;
 
--- The inbox in numbers (the console's overview and menu): waiting for the team, waiting for the
--- customer, open and unassigned, the oldest one waiting for the team, opened today (Israel time), and
--- the median time to the team's first answer over the last 30 days (minutes; null: none answered).
+-- The inbox in numbers (the console's overview and menu — cheap, asked on every console page): waiting
+-- for the team, waiting for the customer, open and unassigned, open and urgent, the oldest one waiting
+-- for the team, and opened today (Israel time).
 create function public.admin_support_summary(p_actor uuid) returns jsonb
 language plpgsql stable security definer set search_path = '' as $$
 declare
@@ -826,17 +828,32 @@ begin
   ) into v_result
   from public.support_tickets
   where deleted_at is null and (status <> 'closed' or created_at >= v_today);
-  return v_result || jsonb_build_object('firstReplyMedianMinutes', (
-    select round(percentile_cont(0.5) within group (
+  return v_result;
+end $$;
+
+-- How fast the team answers: the median time from a ticket opening to the team's first answer, over
+-- the tickets opened in the last p_days days (minutes; null: none answered), and how many were.
+create function public.admin_support_reply_time(p_actor uuid, p_days int) returns jsonb
+language plpgsql stable security definer set search_path = '' as $$
+declare
+  v_result jsonb;
+begin
+  perform public.admin_require(p_actor, 'support.view');
+  select jsonb_build_object(
+    'medianMinutes', round(percentile_cont(0.5) within group (
       order by extract(epoch from (f.first_at - t.created_at)) / 60
-    ))::int
-    from public.support_tickets t
-    cross join lateral (
-      select min(m.created_at) as first_at from public.support_messages m
-      where m.ticket_id = t.id and m.author = 'staff' and not m.internal
-    ) f
-    where t.deleted_at is null and t.created_at > now() - interval '30 days' and f.first_at is not null
-  ));
+    ))::int,
+    'answered', count(*)
+  ) into v_result
+  from public.support_tickets t
+  cross join lateral (
+    select min(m.created_at) as first_at from public.support_messages m
+    where m.ticket_id = t.id and m.author = 'staff' and not m.internal
+  ) f
+  where t.deleted_at is null
+    and t.created_at > now() - make_interval(days => least(greatest(coalesce(p_days, 30), 1), 365))
+    and f.first_at is not null;
+  return v_result;
 end $$;
 
 -- The console's live feed: tickets opened and the team's answers, newest first — the subject and the
@@ -976,6 +993,7 @@ begin
     'public.admin_support_assign(uuid, uuid, uuid)',
     'public.admin_support_delete(uuid, uuid, text)',
     'public.admin_support_summary(uuid)',
+    'public.admin_support_reply_time(uuid, int)',
     'public.admin_support_activity(uuid, int)',
     'public.admin_support_user_tickets(uuid, uuid)',
     'public.support_maintenance()'

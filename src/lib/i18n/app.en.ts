@@ -14,6 +14,7 @@ import { insightsEn } from './insights.en';
 import { galleryNotifyEn } from './gallery-notify.en';
 import { facesEn } from './faces.en';
 import { filmEn } from './film.en';
+import { ticketsEn } from './tickets.en';
 
 /** Host-app UI strings, English. Same shape as app.he.ts (checked by the type). */
 export const en: AppDict = {
@@ -33,6 +34,7 @@ export const en: AppDict = {
   galleryNotify: galleryNotifyEn,
   faces: facesEn,
   film: filmEn,
+  tickets: ticketsEn,
   common: {
     close: 'Close',
     cancel: 'Cancel',

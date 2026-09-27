@@ -246,6 +246,7 @@ const FUNCTIONS = new Set([
   'admin_support_assign',
   'admin_support_delete',
   'admin_support_summary',
+  'admin_support_reply_time',
   'admin_support_activity',
   'admin_support_user_tickets',
 ]);
