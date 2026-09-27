@@ -1,4 +1,5 @@
 import { after } from 'next/server';
+import { nudgeAfter } from '@/features/admin/server/nudge';
 import { eventDayDb } from '@/features/event-day/server/db';
 import { tick } from '@/features/jobs/jobs';
 import { galleryNoticesDb } from '@/features/live-gallery/server/notices-db';
@@ -53,5 +54,7 @@ export async function POST(request: Request) {
   }
   // WhatsApp's notices come while messages go out: a good moment for the queue's retries (features/jobs)
   after(() => tick());
+  // the admin console's delivery numbers: one hint per notice, however many statuses it carried
+  if (statusesOf(payload).length) nudgeAfter('message');
   return new Response('OK', { headers: NO_STORE });
 }

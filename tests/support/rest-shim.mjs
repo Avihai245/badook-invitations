@@ -4,7 +4,8 @@
 //   · Auth  /auth/v1 — email + password sign-up (auto-confirmed), password / refresh-token grants,
 //     GET/PUT /user, logout, recover; HS256 access tokens; users live in auth.users; "Continue with
 //     Google" through a stand-in account chooser (authorize → code → the PKCE grant); /settings;
-//     admin: create users, one-time sign-in links (generate_link → POST /verify), get / update / delete;
+//     admin: create users, one-time sign-in links (generate_link → POST /verify), get / update (a ban:
+//     ban_duration — a banned user gets no new session) / delete; each sign-in sets last_sign_in_at;
 //   · Storage /storage/v1 — signed upload URLs (service role), uploads, the server's own uploads
 //     (service role), public reads; files on disk, bucket size/MIME limits from storage.buckets.
 //
@@ -264,6 +265,23 @@ const FUNCTIONS = new Set([
   'admin_partners_user_source',
   'admin_partners_activity',
   'admin_logs_maintenance',
+  // the admin console's core: overview, feed, users, invitations, actions, record, system
+  // (supabase/migrations/20260927210000_admin_core.sql)
+  'admin_overview',
+  'admin_activity',
+  'admin_users',
+  'admin_user',
+  'admin_audit_search',
+  'admin_user_credits',
+  'admin_user_gift',
+  'admin_user_discount',
+  'admin_user_suspend_check',
+  'admin_staff_change',
+  'admin_staff_drop',
+  'admin_invitations',
+  'admin_invitation',
+  'admin_invitation_feature',
+  'admin_system',
 ]);
 const IDENT = /^p_[a-z_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
@@ -385,8 +403,22 @@ function userJson(row) {
     identities: [],
     created_at: row.created_at,
     updated_at: row.updated_at,
+    last_sign_in_at: row.last_sign_in_at ?? null,
+    // like Supabase Auth: only while the user is (or was) banned
+    ...(row.banned_until ? { banned_until: row.banned_until } : {}),
     is_anonymous: false,
   };
+}
+
+/** Supabase Auth refuses a banned user a new session (the admin console's "suspend sign-in"). */
+const banned = (row) => !!row?.banned_until && new Date(row.banned_until).getTime() > Date.now();
+
+/** A new session for the user: Supabase Auth records when they last signed in. */
+async function signedIn(row) {
+  return (
+    (await pool.query('update auth.users set last_sign_in_at = now() where id = $1 returning *', [row.id]))
+      .rows[0] ?? row
+  );
 }
 
 const refreshTokens = new Map(); // refresh token → user id (sessions reset when the shim restarts)
@@ -538,7 +570,7 @@ async function auth(req, res, path, query) {
         ],
       )
     ).rows[0];
-    return send(res, 200, session(row));
+    return send(res, 200, session(await signedIn(row)));
   }
   if (req.method === 'POST' && path === 'token') {
     const body = await readBody(req);
@@ -555,7 +587,8 @@ async function auth(req, res, path, query) {
           error_code: 'invalid_credentials',
           msg: 'Invalid login credentials',
         });
-      return send(res, 200, session(row));
+      if (banned(row)) return authError(res, 400, 'user_banned', 'User is banned');
+      return send(res, 200, session(await signedIn(row)));
     }
     if (query.get('grant_type') === 'refresh_token') {
       const id = refreshTokens.get(body.refresh_token);
@@ -567,7 +600,9 @@ async function auth(req, res, path, query) {
           'Invalid Refresh Token: Refresh Token Not Found',
         );
       refreshTokens.delete(body.refresh_token);
-      return send(res, 200, session(await userById(id)));
+      const row = await userById(id);
+      if (banned(row)) return authError(res, 400, 'user_banned', 'Invalid Refresh Token: User Banned');
+      return send(res, 200, session(row));
     }
     if (query.get('grant_type') === 'pkce') {
       const entry = oauthCodes.get(body.auth_code);
@@ -579,7 +614,9 @@ async function auth(req, res, path, query) {
           : verifier;
       if (!entry || !verifier || expected !== entry.challenge)
         return authError(res, 400, 'flow_state_not_found', 'invalid flow state, no valid flow state found');
-      return send(res, 200, session(await userById(entry.userId)));
+      const row = await userById(entry.userId);
+      if (banned(row)) return authError(res, 400, 'user_banned', 'User is banned');
+      return send(res, 200, session(await signedIn(row)));
     }
     return authError(res, 400, 'unsupported_grant_type', 'Unsupported grant type');
   }
@@ -607,7 +644,10 @@ async function auth(req, res, path, query) {
     if (!entry || entry.type !== type || entry.expires < Date.now())
       return authError(res, 403, 'otp_expired', 'Email link is invalid or has expired');
     const row = await userById(entry.userId);
-    return row ? send(res, 200, session(row)) : authError(res, 404, 'user_not_found', 'User not found');
+    if (banned(row)) return authError(res, 400, 'user_banned', 'User is banned');
+    return row
+      ? send(res, 200, session(await signedIn(row)))
+      : authError(res, 404, 'user_not_found', 'User not found');
   }
   // ── admin (service role): what the server does with auth.admin.* ──
   if (req.method === 'POST' && (path === 'admin/users' || path === 'admin/generate_link')) {
@@ -686,12 +726,20 @@ async function auth(req, res, path, query) {
           'email_exists',
           'A user with this email address has already been registered',
         );
+      // ban_duration: '<n>h' bans the user that long (sign-in refused); 'none' lifts it
+      let bannedUntil = row.banned_until ?? null;
+      if (body.ban_duration !== undefined) {
+        const hours = /^(\d+)h$/.exec(String(body.ban_duration));
+        if (body.ban_duration === 'none') bannedUntil = null;
+        else if (hours) bannedUntil = new Date(Date.now() + Number(hours[1]) * 3_600_000).toISOString();
+        else return authError(res, 400, 'validation_failed', 'invalid ban_duration');
+      }
       const updated = (
         await pool.query(
           `update auth.users set email = $2, raw_app_meta_data = coalesce(raw_app_meta_data, '{}') || $3,
-             raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || $4, updated_at = now()
+             raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || $4, banned_until = $5, updated_at = now()
            where id = $1 returning *`,
-          [row.id, email, body.app_metadata ?? {}, body.user_metadata ?? {}],
+          [row.id, email, body.app_metadata ?? {}, body.user_metadata ?? {}, bannedUntil],
         )
       ).rows[0];
       return send(res, 200, userJson(updated));

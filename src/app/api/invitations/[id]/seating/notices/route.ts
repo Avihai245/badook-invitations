@@ -1,3 +1,4 @@
+import { nudgeIfOk } from '@/features/admin/server/nudge';
 import { dayHostDeps } from '@/features/event-day/server/deps';
 import { noticesState, sendNotices } from '@/features/event-day/server/host-api';
 import { hostRoute } from '@/features/invitations/server/host-route';
@@ -18,5 +19,7 @@ export async function GET(request: Request, { params }: Params) {
  */
 export async function POST(request: Request, { params }: Params) {
   const { id } = await params;
-  return hostRoute(request, (userId, body) => sendNotices(userId, id, body, dayHostDeps()));
+  const res = await hostRoute(request, (userId, body) => sendNotices(userId, id, body, dayHostDeps()));
+  // the admin console's numbers, queues and feed
+  return nudgeIfOk(res, 'message');
 }

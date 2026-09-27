@@ -1,5 +1,6 @@
 import type { EmailOtpType } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
+import { nudgeAfter } from '@/features/admin/server/nudge';
 import { requestBaseUrl } from '@/lib/request-url';
 import { callbackError, failedLinkPath, loginPath, RESET_PATH } from '@/lib/supabase/auth-paths';
 import { safeNext, sessionDb } from '@/lib/supabase/session';
@@ -39,13 +40,20 @@ export async function GET(request: NextRequest) {
     const db = await sessionDb();
     if (code) {
       const { data, error } = await db.auth.exchangeCodeForSession(code);
+      // the Badook team suspended this account's sign-in (the admin console)
+      if (error?.code === 'user_banned') return go(loginPath({ error: 'suspended', next }));
       if (error) return go(failedLinkPath(error, next));
+      // a sign-in through Google (maybe a new account) or a confirmed email: the admin console's
+      // numbers and feed
+      nudgeAfter('user');
       // a recovery code says so even when `next` was lost on the way (Supabase's Site URL fallback)
       const recovery = (data as { redirectType?: string | null }).redirectType === 'recovery';
       return go(recovery ? RESET_PATH : next);
     }
     const { error } = await db.auth.verifyOtp({ type: type!, token_hash: tokenHash! });
+    if (error?.code === 'user_banned') return go(loginPath({ error: 'suspended', next }));
     if (error) return go(loginPath({ error: 'link_expired', next }));
+    if (type === 'signup' || type === 'email') nudgeAfter('user');
     return go(type === 'recovery' ? RESET_PATH : next);
   } catch (err) {
     console.error('[auth callback]', err);

@@ -2,6 +2,7 @@ import 'server-only';
 import { reportOverdue } from '@/features/billing/server/billing';
 import { consoleLogsHousekeeping } from '@/features/admin/messages/server';
 import { adminDb } from '@/features/admin/server/db';
+import { adminNudge } from '@/features/admin/server/live';
 import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
 import { facesHousekeeping } from '@/features/faces/server/deps';
@@ -112,6 +113,8 @@ export async function runWhatsAppQueue(budgetMs: number) {
     if (r.sent + r.failed + r.retried + t.sent + t.failed + t.retried + g.sent + g.failed + g.retried === 0)
       break;
   }
+  // messages left (or failed): the admin console's numbers and queues (it never throws)
+  if (total.sent + total.failed > 0) await adminNudge('message');
   return total;
 }
 

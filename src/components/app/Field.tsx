@@ -117,7 +117,8 @@ export function Field({
           {counter && (
             <p
               id={counterId}
-              className={cn('mt-1 shrink-0 text-[11px] tabular-nums', over ? 'text-danger' : 'text-faint')}
+              // (muted, not faint: it is text, and faint grey on white is under 4.5:1)
+              className={cn('mt-1 shrink-0 text-[11px] tabular-nums', over ? 'text-danger' : 'text-muted')}
             >
               <span dir="ltr">
                 {counter.value}/{counter.max}

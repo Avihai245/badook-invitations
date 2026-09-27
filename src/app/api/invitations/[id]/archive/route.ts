@@ -1,3 +1,4 @@
+import { nudgeIfOk } from '@/features/admin/server/nudge';
 import { setArchived } from '@/features/invitations/server/host-api';
 import { hostRoute } from '@/features/invitations/server/host-route';
 
@@ -6,5 +7,7 @@ type Params = { params: Promise<{ id: string }> };
 /** POST /api/invitations/:id/archive { archived } — archiving takes the public page offline. */
 export async function POST(request: Request, { params }: Params) {
   const { id } = await params;
-  return hostRoute(request, (userId, body, deps) => setArchived(userId, id, body, deps));
+  const res = await hostRoute(request, (userId, body, deps) => setArchived(userId, id, body, deps));
+  // the admin console's numbers
+  return nudgeIfOk(res, 'invitation');
 }

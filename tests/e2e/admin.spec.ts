@@ -91,6 +91,32 @@ test.describe('the admin console', () => {
       await expect(page.getByTestId(`admin-nav-${area}`)).toHaveCount(0);
   });
 
+  test('its API too: anyone else gets “not found”; staff without the permission, “forbidden”', async ({
+    page,
+  }, testInfo) => {
+    const email = unique(`admin-api-${testInfo.project.name}`);
+    await signUpAs(page, email);
+    const [me] = await sql<{ id: string }>(`select id from auth.users where email = $1`, [email]);
+    const calls: [string, unknown][] = [
+      [`/api/admin/users/${me!.id}/credits`, { delta: 5, reason: 'ניסיון' }],
+      [`/api/admin/users/${me!.id}/suspend`, { suspend: true, reason: 'ניסיון' }],
+      ['/api/admin/staff', { email: unique('admin-api-new'), role: 'owner', note: null, reason: 'ניסיון' }],
+      ['/api/admin/system/channel', {}],
+    ];
+    for (const [path, data] of calls)
+      expect((await page.request.post(path, { data })).status(), path).toBe(404);
+    // the same account on the staff as a viewer: the console is theirs, these actions aren't
+    await sql(`insert into public.admin_staff (email, role) values ($1, 'viewer')`, [email]);
+    for (const [path, data] of calls)
+      expect((await page.request.post(path, { data })).status(), path).toBe(403);
+    // and nothing was done
+    const [row] = await sql<{ n: number }>(
+      `select count(*)::int as n from public.admin_audit where actor_email = $1`,
+      [email],
+    );
+    expect(row!.n).toBe(0);
+  });
+
   test('an account Badook Events opened is never staff, whatever its email', async ({ page }, testInfo) => {
     const email = unique(`admin-partner-${testInfo.project.name}`);
     await sql(`insert into public.admin_staff (email, role) values ($1, 'owner')`, [email]);

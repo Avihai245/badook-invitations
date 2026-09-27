@@ -4,6 +4,7 @@ import {
   authAnswerRedirect,
   callbackError,
   failedLinkPath,
+  isSuspended,
   loginPath,
   signedInLanding,
   signupNext,
@@ -205,6 +206,31 @@ describe('/auth/callback', () => {
     expect(await callback('type=signup')).toBe('https://invitations.example.com/login?error=link_invalid');
     auth.exchangeCodeForSession.mockRejectedValue(new Error('network'));
     expect(await callback('code=c4')).toBe('https://invitations.example.com/login?error=generic');
+  });
+
+  it('an account whose sign-in the Badook team suspended is told so', async () => {
+    auth.exchangeCodeForSession.mockResolvedValue({
+      data: { session: null },
+      error: { code: 'user_banned' },
+    });
+    expect(await callback('code=c5&next=%2Fapp%2Fbilling')).toBe(
+      'https://invitations.example.com/login?error=suspended&next=%2Fapp%2Fbilling',
+    );
+    auth.verifyOtp.mockResolvedValue({ data: {}, error: { code: 'user_banned' } });
+    expect(await callback('token_hash=t3&type=magiclink')).toBe(
+      'https://invitations.example.com/login?error=suspended',
+    );
+  });
+});
+
+describe('a suspended sign-in (the admin console)', () => {
+  it('while the ban lasts, never before or after it', () => {
+    const now = Date.parse('2026-09-27T10:00:00Z');
+    expect(isSuspended({ banned_until: '2126-09-27T10:00:00Z' }, now)).toBe(true);
+    expect(isSuspended({ banned_until: '2026-09-27T09:59:59Z' }, now)).toBe(false);
+    expect(isSuspended({ banned_until: null }, now)).toBe(false);
+    expect(isSuspended({}, now)).toBe(false);
+    expect(isSuspended(null, now)).toBe(false);
   });
 });
 

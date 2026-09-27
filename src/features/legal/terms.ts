@@ -111,6 +111,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
           heading: '10. Ending the use',
           body: [
             'You may stop using the Service and close your account at any time. We may suspend or close an account that breaks these terms or the law, or to protect guests, users or the Service, and will explain why where we can. When an account is closed its information is deleted as described in the privacy policy.',
+            'While an account is suspended it can’t be signed in to; its information is kept, and invitations it already published keep working for their guests unless the suspension is about them. You can ask us about a suspension through the contact page.',
           ],
         },
         {
@@ -247,6 +248,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
         heading: '10. סיום השימוש',
         body: [
           'אפשר להפסיק להשתמש בשירות ולסגור את החשבון בכל עת. אנחנו רשאים להשעות או לסגור חשבון שמפר את התנאים או את החוק, או כדי להגן על אורחים, משתמשים או על השירות, ונסביר את הסיבה כשאפשר. כשחשבון נסגר, המידע שלו נמחק כמתואר במדיניות הפרטיות.',
+          'כל עוד חשבון מושעה אי אפשר להיכנס אליו; המידע שלו נשמר, וההזמנות שכבר פורסמו בו ממשיכות לעבוד לאורחים, אלא אם ההשעיה נוגעת להן. אפשר לפנות אלינו לגבי השעיה דרך דף יצירת הקשר.',
         ],
       },
       {

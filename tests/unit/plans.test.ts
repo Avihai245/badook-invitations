@@ -29,6 +29,26 @@ describe('the plan in force', () => {
     expect(effectivePlan({ plan: 'pro', planStatus: 'canceled', planRenewsAt: null }, NOW)).toBe('free');
   });
 
+  it('a gift from the Badook team lasts until its date — and not a day of grace after it', () => {
+    const gift = { planStatus: 'canceled', billingProvider: 'gift' } as const;
+    expect(effectivePlan({ ...gift, plan: 'business', planRenewsAt: at(10) }, NOW)).toBe('business');
+    expect(effectivePlan({ ...gift, plan: 'business', planRenewsAt: at(-1) }, NOW)).toBe('free');
+    // whatever its status says: nothing was going to renew it
+    expect(
+      effectivePlan(
+        { plan: 'pro', planStatus: 'active', planRenewsAt: at(-1), billingProvider: 'gift' },
+        NOW,
+      ),
+    ).toBe('free');
+    // a paid plan whose renewal is late keeps its grace
+    expect(
+      effectivePlan(
+        { plan: 'pro', planStatus: 'active', planRenewsAt: at(-1), billingProvider: 'payplus' },
+        NOW,
+      ),
+    ).toBe('pro');
+  });
+
   it('a renewal that never came keeps the plan for the grace period only', () => {
     expect(effectivePlan({ plan: 'business', planStatus: 'active', planRenewsAt: at(20) }, NOW)).toBe(
       'business',

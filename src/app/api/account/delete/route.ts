@@ -1,3 +1,4 @@
+import { nudgeIfOk } from '@/features/admin/server/nudge';
 import { deleteAccount } from '@/features/billing/server/account-api';
 import { userRoute } from '@/features/billing/server/route';
 import { sessionDb } from '@/lib/supabase/session';
@@ -7,5 +8,6 @@ export async function POST(request: Request) {
   const response = await userRoute(request, (user, body) => deleteAccount(user, body));
   // the session cookies go too
   if (response.ok) await (await sessionDb()).auth.signOut({ scope: 'local' }).catch(() => undefined);
-  return response;
+  // the admin console's numbers
+  return nudgeIfOk(response, 'user');
 }
