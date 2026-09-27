@@ -266,7 +266,7 @@ const FUNCTIONS = new Set([
   'admin_partners_activity',
   'admin_logs_maintenance',
   // the admin console's core: overview, feed, users, invitations, actions, record, system
-  // (supabase/migrations/20260927210000_admin_core.sql)
+  // (supabase/migrations/20260927052200_admin_core.sql)
   'admin_overview',
   'admin_activity',
   'admin_users',

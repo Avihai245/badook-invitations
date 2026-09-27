@@ -8,7 +8,7 @@ export { INVITATION_SORTS, USER_SORTS } from '../lists';
 export type { InvitationSort, InvitationStatus, UserSort } from '../lists';
 
 /**
- * The console's core in the database (supabase/migrations/20260927210000_admin_core.sql): the
+ * The console's core in the database (supabase/migrations/20260927052200_admin_core.sql): the
  * overview's numbers and feed, the users and invitations, the team's actions on them, the record of
  * actions in words and the system's state. Each function takes the acting staff member and checks
  * their role itself; contact details come back masked to roles without users.pii.

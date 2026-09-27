@@ -12,7 +12,7 @@ export type InvitationStatus = (typeof INVITATION_STATUSES)[number];
 
 /**
  * The most credits one action may add or remove, by role — the database holds the same caps
- * (supabase/migrations/20260927210000_admin_core.sql admin_user_credits).
+ * (supabase/migrations/20260927052200_admin_core.sql admin_user_credits).
  */
 export const CREDIT_CAPS: Record<StaffRole, number> = {
   owner: 100_000,
