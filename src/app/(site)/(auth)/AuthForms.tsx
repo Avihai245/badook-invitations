@@ -2,7 +2,17 @@
 
 import { CircleCheck } from 'lucide-react';
 import Link from 'next/link';
-import { Fragment, useActionState, type ReactNode } from 'react';
+import {
+  Fragment,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ClipboardEvent,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react';
 import { useFormStatus } from 'react-dom';
 import { Button, Field, Input } from '@/components/app';
 import type { AppDict } from '@/lib/i18n/app';
@@ -10,10 +20,12 @@ import { useUi } from '@/lib/i18n/client';
 import {
   continueWithLink,
   requestPasswordReset,
+  resendCode,
   signIn,
   signInWithGoogle,
   signUp,
   updatePassword,
+  verifyCode,
   type AuthErrorKey,
   type AuthState,
 } from './actions';
@@ -61,6 +73,160 @@ function PendingSubmit({ children }: { children: ReactNode }) {
     <Button type="submit" size="lg" fullWidth loading={pending}>
       {children}
     </Button>
+  );
+}
+
+/** 6 separate boxes (LTR, numeric keyboard): auto-advance, backspace-to-previous, paste anywhere. */
+function CodeInput({
+  length = 6,
+  onChange,
+  disabled = false,
+}: {
+  length?: number;
+  onChange: (code: string) => void;
+  disabled?: boolean;
+}) {
+  const { t, fmt } = useUi();
+  const [digits, setDigits] = useState<string[]>(() => Array(length).fill(''));
+  const refs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const update = (next: string[]) => {
+    setDigits(next);
+    onChange(next.join(''));
+  };
+
+  return (
+    <div dir="ltr" className="flex justify-center gap-2">
+      {digits.map((digit, i) => (
+        <input
+          key={i}
+          ref={(el) => {
+            refs.current[i] = el;
+          }}
+          value={digit}
+          disabled={disabled}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            const d = e.target.value.replace(/\D/g, '').slice(-1);
+            const next = digits.slice();
+            next[i] = d;
+            update(next);
+            if (d && i < length - 1) refs.current[i + 1]?.focus();
+          }}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === 'Backspace' && !digits[i] && i > 0) {
+              e.preventDefault();
+              const next = digits.slice();
+              next[i - 1] = '';
+              update(next);
+              refs.current[i - 1]?.focus();
+            }
+          }}
+          onPaste={(e: ClipboardEvent<HTMLInputElement>) => {
+            const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, length);
+            if (!pasted) return;
+            e.preventDefault();
+            update(Array.from({ length }, (_, j) => pasted[j] ?? ''));
+            refs.current[Math.min(pasted.length, length - 1)]?.focus();
+          }}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          autoComplete="one-time-code"
+          maxLength={1}
+          autoFocus={i === 0}
+          aria-label={fmt(t.auth.codeDigit, { n: i + 1 })}
+          className="h-12 w-11 rounded-input border border-line bg-surface text-center text-[20px] font-semibold text-ink transition-[border-color,box-shadow] duration-150 focus:border-ink focus:shadow-ring focus:outline-hidden disabled:cursor-not-allowed disabled:bg-subtle disabled:text-muted"
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The 6-digit code screen: sign-up confirmation, a login stalled on confirming the email, or a
+ * password reset — same UI, `kind` says which. "Resend code" below has a 60s cooldown, restarted on
+ * mount (a code was just sent) and after every resend; a full code submits itself.
+ */
+function CodeStep({
+  email,
+  next,
+  kind,
+  title,
+  onBack,
+}: {
+  email: string;
+  next: string;
+  kind: 'signup' | 'recovery';
+  title: string;
+  onBack: () => void;
+}) {
+  const { t, fmt } = useUi();
+  const [code, setCode] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const [cooldown, setCooldown] = useState(60);
+  const [state, action, pending] = useActionState<AuthState, FormData>(verifyCode, null);
+  const [resendState, resendAction, resendPending] = useActionState<AuthState, FormData>(resendCode, null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(() => setCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, [cooldown]);
+
+  // a wrong or expired code: clear the boxes and refocus the first one for another try
+  useEffect(() => {
+    if (state?.error) {
+      setCode('');
+      setAttempt((a) => a + 1);
+    }
+  }, [state]);
+
+  useEffect(() => {
+    if (resendState?.sent) setCooldown(60);
+  }, [resendState]);
+
+  useEffect(() => {
+    if (code.length === 6 && !pending) formRef.current?.requestSubmit();
+  }, [code, pending]);
+
+  return (
+    <AuthCard title={title} subtitle={fmt(t.auth.verifySubtitle, { email })}>
+      <form ref={formRef} action={action} className="flex flex-col gap-4" noValidate>
+        <input type="hidden" name="email" value={email} />
+        <input type="hidden" name="next" value={next} />
+        <input type="hidden" name="kind" value={kind} />
+        <input type="hidden" name="code" value={code} />
+        <CodeInput key={attempt} onChange={setCode} disabled={pending} />
+        <FormError error={state?.error} />
+        <Button type="submit" size="lg" fullWidth loading={pending} disabled={code.length !== 6}>
+          {t.auth.verifyCode}
+        </Button>
+      </form>
+      <form action={resendAction} className="mt-5 flex flex-col items-center gap-2">
+        <input type="hidden" name="email" value={email} />
+        <input type="hidden" name="kind" value={kind} />
+        <button
+          type="submit"
+          disabled={cooldown > 0 || resendPending}
+          className="text-[13px] font-medium text-ink underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:text-muted disabled:no-underline"
+        >
+          {cooldown > 0 ? fmt(t.auth.resendIn, { s: cooldown }) : t.auth.resendCode}
+        </button>
+        {resendState?.error ? (
+          <FormError error={resendState.error} />
+        ) : resendState?.sent ? (
+          <p className="text-[12px] text-success">{t.auth.codeResent}</p>
+        ) : null}
+      </form>
+      <button
+        type="button"
+        onClick={onBack}
+        className="mt-4 block w-full text-center text-[13px] text-muted underline-offset-2 hover:underline"
+      >
+        {t.auth.changeEmail}
+      </button>
+    </AuthCard>
   );
 }
 
@@ -174,10 +340,25 @@ export function LoginForm({
   google?: boolean;
 }) {
   const { t } = useUi();
+  const [step, setStep] = useState<'form' | 'code'>('form');
   const [state, action, pending] = useActionState<AuthState, FormData>(
     signIn,
     initialError ? { error: initialError } : null,
   );
+  useEffect(() => {
+    if (state?.step === 'code') setStep('code');
+  }, [state]);
+  if (step === 'code' && state?.step === 'code') {
+    return (
+      <CodeStep
+        email={state.email}
+        next={state.next}
+        kind={state.kind}
+        title={t.auth.verifyTitle}
+        onBack={() => setStep('form')}
+      />
+    );
+  }
   return (
     <AuthCard title={t.auth.loginTitle} subtitle={t.auth.loginSubtitle}>
       {notice ? <Notice notice={notice} /> : null}
@@ -225,19 +406,22 @@ export function LoginForm({
 }
 
 export function SignupForm({ next, google = false }: { next: string; google?: boolean }) {
-  const { t, fmt } = useUi();
+  const { t } = useUi();
+  const [step, setStep] = useState<'form' | 'code'>('form');
   const [state, action, pending] = useActionState<AuthState, FormData>(signUp, null);
   const toLogin = next === '/app/invitations' ? '/login' : `/login?next=${encodeURIComponent(next)}`;
-  if (state?.sent) {
+  useEffect(() => {
+    if (state?.step === 'code') setStep('code');
+  }, [state]);
+  if (step === 'code' && state?.step === 'code') {
     return (
-      <AuthCard
-        title={t.auth.checkEmailTitle}
-        subtitle={fmt(t.auth.checkEmail, { email: state.email ?? '' })}
-      >
-        <Button asChild variant="secondary" fullWidth>
-          <Link href={toLogin}>{t.auth.toLogin}</Link>
-        </Button>
-      </AuthCard>
+      <CodeStep
+        email={state.email}
+        next={state.next}
+        kind={state.kind}
+        title={t.auth.verifyTitle}
+        onBack={() => setStep('form')}
+      />
     );
   }
   return (
@@ -287,41 +471,47 @@ export function SignupForm({ next, google = false }: { next: string; google?: bo
 
 export function ForgotPasswordForm({ initialError }: { initialError?: AuthErrorKey }) {
   const { t } = useUi();
+  const [step, setStep] = useState<'email' | 'code'>('email');
   const [state, action, pending] = useActionState<AuthState, FormData>(
     requestPasswordReset,
     initialError ? { error: initialError } : null,
   );
+  useEffect(() => {
+    if (state?.step === 'code') setStep('code');
+  }, [state]);
+  if (step === 'code' && state?.step === 'code') {
+    return (
+      <CodeStep
+        email={state.email}
+        next={state.next}
+        kind={state.kind}
+        title={t.auth.recoveryCodeTitle}
+        onBack={() => setStep('email')}
+      />
+    );
+  }
   return (
-    <AuthCard title={t.auth.forgotTitle} subtitle={state?.sent ? t.auth.linkSent : t.auth.forgotSubtitle}>
-      {state?.sent ? (
-        <Button asChild variant="secondary" fullWidth>
-          <Link href="/login">{t.auth.toLogin}</Link>
+    <AuthCard title={t.auth.forgotTitle} subtitle={t.auth.forgotSubtitle}>
+      <form action={action} className="flex flex-col gap-4" noValidate>
+        <Field label={t.auth.email} required>
+          <Input
+            name="email"
+            type="email"
+            dir="ltr"
+            autoComplete="email"
+            inputMode="email"
+            defaultValue={state?.email}
+            required
+          />
+        </Field>
+        <FormError error={state?.error} />
+        <Button type="submit" size="lg" fullWidth loading={pending}>
+          {t.auth.sendCode}
         </Button>
-      ) : (
-        <form action={action} className="flex flex-col gap-4" noValidate>
-          <Field label={t.auth.email} required>
-            <Input
-              name="email"
-              type="email"
-              dir="ltr"
-              autoComplete="email"
-              inputMode="email"
-              defaultValue={state?.email}
-              required
-            />
-          </Field>
-          <FormError error={state?.error} />
-          <Button type="submit" size="lg" fullWidth loading={pending}>
-            {t.auth.sendLink}
-          </Button>
-          <Link
-            href="/login"
-            className="text-center text-[13px] text-muted underline-offset-2 hover:underline"
-          >
-            {t.auth.toLogin}
-          </Link>
-        </form>
-      )}
+        <Link href="/login" className="text-center text-[13px] text-muted underline-offset-2 hover:underline">
+          {t.auth.toLogin}
+        </Link>
+      </form>
     </AuthCard>
   );
 }

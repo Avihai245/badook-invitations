@@ -31,7 +31,9 @@ const auth = {
   exchangeCodeForSession: vi.fn(),
   verifyOtp: vi.fn(),
   signInWithOAuth: vi.fn(),
+  signInWithPassword: vi.fn(),
   signUp: vi.fn(),
+  resend: vi.fn(),
   resetPasswordForEmail: vi.fn(),
 };
 const sessionDb = vi.fn(async () => ({ auth }));
@@ -258,18 +260,25 @@ describe('the sign-in actions', () => {
     );
   });
 
-  it('sign-up and password reset send people back to the address they are on, keeping next', async () => {
-    const { requestPasswordReset, signUp } = await import('@/app/(site)/(auth)/actions');
+  it('sign-up sends a 6-digit code (no link), full_name in the metadata, next kept for after it', async () => {
+    const { signUp } = await import('@/app/(site)/(auth)/actions');
     auth.signUp.mockResolvedValue({ data: { session: null }, error: null });
     expect(
       await signUp(
         null,
-        form({ email: 'a@example.com', password: 'a-good-password', next: '/app/billing?plan=pro' }),
+        form({
+          name: 'Dana',
+          email: 'a@example.com',
+          password: 'a-good-password',
+          next: '/app/billing?plan=pro',
+        }),
       ),
-    ).toEqual({ sent: true, email: 'a@example.com' });
-    expect(auth.signUp.mock.calls[0]![0].options.emailRedirectTo).toBe(
-      'https://invitations.example.com/auth/callback?next=%2Fapp%2Fbilling%3Fplan%3Dpro',
-    );
+    ).toEqual({ step: 'code', kind: 'signup', email: 'a@example.com', next: '/app/billing?plan=pro' });
+    expect(auth.signUp.mock.calls[0]![0]).toEqual({
+      email: 'a@example.com',
+      password: 'a-good-password',
+      options: { data: { full_name: 'Dana' } },
+    });
     // confirmation off: signed in at once, on to next
     auth.signUp.mockResolvedValue({ data: { session: {} }, error: null });
     expect(
@@ -277,11 +286,106 @@ describe('the sign-in actions', () => {
         signUp(null, form({ email: 'b@example.com', password: 'a-good-password', next: '/app/account' })),
       ),
     ).toBe('/app/account');
+  });
+
+  it('a password reset sends a code too — same answer whether or not the account exists', async () => {
+    const { requestPasswordReset } = await import('@/app/(site)/(auth)/actions');
     auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
-    await requestPasswordReset(null, form({ email: 'a@example.com' }));
-    expect(auth.resetPasswordForEmail.mock.calls[0]![1].redirectTo).toBe(
-      'https://invitations.example.com/auth/callback?next=%2Fauth%2Fupdate-password',
-    );
+    expect(await requestPasswordReset(null, form({ email: 'a@example.com' }))).toEqual({
+      step: 'code',
+      kind: 'recovery',
+      email: 'a@example.com',
+      next: '/auth/update-password',
+    });
+    expect(auth.resetPasswordForEmail).toHaveBeenCalledWith('a@example.com');
+  });
+
+  it('a code finishes a sign-up (next) or unlocks a new password; wrong/expired says so', async () => {
+    const { verifyCode } = await import('@/app/(site)/(auth)/actions');
+    auth.verifyOtp.mockResolvedValue({ data: {}, error: null });
+    expect(
+      await redirectOf(() =>
+        verifyCode(
+          null,
+          form({ email: 'a@example.com', code: '123456', kind: 'signup', next: '/app/account' }),
+        ),
+      ),
+    ).toBe('/app/account');
+    expect(auth.verifyOtp).toHaveBeenCalledWith({ email: 'a@example.com', token: '123456', type: 'signup' });
+
+    expect(
+      await redirectOf(() => verifyCode(null, form({ email: 'a@example.com', code: '123456', kind: 'recovery' }))),
+    ).toBe('/auth/update-password');
+    expect(auth.verifyOtp).toHaveBeenCalledWith({
+      email: 'a@example.com',
+      token: '123456',
+      type: 'recovery',
+    });
+
+    expect(await verifyCode(null, form({ email: 'a@example.com', code: '12x456', kind: 'signup' }))).toEqual({
+      step: 'code',
+      kind: 'signup',
+      email: 'a@example.com',
+      next: '/app/invitations',
+      error: 'code_invalid',
+    });
+    auth.verifyOtp.mockResolvedValue({ data: {}, error: { code: 'otp_expired' } });
+    expect(await verifyCode(null, form({ email: 'a@example.com', code: '000000', kind: 'signup' }))).toEqual({
+      step: 'code',
+      kind: 'signup',
+      email: 'a@example.com',
+      next: '/app/invitations',
+      error: 'code_invalid',
+    });
+  });
+
+  it('resend: a fresh sign-up code, or asking Supabase to send the reset code again', async () => {
+    const { resendCode } = await import('@/app/(site)/(auth)/actions');
+    auth.resend.mockResolvedValue({ data: {}, error: null });
+    expect(await resendCode(null, form({ email: 'a@example.com', kind: 'signup' }))).toEqual({
+      sent: true,
+      email: 'a@example.com',
+    });
+    expect(auth.resend).toHaveBeenCalledWith({ type: 'signup', email: 'a@example.com' });
+
+    auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
+    expect(await resendCode(null, form({ email: 'a@example.com', kind: 'recovery' }))).toEqual({
+      sent: true,
+      email: 'a@example.com',
+    });
+    expect(auth.resetPasswordForEmail).toHaveBeenCalledWith('a@example.com');
+
+    auth.resend.mockResolvedValue({ data: {}, error: { status: 429 } });
+    expect(await resendCode(null, form({ email: 'a@example.com', kind: 'signup' }))).toEqual({
+      error: 'rate_limited',
+      email: 'a@example.com',
+    });
+  });
+
+  it('signing in on an unconfirmed account gets a fresh code and the same verification screen', async () => {
+    const { signIn } = await import('@/app/(site)/(auth)/actions');
+    auth.signInWithPassword.mockResolvedValue({ data: {}, error: { code: 'email_not_confirmed' } });
+    auth.resend.mockResolvedValue({ data: {}, error: null });
+    expect(await signIn(null, form({ email: 'a@example.com', password: 'x', next: '/app/account' }))).toEqual({
+      step: 'code',
+      kind: 'signup',
+      email: 'a@example.com',
+      next: '/app/account',
+    });
+    expect(auth.resend).toHaveBeenCalledWith({ type: 'signup', email: 'a@example.com' });
+
+    auth.signInWithPassword.mockResolvedValue({ data: {}, error: { code: 'invalid_credentials' } });
+    expect(await signIn(null, form({ email: 'a@example.com', password: 'x' }))).toEqual({
+      error: 'invalid_credentials',
+      email: 'a@example.com',
+    });
+
+    auth.signInWithPassword.mockResolvedValue({ data: {}, error: null });
+    expect(
+      await redirectOf(() =>
+        signIn(null, form({ email: 'a@example.com', password: 'x', next: '/app/billing' })),
+      ),
+    ).toBe('/app/billing');
   });
 
   it('a partner’s sign-in link is used on the click, not on opening it', async () => {
