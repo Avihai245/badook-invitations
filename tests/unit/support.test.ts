@@ -398,7 +398,8 @@ describe('the support assistant', () => {
     expect(headers.authorization).toBe('Bearer oa-test-key');
     expect(headers['x-api-key']).toBeUndefined();
     const body = JSON.parse(String(init.body));
-    expect(body).toMatchObject({ model: 'oa-test-model', stream: true, max_tokens: 1024 });
+    // 'oa-test-model' isn't a gpt-4*/gpt-3.5* id, so openAiTokenParam() picks the newer parameter name
+    expect(body).toMatchObject({ model: 'oa-test-model', stream: true, max_completion_tokens: 1024 });
     // the manual first (a stable prefix, for OpenAI's own prompt caching), then the screen, then the
     // conversation only — no Anthropic-shaped `system` array here
     expect(body.system).toBeUndefined();
@@ -408,6 +409,77 @@ describe('the support assistant', () => {
       content: expect.stringContaining('/app/invitations/:id/guests'),
     });
     expect(body.messages[2]).toEqual({ role: 'user', content: 'איך שולחים בוואטסאפ?' });
+    vi.unstubAllEnvs();
+    vi.doUnmock('@/lib/supabase/server');
+    vi.resetModules();
+  });
+
+  it('picks max_tokens vs max_completion_tokens by the OpenAI model family', async () => {
+    const { openAiTokenParam } = await import('@/features/support/chat');
+    for (const legacy of ['gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-3.5-turbo'])
+      expect(openAiTokenParam(legacy)).toBe('max_tokens');
+    for (const newer of ['gpt-5', 'gpt-5-mini', 'gpt-5.4-mini', 'o1', 'o1-mini', 'o3', 'o4-mini'])
+      expect(openAiTokenParam(newer)).toBe('max_completion_tokens');
+  });
+
+  it('a model that rejects the guessed token parameter: one retry with the one the API named, not a blind one', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'oa-test-key');
+    vi.stubEnv('INVITES_AI_MODEL_OPENAI', 'gpt-4o-mini'); // openAiTokenParam() guesses max_tokens here
+    vi.stubEnv('INVITES_AI_API_BASE_OPENAI', 'https://oa.test');
+    vi.resetModules();
+    const freshRpc = vi.fn().mockResolvedValue({ data: true, error: null });
+    vi.doMock('@/lib/supabase/server', () => ({ serviceDb: () => ({ rpc: freshRpc }) }));
+    const { supportChat } = await import('@/features/support/chat');
+
+    // the API rejects the guess and names the parameter it actually wants: one retry, corrected
+    const unsupported = () =>
+      new Response(
+        JSON.stringify({
+          error: {
+            message: "Unsupported parameter: 'max_tokens' is not supported. Use 'max_completion_tokens'.",
+          },
+        }),
+        { status: 400 },
+      );
+    const ok = () =>
+      new Response(sseOpenAi([oaiDelta('תשובה'), oaiFinish('stop'), '[DONE]']), {
+        status: 200,
+        headers: { 'content-type': 'text/event-stream' },
+      });
+    const fetchImpl = vi.fn().mockResolvedValueOnce(unsupported()).mockResolvedValueOnce(ok());
+    const result = await supportChat(
+      { messages: [{ role: 'user', content: 'שאלה' }] },
+      { userId: 'u1', ip: null },
+      fetchImpl as unknown as typeof fetch,
+    );
+    expect(result.status).toBe(200);
+    expect('stream' in result && (await read(result.stream))).toBe('תשובה');
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    const firstBody = JSON.parse(
+      String((fetchImpl.mock.calls[0] as unknown as [string, RequestInit])[1].body),
+    );
+    const secondBody = JSON.parse(
+      String((fetchImpl.mock.calls[1] as unknown as [string, RequestInit])[1].body),
+    );
+    expect(firstBody.max_tokens).toBe(1024);
+    expect(firstBody.max_completion_tokens).toBeUndefined();
+    expect(secondBody.max_completion_tokens).toBe(1024);
+    expect(secondBody.max_tokens).toBeUndefined();
+
+    // a 400 for an unrelated reason: no retry, and the kind fallback (not silently misread as this case)
+    const otherError = vi.fn(
+      async () => new Response(JSON.stringify({ error: { message: 'invalid request' } }), { status: 400 }),
+    );
+    const otherResult = await supportChat(
+      { messages: [{ role: 'user', content: 'שאלה' }] },
+      { userId: 'u2', ip: null },
+      otherError as unknown as typeof fetch,
+    );
+    expect(otherError).toHaveBeenCalledTimes(1);
+    expect('stream' in otherResult && (await read(otherResult.stream))).toMatch(
+      /^סליחה, לא הצלחתי לענות כרגע/,
+    );
+
     vi.unstubAllEnvs();
     vi.doUnmock('@/lib/supabase/server');
     vi.resetModules();

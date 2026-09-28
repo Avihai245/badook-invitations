@@ -3,6 +3,7 @@ import { billingMode, type BillingMode } from '@/features/billing/server/billing
 import { payplusConfigured } from '@/features/billing/server/payplus';
 import { seedVersion } from '@/features/invitations/templates/seed-data';
 import { dailyDue } from '@/features/jobs/schedule';
+import { chatProvider } from '@/features/support/chat';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { templateLanguages } from '@/features/whatsapp/languages';
 import { serverEnv } from '@/lib/env';
@@ -24,6 +25,8 @@ export interface Deployment {
     supportEmail: boolean;
     ai: boolean;
     aiChat: boolean;
+    /** which provider answers it (support/chat.ts's chatProvider()); null when aiChat is false */
+    aiChatProvider: 'openai' | 'anthropic' | null;
     tts: boolean;
     partnerApi: boolean;
     faceAlbums: boolean;
@@ -60,11 +63,9 @@ export function deployment(now = new Date()): Deployment {
       email: !!(env.INVITES_EMAIL_API_KEY && env.INVITES_EMAIL_FROM),
       supportEmail: !!env.INVITES_SUPPORT_EMAIL,
       ai: !!(env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL),
-      // the chat only: either provider (support/chat.ts) — true even when only OpenAI is set up
-      aiChat: !!(
-        (env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL) ||
-        (env.OPENAI_API_KEY && env.INVITES_AI_MODEL_OPENAI)
-      ),
+      // the chat only: either provider — true even when only OpenAI is set up
+      aiChat: !!chatProvider(env),
+      aiChatProvider: chatProvider(env),
       tts: !!(env.INVITES_TTS_AZURE_KEY && env.INVITES_TTS_AZURE_REGION),
       partnerApi: !!env.INVITES_PARTNER_API_KEY,
       faceAlbums: env.INVITES_FACE_ALBUMS,

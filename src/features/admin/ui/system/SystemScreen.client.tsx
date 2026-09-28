@@ -194,6 +194,14 @@ export function SystemScreen({ state, deployment: dep }: { state: SystemState; d
                 <YesNo on={on} />
               </li>
             ))}
+            {dep.services.aiChatProvider ? (
+              <li className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <span className="text-[13.5px]">{S.services.aiChatProviderLabel}</span>
+                <span className="text-[13px] font-medium" data-testid="admin-system-ai-chat-provider">
+                  {S.services.aiChatProviders[dep.services.aiChatProvider]}
+                </span>
+              </li>
+            ) : null}
             <li className="flex flex-wrap items-center justify-between gap-2 py-2">
               <span className="text-[13.5px]">{S.services.billing}</span>
               <span className="text-[13px] font-medium">{S.services.billingModes[dep.services.billing]}</span>

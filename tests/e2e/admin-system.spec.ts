@@ -54,6 +54,7 @@ test.describe('the admin console’s system status', () => {
     await setUp('תשלומים (PayPlus)', false);
     await setUp('המערכת מריצה עבודות בעצמה', false);
     await expect(service('מצב התשלומים')).toContainText('עמוד תשלום לבדיקה');
+    await expect(service('עוזר הצ׳אט פועל דרך')).toContainText('Anthropic');
     await expect(page.getByTestId('admin-system-langs')).toHaveText('he, en, ru, ar');
     const html = await page.content();
     for (const secret of SECRETS) expect(html, `the page shows ${secret}`).not.toContain(secret);

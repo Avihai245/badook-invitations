@@ -55,6 +55,8 @@ export const systemEn: typeof systemHe = {
       cronSecret: 'Outside scheduler (cron secret)',
       jobsFallback: 'The system runs jobs by itself',
     },
+    aiChatProviderLabel: 'The chat assistant runs on',
+    aiChatProviders: { openai: 'OpenAI', anthropic: 'Anthropic' },
     billing: 'Payments mode',
     billingModes: { payplus: 'PayPlus', test: 'Test payment page', off: 'Off' },
     langs: 'WhatsApp template languages',

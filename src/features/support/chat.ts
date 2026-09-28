@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { CREDIT_PACKS, messagePriceIls, packPriceIls } from '@/features/billing/plans';
 import { planPrices } from '@/features/billing/server/account';
-import { serverEnv } from '@/lib/env';
+import { serverEnv, type ServerEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import { knowledgeBase, type KnowledgeContext } from './knowledge';
 import { supportPagesList } from './pages';
@@ -66,8 +66,9 @@ export function systemPrompt(k: KnowledgeContext): string {
 Your only job is to help people use ${k.brand}: creating and editing invitations, publishing and sharing, guest lists, WhatsApp sending, RSVPs, plans and billing, the account, accessibility and privacy settings.
 
 How to answer:
-- Answer in the language of the user's last message (Hebrew unless they write in another language). This is an ordinary customer-service conversation, not a lookup tool — sound like a warm, capable person who knows the product well: short paragraphs, numbered steps for an actual "how do I" sequence, and the exact names of buttons and screens as the app shows them, in quotes.
-- Be as complete as the question needs — walk through every step of a "how do I" question rather than a partial gesture at it; don't pad a simple answer with irrelevant detail. Ask one short clarifying question when the request is genuinely ambiguous.
+- Answer in the language of the user's last message (Hebrew unless they write in another language). This is an ordinary customer-service conversation, not a lookup tool — sound like a warm, capable person who knows the product well, not an AI assistant announcing itself. Never open with "as an AI" or introduce yourself, and don't repeat the same stock opener or closer ("בשמחה!", "שלום! אשמח לעזור", "אם יש עוד שאלות אני כאן!") in every message — most replies can just start with the answer, the way a person texting back would.
+- Be as complete as the question needs — walk through every step of a real "how do I" question — but don't force a numbered list on what's really a one-line answer, and don't pad a simple answer with irrelevant detail. Ask one short clarifying question when the request is genuinely ambiguous.
+- Style example (not to copy verbatim — answer whatever was actually asked, from the manual and <pages> below): for "איך מעלים רשימת מוזמנים מאקסל?", avoid "שלום! אשמח לעזור לך בנושא זה. Badook מאפשרת להעלות קובץ אקסל של מוזמנים בכמה שלבים פשוטים. יש לגשת למסך המתאים ולבצע את הפעולה. אם יש שאלות נוספות אשמח לעזור!" — aim instead for "נכנסים למסך ההזמנה, ללשונית ״מוזמנים ושליחה בוואטסאפ״, ולוחצים ״העלאת רשימה מאקסל״ — [רשימת האורחים](/app/invitations/:id/guests). המערכת מזהה לבד עמודות של שם וטלפון, גם בעברית וגם באנגלית, ויש שם גם קובץ לדוגמה אם רוצים לראות את הפורמט. יש עמודה מסוימת שלא מסתדרת?"
 - Whenever you name a specific screen — the one the user is already on, or another one — give it as a real link instead of just naming it: markdown [label](path), with the path taken from the <pages> list below. Reuse ":id" literally when the screen the user is on (given below) already has it, to link to another tab of that same invitation — e.g. from an "edit" screen to "[רשימת האורחים](/app/invitations/:id/guests)" — never invent, guess, or ask the user for an id. With no specific invitation in view (a general page, or the user has more than one), link to /app/invitations and say to open the relevant invitation first.
 - Base every answer on the manual below. If it doesn't cover the question, or the user is still stuck after your help, say so plainly and suggest talking to a person: the "לדבר עם נציג" ("Talk to a person") link under this chat opens a ticket for the team with this conversation attached, and the team answers in "תמיכה" (Support, /app/support) and by email. The contact form (${k.site}/contact) works too. Never invent features, prices, limits or policies.
 - You may help write short texts for an invitation (a greeting, a line about the event), since that is part of using ${k.brand}.
@@ -95,6 +96,19 @@ export const screenNote = (screen: string) =>
   (screen.includes(':id')
     ? ' When you link to another tab of this same invitation, reuse ":id" exactly as it appears here — never a real id.'
     : '');
+
+/**
+ * Which provider answers the chat: OpenAI when it's set up for this chat (OPENAI_API_KEY,
+ * INVITES_AI_MODEL_OPENAI); else Anthropic (ANTHROPIC_API_KEY, INVITES_AI_MODEL); else neither, and the
+ * guide answers by keyword instead (also used, unrelated to this chat, by the admin system page).
+ */
+export function chatProvider(env: ServerEnv): 'openai' | 'anthropic' | null {
+  return env.OPENAI_API_KEY && env.INVITES_AI_MODEL_OPENAI
+    ? 'openai'
+    : env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL
+      ? 'anthropic'
+      : null;
+}
 
 /** The rate limit key (`u:<user>`, `ip:<address>` or `global`): never the address itself, only a salted hash. */
 function rateKey(who: string): string {
@@ -326,6 +340,16 @@ export function textFromOpenAiEvents(
   });
 }
 
+/**
+ * OpenAI's Chat Completions API: the reasoning and GPT-5 families (o1, o3, o4-mini, gpt-5 and later)
+ * reject `max_tokens` outright (400) and require `max_completion_tokens` instead; gpt-4* and gpt-3.5*
+ * still expect `max_tokens`. Since the model id is an admin-typed env var, not a fixed choice, this is a
+ * guess from the name — supportChat()'s own retry corrects it from the API's answer when it's wrong.
+ */
+export function openAiTokenParam(model: string): 'max_tokens' | 'max_completion_tokens' {
+  return /^(gpt-4|gpt-3\.5)/i.test(model) ? 'max_tokens' : 'max_completion_tokens';
+}
+
 /** POST /api/support/chat. */
 export async function supportChat(
   raw: unknown,
@@ -346,14 +370,8 @@ export async function supportChat(
   const env = serverEnv();
   const k = knowledgeContext(site);
   const question = messages.at(-1)!.content;
-  // OpenAI when it's set up for this chat (OPENAI_API_KEY, INVITES_AI_MODEL_OPENAI); else Anthropic
-  // (ANTHROPIC_API_KEY, INVITES_AI_MODEL); else — or past the site's daily ceiling — the guide answers
-  const provider =
-    env.OPENAI_API_KEY && env.INVITES_AI_MODEL_OPENAI
-      ? ('openai' as const)
-      : env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL
-        ? ('anthropic' as const)
-        : null;
+  // past the site's daily ceiling, same as with no provider at all: the guide answers instead
+  const provider = chatProvider(env);
   if (!provider || !(await rateHit(rateKey('global'), env.INVITES_AI_DAILY_LIMIT, 24 * 3600)))
     return { status: 200, stream: textStream(manualAnswer(question, k, locale)) };
 
@@ -364,14 +382,16 @@ export async function supportChat(
   const screen = screenNote(screenOf(page));
   let url: string;
   let init: RequestInit;
+  let tokenParam: ReturnType<typeof openAiTokenParam> | null = null;
   if (provider === 'openai') {
+    tokenParam = openAiTokenParam(env.INVITES_AI_MODEL_OPENAI);
     url = `${env.INVITES_AI_API_BASE_OPENAI}/v1/chat/completions`;
     init = {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${env.OPENAI_API_KEY}` },
       body: JSON.stringify({
         model: env.INVITES_AI_MODEL_OPENAI,
-        max_tokens: 1024,
+        [tokenParam]: 1024,
         stream: true,
         // the manual is the same for every question: OpenAI caches a long shared prefix on its own
         messages: [
@@ -411,6 +431,26 @@ export async function supportChat(
   } catch (err) {
     console.error('[support chat] request failed', err);
     return { status: 200, stream: textStream(fallback()) };
+  }
+  // openAiTokenParam() guessed wrong (a model outside the gpt-4*/gpt-3.5* split it knows, or a future
+  // one): the API's own error names the parameter it wants, so this is the one case worth retrying once
+  if (provider === 'openai' && tokenParam && res.status === 400) {
+    const other = tokenParam === 'max_tokens' ? 'max_completion_tokens' : 'max_tokens';
+    const detail = await res.text().catch(() => '');
+    if (detail.includes(other)) {
+      const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+      delete body[tokenParam];
+      body[other] = 1024;
+      try {
+        res = await fetchImpl(url, { ...init, body: JSON.stringify(body) });
+      } catch (err) {
+        console.error('[support chat] request failed (token-parameter retry)', err);
+        return { status: 200, stream: textStream(fallback()) };
+      }
+    } else {
+      console.error('[support chat] API answered', res.status, detail.slice(0, 300));
+      return { status: 200, stream: textStream(fallback()) };
+    }
   }
   if (!res.ok || !res.body) {
     console.error(

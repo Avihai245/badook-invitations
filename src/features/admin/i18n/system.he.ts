@@ -53,6 +53,8 @@ export const systemHe = {
       cronSecret: 'מתזמן חיצוני (סוד ה־cron)',
       jobsFallback: 'המערכת מריצה עבודות בעצמה',
     },
+    aiChatProviderLabel: 'עוזר הצ׳אט פועל דרך',
+    aiChatProviders: { openai: 'OpenAI', anthropic: 'Anthropic' },
     billing: 'מצב התשלומים',
     billingModes: { payplus: 'PayPlus', test: 'עמוד תשלום לבדיקה', off: 'כבוי' },
     langs: 'שפות תבנית הוואטסאפ',
