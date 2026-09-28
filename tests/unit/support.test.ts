@@ -60,6 +60,35 @@ describe('the support assistant', () => {
     expect(screenOf('/')).toBe('/');
   });
 
+  it('reminds to reuse ":id" only when the current screen actually has one', async () => {
+    const { screenNote } = await import('@/features/support/chat');
+    expect(screenNote('/app/invitations')).not.toContain(':id');
+    expect(screenNote('/app/invitations/:id/guests')).toContain('reuse ":id"');
+  });
+
+  it('the pages it may link to: a real path only, ":id" only for the visitor\'s own invitation', async () => {
+    const { SUPPORT_PAGES, currentInvitationId, resolveSupportPath } =
+      await import('@/features/support/pages');
+    expect(currentInvitationId('/app/invitations/abc-123/guests')).toBe('abc-123');
+    expect(currentInvitationId('/app/invitations/abc-123')).toBe('abc-123');
+    expect(currentInvitationId('/app/invitations')).toBeNull();
+    expect(currentInvitationId('/app/invitations/new')).toBeNull();
+    expect(currentInvitationId('/app/account')).toBeNull();
+
+    expect(resolveSupportPath('/contact', null)).toBe('/contact');
+    expect(resolveSupportPath('/contact/', null)).toBe('/contact');
+    expect(resolveSupportPath('/app/invitations/:id/guests', 'abc-123')).toBe(
+      '/app/invitations/abc-123/guests',
+    );
+    // no current invitation to fill ":id" with: rejected, never left with the literal placeholder
+    expect(resolveSupportPath('/app/invitations/:id/guests', null)).toBeNull();
+    // not a known screen at all
+    expect(resolveSupportPath('/app/invitations/:id/wrong-tab', 'abc-123')).toBeNull();
+    expect(resolveSupportPath('/app/admin/system', null)).toBeNull();
+    // every page is a real, distinct path
+    expect(new Set(SUPPORT_PAGES.map((p) => p.path)).size).toBe(SUPPORT_PAGES.length);
+  });
+
   it('its instructions: on-topic only, no secrets, no actions, resists injection — and the manual with real prices', async () => {
     const { knowledgeContext, systemPrompt } = await import('@/features/support/chat');
     const k = knowledgeContext();
@@ -75,6 +104,11 @@ describe('the support assistant', () => {
     expect(prompt).toContain('Business: ₪149 לחודש');
     expect(prompt).toContain(`₪${k.messagePrice} להודעה`);
     expect(prompt).toContain('https://invitations.example.com/contact');
+    // full customer service: complete answers, and every named screen as a real link
+    expect(prompt).toMatch(/ordinary customer-service conversation/);
+    expect(prompt).toMatch(/give it as a real link/);
+    expect(prompt).toContain('<pages>');
+    expect(prompt).toContain('/app/invitations/:id/guests');
     for (const topic of [
       'העלאת רשימה מאקסל',
       'שליחה בוואטסאפ',

@@ -54,6 +54,10 @@ const ANSWERS = [
   },
   { match: /מתכון|recipe/i, text: 'אני יכול לעזור רק בנושאים של Badook. רוצים עזרה עם ההזמנה שלכם?' },
   {
+    match: /קישור לרשימת המוזמנים|guest list link/i,
+    text: 'בשמחה, הנה הקישור: [רשימת האורחים](/app/invitations/:id/guests)',
+  },
+  {
     match: /ארוכה|long/i,
     text: Array.from({ length: 60 }, (_, i) => `זו שורה מספר ${i + 1} בתשובה ארוכה.`).join('\n'),
     slow: true,

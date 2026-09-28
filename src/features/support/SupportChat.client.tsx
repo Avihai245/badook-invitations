@@ -16,6 +16,7 @@ import {
 import { cn, Hint } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { SUPPORT_OPEN, openSupport, type SupportOpenDetail } from './open';
+import { currentInvitationId, resolveSupportPath } from './pages';
 import { ChatHandoff } from './tickets/ui/ChatHandoff.client';
 
 /**
@@ -128,12 +129,12 @@ const INLINE = new RegExp(
     '\\*\\*([^*]+)\\*\\*', // **bold**
     '\\[([^\\]]+)\\]\\(([^)\\s]+)\\)', // [label](url)
     '(https?:\\/\\/[^\\s<>()]+)', // a web address
-    `(?<![\\w/.])(\\/${SITE_PATHS}(?:\\/[\\w\\-/]*)?)`, // a page of the site: /contact
+    `(?<![\\w/.])(\\/${SITE_PATHS}(?:\\/[\\w:\\-/]*)?)`, // a page of the site: /contact, /app/invitations/:id/guests
   ].join('|'),
   'g',
 );
 
-/** A link only when it leads to this site; anything else stays text (an answer can't send people away). */
+/** The path of a URL, only when it leads to this site — not yet whether it's a real screen. */
 function internalPath(url: string): string | null {
   const clean = url.replace(/[.,;:!?'"»”]+$/, '');
   // a path of this site — not `//host` or `/\host`, which browsers read as another site
@@ -146,7 +147,25 @@ function internalPath(url: string): string | null {
   }
 }
 
-function Inline({ text, onNavigate }: { text: string; onNavigate: () => void }) {
+/**
+ * A URL the assistant wrote → a link only when it is one of SUPPORT_PAGES (pages.ts), with `:id`
+ * substituted for the visitor's real, current invitation; anything else — another site, or a path
+ * that isn't a real known screen — stays plain text.
+ */
+function supportLink(url: string, invitationId: string | null): string | null {
+  const path = internalPath(url);
+  return path ? resolveSupportPath(path, invitationId) : null;
+}
+
+function Inline({
+  text,
+  onNavigate,
+  invitationId,
+}: {
+  text: string;
+  onNavigate: () => void;
+  invitationId: string | null;
+}) {
   const parts: ReactNode[] = [];
   let last = 0;
   for (const m of text.matchAll(INLINE)) {
@@ -165,12 +184,12 @@ function Inline({ text, onNavigate }: { text: string; onNavigate: () => void }) 
     );
     if (bold) parts.push(<strong key={at}>{bold}</strong>);
     else if (label && href) {
-      const to = internalPath(href);
+      const to = supportLink(href, invitationId);
       parts.push(to ? link(to, label, at) : `${label} (${href})`);
     } else if (bare || path) {
       const raw = (bare ?? path)!;
       const trimmed = raw.replace(/[.,;:!?'"»”]+$/, '');
-      const to = internalPath(trimmed);
+      const to = supportLink(trimmed, invitationId);
       parts.push(to ? link(to, <bdi dir="ltr">{trimmed}</bdi>, at) : trimmed);
       if (trimmed.length < raw.length) parts.push(raw.slice(trimmed.length));
     } else parts.push(whole);
@@ -180,7 +199,15 @@ function Inline({ text, onNavigate }: { text: string; onNavigate: () => void }) 
   return <>{parts}</>;
 }
 
-function Answer({ text, onNavigate }: { text: string; onNavigate: () => void }) {
+function Answer({
+  text,
+  onNavigate,
+  invitationId,
+}: {
+  text: string;
+  onNavigate: () => void;
+  invitationId: string | null;
+}) {
   return (
     <>
       {blocksOf(text).map((b, i) =>
@@ -189,7 +216,7 @@ function Answer({ text, onNavigate }: { text: string; onNavigate: () => void }) 
             {b.lines.map((line, j) => (
               <Fragment key={j}>
                 {j ? <br /> : null}
-                <Inline text={line} onNavigate={onNavigate} />
+                <Inline text={line} onNavigate={onNavigate} invitationId={invitationId} />
               </Fragment>
             ))}
           </p>
@@ -203,7 +230,7 @@ function Answer({ text, onNavigate }: { text: string; onNavigate: () => void }) 
               >
                 {b.items.map((item, j) => (
                   <li key={j} className="ps-0.5">
-                    <Inline text={item} onNavigate={onNavigate} />
+                    <Inline text={item} onNavigate={onNavigate} invitationId={invitationId} />
                   </li>
                 ))}
               </List>
@@ -237,6 +264,8 @@ export function SupportChat() {
   // the full-screen editor has the assistant in its top bar: a floating button would cover its controls
   const inEditor = /^\/app\/invitations\/[^/]+\/edit/.test(path);
   const brand = t.brand;
+  // for substituting a ":id" the assistant reused from its own screen note (chat.ts's screenNote())
+  const invitationId = currentInvitationId(path);
 
   useEffect(() => setMessages(load()), []);
   useEffect(() => {
@@ -532,7 +561,7 @@ export function SupportChat() {
                       </span>
                     ) : (
                       <>
-                        <Answer text={m.content} onNavigate={onNavigate} />
+                        <Answer text={m.content} onNavigate={onNavigate} invitationId={invitationId} />
                         {m.state === 'stopped' ? (
                           <p className="text-[12px] text-muted italic">{s.stopped}</p>
                         ) : null}

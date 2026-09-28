@@ -169,6 +169,17 @@ test.describe('the support assistant', () => {
     expect(sent?.body.system[1]?.text).toContain('/app/invitations/:id/guests');
     expect(JSON.stringify(sent)).not.toContain(id);
     expect(JSON.stringify(sent)).not.toContain(email);
+
+    // a screen the assistant names always comes as a link — ":id" filled in with this real invitation,
+    // never sent to the API (checked above) but substituted here, in the browser, for display only
+    const input = chat.getByRole('textbox', { name: 'כתבו שאלה…' });
+    await input.fill('תן לי קישור לרשימת המוזמנים');
+    await input.press('Enter');
+    await expect(chat.getByRole('link', { name: 'רשימת האורחים' })).toHaveAttribute(
+      'href',
+      `/app/invitations/${id}/guests`,
+    );
+
     await chat.getByRole('button', { name: 'סגירת הצ׳אט' }).click();
     await expect(chat).toBeHidden();
 
