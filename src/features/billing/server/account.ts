@@ -9,6 +9,8 @@ import { PLAN_LIMITS, effectivePlan, type PlanDiscount, type PlanId, type PlanLi
 export interface AccountRecord {
   userId: string;
   fullName: string | null;
+  /** the Google account's profile photo (null: signed up with email, or Google gave none) */
+  avatarUrl: string | null;
   phone: string | null;
   plan: PlanId;
   planStatus: 'active' | 'trialing' | 'past_due' | 'canceled';

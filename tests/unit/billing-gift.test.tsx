@@ -23,6 +23,7 @@ function page(
   const base = {
     userId: '11111111-1111-4111-8111-111111111111',
     fullName: 'Dana',
+    avatarUrl: null,
     phone: null,
     plan: 'free' as PlanId,
     planStatus: 'active' as const,
