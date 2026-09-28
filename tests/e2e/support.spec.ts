@@ -201,4 +201,20 @@ test.describe('the support assistant', () => {
     await chat.getByRole('button', { name: 'שיחה חדשה' }).click();
     await expect(chat.getByRole('button', { name: 'איך שמים סרטון מיוטיוב ברקע?' })).toBeVisible();
   });
+
+  test('recommending a design links to it directly, and the link actually opens that design', async ({
+    page,
+  }) => {
+    await signUp(page);
+    await open(page, '/app/invitations/new');
+    await page.getByTestId('support-launcher').click();
+    const chat = page.getByRole('dialog', { name: 'העוזר של Badook' });
+    const input = chat.getByRole('textbox', { name: 'כתבו שאלה…' });
+    await input.fill('איזה עיצוב מתאים לחתונה?');
+    await input.press('Enter');
+    const link = chat.getByRole('link', { name: 'סהר בורדו' });
+    await expect(link).toHaveAttribute('href', '/app/invitations/new?template=sahar-bordeaux');
+    await link.click();
+    await expect(page.getByRole('dialog', { name: 'סהר בורדו' })).toBeVisible();
+  });
 });

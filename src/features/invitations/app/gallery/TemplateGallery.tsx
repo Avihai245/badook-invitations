@@ -37,6 +37,17 @@ export function eventTypeFilters(
 /** A design made as a film: its backdrop moves as the guest scrolls (manifest `scene`). */
 export const isAnimated = (manifest: Pick<TemplateManifest, 'scene'>) => !!manifest.scene?.enabled;
 
+/**
+ * A design to open the preview dialog on right away, from a link's `?template=<id>` (the support
+ * chat's own `<templates>` list, chat.ts, names real ids for this). An id that doesn't exist, or isn't
+ * listed (unless `admin`), opens nothing — the gallery itself, same as without the query string.
+ */
+export function initialPreview(id: string | null | undefined, admin: boolean): string | null {
+  if (!id) return null;
+  const entry = TEMPLATES.get(id);
+  return entry && (entry.manifest.listed || admin) ? id : null;
+}
+
 /** The designs a chip shows. */
 export const matchesFilter = (manifest: Pick<TemplateManifest, 'categories' | 'scene'>, filter: Filter) =>
   filter === 'all' || (filter === 'animated' ? isAnimated(manifest) : manifest.categories.includes(filter));
@@ -59,6 +70,7 @@ export function TemplateGallery({
   moreLanguages = true,
   admin = false,
   studio = null,
+  initialTemplateId = null,
 }: {
   bases: AssetBases;
   fontCss: string;
@@ -69,12 +81,18 @@ export function TemplateGallery({
   admin?: boolean;
   /** "design it from my photos" (feature `art_direction`): on, offered as an upgrade, or not shown */
   studio?: { access: 'on' | 'plan'; cinematic: boolean } | null;
+  /**
+   * From the page's own `?template=` (e.g. a link from the support chat): opens straight to it. Only
+   * read once, on mount — the page keys this component by it (NewInvitationPage), so a new link while
+   * already here mounts a fresh instance rather than relying on an update to this prop alone.
+   */
+  initialTemplateId?: string | null;
 }) {
   const { t, locale, plural, number } = useUi();
   const videos = usePreviewVideos();
   const [filter, setFilter] = useState<Filter>('all');
   const [previewLocale, setPreviewLocale] = useState<Locale>(locale);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(() => initialPreview(initialTemplateId, admin));
   const [wizard, setWizard] = useState<WizardSeed | null>(null);
 
   const templates = useMemo(

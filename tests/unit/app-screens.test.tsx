@@ -2,7 +2,11 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { DataTable, Hint, HintProvider, isDisabledElement } from '@/components/app';
 import { countdownState, daysUntilEvent } from '@/features/invitations/app/countdown';
-import { eventTypeFilters, matchesFilter } from '@/features/invitations/app/gallery/TemplateGallery';
+import {
+  eventTypeFilters,
+  initialPreview,
+  matchesFilter,
+} from '@/features/invitations/app/gallery/TemplateGallery';
 import { overviewSteps } from '@/features/invitations/app/overview/InvitationOverview';
 import { publishHref, workspaceTab } from '@/features/invitations/app/workspace/paths';
 import {
@@ -53,6 +57,20 @@ describe('the gallery’s event-type chips', () => {
     for (const { type, count } of filters)
       expect(count).toBe(manifests.filter((m) => matchesFilter(m, type)).length);
     expect(manifests.every((m) => matchesFilter(m, 'all'))).toBe(true);
+  });
+});
+
+describe('a design to open the preview on right away (from a ?template= link)', () => {
+  it('a real, listed id opens it; anything else opens the plain gallery', () => {
+    expect(initialPreview('sahar-bordeaux', false)).toBe('sahar-bordeaux');
+    expect(initialPreview(null, false)).toBeNull();
+    expect(initialPreview(undefined, false)).toBeNull();
+    expect(initialPreview('', false)).toBeNull();
+    expect(initialPreview('no-such-template', false)).toBeNull();
+    // unlisted: nothing for a visitor, the design itself for an admin
+    expect(TEMPLATES.get('lumiere')?.manifest.listed).toBe(false);
+    expect(initialPreview('lumiere', false)).toBeNull();
+    expect(initialPreview('lumiere', true)).toBe('lumiere');
   });
 });
 

@@ -58,6 +58,10 @@ const ANSWERS = [
     text: 'בשמחה, הנה הקישור: [רשימת האורחים](/app/invitations/:id/guests)',
   },
   {
+    match: /עיצוב מתאים לחתונה|wedding design/i,
+    text: 'לחתונה מתאים מאוד העיצוב [סהר בורדו](/app/invitations/new?template=sahar-bordeaux): אלגנטי וקלאסי.',
+  },
+  {
     match: /ארוכה|long/i,
     text: Array.from({ length: 60 }, (_, i) => `זו שורה מספר ${i + 1} בתשובה ארוכה.`).join('\n'),
     slow: true,

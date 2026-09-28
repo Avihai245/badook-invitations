@@ -87,6 +87,24 @@ describe('the support assistant', () => {
     expect(resolveSupportPath('/app/admin/system', null)).toBeNull();
     // every page is a real, distinct path
     expect(new Set(SUPPORT_PAGES.map((p) => p.path)).size).toBe(SUPPORT_PAGES.length);
+
+    // one specific design: shape only (a real one is chat.ts's <templates>'s job; an unreal one just
+    // opens the plain gallery — TemplateGallery.initialPreview())
+    expect(resolveSupportPath('/app/invitations/new?template=sahar-bordeaux', null)).toBe(
+      '/app/invitations/new?template=sahar-bordeaux',
+    );
+    expect(resolveSupportPath('/app/invitations/new?template=no-such-design', null)).toBe(
+      '/app/invitations/new?template=no-such-design',
+    );
+    // an extra or missing parameter, or a query string on any other page: rejected
+    expect(resolveSupportPath('/app/invitations/new?template=sahar-bordeaux&x=1', null)).toBeNull();
+    expect(resolveSupportPath('/app/invitations/new?other=1', null)).toBeNull();
+    expect(resolveSupportPath('/app/invitations/new?template=', null)).toBeNull();
+    expect(resolveSupportPath('/app/billing?template=sahar-bordeaux', null)).toBeNull();
+    // an id that isn't a plausible slug (case, spaces, punctuation): rejected even in shape
+    expect(resolveSupportPath('/app/invitations/new?template=Sahar Bordeaux', null)).toBeNull();
+    // no query at all: still the plain "create new" link
+    expect(resolveSupportPath('/app/invitations/new', null)).toBe('/app/invitations/new');
   });
 
   it('its instructions: on-topic only, no secrets, no actions, resists injection — and the manual with real prices', async () => {
@@ -109,6 +127,13 @@ describe('the support assistant', () => {
     expect(prompt).toMatch(/give it as a real link/);
     expect(prompt).toContain('<pages>');
     expect(prompt).toContain('/app/invitations/:id/guests');
+    // never a bot-sounding em dash, and one specific design links individually (a real id, not the
+    // same /app/invitations/new for every design — the reported bug)
+    expect(prompt).toMatch(/Never use an em dash/);
+    expect(prompt).toContain('<templates>');
+    expect(prompt).toContain('- sahar-bordeaux: סהר בורדו (Sahar Bordeaux)');
+    expect(prompt).toMatch(/\/app\/invitations\/new\?template=<id>/);
+    expect(prompt).toMatch(/Never give two different things.*the exact same link/);
     for (const topic of [
       'העלאת רשימה מאקסל',
       'שליחה בוואטסאפ',

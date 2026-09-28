@@ -34,7 +34,7 @@ export default async function NewInvitationPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const env = serverEnv();
-  const [{ previews }, user] = await Promise.all([searchParams, getSessionUser()]);
+  const [{ previews, template }, user] = await Promise.all([searchParams, getSessionUser()]);
   // the host's plan in force and this deployment (before signing in: only what this deployment offers)
   const account = user ? await accountFeatures(user).catch(() => null) : null;
   // languages beyond Hebrew and English (feature `languages`)
@@ -54,8 +54,13 @@ export default async function NewInvitationPage({
       : why === 'plan'
         ? { access: 'plan' as const, cinematic: false }
         : null;
+  const initialTemplateId = typeof template === 'string' ? template : null;
   return (
     <TemplateGallery
+      // a fresh mount whenever ?template= changes (e.g. a new link from the support chat while already
+      // on this page): a client re-render alone wouldn't reopen the preview dialog, since preview is
+      // only ever set from this prop once, on mount
+      key={initialTemplateId ?? 'gallery'}
       moreLanguages={moreLanguages}
       bases={assetBasesFromEnv({
         supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
@@ -66,6 +71,7 @@ export default async function NewInvitationPage({
       // unlisted designs (manifest `listed: false`) are the platform admins' to try
       admin={isAdminEmail(user?.email)}
       studio={studio}
+      initialTemplateId={initialTemplateId}
     />
   );
 }
