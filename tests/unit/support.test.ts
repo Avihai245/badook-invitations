@@ -107,6 +107,62 @@ describe('the support assistant', () => {
     expect(resolveSupportPath('/app/invitations/new', null)).toBe('/app/invitations/new');
   });
 
+  it('a screen named but its raw path left exposed in parentheses becomes a real link (the reported bug)', async () => {
+    const { linkifyLabeledPaths } = await import('@/features/support/pages');
+    // no bare "(path)" left outside a [label](...) link, for this one exact path
+    const noBarePath = (s: string, path: string) =>
+      expect(s).not.toMatch(new RegExp(`[^\\]]\\(${path.replace(/\//g, '\\/')}\\)`));
+
+    // the exact pattern reported, word-for-word: a label, then its own raw path right after it — becomes
+    // a working markdown link, the label words still visible. The path itself keeps ":id" exactly as
+    // written (the same form a correctly-written link would use) — SupportChat.client.tsx's own Inline
+    // resolves "[label](path)" through this same resolveSupportPath() and substitutes the real id at
+    // render time, so pre-resolving it here would only make that second, later lookup fail (a real id
+    // never matches SUPPORT_PAGES the way the literal ":id" placeholder does).
+    const first = linkifyLabeledPaths(
+      'ב-סידור שולחנות (/app/invitations/:id/seating) עושים את זה ככה:',
+      'abc-123',
+    );
+    expect(first).toContain('](/app/invitations/:id/seating)');
+    expect(first).toContain('סידור שולחנות');
+    noBarePath(first, '/app/invitations/:id/seating');
+
+    // reported twice in the one answer — both get fixed
+    const reported = [
+      'ב-סידור שולחנות (/app/invitations/:id/seating) עושים את זה ככה:',
+      '1. פותחים את הלשונית ומעלים או בוחרים את מפת האולם.',
+      'אפשר גם:',
+      '* לנעול שולחנות שלא רוצים להזיז.',
+      '* להשתמש ב-סידור אוטומטי (/app/invitations/:id/seating) אם רוצים שהמערכת תנסה לסדר לבד.',
+      'המשפחה נשארת יחד בשולחן אחד, לא מפצלים אותה.',
+    ].join('\n');
+    const fixed = linkifyLabeledPaths(reported, 'abc-123');
+    noBarePath(fixed, '/app/invitations/:id/seating');
+    expect(fixed.match(/\]\(\/app\/invitations\/:id\/seating\)/g)).toHaveLength(2);
+
+    // no current invitation to fill ":id" with: same rule as resolveSupportPath — left exactly as is,
+    // never linked into something Inline could never resolve either
+    const noId = 'ב-סידור שולחנות (/app/invitations/:id/seating) עושים את זה ככה:';
+    expect(linkifyLabeledPaths(noId, null)).toBe(noId);
+
+    // a page with no ":id" at all
+    const contact = linkifyLabeledPaths('טופס יצירת קשר (/contact) בכל שאלה.', null);
+    expect(contact).toBe('[טופס יצירת קשר](/contact) בכל שאלה.');
+
+    // a parenthetical that isn't a path at all: untouched
+    expect(linkifyLabeledPaths('המחיר 49 ₪ (לא כולל מע"מ) לחודש.', null)).toBe(
+      'המחיר 49 ₪ (לא כולל מע"מ) לחודש.',
+    );
+    // a path-shaped parenthetical that isn't a real known screen: untouched, same as resolveSupportPath
+    expect(linkifyLabeledPaths('זה בעמוד הבית (/no/such/page) שלנו.', null)).toBe(
+      'זה בעמוד הבית (/no/such/page) שלנו.',
+    );
+
+    // a link already written correctly, with the real id already substituted, is never touched again
+    const already = 'לכו ל[רשימת האורחים](/app/invitations/abc-123/guests) ומשם קדימה.';
+    expect(linkifyLabeledPaths(already, 'abc-123')).toBe(already);
+  });
+
   it('its instructions: on-topic only, no secrets, no actions, resists injection — and the manual with real prices', async () => {
     const { knowledgeContext, systemPrompt } = await import('@/features/support/chat');
     const k = knowledgeContext();

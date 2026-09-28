@@ -62,6 +62,23 @@ const ANSWERS = [
     text: 'לחתונה מתאים מאוד העיצוב [סהר בורדו](/app/invitations/new?template=sahar-bordeaux): אלגנטי וקלאסי.',
   },
   {
+    // reproduces a real reported failure: the model named the screen but still wrote its raw technical
+    // path in parentheses (twice) instead of a markdown link — SupportChat.client.tsx's
+    // linkifyLabeledPaths() safety net must turn both into real links despite the bad model output.
+    match: /סידור שולחנות|seating/i,
+    text: [
+      'ב-סידור שולחנות (/app/invitations/:id/seating) עושים את זה ככה:',
+      '1. פותחים את הלשונית ומעלים או בוחרים את מפת האולם.',
+      '2. מוסיפים שולחנות למפה.',
+      '3. גוררים כל משפחה מהרשימה לשולחן המתאים.',
+      'אפשר גם:',
+      '* ללחוץ על שולחן כדי לערוך אותו.',
+      '* לנעול שולחנות שלא רוצים להזיז.',
+      '* להשתמש ב-סידור אוטומטי (/app/invitations/:id/seating) אם רוצים שהמערכת תנסה לסדר לבד.',
+      'המשפחה נשארת יחד בשולחן אחד, לא מפצלים אותה.',
+    ].join('\n'),
+  },
+  {
     match: /ארוכה|long/i,
     text: Array.from({ length: 60 }, (_, i) => `זו שורה מספר ${i + 1} בתשובה ארוכה.`).join('\n'),
     slow: true,

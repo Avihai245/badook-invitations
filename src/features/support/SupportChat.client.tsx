@@ -16,7 +16,7 @@ import {
 import { cn, Hint } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { SUPPORT_OPEN, openSupport, type SupportOpenDetail } from './open';
-import { currentInvitationId, resolveSupportPath } from './pages';
+import { currentInvitationId, linkifyLabeledPaths, resolveSupportPath } from './pages';
 import { ChatHandoff } from './tickets/ui/ChatHandoff.client';
 
 /**
@@ -210,7 +210,7 @@ function Answer({
 }) {
   return (
     <>
-      {blocksOf(text).map((b, i) =>
+      {blocksOf(linkifyLabeledPaths(text, invitationId)).map((b, i) =>
         b.kind === 'p' ? (
           <p key={i}>
             {b.lines.map((line, j) => (

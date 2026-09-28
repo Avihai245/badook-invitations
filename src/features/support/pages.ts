@@ -86,3 +86,26 @@ export function resolveSupportPath(candidate: string, invitationId: string | nul
   if (!page.path.includes(':id')) return page.path;
   return invitationId ? page.path.replace(':id', invitationId) : null;
 }
+
+/** A word of a label: letters, digits, or a quote mark inside one (״הזמנות״, don't) — never a path or punctuation. */
+const WORD = '[\\p{L}\\p{N}\'"׳״]+';
+/** "label (path)", the assistant's own words followed by the raw path it was told never to show. */
+const LABELED_PATH = new RegExp(`((?:${WORD}[\\s-]){0,3}${WORD})\\s*\\((\\/[^\\s()]*)\\)`, 'gu');
+
+/**
+ * A safety net for when the assistant names a screen but, despite systemPrompt()'s instruction, still
+ * writes its raw path next to the words instead of turning them into the link — "סידור שולחנות
+ * (/app/invitations/:id/seating)" becomes "[סידור שולחנות](/app/invitations/:id/seating)", which then
+ * renders exactly as if the assistant had written it correctly: SupportChat.client.tsx's own Inline
+ * resolves a "[label](path)" it parses through this same resolveSupportPath(), substituting the real id
+ * for ":id" at render time — so the path kept here is the candidate as written (":id" and all), never
+ * pre-resolved (a real id wouldn't match SUPPORT_PAGES on that second, later resolution). Only a path
+ * resolveSupportPath() actually recognizes is turned into a link; unrelated parenthetical text is left
+ * exactly as written, and a path already inside a proper [label](path) is never matched here in the
+ * first place (the character right before "(" there is "]", not a word).
+ */
+export function linkifyLabeledPaths(text: string, invitationId: string | null): string {
+  return text.replace(LABELED_PATH, (whole, label: string, path: string) =>
+    resolveSupportPath(path, invitationId) ? `[${label}](${path})` : whole,
+  );
+}

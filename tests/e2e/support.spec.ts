@@ -217,4 +217,30 @@ test.describe('the support assistant', () => {
     await link.click();
     await expect(page.getByRole('dialog', { name: 'סהר בורדו' })).toBeVisible();
   });
+
+  test('a screen the model still names with its raw path in parentheses renders as a real link anyway', async ({
+    page,
+  }) => {
+    // reproduces a real, repeated report: despite the instruction, the model's own answer (canned in
+    // tests/support/mock-whatsapp.mjs) names "סידור שולחנות" but still writes its raw technical path
+    // right after it, twice. The client-side safety net (linkifyLabeledPaths, SupportChat.client.tsx)
+    // must catch this and render real links regardless — not just trust the prompt to be followed.
+    await signUp(page);
+    const { id } = await createInvitation(page);
+    await open(page, `/app/invitations/${id}/guests`);
+    await page.getByTestId('support-launcher').click();
+    const chat = page.getByRole('dialog', { name: 'העוזר של Badook' });
+    const input = chat.getByRole('textbox', { name: 'כתבו שאלה…' });
+    await input.fill('איך עובד סידור שולחנות');
+    await input.press('Enter');
+    const log = chat.getByRole('log');
+
+    const links = log.getByRole('link', { name: /סידור/ });
+    await expect(links).toHaveCount(2);
+    await expect(links.nth(0)).toHaveAttribute('href', `/app/invitations/${id}/seating`);
+    await expect(links.nth(1)).toHaveAttribute('href', `/app/invitations/${id}/seating`);
+
+    // the raw path itself is never left as visible text, not even once
+    await expect(log.getByText('/app/invitations/:id/seating', { exact: false })).toHaveCount(0);
+  });
 });
