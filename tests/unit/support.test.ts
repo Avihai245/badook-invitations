@@ -134,6 +134,8 @@ describe('the support assistant', () => {
     expect(prompt).toContain('- sahar-bordeaux: סהר בורדו (Sahar Bordeaux)');
     expect(prompt).toMatch(/\/app\/invitations\/new\?template=<id>/);
     expect(prompt).toMatch(/Never give two different things.*the exact same link/);
+    // a screen's raw path never shows in the visible text, not even in parentheses (the reported bug)
+    expect(prompt).toMatch(/Never show the technical path itself in the visible text/);
     for (const topic of [
       'העלאת רשימה מאקסל',
       'שליחה בוואטסאפ',
