@@ -437,6 +437,23 @@ export const helpEn: typeof helpHe = {
       },
     },
   },
+  designTemplate: {
+    title: 'Another design: what each thing does',
+    items: {
+      choose: {
+        label: 'Choosing a design',
+        text: 'Every design for this kind of event, with your names and date. The current one is marked.',
+      },
+      keeps: {
+        label: 'What stays',
+        text: 'Names, date, place, texts and RSVP stay. The colors, fonts, the design’s pictures and the music change.',
+      },
+      undo: {
+        label: 'Undo',
+        text: 'Undo brings the previous design back, and the invitation as it was is also kept in the version history.',
+      },
+    },
+  },
   designCover: {
     title: 'Envelope and opening: what each thing does',
     items: {

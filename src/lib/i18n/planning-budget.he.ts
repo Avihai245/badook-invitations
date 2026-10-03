@@ -64,6 +64,10 @@ export const planningBudgetHe = {
     perGuest: 'עלות לאורח',
     planned: 'מתוכנן בקטגוריות',
     guests: { one: 'לפי אורח אחד', other: 'לפי {n} אורחים' },
+    edit: 'שינוי',
+    editLabel: 'שינוי התקציב',
+    editHint: 'בשקלים שלמים. התכנון של הקטגוריות נשאר כמו שהוא — אפשר לעדכן אותו בכל קטגוריה.',
+    save: 'שמירה',
   },
   catGauges: {
     title: 'לפי קטגוריה',

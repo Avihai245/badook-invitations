@@ -1,16 +1,27 @@
 'use client';
 
-import { CalendarClock, ChartColumn, Check, Handshake, Receipt, Table2, Users, Wallet } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import {
+  CalendarClock,
+  ChartColumn,
+  Check,
+  Handshake,
+  Pencil,
+  Receipt,
+  Table2,
+  Users,
+  Wallet,
+} from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button, Card, cn } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
-import { categoryOver, categoryRows, paymentRows, totalOver } from '../../model/budget-view';
+import { categoryOver, categoryRows, parseAmount, paymentRows, totalOver } from '../../model/budget-view';
 import { daysBetween } from '../../model/schedule';
 import { BudgetGauge, MiniGauge } from '../BudgetGauge';
 import { dueText, toneClass } from '../format';
 import { Money } from '../Money';
 import { usePlan } from '../PlanProvider';
 import { Fill } from './Fill';
+import { MoneyField } from './MoneyField';
 import { useBudget } from './useBudget';
 
 /**
@@ -54,7 +65,7 @@ export function BudgetHero() {
           <div className="flex min-w-0 flex-col gap-3">
             <h2 className="text-[13px] font-bold tracking-wide text-muted uppercase">{H.title}</h2>
             <dl className="grid grid-cols-2 gap-3">
-              <Stat icon={<Wallet />} label={H.budget} value={<Money value={total} />} strong />
+              <TotalStat total={total} />
               <Stat icon={<Handshake />} label={H.committed} value={<Money value={totals.committed} />} />
               <Stat
                 icon={<Check />}
@@ -98,6 +109,105 @@ export function BudgetHero() {
   );
 }
 
+/**
+ * The budget's own number, changed in place: "change" turns it into a field (whole shekels); Enter or
+ * "save" keeps it, Esc or "cancel" leaves it. The categories keep their plans; the gauge follows at once.
+ */
+function TotalStat({ total }: { total: number }) {
+  const { t } = useUi();
+  const T = t.planning.budget;
+  const H = T.hero;
+  const { saveSettings } = useBudget();
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState('');
+  const [tried, setTried] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  const opener = useRef<HTMLButtonElement>(null);
+  const value = parseAmount(text);
+  const ok = typeof value === 'number' && value > 0;
+  useEffect(() => {
+    if (editing) box.current?.querySelector('input')?.select();
+  }, [editing]);
+  const close = () => {
+    setEditing(false);
+    requestAnimationFrame(() => opener.current?.focus());
+  };
+  const save = async () => {
+    setTried(true);
+    if (!ok) return;
+    if (Math.round(value) === total) return close();
+    setBusy(true);
+    const saved = await saveSettings({ totalBudget: Math.round(value) });
+    setBusy(false);
+    if (saved) close();
+  };
+  if (!editing)
+    return (
+      <Stat
+        icon={<Wallet />}
+        label={H.budget}
+        value={<Money value={total} />}
+        strong
+        action={
+          <button
+            ref={opener}
+            type="button"
+            onClick={() => {
+              setText(String(total));
+              setTried(false);
+              setEditing(true);
+            }}
+            aria-label={H.editLabel}
+            data-testid="budget-total-edit"
+            className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[12px] font-semibold text-brand-deep transition-colors hover:bg-brand-soft"
+          >
+            <Pencil aria-hidden className="size-3.5" />
+            {H.edit}
+          </button>
+        }
+      />
+    );
+  return (
+    <div
+      ref={box}
+      className="col-span-2 rounded-[14px] border border-brand bg-brand-soft/50 p-3.5"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
+          e.stopPropagation();
+          close();
+        }
+      }}
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          void save();
+        }}
+        className="flex flex-wrap items-end gap-3"
+        noValidate
+      >
+        <MoneyField
+          label={H.editLabel}
+          value={text}
+          onChange={setText}
+          error={tried && !ok ? T.setup.totalInvalid : undefined}
+          help={H.editHint}
+          className="min-w-[200px] flex-1"
+        />
+        <div className="flex gap-2 pb-6">
+          <Button type="submit" size="sm" loading={busy} data-testid="budget-total-save">
+            {H.save}
+          </Button>
+          <Button type="button" size="sm" variant="ghost" onClick={close} disabled={busy}>
+            {t.common.cancel}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 function Stat({
   icon,
   label,
@@ -105,6 +215,7 @@ function Stat({
   sub,
   strong = false,
   tone,
+  action,
 }: {
   icon: ReactNode;
   label: string;
@@ -112,6 +223,8 @@ function Stat({
   sub?: ReactNode;
   strong?: boolean;
   tone?: 'success' | 'danger';
+  /** a small button at the label's end (the budget's "change") */
+  action?: ReactNode;
 }) {
   return (
     <div
@@ -123,6 +236,7 @@ function Stat({
       <dt className="flex items-center gap-1.5 text-[12.5px] font-semibold text-muted [&_svg]:size-4">
         <span aria-hidden>{icon}</span>
         {label}
+        {action ? <span className="ms-auto -my-1">{action}</span> : null}
       </dt>
       <dd
         className={cn(

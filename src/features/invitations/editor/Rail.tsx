@@ -54,6 +54,7 @@ import {
   Type,
   Users,
   UtensilsCrossed,
+  LayoutTemplate,
   WandSparkles,
   type LucideIcon,
 } from 'lucide-react';
@@ -62,6 +63,9 @@ import { useDeferredValue, useId, useMemo, useState } from 'react';
 import { Switch, cn, rovingKeyDown, useDir } from '@/components/app';
 import { useReview } from '@/features/review/ui/host/ReviewProvider';
 import { fmt } from '@/lib/i18n/app';
+import { SectionHelp, sectionHelpKey } from './SectionHelp';
+import { PANEL_HELP } from './panel-help';
+import { HelpFor } from '../app/HelpFor';
 import { useUi } from '@/lib/i18n/client';
 import type { Section, V2_SECTION_TYPES } from '../contracts/types';
 import { validateDocument } from '../contracts/validate';
@@ -77,7 +81,6 @@ import {
   type PanelId,
   type RailTab,
 } from './state/EditorProvider';
-import { HelpFor } from '../app/HelpFor';
 
 type IconKey =
   | CatalogKey
@@ -118,6 +121,7 @@ export const SECTION_ICONS: Record<IconKey, LucideIcon> = {
   fonts: CaseSensitive,
   style: SlidersHorizontal,
   studio: WandSparkles,
+  template: LayoutTemplate,
   music: Music,
   event: CalendarDays,
   languages: Languages,
@@ -314,6 +318,7 @@ function LockedRow({
   onSelect,
   flagged,
   comments,
+  helpKey,
 }: {
   icon: LucideIcon;
   name: string;
@@ -321,6 +326,8 @@ function LockedRow({
   onSelect: () => void;
   flagged?: IssueMark;
   comments?: number;
+  /** its "?" (SectionHelp) */
+  helpKey: string;
 }) {
   const { t } = useUi();
   return (
@@ -340,6 +347,9 @@ function LockedRow({
         flagged={flagged}
         comments={comments}
       />
+      <SectionHelp helpKey={helpKey} name={name} className={COMPACT_HIDE} />
+      {/* where the other rows have their switch: the "?"s stay in one column */}
+      <span aria-hidden className={cn('w-9 shrink-0', COMPACT_HIDE)} />
     </RowShell>
   );
 }
@@ -396,6 +406,7 @@ function SortableRow({
         flagged={flagged}
         comments={comments}
       />
+      <SectionHelp helpKey={sectionHelpKey(section)} name={name} className={COMPACT_HIDE} />
       <Switch
         label={fmt(r.toggle, { name })}
         checked={section.enabled}
@@ -473,6 +484,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
       <LockedRow
         icon={SECTION_ICONS.cover}
         name={e.names.cover}
+        helpKey="cover"
         selected={selection.kind === 'panel' && selection.panel === 'cover'}
         onSelect={() => go(() => select({ kind: 'panel', panel: 'cover' }))}
       />
@@ -480,6 +492,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
         <LockedRow
           icon={SECTION_ICONS.hero}
           name={e.names.hero}
+          helpKey="hero"
           selected={isSelected(hero.id)}
           onSelect={() => go(() => select({ kind: 'section', id: hero.id }))}
           flagged={flagged.get(hero.id)}
@@ -529,6 +542,7 @@ function SectionList({ onNavigate }: { onNavigate?: () => void }) {
         <LockedRow
           icon={SECTION_ICONS.footer}
           name={e.names.footer}
+          helpKey="footer"
           selected={isSelected(footer.id)}
           onSelect={() => go(() => select({ kind: 'section', id: footer.id }))}
           flagged={flagged.get(footer.id)}
@@ -571,6 +585,7 @@ function PanelList({
                 onNavigate?.();
               }}
             />
+            <HelpFor area={PANEL_HELP[panel]} className={COMPACT_HIDE} />
           </RowShell>
         );
       })}

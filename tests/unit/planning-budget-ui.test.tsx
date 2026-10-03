@@ -9,7 +9,7 @@ import { composeView } from '@/features/planning/server/view';
 import { BudgetScreen } from '@/features/planning/ui/BudgetScreen';
 import { PlanProvider } from '@/features/planning/ui/PlanProvider';
 import { TodayPayments } from '@/features/planning/ui/TodayPayments';
-import { UiProvider } from '@/lib/i18n/client';
+import { UiProvider } from '@/lib/i18n/provider';
 
 // The budget screen as the host uses it (jsdom, the server's answers faked): the setup card, the numbers, a
 // category opening into its items, adding and closing an expense, marking a payment paid, deleting with Undo,
@@ -379,6 +379,38 @@ describe('the numbers', () => {
     expect(within(s).getAllByRole('meter')).toHaveLength(1);
     // under budget: no warning at all
     expect(screen.queryByTestId('budget-over')).toBeNull();
+  });
+
+  it('changes the budget in place: whole shekels, Enter saves, Esc leaves it as it was', async () => {
+    mount(makeView(raw()));
+    const s = screen.getByTestId('budget-summary');
+    // Esc: nothing is sent
+    fireEvent.click(within(s).getByRole('button', { name: 'שינוי התקציב' }));
+    const field = within(s).getByRole('textbox', { name: /שינוי התקציב/ });
+    fireEvent.keyDown(field, { key: 'Escape' });
+    expect(within(s).queryByRole('textbox', { name: /שינוי התקציב/ })).toBeNull();
+    // not a number: a word, and nothing sent
+    fireEvent.click(within(s).getByRole('button', { name: 'שינוי התקציב' }));
+    fireEvent.change(within(s).getByRole('textbox', { name: /שינוי התקציב/ }), { target: { value: 'הרבה' } });
+    fireEvent.click(within(s).getByRole('button', { name: 'שמירה' }));
+    expect(s.textContent).toContain('כתבו סכום בשקלים, למשל 80000');
+    expect(calls.filter((c) => c.method === 'POST')).toHaveLength(0);
+    // a new amount, rounded to a whole shekel, through the settings route
+    fireEvent.change(within(s).getByRole('textbox', { name: /שינוי התקציב/ }), {
+      target: { value: '120,000.4' },
+    });
+    fireEvent.submit(
+      within(s)
+        .getByRole('textbox', { name: /שינוי התקציב/ })
+        .closest('form')!,
+    );
+    await waitFor(() =>
+      expect(calls.find((c) => c.method === 'POST')!.body).toEqual({
+        op: 'settings',
+        patch: { totalBudget: 120000 },
+      }),
+    );
+    await waitFor(() => expect(within(s).queryByRole('textbox', { name: /שינוי התקציב/ })).toBeNull());
   });
 
   it('warns, quietly, only when what is committed passes the total', () => {

@@ -303,7 +303,7 @@ export function SupportChat() {
   const field = useRef<HTMLTextAreaElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
   const stick = useRef(true);
-  // the full-screen editor has the assistant in its top bar: a floating button would cover its controls
+  // the full-screen editor: the launcher is a small round button there (the preview's corner)
   const inEditor = /^\/app\/invitations\/[^/]+\/edit/.test(path);
   const brand = t.brand;
   // for substituting a ":id" the assistant reused from its own screen note (chat.ts's screenNote())
@@ -465,22 +465,31 @@ export function SupportChat() {
 
   return (
     <>
-      {!inEditor ? (
-        <button
-          type="button"
-          hidden={open}
-          onClick={() => openHelp()}
-          aria-label={s.open}
-          aria-haspopup="dialog"
-          data-testid="support-launcher"
-          className="support-launcher fixed end-4 bottom-4 z-[55] flex h-13 lg:hidden lg:[body:has([data-fullscreen])_&]:flex items-center gap-2.5 rounded-full bg-linear-to-br from-brand to-brand-strong ps-1.5 pe-5 text-white shadow-[0_14px_34px_-10px_rgba(122,82,48,0.75)] transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus max-sm:w-13 max-sm:justify-center max-sm:p-0 print:hidden sm:end-6 sm:bottom-6"
+      {/* always there (the sidebar's help opens the same panel); in the editor a small round button in
+          the preview's corner, clear of the phone and above the phone editor's own bottom bar */}
+      <button
+        type="button"
+        hidden={open}
+        onClick={() => openHelp()}
+        aria-label={s.open}
+        aria-haspopup="dialog"
+        data-testid="support-launcher"
+        data-compact={inEditor ? '' : undefined}
+        className={cn(
+          'support-launcher fixed z-[55] flex items-center rounded-full bg-linear-to-br from-brand to-brand-strong text-white shadow-[0_14px_34px_-10px_rgba(122,82,48,0.75)] transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus print:hidden',
+          inEditor
+            ? 'end-3 bottom-[68px] size-11 justify-center lg:end-5 lg:bottom-5'
+            : 'end-4 bottom-4 h-13 gap-2.5 ps-1.5 pe-5 max-sm:w-13 max-sm:justify-center max-sm:p-0 sm:end-6 sm:bottom-6',
+        )}
+      >
+        <span
+          aria-hidden
+          className={cn('grid place-items-center rounded-full', inEditor ? 'size-9' : 'size-10 bg-white/15')}
         >
-          <span aria-hidden className="grid size-10 place-items-center rounded-full bg-white/15">
-            <Sparkles className="size-5" />
-          </span>
-          <span className="text-[14px] font-semibold max-sm:sr-only">{s.launcher}</span>
-        </button>
-      ) : null}
+          <Sparkles className={inEditor ? 'size-[18px]' : 'size-5'} />
+        </span>
+        {inEditor ? null : <span className="text-[14px] font-semibold max-sm:sr-only">{s.launcher}</span>}
+      </button>
 
       {open ? (
         <>

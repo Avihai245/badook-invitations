@@ -60,6 +60,10 @@ export const planningBudgetEn: PlanningBudgetDict = {
     perGuest: 'Cost per guest',
     planned: 'Planned in categories',
     guests: { one: 'for 1 guest', other: 'for {n} guests' },
+    edit: 'Change',
+    editLabel: 'Change the budget',
+    editHint: 'In whole shekels. The categories keep their plans — update them per category.',
+    save: 'Save',
   },
   catGauges: {
     title: 'By category',

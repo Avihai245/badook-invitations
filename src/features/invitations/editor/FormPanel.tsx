@@ -12,21 +12,10 @@ import { GlobalPanel } from './panels/GlobalPanels';
 import { ReviewTextsNote, SectionForm } from './panels/SectionForms';
 import { insertAt, moveAt, uniqueId } from './paths';
 import { withoutPresentation } from './presentation';
-import { useEditor, type PanelId } from './state/EditorProvider';
-import { HelpFor, type HelpArea } from '../app/HelpFor';
-
-/** Each design and settings panel's "?" (what each of its controls does). */
-const PANEL_HELP: Record<PanelId, HelpArea> = {
-  studio: 'studio',
-  palette: 'designPalette',
-  fonts: 'designFonts',
-  style: 'designStyle',
-  cover: 'designCover',
-  music: 'designMusic',
-  event: 'settingsEvent',
-  languages: 'settingsLanguages',
-  share: 'settingsShare',
-};
+import { useEditor } from './state/EditorProvider';
+import { HelpFor } from '../app/HelpFor';
+import { PANEL_HELP } from './panel-help';
+import { SectionHelp, sectionHelpKey } from './SectionHelp';
 
 /** The form panel (§9B.3-D): title + helper line, then the cards of the selected section or panel. */
 export function FormPanel({ className }: { className?: string }) {
@@ -158,7 +147,18 @@ export function FormPanel({ className }: { className?: string }) {
         <div className="min-w-0">
           <div className="flex items-center gap-1">
             <h2 className="text-[18px] font-bold">{title}</h2>
-            {selection.kind === 'panel' ? <HelpFor area={PANEL_HELP[selection.panel]} /> : null}
+            {selection.kind === 'panel' ? (
+              selection.panel === 'cover' ? (
+                <>
+                  <SectionHelp helpKey="cover" name={title} />
+                  <HelpFor area={PANEL_HELP.cover} />
+                </>
+              ) : (
+                <HelpFor area={PANEL_HELP[selection.panel]} />
+              )
+            ) : section ? (
+              <SectionHelp helpKey={sectionHelpKey(section)} name={title} />
+            ) : null}
           </div>
           <p className="mt-0.5 text-[13px] text-muted">{sub}</p>
         </div>

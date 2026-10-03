@@ -81,6 +81,8 @@ import {
   TriangleAlert,
   Type,
   Undo2,
+  LayoutTemplate,
+  ShieldCheck,
   Upload,
   Users,
   Volume2,
@@ -213,6 +215,11 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     fromPhoto: ImagePlus,
     size: Ruler,
     reset: RotateCcw,
+  },
+  designTemplate: {
+    choose: LayoutTemplate,
+    keeps: ShieldCheck,
+    undo: Undo2,
   },
   designCover: {
     enabled: Mail,
