@@ -14,6 +14,46 @@ export const guestsEn: typeof guestsHe = {
     declined: 'Not coming',
     pending: 'No reply yet',
   },
+  unmatched: {
+    fromLink: { one: '1 of them from the general link', other: '{n} of them from the general link' },
+    banner: {
+      one: 'One reply came through the general link and isn’t matched to a guest on the list yet.',
+      other: '{n} replies came through the general link and aren’t matched to guests on the list yet.',
+    },
+    bannerBody:
+      'They already count under “Coming”. Match them to guests so the list shows their status and “Not answered” is exact.',
+    action: 'Match to guests',
+    title: 'Replies from the general link',
+    body: 'Someone who replied through the general link (not their personal one) isn’t linked to a guest. Pick who it is on the list — by name or phone.',
+    coming: { one: 'Coming · 1 person', other: 'Coming · {n} people' },
+    declined: 'Not coming',
+    suggest: 'Possible matches',
+    pickLabel: 'Guest on the list',
+    pickPlaceholder: 'Choose a guest…',
+    noSuggest: 'No match by name or phone — choose from the list.',
+    match: 'Match',
+    matched: 'Reply matched to {name}',
+    taken: 'That guest already has a reply of their own',
+    allDone: 'Every reply is matched. 🎉',
+  },
+  own: {
+    cta: 'Send from my WhatsApp',
+    soon: 'Automatic sending — coming soon',
+    hint: {
+      one: 'One guest hasn’t got it yet. Send from your own WhatsApp — with their personal link.',
+      other:
+        '{n} guests haven’t got it yet. Send one after another from your own WhatsApp — each with their personal link.',
+    },
+    title: 'Send from my WhatsApp',
+    body: 'Each guest opens a chat with a ready message and their personal link. Send it in WhatsApp, come back and press “Next”.',
+    progress: '{i} of {n}',
+    open: 'Open in WhatsApp',
+    next: 'Next',
+    skip: 'Skip',
+    sent: 'Marked as sent',
+    done: 'Done — every guest in the queue got the invitation.',
+    none: 'No guests with a mobile number left to send to.',
+  },
   start: {
     importStep: 'Step 1 · The list',
     importHint:

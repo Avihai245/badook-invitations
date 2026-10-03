@@ -90,7 +90,7 @@ export const planningBudgetEn: PlanningBudgetDict = {
   guests: {
     title: 'Guests and how costs are counted',
     summary: '{numbers} · {source}',
-    sourceManual: 'your own numbers',
+    sourceManual: 'expected guests',
     adults: 'Adults',
     children: 'Children',
     tables: 'Tables',
@@ -100,11 +100,12 @@ export const planningBudgetEn: PlanningBudgetDict = {
     childrenN: { one: '1 child', other: '{n} children' },
     tablesN: { one: '1 table', other: '{n} tables' },
     basisLabel: 'Where the number of guests comes from',
-    basis: { invited: 'Everyone invited', confirmed: 'Those who said yes', manual: 'My own numbers' },
+    basis: { invited: 'Everyone invited', confirmed: 'Those who said yes', manual: 'Expected guests' },
     basisHelp: {
       invited: 'Everyone on the guest list, counted as adults.',
       confirmed: 'Those who replied "attending": adults and children from their replies.',
-      manual: 'The numbers you type here.',
+      manual:
+        'How many guests you expect — the number you type here. Once the list is ready you can sync to it.',
     },
     offTitle: 'The budget does not follow your guest list',
     offBody:
@@ -113,6 +114,13 @@ export const planningBudgetEn: PlanningBudgetDict = {
     offSeating: 'A cost per table is counted with the number you typed, not with the seating plan.',
     followSeating: 'Follow the seating plan',
     tablesFollow: 'From the seating plan.',
+    expected: 'Expected guests',
+    byList: 'By the guest list',
+    confirmed: 'People who said yes',
+    byListNote: { one: '1 guest on the list', other: '{n} guests on the list' },
+    sync: 'Sync to the list',
+    synced: 'Expected guests updated from the list',
+    differ: 'The budget counts {expected}; the guest list has {list}.',
   },
   categories: {
     expand: 'Open {name}',

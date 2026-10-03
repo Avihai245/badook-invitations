@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { categoryPlanned, plannedTotal, shekels } from '@/features/planning/model/budget';
-import { buildPlanDraft, buildPlanDraftFromPrivate } from '@/features/planning/model/draft';
+import { buildPlanDraft, buildPlanDraftFromPrivate, splitBudget } from '@/features/planning/model/draft';
 import { integrationsForMode, readIntegrations } from '@/features/planning/model/integrations';
 import { computeSchedule, daysBetween, todayIn } from '@/features/planning/model/schedule';
 import { systemTaskDone, systemTasksFor, type SystemFacts } from '@/features/planning/model/system-tasks';
@@ -253,5 +253,26 @@ describe('how the plan follows the invitation system', () => {
       guests: true,
       seating: false,
     });
+  });
+});
+
+describe('splitBudget (whole shekels, summing to the budget)', () => {
+  const wedding = TEMPLATES.wedding.categories.map((c) => ({ key: c.key, pct: c.pct, basis: c.basis }));
+
+  it('never leaves agorot and adds up to the total exactly (the report: ₪100,000 for 126 + 20)', () => {
+    const split = splitBudget(100_000, wedding, { adults: 126, children: 20, tables: 1 });
+    for (const s of split) {
+      expect(Number.isInteger(s.planned)).toBe(true);
+      if (s.unitPrice !== null) expect(Number.isInteger(s.unitPrice)).toBe(true);
+    }
+    expect(split.reduce((n, s) => n + s.planned, 0)).toBe(100_000);
+    const catering = split[wedding.findIndex((c) => c.key === 'catering')]!;
+    expect(catering.planned).toBe(catering.unitPrice! * 126);
+  });
+
+  it('balances an odd total with no guests to divide by', () => {
+    const split = splitBudget(99_999.99, wedding, { adults: 0, children: 0, tables: 0 });
+    expect(split.reduce((n, s) => n + s.planned, 0)).toBe(100_000);
+    expect(split.every((s) => s.unitPrice === null)).toBe(true);
   });
 });

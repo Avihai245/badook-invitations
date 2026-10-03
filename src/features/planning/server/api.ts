@@ -81,11 +81,16 @@ async function draftFor(
   if (!eventDate) return fail(409, 'no_date');
   const tz = raw.invitation.timezone ?? DEFAULT_ZONE;
   const today = todayIn(tz, new Date(deps.now()));
-  const manual = {
-    adults: input.manualAdults ?? raw.headcount.invited,
-    children: input.manualChildren ?? 0,
-    tables: input.manualTables ?? raw.facts.tables,
-  };
+  // the guest numbers the budget will follow (planning_headcount), so a per-head price × heads is the share
+  const tables = input.manualTables ?? raw.facts.tables;
+  // (with the guests' integration off the plan follows the host's own numbers, whatever the basis)
+  const basis = integrationsForMode(input.integrationsMode).guests ? input.guestBasis : 'manual';
+  const manual =
+    basis === 'confirmed'
+      ? { adults: raw.headcount.confirmedAdults, children: raw.headcount.confirmedChildren, tables }
+      : basis === 'manual'
+        ? { adults: input.manualAdults ?? raw.headcount.invited, children: input.manualChildren ?? 0, tables }
+        : { adults: raw.headcount.invited, children: 0, tables };
   const ctx = {
     eventDate,
     today,

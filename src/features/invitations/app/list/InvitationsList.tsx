@@ -133,7 +133,16 @@ export function InvitationsList({ items, name }: { items: InvitationSummary[]; n
         <div className="relative flex flex-wrap items-end justify-between gap-5">
           <div className="min-w-0">
             <p className="text-[14px] font-semibold text-brand-deep">
-              {name ? fmt(t.list.greeting, { name }) : t.list.greetingNoName}
+              {name ? (
+                // the name isolated: a Latin name keeps the comma on the Hebrew side ("שלום, Avihai")
+                <>
+                  {t.list.greeting.split('{name}')[0]}
+                  <bdi>{name}</bdi>
+                  {t.list.greeting.split('{name}')[1]}
+                </>
+              ) : (
+                t.list.greetingNoName
+              )}
             </p>
             <div className="mt-1 flex items-center gap-1">
               <PageTitle>

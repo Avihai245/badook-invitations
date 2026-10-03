@@ -247,6 +247,17 @@ export const hostDb = {
       ? rpc<boolean>('owner_delete_response', { p_id: id, p_owner_id: ownerId, p_response_id: responseId })
       : Promise.resolve(false),
 
+  /** Matches a reply to a guest on the list (null: unmatches it): 'ok', 'taken', or null when not the owner's. */
+  linkResponse: (id: string, ownerId: string, responseId: string, guestId: string | null) =>
+    isUuid(id) && isUuid(responseId) && (guestId === null || isUuid(guestId))
+      ? rpc<'ok' | 'taken' | null>('owner_link_response', {
+          p_id: id,
+          p_owner_id: ownerId,
+          p_response_id: responseId,
+          p_guest_id: guestId,
+        })
+      : Promise.resolve(null),
+
   setNotify: (id: string, ownerId: string, mode: NotifyMode) =>
     isUuid(id)
       ? rpc<boolean>('set_invitation_notify', { p_id: id, p_owner_id: ownerId, p_mode: mode })

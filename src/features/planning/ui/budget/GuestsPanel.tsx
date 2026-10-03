@@ -98,6 +98,36 @@ export function GuestsPanel() {
           )}
         />
       </button>
+      {/* the three guest numbers side by side (UX report B3): what the budget counts, the list, the replies */}
+      <div className="grid grid-cols-3 gap-px border-t border-line bg-line" data-testid="budget-headcount">
+        {[
+          { label: manual ? G.expected : G.basis[basis], value: h.guests },
+          { label: G.byList, value: h.invited },
+          { label: G.confirmed, value: h.confirmedAdults + h.confirmedChildren },
+        ].map((x, i) => (
+          <div key={i} className={cn('bg-surface px-4 py-2.5', i === 0 && 'bg-brand-soft/40')}>
+            <p className="text-[11.5px] font-semibold text-muted">{x.label}</p>
+            <p className="text-[18px] font-bold tabular-nums">{number(x.value)}</p>
+          </div>
+        ))}
+      </div>
+      {manual && h.invited > 0 && h.invited !== h.guests ? (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-4 py-2.5 text-[12.5px] text-muted">
+          <span>
+            {fmt(G.differ, {
+              expected: plural(G.guestsN, h.guests, { n: number(h.guests) }),
+              list: plural(G.guestsN, h.invited, { n: number(h.invited) }),
+            })}
+          </span>
+          <button
+            type="button"
+            onClick={() => void saveSettings({ manualAdults: h.invited, manualChildren: 0 })}
+            className="rounded-btn px-2 py-1 text-[13px] font-semibold text-brand-deep hover:bg-brand-soft"
+          >
+            {G.sync}
+          </button>
+        </div>
+      ) : null}
       {open ? (
         <div id={id} className="flex flex-col gap-5 border-t border-line p-4">
           {!integrations.guests ? (

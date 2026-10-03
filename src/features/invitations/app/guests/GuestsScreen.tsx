@@ -67,10 +67,12 @@ import {
   type ListFilter,
 } from '../../lib/guest-list';
 import { guestState, guestStats, matchesGuestSearch, wasSent, type GuestState } from '../../lib/guest-status';
+import { rsvpSummary } from '../../lib/rsvp-summary';
 import type { GuestRecord, GuestsPageData } from '../../server/guests';
 import { GuestDialog } from './GuestDialog';
 import { GuestsActions, GuestsGuide } from './GuestsStart';
 import { downloadSample, ImportDialog } from './ImportDialog';
+import { OwnSendQueue, UnmatchedReplies } from './ReplyMatch';
 import { WhatsAppDialog } from './WhatsAppDialog';
 
 /** How often the list asks the server for news (opened, replied, delivered) while the tab is visible. */
@@ -127,10 +129,16 @@ export function GuestsScreen({
   const [filter, setFilter] = useState<ListFilter>('all');
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set());
   const [dialog, setDialog] = useState<DialogState>(() =>
-    open === 'import' ? { kind: 'import' } : open === 'send' ? { kind: 'whatsapp' } : null,
+    open === 'import'
+      ? { kind: 'import' }
+      : open === 'send' && data.whatsapp.configured
+        ? { kind: 'whatsapp' }
+        : null,
   );
   const [, startRefresh] = useTransition();
   const [tablesOpen, setTablesOpen] = useState(false);
+  // ?send=1 without the system's number: the host's own WhatsApp, one guest after another
+  const [ownOpen, setOwnOpen] = useState(open === 'send' && !data.whatsapp.configured);
 
   const refresh = () => startRefresh(() => router.refresh());
   useEffect(() => {
@@ -153,6 +161,12 @@ export function GuestsScreen({
   }, []);
 
   const stats = useMemo(() => guestStats(guests), [guests]);
+  // the replies the way every screen counts them: a general-link reply is "coming" too (lib/rsvp-summary)
+  const rsvp = useMemo(() => rsvpSummary(guests, data.replies), [guests, data.replies]);
+  const unmatched = useMemo(() => {
+    const onList = new Set(guests.map((x) => x.id));
+    return data.replies.filter((r) => !r.guestId || !onList.has(r.guestId));
+  }, [guests, data.replies]);
   const rows = useMemo(
     () => guests.filter((x) => matchesListFilter(x, filter) && matchesGuestSearch(x, query)),
     [guests, filter, query],
@@ -175,13 +189,20 @@ export function GuestsScreen({
         : !reachable.length
           ? g.sendBlocked.noMobile
           : null;
-  const sendHint = !unsent
-    ? g.start.allSent
-    : plural(data.unlimited ? g.start.sendHintUnlimited : g.start.sendHint, unsent, {
-        n: number(unsent),
-        price,
-        credits: number(data.credits),
-      });
+  // until the system's number is connected, the host's own WhatsApp is the way: a queue, one by one
+  const ownQueue = guests.filter((x) => whatsappCapable(x.phone) && !wasSent(x) && x.sendStatus !== 'queued');
+  const own = !data.whatsapp.configured;
+  const sendHint = own
+    ? ownQueue.length
+      ? plural(g.own.hint, ownQueue.length, { n: number(ownQueue.length) })
+      : g.own.none
+    : !unsent
+      ? g.start.allSent
+      : plural(data.unlimited ? g.start.sendHintUnlimited : g.start.sendHint, unsent, {
+          n: number(unsent),
+          price,
+          credits: number(data.credits),
+        });
 
   const copyLink = (x: GuestRecord) =>
     navigator.clipboard.writeText(linkOf(x)).then(
@@ -526,9 +547,10 @@ export function GuestsScreen({
             <GuestsActions
               onImport={openImport}
               onAdd={openAdd}
-              onSend={() => setDialog({ kind: 'whatsapp' })}
+              onSend={() => (own ? setOwnOpen(true) : setDialog({ kind: 'whatsapp' }))}
               sendHint={sendHint}
-              sendBlocked={sendBlocked}
+              sendBlocked={own ? (ownQueue.length ? null : g.own.none) : sendBlocked}
+              own={own}
             />
 
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -538,16 +560,25 @@ export function GuestsScreen({
               <KpiCard
                 label={g.kpi.attending}
                 icon={<CheckCheck />}
-                value={number(stats.attending)}
+                value={number(rsvp.coming)}
                 sub={
-                  stats.attendingPeople
-                    ? plural(t.common.people, stats.attendingPeople, { n: number(stats.attendingPeople) })
-                    : undefined
+                  [
+                    rsvp.comingPeople
+                      ? plural(t.common.people, rsvp.comingPeople, { n: number(rsvp.comingPeople) })
+                      : null,
+                    rsvp.comingFromLink
+                      ? plural(g.unmatched.fromLink, rsvp.comingFromLink, { n: number(rsvp.comingFromLink) })
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ') || undefined
                 }
               />
-              <KpiCard label={g.kpi.declined} icon={<UserX />} value={number(stats.declined)} />
-              <KpiCard label={g.kpi.pending} icon={<MailCheck />} value={number(stats.pending)} />
+              <KpiCard label={g.kpi.declined} icon={<UserX />} value={number(rsvp.declined)} />
+              <KpiCard label={g.kpi.pending} icon={<MailCheck />} value={number(rsvp.notAnswered)} />
             </div>
+
+            <UnmatchedReplies id={data.id} replies={unmatched} guests={guests} onChanged={refresh} />
 
             <Card padding="md" className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
@@ -768,6 +799,7 @@ export function GuestsScreen({
         />
       ) : null}
       {tables ? <NoticesDialog id={data.id} open={tablesOpen} onOpenChange={setTablesOpen} /> : null}
+      <OwnSendQueue open={ownOpen} onOpenChange={setOwnOpen} queue={ownQueue} onSend={sendOwn} />
     </>
   );
 }

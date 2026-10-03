@@ -59,6 +59,11 @@ export function overviewSteps(f: OverviewFacts): {
     track: systemTaskDone('rsvp_tracked', facts) === true,
   };
   const order: OverviewStep[] = ['design', 'publish', 'import', 'send', 'track'];
+  // a road, not a checklist: a step isn't done while one before it isn't (a reply through the general
+  // link before anyone was sent the invitation doesn't make "track the replies" done — UX report B5)
+  order.forEach((s, i) => {
+    if (i > 0 && !done[order[i - 1]!]) done[s] = false;
+  });
   return { done, next: order.find((s) => !done[s]) ?? null };
 }
 
