@@ -585,7 +585,7 @@ function PanelList({
                 onNavigate?.();
               }}
             />
-            <HelpFor area={PANEL_HELP[panel]} className={COMPACT_HIDE} />
+            <HelpFor area={PANEL_HELP[panel]} named className={COMPACT_HIDE} />
           </RowShell>
         );
       })}

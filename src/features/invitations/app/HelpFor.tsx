@@ -319,10 +319,13 @@ export function HelpFor({
   area,
   inDialog = false,
   hide = [],
+  named = false,
   className,
 }: {
   area: HelpArea;
   inDialog?: boolean;
+  /** the button named by its card's title ("Colors: what each thing does"): one of several in a list */
+  named?: boolean;
   /** items about something this page doesn't show (a feature the event doesn't have) */
   hide?: readonly string[];
   className?: string;
@@ -338,7 +341,7 @@ export function HelpFor({
     });
   return (
     <AreaHelp
-      label={t.common.helpLabel}
+      label={named ? help.title : t.common.helpLabel}
       title={help.title}
       items={items}
       footer={!inDialog}

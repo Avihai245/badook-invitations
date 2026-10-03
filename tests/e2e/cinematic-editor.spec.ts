@@ -403,7 +403,7 @@ test.describe('the photographic flagship (Lumière)', () => {
     const errors = collectErrors(page);
     if (!phone) {
       await signUp(page);
-      await open(page, '/app/invitations/new');
+      await open(page, '/app/invitations/new?gallery=1');
       await expect(page.getByRole('heading', { name: 'בחרו עיצוב' })).toBeVisible();
       await expect(page.getByRole('button', { name: /סהר בורדו/ })).toHaveCount(1);
       await expect(page.getByRole('button', { name: /לומייר/ })).toHaveCount(0);

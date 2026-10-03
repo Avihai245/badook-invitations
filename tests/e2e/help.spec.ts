@@ -210,7 +210,8 @@ test('the editor: its bar, rail, design and settings panels, publishing and vers
   await openRail('עיצוב');
   await explains(
     page,
-    page.locator('aside:visible').getByTestId('area-help'),
+    // the rail's own "?" (each section and panel row has one of its own, named by it)
+    page.locator('aside:visible').getByRole('button', { name: 'הסבר על הכפתורים באזור הזה' }),
     'סקשנים ועיצוב: מה כל דבר עושה',
     ['מתג הסתרה', 'הוספת סקשן', 'נקודה צהובה / אדומה'],
   );

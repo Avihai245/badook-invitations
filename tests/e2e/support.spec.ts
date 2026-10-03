@@ -200,10 +200,10 @@ test.describe('the support assistant', () => {
     await expect(chat).toBeVisible();
     await chat.getByRole('button', { name: 'סגירת הצ׳אט' }).click();
 
-    // the editor's bar (phones: its ⋯ menu) instead of a floating button that would cover the editor;
-    // a new conversation there suggests editor questions
+    // the editor: a small round button in the preview's corner (and its bar — phones: the ⋯ menu); a
+    // new conversation there suggests editor questions
     await open(page, `/app/invitations/${id}/edit`);
-    await expect(page.getByTestId('support-launcher')).toHaveCount(0);
+    await expect(page.getByTestId('support-launcher')).toHaveAttribute('data-compact', '');
     if (testInfo.project.name === 'mobile') {
       await page.getByRole('button', { name: 'פעולות נוספות' }).click();
       await page.getByRole('menuitem', { name: 'עזרה: שאלו את העוזר' }).click();
