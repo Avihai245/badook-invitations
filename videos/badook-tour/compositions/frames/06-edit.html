@@ -1,0 +1,568 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="06-edit-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 1100px 800px at 88% 6%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── window card: x 70–1250, y 70–807.5 (1440×900 CSS @ 0.81944 px/CSS px) ── */
+    [id="06-edit-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="06-edit-window"] {
+      position: absolute;
+      left: 70px;
+      top: 70px;
+      width: 1180px;
+      height: 737.5px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-sizing: content-box;
+      margin: -1px 0 0 -1px;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 18px 48px -18px rgba(60, 35, 15, 0.35);
+      transform-origin: 50% 50%;
+    }
+    [id="06-edit-world"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1180px;
+      height: 737.5px;
+      transform-origin: 0 0;
+    }
+    [id="06-edit-shot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1180px;
+      height: 737.5px;
+      display: block;
+    }
+    [id="06-edit-svg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1180px;
+      height: 737.5px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [class~="06-edit-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 3;
+      stroke-dasharray: 1 1;
+      stroke-linejoin: round;
+    }
+    [class~="06-edit-ring-glow"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-width: 12;
+      stroke-dasharray: 1 1;
+      stroke-linejoin: round;
+    }
+    [class~="06-edit-arc"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 1.5;
+      stroke-dasharray: 1 1;
+      stroke-linecap: butt;
+    }
+    [class~="06-edit-dot"] {
+      fill: #A0703F;
+    }
+    [class~="06-edit-phone-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 3;
+    }
+    [class~="06-edit-phone-glow"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.2);
+      stroke-width: 14;
+    }
+
+    /* feature chip — solid brown, cream text, live dot (positioned by script on the phone's top edge) */
+    [id="06-edit-chip-anchor"] {
+      position: absolute;
+      width: 420px;
+      height: 64px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    [id="06-edit-chip"] {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      direction: rtl;
+      padding: 12px 26px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 30px;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 10px 24px -10px rgba(60, 35, 15, 0.45);
+      transform-origin: 50% 50%;
+    }
+    [id="06-edit-live"] {
+      position: relative;
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+    }
+    [id="06-edit-live-core"],
+    [id="06-edit-live-halo"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: #FBF7F1;
+    }
+    [id="06-edit-live-halo"] {
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    /* rebuilt review card — cream, 300px, slides out beneath הערות */
+    [id="06-edit-card"] {
+      position: absolute;
+      width: 300px;
+      box-sizing: border-box;
+      padding: 18px 18px 18px;
+      border-radius: 12px;
+      background: #FBF7F1;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 16px 36px -14px rgba(60, 35, 15, 0.40);
+      direction: rtl;
+      text-align: right;
+      font-family: "Heebo", sans-serif;
+    }
+    [id="06-edit-card-notch"] {
+      position: absolute;
+      top: -8px;
+      width: 14px;
+      height: 14px;
+      background: #FBF7F1;
+      border-left: 1px solid rgba(28, 25, 23, 0.12);
+      border-top: 1px solid rgba(28, 25, 23, 0.12);
+      transform: rotate(45deg);
+    }
+    [id="06-edit-card-title"] {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      font-size: 28px;
+      line-height: 1.2;
+      color: #1C1917;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(28, 25, 23, 0.12);
+    }
+    [id="06-edit-card-title"] svg {
+      width: 26px;
+      height: 26px;
+      flex: 0 0 26px;
+    }
+    [class~="06-edit-bubble"] {
+      background: #F3E8DB;
+      border-radius: 12px 12px 4px 12px;
+      padding: 10px 14px;
+      font-size: 24px;
+      line-height: 1.35;
+      font-weight: 400;
+      color: #1C1917;
+      transform-origin: 100% 0%;
+    }
+    [class~="06-edit-bubble"] + [class~="06-edit-bubble"] {
+      margin-top: 10px;
+    }
+    [class~="06-edit-who"] {
+      font-weight: 700;
+      color: #7A5230;
+    }
+
+    /* publish press: a lifted crop of the REAL button (same screenshot, same mapping) */
+    [id="06-edit-burst"] {
+      position: absolute;
+      border-radius: 9999px;
+      background: radial-gradient(closest-side, rgba(122, 82, 48, 0.85), rgba(160, 112, 63, 0.35) 60%, rgba(160, 112, 63, 0) 100%);
+      filter: blur(14px);
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+    [id="06-edit-lift"] {
+      position: absolute;
+      overflow: hidden;
+      border-radius: 8px;
+      transform-origin: 50% 50%;
+      box-shadow: 0 0 0 rgba(28, 25, 23, 0);
+    }
+    [id="06-edit-lift-img"] {
+      position: absolute;
+      width: 1180px;
+      height: 737.5px;
+      display: block;
+    }
+
+    /* "פורסם" check pill */
+    [id="06-edit-pill"] {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      direction: rtl;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 30px;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 10px 24px -10px rgba(60, 35, 15, 0.45);
+      transform-origin: 0% 50%;
+    }
+    [id="06-edit-pill"] svg {
+      width: 26px;
+      height: 26px;
+      flex: 0 0 26px;
+    }
+
+    /* ── text column (RTL, right side x 1310–1840) ── */
+    [id="06-edit-col"] {
+      position: absolute;
+      left: 1310px;
+      top: 0;
+      width: 530px;
+      height: 896px;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="06-edit-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 150px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="06-edit-head"] {
+      position: absolute;
+      right: 0;
+      top: 214px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 124px;
+      line-height: 1.06;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+    }
+    [class~="06-edit-line"] {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      padding-bottom: 6px;
+    }
+    [class~="06-edit-word"] {
+      display: inline-block;
+    }
+    [id="06-edit-rule"] {
+      position: absolute;
+      right: 0;
+      top: 520px;
+      width: 530px;
+      height: 1px;
+      background: rgba(28, 25, 23, 0.12);
+      transform-origin: 100% 50%;
+    }
+    [id="06-edit-rule-accent"] {
+      position: absolute;
+      right: 0;
+      top: 519px;
+      width: 120px;
+      height: 3px;
+      border-radius: 2px;
+      background: #A0703F;
+      transform-origin: 100% 50%;
+    }
+  </style>
+
+  <div id="root" data-composition-id="06-edit" data-width="1920" data-height="1080" data-duration="10.247">
+    <div id="06-edit-bg" class="clip" data-start="0" data-duration="10.247" data-track-index="0"></div>
+
+    <div id="06-edit-stage" class="clip" data-start="0" data-duration="10.247" data-track-index="1">
+      <div id="06-edit-window">
+        <div id="06-edit-world">
+          <img id="06-edit-shot" src="assets/screen-editor.png" alt="" />
+
+          <svg id="06-edit-svg" viewBox="0 0 1180 737.5" aria-hidden="true">
+            <!-- phone "answers" ring (phone box) -->
+            <path id="06-edit-phone-glow" class="06-edit-phone-glow" d="" />
+            <path id="06-edit-phone-ring" class="06-edit-phone-ring" d="" />
+            <!-- field rings -->
+            <path id="06-edit-r1-glow" class="06-edit-ring-glow" pathLength="1" d="" />
+            <path id="06-edit-r1" class="06-edit-ring" pathLength="1" d="" />
+            <path id="06-edit-r2-glow" class="06-edit-ring-glow" pathLength="1" d="" />
+            <path id="06-edit-r2" class="06-edit-ring" pathLength="1" d="" />
+            <!-- live-link arcs field → phone -->
+            <path id="06-edit-a1" class="06-edit-arc" pathLength="1" d="" />
+            <path id="06-edit-a2" class="06-edit-arc" pathLength="1" d="" />
+            <circle id="06-edit-d1" class="06-edit-dot" r="6" cx="0" cy="0" />
+            <circle id="06-edit-d2" class="06-edit-dot" r="6" cx="0" cy="0" />
+            <!-- comments + publish rings -->
+            <path id="06-edit-rc-glow" class="06-edit-ring-glow" pathLength="1" d="" />
+            <path id="06-edit-rc" class="06-edit-ring" pathLength="1" d="" />
+            <path id="06-edit-rp-glow" class="06-edit-ring-glow" pathLength="1" d="" />
+            <path id="06-edit-rp" class="06-edit-ring" pathLength="1" d="" />
+          </svg>
+
+          <div id="06-edit-chip-anchor">
+            <div id="06-edit-chip" dir="rtl" lang="he">
+              <span id="06-edit-live"><span id="06-edit-live-halo"></span><span id="06-edit-live-core"></span></span>
+              <span>מתעדכן בזמן אמת</span>
+            </div>
+          </div>
+
+          <div id="06-edit-burst"></div>
+          <div id="06-edit-lift"><img id="06-edit-lift-img" src="assets/screen-editor.png" alt="" /></div>
+
+          <div id="06-edit-pill" dir="rtl" lang="he">
+            <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="#FBF7F1" /><path d="M7.5 13.5 L11.5 17.2 L18.8 9.4" fill="none" stroke="#A0703F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span>פורסם</span>
+          </div>
+
+          <div id="06-edit-card" dir="rtl" lang="he">
+            <div id="06-edit-card-notch"></div>
+            <div id="06-edit-card-title">
+              <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M4 6.5 Q4 4 6.5 4 H19.5 Q22 4 22 6.5 V15.5 Q22 18 19.5 18 H11 L6 22 V18 H6.5 Q4 18 4 15.5 Z" fill="none" stroke="#A0703F" stroke-width="2" stroke-linejoin="round" /></svg>
+              <span>טיוטה למשפחה</span>
+            </div>
+            <div id="06-edit-b1" class="06-edit-bubble"><span class="06-edit-who">אמא:</span> מהמם!</div>
+            <div id="06-edit-b2" class="06-edit-bubble"><span class="06-edit-who">סבתא שושנה:</span> להוסיף את שעת החופה</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="06-edit-col" class="clip" data-start="0" data-duration="10.247" data-track-index="2" dir="rtl" lang="he">
+      <div id="06-edit-kicker" dir="rtl" lang="he">05 · עורכים</div>
+      <h1 id="06-edit-head" dir="rtl" lang="he">
+        <span class="06-edit-line"><span id="06-edit-w1" class="06-edit-word">רואים</span> <span id="06-edit-w2" class="06-edit-word">כל</span></span>
+        <span class="06-edit-line"><span id="06-edit-w3" class="06-edit-word">שינוי</span> <span id="06-edit-w4" class="06-edit-word">מיד</span></span>
+      </h1>
+      <div id="06-edit-rule"></div>
+      <div id="06-edit-rule-accent"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="06-edit"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="06-edit-' + name + '"]') || document.getElementById("06-edit-" + name);
+      }
+
+      // ── coordinate mapping: page 1440×900 CSS px → window 1180×737.5 (origin = window top-left) ──
+      var S = 1180 / 1440; // 0.81944 px per CSS px
+      var WIN_W = 1180;
+      var WIN_H = 737.5;
+      var BOX = {
+        phone: [217, 102, 326, 706],
+        fieldOpen: [798, 264, 325, 93],
+        fieldPlace: [798, 468, 325, 93],
+        comments: [291, 12, 83, 32],
+        publish: [12, 12, 134, 32]
+      };
+      function loc(b, pad) {
+        pad = pad || 0;
+        return { x: b[0] * S - pad, y: b[1] * S - pad, w: b[2] * S + 2 * pad, h: b[3] * S + 2 * pad };
+      }
+      function rr(r, rad) {
+        var x = r.x, y = r.y, w = r.w, h = r.h, cx = x + w / 2;
+        rad = Math.min(rad, w / 2, h / 2);
+        return "M" + cx + " " + y +
+          " H" + (x + w - rad) + " A" + rad + " " + rad + " 0 0 1 " + (x + w) + " " + (y + rad) +
+          " V" + (y + h - rad) + " A" + rad + " " + rad + " 0 0 1 " + (x + w - rad) + " " + (y + h) +
+          " H" + (x + rad) + " A" + rad + " " + rad + " 0 0 1 " + x + " " + (y + h - rad) +
+          " V" + (y + rad) + " A" + rad + " " + rad + " 0 0 1 " + (x + rad) + " " + y +
+          " H" + cx + " Z";
+      }
+      function setD(name, d) { el(name).setAttribute("d", d); }
+
+      var phone = loc(BOX.phone, 0);
+      var phoneR = loc(BOX.phone, 5);
+      var fo = loc(BOX.fieldOpen, 6);
+      var fp = loc(BOX.fieldPlace, 6);
+      var cm = loc(BOX.comments, 5);
+      var pb = loc(BOX.publish, 5);
+
+      // rings (radius 14; small buttons 10)
+      setD("r1", rr(fo, 14)); setD("r1-glow", rr(fo, 14));
+      setD("r2", rr(fp, 14)); setD("r2-glow", rr(fp, 14));
+      setD("rc", rr(cm, 10)); setD("rc-glow", rr(cm, 10));
+      setD("rp", rr(pb, 10)); setD("rp-glow", rr(pb, 10));
+      setD("phone-ring", rr(phoneR, 46)); setD("phone-glow", rr(phoneR, 46));
+
+      // live-link arcs: field's left edge (centre-y) → phone box's right edge, same y; bows upward
+      var phoneRight = (BOX.phone[0] + BOX.phone[2]) * S;
+      function arc(b, a, d) {
+        var x0 = b[0] * S, y0 = (b[1] + b[3] / 2) * S, x1 = phoneRight;
+        var lift = 70;
+        el(a).setAttribute("d", "M" + x0 + " " + y0 + " C" + (x0 - 60) + " " + (y0 - lift) + ", " + (x1 + 60) + " " + (y0 - lift) + ", " + x1 + " " + y0);
+        el(d).setAttribute("cx", x1);
+        el(d).setAttribute("cy", y0);
+      }
+      arc(BOX.fieldOpen, "a1", "d1");
+      arc(BOX.fieldPlace, "a2", "d2");
+
+      // feature chip: centred on the phone, hanging just inside its top edge
+      var chipAnchor = el("chip-anchor");
+      chipAnchor.style.left = (phone.x + phone.w / 2 - 210) + "px";
+      chipAnchor.style.top = (phone.y + 22) + "px";
+
+      // review card: right-aligned under הערות (RTL popover), 10px below the button
+      var card = el("card");
+      var cmRight = (BOX.comments[0] + BOX.comments[2]) * S;
+      card.style.left = (cmRight - 300) + "px";
+      card.style.top = ((BOX.comments[1] + BOX.comments[3]) * S + 12) + "px";
+      el("card-notch").style.left = ((BOX.comments[0] + BOX.comments[2] / 2) * S - (cmRight - 300) - 7) + "px";
+
+      // publish lift: the real button cropped from the same screenshot at the same mapping
+      var pub = loc(BOX.publish, 0);
+      var lift = el("lift");
+      lift.style.left = pub.x + "px"; lift.style.top = pub.y + "px";
+      lift.style.width = pub.w + "px"; lift.style.height = pub.h + "px";
+      el("lift-img").style.left = (-pub.x) + "px";
+      el("lift-img").style.top = (-pub.y) + "px";
+      var burst = el("burst");
+      burst.style.left = pub.x + "px"; burst.style.top = pub.y + "px";
+      burst.style.width = pub.w + "px"; burst.style.height = pub.h + "px";
+
+      // "פורסם" pill: directly beneath the publish button, left-aligned with it
+      var pill = el("pill");
+      pill.style.left = pub.x + "px";
+      pill.style.top = (pub.y + pub.h + 16) + "px";
+
+      // zoom-to-target on the phone (≈1.25×), clamped so the screenshot always fills the window
+      var Z = 1.25;
+      var pcx = phone.x + phone.w / 2, pcy = phone.y + phone.h / 2;
+      var zx = Math.min(0, Math.max(WIN_W - Z * WIN_W, WIN_W / 2 - Z * pcx));
+      var zy = Math.min(0, Math.max(WIN_H - Z * WIN_H, WIN_H / 2 - Z * pcy));
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–1.2s): window enters; headline at 0.3s ──
+      tl.fromTo(el("window"), { opacity: 0, y: 36, scale: 0.975 }, { opacity: 1, y: 0, scale: 1, duration: 1.0, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.15);
+      ["w1", "w2", "w3", "w4"].forEach(function (w, i) {
+        tl.fromTo(el(w), { yPercent: 105, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.75, ease: "power3.out" }, 0.3 + i * 0.12);
+      });
+      tl.fromTo(el("rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 0.75);
+      tl.fromTo(el("rule-accent"), { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, 0.95);
+
+      // ── Scene 2 (1.2–3.2s): rings on the fields; hairline arc field → phone; the phone answers ──
+      function ring(name, at) {
+        tl.fromTo(el(name), { strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, at);
+        tl.fromTo(el(name + "-glow"), { strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, at);
+      }
+      function link(a, d, at) {
+        tl.fromTo(el(a), { strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: 0.5, ease: "power2.inOut" }, at);
+        tl.fromTo(el(d), { scale: 0, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, duration: 0.35, ease: "power3.out" }, at + 0.42);
+      }
+      function answer(at) {
+        // the bound surface lights up on arrival of the link (same beat as the edit)
+        tl.fromTo([el("phone-ring"), el("phone-glow")], { opacity: 0.35 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, at);
+        tl.to([el("phone-ring"), el("phone-glow")], { opacity: 0.45, duration: 0.6, ease: "power2.inOut" }, at + 0.3);
+      }
+      tl.set([el("phone-ring"), el("phone-glow")], { opacity: 0 }, 0);
+      tl.set([el("r1"), el("r1-glow"), el("r2"), el("r2-glow"), el("rc"), el("rc-glow"), el("rp"), el("rp-glow"), el("a1"), el("a2")], { strokeDashoffset: 1 }, 0);
+
+      ring("r1", 1.2);
+      link("a1", "d1", 1.45);
+      answer(1.9);
+
+      tl.to([el("r1"), el("r1-glow"), el("a1"), el("d1")], { opacity: 0.35, duration: 0.4, ease: "power2.out" }, 2.4);
+      ring("r2", 2.4);
+      link("a2", "d2", 2.65);
+      answer(3.1);
+
+      // ── Scene 3 (3.2–5.4s): zoom-to-target ≈1.25× on the phone (fields stay co-visible) ──
+      tl.fromTo(el("world"), { x: 0, y: 0, scale: 1 }, { x: zx, y: zy, scale: Z, duration: 0.95, ease: "power3.inOut" }, 3.2);
+      // feature chip pops at the phone's top edge at 3.8s
+      tl.fromTo(el("chip"), { scale: 0.6, opacity: 0, y: 10 }, { scale: 1, opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 3.8);
+      // live dot: two finite pulses (no repeat)
+      [4.3, 5.0].forEach(function (t) {
+        tl.fromTo(el("live-halo"), { scale: 1, opacity: 0.7 }, { scale: 2.6, opacity: 0, duration: 0.65, ease: "power2.out" }, t);
+      });
+
+      // ── Scene 4 (5.4–8.6s): zoom back; ring on הערות; review card slides out; comments arrive ──
+      tl.to(el("world"), { x: 0, y: 0, scale: 1, duration: 0.8, ease: "power3.inOut" }, 5.4);
+      tl.to([el("r1"), el("r1-glow"), el("a1"), el("d1"), el("r2"), el("r2-glow"), el("a2"), el("d2"), el("phone-ring"), el("phone-glow")], { opacity: 0, duration: 0.5, ease: "power2.out" }, 5.45);
+
+      ring("rc", 5.8);
+
+      tl.fromTo(card, { opacity: 0, y: -14, clipPath: "inset(0% 0% 100% 0% round 12px)" }, { opacity: 1, y: 0, clipPath: "inset(0% 0% 0% 0% round 12px)", duration: 0.6, ease: "power3.out" }, 6.3);
+      tl.fromTo(el("b1"), { opacity: 0, y: 10, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 6.8);
+      tl.fromTo(el("b2"), { opacity: 0, y: 10, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 7.8);
+
+      // ── Scene 5 (8.6–10.247s): card tucks away; press on פרסום השינויים; "פורסם" pops ──
+      tl.to(card, { opacity: 0, y: -10, clipPath: "inset(0% 0% 100% 0% round 12px)", duration: 0.45, ease: "power3.in" }, 8.6);
+      tl.to([el("rc"), el("rc-glow")], { opacity: 0, duration: 0.35, ease: "power2.out" }, 8.65);
+      ring("rp", 8.9);
+
+      // press-release-spring (subtle variant): linear-ish compression, spring release, burst behind
+      var PRESS_START = 9.3, PRESS_DUR = 0.15, RELEASE_START = PRESS_START + PRESS_DUR;
+      tl.fromTo(lift, { scale: 1, boxShadow: "0 6px 16px -4px rgba(28,25,23,0.35)" }, { scale: 0.9, boxShadow: "0 1px 2px 0px rgba(28,25,23,0.25)", duration: PRESS_DUR, ease: "power1.in" }, PRESS_START);
+      tl.to(lift, { scale: 1, boxShadow: "0 6px 16px -4px rgba(28,25,23,0.35)", duration: 0.55, ease: "back.out(1.4)" }, RELEASE_START);
+      tl.fromTo(burst, { scale: 1, opacity: 0 }, { scale: 3, opacity: 0.55, duration: 0.4, ease: "power2.out" }, RELEASE_START);
+      tl.to(burst, { opacity: 0, duration: 0.4, ease: "power2.in" }, RELEASE_START + 0.4);
+
+      // state change at release: the check pill stamps in beside the button, then holds
+      tl.fromTo(pill, { scale: 0.5, opacity: 0, x: -8 }, { scale: 1, opacity: 1, x: 0, duration: 0.45, ease: "back.out(1.6)" }, RELEASE_START);
+
+      // pin the timeline to the frame duration (hold)
+      tl.set({}, {}, 10.247);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["06-edit"] = tl;
+    })();
+  </script>
+</template>

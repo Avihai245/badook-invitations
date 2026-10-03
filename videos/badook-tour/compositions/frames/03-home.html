@@ -276,11 +276,6 @@
           <div id="03-home-world" data-layout-allow-overflow>
             <img id="03-home-shot" src="assets/screen-home.png" alt="" />
 
-            <!-- spotlight cut-outs (veil everything except the measured box) -->
-            <div id="03-home-spot-countdown" class="03-home-spot"></div>
-            <div id="03-home-spot-next" class="03-home-spot"></div>
-            <div id="03-home-spot-widget" class="03-home-spot"></div>
-
             <!-- road-map cards: a page-colored slot + the real card crop that lifts -->
             <div class="03-home-slot" data-card="plan"></div>
             <div class="03-home-slot" data-card="invite"></div>
@@ -302,6 +297,11 @@
               <div id="03-home-liftshadow-celebrate" class="03-home-lift-shadow"></div>
               <div class="03-home-lift-clip"><img src="assets/screen-home.png" alt="" /></div>
             </div>
+
+            <!-- spotlight cut-outs (veil everything except the measured box; above the card crops, below the rings) -->
+            <div id="03-home-spot-countdown" class="03-home-spot"></div>
+            <div id="03-home-spot-next" class="03-home-spot"></div>
+            <div id="03-home-spot-widget" class="03-home-spot"></div>
 
             <!-- highlight rings, in page (world) coordinates -->
             <svg id="03-home-rings" viewBox="0 0 1150 1130.833" xmlns="http://www.w3.org/2000/svg">
@@ -614,7 +614,7 @@
         tl.fromTo($("dot-" + n), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, at + 0.04);
         tl.fromTo($("name-" + n), { x: 26, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, at + 0.12);
       });
-      // held read from ~15.9s to the end (no exits — the root transition is the exit)
+      // held read from ~15.9s to the end (no exit tweens: the root handles the frame change)
 
       window.__timelines = window.__timelines || {};
       window.__timelines["03-home"] = tl;

@@ -1,0 +1,437 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="07-share-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 1150px 820px at 86% 8%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── stage layer: window + phone ── */
+    [id="07-share-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* window card: crop CSS x 48–1176 (1128) × y 60–909 at s = 1150/1128 = 1.019504 → 1150×866 at (80,24).
+       Mapping: X = 80 + (x − 48)·s, Y = 24 + (y − 60)·s */
+    [id="07-share-win"] {
+      position: absolute;
+      left: 80px;
+      top: 24px;
+      width: 1150px;
+      height: 866px;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #F8F7F5;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 18px 48px -18px rgba(60, 35, 15, 0.35);
+      transform-origin: 0% 50%;
+      z-index: 1;
+    }
+    /* coordinate-target-zoom: outer scales (origin = window center), inner counter-translates */
+    [id="07-share-zoom-outer"] {
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 1150px;
+      height: 866px;
+      transform-origin: 50% 50%;
+      background: #F8F7F5;
+    }
+    [id="07-share-zoom-inner"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="07-share-shot"] {
+      position: absolute;
+      left: -48.936px;   /* −48 · s */
+      top: -61.170px;    /* −60 · s */
+      width: 1468.086px; /* 1440 · s */
+      height: 1037.855px;/* 1018 · s */
+      display: block;
+    }
+    /* overlay in window-local coords (not zoomed; rides the window's slide) */
+    [id="07-share-win-ov"] {
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 1150px;
+      height: 866px;
+    }
+    [class~="07-share-spot"] {
+      position: absolute;
+      border-radius: 14px;
+      box-shadow: 0 0 0 3000px rgba(28, 25, 23, 0.36);
+      opacity: 0;
+    }
+    [class~="07-share-ring"] {
+      position: absolute;
+      border-radius: 14px;
+    }
+    [class~="07-share-ring-glow"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      box-shadow: 0 0 0 6px rgba(160, 112, 63, 0.18), 0 0 22px rgba(160, 112, 63, 0.28);
+      opacity: 0;
+    }
+    [class~="07-share-ring"] svg {
+      position: absolute;
+      inset: 0;
+      overflow: visible;
+    }
+    [class~="07-share-ring"] path {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    /* callout pill + hairline leader (link field) */
+    [id="07-share-leader"] {
+      position: absolute;
+      left: 1049.25px;
+      top: 327.1px;
+      width: 1.5px;
+      height: 25px;
+      background: #A0703F;
+      transform-origin: 50% 0%;
+    }
+    [id="07-share-pill"] {
+      position: absolute;
+      right: 37.9px;
+      top: 352px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 26px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      color: #A0703F;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      line-height: 1;
+      white-space: nowrap;
+      direction: rtl;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.06);
+      transform-origin: 85% 0%;
+    }
+    [id="07-share-pill"] svg {
+      width: 30px;
+      height: 30px;
+      flex: none;
+    }
+
+    /* phone: device 386×805 centered at x 1000, y 50–855; screen 360×779 at (820,63), CSS scale 360/390 = 0.923077 */
+    [id="07-share-phone"] {
+      position: absolute;
+      left: 807px;
+      top: 50px;
+      width: 386px;
+      height: 805px;
+      box-sizing: border-box;
+      padding: 13px;
+      border-radius: 54px;
+      background: #1C1917;
+      box-shadow:
+        inset 0 0 0 1px rgba(251, 247, 241, 0.10),
+        0 1px 3px rgba(28, 25, 23, 0.08),
+        0 26px 52px -18px rgba(60, 35, 15, 0.45),
+        0 6px 18px rgba(28, 25, 23, 0.06);
+      z-index: 3;
+      transform-origin: 50% 50%;
+    }
+    [id="07-share-screen"] {
+      position: relative;
+      width: 360px;
+      height: 779px;
+      overflow: hidden;
+      border-radius: 42px;
+      background: #F8F1EE;
+    }
+    [class~="07-share-pg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 360px;
+      height: 779.077px;
+    }
+    [class~="07-share-pg"] img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 360px;
+      height: 779.077px;
+      display: block;
+    }
+    /* marker highlight under the greeting: CSS [100,222,190,30] → screen-local [92.31,204.92,175.38,27.69] (+6 / +2 bleed) */
+    [id="07-share-marker"] {
+      position: absolute;
+      left: 86.31px;
+      top: 202.92px;
+      width: 187.38px;
+      height: 31.69px;
+      border-radius: 4px;
+      background: rgba(160, 112, 63, 0.78);
+      mix-blend-mode: screen;
+      transform-origin: 100% 50%;
+    }
+    [id="07-share-ph-spot"] {
+      border-radius: 14px;
+      box-shadow: 0 0 0 1200px rgba(28, 25, 23, 0.30);
+    }
+
+    /* ── text column (RTL, right side x 1270–1840) ── */
+    [id="07-share-col"] {
+      position: absolute;
+      left: 1270px;
+      top: 0;
+      width: 570px;
+      height: 896px;
+      direction: rtl;
+      text-align: right;
+      z-index: 4;
+    }
+    [id="07-share-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 112px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="07-share-head"] {
+      position: absolute;
+      right: 0;
+      top: 168px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 124px;
+      line-height: 1.04;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [class~="07-share-word"] {
+      display: block;
+    }
+    [id="07-share-rule"] {
+      position: absolute;
+      right: 0;
+      top: 462px;
+      width: 570px;
+      height: 1px;
+      background: rgba(28, 25, 23, 0.12);
+      transform-origin: 100% 50%;
+    }
+    [id="07-share-chip"] {
+      position: absolute;
+      right: 0;
+      top: 500px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 28px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 32px;
+      line-height: 1;
+      white-space: nowrap;
+      direction: rtl;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 10px 28px -12px rgba(122, 82, 48, 0.55);
+      transform-origin: 100% 50%;
+    }
+    [id="07-share-chip"] svg {
+      width: 30px;
+      height: 30px;
+      flex: none;
+    }
+  </style>
+  <div id="root" data-composition-id="07-share" data-width="1920" data-height="1080" data-duration="10.27">
+    <!-- full-bleed cream ground -->
+    <div id="07-share-bg" class="clip" data-start="0" data-duration="10.27" data-track-index="0"></div>
+
+    <!-- stage: share window (left) + phone (enters in Scene 3) -->
+    <div id="07-share-stage" class="clip" data-start="0" data-duration="10.27" data-track-index="1">
+      <div id="07-share-win">
+        <div id="07-share-zoom-outer">
+          <div id="07-share-zoom-inner">
+            <img id="07-share-shot" src="assets/screen-share.png" alt="" />
+          </div>
+        </div>
+        <div id="07-share-win-ov">
+          <!-- link-field [704,333,427,40] → local [668.79,278.32,435.33,40.78]; +8 pad -->
+          <div class="07-share-spot" id="07-share-spot1" style="left: 660.79px; top: 270.32px; width: 451.33px; height: 56.78px;"></div>
+          <!-- qr [374,718,159,159] after zoom 1.6× (inner x +161.59, y −272) → local [445.32,378.32,259.36,259.36]; +10 pad -->
+          <div class="07-share-spot" id="07-share-spot2" style="left: 435.32px; top: 368.32px; width: 279.36px; height: 279.36px;"></div>
+          <div class="07-share-ring" id="07-share-ring1" style="left: 660.79px; top: 270.32px; width: 451.33px; height: 56.78px;">
+            <div class="07-share-ring-glow" id="07-share-ring1-glow"></div>
+            <svg width="451.33" height="56.78" aria-hidden="true"><path id="07-share-ring1-path" pathLength="1" data-w="451.33" data-h="56.78" /></svg>
+          </div>
+          <div class="07-share-ring" id="07-share-ring2" style="left: 435.32px; top: 368.32px; width: 279.36px; height: 279.36px;">
+            <div class="07-share-ring-glow" id="07-share-ring2-glow"></div>
+            <svg width="279.36" height="279.36" aria-hidden="true"><path id="07-share-ring2-path" pathLength="1" data-w="279.36" data-h="279.36" /></svg>
+          </div>
+          <div id="07-share-leader"></div>
+          <div id="07-share-pill" dir="rtl" lang="he">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2" fill="none" stroke="#A0703F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span>קישור משלה</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="07-share-phone">
+        <div id="07-share-screen">
+          <!-- page A: personal hero -->
+          <div class="07-share-pg" id="07-share-pg-hero">
+            <img src="assets/phone-personal-hero.png" alt="" />
+            <div id="07-share-marker"></div>
+          </div>
+          <!-- page B: prefilled RSVP -->
+          <div class="07-share-pg" id="07-share-pg-rsvp">
+            <img src="assets/phone-personal-rsvp.png" alt="" />
+            <!-- fields CSS [62,380,266,150] (+12 CSS pad) → screen-local [46.15,339.69,267.69,160.62] -->
+            <div class="07-share-spot" id="07-share-ph-spot" style="left: 46.15px; top: 339.69px; width: 267.69px; height: 160.62px;"></div>
+            <div class="07-share-ring" id="07-share-ring3" style="left: 46.15px; top: 339.69px; width: 267.69px; height: 160.62px;">
+              <div class="07-share-ring-glow" id="07-share-ring3-glow"></div>
+              <svg width="267.69" height="160.62" aria-hidden="true"><path id="07-share-ring3-path" pathLength="1" data-w="267.69" data-h="160.62" /></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- text column -->
+    <div id="07-share-col" class="clip" data-start="0" data-duration="10.27" data-track-index="2" dir="rtl" lang="he">
+      <div id="07-share-kicker" dir="rtl" lang="he">06 · משתפים</div>
+      <h1 id="07-share-head" dir="rtl" lang="he"><span class="07-share-word" id="07-share-w1">קישור</span><span class="07-share-word" id="07-share-w2">משלה</span></h1>
+      <div id="07-share-rule"></div>
+      <div id="07-share-chip" dir="rtl" lang="he">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 4.6 2.9 6.9 7.5 7.5-4.6.6-6.9 2.9-7.5 7.5-.6-4.6-2.9-6.9-7.5-7.5 4.6-.6 6.9-2.9 7.5-7.5z" fill="#FBF7F1" /><path d="M19 15.5c.25 1.9 1.1 2.75 3 3-1.9.25-2.75 1.1-3 3-.25-1.9-1.1-2.75-3-3 1.9-.25 2.75-1.1 3-3z" fill="#FBF7F1" /></svg>
+        <span>קישור אישי לכל מוזמן</span>
+      </div>
+    </div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="07-share"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="07-share-' + name + '"]') || document.getElementById("07-share-" + name);
+      }
+
+      // rounded-rect ring path (r = 14), drawn from the top-right going left (RTL reading edge)
+      function ringD(w, h) {
+        var r = 14, p = 1.5;
+        var L = p, T = p, R = w - p, B = h - p;
+        return "M" + (R - r) + " " + T + " H" + (L + r) +
+          " A" + r + " " + r + " 0 0 0 " + L + " " + (T + r) +
+          " V" + (B - r) +
+          " A" + r + " " + r + " 0 0 0 " + (L + r) + " " + B +
+          " H" + (R - r) +
+          " A" + r + " " + r + " 0 0 0 " + R + " " + (B - r) +
+          " V" + (T + r) +
+          " A" + r + " " + r + " 0 0 0 " + (R - r) + " " + T + " Z";
+      }
+      ["ring1-path", "ring2-path", "ring3-path"].forEach(function (n) {
+        var p = el(n);
+        if (p) p.setAttribute("d", ringD(parseFloat(p.getAttribute("data-w")), parseFloat(p.getAttribute("data-h"))));
+      });
+
+      var tl = gsap.timeline({ paused: true });
+
+      // initial states for later-revealed pieces (seek-safe: every entrance below is a fromTo)
+      gsap.set(el("pg-rsvp"), { y: 230, opacity: 0 });
+      gsap.set(el("phone"), { opacity: 0 });
+      gsap.set(el("chip"), { opacity: 0 });
+      gsap.set(el("pill"), { opacity: 0 });
+      gsap.set(el("leader"), { scaleY: 0 });
+
+      // ── Scene 1 (0.0–2.5s): the share window enters; kicker + headline ──
+      tl.fromTo(el("win"), { opacity: 0, scale: 0.96, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: 0.9, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.2);
+      tl.fromTo(el("w1"), { opacity: 0, y: 56 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.45);
+      tl.fromTo(el("w2"), { opacity: 0, y: 56 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.67);
+      tl.fromTo(el("rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 1.2);
+
+      // ── Scene 2 (2.5–4.9s): ring on link-field + pill; zoom-to-target on QR + ring ──
+      tl.fromTo(el("spot1"), { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power1.out" }, 2.5);
+      tl.fromTo(el("ring1-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 2.5);
+      tl.fromTo(el("ring1-glow"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 2.95);
+      tl.fromTo(el("leader"), { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power2.out" }, 2.85);
+      // spring-pop-entrance (smooth settle, no bounce)
+      tl.fromTo(el("pill"), { opacity: 0, scale: 0.82, y: -8 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 2.95);
+      // link callout clears before the camera commits to the QR
+      tl.to([el("spot1"), el("ring1"), el("leader"), el("pill")], { opacity: 0, duration: 0.25, ease: "power1.in" }, 3.4);
+      // coordinate-target-zoom: outer scale 1.6 about window center (575,433); inner counter-translate
+      // QR local center (413.41,751.88) → offset (−161.59, 318.88); x = +161.59, y clamped to −272 so the page keeps covering the window
+      tl.fromTo(el("zoom-outer"), { scale: 1 }, { scale: 1.6, duration: 1.0, ease: "power3.inOut" }, 3.6);
+      tl.fromTo(el("zoom-inner"), { x: 0, y: 0 }, { x: 161.59, y: -272, duration: 1.0, ease: "power3.inOut" }, 3.6);
+      tl.fromTo(el("spot2"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 4.4);
+      tl.fromTo(el("ring2-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.out" }, 4.45);
+      tl.fromTo(el("ring2-glow"), { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 4.85);
+
+      // ── Scene 3 (4.9–8.1s): pivot — window slides aside (≈70%, dims to 60%), phone takes the weight ──
+      tl.to(el("win"), { x: -40, scale: 0.7, opacity: 0.6, duration: 1.0, ease: "power3.inOut" }, 4.9);
+      tl.to(el("spot2"), { opacity: 0, duration: 0.5, ease: "power1.out" }, 4.95);
+      tl.fromTo(el("phone"), { opacity: 0, x: 150, y: 36, scale: 0.94 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 1.0, ease: "power3.out" }, 5.1);
+      // headline steps back as the new idea arrives
+      tl.to(el("head"), { opacity: 0.45, duration: 0.6, ease: "power2.out" }, 5.95);
+      // feature chip (spring-pop, smooth settle)
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.8, x: 30 }, { opacity: 1, scale: 1, x: 0, duration: 0.6, ease: "power3.out" }, 6.1);
+      // brown marker sweeps under the greeting (RTL: from the right edge)
+      tl.fromTo(el("marker"), { scaleX: 0, skewX: -4 }, { scaleX: 1, skewX: -4, duration: 0.5, ease: "power2.out" }, 7.4);
+
+      // ── Scene 4 (8.1–10.27s): cut-the-curve (upward) inside the phone → prefilled RSVP; fields ring ──
+      // exit: y 0 → −230 on power4.in, fade completes ~30% in; entry: y +230 → 0 on power4.out (mirrored, same distance + duration)
+      tl.fromTo(el("pg-hero"), { y: 0 }, { y: -230, duration: 0.3, ease: "power4.in" }, 7.95);
+      tl.fromTo(el("pg-hero"), { opacity: 1 }, { opacity: 0, duration: 0.2, ease: "power1.in" }, 8.05);
+      tl.fromTo(el("pg-rsvp"), { y: 230, opacity: 0.35 }, { y: 0, opacity: 1, duration: 0.3, ease: "power4.out", immediateRender: false }, 8.25);
+      tl.fromTo(el("ph-spot"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 8.5);
+      tl.fromTo(el("ring3-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 8.5);
+      tl.fromTo(el("ring3-glow"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 9.0);
+
+      // hold to the last frame
+      tl.set({}, {}, 10.27);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["07-share"] = tl;
+    })();
+  </script>
+</template>
