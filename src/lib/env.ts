@@ -49,6 +49,8 @@ const ServerEnvSchema = z.object({
     ),
   // the face albums process biometric data: off until approved (docs/features.md)
   INVITES_FACE_ALBUMS: flag(false),
+  // the planning section (tasks, budget, vendors, ideas): off until its migrations are applied
+  INVITES_PLANNING: flag(false),
   // comma-separated emails with the top plan and the admin tools (the platform's owners)
   INVITES_ADMIN_EMAILS: z
     .string()

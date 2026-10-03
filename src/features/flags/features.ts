@@ -40,6 +40,14 @@ export const FEATURES = [
   'draft_review',
   /** how guests use the invitation */
   'analytics',
+  /** the planning section: tasks, budget, vendors and ideas for the event */
+  'planning',
+  /** a plan drafted from a free-text description, and the ideas board's "summarize and suggest steps" */
+  'planning_ai',
+  /** the budget and the plan exported to Excel, and files attached to vendors and costs */
+  'planning_export',
+  /** a plan saved as the host's own template, to start their next events from */
+  'planning_templates',
 ] as const;
 export type Feature = (typeof FEATURES)[number];
 export const isFeature = (v: unknown): v is Feature => FEATURES.includes(v as Feature);
@@ -50,7 +58,14 @@ export type Package = (typeof PACKAGES)[number];
 /** The plans as packages: Free = Basic, Pro = Premium, Business = VIP. */
 export const PACKAGE_OF_PLAN: Record<PlanId, Package> = { free: 'basic', pro: 'premium', business: 'vip' };
 
-const BASIC: readonly Feature[] = ['cinematic', 'seating', 'languages', 'draft_review', 'analytics'];
+const BASIC: readonly Feature[] = [
+  'cinematic',
+  'seating',
+  'languages',
+  'draft_review',
+  'analytics',
+  'planning',
+];
 const PREMIUM: readonly Feature[] = [
   ...BASIC,
   'seating_auto',
@@ -59,6 +74,8 @@ const PREMIUM: readonly Feature[] = [
   'gallery_ai',
   'translate_ai',
   'voice',
+  'planning_ai',
+  'planning_export',
 ];
 const VIP: readonly Feature[] = [
   ...PREMIUM,
@@ -67,6 +84,7 @@ const VIP: readonly Feature[] = [
   'auto_reel',
   'face_albums',
   'art_direction',
+  'planning_templates',
 ];
 export const PACKAGE_FEATURES: Record<Package, readonly Feature[]> = {
   basic: BASIC,
