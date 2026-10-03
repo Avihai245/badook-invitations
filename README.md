@@ -98,6 +98,15 @@ link), and on the seating screen "send guests their table" — a second WhatsApp
 WhatsApp, or table cards to print (`/app/invitations/<id>/seating/cards`). Once numbers were sent, moving
 a family that was told asks first, and only it gets the new number.
 
+**Event planning** (feature `planning`, off until `INVITES_PLANNING=on` — [docs/features.md](docs/features.md)): the
+invitation's "Event planning" tab `/app/invitations/<id>/plan` with tasks (`/plan/tasks`: a timeline compressed into
+the time that is left, system tasks the invitation ticks by itself, calendar export), budget (`/plan/budget`: four
+numbers and a meter, costs per adult / child / guest / table that follow the replies and the seating when the host
+chose that, VAT, payments, Excel), vendors (`/plan/vendors`: a pipeline, what is missing, comparing quotes, closing a
+vendor into a budget item and its payments) and notes & ideas (`/plan/ideas`). Plans start from templates written
+for each kind of event (`src/features/planning/templates`), a weekly email is part of the daily run, and Pro adds an
+AI draft and Excel, Business the host's own templates. Apply `supabase/migrations/*_planning_*.sql` before turning it on.
+
 **Email notifications** (P4): a host gets an email per reply or a daily summary (their choice on the
 responses screen), sent through [Resend](https://resend.com) when `INVITES_EMAIL_API_KEY` and
 `INVITES_EMAIL_FROM` (a sender on a verified domain) are set — otherwise the emails are only logged.
@@ -193,6 +202,8 @@ src/
     sections/            one view per section type + the section registry
     ui/                  invitation CSS (ported from the design reference) and icons
     fonts/ i18n/ lib/    self-hosted fonts, dictionaries, dates/Hebrew calendar/contrast/… utilities
+  features/planning/     event planning: model/ (schedule, budget, system tasks), templates/, server/ (API, AI,
+                         reminders), ui/ (the tabs' screens)
   lib/                   env parsing, feature flag, dev-route gate; supabase/ = server-side clients
 supabase/migrations/     SQL (§4)
 scripts/                 template validation, font generation, seed, design QA

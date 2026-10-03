@@ -108,6 +108,14 @@ export function PlanProvider({
     void lastFailed.current?.();
   }, []);
 
+  // closing the page while a change is still on its way would lose it: the browser asks first
+  useEffect(() => {
+    if (pending === 0) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [pending]);
+
   const value = useMemo<PlanApi>(
     () => ({
       id,

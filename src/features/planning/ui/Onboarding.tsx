@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Card, cn, Field, Input, Switch, Textarea, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { INTEGRATION_MODES, type IntegrationMode, type PlanView } from '../model/plan';
@@ -25,22 +25,41 @@ const toInt = (v: string): number | null => (v === '' ? null : Number.parseInt(v
  * point with what has been chosen so far.
  */
 export function Onboarding() {
-  const { t, fmt, plural, number, date } = useUi();
+  const { t, fmt, plural, number, date, locale } = useUi();
   const O = t.planning.onboarding;
   const { toast } = useToast();
   const plan = usePlan();
   const { view } = plan;
   const type = view.invitation.eventType;
+  const isOtherType = type === 'other';
   const tpl = templateFor(type);
   const [step, setStep] = useState<Step>('event');
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
   // step 1: only an event with no template of its own chooses how to start
-  const [start, setStart] = useState<'blank' | 'draft' | 'private'>('blank');
+  const [choice, setChoice] = useState<string>(isOtherType ? 'blank' : 'default');
   const [describe, setDescribe] = useState('');
   const [draft, setDraft] = useState<PrivateTemplateItems | null>(null);
   const [drafting, setDrafting] = useState(false);
+  // the host's own templates (Business), when there are any
+  const TT = t.planning.templates;
+  const [privates, setPrivates] = useState<{ id: string; name: string; tasks: number }[]>([]);
+  const canTemplates = view.features.templates;
+  useEffect(() => {
+    if (!canTemplates) return;
+    let live = true;
+    void plan
+      .call<{ templates?: { id: string; name: string; tasks: number }[] }>('/templates', { op: 'list' })
+      .then((r) => {
+        if (live && r.ok && r.body?.templates) setPrivates(r.body.templates);
+      });
+    return () => {
+      live = false;
+    };
+    // once, when the wizard opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [draftFailed, setDraftFailed] = useState(false);
 
   // step 2
@@ -79,16 +98,45 @@ export function Onboarding() {
   };
 
   const index = STEPS.indexOf(step);
-  const isOther = type === 'other';
+  const isOther = isOtherType;
+  const options: { key: string; title: string; body: string; locked?: boolean }[] = [
+    ...(isOther
+      ? [
+          { key: 'blank', title: O.event.blank, body: O.event.blankBody },
+          { key: 'draft', title: O.event.describe, body: O.event.describeBody, locked: !view.features.ai },
+        ]
+      : privates.length
+        ? [
+            {
+              key: 'default',
+              title: O.event.template,
+              body: summary
+                ? fmt(summary.full ? O.event.templateFull : O.event.templateLight, {
+                    tasks: number(summary.tasks),
+                    categories: number(summary.categories),
+                  })
+                : '',
+            },
+          ]
+        : []),
+    ...privates.map((p) => ({
+      key: `private:${p.id}`,
+      title: p.name,
+      body: plural(TT.tasks, p.tasks, { n: number(p.tasks) }),
+    })),
+  ];
+  const showChoices = options.length > 1 || (isOther && options.length > 0);
 
   const make = async () => {
     setBusy(true);
     setFailed(false);
-    const template = isOther
-      ? start === 'draft' && draft
-        ? 'draft'
-        : 'blank'
-      : (templateFor(type)?.key ?? 'blank');
+    const template = choice.startsWith('private:')
+      ? choice
+      : isOther
+        ? choice === 'draft' && draft
+          ? 'draft'
+          : 'blank'
+        : (templateFor(type)?.key ?? 'blank');
     const res = await plan.call<{ view?: PlanView }>('', {
       op: 'init',
       template,
@@ -111,7 +159,11 @@ export function Onboarding() {
   const askDraft = async () => {
     setDrafting(true);
     setDraftFailed(false);
-    const res = await plan.call<{ draft?: PrivateTemplateItems }>('/ai', { description: describe });
+    const res = await plan.call<{ draft?: PrivateTemplateItems }>('/ai', {
+      kind: 'plan',
+      description: describe,
+      locale,
+    });
     setDrafting(false);
     if (!res.ok || !res.body?.draft) return setDraftFailed(true);
     setDraft(res.body.draft);
@@ -207,37 +259,31 @@ export function Onboarding() {
               </div>
             ) : null}
 
-            {isOther ? (
+            {showChoices ? (
               <div className="flex flex-col gap-3">
-                <p className="text-[14px] font-semibold">{O.event.other}</p>
-                <div role="radiogroup" aria-label={O.event.other} className="grid gap-3 sm:grid-cols-2">
-                  {(
-                    [
-                      { key: 'blank', title: O.event.blank, body: O.event.blankBody, locked: false },
-                      {
-                        key: 'draft',
-                        title: O.event.describe,
-                        body: O.event.describeBody,
-                        locked: !view.features.ai,
-                      },
-                    ] as const
-                  ).map((o) => (
+                <p className="text-[14px] font-semibold">{isOther ? O.event.other : TT.startFrom}</p>
+                <div
+                  role="radiogroup"
+                  aria-label={isOther ? O.event.other : TT.startFrom}
+                  className="grid gap-3 sm:grid-cols-2"
+                >
+                  {options.map((o) => (
                     <button
                       key={o.key}
                       type="button"
                       role="radio"
-                      aria-checked={start === o.key}
+                      aria-checked={choice === o.key}
                       disabled={o.locked}
-                      onClick={() => setStart(o.key)}
+                      onClick={() => setChoice(o.key)}
                       className={cn(
                         'flex min-h-11 flex-col items-start gap-1 rounded-card border p-4 text-start transition-colors disabled:opacity-60',
-                        start === o.key
+                        choice === o.key
                           ? 'border-brand bg-brand-soft/50'
                           : 'border-line bg-surface hover:bg-subtle',
                       )}
                     >
                       <span className="flex items-center gap-2 text-[14.5px] font-bold">
-                        {o.title}
+                        <bdi>{o.title}</bdi>
                         {o.locked ? (
                           <Badge variant="info">{fmt(O.event.locked, { plan: 'Pro' })}</Badge>
                         ) : null}
@@ -246,7 +292,7 @@ export function Onboarding() {
                     </button>
                   ))}
                 </div>
-                {start === 'draft' && view.features.ai ? (
+                {choice === 'draft' && view.features.ai ? (
                   <div className="flex flex-col gap-3">
                     <Field label={O.event.describeLabel}>
                       <Textarea
@@ -406,7 +452,7 @@ export function Onboarding() {
               icon={index < STEPS.length - 1 ? <ArrowRight className="icon-dir" /> : undefined}
               onClick={next}
               loading={busy && index === STEPS.length - 1}
-              disabled={busy || (isOther && start === 'draft' && !draft && index === 0)}
+              disabled={busy || (isOther && choice === 'draft' && !draft && index === 0)}
             >
               {index < STEPS.length - 1 ? O.next : busy ? O.creating : O.finish}
             </Button>

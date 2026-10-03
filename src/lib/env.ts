@@ -84,6 +84,9 @@ const ServerEnvSchema = z.object({
   // design concepts made by the AI a day per account ("design it for me"); past it they are composed
   // from the photos without it. The site's ceiling for them is INVITES_AI_DAILY_LIMIT.
   INVITES_ART_DIRECTION_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(12),
+  // plan drafts and idea summaries made by the AI a day per account (feature planning_ai); the site's
+  // ceiling for them is INVITES_AI_DAILY_LIMIT
+  INVITES_PLANNING_AI_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(10),
 
   // ── the invitation read aloud (feature `voice`): Azure AI Speech, text to speech (REST) ──
   // without the key and region the guest's "listen" uses the device's own voice (when it has one)

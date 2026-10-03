@@ -40,6 +40,8 @@ export const planningTasksHe = {
     hide: 'הסתרה',
     unhide: 'החזרה לרשימה',
     delete: 'מחיקה',
+    moveUp: 'הזזה למעלה',
+    moveDown: 'הזזה למטה',
     drag: 'גרירה לשינוי סדר',
     auto: 'אוטומטית',
     autoDone: 'סומנה לבד',
@@ -48,6 +50,7 @@ export const planningTasksHe = {
     due: 'עד {date}',
     cost: 'כרוכה בעלות',
     vendor: 'ספק',
+    calendar: 'הוספה ל-Google Calendar',
     assignedTo: 'אחראי: {name}',
   },
   suggest: {

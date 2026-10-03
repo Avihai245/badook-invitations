@@ -3,7 +3,7 @@ import { whyOff, type FeatureInput } from '@/features/flags/features';
 import { dueWithin } from '../model/week';
 import type { RawPlanOverview, TaskView } from '../model/plan';
 import { systemTaskDone } from '../model/system-tasks';
-import { todayIn } from '../model/schedule';
+import { daysBetween, todayIn } from '../model/schedule';
 import { planningDeps } from './deps';
 import { factsOf, DEFAULT_ZONE } from './view';
 import type { PlanSummary } from './types';
@@ -33,8 +33,8 @@ export async function planningOverview(
 
 /**
  * What the invitation's planning tab shows: whether it is there at all (the event has the feature and
- * is not a save-the-date) and the number on it — the tasks due this week or overdue. Without a plan yet
- * the tab is there with no number.
+ * is not a save-the-date) and the number on it — the tasks due this week or overdue (none once the event
+ * is over). Without a plan yet the tab is there with no number.
  */
 export async function planningTab(
   ownerId: string,
@@ -48,6 +48,9 @@ export async function planningTab(
     const o = await planningOverview(ownerId, item.id, summary);
     if (!o) return null;
     if (!o.raw.settings) return { week: 0 };
+    // an event that has happened has no week to plan: the plan is a summary
+    const date = o.raw.invitation.date;
+    if (date && daysBetween(o.today, date) < 0) return { week: 0 };
     return { week: dueWithin(o.tasks, o.today, 7).length };
   } catch (err) {
     // the tab is a convenience: never take the invitation's pages down with it

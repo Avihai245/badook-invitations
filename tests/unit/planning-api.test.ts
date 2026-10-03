@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { NO_OVERRIDES, FEATURES, type Feature, type FeatureInput } from '@/features/flags/features';
 import type { RawPlanState } from '@/features/planning/model/plan';
 import {
-  initPlan,
   loadPlan,
   planOperation,
   savePlanSettings,

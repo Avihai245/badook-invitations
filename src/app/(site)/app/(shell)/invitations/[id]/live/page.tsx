@@ -8,6 +8,9 @@ import { packageFor, planForPackage, whyOff } from '@/features/flags/features';
 import { featureInput } from '@/features/flags/server';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { hostsLine } from '@/features/invitations/lib/text';
+import { planningDeps } from '@/features/planning/server/deps';
+import { todayPayments } from '@/features/planning/server/budget';
+import { TodayPayments } from '@/features/planning/ui/TodayPayments';
 import { planBaseUrl } from '@/features/seating/server';
 import { fmt } from '@/lib/i18n/app';
 import { getUi } from '@/lib/i18n/server';
@@ -15,6 +18,19 @@ import { requestBaseUrl } from '@/lib/request-url';
 import { getSessionUser, requireUser } from '@/lib/supabase/session';
 
 type Params = Promise<{ id: string }>;
+
+/**
+ * The payments the host marked "at the event" (feature `planning`, the plan follows the event day), for the
+ * owner only. Never in the live page's way: any failure is no card.
+ */
+async function eventDayPayments(userId: string, id: string) {
+  try {
+    const rows = await todayPayments(userId, id, planningDeps);
+    return rows && rows.length > 0 ? rows : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const [{ id }, { t, locale }, user] = await Promise.all([params, getUi(), getSessionUser()]);
@@ -48,5 +64,11 @@ export default async function LivePage({ params }: { params: Params }) {
   }
   const view = await dayView(user.id, id, await requestBaseUrl(), dayHostDeps());
   if (!('hall' in view)) notFound();
-  return <LiveHall initial={view} planBase={planBaseUrl()} />;
+  const payments = await eventDayPayments(user.id, id);
+  return (
+    <>
+      <LiveHall initial={view} planBase={planBaseUrl()} />
+      {payments ? <TodayPayments id={id} initial={payments} /> : null}
+    </>
+  );
 }

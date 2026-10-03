@@ -21,6 +21,8 @@ import {
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Button, Card, cn, Hint, Input, KpiCard, PageHeader, useToast } from '@/components/app';
+import type { PlanningCardData } from '@/features/planning/server/overview-card';
+import { PlanningCard } from '@/features/planning/ui/PlanningCard';
 import { BASE_FACTS, systemTaskDone, type SystemFacts } from '@/features/planning/model/system-tasks';
 import { useUi } from '@/lib/i18n/client';
 import type { GuestStats } from '../../lib/guest-status';
@@ -70,11 +72,14 @@ export function InvitationOverview({
   guests,
   replies,
   url,
+  planning = null,
 }: {
   item: InvitationSummary;
   guests: GuestStats;
   replies: ResponseStats;
   url: string;
+  /** the planning's next step (features/planning), when the event has it and its plan follows the overview */
+  planning?: PlanningCardData | null;
 }) {
   const { t, fmt, plural, number } = useUi();
   const o = t.overview;
@@ -246,6 +251,12 @@ export function InvitationOverview({
           }
         />
       </div>
+
+      {planning ? (
+        <div className="mt-4">
+          <PlanningCard id={item.id} data={planning} />
+        </div>
+      ) : null}
 
       <div className="mt-6 grid items-start gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Card padding="none" className="overflow-hidden">

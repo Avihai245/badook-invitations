@@ -29,6 +29,29 @@ export interface PlanSummary {
   responses: number;
 }
 
+/** What the AI tools can ask of the model (server/ai.ts implements it; tests pass their own). */
+export interface PlanningAi {
+  draftPlan(input: {
+    description: string;
+    locale: 'he' | 'en';
+    today: string;
+    eventDate: string | null;
+  }): Promise<
+    | { status: 'ok'; draft: import('../model/draft').PrivateTemplateItems }
+    | { status: 'refused' }
+    | { status: 'error'; error: string }
+  >;
+  summarizeIdea(input: { text: string; locale: 'he' | 'en' }): Promise<
+    | {
+        status: 'ok';
+        summary: string;
+        steps: { title: string; category: import('../model/categories').CategoryKey | null }[];
+      }
+    | { status: 'refused' }
+    | { status: 'error'; error: string }
+  >;
+}
+
 export interface PlanningDeps {
   /** the event's feature inputs and owner (null: no such event) */
   access(invitationId: string): Promise<(FeatureInput & { ownerId: string }) | null>;
@@ -39,6 +62,12 @@ export interface PlanningDeps {
   newId(): string;
   /** one of the owner's private templates (the Business plan), null when it isn't theirs */
   privateTemplate?(id: string, ownerId: string): Promise<PrivateTemplateItems | null>;
+  /** the AI of the plan's paid tools (feature planning_ai): null/absent when none is set up */
+  ai?: PlanningAi | null;
+  /** counts a request against a rate limit; false once the key is over it (the AI's daily caps) */
+  rateHit?(key: string, limit: number, windowSeconds: number): Promise<boolean>;
+  rateKey?(scope: string, value: string): string;
+  aiLimits?: { perAccount: number; site: number };
   /** a signed upload URL / signed read URLs in the plan-files bucket */
   signedUpload?(path: string): Promise<{ path: string; url: string; token: string }>;
   signedReads?(paths: string[]): Promise<Record<string, string>>;

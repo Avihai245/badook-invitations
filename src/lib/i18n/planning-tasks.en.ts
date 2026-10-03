@@ -42,6 +42,8 @@ export const planningTasksEn: PlanningTasksDict = {
     hide: 'Hide',
     unhide: 'Put back on the list',
     delete: 'Delete',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
     drag: 'Drag to reorder',
     auto: 'Automatic',
     autoDone: 'Ticked automatically',
@@ -50,6 +52,7 @@ export const planningTasksEn: PlanningTasksDict = {
     due: 'By {date}',
     cost: 'Has a cost',
     vendor: 'Vendor',
+    calendar: 'Add to Google Calendar',
     assignedTo: 'Owner: {name}',
   },
   suggest: {

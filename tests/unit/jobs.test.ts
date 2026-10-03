@@ -25,6 +25,10 @@ vi.mock('@/features/event-day/server/notify', () => ({ processNoticeQueue }));
 const eventDayHousekeeping = vi.fn(async () => ({ checkins: 0, undone: 0 }));
 vi.mock('@/features/event-day/server/housekeeping', () => ({ eventDayHousekeeping }));
 
+// the weekly planning email (features/planning)
+const sendPlanReminders = vi.fn(async () => ({ sent: 0, skipped: 0, failed: 0 }));
+vi.mock('@/features/planning/server/reminders', () => ({ sendPlanReminders }));
+
 const { dailyDue } = await import('@/features/jobs/schedule');
 const { runJob, runWhatsAppQueue, tick } = await import('@/features/jobs/jobs');
 
