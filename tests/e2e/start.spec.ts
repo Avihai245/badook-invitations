@@ -7,7 +7,7 @@ const inDays = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString(
 // UX report stage 8: a new host from signing up to the event's home, its tour, and a plan that adds up
 test('a new host: the three-screen start, planning first, the tour, and a budget in whole shekels', async ({
   page,
-}) => {
+}, testInfo) => {
   test.setTimeout(90_000);
   const email = `start-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
   await page.goto('/signup');
@@ -52,6 +52,33 @@ test('a new host: the three-screen start, planning first, the tour, and a budget
   await tour.getByRole('button', { name: 'סיימתי' }).click();
   await expect(tour).toHaveCount(0);
   expect(new URL(page.url()).searchParams.has('tour')).toBe(false);
+  // remembered on the account, not just in this browser: another browser doesn't get it again
+  await expect
+    .poll(async () => {
+      const [u] = await sql<{ done: string | null }>(
+        `select raw_user_meta_data->>'badook_tour_done' as done from auth.users where email = $1`,
+        [email],
+      );
+      return u?.done;
+    })
+    .toBe('true');
+  {
+    const other = await page
+      .context()
+      .browser()!
+      .newContext({ storageState: await page.context().storageState() });
+    const fresh = await other.newPage();
+    // a browser that hasn't seen it (and isn't marked automated, which skips the tour on its own)
+    await fresh.addInitScript(() => {
+      window.localStorage.clear();
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    });
+    await open(fresh, new URL(`/app/invitations/${id}`, page.url()).toString());
+    await expect(fresh.getByTestId('home-next')).toBeVisible();
+    await fresh.waitForTimeout(1200);
+    await expect(fresh.getByTestId('tour')).toHaveCount(0);
+    await other.close();
+  }
 
   // the home: one next step, the budget, the RSVPs, the road
   await expect(page.getByTestId('home-next')).toBeVisible();
@@ -82,4 +109,33 @@ test('a new host: the three-screen start, planning first, the tour, and a budget
   // and the guests' screen, where inviting starts
   await navTo(page, 'guests');
   await expect(page).toHaveURL(new RegExp(`/app/invitations/${id}/guests`));
+
+  // the design that came with "planning first" can be swapped in the editor: what was written stays
+  // (the editor's design tab on a computer; a phone's editor has its own modes)
+  if (testInfo.project.name !== 'desktop') return;
+  const [before] = await sql<{ template_id: string }>(`select template_id from invitations where id = $1`, [
+    id,
+  ]);
+  await open(page, `/app/invitations/${id}/edit`);
+  await page.getByRole('tab', { name: 'עיצוב' }).click();
+  await page.getByRole('button', { name: 'עיצוב אחר' }).click();
+  const panel = page.getByTestId('template-panel');
+  await expect(panel.locator(`[data-template="${before!.template_id}"]`)).toBeDisabled();
+  const other = panel.locator('[data-template]:not([disabled])').first();
+  const next = (await other.getAttribute('data-template'))!;
+  await other.click();
+  await page.getByTestId('template-confirm').click();
+  await expect(page.getByText('העיצוב הוחלף', { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'כל השינויים נשמרו' })).toBeVisible({
+    timeout: 15_000,
+  });
+  await expect
+    .poll(async () => {
+      const [row] = await sql<{ template_id: string; primary: string }>(
+        `select template_id, draft#>>'{hosts,primary,he}' as primary from invitations where id = $1`,
+        [id],
+      );
+      return `${row!.template_id}|${row!.primary}`;
+    })
+    .toBe(`${next}|נועה`);
 });

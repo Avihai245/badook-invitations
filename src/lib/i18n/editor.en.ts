@@ -132,6 +132,7 @@ export const editorEn: EditorDict = {
     music: 'Music',
     style: 'Style & motion',
     studio: 'Design it for me',
+    template: 'Another design',
     event: 'Event details',
     languages: 'Languages',
     share: 'Link & sharing',
@@ -184,9 +185,23 @@ export const editorEn: EditorDict = {
     music: 'Plays from the moment guests open the invitation.',
     style: 'An animated invitation, text size, spacing and how much things move — for the whole invitation.',
     studio: 'Three complete, different designs from your photos — pick one and keep editing.',
+    template: 'Pick another design from the gallery — names, date, texts and RSVP stay.',
     event: 'Names, date and time — updated everywhere in the invitation.',
     languages: 'Which languages the invitation has, and which one opens first.',
     share: 'The invitation’s address and how it looks when shared.',
+  },
+  /** "another design" (editor/panels/TemplatePanel) */
+  templatePanel: {
+    intro:
+      'Every design for this kind of event, with your names and date. Pick one: what you wrote stays, and the colors, fonts, pictures and music become the new design’s.',
+    listLabel: 'Designs for this kind of event',
+    current: '(current design)',
+    confirmTitle: 'Switch to “{name}”?',
+    confirmBody:
+      'Names, date, place, texts and RSVP stay. The invitation as it is now is kept in the history, and you can undo right away.',
+    confirm: 'Switch design',
+    premiumNote: 'A premium design: switch and edit freely; publishing needs an advanced plan.',
+    applied: 'Design switched. Undo is one click away.',
   },
   cine: {
     cards: {

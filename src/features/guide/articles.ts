@@ -237,11 +237,15 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         he: 'מה שמילאתם באשף "אירוע חדש" (תאריך ושמות) כבר ממולא בחלון היצירה.',
         en: 'What you typed in the “New event” wizard (the date and names) is already filled in the create window.',
       },
+      {
+        he: 'רוצים עיצוב אחר? בעורך, בלשונית "עיצוב" — "עיצוב אחר". השמות, התאריך, הטקסטים ואישורי ההגעה נשארים, ו"ביטול פעולה" מחזיר את הקודם.',
+        en: 'Want another design? In the editor’s “Design” tab — “Another design”. Names, date, texts and RSVP stay, and Undo brings the previous one back.',
+      },
     ],
     next: ['publish-and-share', 'design-from-photos', 'import-guests'],
     keywords: {
-      he: 'עיצוב, תבנית, גלריית עיצובים, בחירת עיצוב, עורך, יצירת הזמנה, פרימיום, מונפשים, דמו, טיוטה',
-      en: 'design, template, design gallery, choose a design, editor, create invitation, premium, animated, demo, draft',
+      he: 'עיצוב, תבנית, גלריית עיצובים, בחירת עיצוב, החלפת עיצוב, עיצוב אחר, עורך, יצירת הזמנה, פרימיום, מונפשים, דמו, טיוטה',
+      en: 'design, template, design gallery, choose a design, switch design, another design, editor, create invitation, premium, animated, demo, draft',
     },
     screens: ['design'],
   },

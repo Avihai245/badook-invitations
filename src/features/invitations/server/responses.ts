@@ -4,6 +4,7 @@ import { endOfDayUtc, formatDate, formatEventDate } from '../lib/dates';
 import { formatPhone } from '../lib/phone';
 import type { CustomQuestion, NotifyMode, ResponseRecord } from '../lib/responses';
 import { hostsLine } from '../lib/text';
+import { guestsDb } from './guests';
 import { hostDb, type InvitationStatus, type OwnerInvitation } from './host-db';
 
 /**
@@ -31,6 +32,8 @@ export interface DashboardData {
   deadline: { endUtc: number; label: string } | null;
   notify: NotifyMode;
   responses: DashboardResponse[];
+  /** the guest list, as much as the one RSVP count needs (lib/rsvp-summary): who has a reply of their own */
+  listed: { id: string; response: true | null }[];
   dietary: DietaryKey[];
   questions: DashboardQuestion[];
   /** the raw questions (CSV export) */
@@ -67,7 +70,11 @@ export async function loadDashboard(
   ownerId: string,
   uiLocale: Locale,
 ): Promise<DashboardData | null> {
-  const [inv, data] = await Promise.all([hostDb.get(id, ownerId), hostDb.responses(id, ownerId)]);
+  const [inv, data, guests] = await Promise.all([
+    hostDb.get(id, ownerId),
+    hostDb.responses(id, ownerId),
+    guestsDb.list(id, ownerId),
+  ]);
   if (!inv || !data) return null;
   const doc = guestDocument(inv);
   const locale: Locale = doc.locales.includes(uiLocale) ? uiLocale : doc.defaultLocale;
@@ -94,6 +101,7 @@ export async function loadDashboard(
       phoneDisplay: r.phone ? formatPhone(r.phone) : null,
       receivedLabel: receivedLabel(r.createdAt, now, uiLocale, doc.timezone),
     })),
+    listed: (guests ?? []).map((g) => ({ id: g.id, response: g.response ? (true as const) : null })),
     dietary: config?.dietary.enabled ? config.dietary.options : [],
     questions: (config?.customQuestions ?? []).map((q) => ({
       id: q.id,

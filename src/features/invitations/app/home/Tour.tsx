@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
+import { markTourDone } from './tour-done';
 
 const DONE_KEY = 'badook:tour-done';
 
@@ -43,9 +44,10 @@ function seen(): boolean {
 /**
  * The event home's first visit (UX report §4.2): five short stops — the next step, the four stages, the
  * budget gauge, the RSVPs and help — each lit up on a dimmed screen with a short card. Opens by itself
- * once (remembered in this browser), or with `?tour=1` (after the start wizard). Esc or "skip" ends it.
+ * once (remembered on the account and in this browser), or with `?tour=1` (after the start wizard). Esc
+ * or "skip" ends it.
  */
-export function Tour() {
+export function Tour({ seenOnAccount = false }: { seenOnAccount?: boolean }) {
   const { t, fmt, number } = useUi();
   const T = t.tour;
   const [steps, setSteps] = useState<StepKey[] | null>(null);
@@ -56,13 +58,14 @@ export function Tour() {
   useEffect(() => {
     const asked = new URLSearchParams(window.location.search).has('tour');
     // not unasked in an automated browser (tests, audits): it would cover the page they drive
-    if (!asked && (seen() || navigator.webdriver)) return;
+    if (!asked && (seen() || seenOnAccount || navigator.webdriver)) return;
     // after the page has settled (its widgets drawn)
     const timer = window.setTimeout(() => {
       const present = ORDER.filter((k) => find(k));
       if (present.length) setSteps(present);
     }, 700);
     return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- decided once, on the first visit
   }, []);
 
   const key = steps?.[at] ?? null;
@@ -86,8 +89,9 @@ export function Tour() {
     try {
       window.localStorage.setItem(DONE_KEY, '1');
     } catch {
-      /* it may show again next time */
+      /* the account keeps it */
     }
+    void markTourDone();
     setSteps(null);
     const url = new URL(window.location.href);
     if (url.searchParams.has('tour')) {
