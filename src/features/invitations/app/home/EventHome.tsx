@@ -35,6 +35,7 @@ import {
 } from '../workspace/stages';
 import { alsoWorth, getNextAction, type HomeAction } from './next-action';
 import { Tour } from './Tour';
+import { HelpFor } from '../HelpFor';
 
 /**
  * The event's home (UX report §4.1, stage 2): replaces the overview. A countdown hero with the event's
@@ -50,6 +51,9 @@ export function EventHome({ data }: { data: EventHomeData }) {
   return (
     <div className="mx-auto flex max-w-[1400px] flex-col gap-5 px-4 pt-5 pb-16 sm:px-6 sm:pt-6">
       <Tour />
+      <div className="-mb-2 flex justify-end">
+        <HelpFor area="overview" />
+      </div>
       <Hero data={data} />
       <NextCard action={next} label={H.next} />
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={H.road.label}>

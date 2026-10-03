@@ -3,15 +3,15 @@ import type { helpHe } from './help.he';
 /** "What does each button here do?" — the "?" card of each area in the app (AreaHelp), English. */
 export const helpEn: typeof helpHe = {
   list: {
-    title: 'My invitations: what each button does',
+    title: 'My events: what each button does',
     items: {
       newInvitation: {
-        label: 'New invitation',
-        text: 'Pick a design from the gallery, fill in names and a date, and get a ready draft with texts.',
+        label: 'New event',
+        text: 'Three short questions — the kind of event, details and where to start — then planning, the invitation’s design or both.',
       },
       card: {
-        label: 'Clicking an invitation',
-        text: 'Opens its overview: the numbers, the next step, and tabs for guests, RSVPs, sharing and the editor.',
+        label: 'Clicking an event',
+        text: 'Opens the event home: countdown, the next step, the budget, RSVPs and the four stages in the sidebar.',
       },
       quick: {
         label: 'The buttons on a card',
@@ -60,35 +60,35 @@ export const helpEn: typeof helpHe = {
     },
   },
   overview: {
-    title: 'Your invitation: what each thing does',
+    title: 'The event home: what each thing does',
     items: {
-      tabs: {
-        label: 'The tabs',
-        text: 'Overview, guests & WhatsApp sending, RSVPs and sharing. “Edit the design” opens the editor full screen.',
+      countdown: {
+        label: 'Countdown',
+        text: 'Days, hours and minutes to the event’s start. Beside it: copy the link and open the invitation.',
       },
-      stats: {
-        label: 'The numbers',
-        text: 'How many guests are on the list, how many received the invitation, how many are coming, can’t come or haven’t replied.',
+      next: {
+        label: 'The next step',
+        text: 'Always one action — the most important now, by where the event stands and the time left. Finish it and the next one comes.',
       },
-      import: {
-        label: 'Upload your guest list from Excel',
-        text: 'A file with names and phones. Each guest gets a personal link, and their form comes prefilled.',
+      budget: {
+        label: 'The budget gauge',
+        text: 'How much of the budget you’re committed to: green to 85%, amber to 100%, red — over. Tap for the full budget.',
       },
-      send: {
-        label: 'Send on WhatsApp to all your guests',
-        text: 'Sends to everyone who hasn’t got it yet, from the system’s official number. See who got it, opened it and replied.',
+      rsvp: {
+        label: 'RSVPs',
+        text: 'Coming, not coming and not answered — the same numbers as the guest list, general-link replies included.',
       },
-      steps: {
-        label: 'The way to a perfect invitation',
-        text: 'The five steps in order. A done step has a ✓, and tapping a step takes you there.',
+      tasks: {
+        label: 'Tasks',
+        text: 'How many tasks are done, how many are due this week, and what’s next.',
       },
-      link: {
-        label: 'The invitation link',
-        text: 'The general link, to copy. Once published it works for anyone who gets it.',
+      road: {
+        label: 'The road',
+        text: 'The event’s four stages — plan, invite, arrange, celebrate — each with its status. Tap to go to it.',
       },
-      publish: {
-        label: 'Publish / Open the invitation',
-        text: 'At the top, next to the name: on a draft, “Publish” opens the publish window. Once live, “Open the invitation” shows it as guests see it.',
+      also: {
+        label: 'Also worth doing',
+        text: 'Up to three smaller suggestions after the next step.',
       },
     },
   },

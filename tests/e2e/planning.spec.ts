@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { navItem, navTo } from '../support/event-nav';
 import { LOCAL, api, newHost, open, publish, setPlan, sql, type Host } from '../support/phase5b';
 
 // Event planning (feature planning): the tab and its first-run, the tasks (add, tick with undo, hide,
@@ -35,15 +36,14 @@ async function planned(
 const content = (page: Page) =>
   page.locator('[data-group], [data-plan-card]').first().waitFor({ timeout: 30_000 });
 
-test('a new host sets the plan up in three short steps and lands on its overview, the tab shows what is due this week', async ({
+test('a new host sets the plan up in three short steps and lands on the event home, the stage shows what is open', async ({
   page,
 }) => {
   const host = await newHost(page, 'plan-first', 'free', { date: day(150) });
   await open(page, `/app/invitations/${host.id}`);
-  // the tab is there right after "overview", before any plan exists
-  const tab = page.locator('[data-tab="plan"]');
-  await expect(tab).toBeVisible();
-  await tab.click();
+  // the planning stage is in the event's navigation before any plan exists
+  await expect(navItem(page, 'tasks')).toHaveCount(1);
+  await open(page, plan(host));
   await expect(page.getByRole('heading', { name: 'נסתכל' }).or(page.getByText('נתחיל לתכנן'))).toBeVisible();
   await page
     .getByLabel('התקציב הכולל')
@@ -56,8 +56,10 @@ test('a new host sets the plan up in three short steps and lands on its overview
   await page.getByRole('button', { name: 'הבא' }).click();
   await page.getByRole('radio', { name: /מומלץ/ }).click();
   await page.getByRole('button', { name: 'להתחיל לתכנן' }).click();
-  await expect(page.locator('[data-plan-card="next"]')).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator('[data-plan-card="budget"]')).toContainText('120,000');
+  // set up: the event's home takes over (one next step; the budget as a gauge)
+  await page.waitForURL(new RegExp(`/app/invitations/${host.id}$`), { timeout: 30_000 });
+  await expect(page.getByTestId('home-next')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('home-budget')).toContainText('120,000');
 
   // a wedding's plan: many tasks, the system ones among them, and a budget in its categories
   const state = await api<{ view: { tasks: { systemKey: string | null }[]; categories: unknown[] } }>(
@@ -68,11 +70,10 @@ test('a new host sets the plan up in three short steps and lands on its overview
   expect(state.body.view.tasks.some((t) => t.systemKey === 'invitation_published')).toBe(true);
   expect(state.body.view.categories.length).toBeGreaterThan(10);
 
-  // the number on the tab is what is due this week
+  // the stage says how many tasks are open; the home's tasks widget, what is due this week
   await open(page, `/app/invitations/${host.id}`);
-  await expect(page.locator('[data-tab="plan"]')).toContainText('השבוע');
-  // and the invitation's overview carries the plan's next step
-  await expect(page.locator('[data-plan-card="overview"]')).toBeVisible();
+  await expect(page.getByTestId('event-sidebar').locator('[data-stage="plan"]')).toContainText('פתוחים');
+  await expect(page.getByTestId('home-tasks')).toBeVisible();
 });
 
 test('tasks: add with Enter, tick with Undo, hide, and the details drawer keeps a date the host set', async ({
@@ -237,16 +238,16 @@ test('the settings: the level of linking and the weekly email, saved without del
 
 test('every tool’s page opens from the navigation, with its title and the save line', async ({ page }) => {
   const host = await planned(page, 'plan-nav');
-  await open(page, plan(host));
-  await content(page);
+  await open(page, `/app/invitations/${host.id}`);
+  await page.getByTestId('home-next').waitFor();
   for (const [tool, title] of [
     ['tasks', 'משימות'],
     ['budget', 'תקציב'],
     ['vendors', 'ספקים'],
     ['ideas', 'פתקים ורעיונות'],
   ] as const) {
-    await page.locator(`[data-plan-tool="${tool}"]`).click();
-    await expect(page.locator(`[data-plan-tool="${tool}"][aria-current="page"]`)).toBeVisible();
+    await navTo(page, tool);
+    await expect(navItem(page, tool)).toHaveAttribute('aria-current', 'page');
     await expect(page.getByRole('heading', { name: title, exact: true }).first()).toBeVisible();
     await expect(page.getByText('כל השינויים נשמרו')).toBeVisible();
   }
@@ -261,15 +262,17 @@ test('a past event’s plan is a summary: what was spent, paid, and no more task
     integrationsMode: 'recommended',
   });
   expect(res.status).toBe(201);
+  // after the day the home's next step is the film or the numbers, and nothing is "due this week"
   await open(page, plan(host));
-  await expect(page.locator('[data-plan-card="past"]')).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator('[data-plan-card="next"]')).toHaveCount(0);
-  // nothing is "due this week" once the event has happened: the tab has no number
-  await expect(page.locator('[data-tab="plan"]')).toBeVisible();
-  await expect(page.locator('[data-tab="plan"]')).not.toContainText('השבוע');
+  await page.waitForURL(new RegExp(`/app/invitations/${host.id}$`), { timeout: 30_000 });
+  await expect(page.getByTestId('home-next')).toHaveAttribute('data-action', /film|insights/);
+  await expect(page.getByTestId('home-tasks')).not.toContainText('השבוע');
+  // the budget is a summary
+  await open(page, plan(host, '/budget'));
+  await expect(page.getByTestId('budget-past')).toBeVisible({ timeout: 30_000 });
 });
 
-test('only the owner opens a plan; a save-the-date has no planning tab; switched off, it can be switched back on', async ({
+test('only the owner opens a plan; a save-the-date has no planning stage; switched off, it can be switched back on', async ({
   page,
   browser,
 }) => {
@@ -299,7 +302,7 @@ test('only the owner opens a plan; a save-the-date has no planning tab; switched
   });
   expect(std.status).toBe(201);
   await open(page, `/app/invitations/${std.body.id}`);
-  await expect(page.locator('[data-tab="plan"]')).toHaveCount(0);
+  await expect(navItem(page, 'tasks')).toHaveCount(0);
   await page.goto(`/app/invitations/${std.body.id}/plan`);
   await expect(page.getByText('לא מצאנו את העמוד הזה')).toBeVisible();
   await expect(page.locator('[data-plan-card], [data-group]')).toHaveCount(0);
@@ -312,7 +315,7 @@ test('only the owner opens a plan; a save-the-date has no planning tab; switched
   expect(off.status).toBe(200);
   await open(page, plan(host));
   await page.getByRole('button', { name: 'להפעלת התכנון' }).click();
-  await expect(page.locator('[data-plan-card="next"]')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('home-next')).toBeVisible({ timeout: 30_000 });
   const tasks = await sql<{ n: string }>(`select count(*) n from plan_tasks where invitation_id = $1`, [
     host.id,
   ]);
@@ -422,9 +425,9 @@ test.describe('in English', () => {
     await page.getByRole('button', { name: 'Next' }).click();
     await page.getByRole('button', { name: 'Next' }).click();
     await page.getByRole('button', { name: 'Start planning' }).click();
-    await expect(page.locator('[data-plan-card="next"]')).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByRole('link', { name: 'Tasks' }).first()).toBeVisible();
-    await page.locator('[data-plan-tool="tasks"]').click();
+    await expect(page.getByTestId('home-next')).toBeVisible({ timeout: 30_000 });
+    await expect(navItem(page, 'tasks')).toHaveText(/Tasks/);
+    await navTo(page, 'tasks');
     await content(page);
     await expect(page.getByRole('textbox', { name: 'Add a task' })).toBeVisible();
     await expect(page.getByText('All changes saved')).toBeVisible();

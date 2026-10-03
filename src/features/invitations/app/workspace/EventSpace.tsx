@@ -477,6 +477,7 @@ export function EventBottomBar({ data }: { data: EventSpaceData }) {
                 dot={status?.kind === 'open' || status?.kind === 'toSend' || status?.kind === 'today'}
                 onClick={() => setSheet(s)}
                 expanded={sheet === s}
+                stage={s}
               />
             );
           })}
@@ -525,6 +526,7 @@ function BarButton({
   onClick,
   dot = false,
   expanded,
+  stage,
 }: {
   icon: LucideIcon;
   label: string;
@@ -533,6 +535,8 @@ function BarButton({
   onClick?: () => void;
   dot?: boolean;
   expanded?: boolean;
+  /** the stage whose sheet it opens */
+  stage?: StageKey;
 }) {
   const cls = cn(
     'relative flex flex-1 flex-col items-center justify-center gap-1 text-[11px] font-semibold transition-colors',
@@ -558,7 +562,14 @@ function BarButton({
       {inner}
     </Link>
   ) : (
-    <button type="button" onClick={onClick} aria-haspopup="dialog" aria-expanded={expanded} className={cls}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-haspopup="dialog"
+      aria-expanded={expanded}
+      data-stage-button={stage}
+      className={cls}
+    >
       {inner}
     </button>
   );

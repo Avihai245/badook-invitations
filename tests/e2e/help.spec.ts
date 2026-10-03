@@ -70,14 +70,15 @@ async function explains(
 test('the list, the gallery with its preview and wizard, and the account', async ({ page }) => {
   await signUp(page);
   const main = page.locator('#main');
-  await explains(page, main.getByTestId('area-help'), 'ההזמנות שלי: מה כל כפתור עושה', [
-    'הזמנה חדשה',
+  await explains(page, main.getByTestId('area-help'), 'האירועים שלי: מה כל כפתור עושה', [
+    'אירוע חדש',
     'הצעד הבא',
     'הכפתורים בכרטיס',
     'ארכיון',
   ]);
 
-  await open(page, '/app/invitations/new');
+  // ("new event" starts with three questions; the gallery is a step later, or straight from "skip")
+  await open(page, '/app/invitations/new?gallery=1');
   await explains(page, main.getByTestId('area-help'), 'בחירת עיצוב: מה כל כפתור עושה', ['פרימיום', 'דמו חי']);
 
   // the preview dialog has its own "?" (the gallery's is behind it)
@@ -110,7 +111,7 @@ test('the list, the gallery with its preview and wizard, and the account', async
   await explains(page, main.getByTestId('area-help'), 'החשבון: מה כל כפתור עושה', ['מחיקת החשבון']);
 });
 
-test('an invitation: its overview and tabs, the RSVPs and sharing; the app’s own navigation', async ({
+test('an event: its home and navigation, the RSVPs and sharing; the app’s own navigation', async ({
   page,
 }) => {
   await signUp(page);
@@ -127,57 +128,61 @@ test('an invitation: its overview and tabs, the RSVPs and sharing; the app’s o
   }, id);
   expect(published).toBe(200);
 
-  // the list: the card opens the invitation's overview
+  // the list: the card opens the event's home
   await open(page, '/app/invitations');
   await main.getByRole('link', { name: 'נועה & איתי', exact: true }).click();
   await page.waitForURL(new RegExp(`/app/invitations/${id}$`));
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
-  await expect(page.getByRole('heading', { level: 1, name: 'סקירה' })).toBeVisible();
-  await explains(page, main.getByTestId('area-help'), 'ההזמנה: מה כל דבר עושה', [
-    'הלשוניות',
-    'העלאת רשימת מוזמנים מאקסל',
-    'שליחה בוואטסאפ לכל המוזמנים',
+  await expect(page.getByTestId('home-hero')).toBeVisible();
+  // (the first visit's tour: skipped)
+  const tour = page.getByTestId('tour');
+  if (await tour.isVisible().catch(() => false)) await tour.getByRole('button', { name: 'דילוג' }).click();
+  await explains(page, main.getByTestId('area-help'), 'בית האירוע: מה כל דבר עושה', [
+    'הצעד הבא',
+    'מד התקציב',
+    'מפת הדרך',
   ]);
-  // the two main things, as big buttons: upload the list, send on WhatsApp
-  await expect(main.getByRole('link', { name: 'העלאת קובץ' })).toHaveAttribute(
+  // one next step: a published save-the-date (no planning) with no guests yet → the guest list
+  await expect(page.getByTestId('home-next')).toHaveAttribute('data-action', 'guests');
+  await expect(page.getByTestId('home-next').getByRole('link')).toHaveAttribute(
     'href',
     `/app/invitations/${id}/guests?import=1`,
   );
-  // no guests yet: sending waits, and says why
-  const whatsapp = main.locator('[data-action="whatsapp"]');
-  await expect(whatsapp).toContainText('קודם מעלים רשימת מוזמנים');
-  await expect(whatsapp.getByRole('button', { name: 'שליחה בוואטסאפ' })).toBeDisabled();
 
-  // the tabs: RSVPs, then back to the overview
-  const tabs = page.getByRole('navigation', { name: 'ניווט בהזמנה' });
-  await expect(tabs.getByRole('link', { name: /מוזמנים/ })).toHaveAttribute(
-    'href',
-    `/app/invitations/${id}/guests`,
-  );
-  await tabs.getByRole('link', { name: 'אישורי הגעה' }).click();
+  // the event's navigation: the sidebar on a computer, a stage's sheet on a phone
+  const go = async (stage: string, item: string) => {
+    if (isPhone(page)) {
+      await page.getByTestId('event-bottom-bar').getByRole('button', { name: stage }).click();
+      await page.getByRole('dialog', { name: stage }).getByRole('link', { name: item }).click();
+    } else await page.getByTestId('event-sidebar').getByRole('link', { name: item, exact: true }).click();
+  };
+  await go('מזמינים', 'אישורי הגעה');
   await page.waitForURL(/\/responses$/);
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
-  await expect(tabs.getByRole('link', { name: 'אישורי הגעה' })).toHaveAttribute('aria-current', 'page');
+  if (!isPhone(page))
+    await expect(
+      page.getByTestId('event-sidebar').getByRole('link', { name: 'אישורי הגעה', exact: true }),
+    ).toHaveAttribute('aria-current', 'page');
   await explains(page, main.getByTestId('area-help'), 'אישורי הגעה: מה כל כפתור עושה', [
     'ייצוא לאקסל',
     'סינונים פעילים',
   ]);
 
-  await tabs.getByRole('link', { name: 'שיתוף' }).click();
+  await go('מזמינים', 'שליחה ושיתוף');
   await page.waitForURL(/\/share$/);
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await explains(page, main.getByTestId('area-help'), 'שיתוף: מה כל כפתור עושה', ['העתקת ההודעה', 'קוד QR']);
-  await tabs.getByRole('link', { name: 'סקירה' }).click();
-  await page.waitForURL(new RegExp(`/app/invitations/${id}$`));
 
-  // the app's navigation: the sidebar on a computer, the bottom bar on a phone
-  const nav = isPhone(page)
-    ? page.getByRole('navigation', { name: 'ניווט', exact: true })
-    : page.getByRole('navigation', { name: 'ניווט ראשי' });
-  await nav.getByRole('link', { name: isPhone(page) ? 'חבילה' : 'חבילה וחיובים' }).click();
-  await page.waitForURL(/\/app\/billing$/);
-  await nav.getByRole('link', { name: isPhone(page) ? 'ההזמנות' : 'ההזמנות שלי' }).click();
+  // back to all events, then the app's own navigation: billing is in the account menu
+  if (isPhone(page))
+    await page.getByTestId('event-bottom-bar').getByRole('link', { name: 'בית האירוע' }).click();
+  else await page.getByTestId('event-sidebar').getByRole('link', { name: 'כל האירועים' }).click();
+  if (isPhone(page)) await page.goto('/app/invitations');
   await page.waitForURL(/\/app\/invitations$/);
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+  await page.getByTestId('user-menu').filter({ visible: true }).first().click();
+  await page.getByRole('menuitem', { name: 'חבילה וחיובים' }).click();
+  await page.waitForURL(/\/app\/billing$/);
 });
 
 test('the editor: its bar, rail, design and settings panels, publishing and versions', async ({ page }) => {

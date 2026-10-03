@@ -458,7 +458,7 @@ export function SupportChat() {
           aria-label={s.open}
           aria-haspopup="dialog"
           data-testid="support-launcher"
-          className="support-launcher fixed end-4 bottom-4 z-[55] flex h-13 lg:hidden items-center gap-2.5 rounded-full bg-linear-to-br from-brand to-brand-strong ps-1.5 pe-5 text-white shadow-[0_14px_34px_-10px_rgba(122,82,48,0.75)] transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus max-sm:w-13 max-sm:justify-center max-sm:p-0 print:hidden sm:end-6 sm:bottom-6"
+          className="support-launcher fixed end-4 bottom-4 z-[55] flex h-13 lg:hidden lg:[body:has([data-fullscreen])_&]:flex items-center gap-2.5 rounded-full bg-linear-to-br from-brand to-brand-strong ps-1.5 pe-5 text-white shadow-[0_14px_34px_-10px_rgba(122,82,48,0.75)] transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus max-sm:w-13 max-sm:justify-center max-sm:p-0 print:hidden sm:end-6 sm:bottom-6"
         >
           <span aria-hidden className="grid size-10 place-items-center rounded-full bg-white/15">
             <Sparkles className="size-5" />

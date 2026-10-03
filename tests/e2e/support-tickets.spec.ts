@@ -1,6 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Browser, type Page, type TestInfo } from '@playwright/test';
+import { openAssistant } from '../support/help';
 import { hydrated, LOCAL, sql } from '../support/phase5b';
 
 // Support tickets (features/support/tickets, supabase/migrations/*_support_tickets.sql), end to end: a
@@ -164,10 +165,10 @@ test.describe('support tickets', () => {
     const customerEmail = unique(`adm-b-customer-${testInfo.project.name}`);
     await signUpAs(page, customerEmail);
     await createInvitation(page);
-    const nav = mobile
-      ? page.getByRole('navigation', { name: 'ניווט', exact: true })
-      : page.getByRole('navigation', { name: 'ניווט ראשי' });
-    await nav.getByRole('link', { name: 'תמיכה' }).click();
+    // (support is in the account menu, at the sidebar's foot or the phone's top bar)
+    void mobile;
+    await page.getByTestId('user-menu').filter({ visible: true }).first().click();
+    await page.getByRole('menuitem', { name: 'תמיכה' }).click();
     await page.waitForURL(/\/app\/support$/);
     await expect(page.getByRole('heading', { level: 1, name: 'תמיכה' })).toBeVisible();
     await expect(page.getByText('עוד לא פניתם לצוות')).toBeVisible();
@@ -317,7 +318,7 @@ test.describe('support tickets', () => {
   }) => {
     test.setTimeout(90_000);
     await signUpAs(page, unique('adm-b-handoff'));
-    await page.getByTestId('support-launcher').click();
+    await openAssistant(page);
     const chat = page.getByTestId('support-chat');
     const question = 'איך מוסיפים סרטון מיוטיוב לרקע של ההזמנה?';
     const input = chat.getByRole('textbox', { name: 'כתבו שאלה…' });
@@ -583,7 +584,7 @@ test.describe('support tickets', () => {
       await expect(page.getByRole('dialog')).toHaveCount(0);
 
       // the assistant's hand-off
-      await page.getByTestId('support-launcher').click();
+      await openAssistant(page);
       const chat = page.getByTestId('support-chat');
       const input = chat.getByRole('textbox');
       await input.fill(lang === 'he' ? 'איך מחליפים גופן?' : 'How do I change the font?');
