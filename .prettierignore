@@ -15,3 +15,7 @@ playwright-report/
 # the demo video: its own project and its rendered files
 video/node_modules/
 public/video/
+# installed agent skills (third-party, managed by `npx skills`)
+.agents/
+.claude/skills/
+skills-lock.json

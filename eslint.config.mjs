@@ -10,6 +10,8 @@ const config = [
       '.next*/**',
       // local agent worktrees (other checkouts of this repository)
       '.claude/**',
+      // installed agent skills (third-party, managed by `npx skills`; see skills-lock.json)
+      '.agents/**',
       'out/**',
       'coverage/**',
       'tests/.artifacts/**',
