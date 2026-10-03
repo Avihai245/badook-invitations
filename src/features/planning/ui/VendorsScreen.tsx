@@ -1,8 +1,18 @@
 'use client';
 
-import { Columns3, ListTodo, CircleCheck, Paperclip, Plus, Scale } from 'lucide-react';
+import {
+  Columns3,
+  ExternalLink,
+  ListTodo,
+  CircleCheck,
+  MapPinned,
+  Paperclip,
+  Plus,
+  Scale,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Button, Card, EmptyState, cn } from '@/components/app';
+import { BADOOK_EVENTS_URL } from '@/features/site/links';
 import { useUi } from '@/lib/i18n/client';
 import type { CategoryKey, VendorStatus } from '../model/categories';
 import type { PlanVendor } from '../model/plan';
@@ -95,6 +105,30 @@ export function VendorsScreen() {
           />
         ) : view.settings && (view.settings.requiredVendors.length > 0 || missing.length > 0) ? (
           <MissingCard rows={missing} onAdd={(category) => setAdding({ category })} />
+        ) : null}
+
+        {/* no venue closed yet: where to find one (Badook Events, another site) */}
+        {!past && !booked.some((v) => v.category === 'venue') ? (
+          <a
+            href={BADOOK_EVENTS_URL}
+            target="_blank"
+            rel="noopener"
+            data-testid="vendors-venues"
+            className="group flex items-center gap-4 rounded-card border border-brand-line bg-linear-to-l from-brand-soft via-surface to-surface p-4 transition-shadow hover:shadow-md sm:p-5"
+          >
+            <span
+              aria-hidden
+              className="grid size-11 shrink-0 place-items-center rounded-[13px] bg-brand text-white shadow-[0_10px_22px_-12px_rgba(122,82,48,0.9)]"
+            >
+              <MapPinned className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-bold">{t.shell.nav.venues}</span>
+              <span className="block text-[13px] text-muted">{t.shell.nav.venuesHelp}</span>
+            </span>
+            <ExternalLink aria-hidden className="icon-dir size-4 shrink-0 text-brand-deep" />
+            <span className="sr-only">{t.shell.nav.newTab}</span>
+          </a>
         ) : null}
 
         {vendors.length === 0 ? (

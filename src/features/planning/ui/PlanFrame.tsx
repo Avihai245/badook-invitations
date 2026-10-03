@@ -1,20 +1,8 @@
 'use client';
 
-import {
-  Check,
-  CircleAlert,
-  LayoutList,
-  Lightbulb,
-  ListChecks,
-  Loader2,
-  Settings,
-  Store,
-  Wallet,
-  type LucideIcon,
-} from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AreaHelp, Button, cn, PageHeader, useToast } from '@/components/app';
+import { Check, CircleAlert, Loader2, Settings } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { AreaHelp, Button, PageHeader, useToast } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { daysBetween } from '../model/schedule';
 import { readIntegrations } from '../model/integrations';
@@ -27,64 +15,9 @@ import { QuickAdd } from './QuickAdd';
 
 export type PlanTool = 'overview' | 'tasks' | 'budget' | 'vendors' | 'ideas';
 
-const TOOLS: { key: PlanTool; path: string; icon: LucideIcon }[] = [
-  { key: 'overview', path: '', icon: LayoutList },
-  { key: 'tasks', path: '/tasks', icon: ListChecks },
-  { key: 'budget', path: '/budget', icon: Wallet },
-  { key: 'vendors', path: '/vendors', icon: Store },
-  { key: 'ideas', path: '/ideas', icon: Lightbulb },
-];
-
 /** The event is over: the plan turns into a summary and the reminders stop. */
 export const isPast = (view: Pick<PlanView, 'today' | 'invitation'>) =>
   !!view.invitation.date && daysBetween(view.today, view.invitation.date) < 0;
-
-/** The tools' own sub-navigation, in the style of the invitation's tabs: chips that scroll on a phone. */
-function PlanNav({ tool, id }: { tool: PlanTool; id: string }) {
-  const { t } = useUi();
-  const N = t.planning.nav;
-  const row = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const el = row.current;
-    const active = el?.querySelector<HTMLElement>('[aria-current="page"]');
-    if (!el || !active) return;
-    const r = active.getBoundingClientRect();
-    const b = el.getBoundingClientRect();
-    if (r.left < b.left || r.right > b.right)
-      el.scrollBy({ left: r.left + r.width / 2 - (b.left + b.width / 2) });
-  }, [tool]);
-  return (
-    <nav
-      ref={row}
-      aria-label={N.label}
-      className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
-    >
-      <ul className="flex w-max gap-1.5 sm:w-auto sm:flex-wrap">
-        {TOOLS.map(({ key, path, icon: Icon }) => {
-          const active = key === tool;
-          return (
-            <li key={key}>
-              <Link
-                href={`/app/invitations/${id}/plan${path}`}
-                aria-current={active ? 'page' : undefined}
-                data-plan-tool={key}
-                className={cn(
-                  'inline-flex h-11 items-center gap-2 rounded-full px-4 text-[14px] font-semibold whitespace-nowrap ring-1 transition-colors motion-reduce:transition-none',
-                  active
-                    ? 'bg-brand-soft text-brand-deep ring-brand-line'
-                    : 'bg-surface text-ink/75 ring-line hover:bg-subtle hover:text-ink',
-                )}
-              >
-                <Icon aria-hidden className="size-4 shrink-0" strokeWidth={1.9} />
-                {N[key]}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-}
 
 /** "All changes saved" — and, when a change did not go through, a way to try it again. */
 function SaveLine() {
@@ -218,12 +151,13 @@ function Banners() {
 }
 
 /**
- * The frame of every planning screen: the title and its one-line explanation, the tools' navigation,
+ * The frame of every planning screen: the title and its one-line explanation (the tools themselves are
+ * in the event's navigation, workspace/EventSpace),
  * the planning settings, what changed since the host last looked, the "all changes saved" line, and
  * (on a phone) the quick-add button.
  */
 export function PlanFrame({
-  tool,
+  tool: _tool,
   title,
   description,
   help,
@@ -269,7 +203,6 @@ export function PlanFrame({
         }
       />
       <div className="mt-4 flex flex-col gap-4">
-        {planned ? <PlanNav tool={tool} id={plan.id} /> : null}
         {planned ? <SaveLine /> : null}
         {planned && !hideBanners ? <Banners /> : null}
         {planned ? children : <Onboarding />}

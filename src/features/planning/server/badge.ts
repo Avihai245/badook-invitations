@@ -31,30 +31,47 @@ export async function planningOverview(
   return { raw, tasks, today };
 }
 
+/** What the event's navigation shows of the plan: whether there is one, its open tasks, this week's. */
+export interface PlanningBadge {
+  planned: boolean;
+  /** tasks not done or skipped */
+  open: number;
+  /** due this week or overdue (none once the event is over) */
+  week: number;
+  /** the seating's numbers, as the plan's facts know them */
+  seating: { tables: number; unseated: number } | null;
+}
+
 /**
- * What the invitation's planning tab shows: whether it is there at all (the event has the feature and
- * is not a save-the-date) and the number on it — the tasks due this week or overdue (none once the event
- * is over). Without a plan yet the tab is there with no number.
+ * What the event's navigation shows of the planning: whether the stage is there at all (the event has
+ * the feature and is not a save-the-date — null when not) and its numbers. Without a plan yet the stage
+ * is there with no numbers.
  */
 export async function planningTab(
   ownerId: string,
   item: { id: string; eventType: string },
   summary: PlanSummary,
   input: (FeatureInput & { ownerId: string }) | null,
-): Promise<{ week: number } | null> {
+): Promise<PlanningBadge | null> {
   if (!input || item.eventType === 'save_the_date') return null;
   if (whyOff('planning', input) !== null) return null;
+  const empty: PlanningBadge = { planned: false, open: 0, week: 0, seating: null };
   try {
     const o = await planningOverview(ownerId, item.id, summary);
     if (!o) return null;
-    if (!o.raw.settings) return { week: 0 };
+    const seating = o.raw.facts
+      ? { tables: o.raw.facts.tables, unseated: o.raw.facts.confirmedUnseated }
+      : null;
+    if (!o.raw.settings) return { ...empty, seating };
+    const totals = o.raw.taskTotals;
+    const open = totals ? Math.max(0, totals.total - totals.done - totals.skipped) : 0;
     // an event that has happened has no week to plan: the plan is a summary
     const date = o.raw.invitation.date;
-    if (date && daysBetween(o.today, date) < 0) return { week: 0 };
-    return { week: dueWithin(o.tasks, o.today, 7).length };
+    const week = date && daysBetween(o.today, date) < 0 ? 0 : dueWithin(o.tasks, o.today, 7).length;
+    return { planned: true, open, week, seating };
   } catch (err) {
-    // the tab is a convenience: never take the invitation's pages down with it
+    // the navigation's numbers are a convenience: never take the event's pages down with them
     console.error('[planning tab]', err);
-    return { week: 0 };
+    return empty;
   }
 }

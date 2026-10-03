@@ -93,14 +93,14 @@ export const he = {
   shell: {
     nav: {
       label: 'ניווט ראשי',
-      invitations: 'ההזמנות שלי',
-      newInvitation: 'הזמנה חדשה',
+      invitations: 'האירועים שלי',
+      newInvitation: 'אירוע חדש',
       billing: 'חבילה וחיובים',
       account: 'החשבון שלי',
       assistant: 'שאלו את העוזר',
       contact: 'יצירת קשר',
       /** the sidebar's help entry: opens the assistant */
-      help: 'עזרה והעוזר',
+      help: 'מדריך ועזרה',
       /** the admin console (staff only) */
       admin: 'ניהול המערכת',
       /** Badook Events, where hosts find a venue (opens in a new tab) */
@@ -111,8 +111,8 @@ export const he = {
     /** the phones' bottom bar (short labels) */
     tabs: {
       label: 'ניווט',
-      invitations: 'ההזמנות',
-      newInvitation: 'חדשה',
+      invitations: 'אירועים',
+      newInvitation: 'חדש',
       billing: 'חבילה',
       help: 'עזרה',
     },
@@ -123,6 +123,7 @@ export const he = {
     uiLanguage: 'שפת הממשק',
     /** the system's look (light / dark / as the device is set) */
     theme: { label: 'מראה', light: 'בהיר', dark: 'כהה', system: 'לפי המכשיר' },
+    supportUnread: 'יש תשובה חדשה מהצוות',
     account: 'החשבון שלי',
     signOut: 'יציאה',
     skipToContent: 'דילוג לתוכן',
@@ -154,6 +155,82 @@ export const he = {
     editDesign: 'עריכת העיצוב',
     guestsCount: { one: 'מוזמן אחד', other: '{n} מוזמנים' },
     responsesCount: { one: 'תשובה אחת', other: '{n} תשובות' },
+    nav: {
+      label: 'ניווט באירוע',
+      allEvents: 'כל האירועים',
+      home: 'בית האירוע',
+      stages: { plan: 'מתכננים', invite: 'מזמינים', arrange: 'מסדרים', celebrate: 'חוגגים' },
+      stageHint: {
+        plan: 'משימות, תקציב וספקים',
+        invite: 'עיצוב, מוזמנים, שליחה ואישורים',
+        arrange: 'סידור שולחנות',
+        celebrate: 'יום האירוע, גלריה וסרט',
+      },
+      items: {
+        home: 'בית האירוע',
+        tasks: 'משימות',
+        budget: 'תקציב',
+        vendors: 'ספקים',
+        ideas: 'פתקים ורעיונות',
+        design: 'עיצוב ההזמנה',
+        guests: 'מוזמנים',
+        share: 'שליחה ושיתוף',
+        responses: 'אישורי הגעה',
+        seating: 'סידור שולחנות',
+        live: 'יום האירוע',
+        gallery: 'גלריה חיה ומסך באולם',
+        film: 'סרט הרגעים',
+        insights: 'תובנות',
+        settings: 'הגדרות האירוע',
+      },
+      status: {
+        done: 'הושלם',
+        open: { one: 'פתוח אחד', other: '{n} פתוחים' },
+        notStarted: 'עוד לא התחלתם',
+        draft: 'טיוטה',
+        toSend: { one: 'אחד לשליחה', other: '{n} לשליחה' },
+        startsIn: { one: 'מחר', other: 'בעוד {n} ימים' },
+        today: 'היום!',
+      },
+      upgrade: 'בחבילה מתקדמת',
+      fullScreen: 'נפתח במסך מלא',
+      menu: 'האפשרויות של "{stage}"',
+      more: 'עוד',
+    },
+  },
+  /** /app/invitations/[id]/settings — the event's settings */
+  eventSettings: {
+    metaTitle: 'הגדרות האירוע · {name}',
+    title: 'הגדרות האירוע',
+    subtitle: 'הפרטים, התכנון, החבילה — ושכפול או העברה לארכיון.',
+    details: {
+      title: 'פרטי האירוע',
+      body: '{name} · {type} · {date}. שמות, תאריך, מקום ושפות משנים בעורך.',
+      cta: 'עריכה בעורך',
+    },
+    planning: {
+      title: 'הגדרות התכנון',
+      body: 'כמה התכנון מחובר להזמנה (מוזמנים, הושבה, יום האירוע), תזכורות במייל ותבניות משלכם.',
+      cta: 'פתיחת הגדרות התכנון',
+    },
+    plan: {
+      title: 'החבילה',
+      body: 'אילו יכולות פתוחות לאירוע: הושבה, יום האירוע, גלריה, סרט ועוד.',
+      cta: 'חבילה וחיובים',
+    },
+    duplicate: {
+      title: 'שכפול האירוע',
+      body: 'אירוע חדש עם אותו עיצוב וטקסטים — בלי המוזמנים והתשובות.',
+      cta: 'שכפול',
+    },
+    archive: {
+      title: 'העברה לארכיון',
+      body: 'ההזמנה מפסיקה להיות זמינה לאורחים. אפשר להחזיר אותה בכל רגע.',
+      cta: 'העברה לארכיון',
+      restoreTitle: 'האירוע בארכיון',
+      restoreBody: 'ההזמנה לא זמינה לאורחים. אפשר להחזיר אותה לפעילות.',
+      restore: 'החזרה מהארכיון',
+    },
   },
   /** /app/invitations/[id] — the invitation's overview */
   overview: {
