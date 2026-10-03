@@ -413,15 +413,23 @@ describe('support chat and partners', () => {
 
   it('finds users by email (any case); the partner claims only users it created, and sees only its own', async () => {
     const P = 'partner:badook-events';
-    // users the partner created (Auth app_metadata.provisioned_by); one of them set a password before
-    // the partner linked it
+    // users the partner created (Auth app_metadata.provisioned_by); one of them signed in and set a
+    // password of their own before the partner linked it. Auth gives every user the admin API creates a
+    // random password, so MADE_BY_AUTH is what a user the partner just created really looks like.
     const MADE = '99999999-9999-4999-8999-999999999991';
     const MADE_WITH_PASSWORD = '99999999-9999-4999-8999-999999999992';
+    const MADE_BY_AUTH = '99999999-9999-4999-8999-999999999993';
     await c.query(
-      `insert into auth.users (id, email, encrypted_password, raw_app_meta_data, raw_user_meta_data) values
-         ($1, 'made@example.com', '', $3, '{"full_name":"Made"}'),
-         ($2, 'made2@example.com', 'scrypt:x:y', $3, '{}')`,
-      [MADE, MADE_WITH_PASSWORD, { provider: 'email', providers: ['email'], provisioned_by: P }],
+      `insert into auth.users (id, email, encrypted_password, raw_app_meta_data, raw_user_meta_data, last_sign_in_at) values
+         ($1, 'made@example.com', '', $4, '{"full_name":"Made"}', null),
+         ($2, 'made2@example.com', 'scrypt:x:y', $4, '{}', now()),
+         ($3, 'made3@example.com', '$2a$10$generated', $4, '{}', null)`,
+      [
+        MADE,
+        MADE_WITH_PASSWORD,
+        MADE_BY_AUTH,
+        { provider: 'email', providers: ['email'], provisioned_by: P },
+      ],
     );
     expect(await call('user_id_by_email', [' b@EXAMPLE.com '])).toBe(OWNER_B);
     expect(await call('user_id_by_email', ['nobody@example.com'])).toBeNull();
@@ -430,6 +438,28 @@ describe('support chat and partners', () => {
     expect(await call('account_link_partner', [OWNER_B, P, 'be-7', 'Someone', null, false])).toBeNull();
     expect(await call('account_link_partner', [OWNER_B, P, 'be-7', 'Someone', null, true])).toBeNull();
     expect(await call('account_link_partner', [MADE_WITH_PASSWORD, P, null, 'X', null, true])).toBeNull();
+    // the password Auth generated for a user the partner created, who never signed in, isn't theirs:
+    // the claim clears it and goes ahead; without claiming, nothing changes
+    expect(await call('account_link_partner', [MADE_BY_AUTH, P, null, 'X', null, false])).toBeNull();
+    expect(
+      await call('account_link_partner', [MADE_BY_AUTH, 'partner:other', null, 'X', null, true]),
+    ).toBeNull();
+    expect(
+      (await c.query(`select encrypted_password from auth.users where id = $1`, [MADE_BY_AUTH])).rows[0]
+        .encrypted_password,
+    ).toBe('$2a$10$generated');
+    expect(await commit('account_link_partner', [MADE_BY_AUTH, P, 'be-43', 'Gal', null, true])).toMatchObject(
+      {
+        source: P,
+        fullName: 'Gal',
+        userManaged: false,
+      },
+    );
+    expect(
+      (await c.query(`select encrypted_password from auth.users where id = $1`, [MADE_BY_AUTH])).rows[0]
+        .encrypted_password,
+    ).toBe('');
+    expect(await call('user_self_managed', [MADE_BY_AUTH])).toBe(false);
     // a user the partner created becomes the partner's
     const linked = await commit('account_link_partner', [
       MADE,

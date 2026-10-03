@@ -80,8 +80,8 @@ describe('the support assistant', () => {
     expect(resolveSupportPath('/app/invitations/:id/guests', 'abc-123')).toBe(
       '/app/invitations/abc-123/guests',
     );
-    // no current invitation to fill ":id" with: rejected, never left with the literal placeholder
-    expect(resolveSupportPath('/app/invitations/:id/guests', null)).toBeNull();
+    // no current invitation to fill ":id" with: still a link — to the invitation list, never the placeholder
+    expect(resolveSupportPath('/app/invitations/:id/guests', null)).toBe('/app/invitations');
     // not a known screen at all
     expect(resolveSupportPath('/app/invitations/:id/wrong-tab', 'abc-123')).toBeNull();
     expect(resolveSupportPath('/app/admin/system', null)).toBeNull();
@@ -140,10 +140,23 @@ describe('the support assistant', () => {
     noBarePath(fixed, '/app/invitations/:id/seating');
     expect(fixed.match(/\]\(\/app\/invitations\/:id\/seating\)/g)).toHaveLength(2);
 
-    // no current invitation to fill ":id" with: same rule as resolveSupportPath — left exactly as is,
-    // never linked into something Inline could never resolve either
+    // no current invitation: still linked (Inline resolves it to the invitation list), never a bare path
     const noId = 'ב-סידור שולחנות (/app/invitations/:id/seating) עושים את זה ככה:';
-    expect(linkifyLabeledPaths(noId, null)).toBe(noId);
+    expect(linkifyLabeledPaths(noId, null)).toContain('](/app/invitations/:id/seating)');
+
+    // a JSON-escaped path (the reported "\/app\/invitations\/:id\/guests\/") or one in backticks: normalized first
+    const { normalizeAnswer, supportPageName } = await import('@/features/support/pages');
+    const escaped = normalizeAnswer(
+      'נכנסים לרשימת המוזמנים (\\/app\\/invitations\\/:id\\/guests\\/) ולוחצים',
+    );
+    expect(escaped).toBe('נכנסים לרשימת המוזמנים (/app/invitations/:id/guests/) ולוחצים');
+    expect(linkifyLabeledPaths(escaped, null)).toContain('לרשימת המוזמנים](/app/invitations/:id/guests/)');
+    expect(normalizeAnswer('ב-`/app/billing`')).toBe('ב-/app/billing');
+    expect(supportPageName('/app/invitations/:id/guests', 'he')).toBe('מוזמנים');
+    expect(supportPageName('/app/guide/budget-gauge', 'he')).toBe('המדריך');
+    expect(supportPageName('/app/guide/no-such-article', 'he')).toBeNull();
+    expect(supportPageName('/app/billing', 'en')).toBe('Plans');
+    expect(supportPageName('/app/admin', 'he')).toBeNull();
 
     // a page with no ":id" at all
     const contact = linkifyLabeledPaths('טופס יצירת קשר (/contact) בכל שאלה.', null);
@@ -566,5 +579,94 @@ describe('the support assistant', () => {
     vi.unstubAllEnvs();
     vi.doUnmock('@/lib/supabase/server');
     vi.resetModules();
+  });
+});
+
+describe('the support assistant knows every screen', () => {
+  it('every user-facing page of the app is in SUPPORT_PAGES, and every SUPPORT_PAGES path is a real page', async () => {
+    const { readdirSync, statSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { SUPPORT_PAGES } = await import('@/features/support/pages');
+    const root = join(process.cwd(), 'src/app/(site)');
+    const found: string[] = [];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir)) {
+        const full = join(dir, name);
+        if (statSync(full).isDirectory()) walk(full);
+        else if (name === 'page.tsx')
+          found.push(
+            ('/' + dir.slice(root.length + 1))
+              .replace(/\/\([^)]*\)/g, '')
+              .replace(/\[[^\]]+\]/g, ':id')
+              .replace(/\/$/, '') || '/',
+          );
+      }
+    };
+    walk(root);
+    // not for hosts: the staff console, dev tools, auth callbacks, the home redirect, one ticket by id;
+    // one guide article by its slug is linked as /app/guide/<slug> (pages.ts checks the slug itself)
+    const internal =
+      /^\/(dev|auth|app\/admin)(\/|$)|^\/app$|^\/$|^\/app\/support\/:id$|^\/app\/guide\/:id$|test-checkout/;
+    const known = new Set(SUPPORT_PAGES.map((p) => p.path));
+    // a new screen fails here until it's added to pages.ts — and its feature to knowledge.ts
+    expect(found.filter((p) => !internal.test(p) && !known.has(p)).sort()).toEqual([]);
+    expect([...known].filter((p) => !found.includes(p)).sort()).toEqual([]);
+  });
+});
+
+describe('the support assistant knows every feature', () => {
+  it('every feature flag is documented in the manual', async () => {
+    const { FEATURES } = await import('@/features/flags/features');
+    const { MANUAL_COVERAGE, knowledgeBase } = await import('@/features/support/knowledge');
+    const manual = knowledgeBase({
+      brand: 'Badook',
+      site: 'https://example.test',
+      prices: { pro: 1, business: 2 },
+      messagePrice: 1,
+      packs: [],
+      supportEmail: 'a@example.test',
+    });
+    expect(Object.keys(MANUAL_COVERAGE).sort()).toEqual([...FEATURES].sort());
+    // a feature whose phrase is missing: document it in knowledge.ts (or fix the phrase)
+    expect(FEATURES.filter((f) => !manual.includes(MANUAL_COVERAGE[f]))).toEqual([]);
+  });
+
+  it('every product area (src/features/*) is accounted for in the manual', async () => {
+    const { readdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const manual = (await import('node:fs')).readFileSync(
+      join(process.cwd(), 'src/features/support/knowledge.ts'),
+      'utf8',
+    );
+    // each area → a phrase the manual uses for it; internal areas (no host-facing use) are listed as null
+    const AREAS: Record<string, string | null> = {
+      admin: null, // the staff console
+      flags: null, // covered feature by feature above
+      jobs: null, // background work
+      site: null, // marketing pages
+      support: 'פנייה לצוות',
+      partner: null, // partners' console
+      legal: 'פרטיות',
+      'art-direction': 'עצבו לי',
+      billing: 'חבילות ותשלומים',
+      'event-day': 'יום האירוע',
+      faces: 'התמונות שאני בהן',
+      guide: 'המדריך',
+      film: 'סרט הרגעים',
+      insights: 'תובנות',
+      invitations: 'יצירת הזמנה',
+      'live-gallery': 'גלריה חיה',
+      planning: 'תכנון האירוע',
+      review: 'עיון המשפחה',
+      seating: 'סידור שולחנות',
+      voice: 'הקראת ההזמנה',
+      whatsapp: 'וואטסאפ',
+    };
+    const dirs = readdirSync(join(process.cwd(), 'src/features'), { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name);
+    // a new area fails here until it's documented in knowledge.ts and listed above
+    expect(dirs.filter((d) => !(d in AREAS)).sort()).toEqual([]);
+    expect(Object.entries(AREAS).filter(([, w]) => w && !manual.includes(w))).toEqual([]);
   });
 });

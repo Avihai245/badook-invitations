@@ -1,6 +1,7 @@
 import { PLAN_LIMITS } from '@/features/billing/plans';
 import { TEMPLATES } from '@/features/invitations/templates/registry';
 import { he } from '@/lib/i18n/app.he';
+import type { Feature } from '@/features/flags/features';
 import { TICKETS } from './tickets/config';
 
 /** What the assistant's manual needs to know about this deployment (prices come from its settings). */
@@ -12,6 +13,34 @@ export interface KnowledgeContext {
   packs: { count: number; price: number }[];
   supportEmail: string;
 }
+
+/**
+ * Where the manual documents each feature (features/flags FEATURES): a phrase that must appear in
+ * knowledgeBase(). Typed as Record<Feature, …>, so a new feature doesn't compile until it's documented
+ * here, and tests/unit/support.test.ts checks each phrase is really in the manual.
+ */
+export const MANUAL_COVERAGE: Record<Feature, string> = {
+  cinematic: 'עיצוב קולנועי',
+  seating: 'סידור שולחנות',
+  seating_auto: 'סידור אוטומטי',
+  seating_guide: 'מספר השולחן',
+  checkin: 'רישום בכניסה',
+  live_gallery: 'גלריה חיה',
+  gallery_ai: 'בדיקה אוטומטית של התוכן',
+  projector: 'מסך באולם',
+  face_albums: 'התמונות שאני בהן',
+  auto_reel: 'סרט הרגעים',
+  languages: 'משבע השפות',
+  translate_ai: 'תרגום אוטומטי',
+  voice: 'הקראת ההזמנה',
+  art_direction: 'עצבו לי',
+  draft_review: 'עיון המשפחה',
+  analytics: 'תובנות',
+  planning: 'תכנון האירוע',
+  planning_ai: 'הצעה לפי תיאור',
+  planning_export: 'ייצוא ל-Excel',
+  planning_templates: 'שמירת תוכנית כתבנית',
+};
 
 const f = PLAN_LIMITS.free;
 const p = PLAN_LIMITS.pro;

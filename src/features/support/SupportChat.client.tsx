@@ -28,7 +28,13 @@ import { cn, Hint } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { navKeyOf } from '@/features/invitations/app/workspace/stages';
 import { SUPPORT_OPEN, openHelp, type SupportOpenDetail } from './open';
-import { currentInvitationId, linkifyLabeledPaths, resolveSupportPath } from './pages';
+import {
+  currentInvitationId,
+  linkifyLabeledPaths,
+  normalizeAnswer,
+  resolveSupportPath,
+  supportPageName,
+} from './pages';
 import { ChatHandoff } from './tickets/ui/ChatHandoff.client';
 
 /**
@@ -194,6 +200,7 @@ function Inline({
   onNavigate: () => void;
   invitationId: string | null;
 }) {
+  const { locale } = useUi();
   const parts: ReactNode[] = [];
   let last = 0;
   for (const m of text.matchAll(INLINE)) {
@@ -213,12 +220,15 @@ function Inline({
     if (bold) parts.push(<strong key={at}>{bold}</strong>);
     else if (label && href) {
       const to = supportLink(href, invitationId);
-      parts.push(to ? link(to, label, at) : `${label} (${href})`);
+      // not a known screen: the words alone, never the raw path
+      parts.push(to ? link(to, label, at) : label);
     } else if (bare || path) {
       const raw = (bare ?? path)!;
       const trimmed = raw.replace(/[.,;:!?'"»”]+$/, '');
       const to = supportLink(trimmed, invitationId);
-      parts.push(to ? link(to, <bdi dir="ltr">{trimmed}</bdi>, at) : trimmed);
+      // a bare path of this site: linked under the screen's name, never shown as a path
+      const name = path ? supportPageName(trimmed, locale === 'en' ? 'en' : 'he') : null;
+      parts.push(to ? link(to, name ?? <bdi dir="ltr">{trimmed}</bdi>, at) : trimmed);
       if (trimmed.length < raw.length) parts.push(raw.slice(trimmed.length));
     } else parts.push(whole);
     last = at + whole.length;
@@ -238,7 +248,7 @@ function Answer({
 }) {
   return (
     <>
-      {blocksOf(linkifyLabeledPaths(text, invitationId)).map((b, i) =>
+      {blocksOf(linkifyLabeledPaths(normalizeAnswer(text), invitationId)).map((b, i) =>
         b.kind === 'p' ? (
           <p key={i}>
             {b.lines.map((line, j) => (
