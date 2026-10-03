@@ -185,13 +185,18 @@
     /* the resulting design card — crop of "סהר בורדו" from screen-designs.png:
        crop CSS [897,331,255,394], shown 320 wide → s = 320/255 = 1.2549, height 394·s ≈ 494;
        lands centered on the window (490, 443) */
+    [id="05-ai-card-gate"] {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
     [id="05-ai-card"] {
       position: absolute;
       left: 330px;
       top: 196px;
       width: 320px;
       height: 494px;
-      z-index: 5;
       overflow: hidden;
       border-radius: 20px;
       background: #731F2E;
@@ -392,8 +397,10 @@
         <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M13 3 C 14 10, 17 12, 24 13 C 17 14, 14 16, 13 23 C 12 16, 9 14, 2 13 C 9 12, 12 10, 13 3 Z" fill="#FBF7F1" /><path d="M23 2 C 23.4 4.6, 24.2 5.4, 26.8 5.8 C 24.2 6.2, 23.4 7, 23 9.6 C 22.6 7, 21.8 6.2, 19.2 5.8 C 21.8 5.4, 22.6 4.6, 23 2 Z" fill="#FBF7F1" /></svg>
       </div>
 
-      <div id="05-ai-card">
-        <img id="05-ai-card-img" src="assets/screen-designs.png" alt="" />
+      <div id="05-ai-card-gate">
+        <div id="05-ai-card">
+          <img id="05-ai-card-img" src="assets/screen-designs.png" alt="" />
+        </div>
       </div>
 
       <div class="05-ai-leader" id="05-ai-l1" style="top: 328px;"></div>
@@ -497,6 +504,8 @@
       // oversized + blurred and retracts into the window's center
       tl.fromTo(el("stack"), { scale: 1, opacity: 1 }, { scale: 0.9, opacity: 0.82, duration: 0.5, ease: "power3.inOut" }, 4.05);
       tl.fromTo(el("veil"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 4.3);
+      // gate keeps the card fully hidden until the cut frame (the incoming side starts at 0.15 opacity)
+      tl.fromTo(el("card-gate"), { opacity: 0 }, { opacity: 1, duration: 0.02, ease: "none" }, 4.3);
       tl.fromTo(el("card"), { x: -245, y: 117 }, { x: 0, y: 0, duration: 0.7, ease: "power3.out" }, 4.3);
       tl.fromTo(
         el("card"),
