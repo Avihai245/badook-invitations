@@ -19,6 +19,7 @@ import { Button, Card, Confetti, CountUp, cn, useToast } from '@/components/app'
 import { taskTitle } from '@/features/planning/model/task-text';
 import { systemText } from '@/features/planning/model/system-text';
 import { BudgetGauge } from '@/features/planning/ui/BudgetGauge';
+import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { EventHomeData } from '../../server/event-home';
@@ -74,6 +75,15 @@ export function EventHome({ data }: { data: EventHomeData }) {
               </li>
             ))}
           </ul>
+        </section>
+      ) : null}
+      {/* a brand-new event (a draft, nobody on the list yet): the 45-second tour of everything */}
+      {data.item.status === 'draft' && !data.item.guests ? (
+        <section aria-labelledby="home-video" className="max-w-[720px]">
+          <h2 id="home-video" className="text-[16px] font-bold">
+            {t.start.video.cta}
+          </h2>
+          <DemoVideo className="mt-3" />
         </section>
       ) : null}
       <nav className="flex flex-wrap gap-2 lg:hidden" aria-label={t.workspace.nav.more}>

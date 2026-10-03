@@ -14,6 +14,7 @@ import { COUPLE_EVENTS } from '../../templates/seed-copy';
 import { EVENT_ICONS } from '../event-icons';
 import { nameFields, type NameKey } from '../gallery/CreateWizard';
 import { parseWhole, planInit, saveAnswers, type StartAnswers } from './answers';
+import { DemoVideo } from '@/features/site/DemoVideo.client';
 
 /** The kinds of events a host starts from here (a save-the-date starts from the gallery). */
 export const START_TYPES: EventType[] = [
@@ -228,6 +229,13 @@ export function StartWizard() {
                   );
                 })}
               </div>
+              <details className="group mt-8 max-w-[640px]">
+                <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-full border border-brand-line bg-surface px-4 py-2 text-[14px] font-semibold text-brand-deep hover:bg-brand-soft [&::-webkit-details-marker]:hidden">
+                  {S.video.cta}
+                </summary>
+                <p className="mt-3 text-[13px] text-muted">{S.video.title}</p>
+                <DemoVideo className="mt-2" />
+              </details>
             </Screen>
           ) : step === 2 && type ? (
             <Screen headingRef={heading} title={S.details.title} body={S.details.body}>

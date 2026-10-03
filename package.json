@@ -29,7 +29,8 @@
     "media:placeholders": "node scripts/make-template-placeholders.mjs",
     "test:db": "vitest run --config vitest.db.config.ts",
     "qa:host": "node scripts/qa-host.mjs",
-    "perf:templates": "tsx scripts/perf-templates.ts"
+    "perf:templates": "tsx scripts/perf-templates.ts",
+    "video:render": "npm --prefix video ci && npm --prefix video run render"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
