@@ -33,7 +33,7 @@
     [id="10-tasks-kicker"] {
       position: absolute;
       right: 80px;
-      top: 72px;
+      top: 98px;
       font-family: "Heebo", sans-serif;
       font-weight: 700;
       font-size: 34px;
@@ -46,7 +46,7 @@
     [id="10-tasks-rule"] {
       position: absolute;
       left: 80px;
-      top: 128px;
+      top: 154px;
       width: 1760px;
       height: 1px;
       background: rgba(28, 25, 23, 0.12);
@@ -56,7 +56,7 @@
     /* ── empty slots (the grid region before the cards land) ── */
     [class~="10-tasks-slot"] {
       position: absolute;
-      top: 164px;
+      top: 190px;
       width: 560px;
       height: 560px;
       box-sizing: border-box;
@@ -67,7 +67,7 @@
     /* ── window cards: 560×560 at x 1280 / 680 / 80 (RTL: first = rightmost) ── */
     [class~="10-tasks-card"] {
       position: absolute;
-      top: 164px;
+      top: 190px;
       width: 560px;
       height: 560px;
     }
@@ -94,8 +94,8 @@
 
     /* tasks crop CSS [450,250,720,720] → scale 560/720 = 0.77778 */
     [id="10-tasks-img-tasks"] { width: 1120px; height: 1144.11px; left: -350px; top: -194.44px; }
-    /* vendors crop CSS [262,445,660,660] → scale 560/660 = 0.84848 */
-    [id="10-tasks-img-vendors"] { width: 1221.82px; height: 929.94px; left: -222.30px; top: -377.58px; }
+    /* vendors crop CSS [272,446,618,618] → scale 560/618 = 0.90615 (clean band between the "missing" panel and the footer) */
+    [id="10-tasks-img-vendors"] { width: 1304.85px; height: 993.14px; left: -246.47px; top: -404.14px; }
     /* ideas crop CSS [486,255,680,680] → scale 560/680 = 0.82353 */
     [id="10-tasks-img-ideas"] { width: 1185.88px; height: 797.18px; left: -400.24px; top: -210.00px; }
 
@@ -114,11 +114,11 @@
       white-space: nowrap;
     }
 
-    /* ── vendors: callout on the quote card (קייטרינג שפע, CSS [495,556,191,130] → win [197.70,94.18,162.06,110.30]) ── */
+    /* ── vendors: callout on the quote card (קייטרינג שפע, CSS [495,556,191,130] → win [202.07,99.68,173.07,117.80]) ── */
     [id="10-tasks-dot"] {
       position: absolute;
-      left: 273.73px;
-      top: 199.48px;
+      left: 283.60px;
+      top: 212.48px;
       width: 10px;
       height: 10px;
       border-radius: 50%;
@@ -127,17 +127,17 @@
     }
     [id="10-tasks-leader"] {
       position: absolute;
-      left: 277.98px;
-      top: 204.48px;
+      left: 287.85px;
+      top: 217.48px;
       width: 1.5px;
-      height: 46px;
+      height: 50.5px;
       background: #A0703F;
       transform-origin: 50% 0%;
     }
     [id="10-tasks-pill-row"] {
       position: absolute;
-      left: -1.27px;
-      top: 250px;
+      left: 8.60px;
+      top: 268px;
       width: 560px;
       display: flex;
       justify-content: center;
@@ -160,6 +160,17 @@
       transform-origin: 50% 0%;
     }
     [id="10-tasks-pill"] svg { width: 28px; height: 28px; flex: none; }
+
+    [id="10-tasks-vspot"] {
+      position: absolute;
+      left: 196.07px;
+      top: 93.68px;
+      width: 185.07px;
+      height: 129.80px;
+      border-radius: 14px;
+      box-shadow: 0 0 0 900px rgba(251, 247, 241, 0.5);
+      pointer-events: none;
+    }
 
     /* ── ideas: ring + spotlight on the pinned note (CSS [800,396,352,154] → win [258.59,116.12,289.88,126.82], ring padded 6px) ── */
     [id="10-tasks-spot"] {
@@ -224,7 +235,7 @@
           </div>
         </div>
       </div>
-      <div class="10-tasks-title" id="10-tasks-title1" dir="rtl" lang="he" style="right: 80px; top: 754px; width: 560px;">משימות לפי לוח זמנים</div>
+      <div class="10-tasks-title" id="10-tasks-title1" dir="rtl" lang="he" style="right: 80px; top: 780px; width: 560px;">משימות לפי לוח זמנים</div>
 
       <!-- card 2 (middle): vendors board with quotes — focal -->
       <div class="10-tasks-card" id="10-tasks-card2" style="left: 680px;">
@@ -232,6 +243,7 @@
           <div class="10-tasks-world" id="10-tasks-world2">
             <img id="10-tasks-img-vendors" src="assets/screen-vendors.png" alt="" />
           </div>
+          <div id="10-tasks-vspot"></div>
         </div>
         <div id="10-tasks-dot"></div>
         <div id="10-tasks-leader"></div>
@@ -242,7 +254,7 @@
           </div>
         </div>
       </div>
-      <div class="10-tasks-title" id="10-tasks-title2" dir="rtl" lang="he" style="right: 680px; top: 754px; width: 560px;">ספקים והצעות מחיר</div>
+      <div class="10-tasks-title" id="10-tasks-title2" dir="rtl" lang="he" style="right: 680px; top: 780px; width: 560px;">ספקים והצעות מחיר</div>
 
       <!-- card 3 (leftmost): ideas board -->
       <div class="10-tasks-card" id="10-tasks-card3" style="left: 80px;">
@@ -255,7 +267,7 @@
         <div id="10-tasks-ring-glow"></div>
         <svg id="10-tasks-ring" viewBox="0 0 301.88 138.82" aria-hidden="true"><path id="10-tasks-ring-path" pathLength="1" d="M286.38 1.5 H 15.5 A 14 14 0 0 0 1.5 15.5 V 123.32 A 14 14 0 0 0 15.5 137.32 H 286.38 A 14 14 0 0 0 300.38 123.32 V 15.5 A 14 14 0 0 0 286.38 1.5 Z" /></svg>
       </div>
-      <div class="10-tasks-title" id="10-tasks-title3" dir="rtl" lang="he" style="right: 1280px; top: 754px; width: 560px;">לוח רעיונות</div>
+      <div class="10-tasks-title" id="10-tasks-title3" dir="rtl" lang="he" style="right: 1280px; top: 780px; width: 560px;">לוח רעיונות</div>
 
     </div>
   </div>
@@ -289,12 +301,15 @@
 
       // ── Scene 3 (4.0–5.9s): the middle card — vendors; quote pill pops on the quote card ──
       assemble(2, 4.0);
+      tl.fromTo(el("vspot"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 4.7);
       tl.fromTo(el("dot"), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "power3.out" }, 4.75);
       tl.fromTo(el("leader"), { scaleY: 0 }, { scaleY: 1, duration: 0.35, ease: "power2.out" }, 4.85);
       tl.fromTo(el("pill"), { opacity: 0, scale: 0.7, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 5.02);
 
       // ── Scene 4 (5.9–7.882s): the left card — ideas; ring draws on the pinned note, then hold ──
       assemble(3, 5.9);
+      // attention moves to the ideas board: the vendors spotlight eases off (the quote card stays faintly lifted — the focal)
+      tl.fromTo(el("vspot"), { opacity: 1 }, { opacity: 0.4, duration: 0.6, ease: "power2.inOut", immediateRender: false }, 5.9);
       tl.fromTo(el("spot"), { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 6.55);
       tl.fromTo(el("ring-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut" }, 6.55);
       tl.fromTo(el("ring-glow"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 7.2);
