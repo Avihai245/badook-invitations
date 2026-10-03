@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { openSupport } from '@/features/support/open';
 import { GuideArticleView, GuideIndex, articleBySlug } from './GuideView';
+import { TourVideo } from '@/features/site/DemoVideo.client';
 
 /** /app/guide — the written guide as a page: its search, the stages' articles and the FAQ. */
 export function GuidePage() {
@@ -23,6 +24,7 @@ export function GuidePage() {
         }
         description={t.helpCenter.pageSubtitle}
       />
+      <TourVideo className="mt-6" />
       <div className="mt-6">
         <GuideIndex onOpen={(slug) => router.push(`/app/guide/${slug}`)} onAsk={(q) => openSupport(q)} />
       </div>

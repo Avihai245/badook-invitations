@@ -1,0 +1,70 @@
+{
+  "intro": {
+    "seconds": 9.54,
+    "audio": false
+  },
+  "start": {
+    "seconds": 9.92,
+    "audio": false
+  },
+  "home": {
+    "seconds": 12.69,
+    "audio": false
+  },
+  "design": {
+    "seconds": 6.77,
+    "audio": false
+  },
+  "ai": {
+    "seconds": 6.54,
+    "audio": false
+  },
+  "edit": {
+    "seconds": 8.08,
+    "audio": false
+  },
+  "share": {
+    "seconds": 8.31,
+    "audio": false
+  },
+  "guests": {
+    "seconds": 8.46,
+    "audio": false
+  },
+  "rsvp": {
+    "seconds": 9.85,
+    "audio": false
+  },
+  "tasks": {
+    "seconds": 6.54,
+    "audio": false
+  },
+  "budget": {
+    "seconds": 11.31,
+    "audio": false
+  },
+  "seating": {
+    "seconds": 8.77,
+    "audio": false
+  },
+  "eventday": {
+    "seconds": 6.62,
+    "audio": false
+  },
+  "gallery": {
+    "seconds": 7.62,
+    "audio": false
+  },
+  "film": {
+    "seconds": 5,
+    "audio": false
+  },
+  "help": {
+    "seconds": 6.54,
+    "audio": false
+  },
+  "end": {
+    "seconds": 4,
+    "audio": false
+  }
+}

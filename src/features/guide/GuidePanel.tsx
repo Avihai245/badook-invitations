@@ -1,6 +1,7 @@
 'use client';
 
 import type { NavKey } from '@/features/invitations/app/workspace/stages';
+import { TourVideo } from '@/features/site/DemoVideo.client';
 import { GuideArticleView, GuideIndex, articleBySlug } from './GuideView';
 
 /**
@@ -23,6 +24,10 @@ export default function GuidePanel({
   return shown ? (
     <GuideArticleView article={shown} onOpen={onOpen} onBack={() => onOpen(null)} full />
   ) : (
-    <GuideIndex compact screen={screen} onOpen={onOpen} onAsk={onAsk} />
+    <>
+      {/* the full narrated tour, above the articles */}
+      <TourVideo compact className="mb-4" />
+      <GuideIndex compact screen={screen} onOpen={onOpen} onAsk={onAsk} />
+    </>
   );
 }

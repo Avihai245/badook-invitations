@@ -8,11 +8,18 @@
     "studio": "remotion studio src/index.ts",
     "typecheck": "tsc -p tsconfig.json",
     "stills": "node scripts/stills.mjs out/stills",
+    "stills:tour": "node scripts/tour-stills.mjs out/tour-stills",
     "render": "npm run render:mp4 && npm run render:webm && npm run render:portrait && npm run render:poster",
     "render:mp4": "remotion render src/index.ts DemoLandscape ../public/video/badook-demo.mp4 --codec=h264 --crf=28 --x264-preset=slow",
     "render:webm": "remotion render src/index.ts DemoLandscape ../public/video/badook-demo.webm --codec=vp9 --crf=40",
     "render:portrait": "remotion render src/index.ts DemoPortrait ../public/video/badook-demo-portrait.mp4 --codec=h264 --crf=28 --x264-preset=slow",
-    "render:poster": "remotion still src/index.ts DemoLandscape ../public/video/poster.jpg --frame=765 --image-format=jpeg --jpeg-quality=85"
+    "render:poster": "remotion still src/index.ts DemoLandscape ../public/video/poster.jpg --frame=765 --image-format=jpeg --jpeg-quality=85",
+    "narrate": "node scripts/narrate.mjs",
+    "vtt": "node scripts/vtt.mjs",
+    "render:tour": "npm run vtt && npm run render:tour:mp4 && npm run render:tour:portrait && npm run render:tour:poster",
+    "render:tour:mp4": "remotion render src/index.ts TourLandscape ../public/video/badook-tour.mp4 --codec=h264 --crf=30 --x264-preset=slow --audio-bitrate=96k",
+    "render:tour:portrait": "remotion render src/index.ts TourPortrait ../public/video/badook-tour-portrait.mp4 --codec=h264 --crf=30 --x264-preset=slow --audio-bitrate=96k",
+    "render:tour:poster": "node scripts/tour-poster.mjs"
   },
   "dependencies": {
     "@fontsource/heebo": "5.3.0",

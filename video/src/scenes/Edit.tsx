@@ -14,12 +14,21 @@ import {
 } from '../ui';
 
 /** 9–14s: names and date change live on the phone; "עצבו לי מהתמונות" restyles the invitation. */
-export function EditScene() {
+export function EditScene({
+  names: namesEdit = ['דנה & יואב', 'נועה & איתי'],
+  date: dateEdit = ['12.06.2027', '04.09.2027'],
+  place = 'גני הדר, רחובות',
+}: {
+  /** [before, after] of the typed fields (the tour uses its own couple) */
+  names?: [string, string];
+  date?: [string, string];
+  place?: string;
+} = {}) {
   const frame = useCurrentFrame();
   const sp = useSpringAt();
 
-  const names = retype('דנה & יואב', 'נועה & איתי', frame, 18, 0.75);
-  const date = retype('12.06.2027', '04.09.2027', frame, 62, 0.9);
+  const names = retype(namesEdit[0], namesEdit[1], frame, 18, 0.75);
+  const date = retype(dateEdit[0], dateEdit[1], frame, 62, 0.9);
   const namesActive = frame >= 14 && frame < 60;
   const dateActive = frame >= 58 && frame < 92;
   const caret = Math.floor(frame / 8) % 2 === 0;
@@ -142,7 +151,7 @@ export function EditScene() {
         </div>
         {field('השמות', names.text, namesActive, 120)}
         {field('התאריך', date.text, dateActive, 270, true)}
-        {field('המקום', 'גני הדר, רחובות', false, 420)}
+        {field('המקום', place, false, 420)}
       </Card>
 
       {/* the AI chip */}

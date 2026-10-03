@@ -5,8 +5,13 @@ import { Card, clamp, PlayIcon, useSpringAt } from '../ui';
 const DAYS = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
 const RSVPS = [38, 52, 24, 17, 12, 22, 9];
 
+const STATS = [
+  { v: '96%', l: 'הגיעו מתוך המאשרים' },
+  { v: '318', l: 'תמונות בגלריה' },
+];
+
 /** 39–43s: the moments film strip and a small insights chart. */
-export function FilmScene() {
+export function FilmScene({ stats = STATS }: { stats?: { v: string; l: string }[] } = {}) {
   const frame = useCurrentFrame();
   const sp = useSpringAt();
   const frameW = 230;
@@ -164,10 +169,7 @@ export function FilmScene() {
             gap: 16,
           }}
         >
-          {[
-            { v: '96%', l: 'הגיעו מתוך המאשרים' },
-            { v: '318', l: 'תמונות בגלריה' },
-          ].map((s, i) => {
+          {stats.map((s, i) => {
             const p = sp(24 + i * 8);
             return (
               <div

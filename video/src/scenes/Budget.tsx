@@ -9,13 +9,14 @@ import {
   type GaugeZone,
 } from '../../../src/features/planning/model/gauge';
 import { C } from '../theme';
+import type { CSSProperties } from 'react';
 import { Card, CheckIcon, clamp, keyframes, useSpringAt } from '../ui';
 
-const ZONE_COLOR: Record<GaugeZone, string> = { safe: C.success, close: C.warning, over: C.danger };
+export const ZONE_COLOR: Record<GaugeZone, string> = { safe: C.success, close: C.warning, over: C.danger };
 const ZONE_TINT: Record<GaugeZone, string> = { safe: '#cfe3d6', close: '#ecd9c4', over: '#efd0cd' };
-const ZONE_BG: Record<GaugeZone, string> = { safe: C.successBg, close: C.warningBg, over: C.dangerBg };
+export const ZONE_BG: Record<GaugeZone, string> = { safe: C.successBg, close: C.warningBg, over: C.dangerBg };
 // the app's strings (src/lib/i18n/planning-budget.he.ts)
-const ZONE_TEXT: Record<GaugeZone, string> = {
+export const ZONE_TEXT: Record<GaugeZone, string> = {
   safe: 'אתם בטוחים בתקציב',
   close: 'מתקרבים לגבול — שווה לבדוק',
   over: 'חרגתם מהתקציב',
@@ -52,20 +53,7 @@ export function BudgetScene() {
 
   // geometry like BudgetGauge 'lg' (w 360, stroke 22), drawn in a larger viewBox
   const w = 600;
-  const stroke = 36;
-  const pad = stroke / 2 + 24;
-  const r = w / 2 - pad;
-  const geo = { cx: w / 2, cy: w / 2, r };
-  const h = w / 2 + stroke / 2 + 14;
-  const rtl = true;
-  const tip = gaugePoint(value, { ...geo, r: r - stroke / 2 - 10 }, rtl);
-  const ghostTip = gaugePoint(0.88, { ...geo, r: r - stroke / 2 - 10 }, rtl);
-  const tick = (v: number, inner: number, outer: number) => {
-    const a = gaugePoint(v, { ...geo, r: inner }, rtl);
-    const b = gaugePoint(v, { ...geo, r: outer }, rtl);
-    return { x1: a.x, y1: a.y, x2: b.x, y2: b.y };
-  };
-  const ticks = Array.from({ length: 14 }, (_, i) => i / 10);
+  const h = gaugeHeight(w, 36);
   const left = Math.round(TOTAL * (1 - value));
   const money = (n: number) => `₪${new Intl.NumberFormat('he-IL').format(Math.round(n / 100) * 100)}`;
   const cardIn = sp(0, { damping: 16 });
@@ -94,91 +82,7 @@ export function BudgetScene() {
         >
           מתוך <span style={{ color: C.ink, fontWeight: 800 }}>{money(TOTAL)}</span>
         </div>
-        <svg
-          viewBox={`0 0 ${w} ${h}`}
-          width={w}
-          height={h}
-          style={{ position: 'absolute', top: 60, left: (880 - w) / 2, overflow: 'visible' }}
-        >
-          <path
-            d={gaugeArc(0, GAUGE_ZONES.safe, geo, rtl)}
-            stroke={ZONE_TINT.safe}
-            strokeWidth={stroke}
-            fill="none"
-            strokeLinecap="round"
-          />
-          <path
-            d={gaugeArc(GAUGE_ZONES.safe, GAUGE_ZONES.close, geo, rtl)}
-            stroke={ZONE_TINT.close}
-            strokeWidth={stroke}
-            fill="none"
-          />
-          <path
-            d={gaugeArc(GAUGE_ZONES.close, GAUGE_MAX, geo, rtl)}
-            stroke={ZONE_TINT.over}
-            strokeWidth={stroke}
-            fill="none"
-            strokeLinecap="round"
-          />
-          {value > 0.002 ? (
-            <path
-              d={gaugeArc(0, value, geo, rtl)}
-              stroke={color}
-              strokeWidth={stroke}
-              fill="none"
-              strokeLinecap="round"
-            />
-          ) : null}
-          {ticks.map((v, i) => (
-            <line
-              key={i}
-              {...tick(v, r + stroke / 2 + 5, r + stroke / 2 + (i % 5 === 0 ? 18 : 11))}
-              stroke={C.lineStrong}
-              strokeWidth={i % 5 === 0 ? 2.5 : 1.6}
-            />
-          ))}
-          {[0, 0.5, 1].map((v) => {
-            const p = gaugePoint(v, { ...geo, r: r + stroke / 2 + 36 }, rtl);
-            return (
-              <text
-                key={v}
-                x={p.x}
-                y={p.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={C.muted}
-                fontSize={18}
-                fontWeight={600}
-                fontFamily="Heebo"
-              >
-                {`${Math.round(v * 100)}%`}
-              </text>
-            );
-          })}
-          {/* the plan: a ghost needle */}
-          <line
-            x1={geo.cx}
-            y1={geo.cy}
-            x2={ghostTip.x}
-            y2={ghostTip.y}
-            stroke={C.ink}
-            strokeOpacity={0.22}
-            strokeWidth={5}
-            strokeLinecap="round"
-            strokeDasharray="7 7"
-          />
-          <line
-            x1={geo.cx}
-            y1={geo.cy}
-            x2={tip.x}
-            y2={tip.y}
-            stroke={C.ink}
-            strokeWidth={6}
-            strokeLinecap="round"
-          />
-          <circle cx={geo.cx} cy={geo.cy} r={15} fill={C.ink} />
-          <circle cx={geo.cx} cy={geo.cy} r={6} fill="#fff" />
-        </svg>
+        <BudgetGauge value={value} style={{ position: 'absolute', top: 60, left: (880 - w) / 2 }} />
         <div
           style={{
             position: 'absolute',
@@ -293,5 +197,134 @@ export function BudgetScene() {
         })}
       </Card>
     </div>
+  );
+}
+
+export const gaugeHeight = (w: number, stroke: number) => w / 2 + stroke / 2 + 14;
+
+/**
+ * The budget speedometer (the app's BudgetGauge geometry): zones, the value's arc, ticks, 0/50/100%
+ * labels, the plan's ghost needle and the needle. Drawn in a `w`-wide viewBox, shown `displayWidth` wide.
+ */
+export function BudgetGauge({
+  value,
+  ghost = 0.88,
+  w = 600,
+  stroke = 36,
+  displayWidth,
+  labels = true,
+  style,
+}: {
+  value: number;
+  /** the 0/50/100% labels (off when drawn small) */
+  labels?: boolean;
+  ghost?: number;
+  w?: number;
+  stroke?: number;
+  displayWidth?: number;
+  style?: CSSProperties;
+}) {
+  const zone = zoneOf(value);
+  const color = ZONE_COLOR[zone];
+  const pad = stroke / 2 + 24;
+  const r = w / 2 - pad;
+  const geo = { cx: w / 2, cy: w / 2, r };
+  const h = gaugeHeight(w, stroke);
+  const rtl = true;
+  const tip = gaugePoint(value, { ...geo, r: r - stroke / 2 - 10 }, rtl);
+  const ghostTip = gaugePoint(ghost, { ...geo, r: r - stroke / 2 - 10 }, rtl);
+  const tick = (v: number, inner: number, outer: number) => {
+    const a = gaugePoint(v, { ...geo, r: inner }, rtl);
+    const b = gaugePoint(v, { ...geo, r: outer }, rtl);
+    return { x1: a.x, y1: a.y, x2: b.x, y2: b.y };
+  };
+  const ticks = Array.from({ length: 14 }, (_, i) => i / 10);
+  return (
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      width={displayWidth ?? w}
+      height={((displayWidth ?? w) * h) / w}
+      style={{ overflow: 'visible', ...style }}
+    >
+      <path
+        d={gaugeArc(0, GAUGE_ZONES.safe, geo, rtl)}
+        stroke={ZONE_TINT.safe}
+        strokeWidth={stroke}
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d={gaugeArc(GAUGE_ZONES.safe, GAUGE_ZONES.close, geo, rtl)}
+        stroke={ZONE_TINT.close}
+        strokeWidth={stroke}
+        fill="none"
+      />
+      <path
+        d={gaugeArc(GAUGE_ZONES.close, GAUGE_MAX, geo, rtl)}
+        stroke={ZONE_TINT.over}
+        strokeWidth={stroke}
+        fill="none"
+        strokeLinecap="round"
+      />
+      {value > 0.002 ? (
+        <path
+          d={gaugeArc(0, value, geo, rtl)}
+          stroke={color}
+          strokeWidth={stroke}
+          fill="none"
+          strokeLinecap="round"
+        />
+      ) : null}
+      {ticks.map((v, i) => (
+        <line
+          key={i}
+          {...tick(v, r + stroke / 2 + 5, r + stroke / 2 + (i % 5 === 0 ? 18 : 11))}
+          stroke={C.lineStrong}
+          strokeWidth={i % 5 === 0 ? 2.5 : 1.6}
+        />
+      ))}
+      {labels &&
+        [0, 0.5, 1].map((v) => {
+          const p = gaugePoint(v, { ...geo, r: r + stroke / 2 + 36 }, rtl);
+          return (
+            <text
+              key={v}
+              x={p.x}
+              y={p.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill={C.muted}
+              fontSize={18}
+              fontWeight={600}
+              fontFamily="Heebo"
+            >
+              {`${Math.round(v * 100)}%`}
+            </text>
+          );
+        })}
+      {/* the plan: a ghost needle */}
+      <line
+        x1={geo.cx}
+        y1={geo.cy}
+        x2={ghostTip.x}
+        y2={ghostTip.y}
+        stroke={C.ink}
+        strokeOpacity={0.22}
+        strokeWidth={5}
+        strokeLinecap="round"
+        strokeDasharray="7 7"
+      />
+      <line
+        x1={geo.cx}
+        y1={geo.cy}
+        x2={tip.x}
+        y2={tip.y}
+        stroke={C.ink}
+        strokeWidth={6}
+        strokeLinecap="round"
+      />
+      <circle cx={geo.cx} cy={geo.cy} r={15} fill={C.ink} />
+      <circle cx={geo.cx} cy={geo.cy} r={6} fill="#fff" />
+    </svg>
   );
 }

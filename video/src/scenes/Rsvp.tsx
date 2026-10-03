@@ -9,22 +9,21 @@ const TOASTS = [
   { at: 90, who: 'י', color: '#b45309', title: 'יעל אישרה הגעה · 3 אנשים', ok: true },
 ];
 
-const INVITED = 180;
-
 /** 19–24s: the coming / declined / waiting ring fills while RSVP toasts slide in. */
-export function RsvpScene() {
+export function RsvpScene({ invited: INVITED = 180 }: { invited?: number } = {}) {
   const frame = useCurrentFrame();
+  const k = INVITED / 180;
   const sp = useSpringAt();
   const ease = Easing.out(Easing.cubic);
   const coming = keyframes(
     frame,
     [
       [6, 0],
-      [30, 96],
-      [54, 118],
-      [78, 121],
-      [102, 136],
-      [130, 142],
+      [30, 96 * k],
+      [54, 118 * k],
+      [78, 121 * k],
+      [102, 136 * k],
+      [130, 142 * k],
     ],
     ease,
   );
@@ -32,9 +31,9 @@ export function RsvpScene() {
     frame,
     [
       [6, 0],
-      [30, 8],
-      [66, 9],
-      [80, 14],
+      [30, 8 * k],
+      [66, 9 * k],
+      [80, 14 * k],
     ],
     ease,
   );

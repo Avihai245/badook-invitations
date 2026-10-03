@@ -13,7 +13,7 @@ const GUESTS = [
 ];
 
 /** 14–19s: an Excel sheet flies into the guest list, rows fill, then WhatsApp sends personal links. */
-export function GuestsScene() {
+export function GuestsScene({ couple = 'נועה & איתי' }: { couple?: string } = {}) {
   const frame = useCurrentFrame();
   const sp = useSpringAt();
 
@@ -183,7 +183,7 @@ export function GuestsScene() {
           }}
         >
           <div style={{ fontSize: 22, fontWeight: 600, color: C.ink, lineHeight: 1.4 }}>
-            היי דנה! הוזמנתם לחתונה של נועה & איתי
+            היי דנה! הוזמנתם לחתונה של {couple}
           </div>
           <div
             style={{
