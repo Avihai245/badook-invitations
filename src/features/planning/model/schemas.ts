@@ -110,6 +110,6 @@ export type TaskOpInput = z.infer<typeof TaskOp>;
 export const PlanOp = z.discriminatedUnion('op', [
   z.strictObject({ op: z.literal('init'), ...InitSchema.shape }),
   z.strictObject({ op: z.literal('settings'), patch: SettingsSchema }),
-  z.strictObject({ op: z.literal('dates') }),
+  z.strictObject({ op: z.literal('dates'), keep: z.boolean().optional() }),
   z.strictObject({ op: z.literal('ack_headcount') }),
 ]);

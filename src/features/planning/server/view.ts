@@ -8,7 +8,11 @@ import type { PlanView, RawPlanState, TaskView } from '../model/plan';
 export const DEFAULT_ZONE = 'Asia/Jerusalem';
 
 /** What the invitation system knows about the event, as the system tasks are judged by it. */
-export function factsOf(raw: RawPlanState, summary: PlanSummary, today: string): SystemFacts {
+export function factsOf(
+  raw: Pick<RawPlanState, 'invitation' | 'facts'>,
+  summary: PlanSummary,
+  today: string,
+): SystemFacts {
   return {
     status: summary.status,
     unpublishedChanges: summary.unpublishedChanges,

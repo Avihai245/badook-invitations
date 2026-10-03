@@ -40,7 +40,7 @@ export type { ApiResult, PlanningDeps } from './types';
  */
 
 /** The plan as the screens load it: null when it isn't the host's or has no summary. */
-async function loadView(
+export async function loadPlanView(
   userId: string,
   id: string,
   deps: PlanningDeps,
@@ -59,7 +59,7 @@ async function loadView(
 export async function loadPlan(userId: string, id: string, deps: PlanningDeps): Promise<ApiResult> {
   const g = await gate(userId, id, deps);
   if (isRefusal(g)) return g;
-  const loaded = await loadView(userId, id, deps, g.input);
+  const loaded = await loadPlanView(userId, id, deps, g.input);
   if (!loaded) return notFound;
   return ok({ view: loaded.view });
 }
@@ -132,7 +132,7 @@ export async function initPlan(
   const parsed = InitSchema.safeParse(body);
   if (!parsed.success) return invalid(parsed.error);
   const input = parsed.data;
-  const loaded = await loadView(userId, id, deps, g.input);
+  const loaded = await loadPlanView(userId, id, deps, g.input);
   if (!loaded) return notFound;
   const { raw, view } = loaded;
   if (raw.settings) return fail(409, 'exists');
@@ -165,7 +165,7 @@ export async function initPlan(
   });
   if (!answer) return notFound;
   if (!answer.ok) return fail(answer.code === 'exists' ? 409 : 422, answer.code ?? 'invalid');
-  const fresh = await loadView(userId, id, deps, g.input);
+  const fresh = await loadPlanView(userId, id, deps, g.input);
   return fresh ? ok({ view: fresh.view }, 201) : notFound;
 }
 
@@ -197,28 +197,37 @@ export async function savePlanSettings(
     p_patch: settingsPatch(parsed.data),
   });
   if (!saved) return notFound;
-  const loaded = await loadView(userId, id, deps, g.input);
+  const loaded = await loadPlanView(userId, id, deps, g.input);
   return loaded ? ok({ view: loaded.view }) : notFound;
 }
 
 /**
  * POST { op: 'dates' } — the event's date changed: moves the tasks the host never dated themselves
  * to the same place around the new date (compressed into the time that is left, like a new plan).
+ * `keep`: leave every date as it is and stop asking about this one.
  */
-export async function applyDates(userId: string, id: string, deps: PlanningDeps): Promise<ApiResult> {
+export async function applyDates(
+  userId: string,
+  id: string,
+  deps: PlanningDeps,
+  keep = false,
+): Promise<ApiResult> {
   const g = await gate(userId, id, deps);
   if (isRefusal(g)) return g;
-  const loaded = await loadView(userId, id, deps, g.input);
+  const loaded = await loadPlanView(userId, id, deps, g.input);
   if (!loaded) return notFound;
   const { raw, view } = loaded;
   if (!raw.settings || !raw.invitation.date) return fail(409, 'no_plan');
-  const movable = raw.tasks.filter(
-    (t) =>
-      !t.dueIsManual &&
-      t.offsetDays !== null &&
-      t.systemKey !== 'rsvp_deadline' &&
-      t.systemKey !== 'final_headcount',
-  );
+  // "keep them as they are": nothing moves, and the question is not asked again for this date
+  const movable = keep
+    ? []
+    : raw.tasks.filter(
+        (t) =>
+          !t.dueIsManual &&
+          t.offsetDays !== null &&
+          t.systemKey !== 'rsvp_deadline' &&
+          t.systemKey !== 'final_headcount',
+      );
   const schedule = computeSchedule(
     movable.map((t) => ({ id: t.id, offset: t.offsetDays! })),
     { eventDate: raw.invitation.date, today: view.today },
@@ -229,7 +238,7 @@ export async function applyDates(userId: string, id: string, deps: PlanningDeps)
     p_dates: schedule.map((s) => ({ id: s.id, due: s.due })),
     p_anchor: raw.invitation.date,
   });
-  const fresh = await loadView(userId, id, deps, g.input);
+  const fresh = await loadPlanView(userId, id, deps, g.input);
   return fresh ? ok({ view: fresh.view }) : notFound;
 }
 
@@ -258,7 +267,7 @@ export async function planOperation(
     case 'settings':
       return savePlanSettings(userId, id, (rest as { patch: unknown }).patch, deps);
     case 'dates':
-      return applyDates(userId, id, deps);
+      return applyDates(userId, id, deps, (rest as { keep?: boolean }).keep === true);
     case 'ack_headcount':
       return ackHeadcount(userId, id, deps);
   }
