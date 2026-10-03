@@ -5,7 +5,7 @@ import { HintProvider, ToastProvider } from '@/components/app';
 import type { PlanIdea, PlanView } from '@/features/planning/model/plan';
 import { IdeasScreen } from '@/features/planning/ui/IdeasScreen';
 import { PlanProvider } from '@/features/planning/ui/PlanProvider';
-import { UiProvider } from '@/lib/i18n/client';
+import { UiProvider } from '@/lib/i18n/provider';
 import { planningIdeasHe as T } from '@/lib/i18n/planning-ideas.he';
 
 // The ideas board as the host uses it: the composer, link cards with their preview, ticking a checklist,

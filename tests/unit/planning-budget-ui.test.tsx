@@ -9,7 +9,7 @@ import { composeView } from '@/features/planning/server/view';
 import { BudgetScreen } from '@/features/planning/ui/BudgetScreen';
 import { PlanProvider } from '@/features/planning/ui/PlanProvider';
 import { TodayPayments } from '@/features/planning/ui/TodayPayments';
-import { UiProvider } from '@/lib/i18n/client';
+import { UiProvider } from '@/lib/i18n/provider';
 
 // The budget screen as the host uses it (jsdom, the server's answers faked): the setup card, the numbers, a
 // category opening into its items, adding and closing an expense, marking a payment paid, deleting with Undo,
@@ -369,14 +369,48 @@ describe('the numbers', () => {
   it('shows planned, committed, paid and left, one meter, and the cost per guest', () => {
     mount(makeView(raw()));
     const s = screen.getByTestId('budget-summary');
-    for (const label of ['מתוכנן', 'התחייבנו', 'שולם', 'נשאר', 'עלות לאורח'])
+    for (const label of ['התקציב', 'מתוכנן', 'התחייבנו', 'שולם', 'נשאר', 'עלות לאורח'])
       expect(within(s).getAllByText(label).length).toBeGreaterThan(0);
     expect(s.textContent).toContain('₪33,500');
     expect(s.textContent).toContain('₪98,500');
-    expect(s.textContent).toContain('₪13.64');
-    expect(within(s).getAllByRole('img')).toHaveLength(1);
+    // the cost per guest in whole shekels (UX report B1), and the budget as one speedometer
+    expect(s.textContent).toContain('₪14');
+    expect(s.textContent).not.toContain('₪13.64');
+    expect(within(s).getAllByRole('meter')).toHaveLength(1);
     // under budget: no warning at all
     expect(screen.queryByTestId('budget-over')).toBeNull();
+  });
+
+  it('changes the budget in place: whole shekels, Enter saves, Esc leaves it as it was', async () => {
+    mount(makeView(raw()));
+    const s = screen.getByTestId('budget-summary');
+    // Esc: nothing is sent
+    fireEvent.click(within(s).getByRole('button', { name: 'שינוי התקציב' }));
+    const field = within(s).getByRole('textbox', { name: /שינוי התקציב/ });
+    fireEvent.keyDown(field, { key: 'Escape' });
+    expect(within(s).queryByRole('textbox', { name: /שינוי התקציב/ })).toBeNull();
+    // not a number: a word, and nothing sent
+    fireEvent.click(within(s).getByRole('button', { name: 'שינוי התקציב' }));
+    fireEvent.change(within(s).getByRole('textbox', { name: /שינוי התקציב/ }), { target: { value: 'הרבה' } });
+    fireEvent.click(within(s).getByRole('button', { name: 'שמירה' }));
+    expect(s.textContent).toContain('כתבו סכום בשקלים, למשל 80000');
+    expect(calls.filter((c) => c.method === 'POST')).toHaveLength(0);
+    // a new amount, rounded to a whole shekel, through the settings route
+    fireEvent.change(within(s).getByRole('textbox', { name: /שינוי התקציב/ }), {
+      target: { value: '120,000.4' },
+    });
+    fireEvent.submit(
+      within(s)
+        .getByRole('textbox', { name: /שינוי התקציב/ })
+        .closest('form')!,
+    );
+    await waitFor(() =>
+      expect(calls.find((c) => c.method === 'POST')!.body).toEqual({
+        op: 'settings',
+        patch: { totalBudget: 120000 },
+      }),
+    );
+    await waitFor(() => expect(within(s).queryByRole('textbox', { name: /שינוי התקציב/ })).toBeNull());
   });
 
   it('warns, quietly, only when what is committed passes the total', () => {
@@ -764,9 +798,10 @@ describe('what if', () => {
 });
 
 describe('the chart and the Excel file', () => {
-  it('bars by category with the same numbers as a table', () => {
+  it('small gauges by category with the same numbers as a table', () => {
     mount(makeView(raw()));
-    const chart = screen.getByTestId('budget-chart');
+    const chart = screen.getByTestId('budget-cat-gauges');
+    expect(within(chart).getAllByRole('meter').length).toBeGreaterThan(0);
     const toggle = within(chart).getByRole('button', { name: 'הצגה כטבלה' });
     expect(toggle.getAttribute('aria-pressed')).toBe('false');
     fireEvent.click(toggle);

@@ -21,6 +21,8 @@ export interface ResponseAttendee {
 
 export interface ResponseRecord {
   id: string;
+  /** the guest on the list it belongs to (their personal link, or matched by the host); null: the general link */
+  guestId?: string | null;
   attending: boolean;
   locale: Locale;
   name: string;

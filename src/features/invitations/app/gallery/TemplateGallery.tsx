@@ -71,6 +71,7 @@ export function TemplateGallery({
   admin = false,
   studio = null,
   initialTemplateId = null,
+  initialType = null,
 }: {
   bases: AssetBases;
   fontCss: string;
@@ -87,10 +88,12 @@ export function TemplateGallery({
    * already here mounts a fresh instance rather than relying on an update to this prop alone.
    */
   initialTemplateId?: string | null;
+  /** the kind of event chosen in the start wizard (`?type=`): the gallery opens filtered by it */
+  initialType?: EventType | null;
 }) {
   const { t, locale, plural, number } = useUi();
   const videos = usePreviewVideos();
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>(initialType ?? 'all');
   const [previewLocale, setPreviewLocale] = useState<Locale>(locale);
   const [preview, setPreview] = useState<string | null>(() => initialPreview(initialTemplateId, admin));
   const [wizard, setWizard] = useState<WizardSeed | null>(null);

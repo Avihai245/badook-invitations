@@ -6,7 +6,8 @@
  * same three concepts. Pure and isomorphic.
  */
 import type { Palette, TemplateManifest } from '../invitations/contracts/types';
-import { dictFor, fmt } from '@/lib/i18n/app';
+import { fmt } from '@/lib/i18n/app';
+import { dictFor } from '@/lib/i18n/dict';
 import {
   hexToOklch,
   hueDistance,

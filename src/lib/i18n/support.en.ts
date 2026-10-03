@@ -10,6 +10,26 @@ export const supportEn: typeof supportHe = {
     'Hi! I’m the {brand} assistant. Ask me anything about the app: creating and designing an invitation, the guest list, sending on WhatsApp, RSVPs and plans. How can I help?',
   suggestionsTitle: 'Start here',
   suggestions: {
+    home: [
+      'What’s my next step?',
+      'How do I read the budget gauge?',
+      'Why is the coming count different from the list?',
+    ],
+    budget: [
+      'How is the budget split into categories?',
+      'What’s the difference between planned and committed?',
+      'How do I add a payment for a vendor?',
+    ],
+    seating: [
+      'How does auto-seating work?',
+      'How do I send guests their table?',
+      'How do I print table cards?',
+    ],
+    gallery: [
+      'How do guests upload photos?',
+      'How do I show the gallery on a screen in the hall?',
+      'How do I make the moments film?',
+    ],
     general: [
       'How do I create my first invitation?',
       'How do I upload a guest list from Excel?',

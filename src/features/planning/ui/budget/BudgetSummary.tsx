@@ -106,7 +106,7 @@ export function BudgetSummary() {
             className="col-span-2 lg:col-span-1"
             icon={<Users />}
             label={T.kpi.perGuest}
-            value={<Money className={BIG} value={totals.perGuest} />}
+            value={<Money className={BIG} value={Math.round(totals.perGuest)} />}
             sub={plural(T.guests.guestsN, view.headcount.guests, { n: number(view.headcount.guests) })}
           />
         ) : null}
@@ -189,7 +189,7 @@ export function PastSummary() {
           <KpiCard
             icon={<Users />}
             label={T.kpi.perGuest}
-            value={<Money className={BIG} value={totals.perGuest} />}
+            value={<Money className={BIG} value={Math.round(totals.perGuest)} />}
             sub={plural(T.guests.guestsN, view.headcount.guests, { n: number(view.headcount.guests) })}
           />
         ) : null}

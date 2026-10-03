@@ -16,6 +16,7 @@ export function GuestsActions({
   onSend,
   sendHint,
   sendBlocked,
+  own = false,
 }: {
   onImport: () => void;
   onAdd: () => void;
@@ -24,6 +25,8 @@ export function GuestsActions({
   sendHint: string;
   /** why sending can't start now (the button is disabled), or null */
   sendBlocked: string | null;
+  /** the system's WhatsApp number isn't connected: the main button sends from the host's own, one by one */
+  own?: boolean;
 }) {
   const { t } = useUi();
   const g = t.guests;
@@ -57,14 +60,19 @@ export function GuestsActions({
             aria-describedby="guests-send-note"
             className="max-sm:w-full"
           >
-            {g.actions.whatsappAll}
+            {own ? g.own.cta : g.actions.whatsappAll}
           </Button>
+          {own ? (
+            <span className="inline-flex items-center rounded-full border border-dashed border-line-strong px-3 text-[12px] font-semibold text-muted max-sm:justify-center max-sm:py-1">
+              {g.own.soon}
+            </span>
+          ) : null}
         </div>
         <p
           id="guests-send-note"
           className={cn(
             'text-[13px] leading-[1.55]',
-            sendBlocked ? 'font-medium text-warning' : 'text-muted',
+            sendBlocked && !own ? 'font-medium text-warning' : 'text-muted',
           )}
         >
           {sendBlocked ?? sendHint}

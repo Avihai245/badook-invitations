@@ -2,6 +2,7 @@ import type { LiveGalleryDict } from './live-gallery.he';
 
 /** The live gallery in the host app (the invitation's "Gallery" tab) — English. */
 export const liveGalleryEn: LiveGalleryDict = {
+  views: { use: 'At the event', settings: 'Settings & deleting' },
   tab: 'Gallery',
   metaTitle: 'Gallery · {name}',
   title: 'Live gallery',

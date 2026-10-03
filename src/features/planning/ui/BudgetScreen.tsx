@@ -11,7 +11,7 @@ import { AddCategoryDialog } from './budget/AddCategoryDialog';
 import { BudgetSetup } from './budget/BudgetSetup';
 import { BudgetSummary, PastSummary } from './budget/BudgetSummary';
 import { CategoryCard } from './budget/CategoryCard';
-import { Charts } from './budget/Charts';
+import { BudgetHero, CategoryGauges, UpcomingPayments } from './budget/BudgetHero';
 import { ExportButton, ExportLocked } from './budget/ExportBlock';
 import { GuestsPanel } from './budget/GuestsPanel';
 import { ItemDrawer } from './budget/ItemDrawer';
@@ -147,12 +147,34 @@ function BudgetBody({
       return next;
     });
 
-  return (
-    <div className="flex flex-col gap-4">
-      {past ? <PastSummary /> : <BudgetSummary />}
-      {!past ? <GuestsPanel /> : null}
+  // a category tapped above (its small gauge) opens below, in view
+  const reveal = (id: string) => {
+    setTab('categories');
+    setOpen((cur) => new Set(cur).add(id));
+    requestAnimationFrame(() =>
+      document.getElementById(`budget-cat-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    );
+  };
+  const toPayments = () => {
+    setTab('payments');
+    requestAnimationFrame(() =>
+      document.getElementById('budget-views')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    );
+  };
+  const withTotal = view.totals.totalBudget !== null && view.totals.totalBudget > 0;
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+  return (
+    <div className="flex flex-col gap-5">
+      {past ? <PastSummary /> : withTotal ? <BudgetHero /> : <BudgetSummary />}
+      {!past ? <GuestsPanel /> : null}
+      {!past && rows.length ? (
+        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
+          <CategoryGauges onOpen={reveal} />
+          <UpcomingPayments onAll={toPayments} onOpenItem={(id) => onOpenItem(id)} />
+        </div>
+      ) : null}
+
+      <div id="budget-views" className="flex scroll-mt-24 flex-wrap items-center justify-between gap-3">
         <Segmented<Tab>
           label={T.views.label}
           value={tab}
@@ -187,18 +209,19 @@ function BudgetBody({
       ) : (
         <section aria-label={T.views.categories} className="flex flex-col gap-3">
           {rows.map((row) => (
-            <CategoryCard
-              key={row.category.id}
-              row={row}
-              past={past}
-              open={open.has(row.category.id)}
-              onToggle={() => toggle(row.category.id)}
-              onAddItem={(categoryId) => {
-                setOpen((cur) => new Set(cur).add(categoryId));
-                onOpenItem(null, categoryId);
-              }}
-              onOpenItem={(id) => onOpenItem(id)}
-            />
+            <div key={row.category.id} id={`budget-cat-${row.category.id}`} className="scroll-mt-24">
+              <CategoryCard
+                row={row}
+                past={past}
+                open={open.has(row.category.id)}
+                onToggle={() => toggle(row.category.id)}
+                onAddItem={(categoryId) => {
+                  setOpen((cur) => new Set(cur).add(categoryId));
+                  onOpenItem(null, categoryId);
+                }}
+                onOpenItem={(id) => onOpenItem(id)}
+              />
+            </div>
           ))}
           {!past ? (
             <div>
@@ -211,7 +234,6 @@ function BudgetBody({
       )}
 
       {!past ? <WhatIf /> : null}
-      <Charts past={past} />
       <ExportLocked />
     </div>
   );

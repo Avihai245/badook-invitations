@@ -25,7 +25,7 @@ import { commit, createHistory, redo, replacePresent, undo, type History } from 
 import { setAt } from '../paths';
 
 export type PanelId =
-  'studio' | 'cover' | 'palette' | 'fonts' | 'style' | 'music' | 'event' | 'languages' | 'share';
+  'template' | 'studio' | 'cover' | 'palette' | 'fonts' | 'style' | 'music' | 'event' | 'languages' | 'share';
 export type Selection = { kind: 'section'; id: string } | { kind: 'panel'; panel: PanelId };
 export type RailTab = 'sections' | 'design' | 'settings';
 
@@ -33,7 +33,15 @@ export type RailTab = 'sections' | 'design' | 'settings';
  * The design tab's panels (`style`: the type scale, spacing and motion — feature `cinematic`;
  * `studio`: "design it for me" — feature `art_direction`).
  */
-export const DESIGN_PANELS: readonly PanelId[] = ['studio', 'palette', 'fonts', 'style', 'cover', 'music'];
+export const DESIGN_PANELS: readonly PanelId[] = [
+  'template',
+  'studio',
+  'palette',
+  'fonts',
+  'style',
+  'cover',
+  'music',
+];
 /** Panels only an event with the `cinematic` feature has. */
 export const CINEMATIC_PANELS: readonly PanelId[] = ['style'];
 export const SETTINGS_PANELS: readonly PanelId[] = ['event', 'languages', 'share'];

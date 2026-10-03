@@ -51,7 +51,9 @@ ideas. It lives only inside the invitations system — nothing is read from or s
 
 **Rolling it out.** The tab stays hidden until `INVITES_PLANNING=on`. Apply the planning migrations
 (`supabase/migrations/*_planning_*.sql`) to the database *before* turning it on (and before the code that
-uses them is deployed with the switch on). `INVITES_FEATURES_OFF=planning` switches it off again for the
+uses them is deployed with the switch on). `amplify.yml` turns it on for the production branch (`main`) when
+the console has no value of its own — a console value, e.g. `false`, wins — and the other branches stay off
+until their database has the migrations. `INVITES_FEATURES_OFF=planning` switches it off again for the
 whole deployment; the host can switch it off for one event (nothing is deleted), and an admin can grant a
 paid tool to one event.
 

@@ -9,6 +9,10 @@ import { devRoutesEnabled } from '@/lib/dev-routes';
 import { serverEnv } from '@/lib/env';
 import { getUi } from '@/lib/i18n/server';
 import { getSessionUser } from '@/lib/supabase/session';
+import { StartWizard } from '@/features/invitations/app/onboarding/StartWizard';
+import { EVENT_TYPES, type EventType } from '@/features/invitations/contracts/types';
+
+const isEventType = (v: string): v is EventType => (EVENT_TYPES as readonly string[]).includes(v);
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getUi();
@@ -27,14 +31,17 @@ function devPreviews(param: string | string[] | undefined): DevPreviews | null {
   return null;
 }
 
-/** /app/invitations/new — the template gallery (§9B.3-B) → preview → wizard. */
+/** /app/invitations/new — the start wizard → the template gallery (§9B.3-B) → preview → wizard. */
 export default async function NewInvitationPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const env = serverEnv();
-  const [{ previews, template }, user] = await Promise.all([searchParams, getSessionUser()]);
+  const [{ previews, template, type, gallery }, user] = await Promise.all([searchParams, getSessionUser()]);
+  // "New event" starts with three questions (the start wizard); the gallery is the next screen, or
+  // straight away for a link to a design (?template=), a type (?type=) or "skip" (?gallery=1)
+  if (!template && !type && !gallery && !previews) return <StartWizard />;
   // the host's plan in force and this deployment (before signing in: only what this deployment offers)
   const account = user ? await accountFeatures(user).catch(() => null) : null;
   // languages beyond Hebrew and English (feature `languages`)
@@ -72,6 +79,7 @@ export default async function NewInvitationPage({
       admin={isAdminEmail(user?.email)}
       studio={studio}
       initialTemplateId={initialTemplateId}
+      initialType={typeof type === 'string' && isEventType(type) ? type : null}
     />
   );
 }

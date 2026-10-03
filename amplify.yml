@@ -27,6 +27,12 @@ frontend:
                 ;;
             esac
           fi
+          # Event planning (INVITES_PLANNING): on for the production branch, whose database has the planning
+          # migrations (supabase/migrations/*_planning_*.sql). A value set in the console wins, and the
+          # other branches stay off until their own database has them.
+          if [ "${AWS_BRANCH:-}" = "main" ] && [ -z "${INVITES_PLANNING:-}" ]; then
+            echo "INVITES_PLANNING=true" >> .env.production
+          fi
           npm run build
   artifacts:
     baseDirectory: .next

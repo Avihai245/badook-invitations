@@ -81,25 +81,50 @@ interface Entry {
   task: Omit<InitTask, 'dueDate' | 'suggestHide' | 'sort' | 'offsetDays'>;
 }
 
-const round2 = (n: number) => Math.round(n * 100) / 100;
+/** A per-head divisor: how many adults / children / guests / tables a category's price is multiplied by. */
+function divisorFor(basis: CostBasis, h: { adults: number; children: number; tables: number }): number {
+  return basis === 'per_adult'
+    ? h.adults
+    : basis === 'per_child'
+      ? h.children
+      : basis === 'per_guest'
+        ? h.adults + h.children
+        : basis === 'per_table'
+          ? h.tables
+          : 0;
+}
 
-/** A per-head price that makes the category come to its share today (null: nothing to divide by). */
-function unitPriceFor(
-  basis: CostBasis,
-  planned: number,
+/**
+ * The total split into the categories in whole shekels, summing to the total exactly. A category priced
+ * per head gets a whole-shekel price (so price × heads is whole too — never ₪24,000.48), and whatever
+ * the rounding left over goes to "other" (else the largest fixed category), so the plan is the budget.
+ */
+export function splitBudget(
+  total: number,
+  categories: readonly { key: CategoryKey | null; pct: number; basis: CostBasis }[],
   h: { adults: number; children: number; tables: number },
-): number | null {
-  const divisor =
-    basis === 'per_adult'
-      ? h.adults
-      : basis === 'per_child'
-        ? h.children
-        : basis === 'per_guest'
-          ? h.adults + h.children
-          : basis === 'per_table'
-            ? h.tables
-            : 0;
-  return divisor > 0 && planned > 0 ? round2(planned / divisor) : null;
+): { planned: number; unitPrice: number | null }[] {
+  const whole = Math.round(total);
+  const out = categories.map((c) => {
+    const share = Math.round((whole * c.pct) / 100);
+    const divisor = divisorFor(c.basis, h);
+    if (c.basis === 'fixed' || divisor <= 0 || share <= 0) return { planned: share, unitPrice: null };
+    const unitPrice = Math.round(share / divisor);
+    return { planned: unitPrice * divisor, unitPrice };
+  });
+  // only a split of the whole budget is balanced (a template whose shares don't add up to 100% isn't)
+  const pctSum = categories.reduce((n, c) => n + c.pct, 0);
+  if (Math.abs(pctSum - 100) > 0.001) return out;
+  const diff = whole - out.reduce((n, c) => n + c.planned, 0);
+  if (diff === 0) return out;
+  const fixed = categories
+    .map((c, i) => ({ c, i }))
+    .filter(({ c, i }) => c.basis === 'fixed' || out[i]!.unitPrice === null);
+  const target =
+    fixed.find(({ c }) => c.key === 'other') ??
+    [...fixed].sort((a, b) => out[b.i]!.planned - out[a.i]!.planned)[0];
+  if (target && out[target.i]!.planned + diff >= 0) out[target.i]!.planned += diff;
+  return out;
 }
 
 function finish(
@@ -134,14 +159,15 @@ function finish(
     .sort((a, b) => (a.dueDate! < b.dueDate! ? -1 : a.dueDate! > b.dueDate! ? 1 : a.order - b.order))
     .map(({ order: _order, ...t }, i): InitTask => ({ ...t, sort: (i + 1) * 10 }));
 
+  const split = ctx.totalBudget ? splitBudget(ctx.totalBudget, categories, ctx.headcount) : null;
   const cats = categories.map((c, i): InitCategory => {
-    const planned = ctx.totalBudget ? round2((ctx.totalBudget * c.pct) / 100) : 0;
+    const planned = split?.[i]?.planned ?? 0;
     return {
       key: c.key,
       name: c.name,
       plannedAmount: planned,
       costBasis: c.basis,
-      unitPrice: c.basis === 'fixed' ? null : unitPriceFor(c.basis, planned, ctx.headcount),
+      unitPrice: split?.[i]?.unitPrice ?? null,
       childPrice: null,
       required: c.required,
       sort: (i + 1) * 10,

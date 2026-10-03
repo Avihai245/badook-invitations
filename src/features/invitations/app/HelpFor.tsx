@@ -39,7 +39,6 @@ import {
   Ellipsis,
   ExternalLink,
   Eye,
-  FileSpreadsheet,
   Globe,
   GripVertical,
   Hash,
@@ -82,6 +81,8 @@ import {
   TriangleAlert,
   Type,
   Undo2,
+  LayoutTemplate,
+  ShieldCheck,
   Upload,
   Users,
   Volume2,
@@ -112,13 +113,13 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     status: BadgeCheck,
   },
   overview: {
-    tabs: LayoutDashboard,
-    stats: ChartColumn,
-    import: FileSpreadsheet,
-    send: MessageCircle,
-    steps: ListOrdered,
-    link: Link2,
-    publish: Send,
+    countdown: CalendarClock,
+    next: Send,
+    budget: Gauge,
+    rsvp: ListChecks,
+    tasks: ListOrdered,
+    road: LayoutDashboard,
+    also: Check,
   },
   gallery: {
     filter: ListFilter,
@@ -214,6 +215,11 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
     fromPhoto: ImagePlus,
     size: Ruler,
     reset: RotateCcw,
+  },
+  designTemplate: {
+    choose: LayoutTemplate,
+    keeps: ShieldCheck,
+    undo: Undo2,
   },
   designCover: {
     enabled: Mail,
@@ -313,10 +319,13 @@ export function HelpFor({
   area,
   inDialog = false,
   hide = [],
+  named = false,
   className,
 }: {
   area: HelpArea;
   inDialog?: boolean;
+  /** the button named by its card's title ("Colors: what each thing does"): one of several in a list */
+  named?: boolean;
   /** items about something this page doesn't show (a feature the event doesn't have) */
   hide?: readonly string[];
   className?: string;
@@ -332,7 +341,7 @@ export function HelpFor({
     });
   return (
     <AreaHelp
-      label={t.common.helpLabel}
+      label={named ? help.title : t.common.helpLabel}
       title={help.title}
       items={items}
       footer={!inDialog}

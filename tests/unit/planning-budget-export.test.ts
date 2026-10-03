@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FEATURES, NO_OVERRIDES, type FeatureInput } from '@/features/flags/features';
 import type { RawPlanState } from '@/features/planning/model/plan';
 import type { PlanningDeps } from '@/features/planning/server/types';
-import { dictFor, type UiLocale } from '@/lib/i18n/app';
+import { type UiLocale } from '@/lib/i18n/app';
+import { dictFor } from '@/lib/i18n/dict';
 
 // GET /api/invitations/:id/planning/budget/export: the budget as an Excel file, for the owner of an event whose
 // plan has the export (Pro), in the language of the screen.

@@ -19,12 +19,12 @@ import {
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-import { Button, cn } from '@/components/app';
+import { Button } from '@/components/app';
 import { planPrices } from '@/features/billing/server/account';
 import { posterSample } from '@/features/invitations/app/poster';
 import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { TemplatePoster } from '@/features/invitations/app/TemplatePoster';
-import type { EventType, Locale } from '@/features/invitations/contracts/types';
+import type { EventType } from '@/features/invitations/contracts/types';
 import { parseVideoLink } from '@/features/invitations/lib/video-links';
 import { SAMPLES } from '@/features/invitations/templates/demo';
 import { requireTemplate, TEMPLATES } from '@/features/invitations/templates/registry';
@@ -37,6 +37,7 @@ import { Petals } from '@/features/site/Petals';
 import { PlanCards } from '@/features/site/PlanCards';
 import { Reveal } from '@/features/site/Reveal.client';
 import { SampleShowcase } from '@/features/site/SampleShowcase.client';
+import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { SiteFooter } from '@/features/site/SiteFooter';
 import { SiteHeader } from '@/features/site/SiteHeader.client';
 import { invitationsEnabled } from '@/lib/feature';
@@ -46,8 +47,6 @@ import '@/styles/site-home.css';
 
 /** The designs fanned out in "how it works" (the last one is in front). */
 const FAN = ['kalanit', 'midnight-bloom', 'sahar-bordeaux'] as const;
-/** The three phones of the first screen: [left, center, right]. */
-const PHONES = ['papercut-gold', 'sahar-bordeaux', 'rooftop-dusk'] as const;
 /** The event types the band under the first screen names. */
 const EVENTS: EventType[] = [
   'wedding',
@@ -74,39 +73,6 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: true, follow: true },
     openGraph: { title, description: t.home.subtitle, type: 'website' },
   };
-}
-
-/** A template's first screen in a phone (the first screen's mock-ups). */
-function Phone({
-  id,
-  locale,
-  className,
-  style,
-}: {
-  id: string;
-  locale: Locale;
-  className?: string;
-  style?: CSSProperties;
-}) {
-  return (
-    <div
-      style={style}
-      className={cn(
-        'rounded-[2.1rem] bg-[#161412] p-[3.2%] shadow-[0_34px_60px_-24px_rgba(0,0,0,0.65)] ring-1 ring-white/10',
-        className,
-      )}
-    >
-      <div className="relative overflow-hidden rounded-[1.75rem]">
-        <TemplatePoster
-          template={requireTemplate(id).manifest}
-          locale={locale}
-          text={posterSample(id, locale)}
-          frameless
-        />
-        <span className="absolute top-[1.6%] left-1/2 h-[2.6%] w-[30%] -translate-x-1/2 rounded-full bg-[#161412]" />
-      </div>
-    </div>
-  );
 }
 
 function SectionTitle({
@@ -259,26 +225,12 @@ export default async function HomePage() {
                 ))}
               </ul>
             </div>
-            <div aria-hidden className="relative mx-auto aspect-[10/9] w-full max-w-[540px] max-lg:hidden">
-              <div className="absolute top-[13%] left-[3%] w-[38%]">
-                <Phone
-                  id={PHONES[0]}
-                  locale={locale}
-                  className="site-float -rotate-[7deg]"
-                  style={{ '--float-delay': '-2s' } as CSSProperties}
-                />
-              </div>
-              <div className="absolute top-[13%] right-[3%] w-[38%]">
-                <Phone
-                  id={PHONES[2]}
-                  locale={locale}
-                  className="site-float rotate-[7deg]"
-                  style={{ '--float-delay': '-4.5s' } as CSSProperties}
-                />
-              </div>
-              <div className="absolute top-0 left-1/2 z-10 w-[45%] -translate-x-1/2">
-                <Phone id={PHONES[1]} locale={locale} className="site-float" />
-              </div>
+            {/* the 45-second demo, beside the main action (UX report stage 7) */}
+            <div
+              className="site-rise relative mx-auto w-full max-w-[600px]"
+              style={{ '--rise-delay': '360ms' } as CSSProperties}
+            >
+              <DemoVideo className="ring-white/20" />
             </div>
           </div>
           <a

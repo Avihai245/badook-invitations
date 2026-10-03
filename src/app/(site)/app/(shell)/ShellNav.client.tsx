@@ -8,7 +8,6 @@ import {
   LifeBuoy,
   LogOut,
   Mail,
-  MapPinned,
   MessageCircleQuestion,
   Monitor,
   Moon,
@@ -23,10 +22,10 @@ import type { ReactNode } from 'react';
 import { BrandLogo, cn, Menu, useMedia, type MenuItem } from '@/components/app';
 import { ThemeToggle, useThemePref } from '@/features/site/Theme.client';
 import { LEGAL_PAGES } from '@/features/legal/links';
-import { BADOOK_EVENTS_URL } from '@/features/site/links';
 import { isThemePref } from '@/features/site/theme';
-import { openSupport } from '@/features/support/open';
+import { openHelp, openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
+import { setUiLocale } from '../../ui-locale';
 import { signOut } from '../../(auth)/actions';
 import { UiLanguageToggle } from '../../UiLanguageToggle';
 
@@ -59,7 +58,7 @@ export function AppSidebar({
   /** support tickets with an answer the user hasn't seen */
   unread?: number;
 }) {
-  const { t, plural } = useUi();
+  const { t } = useUi();
   const n = t.shell.nav;
   const current = sectionOf(usePathname());
   return (
@@ -94,41 +93,15 @@ export function AppSidebar({
         <SideLink href="/app/invitations" icon={LayoutGrid} active={current === 'invitations'}>
           {n.invitations}
         </SideLink>
-        <SideLink href="/app/billing" icon={CreditCard} active={current === 'billing'}>
-          {n.billing}
-        </SideLink>
-        <SideLink href="/app/account" icon={CircleUserRound} active={current === 'account'}>
-          {n.account}
-        </SideLink>
-        <SideLink
-          href="/app/support"
-          icon={LifeBuoy}
-          active={current === 'support'}
-          badge={unread ? { count: unread, label: plural(t.tickets.navUnread, unread) } : undefined}
-        >
-          {t.tickets.nav}
-        </SideLink>
         <button
           type="button"
-          onClick={() => openSupport()}
+          onClick={() => openHelp()}
+          data-tour="help"
           className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-[14px] font-medium text-muted transition-colors hover:bg-subtle hover:text-ink"
         >
           <MessageCircleQuestion aria-hidden className="size-[19px] shrink-0" strokeWidth={1.75} />
           {n.help}
         </button>
-        {/* Badook Events: where hosts find a venue — another site, in a new tab */}
-        <a
-          href={BADOOK_EVENTS_URL}
-          target="_blank"
-          rel="noopener"
-          title={n.venuesHelp}
-          data-testid="nav-venues"
-          className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-[14px] font-medium text-brand-deep transition-colors hover:bg-brand-soft"
-        >
-          <MapPinned aria-hidden className="size-[19px] shrink-0" strokeWidth={1.75} />
-          {n.venues}
-          <span className="sr-only">{n.newTab}</span>
-        </a>
         {admin ? (
           <SideLink href="/app/admin" icon={ShieldCheck} active={false}>
             {n.admin}
@@ -217,6 +190,7 @@ export function MobileTabBar({ unread = 0 }: { unread?: number }) {
   return (
     <nav
       aria-label={s.label}
+      data-tabbar=""
       className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_-16px_rgba(28,25,23,0.25)] backdrop-blur lg:hidden"
     >
       <div className="flex h-16 items-stretch ps-1 pe-[76px]">
@@ -239,14 +213,24 @@ export function MobileTabBar({ unread = 0 }: { unread?: number }) {
         <TabLink href="/app/billing" icon={CreditCard} active={current === 'billing'}>
           {s.billing}
         </TabLink>
-        <TabLink
-          href="/app/support"
-          icon={LifeBuoy}
-          active={current === 'support'}
-          badge={unread ? plural(t.tickets.navUnread, unread) : undefined}
+        <button
+          type="button"
+          onClick={() => openHelp()}
+          aria-haspopup="dialog"
+          className="relative flex flex-1 flex-col items-center justify-center gap-1 text-[11px] font-semibold text-muted transition-colors hover:text-ink"
         >
-          {t.tickets.nav}
-        </TabLink>
+          <span className="relative">
+            <MessageCircleQuestion aria-hidden className="size-[22px]" strokeWidth={1.75} />
+            {unread ? (
+              <span
+                aria-hidden
+                className="absolute -end-1 -top-0.5 size-2.5 rounded-full bg-brand-strong ring-2 ring-surface"
+              />
+            ) : null}
+          </span>
+          {s.help}
+          {unread ? <span className="sr-only">({plural(t.tickets.navUnread, unread)})</span> : null}
+        </button>
       </div>
     </nav>
   );
@@ -300,13 +284,16 @@ export function UserMenu({
   email,
   admin = false,
   unread = 0,
+  compact = false,
 }: {
   email: string | null;
   admin?: boolean;
   unread?: number;
+  /** in an event's sidebar: no toggles beside it, so the look and the language are in the menu */
+  compact?: boolean;
 }) {
-  const { t, plural } = useUi();
-  const wide = useMedia('(min-width: 1024px)');
+  const { t, plural, locale } = useUi();
+  const wide = useMedia('(min-width: 1024px)') && !compact;
   const [theme, chooseTheme] = useThemePref();
   const initial = (email ?? '?').trim()[0]?.toUpperCase() ?? '?';
   const items: MenuItem[] = [
@@ -333,14 +320,24 @@ export function UserMenu({
     },
     { label: t.shell.nav.assistant, icon: <MessageCircleQuestion />, onSelect: () => openSupport() },
     { label: t.shell.nav.contact, icon: <Mail />, href: '/contact' },
-    // phones: the sidebar's way to Badook Events is here
-    ...(wide
-      ? []
-      : [{ label: t.shell.nav.venues, icon: <MapPinned />, href: BADOOK_EVENTS_URL, external: true }]),
     { type: 'separator' },
     ...(wide
       ? []
       : ([
+          {
+            type: 'radio',
+            label: t.shell.uiLanguage,
+            value: locale,
+            options: [
+              { value: 'he', label: t.common.hebrew },
+              { value: 'en', label: t.common.english },
+            ],
+            onValueChange: (value: string) => {
+              // a full load, as in UiLanguageToggle: the other language's dictionary is its own chunk
+              if (value === 'he' || value === 'en')
+                void setUiLocale(value).then(() => window.location.reload());
+            },
+          },
           {
             type: 'radio',
             label: t.shell.theme.label,
@@ -364,16 +361,22 @@ export function UserMenu({
       trigger={
         <button
           type="button"
-          aria-label={t.shell.userMenu}
+          // the visible words ("signed in as …") are part of the name (WCAG 2.5.3)
+          aria-label={email ? `${t.shell.userMenu} · ${t.shell.signedInAs} ${email}` : t.shell.userMenu}
           data-testid="user-menu"
           className="grid size-9 place-items-center rounded-full transition-colors hover:bg-subtle lg:flex lg:size-auto lg:w-full lg:items-center lg:gap-2.5 lg:rounded-[12px] lg:border lg:border-line lg:bg-canvas lg:px-2.5 lg:py-2 lg:text-start"
         >
           <span
             aria-hidden
-            className="grid size-8 shrink-0 place-items-center rounded-full bg-linear-to-br from-brand to-brand-strong text-[14px] font-bold text-white"
+            // the initial drawn by CSS: a picture of the account, not words of the button's name
+            data-initial={initial}
+            className="relative grid size-8 shrink-0 place-items-center rounded-full bg-linear-to-br from-brand to-brand-strong text-[14px] font-bold text-white before:content-[attr(data-initial)]"
           >
-            {initial}
+            {unread ? (
+              <span className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-danger ring-2 ring-surface" />
+            ) : null}
           </span>
+          {unread ? <span className="sr-only">{t.shell.supportUnread}</span> : null}
           <span aria-hidden className="hidden min-w-0 flex-1 lg:block">
             <span className="block text-[11px] text-muted">{t.shell.signedInAs}</span>
             <span dir="ltr" className="block truncate text-start text-[12.5px] font-semibold">

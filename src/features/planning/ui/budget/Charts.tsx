@@ -17,7 +17,7 @@ export function Charts({ past }: { past: boolean }) {
   const T = t.planning.budget;
   const C = T.chart;
   const { view } = usePlan();
-  const [metric, setMetric] = useState<Metric>('committed');
+  const [picked, setMetric] = useState<Metric | null>(null);
   const [table, setTable] = useState(false);
   const rows = categoryRows(view).map((r) => ({
     id: r.category.id,
@@ -25,6 +25,9 @@ export function Charts({ past }: { past: boolean }) {
     totals: r.totals,
   }));
   if (rows.length === 0) return null;
+  // until something is committed a chart of what's committed is all zeros: show the plan instead
+  const metric: Metric =
+    picked ?? (rows.some((r) => r.totals.committed > 0) || past ? 'committed' : 'planned');
   const compact = new Intl.NumberFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
     notation: 'compact',
     maximumFractionDigits: 1,

@@ -1,5 +1,6 @@
 import { mkdirSync } from 'node:fs';
 import { expect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test';
+import { navItem, navTo } from '../support/event-nav';
 import { Client } from 'pg';
 import { PNG } from 'pngjs';
 import readXlsxFile from 'read-excel-file/node';
@@ -213,9 +214,9 @@ test.describe('seating', () => {
       { name: 'יעל מזרחי', party: 1, coming: 0 },
     ]);
 
-    // the workspace has the tab
+    // the event's navigation has it (the "arrange" stage)
     await open(page, `/app/invitations/${id}`);
-    await page.locator('[data-tab="seating"]').click();
+    await navTo(page, 'seating');
     await page.waitForURL(/\/seating$/);
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
     await expect(page.getByRole('heading', { level: 1, name: 'סידור שולחנות' })).toBeVisible();
@@ -476,18 +477,17 @@ test.describe('seating', () => {
     }, id);
     expect(off).toBe(200);
     await open(page, `/app/invitations/${id}`);
-    await expect(page.locator('[data-tab="responses"]')).toBeVisible();
-    await expect(page.locator('[data-tab="seating"]')).toHaveCount(0);
+    await expect(navItem(page, 'responses')).toHaveCount(1);
+    await expect(navItem(page, 'seating')).toHaveCount(0);
     expect((await page.request.get(`/api/invitations/${id}/seating`)).status()).toBe(403);
     await open(page, `/app/invitations/${id}/seating`);
     await expect(page.getByRole('heading', { name: 'סידור השולחנות כבוי בהזמנה הזו' })).toBeVisible();
-    // switching it on reloads the page into the editor, with its tab back in the row
+    // switching it on reloads the page into the editor, with its screen back in the navigation
     await page.getByRole('button', { name: 'הפעלת סידור השולחנות' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'סידור שולחנות' })).toBeVisible({
       timeout: 15_000,
     });
-    // :visible — while the reloaded page streams in, React may still hold a hidden copy of the row
-    await expect(page.locator('[data-tab="seating"]:visible')).toBeVisible();
+    await expect(navItem(page, 'seating')).toHaveCount(1);
   });
 });
 

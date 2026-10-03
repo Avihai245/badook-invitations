@@ -1,5 +1,6 @@
 import { emailLayout, escapeHtml, type EmailContent } from '@/features/invitations/lib/notify-email';
-import { dictFor, fmt, plural, type UiLocale } from '@/lib/i18n/app';
+import { fmt, plural, type UiLocale } from '@/lib/i18n/app';
+import { dictFor } from '@/lib/i18n/dict';
 
 /**
  * The host's email about new comments on the review link: the comments and the family's replies since

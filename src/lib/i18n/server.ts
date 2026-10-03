@@ -1,6 +1,7 @@
 import 'server-only';
 import { cookies } from 'next/headers';
-import { dictFor, isUiLocale, UI_LOCALE_COOKIE, type AppDict, type UiLocale } from './app';
+import { isUiLocale, UI_LOCALE_COOKIE, type AppDict, type UiLocale } from './app';
+import { dictFor } from './dict';
 
 /** The host-app UI language: the `ui_lang` cookie, Hebrew by default. */
 export async function getUiLocale(): Promise<UiLocale> {

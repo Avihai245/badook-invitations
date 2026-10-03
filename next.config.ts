@@ -99,6 +99,26 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_COMMIT: buildCommit,
     NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
   },
+  // The host app's two dictionaries (lib/i18n/*.he.ts, *.en.ts — the guests' own dictionaries aside)
+  // each in a chunk of its own: a page loads its UI language's (lib/i18n/provider.tsx) instead of one
+  // shared chunk with both, which was most of every page's JavaScript.
+  webpack(config, { isServer }) {
+    const split = config.optimization?.splitChunks;
+    if (!isServer && split && typeof split === 'object') {
+      const dictionary = (lang: 'he' | 'en') => ({
+        test: (module: { resource?: string }) =>
+          new RegExp(`[\\\\/]src[\\\\/]lib[\\\\/]i18n[\\\\/][^\\\\/]+\\.${lang}\\.ts$`).test(
+            module.resource ?? '',
+          ) && !/(event-day-guest|event-day-guide|gallery-guest|review-guest)/.test(module.resource ?? ''),
+        name: `ui-${lang}`,
+        chunks: 'all' as const,
+        enforce: true,
+        priority: 60,
+      });
+      split.cacheGroups = { ...(split.cacheGroups || {}), uiHe: dictionary('he'), uiEn: dictionary('en') };
+    }
+    return config;
+  },
   // The dev-tools badge would show up in Design QA screenshots.
   devIndicators: false,
   // Lets a second dev server run side by side (e.g. QA scripts) without clobbering `.next`.

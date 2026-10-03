@@ -9,6 +9,8 @@ export { BrandLogo } from './BrandLogo';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button';
 export { Card, CardTitle, type CardPadding, type CardProps, type CardTitleProps } from './Card';
 export { Checkbox, type CheckboxProps } from './Checkbox';
+export { Confetti } from './Confetti';
+export { CountUp } from './CountUp';
 export {
   ColorSwatch,
   PaletteDots,

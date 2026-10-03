@@ -1,7 +1,15 @@
 import 'server-only';
 import { serviceDb } from '@/lib/supabase/server';
 import { migrateDocument } from '../contracts/migrate';
-import type { EventType, InvitationDocument, L10n, Locale, Palette } from '../contracts/types';
+import type { PosterTemplate } from '../app/TemplatePoster';
+import type {
+  EventType,
+  InvitationDocument,
+  L10n,
+  Locale,
+  Palette,
+  TemplateManifest,
+} from '../contracts/types';
 import type { NotifyMode, ResponseRecord } from '../lib/responses';
 import { VERSIONS, type HistoryEntry, type SaveReason } from '../lib/versions';
 import { syncSeedOnce } from './seed-sync';
@@ -13,6 +21,9 @@ import { syncSeedOnce } from './seed-sync';
  */
 
 export type InvitationStatus = 'draft' | 'published' | 'archived';
+
+/** An invitation's design as the host app's screens draw it (server/design-summary.ts). */
+export type DesignSummary = PosterTemplate & Pick<TemplateManifest, 'categories'>;
 
 export interface InvitationSummary {
   id: string;
@@ -36,6 +47,8 @@ export interface InvitationSummary {
   /** the guest list, and how many of them were sent the invitation (WhatsApp or by hand) */
   guests: number;
   sent: number;
+  /** its design, filled in on the server for the screens (not from the database) */
+  design?: DesignSummary | null;
 }
 
 export interface OwnerInvitation {
@@ -246,6 +259,17 @@ export const hostDb = {
     isUuid(id) && isUuid(responseId)
       ? rpc<boolean>('owner_delete_response', { p_id: id, p_owner_id: ownerId, p_response_id: responseId })
       : Promise.resolve(false),
+
+  /** Matches a reply to a guest on the list (null: unmatches it): 'ok', 'taken', or null when not the owner's. */
+  linkResponse: (id: string, ownerId: string, responseId: string, guestId: string | null) =>
+    isUuid(id) && isUuid(responseId) && (guestId === null || isUuid(guestId))
+      ? rpc<'ok' | 'taken' | null>('owner_link_response', {
+          p_id: id,
+          p_owner_id: ownerId,
+          p_response_id: responseId,
+          p_guest_id: guestId,
+        })
+      : Promise.resolve(null),
 
   setNotify: (id: string, ownerId: string, mode: NotifyMode) =>
     isUuid(id)

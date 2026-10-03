@@ -8,7 +8,9 @@ import {
   Clock,
   Download,
   Filter,
+  Link2,
   Mail,
+  MailQuestion,
   MessageSquareQuote,
   Search,
   Send,
@@ -45,6 +47,7 @@ import { hostApi, loginUrl } from '../api';
 import { publishHref } from '../workspace/paths';
 import type { DietaryKey } from '../../contracts/types';
 import { isLocale } from '../../lib/locales';
+import { rsvpSummary } from '../../lib/rsvp-summary';
 import {
   NOTIFY_MODES,
   attendeeName,
@@ -103,6 +106,9 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
   const [removed, setRemoved] = useState<ReadonlySet<string>>(() => new Set());
   const list = useMemo(() => data.responses.filter((x) => !removed.has(x.id)), [data.responses, removed]);
   const stats = useMemo(() => responseStats(list, now), [list, now]);
+  // the one RSVP count of every screen (the event's home, the guest list): "yes" replies, the people in
+  // them, how many came through the general link, and who on the list hasn't answered
+  const rsvp = useMemo(() => rsvpSummary(data.listed, list), [data.listed, list]);
   const questionCols = data.questions.filter((q) => q.type !== 'text').slice(0, 2);
   const rows = useMemo(
     () =>
@@ -307,15 +313,24 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
           </Card>
         ) : (
           <>
-            <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
               <KpiCard
                 icon={<Users />}
                 label={r.kpi.attending}
-                value={number(stats.attending)}
-                sub={fmt(r.kpi.attendingSub, {
-                  adults: plural(t.common.adults, stats.adults, { n: number(stats.adults) }),
-                  children: plural(t.common.children, stats.children, { n: number(stats.children) }),
-                })}
+                value={number(rsvp.coming)}
+                sub={[
+                  plural(r.kpi.people, rsvp.comingPeople, { n: number(rsvp.comingPeople) }),
+                  fmt(r.kpi.attendingSub, {
+                    adults: plural(t.common.adults, stats.adults, { n: number(stats.adults) }),
+                    children: plural(t.common.children, stats.children, { n: number(stats.children) }),
+                  }),
+                  // with no guest list, every reply came through the general link: nothing to say
+                  rsvp.listed && rsvp.comingFromLink
+                    ? plural(r.kpi.fromLink, rsvp.comingFromLink, { n: number(rsvp.comingFromLink) })
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
               />
               <KpiCard
                 icon={<Mail />}
@@ -330,12 +345,34 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
                 sub={fmt(r.kpi.declinedSub, { pct: number(stats.declinedPct) })}
               />
               <KpiCard
+                icon={<MailQuestion />}
+                label={r.kpi.pending}
+                value={rsvp.listed ? number(rsvp.notAnswered) : '—'}
+                sub={rsvp.listed ? fmt(r.kpi.pendingSub, { n: number(rsvp.listed) }) : r.kpi.noList}
+              />
+              <KpiCard
                 icon={<Clock />}
                 label={r.kpi.deadline}
                 value={deadlineValue}
                 sub={data.deadline?.label}
               />
             </div>
+
+            {rsvp.listed && rsvp.unmatched ? (
+              <Card
+                padding="md"
+                className="mt-4 flex flex-wrap items-center justify-between gap-3"
+                data-testid="responses-unmatched"
+              >
+                <p className="flex min-w-0 items-start gap-2 text-[14px]">
+                  <Link2 aria-hidden className="mt-0.5 size-4 shrink-0 text-brand-deep" />
+                  {plural(r.unmatched, rsvp.unmatched, { n: number(rsvp.unmatched) })}
+                </p>
+                <Button size="sm" variant="secondary" asChild>
+                  <Link href={`/app/invitations/${data.id}/guests`}>{r.matchLink}</Link>
+                </Button>
+              </Card>
+            ) : null}
 
             {diet.length || breakdowns.length ? (
               <div className="mt-4 grid gap-4 md:grid-cols-[repeat(auto-fit,minmax(340px,1fr))]">

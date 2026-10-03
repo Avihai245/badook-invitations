@@ -172,8 +172,13 @@ test.describe('responses dashboard', () => {
 
     await open(page, `/app/invitations/${id}/responses`);
     await expect(page.getByRole('heading', { level: 1, name: 'אישורי הגעה' })).toBeVisible();
-    await expect(kpi(page, 'מגיעים').locator('dd').first()).toHaveText('4');
+    // the one count of every screen: two "yes" replies, four people in them
+    await expect(kpi(page, 'מגיעים').locator('dd').first()).toHaveText('2');
+    await expect(kpi(page, 'מגיעים')).toContainText('4 אנשים');
     await expect(kpi(page, 'מגיעים')).toContainText('3 מבוגרים · ילד אחד');
+    // no guest list yet: no one is "not answered", and no reply waits to be matched
+    await expect(kpi(page, 'עוד לא ענו')).toContainText('אין עדיין רשימת מוזמנים');
+    await expect(page.getByTestId('responses-unmatched')).toHaveCount(0);
     await expect(kpi(page, 'תשובות').locator('dd').first()).toHaveText('3');
     await expect(kpi(page, 'לא מגיעים').locator('dd').first()).toHaveText('1');
     await expect(kpi(page, 'לא מגיעים')).toContainText('33% מהתשובות');
