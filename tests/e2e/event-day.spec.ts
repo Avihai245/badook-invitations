@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { chromium, expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { Client } from 'pg';
 import QRCode from 'qrcode';
+import { navItem } from '../support/event-nav';
 
 // The event day (Phase 5A): a guest opens their table guide from their personal link on the phone (and
 // again without signal); the entrance station checks families in by search and by the code on the
@@ -552,7 +553,7 @@ test('without the package the event day is offered, switched off it is gone, and
       .status,
   ).toBe(200);
   await open(page, `/app/invitations/${ev.id}`);
-  await expect(page.getByRole('link', { name: 'יום האירוע' })).toHaveCount(0);
+  await expect(navItem(page, 'live')).toHaveCount(0);
   expect(await api(page, `/api/invitations/${ev.id}/event-day`)).toMatchObject(refused);
   expect((await api(page, '/api/checkin/station', 'POST', { t: token })).status).toBe(404);
   expect((await api(page, '/api/checkin/search', 'POST', { t: token, q: 'כהן' })).status).toBe(404);
@@ -568,7 +569,7 @@ test('without the package the event day is offered, switched off it is gone, and
   await page.getByRole('button', { name: 'להפעיל את יום האירוע' }).click();
   // after the reload React may still hold a hidden copy of the streamed page for a moment
   await expect(page.locator('[data-testid="live-hall"]:visible')).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByRole('link', { name: 'יום האירוע' })).toBeVisible();
+  await expect(navItem(page, 'live')).toBeVisible();
 });
 
 test('the event day’s screens, in Hebrew and English (screenshots to look at)', async ({

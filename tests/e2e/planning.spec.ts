@@ -109,11 +109,18 @@ test('tasks: add with Enter, tick with Undo, hide, and the details drawer keeps 
   await page.getByLabel('תאריך יעד').fill(day(9));
   await page.getByRole('button', { name: 'שמירה' }).click();
   await expect(row).toContainText('בעוד 9 ימים');
-  const stored = await sql<{ due_is_manual: boolean }>(
-    `select due_is_manual from plan_tasks where title = 'להזמין שמלה לאמא' and invitation_id = $1`,
-    [host.id],
-  );
-  expect(stored[0]!.due_is_manual).toBe(true);
+  // the drawer's save reaches the server a moment after the row shows it
+  await expect
+    .poll(
+      async () =>
+        (
+          await sql<{ due_is_manual: boolean }>(
+            `select due_is_manual from plan_tasks where title = 'להזמין שמלה לאמא' and invitation_id = $1`,
+            [host.id],
+          )
+        )[0]?.due_is_manual,
+    )
+    .toBe(true);
 
   // hide it: it leaves the list and shows under "hidden"
   await row.getByRole('button', { name: 'פעולות' }).click();

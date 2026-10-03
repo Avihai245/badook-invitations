@@ -656,7 +656,7 @@ function Road({ data }: { data: EventHomeData }) {
                       done
                         ? 'bg-success-bg text-success'
                         : current
-                          ? 'bg-brand text-white'
+                          ? 'bg-brand-deep text-white dark:text-[#1c1917]'
                           : 'bg-subtle text-muted',
                     )}
                   >

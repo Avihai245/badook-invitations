@@ -139,9 +139,9 @@ function StatusPill({ status, active }: { status: StageStatus; active?: boolean 
           : status.kind === 'startsIn' || status.kind === 'notStarted'
             ? 'bg-subtle text-muted'
             : status.kind === 'today'
-              ? 'bg-brand text-white'
+              ? 'bg-brand-deep text-white dark:text-[#1c1917]'
               : active
-                ? 'bg-brand text-white'
+                ? 'bg-brand-deep text-white dark:text-[#1c1917]'
                 : 'bg-brand-soft text-brand-deep',
       )}
     >
@@ -171,7 +171,7 @@ function StageMark({
         done
           ? 'bg-success text-white dark:text-success-bg'
           : current
-            ? 'bg-brand text-white'
+            ? 'bg-brand-deep text-white dark:text-[#1c1917]'
             : 'bg-subtle text-muted ring-1 ring-line',
       )}
     >

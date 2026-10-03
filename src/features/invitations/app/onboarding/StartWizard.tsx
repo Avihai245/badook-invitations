@@ -315,7 +315,7 @@ export function StartWizard() {
                       )}
                     >
                       {'badge' in words ? (
-                        <span className="absolute -top-2.5 end-4 rounded-full bg-brand px-2.5 py-0.5 text-[11px] font-bold text-white">
+                        <span className="absolute -top-2.5 end-4 rounded-full bg-brand-deep px-2.5 py-0.5 text-[11px] font-bold text-white dark:text-[#1c1917]">
                           {words.badge}
                         </span>
                       ) : null}
