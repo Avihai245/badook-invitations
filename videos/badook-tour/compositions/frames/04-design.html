@@ -137,7 +137,7 @@
       margin: 0;
       font-family: "Frank Ruhl Libre", serif;
       font-weight: 500;
-      font-size: 76px;
+      font-size: 80px;
       line-height: 1.06;
       letter-spacing: -0.018em;
       color: #1C1917;
@@ -267,9 +267,6 @@
         { transformPerspective: 1800, rotationX: 8, rotationY: -6, transformOrigin: "50% 50%", y: 0, opacity: 1, duration: 1.15, ease: "power3.out" },
         0
       );
-      // page parked at CSS y ≈ 380 until the scroll begins
-      tl.fromTo(el("page"), { y: SCROLL_FROM }, { y: SCROLL_FROM, duration: 0.01, ease: "none" }, 0);
-
       // kicker — clip-path wipe from the reading edge (right) + hairline rule draws on
       tl.fromTo(
         el("kicker"),
@@ -298,8 +295,9 @@
       );
       tl.fromTo(el("plus"), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, 2.6);
 
-      // 3d-page-scroll: one finite power3 travel CSS y 380 → 1700, rows of cards pass (2.1–6.6s)
-      tl.fromTo(el("page"), { y: SCROLL_FROM }, { y: SCROLL_TO, duration: 4.5, ease: "power3.inOut", immediateRender: false }, 2.1);
+      // 3d-page-scroll: one finite power3 travel CSS y 380 → 1700, rows of cards pass (2.1–6.6s);
+      // fromTo renders the from-state immediately, so the page is parked at CSS y ≈ 380 before 2.1s
+      tl.fromTo(el("page"), { y: SCROLL_FROM }, { y: SCROLL_TO, duration: 4.5, ease: "power3.inOut" }, 2.1);
 
       // "עיצובים מונפשים" — per-word rise (RTL: first word first)
       tl.fromTo(el("w1"), { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 2.85);
