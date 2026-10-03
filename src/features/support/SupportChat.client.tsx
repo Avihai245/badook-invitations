@@ -471,7 +471,8 @@ export function SupportChat() {
         type="button"
         hidden={open}
         onClick={() => openHelp()}
-        aria-label={s.open}
+        // its visible words are its name; the editor's round button has none, so it is named
+        aria-label={inEditor ? s.open : undefined}
         aria-haspopup="dialog"
         data-testid="support-launcher"
         data-compact={inEditor ? '' : undefined}
