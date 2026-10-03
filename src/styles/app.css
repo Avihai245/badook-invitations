@@ -656,3 +656,17 @@
     filter: none;
   }
 }
+
+/* the budget gauge's needle past the end of its scale (features/planning/ui/BudgetGauge) */
+@keyframes gauge-tremble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-1.6deg);
+  }
+  75% {
+    transform: rotate(1.6deg);
+  }
+}

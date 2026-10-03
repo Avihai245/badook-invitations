@@ -6,6 +6,7 @@ import { Button, Card, cn } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { categoryPlanned, plannedTotal } from '../../model/budget';
 import type { PlanCategory } from '../../model/plan';
+import { BudgetGauge } from '../BudgetGauge';
 import { Money } from '../Money';
 import { usePlan } from '../PlanProvider';
 import { Fill } from './Fill';
@@ -151,6 +152,13 @@ export function WhatIf() {
             <p className="text-[12.5px] text-muted">{W.noPlate}</p>
           )}
 
+          {/* the plan "if so" on the speedometer, moving with the sliders (the dashed needle: today's plan) */}
+          {total !== null && total > 0 ? (
+            <div className="flex flex-col items-center gap-1" data-testid="budget-whatif-gauge">
+              <BudgetGauge size="md" total={total} committed={ifTotal} paid={0} planned={nowTotal} />
+              <p className="text-center text-[12px] text-muted">{W.gaugeCaption}</p>
+            </div>
+          ) : null}
           <dl className="grid grid-cols-3 gap-3 rounded-btn bg-subtle p-3 text-[13px]">
             <div>
               <dt className="text-muted">{W.now}</dt>

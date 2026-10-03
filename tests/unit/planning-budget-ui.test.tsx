@@ -369,12 +369,14 @@ describe('the numbers', () => {
   it('shows planned, committed, paid and left, one meter, and the cost per guest', () => {
     mount(makeView(raw()));
     const s = screen.getByTestId('budget-summary');
-    for (const label of ['מתוכנן', 'התחייבנו', 'שולם', 'נשאר', 'עלות לאורח'])
+    for (const label of ['התקציב', 'מתוכנן', 'התחייבנו', 'שולם', 'נשאר', 'עלות לאורח'])
       expect(within(s).getAllByText(label).length).toBeGreaterThan(0);
     expect(s.textContent).toContain('₪33,500');
     expect(s.textContent).toContain('₪98,500');
-    expect(s.textContent).toContain('₪13.64');
-    expect(within(s).getAllByRole('img')).toHaveLength(1);
+    // the cost per guest in whole shekels (UX report B1), and the budget as one speedometer
+    expect(s.textContent).toContain('₪14');
+    expect(s.textContent).not.toContain('₪13.64');
+    expect(within(s).getAllByRole('meter')).toHaveLength(1);
     // under budget: no warning at all
     expect(screen.queryByTestId('budget-over')).toBeNull();
   });
@@ -764,9 +766,10 @@ describe('what if', () => {
 });
 
 describe('the chart and the Excel file', () => {
-  it('bars by category with the same numbers as a table', () => {
+  it('small gauges by category with the same numbers as a table', () => {
     mount(makeView(raw()));
-    const chart = screen.getByTestId('budget-chart');
+    const chart = screen.getByTestId('budget-cat-gauges');
+    expect(within(chart).getAllByRole('meter').length).toBeGreaterThan(0);
     const toggle = within(chart).getByRole('button', { name: 'הצגה כטבלה' });
     expect(toggle.getAttribute('aria-pressed')).toBe('false');
     fireEvent.click(toggle);
