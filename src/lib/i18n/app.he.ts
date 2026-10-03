@@ -1,3 +1,4 @@
+import { sectionHelpHe } from './section-help.he';
 import { editorHe } from './editor.he';
 import { accountHe } from './account.he';
 import { billingHe } from './billing.he';
@@ -34,6 +35,7 @@ export const he = {
   liveGallery: liveGalleryHe,
   eventDay: eventDayHe,
   studio: studioHe,
+  sectionHelp: sectionHelpHe,
   insights: insightsHe,
   galleryNotify: galleryNotifyHe,
   faces: facesHe,
@@ -198,7 +200,18 @@ export const he = {
       more: 'עוד',
     },
   },
-  demoVideo: { label: 'Badook בארבעים וחמש שניות', watch: 'צפייה מלאה' },
+  demoVideo: {
+    label: 'Badook בארבעים וחמש שניות',
+    watch: 'צפו עם קול',
+    /** the full narrated tour (video/: TourLandscape) */
+    tour: {
+      title: 'סיור מלא במערכת',
+      body: 'כל היכולות של Badook, צעד אחר צעד — מהאירוע החדש ועד הסרט שאחרי.',
+      length: 'כ־{n} דקות',
+      play: 'צפייה בסיור',
+      captions: 'עברית',
+    },
+  },
   /** the one help panel (the chat's panel, three tabs) and the guide's pages */
   helpCenter: {
     title: 'עזרה',
@@ -612,6 +625,7 @@ export const he = {
     hideArchived: 'חזרה להזמנות',
     emptyTitle: 'עוד אין הזמנות',
     emptyBody: 'בחרו עיצוב ותוך דקות תהיה לכם הזמנה מרגשת',
+    emptyStart: 'אירוע חדש',
     emptyCta: 'בחירת עיצוב',
     archivedEmpty: 'אין הזמנות בארכיון',
     greeting: 'שלום, {name}',
@@ -817,7 +831,17 @@ export const he = {
       today: 'היום',
       closed: 'הסתיים',
       none: 'אין דדליין',
+      people: { one: 'אדם אחד', other: '{n} אנשים' },
+      fromLink: { one: 'מתוכם אחד מהקישור הכללי', other: 'מתוכם {n} מהקישור הכללי' },
+      pending: 'עוד לא ענו',
+      pendingSub: 'מתוך {n} ברשימת המוזמנים',
+      noList: 'אין עדיין רשימת מוזמנים',
     },
+    unmatched: {
+      one: 'תשובה אחת הגיעה מהקישור הכללי ועוד לא שויכה למוזמן ברשימה.',
+      other: '{n} תשובות הגיעו מהקישור הכללי ועוד לא שויכו למוזמנים ברשימה.',
+    },
+    matchLink: 'לשיוך ברשימת המוזמנים',
     dietary: 'העדפות תזונה',
     search: 'חיפוש לפי שם, טלפון או אימייל',
     statusFilter: 'סינון לפי תשובה',

@@ -3,11 +3,13 @@ import type { ReactNode } from 'react';
 import { mayOpenConsole } from '@/features/admin/server/gate';
 import { whyOff } from '@/features/flags/features';
 import { deploymentFeatures, featureInput } from '@/features/flags/server';
+import { ItemPoster } from '@/features/invitations/app/ItemPoster';
 import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { InvitationWorkspace } from '@/features/invitations/app/workspace/InvitationWorkspace';
 import { planningTab } from '@/features/planning/server/badge';
 import { ticketsDb } from '@/features/support/tickets/server/db';
+import { getUiLocale } from '@/lib/i18n/server';
 import { requireUser } from '@/lib/supabase/session';
 import { UserMenu } from '../../ShellNav.client';
 
@@ -28,11 +30,12 @@ export default async function InvitationLayout({
 }) {
   const { id } = await params;
   const user = await requireUser(`/app/invitations/${id}`);
-  const [item, input, admin, unread] = await Promise.all([
+  const [item, input, admin, unread, uiLocale] = await Promise.all([
     ownerInvitation(user.id, id),
     featureInput(id).catch(() => null),
     mayOpenConsole(user),
     ticketsDb.unread(user.id).catch(() => 0),
+    getUiLocale(),
   ]);
   if (!item) notFound();
   // seating and the event day: there when the event has them, or offered when only the package keeps them off
@@ -71,6 +74,13 @@ export default async function InvitationLayout({
         plan={planning?.planned ? { open: planning.open } : null}
         seating={planning?.seating ?? null}
         account={<UserMenu email={user.email ?? null} admin={admin} unread={unread} compact />}
+        thumb={
+          <ItemPoster
+            item={item}
+            uiLocale={uiLocale}
+            className="w-full rounded-[9px]! shadow-[0_8px_16px_-10px_rgba(60,35,15,0.7)]!"
+          />
+        }
       >
         {children}
       </InvitationWorkspace>

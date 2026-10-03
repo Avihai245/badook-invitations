@@ -16,7 +16,8 @@ import {
 import { premiumLocked } from '@/features/invitations/editor/Topbar';
 import { trackLicense } from '@/features/invitations/editor/panels/GlobalPanels';
 import { TEMPLATES, requireTemplate } from '@/features/invitations/templates/registry';
-import { dictFor, plural } from '@/lib/i18n/app';
+import { plural } from '@/lib/i18n/app';
+import { dictFor } from '@/lib/i18n/dict';
 
 describe('the countdown on an invitation', () => {
   const now = new Date(2026, 8, 24, 21, 30); // late evening, local time

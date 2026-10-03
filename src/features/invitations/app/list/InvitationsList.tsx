@@ -10,6 +10,7 @@ import {
   MailPlus,
   MoreHorizontal,
   Palette,
+  Plus,
   PencilLine,
   Send,
   Share2,
@@ -19,7 +20,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UpgradeDialog, upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
-import { useState, useTransition, type CSSProperties } from 'react';
+import { useState, useTransition, type CSSProperties, type ReactNode } from 'react';
 import {
   Badge,
   Button,
@@ -35,11 +36,9 @@ import { BudgetGauge } from '@/features/planning/ui/BudgetGauge';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
-import { getTemplate } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
 import { CountdownChip, daysUntilEvent, useToday } from '../countdown';
 import { HelpFor } from '../HelpFor';
-import { TemplatePoster } from '../TemplatePoster';
 import { publishHref } from '../workspace/paths';
 import { STAGE_ICONS } from '../workspace/EventSpace';
 import { STAGES } from '../workspace/stages';
@@ -85,10 +84,13 @@ export function InvitationsList({
   items,
   name,
   budgets = {},
+  posters = {},
 }: {
   items: InvitationSummary[];
   name: string | null;
   budgets?: Record<string, CardBudget>;
+  /** each invitation's poster, drawn on the server (app/ItemPoster) */
+  posters?: Record<string, ReactNode>;
 }) {
   const { t, fmt, plural, number } = useUi();
   const router = useRouter();
@@ -204,6 +206,7 @@ export function InvitationsList({
             >
               <InvitationCard
                 budget={budgets[item.id] ?? null}
+                poster={posters[item.id] ?? null}
                 item={item}
                 busy={busy === item.id}
                 past={today ? daysUntilEvent(item.date, today) < 0 : false}
@@ -243,9 +246,19 @@ function EmptyList() {
             {t.list.emptyTitle}
           </h2>
           <p className="mt-2 text-[15.5px] text-pretty text-muted">{t.list.emptyBody}</p>
-          <Button asChild size="lg" icon={<Palette />} className="mt-6">
-            <Link href="/app/invitations/new">{t.list.emptyCta}</Link>
-          </Button>
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+            {/* the three-screen start (onboarding/StartWizard); or straight to the designs */}
+            <Button asChild size="lg" icon={<Plus />}>
+              <Link href="/app/invitations/new">{t.list.emptyStart}</Link>
+            </Button>
+            <Link
+              href="/app/invitations/new?gallery=1"
+              className="inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-brand-deep underline-offset-4 hover:underline"
+            >
+              <Palette aria-hidden className="size-4" />
+              {t.list.emptyCta}
+            </Link>
+          </div>
         </div>
         <DemoVideo />
       </div>
@@ -293,6 +306,7 @@ function EmptyList() {
 function InvitationCard({
   item,
   budget = null,
+  poster = null,
   busy,
   past,
   onDuplicate,
@@ -301,6 +315,7 @@ function InvitationCard({
 }: {
   item: InvitationSummary;
   budget?: CardBudget | null;
+  poster?: ReactNode;
   busy: boolean;
   /** the event's day has passed (the visitor's own day) */
   past: boolean;
@@ -310,11 +325,8 @@ function InvitationCard({
   onFollowUp: () => void;
 }) {
   const { t, locale, date, number, plural, fmt } = useUi();
-  const template = getTemplate(item.templateId)?.manifest;
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
-  const primary = item.hosts.primary[loc] ?? item.hosts.primary[item.defaultLocale] ?? '';
-  const secondary = item.hosts.secondary?.[loc] ?? item.hosts.secondary?.[item.defaultLocale] ?? null;
   const base = `/app/invitations/${item.id}`;
   const archived = item.status === 'archived';
   const next = nextStep(item, { past });
@@ -335,23 +347,7 @@ function InvitationCard({
     >
       <div className="flex gap-4 p-3 sm:p-4">
         <Link href={base} tabIndex={-1} aria-hidden className="relative block w-[88px] shrink-0 sm:w-[112px]">
-          {template ? (
-            // the invitation's own names and date on its design (the event type as the opening line)
-            <TemplatePoster
-              template={template}
-              locale={loc}
-              text={{
-                eyebrow: t.eventTypes[item.eventType],
-                primary: primary || name,
-                secondary,
-                date: shortDate,
-              }}
-              joiner={item.hosts.joiner?.[loc] || '&'}
-              className="rounded-[14px]! transition-transform duration-300 group-hover/card:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover/card:translate-y-0 sm:rounded-[16px]!"
-            />
-          ) : (
-            <div className="aspect-[9/16] rounded-[14px] bg-subtle" />
-          )}
+          {poster ?? <div className="aspect-[9/16] rounded-[14px] bg-subtle" />}
         </Link>
 
         <div className="flex min-w-0 flex-1 flex-col">
@@ -391,7 +387,7 @@ function InvitationCard({
                 ...(item.status !== 'draft' || item.responses > 0
                   ? [{ label: t.list.menu.responses, icon: <ListChecks />, href: `${base}/responses` }]
                   : []),
-                ...(item.eventType === 'save_the_date' && !archived && followUpTypes(item.templateId).length
+                ...(item.eventType === 'save_the_date' && !archived && followUpTypes(item).length
                   ? [{ label: t.list.menu.followUp, icon: <MailPlus />, onSelect: onFollowUp }]
                   : []),
                 { label: t.list.menu.duplicate, icon: <Copy />, onSelect: onDuplicate },

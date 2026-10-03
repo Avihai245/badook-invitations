@@ -1,7 +1,15 @@
 import 'server-only';
 import { serviceDb } from '@/lib/supabase/server';
 import { migrateDocument } from '../contracts/migrate';
-import type { EventType, InvitationDocument, L10n, Locale, Palette } from '../contracts/types';
+import type { PosterTemplate } from '../app/TemplatePoster';
+import type {
+  EventType,
+  InvitationDocument,
+  L10n,
+  Locale,
+  Palette,
+  TemplateManifest,
+} from '../contracts/types';
 import type { NotifyMode, ResponseRecord } from '../lib/responses';
 import { VERSIONS, type HistoryEntry, type SaveReason } from '../lib/versions';
 import { syncSeedOnce } from './seed-sync';
@@ -13,6 +21,9 @@ import { syncSeedOnce } from './seed-sync';
  */
 
 export type InvitationStatus = 'draft' | 'published' | 'archived';
+
+/** An invitation's design as the host app's screens draw it (server/design-summary.ts). */
+export type DesignSummary = PosterTemplate & Pick<TemplateManifest, 'categories'>;
 
 export interface InvitationSummary {
   id: string;
@@ -36,6 +47,8 @@ export interface InvitationSummary {
   /** the guest list, and how many of them were sent the invitation (WhatsApp or by hand) */
   guests: number;
   sent: number;
+  /** its design, filled in on the server for the screens (not from the database) */
+  design?: DesignSummary | null;
 }
 
 export interface OwnerInvitation {

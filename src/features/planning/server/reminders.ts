@@ -6,7 +6,7 @@ import { hostsLine } from '@/features/invitations/lib/text';
 import { sendEmail } from '@/features/invitations/server/email';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { serverEnv } from '@/lib/env';
-import { dictFor } from '@/lib/i18n/app';
+import { dictFor } from '@/lib/i18n/dict';
 import { serviceDb } from '@/lib/supabase/server';
 import { planReminderEmail, type ReminderPayment, type ReminderTask } from '../model/reminder-email';
 import { systemText } from '../model/system-text';

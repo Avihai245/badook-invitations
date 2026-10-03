@@ -5,7 +5,8 @@ import { whyOff } from '@/features/flags/features';
 import { featureInput } from '@/features/flags/server';
 import { planningOverview } from '@/features/planning/server/badge';
 import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
-import { hostDb } from '@/features/invitations/server/host-db';
+import { ItemPoster } from '@/features/invitations/app/ItemPoster';
+import { ownerInvitations } from '@/features/invitations/app/workspace/data';
 import { getUi } from '@/lib/i18n/server';
 import { requireUser } from '@/lib/supabase/session';
 import type { InvitationSummary } from '@/features/invitations/server/host-db';
@@ -68,7 +69,7 @@ async function cardBudgets(ownerId: string, items: InvitationSummary[]): Promise
 /** /app/invitations — the host's invitations (§9B.3-A). */
 export default async function InvitationsPage() {
   const user = await requireUser('/app/invitations');
-  const [items, account] = await Promise.all([hostDb.list(user.id), loadAccount(user)]);
+  const [items, account] = await Promise.all([ownerInvitations(user.id), loadAccount(user)]);
   const budgets = await cardBudgets(user.id, items);
   // the greeting: the first name from the account, else from sign-up / Google
   const meta = (user.user_metadata ?? {}) as { full_name?: unknown; name?: unknown };
@@ -77,13 +78,31 @@ export default async function InvitationsPage() {
     (typeof meta.full_name === 'string' ? meta.full_name : null) ??
     (typeof meta.name === 'string' ? meta.name : null);
   const first = full?.trim().split(/\s+/)[0] || null;
-  const { locale } = await getUi();
+  const { locale, t } = await getUi();
   const name = first ? localFirstName(first, locale, items) : null;
   return (
     <>
       {/* the cards' posters write the names in their designs' fonts */}
       <style dangerouslySetInnerHTML={{ __html: POSTER_FONT_CSS }} />
-      <InvitationsList items={items} name={name} budgets={budgets} />
+      <InvitationsList
+        items={items}
+        name={name}
+        budgets={budgets}
+        posters={Object.fromEntries(
+          items.map((item) => [
+            item.id,
+            // the invitation's own names and date on its design (the event type as the opening line)
+            <ItemPoster
+              key={item.id}
+              item={item}
+              uiLocale={locale}
+              eyebrow={t.eventTypes[item.eventType]}
+              fallbackName={t.eventTypes[item.eventType]}
+              className="rounded-[14px]! transition-transform duration-300 group-hover/card:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover/card:translate-y-0 sm:rounded-[16px]!"
+            />,
+          ]),
+        )}
+      />
     </>
   );
 }

@@ -19,6 +19,7 @@ export function InvitationWorkspace({
   plan = null,
   seating = null,
   account,
+  thumb,
   children,
 }: {
   item: InvitationSummary;
@@ -29,15 +30,17 @@ export function InvitationWorkspace({
   seating?: { tables: number; unseated: number } | null;
   /** the account menu at the sidebar's foot */
   account: ReactNode;
+  /** the invitation's poster, drawn on the server (app/ItemPoster) */
+  thumb?: ReactNode;
   children: ReactNode;
 }) {
-  const data = { item, caps, plan, seating };
+  const data = { item, caps, plan, seating, thumb };
   return (
     <InWorkspace.Provider value>
       <div data-event-space="" className="lg:grid lg:min-h-dvh lg:grid-cols-[264px_minmax(0,1fr)]">
         <EventSidebar data={data} account={account} />
         <div className="min-w-0">
-          <EventBar item={item} />
+          <EventBar item={item} thumb={thumb} />
           {children}
         </div>
       </div>

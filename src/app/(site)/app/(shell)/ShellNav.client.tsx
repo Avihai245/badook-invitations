@@ -17,7 +17,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { BrandLogo, cn, Menu, useMedia, type MenuItem } from '@/components/app';
 import { ThemeToggle, useThemePref } from '@/features/site/Theme.client';
@@ -293,7 +293,6 @@ export function UserMenu({
   compact?: boolean;
 }) {
   const { t, plural, locale } = useUi();
-  const router = useRouter();
   const wide = useMedia('(min-width: 1024px)') && !compact;
   const [theme, chooseTheme] = useThemePref();
   const initial = (email ?? '?').trim()[0]?.toUpperCase() ?? '?';
@@ -334,7 +333,9 @@ export function UserMenu({
               { value: 'en', label: t.common.english },
             ],
             onValueChange: (value: string) => {
-              if (value === 'he' || value === 'en') void setUiLocale(value).then(() => router.refresh());
+              // a full load, as in UiLanguageToggle: the other language's dictionary is its own chunk
+              if (value === 'he' || value === 'en')
+                void setUiLocale(value).then(() => window.location.reload());
             },
           },
           {

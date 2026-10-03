@@ -1,4 +1,5 @@
-import { dictFor, fmt, type UiLocale } from '@/lib/i18n/app';
+import { fmt, type UiLocale } from '@/lib/i18n/app';
+import { dictFor } from '@/lib/i18n/dict';
 import { emailLayout, escapeHtml, type EmailContent } from '@/features/invitations/lib/notify-email';
 import { shekels } from './budget';
 import { formatDate } from '@/features/invitations/lib/dates';

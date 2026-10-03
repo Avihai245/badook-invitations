@@ -1,16 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
-import {
-  dictFor,
-  fmt,
-  intlLocale,
-  plural,
-  uiDir,
-  type AppDict,
-  type PluralEntry,
-  type UiLocale,
-} from './app';
+import { fmt, intlLocale, plural, uiDir, type AppDict, type PluralEntry, type UiLocale } from './app';
 
 interface UiContextValue {
   locale: UiLocale;
@@ -26,10 +17,19 @@ interface UiContextValue {
 const UiContext = createContext<UiContextValue | null>(null);
 
 /**
- * Host-app strings for client components. Both dictionaries ship in the (cached) JS bundle and the
- * provider picks one by the locale the server resolved, so no strings travel in the RSC payload.
+ * Host-app strings for client components, given the UI language's dictionary. Mounted through
+ * provider.tsx, which picks a client module per language (ui-he / ui-en): the browser loads the one
+ * dictionary it needs, from the (cached) JS bundle, so no strings travel in the RSC payload.
  */
-export function UiProvider({ locale, children }: { locale: UiLocale; children: ReactNode }) {
+export function UiProviderWith({
+  locale,
+  t,
+  children,
+}: {
+  locale: UiLocale;
+  t: AppDict;
+  children: ReactNode;
+}) {
   // <html data-hydrated> once React owns the page and the parts streamed in behind a loading skeleton
   // have taken their place — React reveals them a moment later and keeps each one in a hidden
   // <div id="S:…"> until then, a second copy (end-to-end tests wait for this before looking and
@@ -50,7 +50,7 @@ export function UiProvider({ locale, children }: { locale: UiLocale; children: R
     return {
       locale,
       dir: uiDir(locale),
-      t: dictFor(locale),
+      t,
       fmt,
       plural: (entry, n, vars) => plural(locale, entry, n, vars),
       number: (n) => new Intl.NumberFormat(intl).format(n),
@@ -61,7 +61,7 @@ export function UiProvider({ locale, children }: { locale: UiLocale; children: R
             : new Date(value),
         ),
     };
-  }, [locale]);
+  }, [locale, t]);
   return <UiContext.Provider value={value}>{children}</UiContext.Provider>;
 }
 

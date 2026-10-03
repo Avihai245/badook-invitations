@@ -1,3 +1,4 @@
+import { sectionHelpEn } from './section-help.en';
 import type { AppDict } from './app.he';
 import { accountEn } from './account.en';
 import { billingEn } from './billing.en';
@@ -31,6 +32,7 @@ export const en: AppDict = {
   liveGallery: liveGalleryEn,
   eventDay: eventDayEn,
   studio: studioEn,
+  sectionHelp: sectionHelpEn,
   insights: insightsEn,
   galleryNotify: galleryNotifyEn,
   faces: facesEn,
@@ -186,7 +188,17 @@ export const en: AppDict = {
       more: 'More',
     },
   },
-  demoVideo: { label: 'Badook in 45 seconds', watch: 'Watch in full' },
+  demoVideo: {
+    label: 'Badook in 45 seconds',
+    watch: 'Watch with sound',
+    tour: {
+      title: 'A full tour of the system',
+      body: 'Everything Badook does, step by step — from a new event to the film after it (in Hebrew).',
+      length: 'About {n} minutes',
+      play: 'Watch the tour',
+      captions: 'Hebrew',
+    },
+  },
   helpCenter: {
     title: 'Help',
     tabs: { guide: 'Guide', assistant: 'Ask the assistant', contact: 'Contact the team' },
@@ -622,6 +634,7 @@ export const en: AppDict = {
     hideArchived: 'Back to invitations',
     emptyTitle: 'No invitations yet',
     emptyBody: 'Pick a design and you’ll have a moving invitation in minutes',
+    emptyStart: 'New event',
     emptyCta: 'Choose a design',
     archivedEmpty: 'No archived invitations',
     greeting: 'Hi, {name}',
@@ -845,7 +858,17 @@ export const en: AppDict = {
       today: 'Today',
       closed: 'Closed',
       none: 'No deadline',
+      people: { one: '1 person', other: '{n} people' },
+      fromLink: { one: 'of them, 1 from the general link', other: 'of them, {n} from the general link' },
+      pending: 'Not answered yet',
+      pendingSub: 'of {n} on the guest list',
+      noList: 'No guest list yet',
     },
+    unmatched: {
+      one: 'One reply came through the general link and isn’t matched to a guest on the list yet.',
+      other: '{n} replies came through the general link and aren’t matched to guests on the list yet.',
+    },
+    matchLink: 'Match them on the guest list',
     dietary: 'Dietary preferences',
     search: 'Search by name, phone or email',
     statusFilter: 'Filter by reply',

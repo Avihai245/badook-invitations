@@ -1,14 +1,13 @@
-import { en } from './app.en';
-import { he, type AppDict } from './app.he';
-
-export type { AppDict };
+// No dictionary here: client code imports these helpers, and a dictionary imported here would ship
+// to every page in both languages. The dictionaries: dict.ts (server, e-mails) and provider.tsx (the
+// browser gets its UI language's only).
+export type { AppDict } from './app.he';
 export type UiLocale = 'he' | 'en';
 export const UI_LOCALES: readonly UiLocale[] = ['he', 'en'];
 export const UI_LOCALE_COOKIE = 'ui_lang';
 
 export const isUiLocale = (v: unknown): v is UiLocale => v === 'he' || v === 'en';
 export const uiDir = (l: UiLocale) => (l === 'he' ? 'rtl' : 'ltr');
-export const dictFor = (l: UiLocale): AppDict => (l === 'en' ? en : he);
 /** Intl locale for dates/numbers in the host app (§9B.3-H: numbers and dates always via Intl). */
 export const intlLocale = (l: UiLocale) => (l === 'he' ? 'he-IL' : 'en-GB');
 

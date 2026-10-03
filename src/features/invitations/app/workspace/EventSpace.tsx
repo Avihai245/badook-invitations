@@ -35,9 +35,7 @@ import { openHelp } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
-import { getTemplate } from '../../templates/registry';
 import { CountdownChip, daysUntilEvent, useToday } from '../countdown';
-import { TemplatePoster } from '../TemplatePoster';
 import { publishHref } from './paths';
 import {
   NAV_PATHS,
@@ -84,6 +82,8 @@ export interface EventSpaceData {
   /** the plan's open tasks (null: no plan yet, or no planning) and the seating's numbers */
   plan: { open: number } | null;
   seating: { tables: number; unseated: number } | null;
+  /** the invitation's poster, drawn on the server (app/ItemPoster) */
+  thumb?: ReactNode;
 }
 
 /** The facts the stages' badges read; the days to the event only once the visitor's own today is known. */
@@ -272,7 +272,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
           href={itemHref(item.id, 'home')}
           className="mt-2 flex items-center gap-3 rounded-[14px] border border-brand-line bg-linear-to-br from-brand-soft/80 to-surface p-2 transition-shadow hover:shadow-sm"
         >
-          <EventThumb item={item} className="w-[36px]" />
+          <EventThumb thumb={data.thumb} className="w-[36px]" />
           <span className="min-w-0">
             <span className="block truncate text-[14.5px] font-bold" lang={loc}>
               <bdi>{name}</bdi>
@@ -342,34 +342,16 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
   );
 }
 
-function EventThumb({ item, className }: { item: InvitationSummary; className?: string }) {
-  const { locale, date } = useUi();
-  const template = getTemplate(item.templateId)?.manifest;
-  if (!template) return null;
-  const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
-  const primary = item.hosts.primary[loc] ?? item.hosts.primary[item.defaultLocale] ?? '';
-  const secondary = item.hosts.secondary?.[loc] ?? item.hosts.secondary?.[item.defaultLocale] ?? null;
-  return (
-    <TemplatePoster
-      template={template}
-      locale={loc}
-      text={{
-        eyebrow: null,
-        primary,
-        secondary,
-        date: date(item.date, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' }),
-      }}
-      joiner={item.hosts.joiner?.[loc] || '&'}
-      className={cn('shrink-0 rounded-[9px]! shadow-[0_8px_16px_-10px_rgba(60,35,15,0.7)]!', className)}
-    />
-  );
+function EventThumb({ thumb, className }: { thumb?: ReactNode; className?: string }) {
+  if (!thumb) return null;
+  return <span className={cn('block shrink-0', className)}>{thumb}</span>;
 }
 
 /**
  * The top of every screen in an event: a strip no taller than 72px — the poster, names, date and
  * countdown, whether it's live, and the main action (publish, or open the invitation).
  */
-export function EventBar({ item }: { item: InvitationSummary }) {
+export function EventBar({ item, thumb }: { item: InvitationSummary; thumb?: ReactNode }) {
   const { t, locale, date } = useUi();
   const w = t.workspace;
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
@@ -381,7 +363,7 @@ export function EventBar({ item }: { item: InvitationSummary }) {
       className="flex min-h-[64px] items-center gap-3 border-b border-line bg-surface/85 px-4 py-2 backdrop-blur sm:px-6 lg:sticky lg:top-0 lg:z-20 lg:max-h-[72px]"
       data-testid="event-bar"
     >
-      <EventThumb item={item} className="w-[34px] lg:hidden" />
+      <EventThumb thumb={thumb} className="w-[34px] lg:hidden" />
       <div className="min-w-0 flex-1">
         <p className="flex min-w-0 items-center gap-2">
           <span className="truncate text-[16px] font-bold sm:text-[17px]" lang={loc}>

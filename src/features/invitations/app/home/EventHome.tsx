@@ -23,8 +23,6 @@ import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { EventHomeData } from '../../server/event-home';
-import { getTemplate } from '../../templates/registry';
-import { TemplatePoster } from '../TemplatePoster';
 import { STAGE_ICONS } from '../workspace/EventSpace';
 import {
   NAV_PATHS,
@@ -43,7 +41,17 @@ import { HelpFor } from '../HelpFor';
  * poster; the one next step (lib: next-action); three widgets — the budget's gauge, the RSVPs' ring and
  * the tasks' progress; the road through the four stages; and up to three "also worth doing".
  */
-export function EventHome({ data }: { data: EventHomeData }) {
+export function EventHome({
+  data,
+  tourDone = false,
+  poster = null,
+}: {
+  data: EventHomeData;
+  /** the account has seen the tour (on any device) */
+  tourDone?: boolean;
+  /** the invitation's poster, drawn on the server (app/ItemPoster) */
+  poster?: ReactNode;
+}) {
   const { t } = useUi();
   const H = t.eventHome;
   const id = data.item.id;
@@ -51,11 +59,11 @@ export function EventHome({ data }: { data: EventHomeData }) {
   const more = alsoWorth(id, data.facts);
   return (
     <div className="mx-auto flex max-w-[1400px] flex-col gap-5 px-4 pt-5 pb-16 sm:px-6 sm:pt-6">
-      <Tour />
+      <Tour seenOnAccount={tourDone} />
       <div className="-mb-2 flex justify-end">
         <HelpFor area="overview" />
       </div>
-      <Hero data={data} />
+      <Hero data={data} poster={poster} />
       <NextCard action={next} label={H.next} />
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={H.road.label}>
         <RsvpWidget data={data} />
@@ -117,14 +125,13 @@ function useCountdown(startsAt: number) {
   };
 }
 
-function Hero({ data }: { data: EventHomeData }) {
+function Hero({ data, poster }: { data: EventHomeData; poster: ReactNode }) {
   const { t, locale, date, plural, number } = useUi();
   const H = t.eventHome.hero;
   const { toast } = useToast();
   const { item } = data;
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
-  const template = getTemplate(item.templateId)?.manifest;
   const left = useCountdown(data.startsAt);
   const live = item.status === 'published';
   const copy = () =>
@@ -141,20 +148,7 @@ function Hero({ data }: { data: EventHomeData }) {
     >
       <div aria-hidden className="home-hero-glow pointer-events-none absolute inset-0" />
       <div className="relative flex flex-wrap items-center gap-6 sm:gap-8">
-        {template ? (
-          <TemplatePoster
-            template={template}
-            locale={loc}
-            text={{
-              eyebrow: null,
-              primary: item.hosts.primary[loc] ?? item.hosts.primary[item.defaultLocale] ?? name,
-              secondary: item.hosts.secondary?.[loc] ?? item.hosts.secondary?.[item.defaultLocale] ?? null,
-              date: date(item.date, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' }),
-            }}
-            joiner={item.hosts.joiner?.[loc] || '&'}
-            className="w-[96px] shrink-0 rotate-[-3deg] rounded-[16px]! shadow-[0_24px_40px_-20px_rgba(60,35,15,0.75)]! ring-4 ring-white/85 sm:w-[124px] dark:ring-line-strong"
-          />
-        ) : null}
+        {poster}
         <div className="min-w-0 flex-1 basis-[260px]">
           <p className="text-[13.5px] font-semibold text-brand-deep">{t.eventTypes[item.eventType]}</p>
           <h1

@@ -6,13 +6,12 @@ import { Button, Dialog, Skeleton, cn, rovingKeyDown } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import type { EventType } from '../../contracts/types';
 import type { InvitationSummary } from '../../server/host-db';
-import { getTemplate } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
 import { EVENT_ICONS } from '../event-icons';
 
-/** The events a save-the-date can lead to in its template (wedding, engagement…). */
-export const followUpTypes = (templateId: string): EventType[] =>
-  (getTemplate(templateId)?.manifest.categories ?? []).filter((c) => c !== 'save_the_date');
+/** The events a save-the-date can lead to in its design (wedding, engagement…). */
+export const followUpTypes = (item: InvitationSummary): EventType[] =>
+  (item.design?.categories ?? []).filter((c) => c !== 'save_the_date');
 
 /**
  * The save-the-date flow (§11 P4): pick the event, and a new draft with the save-the-date's names,
@@ -22,7 +21,7 @@ export function FollowUpDialog({ item, onClose }: { item: InvitationSummary; onC
   const { t } = useUi();
   const f = t.list.followUp;
   const router = useRouter();
-  const types = followUpTypes(item.templateId);
+  const types = followUpTypes(item);
   const [eventType, setEventType] = useState<EventType | undefined>(types[0]);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);

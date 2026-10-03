@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { EventHome } from '@/features/invitations/app/home/EventHome';
+import { ItemPoster } from '@/features/invitations/app/ItemPoster';
+import { TOUR_DONE_META } from '@/features/invitations/app/home/tour-meta';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { loadEventHome } from '@/features/invitations/server/event-home';
@@ -33,5 +35,20 @@ export default async function EventHomePage({ params }: { params: Params }) {
   if (!item) notFound();
   const data = await loadEventHome(user.id, item, await requestBaseUrl());
   if (!data) notFound();
-  return <EventHome data={data} />;
+  const { t, locale } = await getUi();
+  const tourDone = (user.user_metadata as Record<string, unknown> | null)?.[TOUR_DONE_META] === true;
+  return (
+    <EventHome
+      data={data}
+      tourDone={tourDone}
+      poster={
+        <ItemPoster
+          item={item}
+          uiLocale={locale}
+          fallbackName={hostsLine(item.hosts, item.defaultLocale) || t.eventTypes[item.eventType]}
+          className="w-[96px] shrink-0 rotate-[-3deg] rounded-[16px]! shadow-[0_24px_40px_-20px_rgba(60,35,15,0.75)]! ring-4 ring-white/85 sm:w-[124px] dark:ring-line-strong"
+        />
+      }
+    />
+  );
 }

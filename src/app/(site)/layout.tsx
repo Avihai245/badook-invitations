@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { uiDir } from '@/lib/i18n/app';
-import { UiProvider } from '@/lib/i18n/client';
+import { UiProvider } from '@/lib/i18n/provider-lazy';
 import { getUiLocale } from '@/lib/i18n/server';
 import { A11Y_BOOT } from '@/features/site/a11y';
 import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';

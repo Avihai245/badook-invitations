@@ -8,7 +8,7 @@ import type { PlanVendor, PlanView, RawPlanState } from '@/features/planning/mod
 import { composeView } from '@/features/planning/server/view';
 import { PlanProvider } from '@/features/planning/ui/PlanProvider';
 import { VendorsScreen } from '@/features/planning/ui/VendorsScreen';
-import { UiProvider } from '@/lib/i18n/client';
+import { UiProvider } from '@/lib/i18n/provider';
 import { planningVendorsEn } from '@/lib/i18n/planning-vendors.en';
 import { planningVendorsHe } from '@/lib/i18n/planning-vendors.he';
 
