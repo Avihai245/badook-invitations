@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { loadAccount } from '@/features/billing/server/account';
-import { InvitationsList } from '@/features/invitations/app/list/InvitationsList';
+import { InvitationsList, type CardBudget } from '@/features/invitations/app/list/InvitationsList';
+import { whyOff } from '@/features/flags/features';
+import { featureInput } from '@/features/flags/server';
+import { planningOverview } from '@/features/planning/server/badge';
 import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { hostDb } from '@/features/invitations/server/host-db';
 import { getUi } from '@/lib/i18n/server';
@@ -28,10 +31,45 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t.list.title };
 }
 
+/**
+ * Each active event's budget for its card's tiny gauge: the events with planning and a total budget (a
+ * few at most per host; a failure only leaves a card without its gauge).
+ */
+async function cardBudgets(ownerId: string, items: InvitationSummary[]): Promise<Record<string, CardBudget>> {
+  const active = items.filter((i) => i.status !== 'archived' && i.eventType !== 'save_the_date').slice(0, 12);
+  const rows = await Promise.all(
+    active.map(async (item) => {
+      const input = await featureInput(item.id).catch(() => null);
+      if (!input || whyOff('planning', input) !== null) return null;
+      const o = await planningOverview(ownerId, item.id, {
+        eventType: item.eventType,
+        status: item.status,
+        unpublishedChanges: item.unpublishedChanges,
+        guests: item.guests,
+        sent: item.sent,
+        responses: item.responses,
+      }).catch(() => null);
+      const totals = o?.raw.totals;
+      if (!totals || !totals.totalBudget) return null;
+      return [
+        item.id,
+        {
+          total: totals.totalBudget,
+          committed: totals.committed,
+          paid: totals.paid,
+          planned: totals.planned,
+        },
+      ] as const;
+    }),
+  );
+  return Object.fromEntries(rows.filter((r) => r !== null));
+}
+
 /** /app/invitations — the host's invitations (§9B.3-A). */
 export default async function InvitationsPage() {
   const user = await requireUser('/app/invitations');
   const [items, account] = await Promise.all([hostDb.list(user.id), loadAccount(user)]);
+  const budgets = await cardBudgets(user.id, items);
   // the greeting: the first name from the account, else from sign-up / Google
   const meta = (user.user_metadata ?? {}) as { full_name?: unknown; name?: unknown };
   const full =
@@ -45,7 +83,7 @@ export default async function InvitationsPage() {
     <>
       {/* the cards' posters write the names in their designs' fonts */}
       <style dangerouslySetInnerHTML={{ __html: POSTER_FONT_CSS }} />
-      <InvitationsList items={items} name={name} />
+      <InvitationsList items={items} name={name} budgets={budgets} />
     </>
   );
 }

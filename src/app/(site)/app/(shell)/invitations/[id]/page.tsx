@@ -1,14 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { featureInput } from '@/features/flags/server';
-import { planningCard } from '@/features/planning/server/overview-card';
-import { InvitationOverview } from '@/features/invitations/app/overview/InvitationOverview';
+import { EventHome } from '@/features/invitations/app/home/EventHome';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
-import { guestStats } from '@/features/invitations/lib/guest-status';
-import { responseStats } from '@/features/invitations/lib/responses';
 import { hostsLine } from '@/features/invitations/lib/text';
-import { guestsDb } from '@/features/invitations/server/guests';
-import { hostDb } from '@/features/invitations/server/host-db';
+import { loadEventHome } from '@/features/invitations/server/event-home';
 import { fmt } from '@/lib/i18n/app';
 import { getUi } from '@/lib/i18n/server';
 import { requestBaseUrl } from '@/lib/request-url';
@@ -22,35 +17,21 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!item) return { title: t.errorPages.notFound.metaTitle };
   const l = item.locales.includes(locale) ? locale : item.defaultLocale;
   return {
-    title: fmt(t.overview.metaTitle, { name: hostsLine(item.hosts, l) || t.eventTypes[item.eventType] }),
+    title: fmt(t.eventHome.metaTitle, { name: hostsLine(item.hosts, l) || t.eventTypes[item.eventType] }),
   };
 }
 
 /**
- * /app/invitations/[id] — the invitation's overview: its numbers, uploading the guest list and
- * sending on WhatsApp, the steps to a finished invitation and its link (the header and tabs come
- * from the layout).
+ * /app/invitations/[id] — the event's home: the countdown, the one next step, the budget's gauge, the
+ * RSVPs' ring, the tasks, the road through the four stages and what else is worth doing (the event's
+ * navigation and strip come from the layout).
  */
-export default async function InvitationOverviewPage({ params }: { params: Params }) {
+export default async function EventHomePage({ params }: { params: Params }) {
   const { id } = await params;
   const user = await requireUser(`/app/invitations/${id}`);
-  const [item, guests, replies, publicBase] = await Promise.all([
-    ownerInvitation(user.id, id),
-    guestsDb.list(id, user.id),
-    hostDb.responses(id, user.id),
-    requestBaseUrl(),
-  ]);
-  if (!item || !replies) notFound();
-  // the planning's next step, when the plan follows the overview (never in the way of the page)
-  const planning = await planningCard(user.id, item, await featureInput(id).catch(() => null));
-  const base = publicBase.replace(/\/+$/, '');
-  return (
-    <InvitationOverview
-      item={item}
-      guests={guestStats(guests ?? [])}
-      replies={responseStats(replies.responses, Date.now())}
-      url={`${base}/i/${item.slug}`}
-      planning={planning}
-    />
-  );
+  const item = await ownerInvitation(user.id, id);
+  if (!item) notFound();
+  const data = await loadEventHome(user.id, item, await requestBaseUrl());
+  if (!data) notFound();
+  return <EventHome data={data} />;
 }

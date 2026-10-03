@@ -32,6 +32,7 @@ import {
   useToast,
   type BadgeVariant,
 } from '@/components/app';
+import { BudgetGauge } from '@/features/planning/ui/BudgetGauge';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
@@ -78,7 +79,18 @@ export function nextStep(
  * invitation (its poster, where it stands, the next step and its main places one tap away); the
  * archive; and an empty state that teaches the whole flow.
  */
-export function InvitationsList({ items, name }: { items: InvitationSummary[]; name: string | null }) {
+/** An event's budget as its card shows it (a tiny gauge): only for events with a plan and a total. */
+export type CardBudget = { total: number; committed: number; paid: number; planned: number };
+
+export function InvitationsList({
+  items,
+  name,
+  budgets = {},
+}: {
+  items: InvitationSummary[];
+  name: string | null;
+  budgets?: Record<string, CardBudget>;
+}) {
   const { t, fmt, plural, number } = useUi();
   const router = useRouter();
   const { toast } = useToast();
@@ -192,6 +204,7 @@ export function InvitationsList({ items, name }: { items: InvitationSummary[]; n
               style={{ '--rise-delay': `${Math.min(i, 6) * 60}ms` } as CSSProperties}
             >
               <InvitationCard
+                budget={budgets[item.id] ?? null}
                 item={item}
                 busy={busy === item.id}
                 past={today ? daysUntilEvent(item.date, today) < 0 : false}
@@ -283,6 +296,7 @@ function EmptyList() {
 
 function InvitationCard({
   item,
+  budget = null,
   busy,
   past,
   onDuplicate,
@@ -290,6 +304,7 @@ function InvitationCard({
   onFollowUp,
 }: {
   item: InvitationSummary;
+  budget?: CardBudget | null;
   busy: boolean;
   /** the event's day has passed (the visitor's own day) */
   past: boolean;
@@ -429,6 +444,32 @@ function InvitationCard({
               )}
             </div>
           )}
+
+          {/* at a glance: how many replied, and the budget's tiny gauge */}
+          {!archived && (item.guests || budget) ? (
+            <div className="mt-3 flex items-center gap-3" data-testid="card-glance">
+              {item.guests ? (
+                <span className="inline-flex items-center rounded-full bg-success-bg px-2.5 py-1 text-[12px] font-bold text-success">
+                  {fmt(t.list.progress.replied, {
+                    pct: number(Math.min(100, Math.round((item.responses / item.guests) * 100))),
+                  })}
+                </span>
+              ) : null}
+              {budget ? (
+                <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-muted">
+                  <BudgetGauge
+                    size="xs"
+                    total={budget.total}
+                    committed={budget.committed}
+                    paid={budget.paid}
+                    planned={budget.planned}
+                    className="mx-0! w-[64px]!"
+                  />
+                  {t.list.progress.budget}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
 
           {next ? (
             <Hint text={t.list.nextHint}>

@@ -236,7 +236,7 @@ export function BudgetGauge({
       </svg>
 
       {size === 'xs' ? (
-        <p className="-mt-1 text-[12px] font-bold" style={{ color }}>
+        <p className="mt-0.5 text-[12px] leading-none font-bold" style={{ color }}>
           <span className="sr-only">{status}: </span>
           {percentText}
         </p>

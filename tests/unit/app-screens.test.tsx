@@ -7,7 +7,6 @@ import {
   initialPreview,
   matchesFilter,
 } from '@/features/invitations/app/gallery/TemplateGallery';
-import { overviewSteps } from '@/features/invitations/app/overview/InvitationOverview';
 import { publishHref, workspaceTab } from '@/features/invitations/app/workspace/paths';
 import {
   EVENT_TYPES,
@@ -71,21 +70,6 @@ describe('a design to open the preview on right away (from a ?template= link)', 
     expect(TEMPLATES.get('lumiere')?.manifest.listed).toBe(false);
     expect(initialPreview('lumiere', false)).toBeNull();
     expect(initialPreview('lumiere', true)).toBe('lumiere');
-  });
-});
-
-describe('the overview’s steps', () => {
-  const facts = { status: 'draft' as const, unpublishedChanges: false, guests: 0, sent: 0, responses: 0 };
-  it('design → publish → guest list → WhatsApp → replies, the first open one is next', () => {
-    expect(overviewSteps(facts).next).toBe('publish');
-    expect(overviewSteps({ ...facts, status: 'published' }).next).toBe('import');
-    expect(overviewSteps({ ...facts, status: 'published', guests: 10, sent: 4 }).next).toBe('send');
-    expect(overviewSteps({ ...facts, status: 'published', guests: 10, sent: 10 }).next).toBe('track');
-    const all = overviewSteps({ ...facts, status: 'published', guests: 10, sent: 10, responses: 3 });
-    expect(all.next).toBeNull();
-    expect(Object.values(all.done).every(Boolean)).toBe(true);
-    // changes not published yet: publishing is to do again
-    expect(overviewSteps({ ...facts, status: 'published', unpublishedChanges: true }).next).toBe('publish');
   });
 });
 

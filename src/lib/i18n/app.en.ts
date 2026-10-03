@@ -186,6 +186,135 @@ export const en: AppDict = {
       more: 'More',
     },
   },
+  eventHome: {
+    metaTitle: 'Event home · {name}',
+    hero: {
+      label: 'Countdown to the event',
+      days: { one: 'day', other: 'days' },
+      hours: { one: 'hour', other: 'hours' },
+      minutes: 'minutes',
+      left: 'until {event}',
+      today: 'It’s today! 🎉',
+      past: { one: 'The event was yesterday', other: 'The event was {n} days ago' },
+      copy: 'Copy the link',
+      copied: 'Link copied',
+      notLive: 'The invitation isn’t published yet',
+      share: 'Send & share',
+    },
+    next: 'Next step',
+    also: 'Also worth doing',
+    actions: {
+      budget: {
+        title: 'Set a budget',
+        body: 'How much you want to spend and how it splits — so every quote is measured against something.',
+        cta: 'Set the budget',
+      },
+      planSetup: {
+        title: 'Start planning',
+        body: 'Tasks on a timeline, a budget and vendors — ready in a minute, for your kind of event.',
+        cta: 'Start planning',
+      },
+      publish: {
+        title: 'Publish the invitation',
+        body: 'The link opens for guests, and you can start sending and sharing.',
+        cta: 'Publish',
+      },
+      publishChanges: {
+        title: 'You have unpublished changes',
+        body: 'Guests still see the previous version of the invitation.',
+        cta: 'Publish the changes',
+      },
+      guests: {
+        title: 'Upload your guest list',
+        body: 'An Excel file with names and phones — every guest gets a personal link with their name.',
+        cta: 'Upload the list',
+      },
+      send: {
+        title: { one: 'Send the invitation to 1 guest', other: 'Send the invitation to {n} guests' },
+        body: 'Each gets their personal link on WhatsApp — and you see who opened it and who’s coming.',
+        cta: 'Send',
+      },
+      matchReplies: {
+        title: {
+          one: 'A general-link reply is waiting to be matched',
+          other: '{n} general-link replies are waiting to be matched',
+        },
+        body: 'They already count. Matching them to guests on the list updates their status.',
+        cta: 'Match',
+      },
+      remind: {
+        title: { one: '1 guest hasn’t answered', other: '{n} guests haven’t answered' },
+        body: 'A short WhatsApp reminder works wonders — the list shows who.',
+        cta: 'The guest list',
+      },
+      seating: {
+        title: 'Arrange the tables',
+        body: 'Auto-seating seats everyone in one click; then just move what you want.',
+        cta: 'The seating plan',
+      },
+      gallery: {
+        title: 'Get the live gallery ready',
+        body: 'A QR code on the tables, and guests upload photos straight to the screen in the hall.',
+        cta: 'The gallery',
+      },
+      eventDay: {
+        title: 'The big day! Open the entrance station',
+        body: 'Check-in by scanning a QR, and watch the hall fill up live.',
+        cta: 'Event day',
+      },
+      film: {
+        title: 'Your moments film is waiting',
+        body: 'Every guest photo in one film with music — to share with everyone.',
+        cta: 'The moments film',
+      },
+      insights: {
+        title: 'How was it? All the numbers',
+        body: 'How many opened it, when they replied, who came — in one place.',
+        cta: 'Insights',
+      },
+      tasks: {
+        title: { one: '1 task this week', other: '{n} tasks this week' },
+        body: 'What’s worth closing now so everything arrives on time.',
+        cta: 'Tasks',
+      },
+      allSet: {
+        title: 'Everything’s moving along nicely',
+        body: 'Nothing urgent right now. Have a look at who’s coming.',
+        cta: 'RSVPs',
+      },
+    },
+    widgets: {
+      budget: {
+        title: 'Budget',
+        none: 'No total budget yet.',
+        set: 'Set a budget',
+        open: 'The full budget',
+      },
+      rsvp: {
+        title: 'RSVPs',
+        coming: 'Coming',
+        declined: 'Not coming',
+        waiting: 'Not answered',
+        people: { one: '1 person', other: '{n} people' },
+        fromLink: { one: '1 from the general link', other: '{n} from the general link' },
+        aria: 'RSVPs: {coming} coming, {declined} not coming, {waiting} not answered',
+        open: 'All replies',
+        empty: 'No guest list or replies yet.',
+      },
+      tasks: {
+        title: 'Tasks',
+        progress: '{done} of {total} done',
+        week: { one: '1 task this week', other: '{n} tasks this week' },
+        open: 'All tasks',
+        none: 'No plan yet — tasks and reminders for your kind of event.',
+        setup: 'Start planning',
+      },
+    },
+    road: {
+      title: 'The road',
+      label: 'The event’s four stages',
+    },
+  },
   eventSettings: {
     metaTitle: 'Event settings · {name}',
     title: 'Event settings',
@@ -357,7 +486,7 @@ export const en: AppDict = {
     unpublishedChanges: 'Unpublished changes',
   },
   list: {
-    title: 'My invitations',
+    title: 'My events',
     newInvitation: 'New invitation',
     stats: {
       one: '1 response · {attending} attending',
@@ -433,6 +562,8 @@ export const en: AppDict = {
       edit: 'Edit',
     },
     progress: {
+      replied: '{pct}% replied',
+      budget: 'Budget',
       sent: 'Sent to {sent} of {guests}',
       attending: '{attending} coming',
       noGuests: 'No guest list yet',
