@@ -97,7 +97,7 @@ test.describe('the support assistant', () => {
     const steps = log.locator('ol > li');
     await expect(steps).toHaveCount(3);
     await expect(steps.first().locator('strong')).toHaveText('מוזמנים');
-    await expect(log.getByRole('link', { name: '/contact' })).toHaveAttribute('href', '/contact');
+    await expect(log.getByRole('link', { name: 'טופס יצירת קשר' })).toHaveAttribute('href', '/contact');
     // an address outside the site stays plain text
     await expect(log.getByText(/https:\/\/evil\.example\/login/)).toBeVisible();
     await expect(log.locator('a[href*="evil.example"]')).toHaveCount(0);

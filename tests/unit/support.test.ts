@@ -579,3 +579,33 @@ describe('the support assistant', () => {
     vi.resetModules();
   });
 });
+
+describe('the support assistant knows every screen', () => {
+  it('every user-facing page of the app is in SUPPORT_PAGES, and every SUPPORT_PAGES path is a real page', async () => {
+    const { readdirSync, statSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { SUPPORT_PAGES } = await import('@/features/support/pages');
+    const root = join(process.cwd(), 'src/app/(site)');
+    const found: string[] = [];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir)) {
+        const full = join(dir, name);
+        if (statSync(full).isDirectory()) walk(full);
+        else if (name === 'page.tsx')
+          found.push(
+            ('/' + dir.slice(root.length + 1))
+              .replace(/\/\([^)]*\)/g, '')
+              .replace(/\[[^\]]+\]/g, ':id')
+              .replace(/\/$/, '') || '/',
+          );
+      }
+    };
+    walk(root);
+    // not for hosts: the staff console, dev tools, auth callbacks, the home redirect, one ticket by id
+    const internal = /^\/(dev|auth|app\/admin)(\/|$)|^\/app$|^\/$|^\/app\/support\/:id$|test-checkout/;
+    const known = new Set(SUPPORT_PAGES.map((p) => p.path));
+    // a new screen fails here until it's added to pages.ts — and its feature to knowledge.ts
+    expect(found.filter((p) => !internal.test(p) && !known.has(p)).sort()).toEqual([]);
+    expect([...known].filter((p) => !found.includes(p)).sort()).toEqual([]);
+  });
+});
