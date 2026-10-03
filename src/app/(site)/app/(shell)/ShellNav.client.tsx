@@ -360,7 +360,8 @@ export function UserMenu({
       trigger={
         <button
           type="button"
-          aria-label={t.shell.userMenu}
+          // the visible words ("signed in as …") are part of the name (WCAG 2.5.3)
+          aria-label={email ? `${t.shell.userMenu} · ${t.shell.signedInAs} ${email}` : t.shell.userMenu}
           data-testid="user-menu"
           className="grid size-9 place-items-center rounded-full transition-colors hover:bg-subtle lg:flex lg:size-auto lg:w-full lg:items-center lg:gap-2.5 lg:rounded-[12px] lg:border lg:border-line lg:bg-canvas lg:px-2.5 lg:py-2 lg:text-start"
         >
