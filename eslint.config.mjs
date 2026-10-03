@@ -14,6 +14,8 @@ const config = [
       'coverage/**',
       'tests/.artifacts/**',
       'node_modules/**',
+      // the demo video: its own project (video/package.json, Remotion)
+      'video/**',
       'public/**',
       'docs/**',
       'invitation-templates-pack/**',

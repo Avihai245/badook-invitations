@@ -12,3 +12,6 @@ node_modules/
 package-lock.json
 test-results/
 playwright-report/
+# the demo video: its own project and its rendered files
+video/node_modules/
+public/video/

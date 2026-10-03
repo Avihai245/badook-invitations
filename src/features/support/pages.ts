@@ -1,3 +1,4 @@
+import { GUIDE_ARTICLES } from '@/features/guide/articles';
 /**
  * Every screen of the app the support assistant may point someone to — always as a real link, never
  * just named in words. chat.ts's systemPrompt() renders SUPPORT_PAGES under a `<pages>` block and tells
@@ -18,22 +19,33 @@ export interface SupportPage {
 }
 
 export const SUPPORT_PAGES: SupportPage[] = [
-  { path: '/app/invitations', label: 'Invitation list (home)' },
-  { path: '/app/invitations/new', label: 'Create a new invitation' },
-  { path: '/app/invitations/:id', label: 'One invitation, overview' },
-  { path: '/app/invitations/:id/edit', label: 'Edit: design, text, RSVP questions' },
-  { path: '/app/invitations/:id/plan', label: 'Event planning: overview, next step, this week' },
-  { path: '/app/invitations/:id/plan/tasks', label: 'Planning: tasks and the calendar' },
-  { path: '/app/invitations/:id/plan/budget', label: 'Planning: budget, payments, cost per guest' },
-  { path: '/app/invitations/:id/plan/vendors', label: 'Planning: vendors, quotes, closing a vendor' },
-  { path: '/app/invitations/:id/plan/ideas', label: 'Planning: notes and ideas board' },
-  { path: '/app/invitations/:id/guests', label: 'Guest list: add guests, WhatsApp sending, RSVP status' },
-  { path: '/app/invitations/:id/responses', label: 'RSVP responses' },
-  { path: '/app/invitations/:id/seating', label: 'Seating arrangement' },
-  { path: '/app/invitations/:id/gallery', label: 'Photo and video gallery' },
-  { path: '/app/invitations/:id/insights', label: 'Views and opening statistics' },
-  { path: '/app/invitations/:id/live', label: 'The live screen, for the event day' },
-  { path: '/app/invitations/:id/share', label: 'Sharing links and QR code' },
+  { path: '/app/invitations', label: 'My events (home)' },
+  {
+    path: '/app/invitations/new',
+    label: 'Create a new event (the three-question start, then the design gallery)',
+  },
+  {
+    path: '/app/invitations/:id',
+    label: 'The event home: countdown, the next step, budget gauge, RSVPs, tasks, the road',
+  },
+  { path: '/app/invitations/:id/edit', label: 'Edit the invitation design: design, text, RSVP questions' },
+  { path: '/app/invitations/:id/plan/tasks', label: 'Plan: tasks and the calendar' },
+  { path: '/app/invitations/:id/plan/budget', label: 'Plan: budget gauge, categories, payments, what if' },
+  { path: '/app/invitations/:id/plan/vendors', label: 'Plan: vendors, quotes, closing a vendor' },
+  { path: '/app/invitations/:id/plan/ideas', label: 'Plan: notes and ideas board' },
+  { path: '/app/invitations/:id/guests', label: 'Invite: guest list, WhatsApp sending, RSVP status' },
+  { path: '/app/invitations/:id/responses', label: 'Invite: RSVP responses' },
+  { path: '/app/invitations/:id/share', label: 'Invite: send & share, links and QR code' },
+  { path: '/app/invitations/:id/seating', label: 'Arrange: seating plan' },
+  { path: '/app/invitations/:id/live', label: 'Celebrate: the event day, entrance check-in' },
+  { path: '/app/invitations/:id/gallery', label: 'Celebrate: live photo gallery and the hall screen' },
+  { path: '/app/invitations/:id/gallery/film', label: 'Celebrate: the moments film' },
+  { path: '/app/invitations/:id/insights', label: 'Insights: views and opening statistics' },
+  {
+    path: '/app/invitations/:id/settings',
+    label: 'Event settings: details, planning settings, package, duplicate, archive',
+  },
+  { path: '/app/guide', label: 'The written guide (all articles, search, FAQ)' },
   { path: '/app/account', label: 'Account settings' },
   { path: '/app/billing', label: 'Plans, billing and invoices' },
   { path: '/app/support', label: 'Support tickets' },
@@ -53,6 +65,7 @@ export function supportPagesList(): string {
 }
 
 const BY_PATH = new Map(SUPPORT_PAGES.map((p) => [p.path, p]));
+const GUIDE_SLUGS = new Set(GUIDE_ARTICLES.map((a) => a.slug));
 
 /** The invitation id in a real (unmasked) pathname, when the visitor is on one of its own pages. */
 export function currentInvitationId(pathname: string): string | null {
@@ -86,6 +99,9 @@ export function resolveSupportPath(candidate: string, invitationId: string | nul
       ? `/app/invitations/new?template=${id}`
       : null;
   }
+  // one article of the written guide: /app/guide/<slug>, when that article exists
+  const guide = /^\/app\/guide\/([a-z0-9-]+)\/?$/.exec(path)?.[1];
+  if (guide) return GUIDE_SLUGS.has(guide) ? `/app/guide/${guide}` : null;
   const page = BY_PATH.get(path.replace(/\/+$/, ''));
   if (!page) return null;
   if (!page.path.includes(':id')) return page.path;

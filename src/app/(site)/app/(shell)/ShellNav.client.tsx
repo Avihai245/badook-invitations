@@ -23,7 +23,7 @@ import { BrandLogo, cn, Menu, useMedia, type MenuItem } from '@/components/app';
 import { ThemeToggle, useThemePref } from '@/features/site/Theme.client';
 import { LEGAL_PAGES } from '@/features/legal/links';
 import { isThemePref } from '@/features/site/theme';
-import { openSupport } from '@/features/support/open';
+import { openHelp, openSupport } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import { setUiLocale } from '../../ui-locale';
 import { signOut } from '../../(auth)/actions';
@@ -95,7 +95,8 @@ export function AppSidebar({
         </SideLink>
         <button
           type="button"
-          onClick={() => openSupport()}
+          onClick={() => openHelp()}
+          data-tour="help"
           className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-[14px] font-medium text-muted transition-colors hover:bg-subtle hover:text-ink"
         >
           <MessageCircleQuestion aria-hidden className="size-[19px] shrink-0" strokeWidth={1.75} />
@@ -212,14 +213,24 @@ export function MobileTabBar({ unread = 0 }: { unread?: number }) {
         <TabLink href="/app/billing" icon={CreditCard} active={current === 'billing'}>
           {s.billing}
         </TabLink>
-        <TabLink
-          href="/app/support"
-          icon={MessageCircleQuestion}
-          active={current === 'support'}
-          badge={unread ? plural(t.tickets.navUnread, unread) : undefined}
+        <button
+          type="button"
+          onClick={() => openHelp()}
+          aria-haspopup="dialog"
+          className="relative flex flex-1 flex-col items-center justify-center gap-1 text-[11px] font-semibold text-muted transition-colors hover:text-ink"
         >
+          <span className="relative">
+            <MessageCircleQuestion aria-hidden className="size-[22px]" strokeWidth={1.75} />
+            {unread ? (
+              <span
+                aria-hidden
+                className="absolute -end-1 -top-0.5 size-2.5 rounded-full bg-brand-strong ring-2 ring-surface"
+              />
+            ) : null}
+          </span>
           {s.help}
-        </TabLink>
+          {unread ? <span className="sr-only">({plural(t.tickets.navUnread, unread)})</span> : null}
+        </button>
       </div>
     </nav>
   );

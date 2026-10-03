@@ -66,15 +66,22 @@
   --color-brand-strong: #7a5230;
   --color-inverse: #1c1917;
 
-  --radius-btn: 8px;
-  --radius-input: 10px;
-  --radius-card: 12px;
-  --radius-dialog: 16px;
+  /* softer, rounder surfaces (UX report §6): cards 18, dialogs 22 */
+  --radius-btn: 10px;
+  --radius-input: 12px;
+  --radius-card: 18px;
+  --radius-dialog: 22px;
   --radius-poster: 24px;
 
-  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.06);
-  --shadow-md: 0 8px 24px rgba(28, 25, 23, 0.08);
-  --shadow-lg: 0 24px 48px rgba(28, 25, 23, 0.14);
+  /* layered shadows: a tight contact shadow and a soft warm ambient one */
+  --shadow-xs: 0 1px 2px rgba(28, 25, 23, 0.05);
+  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05), 0 4px 12px -4px rgba(60, 35, 15, 0.08);
+  --shadow-md: 0 2px 4px rgba(28, 25, 23, 0.04), 0 14px 32px -10px rgba(60, 35, 15, 0.16);
+  --shadow-lg: 0 4px 10px rgba(28, 25, 23, 0.05), 0 28px 60px -16px rgba(60, 35, 15, 0.24);
+
+  /* the celebrations' second color (a festive rose beside the brand's gold) */
+  --color-festive: #c2557a;
+  --color-festive-soft: #fbe9f0;
   --shadow-ring: 0 0 0 3px rgba(28, 25, 23, 0.08);
 
   /* Arabic and Ethiopic letters (the gallery's guest pages, guests' names) in Cairo and Noto Sans Ethiopic */
@@ -152,6 +159,8 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.035);
     --shadow-md: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 12px 32px -8px rgba(0, 0, 0, 0.65);
     --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 28px 60px -12px rgba(0, 0, 0, 0.75);
+    --color-festive: #f08fb0;
+    --color-festive-soft: #2a1520;
     --shadow-ring: 0 0 0 3px rgba(232, 203, 159, 0.16);
   }
   /* a faint champagne glow at the top of every page, fixed behind the content */

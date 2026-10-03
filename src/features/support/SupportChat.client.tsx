@@ -1,6 +1,16 @@
 'use client';
 
-import { ArrowUp, RotateCcw, Sparkles, Square, X } from 'lucide-react';
+import {
+  ArrowUp,
+  BookOpen,
+  LifeBuoy,
+  Mail,
+  MessagesSquare,
+  RotateCcw,
+  Sparkles,
+  Square,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -15,7 +25,9 @@ import {
 } from 'react';
 import { cn, Hint } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
-import { SUPPORT_OPEN, openSupport, type SupportOpenDetail } from './open';
+import { navKeyOf } from '@/features/invitations/app/workspace/stages';
+import { GuideArticleView, GuideIndex, articleBySlug } from '@/features/guide/GuideView';
+import { SUPPORT_OPEN, openHelp, type SupportOpenDetail } from './open';
 import { currentInvitationId, linkifyLabeledPaths, resolveSupportPath } from './pages';
 import { ChatHandoff } from './tickets/ui/ChatHandoff.client';
 
@@ -33,7 +45,8 @@ interface Msg {
   state?: 'streaming' | 'error' | 'stopped';
 }
 
-type Area = 'general' | 'editor' | 'guests' | 'responses' | 'billing';
+type Area =
+  'general' | 'editor' | 'guests' | 'responses' | 'billing' | 'home' | 'budget' | 'seating' | 'gallery';
 
 const STORE = 'badook:support';
 /** What the server accepts (features/support/chat.ts ChatSchema) */
@@ -41,6 +54,7 @@ const MAX_MESSAGES = 20;
 const MAX_CHARS = 16_000;
 const MAX_QUESTION = 2000;
 
+/** The screen the help was opened on, for the assistant's three ready questions. */
 const areaOf = (path: string): Area =>
   /^\/app\/invitations\/[^/]+\/edit/.test(path)
     ? 'editor'
@@ -48,9 +62,17 @@ const areaOf = (path: string): Area =>
       ? 'guests'
       : /^\/app\/invitations\/[^/]+\/responses/.test(path)
         ? 'responses'
-        : path.startsWith('/app/billing')
-          ? 'billing'
-          : 'general';
+        : /^\/app\/invitations\/[^/]+\/plan\/budget/.test(path)
+          ? 'budget'
+          : /^\/app\/invitations\/[^/]+\/seating/.test(path)
+            ? 'seating'
+            : /^\/app\/invitations\/[^/]+\/gallery/.test(path)
+              ? 'gallery'
+              : /^\/app\/invitations\/(?!new)[^/]+\/?$/.test(path)
+                ? 'home'
+                : path.startsWith('/app/billing')
+                  ? 'billing'
+                  : 'general';
 
 /** The conversation as the server wants it: no local notices, the latest part, starting with a question. */
 function forServer(history: Msg[]): { role: Msg['role']; content: string }[] {
@@ -249,6 +271,10 @@ export function SupportChat() {
   const s = t.support;
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  // the help panel's tab: the written guide (an article or its index), the assistant, the team
+  const [tab, setTab] = useState<'guide' | 'assistant' | 'contact'>('assistant');
+  const [article, setArticle] = useState<string | null>(null);
+  const guideBody = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -340,11 +366,14 @@ export function SupportChat() {
   askRef.current = ask;
   useEffect(() => {
     const onOpen = (e: Event) => {
-      const { question } = (e as CustomEvent<SupportOpenDetail>).detail ?? {};
+      const detail = (e as CustomEvent<SupportOpenDetail>).detail ?? {};
       if (!returnTo.current && document.activeElement instanceof HTMLElement)
         returnTo.current = document.activeElement;
       setOpen(true);
-      if (question) void askRef.current(question);
+      setTab(detail.question ? 'assistant' : (detail.tab ?? 'assistant'));
+      if (detail.tab === 'guide')
+        setArticle(detail.article && articleBySlug(detail.article) ? detail.article : null);
+      if (detail.question) void askRef.current(detail.question);
     };
     window.addEventListener(SUPPORT_OPEN, onOpen);
     return () => window.removeEventListener(SUPPORT_OPEN, onOpen);
@@ -358,7 +387,8 @@ export function SupportChat() {
     // a mouse and keyboard: straight to the field; a touch screen: no keyboard popping over the
     // suggestions. After a beat, so a menu that opened the chat has handed its focus back first.
     const timer = window.setTimeout(() => {
-      if (window.matchMedia('(pointer: fine)').matches) field.current?.focus({ preventScroll: true });
+      if (tab === 'assistant' && window.matchMedia('(pointer: fine)').matches)
+        field.current?.focus({ preventScroll: true });
       else panel.current?.focus({ preventScroll: true });
     }, 40);
     const onKey = (e: globalThis.KeyboardEvent) => {
@@ -369,7 +399,7 @@ export function SupportChat() {
       window.clearTimeout(timer);
       window.removeEventListener('keydown', onKey);
     };
-  }, [open, close]);
+  }, [open, close, tab]);
 
   // follow the answer as it grows, unless the reader scrolled up
   useLayoutEffect(() => {
@@ -412,7 +442,8 @@ export function SupportChat() {
 
   // the admin console is the team's own screen: not the customers' assistant
   if (path.startsWith('/app/admin')) return null;
-  const suggestions = s.suggestions[areaOf(path)];
+  // three ready questions for this screen
+  const suggestions = s.suggestions[areaOf(path)].slice(0, 3);
   const empty = messages.length === 0;
   // what a ticket from here would carry: the conversation as the server gets it
   const conversation = forServer(messages);
@@ -423,11 +454,11 @@ export function SupportChat() {
         <button
           type="button"
           hidden={open}
-          onClick={() => openSupport()}
+          onClick={() => openHelp()}
           aria-label={s.open}
           aria-haspopup="dialog"
           data-testid="support-launcher"
-          className="support-launcher fixed end-4 bottom-4 z-[55] flex h-13 items-center gap-2.5 rounded-full bg-linear-to-br from-brand to-brand-strong ps-1.5 pe-5 text-white shadow-[0_14px_34px_-10px_rgba(122,82,48,0.75)] transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus max-sm:w-13 max-sm:justify-center max-sm:p-0 print:hidden sm:end-6 sm:bottom-6"
+          className="support-launcher fixed end-4 bottom-4 z-[55] flex h-13 lg:hidden items-center gap-2.5 rounded-full bg-linear-to-br from-brand to-brand-strong ps-1.5 pe-5 text-white shadow-[0_14px_34px_-10px_rgba(122,82,48,0.75)] transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus max-sm:w-13 max-sm:justify-center max-sm:p-0 print:hidden sm:end-6 sm:bottom-6"
         >
           <span aria-hidden className="grid size-10 place-items-center rounded-full bg-white/15">
             <Sparkles className="size-5" />
@@ -453,7 +484,7 @@ export function SupportChat() {
             className={cn(
               'support-panel fixed z-[65] flex outline-none flex-col overflow-hidden border border-line bg-surface text-ink shadow-[0_30px_80px_-20px_rgba(28,25,23,0.45)] print:hidden',
               'inset-x-0 bottom-0 h-[88dvh] rounded-t-[22px]',
-              'sm:inset-x-auto sm:end-6 sm:bottom-6 sm:h-[min(640px,calc(100dvh-48px))] sm:w-[400px] sm:rounded-[22px]',
+              'sm:inset-x-auto sm:end-6 sm:bottom-6 sm:h-[min(720px,calc(100dvh-48px))] sm:w-[440px] sm:rounded-[22px]',
             )}
           >
             <header className="relative flex shrink-0 items-center gap-3 overflow-hidden bg-linear-to-br from-brand-strong via-brand to-[#c08a55] px-4 py-3.5 text-white">
@@ -469,14 +500,14 @@ export function SupportChat() {
               </span>
               <div className="relative min-w-0 flex-1">
                 <h2 id="support-title" className="truncate text-[15px] font-bold">
-                  {fmt(s.title, { brand })}
+                  {tab === 'assistant' ? fmt(s.title, { brand }) : t.helpCenter.title}
                 </h2>
                 <p className="flex items-center gap-1.5 truncate text-[12px] text-white/80">
                   <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-[#86efac]" />
                   {s.subtitle}
                 </p>
               </div>
-              {!empty ? (
+              {!empty && tab === 'assistant' ? (
                 <button
                   type="button"
                   onClick={restart}
@@ -499,7 +530,116 @@ export function SupportChat() {
               </button>
             </header>
 
-            {handoff ? (
+            <div
+              role="tablist"
+              aria-label={t.helpCenter.tabsLabel}
+              className="flex shrink-0 gap-1 border-b border-line bg-surface px-2 pt-2"
+            >
+              {(
+                [
+                  ['guide', BookOpen],
+                  ['assistant', MessagesSquare],
+                  ['contact', LifeBuoy],
+                ] as const
+              ).map(([key, Icon]) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === key}
+                  data-help-tab={key}
+                  onClick={() => setTab(key)}
+                  className={cn(
+                    'relative flex flex-1 items-center justify-center gap-1.5 rounded-t-[10px] px-2 pt-1.5 pb-2.5 text-[13px] font-semibold transition-colors',
+                    tab === key ? 'text-brand-deep' : 'text-muted hover:text-ink',
+                  )}
+                >
+                  <Icon aria-hidden className="size-4 shrink-0" />
+                  <span className="truncate">{t.helpCenter.tabs[key]}</span>
+                  {tab === key ? (
+                    <span
+                      aria-hidden
+                      className="absolute inset-x-3 bottom-0 h-[3px] rounded-t-full bg-brand"
+                    />
+                  ) : null}
+                </button>
+              ))}
+            </div>
+
+            {tab === 'guide' ? (
+              <div
+                ref={guideBody}
+                role="tabpanel"
+                className="flex-1 overflow-y-auto overscroll-contain bg-[linear-gradient(180deg,#fbf7f2,#ffffff_30%)] px-4 py-4 dark:bg-none"
+                data-testid="help-guide"
+              >
+                {article && articleBySlug(article) ? (
+                  <GuideArticleView
+                    article={articleBySlug(article)!}
+                    onOpen={(slug) => {
+                      setArticle(slug);
+                      guideBody.current?.scrollTo({ top: 0 });
+                    }}
+                    onBack={() => setArticle(null)}
+                    full
+                  />
+                ) : (
+                  <GuideIndex
+                    compact
+                    screen={invitationId ? navKeyOf(path, invitationId) : null}
+                    onOpen={(slug) => {
+                      setArticle(slug);
+                      guideBody.current?.scrollTo({ top: 0 });
+                    }}
+                    onAsk={(q) => {
+                      setTab('assistant');
+                      void ask(q);
+                    }}
+                  />
+                )}
+              </div>
+            ) : tab === 'contact' ? (
+              <div
+                role="tabpanel"
+                className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-5"
+                data-testid="help-contact"
+              >
+                <div>
+                  <h3 className="text-[17px] font-bold">{t.helpCenter.contact.title}</h3>
+                  <p className="mt-1 text-[13.5px] text-muted">{t.helpCenter.contact.body}</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/app/support/new"
+                    onClick={onNavigate}
+                    className="flex h-12 items-center justify-center gap-2 rounded-[12px] bg-brand text-[15px] font-semibold text-white hover:bg-brand-strong"
+                  >
+                    <LifeBuoy aria-hidden className="size-4" />
+                    {t.helpCenter.contact.newTicket}
+                  </Link>
+                  <Link
+                    href="/app/support"
+                    onClick={onNavigate}
+                    className="flex h-11 items-center justify-center gap-2 rounded-[12px] border border-line-strong text-[14px] font-semibold hover:bg-subtle"
+                  >
+                    {t.helpCenter.contact.myTickets}
+                  </Link>
+                  <Link
+                    href="/contact"
+                    onClick={onNavigate}
+                    className="flex h-11 items-center justify-center gap-2 rounded-[12px] text-[14px] font-semibold text-muted hover:bg-subtle hover:text-ink"
+                  >
+                    <Mail aria-hidden className="size-4" />
+                    {t.helpCenter.contact.contactPage}
+                  </Link>
+                </div>
+                <p className="rounded-[12px] bg-subtle px-3 py-2.5 text-[12.5px] text-muted">
+                  {t.helpCenter.contact.fromChat}
+                </p>
+              </div>
+            ) : null}
+
+            {tab === 'assistant' && handoff ? (
               <ChatHandoff
                 conversation={conversation}
                 hidden={handoff === 'hidden'}
@@ -510,7 +650,7 @@ export function SupportChat() {
             ) : null}
             <div
               ref={log}
-              hidden={handoff === 'shown'}
+              hidden={handoff === 'shown' || tab !== 'assistant'}
               role="log"
               aria-label={fmt(s.title, { brand })}
               aria-busy={busy}
@@ -573,7 +713,7 @@ export function SupportChat() {
             </div>
 
             <form
-              hidden={handoff === 'shown'}
+              hidden={handoff === 'shown' || tab !== 'assistant'}
               className="shrink-0 border-t border-line bg-surface px-3 pt-3 pb-[max(12px,env(safe-area-inset-bottom))]"
               onSubmit={(e) => {
                 e.preventDefault();

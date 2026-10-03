@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Button, Card, cn, useToast } from '@/components/app';
+import { Button, Card, Confetti, CountUp, cn, useToast } from '@/components/app';
 import { taskTitle } from '@/features/planning/model/task-text';
 import { systemText } from '@/features/planning/model/system-text';
 import { BudgetGauge } from '@/features/planning/ui/BudgetGauge';
@@ -446,7 +446,9 @@ function RsvpWidget({ data }: { data: EventHomeData }) {
               })}
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center" aria-hidden>
-              <span className="text-[30px] leading-none font-extrabold">{number(r.coming)}</span>
+              <span className="text-[30px] leading-none font-extrabold">
+                <CountUp value={r.coming} format={number} />
+              </span>
               <span className="mt-1 text-[11.5px] font-semibold text-muted">{W.coming}</span>
             </div>
           </div>
@@ -502,7 +504,9 @@ function TasksWidget({ data }: { data: EventHomeData }) {
     >
       <div className="flex w-full flex-col gap-3">
         <div>
-          <p className="text-[34px] leading-none font-extrabold">{number(pct)}%</p>
+          <p className="text-[34px] leading-none font-extrabold">
+            <CountUp value={pct} format={number} />%
+          </p>
           <p className="mt-1 text-[13px] font-semibold text-muted">
             {fmt(W.progress, { done: number(done), total: number(total) })}
           </p>
@@ -573,8 +577,28 @@ function Road({ data }: { data: EventHomeData }) {
   };
   const stages = STAGES.filter((s) => stageItems(s, data.caps).length);
   const firstOpen = stages.find((s) => stageStatus(s, facts).kind !== 'done');
+  // a stage finished since the host last looked: a little confetti (once per stage, in this browser)
+  const [burst, setBurst] = useState(0);
+  const doneKeys = stages.filter((s) => s !== 'celebrate' && stageStatus(s, facts).kind === 'done').join(',');
+  useEffect(() => {
+    const key = `badook:stages-done:${data.item.id}`;
+    try {
+      const before = new Set((window.localStorage.getItem(key) ?? '').split(',').filter(Boolean));
+      const now = doneKeys.split(',').filter(Boolean);
+      if (
+        now.some((s) => !before.has(s)) &&
+        before.size + now.length > 0 &&
+        window.localStorage.getItem(key) !== null
+      )
+        setBurst((n) => n + 1);
+      window.localStorage.setItem(key, now.join(','));
+    } catch {
+      /* no celebration remembered */
+    }
+  }, [doneKeys, data.item.id]);
   return (
     <section aria-labelledby="home-road" data-testid="home-road">
+      <Confetti fire={burst} />
       <h2 id="home-road" className="text-[16px] font-bold">
         {t.eventHome.road.title}
       </h2>

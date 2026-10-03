@@ -96,6 +96,8 @@ export function BudgetGauge({
   const reading = readGauge(input);
   const needle = useSpring(reading?.needle ?? 0);
   const ghost = useSpring(reading?.ghost ?? 0, { stiffness: 90, damping: 15 });
+  // the percent counts with the needle
+  const percentNow = useSpring(reading?.percent ?? 0, { stiffness: 90, damping: 18 });
   if (!reading) return null;
 
   const { w, stroke, needle: needleWidth } = SIZES[size];
@@ -248,8 +250,10 @@ export function BudgetGauge({
               size === 'lg' ? 'text-[44px]' : 'text-[30px]',
             )}
           >
-            {percentText}
-            <span className="sr-only"> {G.ofBudget}</span>
+            <span aria-hidden>{`${number(Math.max(0, Math.round(percentNow)))}%`}</span>
+            <span className="sr-only">
+              {percentText} {G.ofBudget}
+            </span>
           </p>
           <p className={cn('mt-1.5 font-semibold', size === 'lg' ? 'text-[15px]' : 'text-[13px]')}>
             {reading.left >= 0 ? (

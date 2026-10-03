@@ -15,6 +15,7 @@ import {
   Pause,
   RefreshCw,
   ScanFace,
+  Settings2,
   Send,
   ShieldCheck,
   Smartphone,
@@ -25,7 +26,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   AreaHelp,
   Badge,
@@ -37,6 +38,8 @@ import {
   Hint,
   KpiCard,
   PageHeader,
+  Tabs,
+  TabsPanel,
   useToast,
 } from '@/components/app';
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
@@ -87,6 +90,11 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
   const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [tab, setTab] = useState<'use' | 'settings'>('use');
+  // ?view=settings (a link to the gallery's settings) — read after mounting, like the server rendered it
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('view') === 'settings') setTab('settings');
+  }, []);
   const id = view.id;
   const g = view.gallery;
   const f = view.features.live_gallery;
@@ -322,54 +330,76 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
         <KpiCard label={L.kpi.uploaders} value={number(counts.uploaders)} icon={<Smartphone />} />
       </div>
 
-      <div className="mt-5 grid items-start gap-5 lg:grid-cols-2">
-        <div className="grid gap-5">
-          <ShareCard view={view} onRotate={rotate} />
-          {projector.why !== 'unavailable' ? (
-            <ProjectorCard
-              url={g.projectorUrl}
-              planned={projector.on}
-              plan={projector.plan}
-              onRotate={() => rotate('projector')}
-            />
-          ) : null}
-          {view.features.auto_reel.why !== 'unavailable' ? (
-            <FilmCard id={id} feature={view.features.auto_reel} />
-          ) : null}
-        </div>
-        <div className="grid gap-5">
-          <SettingsCard view={view} onPatch={patch} onAi={(on) => feature('gallery_ai', on)} />
-          {initial.faces ? <FaceSearchCard id={id} initial={initial.faces} /> : null}
-        </div>
-      </div>
-
-      <ItemsSection
-        key={id}
-        invitationId={id}
-        initialPending={initial.pending}
-        initialItems={initial.items}
-        initialNext={initial.next}
-        version={version}
-        onModerate={moderate}
-      />
-
-      <Card padding="lg" className="mt-10 border-danger-line" data-testid="gallery-danger">
-        <CardTitle as="h2" className="mb-1 text-danger">
-          {L.danger.title}
-        </CardTitle>
-        <p className="text-[13px] text-muted">{L.danger.body}</p>
-        <Hint text={L.hints.deleteGallery}>
-          <Button
-            variant="danger"
-            size="sm"
-            className="mt-3"
-            icon={<Trash2 />}
-            onClick={() => setConfirmDelete(true)}
-          >
-            {L.danger.button}
-          </Button>
-        </Hint>
-      </Card>
+      {/* two views (UX report): using the gallery on the day, and its settings — the deleting at the end of those */}
+      <Tabs<'use' | 'settings'>
+        value={tab}
+        onValueChange={(v) => {
+          setTab(v);
+          try {
+            window.history.replaceState(window.history.state, '', v === 'settings' ? '?view=settings' : '?');
+          } catch {
+            /* the view just isn't in the address */
+          }
+        }}
+        label={L.title}
+        stretch={false}
+        className="mt-6"
+        items={[
+          { value: 'use', label: L.views.use, icon: <Images /> },
+          { value: 'settings', label: L.views.settings, icon: <Settings2 /> },
+        ]}
+      >
+        <TabsPanel value="use" className="mt-5">
+          <div className="grid items-start gap-5 lg:grid-cols-2">
+            <ShareCard view={view} onRotate={rotate} />
+            <div className="grid gap-5">
+              {projector.why !== 'unavailable' ? (
+                <ProjectorCard
+                  url={g.projectorUrl}
+                  planned={projector.on}
+                  plan={projector.plan}
+                  onRotate={() => rotate('projector')}
+                />
+              ) : null}
+              {view.features.auto_reel.why !== 'unavailable' ? (
+                <FilmCard id={id} feature={view.features.auto_reel} />
+              ) : null}
+            </div>
+          </div>
+          <ItemsSection
+            key={id}
+            invitationId={id}
+            initialPending={initial.pending}
+            initialItems={initial.items}
+            initialNext={initial.next}
+            version={version}
+            onModerate={moderate}
+          />
+        </TabsPanel>
+        <TabsPanel value="settings" className="mt-5">
+          <div className="grid items-start gap-5 lg:grid-cols-2">
+            <SettingsCard view={view} onPatch={patch} onAi={(on) => feature('gallery_ai', on)} />
+            {initial.faces ? <FaceSearchCard id={id} initial={initial.faces} /> : null}
+          </div>
+          <Card padding="lg" className="mt-10 border-danger-line" data-testid="gallery-danger">
+            <CardTitle as="h2" className="mb-1 text-danger">
+              {L.danger.title}
+            </CardTitle>
+            <p className="text-[13px] text-muted">{L.danger.body}</p>
+            <Hint text={L.hints.deleteGallery}>
+              <Button
+                variant="danger"
+                size="sm"
+                className="mt-3"
+                icon={<Trash2 />}
+                onClick={() => setConfirmDelete(true)}
+              >
+                {L.danger.button}
+              </Button>
+            </Hint>
+          </Card>
+        </TabsPanel>
+      </Tabs>
       <Dialog
         open={confirmDelete}
         onOpenChange={setConfirmDelete}

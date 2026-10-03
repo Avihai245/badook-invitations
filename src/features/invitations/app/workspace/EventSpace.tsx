@@ -31,7 +31,7 @@ import { usePathname } from 'next/navigation';
 import { Dialog as RadixDialog } from 'radix-ui';
 import { useState, type ReactNode } from 'react';
 import { Badge, BrandLogo, Button, cn, useDir } from '@/components/app';
-import { openSupport } from '@/features/support/open';
+import { openHelp } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
@@ -330,7 +330,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
         <button
           type="button"
           data-tour="help"
-          onClick={() => openSupport()}
+          onClick={() => openHelp()}
           className="flex h-9 items-center gap-2.5 rounded-[10px] px-2.5 text-[13.5px] font-medium text-ink/75 transition-colors hover:bg-subtle hover:text-ink"
         >
           <MessageCircleQuestion aria-hidden className="size-[17px] shrink-0" strokeWidth={1.8} />
@@ -437,7 +437,8 @@ export function EventBar({ item }: { item: InvitationSummary }) {
 
 /**
  * Phones and tablets, inside an event: the bottom bar is the event's — its home and the four stages; a
- * stage opens a sheet with its screens (and its status). Insights and the settings are in the home's sheet.
+ * stage opens a sheet with its screens (and its status). Insights and the settings are linked at the foot of
+ * the event's home.
  */
 export function EventBottomBar({ data }: { data: EventSpaceData }) {
   const { t, fmt } = useUi();

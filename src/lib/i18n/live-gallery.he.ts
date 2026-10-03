@@ -1,5 +1,6 @@
 /** The live gallery in the host app (the invitation's "Gallery" tab) — Hebrew. */
 export const liveGalleryHe = {
+  views: { use: 'שימוש באירוע', settings: 'הגדרות ומחיקה' },
   tab: 'גלריה',
   metaTitle: 'גלריה · {name}',
   title: 'גלריה חיה',

@@ -92,8 +92,8 @@ const ROLE_VARIANTS = {
 
 /** Host app (§9B.1): Heebo (HE) / Inter (EN); display headlines in Frank Ruhl Libre (HE) / Fraunces (EN). */
 const APP_FAMILIES = {
-  Heebo: [400, 500, 600, 700].map((w) => [w, 'normal']),
-  Inter: [400, 500, 600, 700].map((w) => [w, 'normal']),
+  Heebo: [400, 500, 600, 700, 800].map((w) => [w, 'normal']),
+  Inter: [400, 500, 600, 700, 800].map((w) => [w, 'normal']),
   'Frank Ruhl Libre': [500, 700].map((w) => [w, 'normal']),
   Fraunces: [500, 600].map((w) => [w, 'normal']),
 };

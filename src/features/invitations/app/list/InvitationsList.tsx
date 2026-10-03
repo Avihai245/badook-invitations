@@ -8,7 +8,6 @@ import {
   FileSpreadsheet,
   ListChecks,
   MailPlus,
-  MessageCircle,
   MoreHorizontal,
   Palette,
   PencilLine,
@@ -36,16 +35,16 @@ import { BudgetGauge } from '@/features/planning/ui/BudgetGauge';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
-import { getTemplate, TEMPLATES } from '../../templates/registry';
+import { getTemplate } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
 import { CountdownChip, daysUntilEvent, useToday } from '../countdown';
 import { HelpFor } from '../HelpFor';
 import { TemplatePoster } from '../TemplatePoster';
 import { publishHref } from '../workspace/paths';
+import { STAGE_ICONS } from '../workspace/EventSpace';
+import { STAGES } from '../workspace/stages';
+import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { FollowUpDialog, followUpTypes } from './FollowUpDialog';
-
-/** How many designs the gallery offers (an unlisted one isn't counted). */
-const LISTED_DESIGNS = [...TEMPLATES.values()].filter(({ manifest }) => manifest.listed).length;
 
 const BADGE: Record<InvitationSummary['status'], BadgeVariant> = {
   draft: 'draft',
@@ -226,44 +225,43 @@ export function InvitationsList({
   );
 }
 
-/** No invitations yet: an inviting first step, then the four steps of the whole flow. */
+/**
+ * No events yet: what Badook is (the demo video), one inviting first step, then the event's four stages —
+ * planning, inviting, arranging, celebrating — so the whole product is in view before the first click.
+ */
 function EmptyList() {
-  const { t, fmt, number } = useUi();
-  const steps: [keyof typeof t.list.steps, LucideIcon][] = [
-    ['design', Palette],
-    ['details', PencilLine],
-    ['guests', FileSpreadsheet],
-    ['send', MessageCircle],
-  ];
+  const { t, number } = useUi();
+  const N = t.workspace.nav;
   return (
-    <section className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface shadow-sm">
-      <div className="grid items-center gap-6 px-6 py-8 sm:px-10 sm:py-10 md:grid-cols-[minmax(0,1fr)_200px]">
-        <div className="max-w-[48ch]">
-          <h2 className="font-display text-[26px] leading-tight font-bold text-balance sm:text-[30px]">
+    <section
+      className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface shadow-sm"
+      data-testid="list-empty"
+    >
+      <div className="grid items-center gap-8 px-6 py-8 sm:px-10 sm:py-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+        <div className="max-w-[52ch]">
+          <h2 className="font-display text-[28px] leading-tight font-bold text-balance sm:text-[34px]">
             {t.list.emptyTitle}
           </h2>
-          <p className="mt-2 text-[15px] text-pretty text-muted">{t.list.emptyBody}</p>
+          <p className="mt-2 text-[15.5px] text-pretty text-muted">{t.list.emptyBody}</p>
           <Button asChild size="lg" icon={<Palette />} className="mt-6">
             <Link href="/app/invitations/new">{t.list.emptyCta}</Link>
           </Button>
         </div>
-        <div aria-hidden className="list-hero-art mx-auto w-[150px] max-md:order-first md:w-[200px]">
-          <EnvelopeArt />
-        </div>
+        <DemoVideo />
       </div>
       <div className="border-t border-line bg-canvas/70 px-6 py-7 sm:px-10">
         <h3 className="text-[12.5px] font-bold tracking-[.06em] text-muted">{t.list.steps.title}</h3>
         <ol className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
-          {steps.map(([key, Icon], i) => {
-            const step = t.list.steps[key] as { title: string; body: string };
+          {STAGES.map((stage, i) => {
+            const Icon = STAGE_ICONS[stage];
             return (
               <li
-                key={key}
+                key={stage}
                 className="site-rise relative"
                 style={{ '--rise-delay': `${i * 90}ms` } as CSSProperties}
               >
-                {i < steps.length - 1 ? (
-                  // the path to the next step (wide screens)
+                {i < STAGES.length - 1 ? (
+                  // the path to the next stage (wide screens)
                   <span
                     aria-hidden
                     className="absolute top-[21px] start-14 -end-2 hidden border-t-2 border-dashed border-brand-line lg:block"
@@ -280,11 +278,9 @@ function EmptyList() {
                 </span>
                 <p className="mt-3 text-[14.5px] font-bold">
                   <span className="sr-only">{number(i + 1)}. </span>
-                  {step.title}
+                  {N.stages[stage]}
                 </p>
-                <p className="mt-1 text-[13px] text-pretty text-muted">
-                  {fmt(step.body, { n: number(LISTED_DESIGNS) })}
-                </p>
+                <p className="mt-1 text-[13px] text-pretty text-muted">{N.stageHint[stage]}</p>
               </li>
             );
           })}
@@ -564,18 +560,6 @@ function EnvelopeDecor() {
         fill="#a0703f"
         className="list-hero-spark [animation-delay:1.2s]"
       />
-    </svg>
-  );
-}
-
-/** Empty-state illustration: an envelope with a seal (decorative, 120×120). */
-function EnvelopeArt() {
-  return (
-    <svg viewBox="0 0 120 120" fill="none">
-      <rect x="14" y="30" width="92" height="64" rx="8" fill="#F5F0E8" stroke="#D6CFC4" strokeWidth="2" />
-      <path d="M16 34 60 66l44-32" stroke="#D6CFC4" strokeWidth="2" strokeLinejoin="round" />
-      <circle cx="60" cy="66" r="13" fill="#731F2E" />
-      <circle cx="60" cy="66" r="9" stroke="#fff" strokeOpacity=".35" strokeWidth="1.5" />
     </svg>
   );
 }

@@ -1,6 +1,8 @@
 import 'server-only';
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { GUIDE_ARTICLES, GUIDE_FAQ } from '@/features/guide/articles';
+import { guideAsText } from '@/features/guide/search';
 import { CREDIT_PACKS, messagePriceIls, packPriceIls } from '@/features/billing/plans';
 import { planPrices } from '@/features/billing/server/account';
 import { TEMPLATES } from '@/features/invitations/templates/registry';
@@ -101,7 +103,12 @@ ${templatesList()}
 
 <manual>
 ${knowledgeBase(k)}
-</manual>`;
+</manual>
+
+The written guide (the "מדריך" tab of the help panel, /app/guide): the same capabilities step by step, in the words the user sees there. When an article covers the question, answer in line with it and link it, [title](/app/guide/<slug>).
+<guide>
+${guideAsText(GUIDE_ARTICLES, GUIDE_FAQ, 'he')}
+</guide>`;
 }
 
 /** Where the question comes from (after the cached part, since it changes from page to page). */
