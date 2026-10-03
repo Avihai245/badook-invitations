@@ -31,7 +31,8 @@
     "qa:host": "node scripts/qa-host.mjs",
     "perf:templates": "tsx scripts/perf-templates.ts",
     "video:render": "npm --prefix video ci && npm --prefix video run render",
-    "video:tour": "npm --prefix video ci && npm --prefix video run narrate && npm --prefix video run render:tour"
+    "video:tour": "npm --prefix video ci && npm --prefix video run narrate && npm --prefix video run render:tour",
+    "video:tour:recorded": "npm --prefix video ci && npm --prefix video run narrate:files && npm --prefix video run render:tour"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

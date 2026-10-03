@@ -116,3 +116,10 @@ npm --prefix video run vtt             # captions only (also prints each scene's
 The scenes are look-alikes, not the real components: when the app's look changes (tokens, cards, the
 budget gauge's zones, wording), update `src/theme.ts` / the scene files, check with `run stills` or the
 studio, then `run render` and commit the new files in `public/video/`.
+
+## A recorded voice-over (no speech service)
+
+The full script, scene by scene with the file name for each, is in `NARRATION.he.md`. Record (or make
+elsewhere) one MP3 per scene as `public/narration/<id>.mp3`, then from the repo root run
+`npm run video:tour:recorded`: `narrate --files` measures each recording, times its scene and subtitles by
+it, and the tour renders with the voice. A scene without its file stays silent with its subtitles.

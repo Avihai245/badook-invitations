@@ -15,6 +15,7 @@
     "render:portrait": "remotion render src/index.ts DemoPortrait ../public/video/badook-demo-portrait.mp4 --codec=h264 --crf=28 --x264-preset=slow",
     "render:poster": "remotion still src/index.ts DemoLandscape ../public/video/poster.jpg --frame=765 --image-format=jpeg --jpeg-quality=85",
     "narrate": "node scripts/narrate.mjs",
+    "narrate:files": "node scripts/narrate.mjs --files",
     "vtt": "node scripts/vtt.mjs",
     "render:tour": "npm run vtt && npm run render:tour:mp4 && npm run render:tour:portrait && npm run render:tour:poster",
     "render:tour:mp4": "remotion render src/index.ts TourLandscape ../public/video/badook-tour.mp4 --codec=h264 --crf=30 --x264-preset=slow --audio-bitrate=96k",

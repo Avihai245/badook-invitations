@@ -7,7 +7,8 @@
 //
 // env: INVITES_TTS_AZURE_KEY, INVITES_TTS_AZURE_REGION or INVITES_TTS_AZURE_ENDPOINT (another base
 // address), TOUR_VOICE (default he-IL-HilaNeural; e.g. he-IL-AvriNeural), TOUR_RATE (default -4%).
-// flags: --force (re-synthesize every segment), --estimate (no audio: write the text-length estimates).
+// flags: --force (re-synthesize every segment), --estimate (no audio: write the text-length estimates),
+// --files (no service: use the recorded MP3s already in public/narration/<id>.mp3 — see NARRATION.he.md).
 // Without a key it says so and exits 0, so `npm run video:tour` still renders a captions-only video.
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
@@ -34,6 +35,31 @@ if (args.has('--estimate')) {
   console.log(
     `narrate: wrote text-length estimates (no audio) to ${path.relative(process.cwd(), DURATIONS_FILE)}`,
   );
+  process.exit(0);
+}
+
+if (args.has('--files')) {
+  // a voice-over recorded (or made elsewhere) as one MP3 per scene: measure each and time the scenes by
+  // it; a scene without its file keeps the text-length estimate and stays silent
+  const next = estimates();
+  let found = 0;
+  for (const { id } of NARRATION) {
+    const file = path.join(NARRATION_DIR, `${id}.mp3`);
+    if (!fs.existsSync(file)) {
+      console.log(`  ${id.padEnd(9)} —  no ${path.relative(process.cwd(), file)} (silent, estimated)`);
+      continue;
+    }
+    const seconds = Math.round(mp3Seconds(fs.readFileSync(file)) * 100) / 100;
+    if (!seconds) {
+      console.error(`narrate: ${path.relative(process.cwd(), file)}: not an MP3 it can read (export as MP3)`);
+      process.exit(1);
+    }
+    next[id] = { seconds, audio: true, voice: 'recorded' };
+    found++;
+    console.log(`  ${id.padEnd(9)} ${seconds.toFixed(2)}s  (recorded)`);
+  }
+  writeDurations(next);
+  console.log(`narrate: ${found} of ${NARRATION.length} scenes have a recording. Wrote ${path.relative(process.cwd(), DURATIONS_FILE)}.`);
   process.exit(0);
 }
 
