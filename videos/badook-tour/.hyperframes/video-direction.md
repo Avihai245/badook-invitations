@@ -68,8 +68,11 @@ subtitle of the voice — the headline/kicker are titles, not captions.
   Show a screenshot crop by putting the `<img>` inside an `overflow:hidden` window element and positioning/scaling the
   img (or an inner `.world` wrapper you animate for zooms). Compute every ring/pill/zoom target from the measured CSS
   boxes in your packet with the mapping in the Video direction — never eyeball positions.
-- Text sizes on screen: headline ≈ 84–96px Frank Ruhl Libre 500, kicker ≈ 30px Heebo 700 brown, lead ≈ 34px Heebo 400,
-  pills ≈ 26–28px Heebo 500. Keep copy SHORT (titles, labels, numbers) — never a narration sentence.
+- Text sizes on screen (this is a 1920×1080 film watched on laptops AND phones — go BIG): headline 104–124px Frank Ruhl
+  Libre 500, kicker 34px Heebo 700 brown, lead / list lines 40–44px Heebo 500, pills and chips 30–32px Heebo 500 with
+  generous padding (14px 26px), big numbers 140–200px. The text column is ~560px wide: fill it — no small text floating
+  in empty space. Keep copy SHORT (titles, labels, numbers) — never a narration sentence.
+- Make the real screen BIG: the window card should take ≈ 60–64% of the width and most of the height above y=896.
 - Window card: background #fff, border 1px rgba(28,25,23,.12), radius 18px, box-shadow 0 1px 3px rgba(28,25,23,.08),
   0 18px 48px -18px rgba(60,35,15,.35). Phone: dark body #1C1917, radius 54px, 12–14px bezel, the screenshot inside
   with radius 42px. Ring: 3px #A0703F, radius 14px, outer glow 0 0 0 6px rgba(160,112,63,.18).
