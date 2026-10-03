@@ -1,0 +1,623 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: "Heebo", sans-serif;
+      color: #1C1917;
+    }
+
+    /* full-bleed ground (clip layer, never on #root) */
+    [id="03-home-bg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      background:
+        radial-gradient(ellipse 980px 760px at 88% 6%, rgba(243, 232, 219, 1) 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+    [id="03-home-stage"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+
+    /* ---- the window card (real screenshot, no browser chrome) ---- */
+    [id="03-home-window"] {
+      position: absolute;
+      left: 80px;
+      top: 60px;
+      width: 1150px;
+      height: 800px;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #FAFAF9;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 18px 48px -18px rgba(60, 35, 15, 0.35);
+    }
+    [id="03-home-zoom-outer"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1150px;
+      height: 800px;
+      transform-origin: 50% 50%;
+    }
+    [id="03-home-world"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1150px;
+      height: 1130.833px;
+    }
+    [id="03-home-shot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1150px;
+      height: 1130.833px;
+      display: block;
+    }
+    [class~="03-home-spot"] {
+      position: absolute;
+      box-shadow: 0 0 0 3200px rgba(28, 25, 23, 0.38);
+      pointer-events: none;
+    }
+    [class~="03-home-slot"] {
+      position: absolute;
+      background: #FAFAF9;
+    }
+    [class~="03-home-lift"] {
+      position: absolute;
+    }
+    [class~="03-home-lift-shadow"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: #FAFAF9;
+      box-shadow: 0 10px 22px -8px rgba(60, 35, 15, 0.38), 0 2px 5px rgba(28, 25, 23, 0.08);
+    }
+    [class~="03-home-lift-clip"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: inherit;
+    }
+    [class~="03-home-lift-clip"] img {
+      position: absolute;
+      width: 1150px;
+      height: 1130.833px;
+      display: block;
+    }
+    [id="03-home-rings"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1150px;
+      height: 1130.833px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [class~="03-home-ring-line"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    [class~="03-home-ring-glow"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ---- callouts (screen space, above the window) ---- */
+    [class~="03-home-pill-anchor"] {
+      position: absolute;
+      width: 800px;
+      height: 56px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+    [class~="03-home-pill"] {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      box-shadow: 0 8px 22px -10px rgba(60, 35, 15, 0.35), 0 1px 3px rgba(28, 25, 23, 0.08);
+      color: #7A5230;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 27px;
+      line-height: 1;
+      white-space: nowrap;
+      direction: rtl;
+    }
+    [class~="03-home-pill"] svg {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    [class~="03-home-num"] {
+      display: inline-block;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 700;
+      font-size: 31px;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      color: #7A5230;
+    }
+    [class~="03-home-leader"] {
+      position: absolute;
+      width: 1.5px;
+      background: #A0703F;
+    }
+
+    /* ---- text column (RTL, right) ---- */
+    [class~="03-home-col"] {
+      position: absolute;
+      left: 1290px;
+      width: 550px;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="03-home-kicker"] {
+      top: 120px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      line-height: 1.2;
+    }
+    [id="03-home-headline"] {
+      top: 172px;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 96px;
+      line-height: 1.06;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+    }
+    [class~="03-home-word"] {
+      display: inline-block;
+    }
+    [id="03-home-rule"] {
+      top: 410px;
+      height: 1px;
+      background: #A0703F;
+      transform-origin: 100% 50%;
+    }
+    [class~="03-home-stage-row"] {
+      position: absolute;
+      left: 1290px;
+      width: 550px;
+      height: 76px;
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      direction: rtl;
+    }
+    [class~="03-home-stage-dot"] {
+      width: 66px;
+      height: 66px;
+      flex: 0 0 66px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 31px;
+      line-height: 1;
+      transform-origin: 50% 50%;
+    }
+    [class~="03-home-stage-name"] {
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 54px;
+      line-height: 1;
+      color: #1C1917;
+      letter-spacing: -0.01em;
+    }
+    [class~="03-home-stage-link"] {
+      position: absolute;
+      left: 1806.25px;
+      width: 1.5px;
+      height: 34px;
+      background: #A0703F;
+      transform-origin: 50% 0%;
+    }
+  </style>
+
+  <div id="root" data-composition-id="03-home" data-width="1920" data-height="1080" data-start="0" data-duration="16.932">
+    <div id="03-home-bg" class="clip" data-start="0" data-duration="16.932" data-track-index="0"></div>
+
+    <div id="03-home-stage" class="clip" data-start="0" data-duration="16.932" data-track-index="1">
+
+      <!-- the real event-home page in a soft window card -->
+      <div id="03-home-window">
+        <div id="03-home-zoom-outer" data-layout-allow-overflow>
+          <div id="03-home-world" data-layout-allow-overflow>
+            <img id="03-home-shot" src="assets/screen-home.png" alt="" />
+
+            <!-- spotlight cut-outs (veil everything except the measured box) -->
+            <div id="03-home-spot-countdown" class="03-home-spot"></div>
+            <div id="03-home-spot-next" class="03-home-spot"></div>
+            <div id="03-home-spot-widget" class="03-home-spot"></div>
+
+            <!-- road-map cards: a page-colored slot + the real card crop that lifts -->
+            <div class="03-home-slot" data-card="plan"></div>
+            <div class="03-home-slot" data-card="invite"></div>
+            <div class="03-home-slot" data-card="arrange"></div>
+            <div class="03-home-slot" data-card="celebrate"></div>
+            <div id="03-home-lift-plan" class="03-home-lift" data-card="plan">
+              <div id="03-home-liftshadow-plan" class="03-home-lift-shadow"></div>
+              <div class="03-home-lift-clip"><img src="assets/screen-home.png" alt="" /></div>
+            </div>
+            <div id="03-home-lift-invite" class="03-home-lift" data-card="invite">
+              <div id="03-home-liftshadow-invite" class="03-home-lift-shadow"></div>
+              <div class="03-home-lift-clip"><img src="assets/screen-home.png" alt="" /></div>
+            </div>
+            <div id="03-home-lift-arrange" class="03-home-lift" data-card="arrange">
+              <div id="03-home-liftshadow-arrange" class="03-home-lift-shadow"></div>
+              <div class="03-home-lift-clip"><img src="assets/screen-home.png" alt="" /></div>
+            </div>
+            <div id="03-home-lift-celebrate" class="03-home-lift" data-card="celebrate">
+              <div id="03-home-liftshadow-celebrate" class="03-home-lift-shadow"></div>
+              <div class="03-home-lift-clip"><img src="assets/screen-home.png" alt="" /></div>
+            </div>
+
+            <!-- highlight rings, in page (world) coordinates -->
+            <svg id="03-home-rings" viewBox="0 0 1150 1130.833" xmlns="http://www.w3.org/2000/svg">
+              <g id="03-home-ring-countdown"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+              <g id="03-home-ring-next"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+              <g id="03-home-ring-budget"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+              <g id="03-home-ring-rsvp"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+              <g id="03-home-ring-tasks"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+              <g id="03-home-ring-plan"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+              <g id="03-home-ring-invite"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+              <g id="03-home-ring-arrange"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+              <g id="03-home-ring-celebrate"><path class="03-home-ring-glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /><path class="03-home-ring-line" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" /></g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- callout leaders + pills (screen space; positions computed from the measured boxes) -->
+      <div id="03-home-leader-countdown" class="03-home-leader"></div>
+      <div id="03-home-leader-next" class="03-home-leader"></div>
+      <div id="03-home-leader-budget" class="03-home-leader"></div>
+      <div id="03-home-leader-rsvp" class="03-home-leader"></div>
+      <div id="03-home-leader-tasks" class="03-home-leader"></div>
+
+      <div id="03-home-anchor-countdown" class="03-home-pill-anchor">
+        <div id="03-home-pill-countdown" class="03-home-pill" dir="rtl" lang="he">
+          <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" /><path d="M3.5 10h17M8 3v4M16 3v4" /></svg>
+          <span><span id="03-home-num-countdown" class="03-home-num" style="width: 3ch">0</span> ימים</span>
+        </div>
+      </div>
+      <div id="03-home-anchor-next" class="03-home-pill-anchor">
+        <div id="03-home-pill-next" class="03-home-pill" dir="rtl" lang="he">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+          <span>הצעד הבא — תמיד דבר אחד</span>
+        </div>
+      </div>
+      <div id="03-home-anchor-budget" class="03-home-pill-anchor">
+        <div id="03-home-pill-budget" class="03-home-pill" dir="rtl" lang="he">
+          <svg viewBox="0 0 24 24"><path d="M3.5 17a8.5 8.5 0 0 1 17 0" /><path d="M12 17l4.2-5.2" /><circle cx="12" cy="17" r="1.2" /></svg>
+          <span><span dir="ltr" style="display: inline-block"><span id="03-home-num-budget" class="03-home-num" style="width: 2ch">0</span>%</span> · בטוחים</span>
+        </div>
+      </div>
+      <div id="03-home-anchor-rsvp" class="03-home-pill-anchor">
+        <div id="03-home-pill-rsvp" class="03-home-pill" dir="rtl" lang="he">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" /><path d="M3 19.5c0-3.3 2.7-5.6 6-5.6s6 2.3 6 5.6" /><path d="M15.8 5.2a3 3 0 0 1 0 5.6M17.8 14.2c1.9.7 3.2 2.5 3.2 5.3" /></svg>
+          <span><span id="03-home-num-rsvp" class="03-home-num" style="width: 2ch">0</span> מגיעים</span>
+        </div>
+      </div>
+      <div id="03-home-anchor-tasks" class="03-home-pill-anchor">
+        <div id="03-home-pill-tasks" class="03-home-pill" dir="rtl" lang="he">
+          <svg viewBox="0 0 24 24"><path d="M10.5 6.5h10M10.5 12h10M10.5 17.5h10" /><path d="M3.5 6.5l1.6 1.6 2.6-3M3.5 12l1.6 1.6 2.6-3M3.5 17.5l1.6 1.6 2.6-3" /></svg>
+          <span><span id="03-home-num-tasks" class="03-home-num" style="width: 2ch">0</span> משימות</span>
+        </div>
+      </div>
+
+      <!-- text column -->
+      <div id="03-home-kicker" class="03-home-col" dir="rtl" lang="he">02 · בית האירוע</div>
+      <div id="03-home-headline" class="03-home-col" dir="rtl" lang="he"><span id="03-home-w1" class="03-home-word">הכול</span><br /><span id="03-home-w2" class="03-home-word">במבט</span> <span id="03-home-w3" class="03-home-word">אחד</span></div>
+      <div id="03-home-rule" class="03-home-col"></div>
+
+      <!-- the four stages: 1-2-3-4 list that assembles with the road map -->
+      <div id="03-home-link-2" class="03-home-stage-link" style="top: 537px"></div>
+      <div id="03-home-link-3" class="03-home-stage-link" style="top: 637px"></div>
+      <div id="03-home-link-4" class="03-home-stage-link" style="top: 737px"></div>
+      <div class="03-home-stage-row" style="top: 466px" dir="rtl" lang="he">
+        <div id="03-home-dot-1" class="03-home-stage-dot">1</div>
+        <div id="03-home-name-1" class="03-home-stage-name">מתכננים</div>
+      </div>
+      <div class="03-home-stage-row" style="top: 566px" dir="rtl" lang="he">
+        <div id="03-home-dot-2" class="03-home-stage-dot">2</div>
+        <div id="03-home-name-2" class="03-home-stage-name">מזמינים</div>
+      </div>
+      <div class="03-home-stage-row" style="top: 666px" dir="rtl" lang="he">
+        <div id="03-home-dot-3" class="03-home-stage-dot">3</div>
+        <div id="03-home-name-3" class="03-home-stage-name">מסדרים</div>
+      </div>
+      <div class="03-home-stage-row" style="top: 766px" dir="rtl" lang="he">
+        <div id="03-home-dot-4" class="03-home-stage-dot">4</div>
+        <div id="03-home-name-4" class="03-home-stage-name">חוגגים</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "03-home";
+      var $ = function (id) { return document.getElementById(FID + "-" + id); };
+
+      // ---------- geometry (all from the measured CSS boxes; page = 1440×1416 CSS px) ----------
+      var SC = 1150 / 1440;              // displayed px per CSS px inside the window
+      var IMG_H = 1416 * SC;             // 1130.833
+      var WIN = { x: 80, y: 60, w: 1150, h: 800 };
+      var C = { x: WIN.w / 2, y: WIN.h / 2 }; // zoom origin (window center)
+      var BOX = {
+        countdown: [265, 231, 112, 94],
+        next: [72, 441, 1080, 140],
+        budget: [437, 601, 349, 338],
+        rsvp: [803, 601, 349, 338],
+        tasks: [72, 601, 349, 338],
+        plan: [891, 995, 261, 123],
+        invite: [618, 995, 261, 123],
+        arrange: [345, 995, 261, 123],
+        celebrate: [72, 995, 261, 123]
+      };
+      function content(b) { return { x: b[0] * SC, y: b[1] * SC, w: b[2] * SC, h: b[3] * SC }; }
+      function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
+      // camera state = scale S + the visible-center (vx, vy) in world px, clamped so the page always fills the window
+      function aim(b, S) {
+        var c = content(b), hw = WIN.w / 2 / S, hh = WIN.h / 2 / S;
+        return { S: S, vx: clamp(c.x + c.w / 2, hw, WIN.w - hw), vy: clamp(c.y + c.h / 2, hh, IMG_H - hh) };
+      }
+      var CAM = {
+        top: { S: 1, vx: C.x, vy: C.y },                      // CSS y 0–1000
+        countdown: aim(BOX.countdown, 1.5),
+        next: aim(BOX.next, 1.15),
+        road: { S: 1.2, vx: ((72 + 1152) / 2) * SC, vy: 560 * SC + WIN.h / 2 / 1.2 } // page scrolled to CSS y≈560
+      };
+      // world box -> canvas px under a camera state
+      function toScreen(b, cam) {
+        var c = content(b);
+        return {
+          x: WIN.x + C.x + cam.S * (c.x - cam.vx),
+          y: WIN.y + C.y + cam.S * (c.y - cam.vy),
+          w: c.w * cam.S,
+          h: c.h * cam.S
+        };
+      }
+      function rrPath(x, y, w, h, r) {
+        return "M" + (x + w / 2) + " " + y +
+          " H" + (x + w - r) + " A" + r + " " + r + " 0 0 1 " + (x + w) + " " + (y + r) +
+          " V" + (y + h - r) + " A" + r + " " + r + " 0 0 1 " + (x + w - r) + " " + (y + h) +
+          " H" + (x + r) + " A" + r + " " + r + " 0 0 1 " + x + " " + (y + h - r) +
+          " V" + (y + r) + " A" + r + " " + r + " 0 0 1 " + (x + r) + " " + y +
+          " H" + (x + w / 2);
+      }
+      // ring geometry in world units so it reads 3px / radius 14 / 6px halo on screen at the camera scale it's shown at
+      var RING = {
+        countdown: { cam: CAM.countdown, pad: 10 },
+        next: { cam: CAM.next, pad: 10 },
+        budget: { cam: CAM.top, pad: 9 },
+        rsvp: { cam: CAM.top, pad: 9 },
+        tasks: { cam: CAM.top, pad: 9 },
+        plan: { cam: CAM.road, pad: 8 },
+        invite: { cam: CAM.road, pad: 8 },
+        arrange: { cam: CAM.road, pad: 8 },
+        celebrate: { cam: CAM.road, pad: 8 }
+      };
+      Object.keys(RING).forEach(function (k) {
+        var c = content(BOX[k]), S = RING[k].cam.S, p = RING[k].pad / S, r = 14 / S, g = 4.5 / S;
+        var gEl = $("ring-" + k);
+        var glow = gEl.querySelector('[class~="03-home-ring-glow"]');
+        var line = gEl.querySelector('[class~="03-home-ring-line"]');
+        line.setAttribute("d", rrPath(c.x - p, c.y - p, c.w + 2 * p, c.h + 2 * p, r));
+        line.setAttribute("stroke-width", String(3 / S));
+        glow.setAttribute("d", rrPath(c.x - p - g, c.y - p - g, c.w + 2 * (p + g), c.h + 2 * (p + g), r + g));
+        glow.setAttribute("stroke-width", String(6 / S));
+      });
+      // spotlights (hole = box + ring pad, radius 14 on screen)
+      function placeSpot(el, k) {
+        var c = content(BOX[k]), S = RING[k].cam.S, p = RING[k].pad / S;
+        el.style.left = (c.x - p) + "px";
+        el.style.top = (c.y - p) + "px";
+        el.style.width = (c.w + 2 * p) + "px";
+        el.style.height = (c.h + 2 * p) + "px";
+        el.style.borderRadius = (14 / S) + "px";
+      }
+      placeSpot($("spot-countdown"), "countdown");
+      placeSpot($("spot-next"), "next");
+      placeSpot($("spot-widget"), "budget");
+      var SPOT_DX_RSVP = (BOX.rsvp[0] - BOX.budget[0]) * SC;
+      var SPOT_DX_TASKS = (BOX.tasks[0] - BOX.budget[0]) * SC;
+
+      // road-map cards: slot + real crop of the card (lifts 6 screen px at 1.2×)
+      var CARD_R = 20 * SC;
+      Array.prototype.forEach.call(document.querySelectorAll('[class~="03-home-slot"], [class~="03-home-lift"]'), function (el) {
+        var c = content(BOX[el.getAttribute("data-card")]);
+        el.style.left = c.x + "px";
+        el.style.top = c.y + "px";
+        el.style.width = c.w + "px";
+        el.style.height = c.h + "px";
+        el.style.borderRadius = CARD_R + "px";
+        var img = el.querySelector("img");
+        if (img) { img.style.left = (-c.x) + "px"; img.style.top = (-c.y) + "px"; }
+      });
+
+      // callout pills + leaders (canvas px, computed at the settled camera of each beat)
+      var PILL_H = 56;
+      function placeCallout(k, side, fx, len) {
+        var s = toScreen(BOX[k], RING[k].cam), pad = RING[k].pad + 1.5;
+        var ax = s.x + s.w * fx;
+        var leader = $("leader-" + k), anchor = $("anchor-" + k), pill = $("pill-" + k);
+        leader.style.left = (ax - 0.75) + "px";
+        leader.style.height = len + "px";
+        anchor.style.left = (ax - 400) + "px";
+        if (side === "below") {
+          var yb = s.y + s.h + pad;
+          leader.style.top = yb + "px";
+          leader.style.transformOrigin = "50% 0%";
+          anchor.style.top = (yb + len) + "px";
+          pill.style.transformOrigin = "50% 0%";
+        } else {
+          var yt = s.y - pad;
+          leader.style.top = (yt - len) + "px";
+          leader.style.transformOrigin = "50% 100%";
+          anchor.style.top = (yt - len - PILL_H) + "px";
+          pill.style.transformOrigin = "50% 100%";
+        }
+      }
+      placeCallout("countdown", "below", 0.5, 30);
+      placeCallout("next", "below", 0.72, 32);
+      placeCallout("budget", "above", 0.5, 18);
+      placeCallout("rsvp", "above", 0.5, 18);
+      placeCallout("tasks", "above", 0.5, 18);
+
+      // ---------- timeline ----------
+      var tl = gsap.timeline({ paused: true });
+      var outer = $("zoom-outer"), world = $("world");
+      gsap.set(outer, { scale: 1, transformOrigin: "50% 50%" });
+      gsap.set(world, { x: 0, y: 0 });
+
+      function camTo(cam, at, dur, ease) {
+        // coordinate-target-zoom: outer scales about the window center, inner counter-translates (T = C − visible center)
+        tl.to(outer, { scale: cam.S, duration: dur, ease: ease }, at);
+        tl.to(world, { x: C.x - cam.vx, y: C.y - cam.vy, duration: dur, ease: ease }, at);
+      }
+      function ringIn(k, at, dur) {
+        var g = $("ring-" + k);
+        tl.fromTo(g, { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "none" }, at);
+        tl.fromTo(g.querySelectorAll("path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: dur, ease: "power2.out" }, at);
+      }
+      function calloutIn(k, side, at) {
+        tl.fromTo($("leader-" + k), { scaleY: 0 }, { scaleY: 1, duration: 0.22, ease: "power2.out" }, at);
+        tl.fromTo($("pill-" + k),
+          { scale: 0, opacity: 0, y: side === "below" ? -10 : 10 },
+          { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, at + 0.08);
+      }
+      function countUp(k, to, at, dur) {
+        var el = $("num-" + k), o = { v: 0 };
+        tl.fromTo(o, { v: 0 }, {
+          v: to, duration: dur, ease: "power3.out",
+          onUpdate: function () { el.textContent = String(Math.round(o.v)); }
+        }, at);
+      }
+      function handOff(els, at) {
+        tl.to(els, { opacity: 0, duration: 0.2, ease: "power1.in" }, at);
+      }
+
+      // Scene 1 (0.0–3.2): window rises + fades in; kicker; headline per-word on "במבט אחד"
+      tl.fromTo($("window"), { y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1, ease: "power3.out" }, 0);
+      tl.fromTo($("kicker"), { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
+      tl.fromTo($("w1"), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 1.6);
+      tl.fromTo($("w2"), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 2.0);
+      tl.fromTo($("w3"), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 2.22);
+      tl.fromTo($("rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 2.55);
+
+      // Scene 2 (3.2–4.5): zoom ≈1.5× on the countdown, ring + pill "256 ימים" counting up
+      camTo(CAM.countdown, 3.05, 0.9, "power3.inOut");
+      tl.fromTo($("spot-countdown"), { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.out" }, 3.4);
+      ringIn("countdown", 3.4, 0.6);
+      calloutIn("countdown", "below", 3.88);
+      countUp("countdown", 256, 3.96, 0.56);
+      handOff([$("ring-countdown"), $("spot-countdown"), $("leader-countdown"), $("pill-countdown")], 4.52);
+
+      // Scene 3 (4.5–6.9): glide to the next-step card (≈1.15×), ring + pill
+      camTo(CAM.next, 4.6, 1.05, "power3.inOut");
+      tl.fromTo($("spot-next"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 5.2);
+      ringIn("next", 5.2, 0.75);
+      calloutIn("next", "below", 5.72);
+      handOff([$("ring-next"), $("spot-next"), $("leader-next"), $("pill-next")], 6.72);
+
+      // Scene 4 (6.9–10.6): back to 1.0 over the three widgets; one ring at a time on its word
+      camTo(CAM.top, 6.8, 0.8, "power3.inOut");
+      tl.fromTo($("spot-widget"), { opacity: 0, x: 0 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 6.95);
+      ringIn("budget", 6.9, 0.6);
+      calloutIn("budget", "above", 7.54);
+      countUp("budget", 44, 7.62, 0.6);
+
+      handOff([$("ring-budget"), $("leader-budget"), $("pill-budget")], 8.02);
+      tl.to($("spot-widget"), { x: SPOT_DX_RSVP, duration: 0.42, ease: "power3.inOut" }, 8.02);
+      ringIn("rsvp", 8.1, 0.6);
+      calloutIn("rsvp", "above", 8.46);
+      countUp("rsvp", 24, 8.54, 0.6);
+
+      handOff([$("ring-rsvp"), $("leader-rsvp"), $("pill-rsvp")], 9.12);
+      tl.to($("spot-widget"), { x: SPOT_DX_TASKS, duration: 0.45, ease: "power3.inOut" }, 9.12);
+      ringIn("tasks", 9.2, 0.6);
+      calloutIn("tasks", "above", 9.56);
+      countUp("tasks", 72, 9.64, 0.6);
+      handOff([$("ring-tasks"), $("spot-widget"), $("leader-tasks"), $("pill-tasks")], 10.42);
+
+      // Scene 5 (10.6–16.932): page travels down to the road map, then the four stages light up in order
+      camTo(CAM.road, 10.6, 1.0, "power3.inOut");
+      var LIFT = -6 / CAM.road.S; // 6 screen px
+      var STAGES = [
+        { k: "plan", at: 13.0 },
+        { k: "invite", at: 13.9 },
+        { k: "arrange", at: 15.0 },
+        { k: "celebrate", at: 15.7 }
+      ];
+      STAGES.forEach(function (st, i) {
+        var k = st.k, at = st.at, n = i + 1;
+        if (i > 0) handOff([$("ring-" + STAGES[i - 1].k)], at);
+        ringIn(k, at, 0.55);
+        tl.fromTo($("ring-" + k), { y: 0 }, { y: LIFT, duration: 0.55, ease: "power3.out" }, at);
+        tl.fromTo($("lift-" + k), { y: 0 }, { y: LIFT, duration: 0.55, ease: "power3.out" }, at);
+        tl.fromTo($("liftshadow-" + k), { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.out" }, at);
+        // text column 1-2-3-4 assembles in sync
+        if (n > 1) tl.fromTo($("link-" + n), { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power2.out" }, at - 0.08);
+        tl.fromTo($("dot-" + n), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, at + 0.04);
+        tl.fromTo($("name-" + n), { x: 26, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, at + 0.12);
+      });
+      // held read from ~15.9s to the end (no exits — the root transition is the exit)
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["03-home"] = tl;
+    })();
+  </script>
+</template>
