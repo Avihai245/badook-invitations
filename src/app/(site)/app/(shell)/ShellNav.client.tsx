@@ -367,9 +367,10 @@ export function UserMenu({
         >
           <span
             aria-hidden
-            className="relative grid size-8 shrink-0 place-items-center rounded-full bg-linear-to-br from-brand to-brand-strong text-[14px] font-bold text-white"
+            // the initial drawn by CSS: a picture of the account, not words of the button's name
+            data-initial={initial}
+            className="relative grid size-8 shrink-0 place-items-center rounded-full bg-linear-to-br from-brand to-brand-strong text-[14px] font-bold text-white before:content-[attr(data-initial)]"
           >
-            {initial}
             {unread ? (
               <span className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-danger ring-2 ring-surface" />
             ) : null}

@@ -3,8 +3,7 @@
 import { BookOpen, MessageCircleQuestion } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useUi } from '@/lib/i18n/client';
-import { articlesFor } from '@/features/guide/search';
-import { GUIDE_ARTICLES } from '@/features/guide/articles';
+import { GUIDE_SCREEN_ARTICLE } from '@/features/guide/catalog';
 import { navKeyOf } from '@/features/invitations/app/workspace/stages';
 import { openHelp, openSupport } from './open';
 import { currentInvitationId } from './pages';
@@ -17,14 +16,15 @@ export function AskAssistant() {
   const { t } = useUi();
   const path = usePathname();
   const id = currentInvitationId(path);
-  const article = id ? articlesFor(GUIDE_ARTICLES, navKeyOf(path, id))[0] : undefined;
+  const key = id ? navKeyOf(path, id) : null;
+  const article = key ? GUIDE_SCREEN_ARTICLE[key] : undefined;
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
       <span className="text-[12.5px] text-muted">{t.support.askTitle}</span>
       <span className="flex flex-wrap gap-1.5">
         <button
           type="button"
-          onClick={() => openHelp({ article: article?.slug })}
+          onClick={() => openHelp({ article })}
           data-testid="area-help-guide"
           className="inline-flex items-center gap-1.5 rounded-full border border-brand-line px-3 py-1.5 text-[12.5px] font-semibold text-brand-deep transition-colors hover:bg-brand-soft"
         >

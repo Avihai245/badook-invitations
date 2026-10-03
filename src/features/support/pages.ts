@@ -1,4 +1,4 @@
-import { GUIDE_ARTICLES } from '@/features/guide/articles';
+import { GUIDE_SLUGS as SLUGS } from '@/features/guide/catalog';
 /**
  * Every screen of the app the support assistant may point someone to — always as a real link, never
  * just named in words. chat.ts's systemPrompt() renders SUPPORT_PAGES under a `<pages>` block and tells
@@ -65,7 +65,7 @@ export function supportPagesList(): string {
 }
 
 const BY_PATH = new Map(SUPPORT_PAGES.map((p) => [p.path, p]));
-const GUIDE_SLUGS = new Set(GUIDE_ARTICLES.map((a) => a.slug));
+const GUIDE_SLUGS = new Set<string>(SLUGS);
 
 /** The invitation id in a real (unmasked) pathname, when the visitor is on one of its own pages. */
 export function currentInvitationId(pathname: string): string | null {

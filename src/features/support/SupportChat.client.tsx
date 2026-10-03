@@ -11,6 +11,7 @@ import {
   Square,
   X,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -26,7 +27,6 @@ import {
 import { cn, Hint } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { navKeyOf } from '@/features/invitations/app/workspace/stages';
-import { GuideArticleView, GuideIndex, articleBySlug } from '@/features/guide/GuideView';
 import { SUPPORT_OPEN, openHelp, type SupportOpenDetail } from './open';
 import { currentInvitationId, linkifyLabeledPaths, resolveSupportPath } from './pages';
 import { ChatHandoff } from './tickets/ui/ChatHandoff.client';
@@ -47,6 +47,12 @@ interface Msg {
 
 type Area =
   'general' | 'editor' | 'guests' | 'responses' | 'billing' | 'home' | 'budget' | 'seating' | 'gallery';
+
+/** The guide tab's words load when it is first shown, not with every page. */
+const GuidePanel = dynamic(() => import('@/features/guide/GuidePanel'), {
+  ssr: false,
+  loading: () => <div aria-hidden className="h-40 animate-pulse rounded-[16px] bg-subtle" />,
+});
 
 const STORE = 'badook:support';
 /** What the server accepts (features/support/chat.ts ChatSchema) */
@@ -371,8 +377,7 @@ export function SupportChat() {
         returnTo.current = document.activeElement;
       setOpen(true);
       setTab(detail.question ? 'assistant' : (detail.tab ?? 'assistant'));
-      if (detail.tab === 'guide')
-        setArticle(detail.article && articleBySlug(detail.article) ? detail.article : null);
+      if (detail.tab === 'guide') setArticle(detail.article ?? null);
       if (detail.question) void askRef.current(detail.question);
     };
     window.addEventListener(SUPPORT_OPEN, onOpen);
@@ -573,30 +578,18 @@ export function SupportChat() {
                 className="flex-1 overflow-y-auto overscroll-contain bg-[linear-gradient(180deg,#fbf7f2,#ffffff_30%)] px-4 py-4 dark:bg-none"
                 data-testid="help-guide"
               >
-                {article && articleBySlug(article) ? (
-                  <GuideArticleView
-                    article={articleBySlug(article)!}
-                    onOpen={(slug) => {
-                      setArticle(slug);
-                      guideBody.current?.scrollTo({ top: 0 });
-                    }}
-                    onBack={() => setArticle(null)}
-                    full
-                  />
-                ) : (
-                  <GuideIndex
-                    compact
-                    screen={invitationId ? navKeyOf(path, invitationId) : null}
-                    onOpen={(slug) => {
-                      setArticle(slug);
-                      guideBody.current?.scrollTo({ top: 0 });
-                    }}
-                    onAsk={(q) => {
-                      setTab('assistant');
-                      void ask(q);
-                    }}
-                  />
-                )}
+                <GuidePanel
+                  article={article}
+                  screen={invitationId ? navKeyOf(path, invitationId) : null}
+                  onOpen={(slug) => {
+                    setArticle(slug);
+                    guideBody.current?.scrollTo({ top: 0 });
+                  }}
+                  onAsk={(q) => {
+                    setTab('assistant');
+                    void ask(q);
+                  }}
+                />
               </div>
             ) : tab === 'contact' ? (
               <div

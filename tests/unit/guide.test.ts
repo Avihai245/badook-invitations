@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { GUIDE_ARTICLES, GUIDE_FAQ } from '@/features/guide/articles';
+import { GUIDE_SCREEN_ARTICLE, GUIDE_SLUGS } from '@/features/guide/catalog';
 import { articlesFor, guideAsText, searchGuide } from '@/features/guide/search';
 import { GUIDE_SECTIONS } from '@/features/guide/types';
+import { NAV_PATHS, type NavKey } from '@/features/invitations/app/workspace/stages';
 import { resolveSupportPath } from '@/features/support/pages';
 
 describe('the written guide (UX report §4.4)', () => {
@@ -20,6 +22,12 @@ describe('the written guide (UX report §4.4)', () => {
     }
     for (const f of GUIDE_FAQ) if (f.more) expect(slugs.has(f.more), f.more).toBe(true);
   });
+  it('has a catalog (the slugs and each screen’s article, on every page) in step with the articles', () => {
+    expect([...GUIDE_SLUGS]).toEqual(GUIDE_ARTICLES.map((a) => a.slug));
+    for (const key of Object.keys(NAV_PATHS) as NavKey[])
+      expect(GUIDE_SCREEN_ARTICLE[key], key).toBe(articlesFor(GUIDE_ARTICLES, key)[0]?.slug);
+  });
+
   it('covers every feature the report lists', () => {
     for (const slug of [
       'quick-start',
