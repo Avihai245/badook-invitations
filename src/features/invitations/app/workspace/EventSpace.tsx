@@ -329,6 +329,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
         <NavItem id={item.id} navKey="settings" current={current === 'settings'} />
         <button
           type="button"
+          data-tour="help"
           onClick={() => openSupport()}
           className="flex h-9 items-center gap-2.5 rounded-[10px] px-2.5 text-[13.5px] font-medium text-ink/75 transition-colors hover:bg-subtle hover:text-ink"
         >

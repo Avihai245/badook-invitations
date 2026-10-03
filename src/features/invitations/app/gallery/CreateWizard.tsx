@@ -14,6 +14,8 @@ import { browserTimezone, DEFAULT_TIMEZONE, timezoneOptions } from '../../lib/ti
 import { COUPLE_EVENTS } from '../../templates/seed-copy';
 import { EVENT_ICONS } from '../event-icons';
 import { HelpFor } from '../HelpFor';
+import { clearAnswers, planInit, readAnswers } from '../onboarding/answers';
+import { templateKeyFor } from '@/features/planning/templates';
 
 export interface WizardSeed {
   templateId: string;
@@ -88,13 +90,21 @@ export function CreateWizard({
   /** the language of the names typed in step 2 */
   const first: Locale = supported.includes(ui) ? ui : supported[0]!;
 
+  // the start wizard's answers (this tab): the date and names typed there, and the plan to set up
+  const [answers] = useState(() => (typeof window === 'undefined' ? null : readAnswers()));
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [eventType, setEventType] = useState<EventType>(
-    seed.eventType && types.includes(seed.eventType) ? seed.eventType : types[0]!,
+    seed.eventType && types.includes(seed.eventType)
+      ? seed.eventType
+      : answers && types.includes(answers.eventType)
+        ? answers.eventType
+        : types[0]!,
   );
-  const [names, setNames] = useState<Partial<Record<Locale, Names>>>({});
+  const [names, setNames] = useState<Partial<Record<Locale, Names>>>(() =>
+    answers ? { [first]: { ...NO_NAMES, ...answers.names } } : {},
+  );
   const [age, setAge] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(answers?.date ?? '');
   const [startTime, setStartTime] = useState('');
   // §7.2: Asia/Jerusalem for Hebrew, otherwise the browser's zone.
   const [timezone, setTimezone] = useState(() => (ui === 'he' ? DEFAULT_TIMEZONE : browserTimezone()));
@@ -190,6 +200,14 @@ export function CreateWizard({
         return;
       }
       if (res.ok && body?.ok && body.id) {
+        // a budget or a guest count from the start wizard: the plan is set up with them (a convenience)
+        if (answers && (answers.budget || answers.guests) && answers.eventType === eventType)
+          await fetch(`/api/invitations/${body.id}/planning`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(planInit(answers, templateKeyFor(eventType) ?? 'blank')),
+          }).catch(() => null);
+        clearAnswers();
         // The skeleton stays up until the editor replaces this page.
         router.push(`/app/invitations/${body.id}/edit`);
         return;

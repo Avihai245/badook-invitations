@@ -28,7 +28,7 @@ export default async function ShellLayout({ children }: { children: ReactNode })
     : [false, 0];
   return (
     // inside an event (data-event-space, the workspace) the event's own sidebar and bottom bar take over
-    <div className="min-h-dvh lg:grid lg:grid-cols-[264px_minmax(0,1fr)] lg:has-[[data-event-space]]:grid-cols-1 lg:[&:has([data-event-space])>header]:hidden [&:has([data-event-space])>nav[data-tabbar]]:hidden">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[264px_minmax(0,1fr)] lg:has-[[data-event-space]]:grid-cols-1 lg:[&:has([data-event-space])>header]:hidden [&:has([data-event-space])>nav[data-tabbar]]:hidden lg:has-[[data-fullscreen]]:grid-cols-1 [&:has([data-fullscreen])>header]:hidden [&:has([data-fullscreen])>nav[data-tabbar]]:hidden">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-3 focus:z-50 focus:rounded-btn focus:bg-surface focus:px-3 focus:py-2 focus:shadow-md"

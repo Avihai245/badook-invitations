@@ -186,6 +186,78 @@ export const en: AppDict = {
       more: 'More',
     },
   },
+  start: {
+    metaTitle: 'New event',
+    skip: 'Skip to the design gallery',
+    back: 'Back',
+    next: 'Next',
+    progress: 'Step {n} of 3',
+    type: {
+      title: 'What are you celebrating?',
+      body: 'We’ll fit the designs, tasks and budget to your kind of event.',
+    },
+    details: {
+      title: 'Tell us a little',
+      body: 'When, roughly how many and the budget — you can change everything later.',
+      date: 'Event date',
+      dateRequired: 'Choose a date',
+      guests: 'About how many guests?',
+      guestsHint: 'Doesn’t have to be exact. The budget follows it until there’s a list.',
+      budget: 'Estimated budget (₪)',
+      budgetHint: 'Optional. We’ll split it into categories, in whole shekels.',
+      invalidNumber: 'Type a whole number',
+    },
+    where: {
+      title: 'Where do you want to start?',
+      body: 'Every road leads to the same place — switch any time.',
+      plan: {
+        title: 'Planning',
+        body: 'Tasks on a timeline, a budget and vendors. Pick an invitation design later.',
+      },
+      design: {
+        title: 'Designing the invitation',
+        body: 'Pick an animated design, fill in the details and publish.',
+      },
+      all: {
+        title: 'Everything',
+        body: 'Invitation design and planning together — our recommendation.',
+        badge: 'Recommended',
+      },
+      cta: 'Let’s go',
+      creating: 'Setting up your event…',
+      error: 'Something went wrong. Try again.',
+    },
+    video: { title: 'Want to see how it works?', cta: 'Watch the 45-second video' },
+  },
+  tour: {
+    label: 'A quick tour',
+    step: '{n} of {total}',
+    next: 'Next',
+    done: 'Done',
+    skip: 'Skip',
+    steps: {
+      next: {
+        title: 'The next step',
+        body: 'Always one thing — the most important now. Finish it and the next one comes.',
+      },
+      nav: {
+        title: 'Four stages',
+        body: 'Plan, invite, arrange, celebrate. Everything the event needs — in order.',
+      },
+      budget: {
+        title: 'The budget gauge',
+        body: 'Green — safe, amber — close to the limit, red — over. It moves with every expense.',
+      },
+      rsvp: {
+        title: 'RSVPs',
+        body: 'Who’s coming, who isn’t and who hasn’t answered — one number, everywhere.',
+      },
+      help: {
+        title: 'Help any time',
+        body: 'A written guide, the smart assistant and the team — one button.',
+      },
+    },
+  },
   eventHome: {
     metaTitle: 'Event home · {name}',
     hero: {
