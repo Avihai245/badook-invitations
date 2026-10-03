@@ -153,6 +153,10 @@ export const invitationsEn: typeof invitationsHe = {
       art_direction: 'Design concepts',
       draft_review: 'Family review link',
       analytics: 'Insights',
+      planning: 'Event planning',
+      planning_ai: 'Planning: AI drafts',
+      planning_export: 'Planning: export and files',
+      planning_templates: 'Planning: private templates',
     } as Record<string, string>,
   },
   errors: {

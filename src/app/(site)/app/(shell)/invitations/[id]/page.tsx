@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { featureInput } from '@/features/flags/server';
+import { planningCard } from '@/features/planning/server/overview-card';
 import { InvitationOverview } from '@/features/invitations/app/overview/InvitationOverview';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { guestStats } from '@/features/invitations/lib/guest-status';
@@ -39,6 +41,8 @@ export default async function InvitationOverviewPage({ params }: { params: Param
     requestBaseUrl(),
   ]);
   if (!item || !replies) notFound();
+  // the planning's next step, when the plan follows the overview (never in the way of the page)
+  const planning = await planningCard(user.id, item, await featureInput(id).catch(() => null));
   const base = publicBase.replace(/\/+$/, '');
   return (
     <InvitationOverview
@@ -46,6 +50,7 @@ export default async function InvitationOverviewPage({ params }: { params: Param
       guests={guestStats(guests ?? [])}
       replies={responseStats(replies.responses, Date.now())}
       url={`${base}/i/${item.slug}`}
+      planning={planning}
     />
   );
 }

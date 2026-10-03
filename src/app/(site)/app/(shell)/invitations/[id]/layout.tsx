@@ -5,6 +5,7 @@ import { deploymentFeatures, featureInput } from '@/features/flags/server';
 import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { InvitationWorkspace } from '@/features/invitations/app/workspace/InvitationWorkspace';
+import { planningTab } from '@/features/planning/server/badge';
 import { requireUser } from '@/lib/supabase/session';
 
 type Params = Promise<{ id: string }>;
@@ -31,6 +32,20 @@ export default async function InvitationLayout({
   // the event day (check-in and the live hall) the same way
   const dayOff = input ? whyOff('checkin', input) : 'unavailable';
   const eventDay = dayOff === null ? 'on' : dayOff === 'plan' ? 'plan' : null;
+  // the planning tab (feature planning): there when the event has it, with the week's task count
+  const planning = await planningTab(
+    user.id,
+    item,
+    {
+      eventType: item.eventType,
+      status: item.status,
+      unpublishedChanges: item.unpublishedChanges,
+      guests: item.guests,
+      sent: item.sent,
+      responses: item.responses,
+    },
+    input,
+  );
   return (
     <>
       {/* the header's poster writes the names in the design's font */}
@@ -39,6 +54,7 @@ export default async function InvitationLayout({
         item={item}
         seating={seating}
         eventDay={eventDay}
+        planning={planning}
         galleryTab={deploymentFeatures().has('live_gallery')}
         insightsTab={deploymentFeatures().has('analytics')}
       >

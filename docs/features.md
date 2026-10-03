@@ -4,7 +4,8 @@ Every new capability sits behind a flag (`src/features/flags`). A feature is on 
 
 1. **this deployment offers it** — not listed in `INVITES_FEATURES_OFF`, and its setup exists: the AI
    features (`gallery_ai`, `translate_ai`) need `ANTHROPIC_API_KEY` + `INVITES_AI_MODEL`;
-   `face_albums` needs `INVITES_FACE_ALBUMS=on` (biometric data — see below). `art_direction` works
+   `face_albums` needs `INVITES_FACE_ALBUMS=on` (biometric data — see below); the `planning` features
+   need `INVITES_PLANNING=on` (see "Event planning" below). `art_direction` works
    without the AI (its composer) and `voice` without the speech service (the guest's device reads) —
    both are better with them;
 2. **the host hasn't switched it off** for the event (`PATCH /api/invitations/:id/features { feature, off }`);
@@ -22,9 +23,9 @@ before it.
 
 | Package | Adds |
 |---|---|
-| Basic | `cinematic`, `seating`, `languages`, `draft_review`, `analytics` |
-| Premium | `seating_auto`, `seating_guide`, `live_gallery`, `gallery_ai`, `translate_ai`, `voice` |
-| VIP | `checkin`, `projector`, `auto_reel`, `face_albums`, `art_direction` |
+| Basic | `cinematic`, `seating`, `languages`, `draft_review`, `analytics`, `planning` |
+| Premium | `seating_auto`, `seating_guide`, `live_gallery`, `gallery_ai`, `translate_ai`, `voice`, `planning_ai`, `planning_export` |
+| VIP | `checkin`, `projector`, `auto_reel`, `face_albums`, `art_direction`, `planning_templates` |
 
 Changing a package is one line in `PACKAGE_FEATURES` (`src/features/flags/features.ts`).
 
@@ -42,6 +43,42 @@ publishing waits (`422 translations_unreviewed`) while a language has machine te
 approved — or whose original changed since. What the host writes counts as approved. Without the
 feature (or without an AI model) the same review screen is where hosts translate by hand. A host has
 30 machine runs a day (`TRANSLATE_LIMITS`).
+
+## Event planning (`planning`, `planning_ai`, `planning_export`, `planning_templates`)
+
+An invitation's "Event planning" tab (`/app/invitations/:id/plan`): tasks, budget, vendors, and notes &
+ideas. It lives only inside the invitations system — nothing is read from or shared with Badook Events.
+
+**Rolling it out.** The tab stays hidden until `INVITES_PLANNING=on`. Apply the planning migrations
+(`supabase/migrations/*_planning_*.sql`) to the database *before* turning it on (and before the code that
+uses them is deployed with the switch on). `INVITES_FEATURES_OFF=planning` switches it off again for the
+whole deployment; the host can switch it off for one event (nothing is deleted), and an admin can grant a
+paid tool to one event.
+
+**What each package gets.** Basic (Free): the section — tasks, budget, vendors, ideas, the weekly email
+and the calendar export. Premium (Pro): `planning_ai` (a plan drafted from a description of the event, and
+an idea card's "summarize and suggest steps" — needs `ANTHROPIC_API_KEY` + `INVITES_AI_MODEL`, capped per
+account by `INVITES_PLANNING_AI_DAILY_LIMIT` and site-wide by `INVITES_AI_DAILY_LIMIT`) and
+`planning_export` (the budget as an Excel file, and files attached to vendors and costs). VIP (Business):
+`planning_templates` (the host's own plans saved as templates, up to 20). A tool outside the package is
+shown as a soft upgrade card, never a broken button.
+
+**How it fits the invitation.** Plans start from a template written for the kind of event (code,
+`src/features/planning/templates`, Hebrew and English): wedding, bar and bat mitzvah, brit in full;
+engagement, henna, baby shower, birthday and company event light; "other" starts from the system tasks, a
+draft from the AI, or a saved template. A save-the-date has no plan (it lives on the full invitation).
+The five steps of "the road to a perfect invitation" are *system tasks* judged by the same function
+(`systemTaskDone`), so the overview and the task list never disagree; the RSVP deadline and the final
+head-count follow the invitation's own deadline. The budget follows the invitation system only as far as
+the host chose — standalone, recommended (vendors, tasks, the overview card; the default) or full (the
+guest list and replies, the seating, today's payments on the event day) — and turning a link off deletes
+nothing.
+
+**Data.** `plan_settings`, `plan_tasks`, `budget_categories`, `budget_items`, `budget_payments`,
+`plan_vendors`, `plan_ideas`, `plan_templates`: row level security on with no policies, every read and
+write through owner-checked functions (service role only), money computed in the database
+(`planning_totals`), files in the private `plan-files` bucket (`<owner>/<invitation>/…`). The weekly email
+is part of the daily run (`sendPlanReminders`), once in six days per plan, owner only.
 
 ## Per event
 

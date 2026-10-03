@@ -21,6 +21,9 @@ import {
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Button, Card, cn, Hint, Input, KpiCard, PageHeader, useToast } from '@/components/app';
+import type { PlanningCardData } from '@/features/planning/server/overview-card';
+import { PlanningCard } from '@/features/planning/ui/PlanningCard';
+import { BASE_FACTS, systemTaskDone, type SystemFacts } from '@/features/planning/model/system-tasks';
 import { useUi } from '@/lib/i18n/client';
 import type { GuestStats } from '../../lib/guest-status';
 import type { ResponseStats } from '../../lib/responses';
@@ -38,17 +41,22 @@ export interface OverviewFacts {
   responses: number;
 }
 
-/** Which of the five steps are done, and the first one that isn't (the one to do now). */
+/**
+ * Which of the five steps are done, and the first one that isn't (the one to do now). Each step is a
+ * system task of the planning section (features/planning), judged by the same function, so the road to a
+ * perfect invitation and the plan's task list can never disagree.
+ */
 export function overviewSteps(f: OverviewFacts): {
   done: Record<OverviewStep, boolean>;
   next: OverviewStep | null;
 } {
+  const facts: SystemFacts = { ...BASE_FACTS, ...f };
   const done: Record<OverviewStep, boolean> = {
-    design: true,
-    publish: f.status === 'published' && !f.unpublishedChanges,
-    import: f.guests > 0,
-    send: f.guests > 0 && f.sent >= f.guests,
-    track: f.responses > 0,
+    design: systemTaskDone('invitation_designed', facts) === true,
+    publish: systemTaskDone('invitation_published', facts) === true,
+    import: systemTaskDone('guests_uploaded', facts) === true,
+    send: systemTaskDone('invites_sent', facts) === true,
+    track: systemTaskDone('rsvp_tracked', facts) === true,
   };
   const order: OverviewStep[] = ['design', 'publish', 'import', 'send', 'track'];
   return { done, next: order.find((s) => !done[s]) ?? null };
@@ -64,11 +72,14 @@ export function InvitationOverview({
   guests,
   replies,
   url,
+  planning = null,
 }: {
   item: InvitationSummary;
   guests: GuestStats;
   replies: ResponseStats;
   url: string;
+  /** the planning's next step (features/planning), when the event has it and its plan follows the overview */
+  planning?: PlanningCardData | null;
 }) {
   const { t, fmt, plural, number } = useUi();
   const o = t.overview;
@@ -240,6 +251,12 @@ export function InvitationOverview({
           }
         />
       </div>
+
+      {planning ? (
+        <div className="mt-4">
+          <PlanningCard id={item.id} data={planning} />
+        </div>
+      ) : null}
 
       <div className="mt-6 grid items-start gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Card padding="none" className="overflow-hidden">

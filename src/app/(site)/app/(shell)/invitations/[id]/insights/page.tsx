@@ -5,6 +5,8 @@ import { featureInput } from '@/features/flags/server';
 import { featureState, insightsView, isResult } from '@/features/insights/server/api';
 import { reportDeps } from '@/features/insights/server/deps';
 import { InsightsScreen } from '@/features/insights/ui/InsightsScreen';
+import { insightsBudget } from '@/features/planning/server/insights-block';
+import { PlanningInsights } from '@/features/planning/ui/PlanningInsights';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { fmt } from '@/lib/i18n/app';
@@ -43,5 +45,12 @@ export default async function InsightsPage({ params }: { params: Params }) {
   }
   const view = await insightsView(user.id, id, { range: 30 }, reportDeps());
   if (!view || isResult(view)) notFound();
-  return <InsightsScreen initial={{ id, view, off: null }} />;
+  // the plan's budget, when the plan follows the insights (never in the way of the page)
+  const budget = await insightsBudget(user.id, id, input);
+  return (
+    <>
+      <InsightsScreen initial={{ id, view, off: null }} />
+      {budget ? <PlanningInsights id={id} data={budget} /> : null}
+    </>
+  );
 }

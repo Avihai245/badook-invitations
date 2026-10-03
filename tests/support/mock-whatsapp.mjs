@@ -23,6 +23,12 @@
 // answers three concepts on the first templates of the catalog it was sent, and remembers each request
 // without the photos (GET /__ai/art). A mood with "crash" / "נפילה" fails (overloaded) and one with
 // "garbage" / "זבל" answers something that isn't JSON — the app then composes the concepts itself.
+//
+// Event planning (POST /v1/messages, not streamed, the planning prompts — features/planning/server/ai.ts):
+// a description answers a draft plan (a dozen tasks around the date and a budget split to 100%), a note
+// answers a one-line summary and two next steps; a description with "crash" / "נפילה" fails (overloaded)
+// and one with "garbage" / "זבל" answers something that isn't JSON. Each request is remembered
+// (GET /__ai/planning).
 import { createServer } from 'node:http';
 
 const port = Number(process.env.MOCK_WHATSAPP_PORT || 54340);
@@ -37,6 +43,7 @@ const aiRequests = [];
 const galleryAiRequests = [];
 const translateRequests = [];
 const artAiRequests = [];
+const planningAiRequests = [];
 let n = 0;
 
 const ANSWERS = [
@@ -95,6 +102,8 @@ async function answerAi(req, res) {
   for await (const chunk of req) raw += chunk;
   const body = JSON.parse(raw || '{}');
   if (typeof body.system === 'string' && body.system.includes('art director')) return answerArt(res, body);
+  if (typeof body.system === 'string' && body.system.startsWith('You help a host plan'))
+    return answerPlanning(res, body);
   const photo = Array.isArray(body.messages?.[0]?.content)
     ? body.messages[0].content.find((c) => c?.type === 'image')
     : null;
@@ -174,6 +183,70 @@ function answerGalleryCheck(res, body, photo) {
     stop_reason: 'end_turn',
     usage: { input_tokens: 420, output_tokens: 30 },
   });
+}
+
+function answerPlanning(res, body) {
+  let task = null;
+  try {
+    task = JSON.parse(String(body.messages?.[0]?.content ?? ''));
+  } catch {
+    // not the expected request
+  }
+  const idea = body.system.includes('ideas board');
+  planningAiRequests.push({ model: body.model, kind: idea ? 'idea' : 'plan', task });
+  const text = String(task?.description ?? task?.note ?? '');
+  if (/crash|נפילה/i.test(text))
+    return json(res, 529, { type: 'error', error: { type: 'overloaded_error', message: 'overloaded' } });
+  const reply = (out) =>
+    json(res, 200, {
+      id: `msg_e2e_planning_${planningAiRequests.length}`,
+      type: 'message',
+      role: 'assistant',
+      model: body.model,
+      content: [{ type: 'text', text: out }],
+      stop_reason: 'end_turn',
+      usage: { input_tokens: 600, output_tokens: 500 },
+    });
+  if (/garbage|זבל/i.test(text)) return reply('this is not json');
+  if (idea)
+    return reply(
+      JSON.stringify({
+        summary: 'A caterer worth a call',
+        steps: [
+          { title: 'Call the caterer and ask for a quote', category: 'catering' },
+          { title: 'Book a tasting', category: 'catering' },
+        ],
+      }),
+    );
+  const he = task?.language === 'Hebrew';
+  const t = (heText, enText) => (he ? heText : enText);
+  const tasks = [
+    ['לסגור מקום לאירוע', 'Book the place', -60, 'venue', 1],
+    ['להזמין קייטרינג', 'Order the catering', -45, 'catering', 1],
+    ['לבחור צלם', 'Choose a photographer', -40, 'photographer', 0],
+    ['לתאם מוזיקה', 'Arrange the music', -30, 'dj', 0],
+    ['לאשר תפריט סופי', 'Confirm the final menu', -14, 'catering', 0],
+    ['לשלם יתרה לספקים', 'Pay the vendors’ balance', 0, null, 0],
+    ['לשלוח מילות תודה', 'Send thank-yous', 7, null, 0],
+  ].map(([he_, en_, offsetDays, category, priority]) => ({
+    title: t(he_, en_),
+    notes: null,
+    offsetDays,
+    category,
+    priority,
+  }));
+  return reply(
+    JSON.stringify({
+      tasks,
+      categories: [
+        { key: 'venue', name: null, pct: 40, basis: 'fixed', required: true },
+        { key: 'catering', name: null, pct: 40, basis: 'per_guest', required: true },
+        { key: 'photographer', name: null, pct: 10, basis: 'fixed', required: false },
+        { key: 'dj', name: null, pct: 10, basis: 'fixed', required: false },
+      ],
+      requiredVendors: ['venue', 'catering'],
+    }),
+  );
 }
 
 function answerTranslation(res, body) {
@@ -293,6 +366,7 @@ createServer(async (req, res) => {
   if (req.method === 'GET' && url.pathname === '/__ai') return json(res, 200, aiRequests);
   if (req.method === 'GET' && url.pathname === '/__ai/gallery') return json(res, 200, galleryAiRequests);
   if (req.method === 'GET' && url.pathname === '/__ai/translate') return json(res, 200, translateRequests);
+  if (req.method === 'GET' && url.pathname === '/__ai/planning') return json(res, 200, planningAiRequests);
   if (req.method === 'GET' && url.pathname === '/__ai/art') return json(res, 200, artAiRequests);
   if (req.method === 'POST' && url.pathname === '/v1/messages') return answerAi(req, res);
   const match = url.pathname.match(/^\/v[\d.]+\/(\d+)\/messages$/);

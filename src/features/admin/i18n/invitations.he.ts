@@ -147,6 +147,10 @@ export const invitationsHe = {
       art_direction: 'הצעות עיצוב',
       draft_review: 'קישור להערות המשפחה',
       analytics: 'תובנות',
+      planning: 'תכנון האירוע',
+      planning_ai: 'תכנון: טיוטות AI',
+      planning_export: 'תכנון: ייצוא וקבצים',
+      planning_templates: 'תכנון: תבניות פרטיות',
     } as Record<string, string>,
   },
   errors: {

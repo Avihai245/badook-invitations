@@ -4,6 +4,7 @@ import {
   Armchair,
   ChartColumn,
   ChevronLeft,
+  ClipboardList,
   DoorOpen,
   ExternalLink,
   Images,
@@ -41,6 +42,7 @@ export function InvitationWorkspace({
   item,
   seating = null,
   eventDay = null,
+  planning = null,
   galleryTab = false,
   insightsTab = false,
   children,
@@ -48,6 +50,8 @@ export function InvitationWorkspace({
   item: InvitationSummary;
   seating?: 'on' | 'plan' | null;
   eventDay?: 'on' | 'plan' | null;
+  /** the planning tab (feature planning), with the tasks due this week; null: not offered */
+  planning?: { week: number } | null;
   /** the live gallery's tab (when this deployment offers it: features/flags) */
   galleryTab?: boolean;
   /** how guests use the invitation (feature analytics, when this deployment offers it) */
@@ -68,6 +72,19 @@ export function InvitationWorkspace({
 
   const tabs: { key: WorkspaceTab; href: string; icon: LucideIcon; label: ReactNode; count?: string }[] = [
     { key: 'overview', href: base, icon: LayoutDashboard, label: w.tabs.overview },
+    ...(planning
+      ? [
+          {
+            key: 'plan' as const,
+            href: `${base}/plan`,
+            icon: ClipboardList,
+            label: t.planning.tab,
+            count: planning.week
+              ? plural(t.planning.tabWeek, planning.week, { n: number(planning.week) })
+              : undefined,
+          },
+        ]
+      : []),
     {
       key: 'guests',
       href: `${base}/guests`,
@@ -105,7 +122,13 @@ export function InvitationWorkspace({
     { key: 'edit', href: `${base}/edit`, icon: PenLine, label: w.tabs.edit },
   ];
   const countOf = (key: WorkspaceTab) =>
-    key === 'guests' ? item.guests : key === 'responses' ? item.responses : 0;
+    key === 'guests'
+      ? item.guests
+      : key === 'responses'
+        ? item.responses
+        : key === 'plan'
+          ? (planning?.week ?? 0)
+          : 0;
 
   // phones: the tab row scrolls sideways — bring the current tab into view (the row only, not the page)
   const tabRow = useRef<HTMLElement>(null);
@@ -237,7 +260,9 @@ export function InvitationWorkspace({
                               active ? 'bg-white/20' : guests ? 'bg-wa-ink/10' : 'bg-ink/8',
                             )}
                           >
-                            {number(countOf(key))}
+                            {key === 'plan'
+                              ? `${number(countOf(key))} ${t.planning.tabWeekShort}`
+                              : number(countOf(key))}
                           </span>
                           <span className="sr-only">({count})</span>
                         </>

@@ -305,6 +305,8 @@ test.describe('responses dashboard', () => {
       erased: expect.any(Number),
       deleted: expect.any(Number),
     };
+    // …and the weekly planning email: tasks and payments of the coming week (features/planning)
+    const planning = { sent: expect.any(Number), failed: expect.any(Number), skipped: expect.any(Number) };
     expect(await first.json()).toEqual({
       sent: 1,
       failed: 0,
@@ -320,6 +322,7 @@ test.describe('responses dashboard', () => {
       logs,
       admin,
       support,
+      planning,
     });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
@@ -337,6 +340,7 @@ test.describe('responses dashboard', () => {
       logs,
       admin,
       support,
+      planning,
     });
   });
 });
