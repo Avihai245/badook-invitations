@@ -609,3 +609,59 @@ describe('the support assistant knows every screen', () => {
     expect([...known].filter((p) => !found.includes(p)).sort()).toEqual([]);
   });
 });
+
+describe('the support assistant knows every feature', () => {
+  it('every feature flag is documented in the manual', async () => {
+    const { FEATURES } = await import('@/features/flags/features');
+    const { MANUAL_COVERAGE, knowledgeBase } = await import('@/features/support/knowledge');
+    const manual = knowledgeBase({
+      brand: 'Badook',
+      site: 'https://example.test',
+      prices: { pro: 1, business: 2 },
+      messagePrice: 1,
+      packs: [],
+      supportEmail: 'a@example.test',
+    });
+    expect(Object.keys(MANUAL_COVERAGE).sort()).toEqual([...FEATURES].sort());
+    // a feature whose phrase is missing: document it in knowledge.ts (or fix the phrase)
+    expect(FEATURES.filter((f) => !manual.includes(MANUAL_COVERAGE[f]))).toEqual([]);
+  });
+
+  it('every product area (src/features/*) is accounted for in the manual', async () => {
+    const { readdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const manual = (await import('node:fs')).readFileSync(
+      join(process.cwd(), 'src/features/support/knowledge.ts'),
+      'utf8',
+    );
+    // each area → a phrase the manual uses for it; internal areas (no host-facing use) are listed as null
+    const AREAS: Record<string, string | null> = {
+      admin: null, // the staff console
+      flags: null, // covered feature by feature above
+      jobs: null, // background work
+      site: null, // marketing pages
+      support: 'פנייה לצוות',
+      partner: null, // partners' console
+      legal: 'פרטיות',
+      'art-direction': 'עצבו לי',
+      billing: 'חבילות ותשלומים',
+      'event-day': 'יום האירוע',
+      faces: 'התמונות שאני בהן',
+      film: 'סרט הרגעים',
+      insights: 'תובנות',
+      invitations: 'יצירת הזמנה',
+      'live-gallery': 'גלריה חיה',
+      planning: 'תכנון האירוע',
+      review: 'עיון המשפחה',
+      seating: 'סידור שולחנות',
+      voice: 'הקראת ההזמנה',
+      whatsapp: 'וואטסאפ',
+    };
+    const dirs = readdirSync(join(process.cwd(), 'src/features'), { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name);
+    // a new area fails here until it's documented in knowledge.ts and listed above
+    expect(dirs.filter((d) => !(d in AREAS)).sort()).toEqual([]);
+    expect(Object.entries(AREAS).filter(([, w]) => w && !manual.includes(w))).toEqual([]);
+  });
+});
