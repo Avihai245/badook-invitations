@@ -80,8 +80,8 @@ describe('the support assistant', () => {
     expect(resolveSupportPath('/app/invitations/:id/guests', 'abc-123')).toBe(
       '/app/invitations/abc-123/guests',
     );
-    // no current invitation to fill ":id" with: rejected, never left with the literal placeholder
-    expect(resolveSupportPath('/app/invitations/:id/guests', null)).toBeNull();
+    // no current invitation to fill ":id" with: still a link — to the invitation list, never the placeholder
+    expect(resolveSupportPath('/app/invitations/:id/guests', null)).toBe('/app/invitations');
     // not a known screen at all
     expect(resolveSupportPath('/app/invitations/:id/wrong-tab', 'abc-123')).toBeNull();
     expect(resolveSupportPath('/app/admin/system', null)).toBeNull();
@@ -140,10 +140,21 @@ describe('the support assistant', () => {
     noBarePath(fixed, '/app/invitations/:id/seating');
     expect(fixed.match(/\]\(\/app\/invitations\/:id\/seating\)/g)).toHaveLength(2);
 
-    // no current invitation to fill ":id" with: same rule as resolveSupportPath — left exactly as is,
-    // never linked into something Inline could never resolve either
+    // no current invitation: still linked (Inline resolves it to the invitation list), never a bare path
     const noId = 'ב-סידור שולחנות (/app/invitations/:id/seating) עושים את זה ככה:';
-    expect(linkifyLabeledPaths(noId, null)).toBe(noId);
+    expect(linkifyLabeledPaths(noId, null)).toContain('](/app/invitations/:id/seating)');
+
+    // a JSON-escaped path (the reported "\/app\/invitations\/:id\/guests\/") or one in backticks: normalized first
+    const { normalizeAnswer, supportPageName } = await import('@/features/support/pages');
+    const escaped = normalizeAnswer(
+      'נכנסים לרשימת המוזמנים (\\/app\\/invitations\\/:id\\/guests\\/) ולוחצים',
+    );
+    expect(escaped).toBe('נכנסים לרשימת המוזמנים (/app/invitations/:id/guests/) ולוחצים');
+    expect(linkifyLabeledPaths(escaped, null)).toContain('לרשימת המוזמנים](/app/invitations/:id/guests/)');
+    expect(normalizeAnswer('ב-`/app/billing`')).toBe('ב-/app/billing');
+    expect(supportPageName('/app/invitations/:id/guests', 'he')).toBe('רשימת האורחים');
+    expect(supportPageName('/app/billing', 'en')).toBe('Plans');
+    expect(supportPageName('/app/admin', 'he')).toBeNull();
 
     // a page with no ":id" at all
     const contact = linkifyLabeledPaths('טופס יצירת קשר (/contact) בכל שאלה.', null);

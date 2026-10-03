@@ -14,37 +14,70 @@
  */
 export interface SupportPage {
   path: string;
+  /** Its name in Hebrew, the link's text when the assistant wrote a bare path. */
+  he: string;
   label: string;
 }
 
 export const SUPPORT_PAGES: SupportPage[] = [
-  { path: '/app/invitations', label: 'Invitation list (home)' },
-  { path: '/app/invitations/new', label: 'Create a new invitation' },
-  { path: '/app/invitations/:id', label: 'One invitation, overview' },
-  { path: '/app/invitations/:id/edit', label: 'Edit: design, text, RSVP questions' },
-  { path: '/app/invitations/:id/plan', label: 'Event planning: overview, next step, this week' },
-  { path: '/app/invitations/:id/plan/tasks', label: 'Planning: tasks and the calendar' },
-  { path: '/app/invitations/:id/plan/budget', label: 'Planning: budget, payments, cost per guest' },
-  { path: '/app/invitations/:id/plan/vendors', label: 'Planning: vendors, quotes, closing a vendor' },
-  { path: '/app/invitations/:id/plan/ideas', label: 'Planning: notes and ideas board' },
-  { path: '/app/invitations/:id/guests', label: 'Guest list: add guests, WhatsApp sending, RSVP status' },
-  { path: '/app/invitations/:id/responses', label: 'RSVP responses' },
-  { path: '/app/invitations/:id/seating', label: 'Seating arrangement' },
-  { path: '/app/invitations/:id/gallery', label: 'Photo and video gallery' },
-  { path: '/app/invitations/:id/insights', label: 'Views and opening statistics' },
-  { path: '/app/invitations/:id/live', label: 'The live screen, for the event day' },
-  { path: '/app/invitations/:id/share', label: 'Sharing links and QR code' },
-  { path: '/app/account', label: 'Account settings' },
-  { path: '/app/billing', label: 'Plans, billing and invoices' },
-  { path: '/app/support', label: 'Support tickets' },
-  { path: '/app/support/new', label: 'Open a new ticket ("Talk to a person")' },
-  { path: '/contact', label: 'The public contact form' },
-  { path: '/terms', label: 'Terms of use' },
-  { path: '/privacy', label: 'Privacy policy' },
-  { path: '/cookies', label: 'Cookies' },
-  { path: '/accessibility', label: 'Accessibility statement' },
-  { path: '/login', label: 'Log in' },
-  { path: '/signup', label: 'Sign up' },
+  { path: '/app/invitations', he: 'ההזמנות שלי', label: 'Invitation list (home)' },
+  { path: '/app/invitations/new', he: 'יצירת הזמנה חדשה', label: 'Create a new invitation' },
+  { path: '/app/invitations/:id', he: 'מסך ההזמנה', label: 'One invitation, overview' },
+  { path: '/app/invitations/:id/edit', he: 'עריכת ההזמנה', label: 'Edit: design, text, RSVP questions' },
+  {
+    path: '/app/invitations/:id/plan',
+    he: 'תכנון האירוע',
+    label: 'Event planning: overview, next step, this week',
+  },
+  {
+    path: '/app/invitations/:id/plan/tasks',
+    he: 'משימות ולוח שנה',
+    label: 'Planning: tasks and the calendar',
+  },
+  {
+    path: '/app/invitations/:id/plan/budget',
+    he: 'תקציב ותשלומים',
+    label: 'Planning: budget, payments, cost per guest',
+  },
+  {
+    path: '/app/invitations/:id/plan/vendors',
+    he: 'ספקים',
+    label: 'Planning: vendors, quotes, closing a vendor',
+  },
+  { path: '/app/invitations/:id/plan/ideas', he: 'לוח רעיונות', label: 'Planning: notes and ideas board' },
+  {
+    path: '/app/invitations/:id/guests',
+    he: 'רשימת האורחים',
+    label: 'Guest list: add guests, WhatsApp sending, RSVP status',
+  },
+  { path: '/app/invitations/:id/responses', he: 'אישורי ההגעה', label: 'RSVP responses' },
+  { path: '/app/invitations/:id/seating', he: 'סידור שולחנות', label: 'Seating arrangement' },
+  { path: '/app/invitations/:id/seating/cards', he: 'כרטיסי שולחן', label: 'Table cards for printing' },
+  {
+    path: '/app/invitations/:id/seating/print',
+    he: 'הדפסת סידור השולחנות',
+    label: 'Printable seating chart',
+  },
+  {
+    path: '/app/invitations/:id/gallery/film',
+    he: 'סרט הרגעים',
+    label: 'The moments film, made from the gallery',
+  },
+  { path: '/app/invitations/:id/gallery', he: 'גלריית התמונות', label: 'Photo and video gallery' },
+  { path: '/app/invitations/:id/insights', he: 'סטטיסטיקות צפייה', label: 'Views and opening statistics' },
+  { path: '/app/invitations/:id/live', he: 'מסך האירוע החי', label: 'The live screen, for the event day' },
+  { path: '/app/invitations/:id/share', he: 'שיתוף וקוד QR', label: 'Sharing links and QR code' },
+  { path: '/app/account', he: 'הגדרות החשבון', label: 'Account settings' },
+  { path: '/app/billing', he: 'חבילות ותשלומים', label: 'Plans, billing and invoices' },
+  { path: '/app/support', he: 'תמיכה', label: 'Support tickets' },
+  { path: '/app/support/new', he: 'פנייה חדשה לצוות', label: 'Open a new ticket ("Talk to a person")' },
+  { path: '/contact', he: 'טופס יצירת קשר', label: 'The public contact form' },
+  { path: '/terms', he: 'תנאי השימוש', label: 'Terms of use' },
+  { path: '/privacy', he: 'מדיניות הפרטיות', label: 'Privacy policy' },
+  { path: '/cookies', he: 'מדיניות עוגיות', label: 'Cookies' },
+  { path: '/accessibility', he: 'הצהרת נגישות', label: 'Accessibility statement' },
+  { path: '/login', he: 'התחברות', label: 'Log in' },
+  { path: '/signup', he: 'הרשמה', label: 'Sign up' },
 ];
 
 /** SUPPORT_PAGES, one per line, for the `<pages>` block of the system prompt. */
@@ -89,7 +122,29 @@ export function resolveSupportPath(candidate: string, invitationId: string | nul
   const page = BY_PATH.get(path.replace(/\/+$/, ''));
   if (!page) return null;
   if (!page.path.includes(':id')) return page.path;
-  return invitationId ? page.path.replace(':id', invitationId) : null;
+  // no invitation open to fill ":id" with: the invitation list, where they pick one — still a link,
+  // never the literal placeholder and never a guessed id
+  return invitationId ? page.path.replace(':id', invitationId) : '/app/invitations';
+}
+
+/**
+ * The assistant's raw answer, before any parsing: some models JSON-escape slashes ("\/app\/…") or
+ * wrap a path in backticks — both would hide a real screen from the link parser and show a path instead.
+ */
+export function normalizeAnswer(text: string): string {
+  return text.replace(/\\\//g, '/').replace(/`(\/[^`\s]*)`/g, '$1');
+}
+
+/** A known path's human name (Hebrew or the English label), for a link the assistant wrote as a bare path — so a path never shows as text. */
+export function supportPageName(candidate: string, locale: 'he' | 'en'): string | null {
+  const page = BY_PATH.get(candidate.split('?')[0]!.replace(/\/+$/, ''));
+  if (!page)
+    return candidate.startsWith('/app/invitations/new?')
+      ? locale === 'en'
+        ? 'Open the design'
+        : 'לפתיחת העיצוב'
+      : null;
+  return locale === 'en' ? page.label.split(/[:,(]/)[0]!.trim() : page.he;
 }
 
 /** A word of a label: letters, digits, or a quote mark inside one (״הזמנות״, don't) — never a path or punctuation. */
