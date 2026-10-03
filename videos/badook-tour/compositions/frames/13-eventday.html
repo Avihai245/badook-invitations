@@ -87,18 +87,18 @@
     [id="13-eventday-chip"] {
       position: absolute;
       right: 984px; /* right edge at x 936 = stats ring's right edge */
-      top: 262px;
+      top: 268px;
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 14px;
-      padding: 12px 26px;
+      gap: 12px;
+      padding: 10px 24px;
       border-radius: 9999px;
       background: #A0703F;
       color: #FBF7F1;
       font-family: "Heebo", sans-serif;
       font-weight: 500;
-      font-size: 30px;
+      font-size: 28px;
       line-height: 1.15;
       white-space: nowrap;
       direction: rtl;
@@ -145,13 +145,13 @@
       border-radius: 42px;
     }
 
-    /* scan frame — four brown corner brackets over the phone's upper half (x 992–1328, y 88–460) */
+    /* scan frame — four brown corner brackets over the phone's upper half (x 992–1328, y 84–374) */
     [id="13-eventday-scan"] {
       position: absolute;
       left: 992px;
-      top: 88px;
+      top: 84px;
       width: 336px;
-      height: 372px;
+      height: 290px;
       transform-origin: 50% 50%;
     }
     [class~="13-eventday-br"] {
@@ -412,7 +412,7 @@
       // scan frame: brackets close in, one finite sweep down the upper half, then the viewfinder clears
       tl.fromTo(el("scan"), { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" }, 4.2);
       tl.fromTo(el("scanline"), { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.1, ease: "none" }, 4.2);
-      tl.to(el("scanline"), { y: 362, duration: 0.8, ease: "sine.inOut" }, 4.2);
+      tl.to(el("scanline"), { y: 276, duration: 0.8, ease: "sine.inOut" }, 4.2);
       tl.to(el("scanline"), { opacity: 0, duration: 0.15, ease: "power1.out" }, 4.95);
       tl.to(el("scan"), { opacity: 0, duration: 0.3, ease: "power2.out" }, 5.05);
 
@@ -439,40 +439,25 @@
       tl.fromTo(el("big"), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 6.3);
       tl.fromTo(el("big-unit"), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 6.45);
 
-      var bigNum = el("big");
-      var smallNum = el("count-small");
-      var counter = { v: 0 };
-      function paint() {
-        var n = String(Math.round(counter.v));
-        bigNum.textContent = n;
-        smallNum.textContent = n;
-      }
-      tl.fromTo(counter, { v: 0 }, { v: 29, duration: 0.7, ease: "power2.out", onUpdate: paint, onStart: paint }, 6.3);
-      paint();
+      // count-up 0 → 29 on both figures (property tween + snap: seek-safe, no callbacks)
+      tl.fromTo(
+        [el("big"), el("count-small")],
+        { textContent: 0 },
+        { textContent: 29, snap: { textContent: 1 }, duration: 0.7, ease: "power2.out" },
+        6.3
+      );
 
       // "בזמן אמת" chip lands at the stats card's inner edge, then one live-dot pulse
       tl.fromTo(el("chip"), { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, 6.75);
       tl.fromTo(el("dot-halo"), { scale: 1, opacity: 0.8 }, { scale: 2.6, opacity: 0, duration: 0.7, ease: "power2.out" }, 7.1);
 
-      // held pair: subtle counter-phase jitter (finite, low amplitude, phase-opposed)
+      // held pair: subtle counter-phase jitter (finite, low amplitude, phase-opposed; no repeat)
       var winFloat = el("win-float");
       var phoneFloat = el("phone-float");
-      var phase = { p: 0 };
-      tl.fromTo(
-        phase,
-        { p: 0 },
-        {
-          p: Math.PI * 1.5,
-          duration: 7.969 - 6.6,
-          ease: "none",
-          onUpdate: function () {
-            var s = Math.sin(phase.p);
-            winFloat.style.transform = "translateY(" + (-3.5 * s).toFixed(3) + "px)";
-            phoneFloat.style.transform = "translateY(" + (3.5 * s).toFixed(3) + "px)";
-          },
-        },
-        6.6
-      );
+      tl.fromTo(winFloat, { y: 0 }, { y: -3.5, duration: 0.55, ease: "sine.inOut" }, 6.85);
+      tl.to(winFloat, { y: 3, duration: 0.56, ease: "sine.inOut" }, 7.4);
+      tl.fromTo(phoneFloat, { y: 0 }, { y: 3.5, duration: 0.55, ease: "sine.inOut" }, 6.85);
+      tl.to(phoneFloat, { y: -3, duration: 0.56, ease: "sine.inOut" }, 7.4);
 
       window.__timelines = window.__timelines || {};
       window.__timelines[ID] = tl;

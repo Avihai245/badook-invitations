@@ -210,6 +210,7 @@
       stroke-linejoin: round;
       stroke-dasharray: 1;
       stroke-dashoffset: 1;
+      opacity: 0;
     }
     [class~="12-seating-ring-glow"] {
       fill: none;
@@ -218,6 +219,7 @@
       stroke-linejoin: round;
       stroke-dasharray: 1;
       stroke-dashoffset: 1;
+      opacity: 0;
     }
 
     [id="12-seating-ripple"] {
@@ -319,7 +321,7 @@
       position: absolute;
       right: 0;
       top: 340px;
-      height: 150px;
+      height: 158px;
       padding: 0 4px;
       overflow: hidden;
     }
@@ -328,7 +330,7 @@
       margin: 0;
       font-family: "Frank Ruhl Libre", serif;
       font-weight: 500;
-      font-size: 116px;
+      font-size: 124px;
       line-height: 1.22;
       letter-spacing: -0.018em;
       color: #1C1917;
@@ -337,8 +339,8 @@
     [id="12-seating-rule"] {
       position: absolute;
       right: 0;
-      top: 506px;
-      width: 360px;
+      top: 512px;
+      width: 378px;
       height: 1px;
       background: rgba(28, 25, 23, 0.12);
       transform-origin: 100% 50%;
@@ -346,7 +348,7 @@
     [id="12-seating-pill"] {
       position: absolute;
       right: 0;
-      top: 538px;
+      top: 546px;
       display: inline-flex;
       flex-direction: row;
       align-items: center;
@@ -552,7 +554,7 @@
       // drag geometry: carrier origin = cursor tip; chip center = tip + (−34, −8)
       var CHIP_DX = -34, CHIP_DY = -8;
       var START = { x: 1100, y: 830 };
-      var GRAB = { x: ROW.x - 32 + 34, y: ROW.y + 8 };          // chip center at (ROW.x − 32, ROW.y): stays inside the window
+      var GRAB = { x: ROW.x - 40 + 34, y: ROW.y + 8 };          // chip center at (ROW.x − 40, ROW.y): stays inside the window
       var DROP = { x: T4.x - CHIP_DX, y: T4.y - CHIP_DY };      // chip center lands exactly on table 4
       var REST = { x: T4.x + 58, y: T4.y + 62 };
       var CLICK = { x: SEND.x + SEND.w / 2, y: SEND.y + SEND.h / 2 };
@@ -571,7 +573,6 @@
 
       tl.fromTo(el("cursor"), { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 1.1);
       tl.fromTo(el("carrier"), { x: START.x, y: START.y }, { x: GRAB.x, y: GRAB.y, duration: 0.65, ease: "power2.inOut" }, 1.15);
-      tl.fromTo(el("chip"), { opacity: 0, scale: 0.9 }, { opacity: 0, scale: 0.9, duration: 0.01 }, 0);
 
       // ── Scene 2 (1.9–4.4s): headline, grab → arc drag → drop on table 4 ──
       tl.fromTo(el("head"), { yPercent: 105 }, { yPercent: 0, duration: 0.8, ease: "power3.out" }, 1.9);
@@ -580,7 +581,7 @@
       // grab: press dip, chip lifts off the row, row dims
       tl.fromTo(el("cursor"), { scale: 1 }, { scale: 0.86, duration: 0.08, ease: "power2.out" }, 1.9);
       tl.fromTo(el("cursor"), { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "power2.out", immediateRender: false }, 1.98);
-      tl.fromTo(el("chip"), { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1.05, duration: 0.24, ease: "power3.out", immediateRender: false }, 1.92);
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1.05, duration: 0.24, ease: "power3.out" }, 1.92);
       tl.fromTo(el("rowdim"), { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, 1.95);
 
       // travel 2.2–3.4: carrier (cursor + chip, rigid) power3 in-out + an upward arc on the lift wrapper
@@ -626,13 +627,15 @@
       tl.fromTo(el("zoom-outer"), { scale: 1 }, { scale: ZS, duration: 1.0, ease: "power3.inOut" }, 4.4);
       tl.fromTo(el("zoom-inner"), { x: 0, y: 0 }, { x: ZX, y: ZY, duration: 1.0, ease: "power3.inOut" }, 4.4);
       tl.fromTo(el("dim"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 4.75);
+      tl.set([el("planring"), el("planglow")], { opacity: 1 }, 4.8);
       tl.fromTo([el("planring"), el("planglow")], { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 4.8);
 
       // ── Scene 4 (6.1–9.243s): zoom back, ring on send, click, phone arrives, ring on its table card ──
       tl.fromTo(el("zoom-outer"), { scale: ZS }, { scale: 1, duration: 0.8, ease: "power3.inOut", immediateRender: false }, 6.1);
       tl.fromTo(el("zoom-inner"), { x: ZX, y: ZY }, { x: 0, y: 0, duration: 0.8, ease: "power3.inOut", immediateRender: false }, 6.1);
       tl.fromTo(el("dim"), { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power2.out", immediateRender: false }, 6.1);
-      tl.fromTo([el("planring"), el("planglow")], { opacity: 1 }, { opacity: 0, duration: 0.35, ease: "power2.out" }, 6.1);
+      tl.fromTo([el("planring"), el("planglow")], { opacity: 1 }, { opacity: 0, duration: 0.35, ease: "power2.out", immediateRender: false }, 6.1);
+      tl.set([el("sendring"), el("sendglow")], { opacity: 1 }, 6.12);
       tl.fromTo([el("sendring"), el("sendglow")], { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 6.12);
 
       tl.fromTo(el("carrier"), { x: REST.x, y: REST.y }, { x: CLICK.x, y: CLICK.y, duration: 0.5, ease: "power2.inOut", immediateRender: false }, 5.95);
@@ -641,6 +644,7 @@
       tl.fromTo(el("ripple"), { opacity: 0.7, scale: 0.3 }, { opacity: 0, scale: 1.5, duration: 0.55, ease: "power2.out" }, 6.5);
 
       tl.fromTo(el("phone"), { x: 860, opacity: 0 }, { x: 0, opacity: 1, duration: 0.85, ease: "power3.out" }, 6.7);
+      tl.set([el("cardring"), el("cardglow")], { opacity: 1 }, 7.6);
       tl.fromTo([el("cardring"), el("cardglow")], { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.65, ease: "power2.inOut" }, 7.6);
 
       // hold to the last frame
