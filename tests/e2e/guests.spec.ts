@@ -1,5 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { navTo } from '../support/event-nav';
 import { xlsx } from '../support/xlsx';
 
 // The guest list: upload it from Excel (and again, without doubling anyone), a personal link per
@@ -337,10 +338,7 @@ test.describe('guest list', () => {
 
     // the other invitation pages link here
     await open(page, `/app/invitations/${id}/responses`);
-    await page
-      .getByRole('navigation', { name: 'ניווט בהזמנה' })
-      .getByRole('link', { name: 'מוזמנים' })
-      .click();
+    await navTo(page, 'guests');
     await page.waitForURL(/\/guests$/);
 
     // no horizontal scroll on a phone

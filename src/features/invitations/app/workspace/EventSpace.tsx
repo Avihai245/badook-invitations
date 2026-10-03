@@ -212,7 +212,7 @@ function NavItem({
       title={navKey === 'design' ? N.fullScreen : locked ? N.upgrade : undefined}
       className={cn(
         'group relative flex items-center gap-2.5 rounded-[10px] px-2.5 font-medium transition-colors motion-reduce:transition-none',
-        size === 'lg' ? 'h-12 text-[15px]' : 'h-9 text-[13.5px]',
+        size === 'lg' ? 'h-12 text-[15px]' : 'h-8 text-[13.5px]',
         current
           ? 'bg-brand-soft font-semibold text-brand-deep'
           : 'text-ink/75 hover:bg-subtle hover:text-ink',
@@ -258,21 +258,21 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
       data-testid="event-sidebar"
     >
       <div className="px-5 pt-5">
-        <Link href="/app/invitations" className="inline-block rounded-btn text-[19px]">
+        <Link href="/app/invitations" className="inline-block rounded-btn text-[18px]">
           <BrandLogo label={t.brand} />
         </Link>
         <Link
           href="/app/invitations"
-          className="mt-4 flex items-center gap-1 rounded-btn text-[12.5px] font-semibold text-muted hover:text-ink"
+          className="mt-3 flex items-center gap-1 rounded-btn text-[12.5px] font-semibold text-muted hover:text-ink"
         >
           <ChevronLeft aria-hidden className="icon-dir size-4" />
           {N.allEvents}
         </Link>
         <Link
           href={itemHref(item.id, 'home')}
-          className="mt-2.5 flex items-center gap-3 rounded-[14px] border border-brand-line bg-linear-to-br from-brand-soft/80 to-surface p-2.5 transition-shadow hover:shadow-sm"
+          className="mt-2 flex items-center gap-3 rounded-[14px] border border-brand-line bg-linear-to-br from-brand-soft/80 to-surface p-2 transition-shadow hover:shadow-sm"
         >
-          <EventThumb item={item} className="w-[42px]" />
+          <EventThumb item={item} className="w-[36px]" />
           <span className="min-w-0">
             <span className="block truncate text-[14.5px] font-bold" lang={loc}>
               <bdi>{name}</bdi>
@@ -286,7 +286,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
 
       <nav
         aria-label={N.label}
-        className="mt-3 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-3"
+        className="mt-2 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain px-3 pb-2 [scrollbar-width:thin]"
       >
         <NavItem id={item.id} navKey="home" current={current === 'home'} />
         {STAGES.map((stage) => {
@@ -295,7 +295,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
           const status = facts ? stageStatus(stage, facts) : null;
           const here = currentStage === stage;
           return (
-            <section key={stage} className="mt-2.5" aria-labelledby={`stage-${stage}`} data-stage={stage}>
+            <section key={stage} className="mt-2" aria-labelledby={`stage-${stage}`} data-stage={stage}>
               <h2
                 id={`stage-${stage}`}
                 className={cn(
@@ -331,7 +331,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
           type="button"
           data-tour="help"
           onClick={() => openHelp()}
-          className="flex h-9 items-center gap-2.5 rounded-[10px] px-2.5 text-[13.5px] font-medium text-ink/75 transition-colors hover:bg-subtle hover:text-ink"
+          className="flex h-8 items-center gap-2.5 rounded-[10px] px-2.5 text-[13.5px] font-medium text-ink/75 transition-colors hover:bg-subtle hover:text-ink"
         >
           <MessageCircleQuestion aria-hidden className="size-[17px] shrink-0" strokeWidth={1.8} />
           {t.shell.nav.help}

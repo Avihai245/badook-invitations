@@ -297,7 +297,7 @@ function NextCard({ action, label }: { action: HomeAction; label: string }) {
         </div>
         <Link
           href={action.href}
-          className="inline-flex h-12 shrink-0 items-center gap-2 rounded-[14px] bg-white px-5 text-[15px] font-bold text-ink shadow-lg transition-transform hover:-translate-y-0.5 motion-reduce:transition-none max-sm:w-full max-sm:justify-center"
+          className="inline-flex h-12 shrink-0 items-center gap-2 rounded-[14px] bg-white px-5 text-[15px] font-bold text-[#1c1917] shadow-lg transition-transform hover:-translate-y-0.5 motion-reduce:transition-none max-sm:w-full max-sm:justify-center"
         >
           {text.cta}
           <ArrowRight aria-hidden className="icon-dir size-4" />

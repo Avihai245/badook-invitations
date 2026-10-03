@@ -55,7 +55,8 @@ export function Tour() {
 
   useEffect(() => {
     const asked = new URLSearchParams(window.location.search).has('tour');
-    if (!asked && seen()) return;
+    // not unasked in an automated browser (tests, audits): it would cover the page they drive
+    if (!asked && (seen() || navigator.webdriver)) return;
     // after the page has settled (its widgets drawn)
     const timer = window.setTimeout(() => {
       const present = ORDER.filter((k) => find(k));

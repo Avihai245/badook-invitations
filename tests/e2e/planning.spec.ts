@@ -33,8 +33,12 @@ async function planned(
   return host;
 }
 
+// a planning screen's content, or the event's home (where /plan leads once the plan exists)
 const content = (page: Page) =>
-  page.locator('[data-group], [data-plan-card]').first().waitFor({ timeout: 30_000 });
+  page
+    .locator('[data-group], [data-plan-card], [data-testid="home-next"]')
+    .first()
+    .waitFor({ timeout: 30_000 });
 
 test('a new host sets the plan up in three short steps and lands on the event home, the stage shows what is open', async ({
   page,
@@ -161,7 +165,7 @@ test('moving the event’s date offers to move the dates; a date the host set st
     `update invitations set draft = jsonb_set(draft, '{event,date}', to_jsonb($2::text)) where id = $1`,
     [host.id, day(230)],
   );
-  await open(page, plan(host));
+  await open(page, plan(host, '/tasks'));
   await content(page);
   await expect(page.getByText('תאריך האירוע השתנה')).toBeVisible();
   await page.getByRole('button', { name: 'לעדכון התאריכים' }).click();
@@ -201,7 +205,7 @@ test('the settings: the level of linking and the weekly email, saved without del
   page,
 }) => {
   const host = await planned(page, 'plan-settings', { mode: 'recommended' });
-  await open(page, plan(host));
+  await open(page, plan(host, '/tasks'));
   await content(page);
   await page.getByRole('button', { name: 'הגדרות' }).click();
   const dialog = page.getByRole('dialog');
