@@ -624,16 +624,16 @@
 
       // ── Scene 6b (10.75s): cut-the-curve scroll down to payments (accelerate out → jump → decelerate in) ──
       tl.fromTo(el("hole-add"), { opacity: 1 }, { opacity: 0, duration: 0.18, ease: "power2.in", immediateRender: false }, 10.75);
-      tl.fromTo(wscroll, { y: Y0, filter: "blur(0px)" }, { y: Y0 - D, filter: "blur(8px)", duration: 0.18, ease: "power2.in" }, 10.75);
-      tl.fromTo(wscroll, { y: YPAY + D, filter: "blur(8px)" }, { y: YPAY, filter: "blur(0px)", duration: 0.3, ease: "power3.out", immediateRender: false }, 10.93);
+      tl.fromTo(wscroll, { y: Y0 }, { y: Y0 - D, duration: 0.18, ease: "power2.in" }, 10.75);
+      tl.fromTo(wscroll, { y: YPAY + D }, { y: YPAY, duration: 0.3, ease: "power3.out", immediateRender: false }, 10.93);
       // "ותשלומים" — payments
       ring("pay", 11.08);
       tl.fromTo(el("c-pay"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 11.22);
 
       // ── Scene 6c (12.15s): cut-the-curve scroll back up to the guests basis ──
       tl.fromTo(el("hole-pay"), { opacity: 1 }, { opacity: 0, duration: 0.18, ease: "power2.in", immediateRender: false }, 12.15);
-      tl.fromTo(wscroll, { y: YPAY, filter: "blur(0px)" }, { y: YPAY + D, filter: "blur(8px)", duration: 0.18, ease: "power2.in", immediateRender: false }, 12.15);
-      tl.fromTo(wscroll, { y: YBASIS - D, filter: "blur(8px)" }, { y: YBASIS, filter: "blur(0px)", duration: 0.3, ease: "power3.out", immediateRender: false }, 12.33);
+      tl.fromTo(wscroll, { y: YPAY }, { y: YPAY + D, duration: 0.18, ease: "power2.in", immediateRender: false }, 12.15);
+      tl.fromTo(wscroll, { y: YBASIS - D }, { y: YBASIS, duration: 0.3, ease: "power3.out", immediateRender: false }, 12.33);
       // "מה יקרה אם ישתנה מספר האורחים" — the guests basis + the what-if chip
       ring("basis", 12.5);
       tl.fromTo(el("chip"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 12.7);
