@@ -31,6 +31,9 @@ const perf = {
   'categories:performance': ['error', { minScore: budget.performance }],
   'largest-contentful-paint': ['error', { maxNumericValue: budget.lcpMs }],
   'total-blocking-time': ['error', { maxNumericValue: budget.tbtMs }],
+  'speed-index': ['error', { maxNumericValue: budget.speedIndexMs }],
+  'server-response-time': ['error', { maxNumericValue: budget.serverResponseMs }],
+  'resource-summary:script:count': ['error', { maxNumericValue: budget.scriptRequests }],
   'cumulative-layout-shift': ['error', { maxNumericValue: budget.cls }],
   'resource-summary:script:size': ['error', { maxNumericValue: budget.scriptBytes }],
   'total-byte-weight': ['error', { maxNumericValue: budget.totalBytes }],
@@ -56,7 +59,11 @@ module.exports = {
         // the public site is meant to be found: search engines too
         {
           matchingUrlPattern: `^${base}/$`,
-          assertions: { ...perf, 'categories:seo': ['error', { minScore: budget.seo }] },
+          assertions: {
+            ...perf,
+            'categories:seo': ['error', { minScore: budget.seo }],
+            'resource-summary:font:count': ['error', { maxNumericValue: budget.fontRequests }],
+          },
         },
         // an invitation is hidden from search engines by default (noindex): SEO isn't held to it
         { matchingUrlPattern: '/dev/invitations/render/', assertions: perf },

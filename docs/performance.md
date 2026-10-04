@@ -2,7 +2,7 @@
 
 What keeps the home page and every invitation fast, and what checks it. The budget, on Lighthouse's
 mobile preset (Moto G Power, Slow 4G, 4× CPU), is in [`perf-budget.json`](../perf-budget.json):
-Performance ≥ 90, LCP ≤ 2.5 s, TBT ≤ 200 ms, CLS ≤ 0.1, ≤ 170 KB of JavaScript and ≤ 1.5 MB in all
+Performance ≥ 98, LCP ≤ 1.8 s, Speed Index ≤ 2.5 s, TBT ≤ 100 ms, CLS ≤ 0.05, server response ≤ 600 ms, ≤ 8 script requests (≤ 2 font files on the home page), ≤ 170 KB of JavaScript and ≤ 1.5 MB in all
 (compressed) with the first load, Accessibility and Best Practices 100 (SEO 100 on the home page — an
 invitation is `noindex` by default).
 
@@ -147,12 +147,14 @@ What is not within the budget yet:
   6 KB and hydrates per picture), Radix is imported per package (`@radix-ui/react-*`, not the umbrella
   that defeats tree-shaking). `node scripts/analyze-bundles.mjs --url …` shows what a page's scripts are
   made of (build with `ANALYZE_SOURCEMAPS=1`).
-- **Fonts.** The text is Heebo (Hebrew UI) / Inter (English), each a variable font (`@fontsource-variable`,
-  "Heebo Variable" / "Inter Variable"): one file per script covers every weight, where a file per weight
-  — the home page uses four — made eight requests (68 KB) for Hebrew; they are cut to the weights the app
-  uses (400–800, as the static faces were: nothing renders lighter or heavier than before), and the
-  Hebrew and ASCII Latin files are 8 + 15 KB. The layout preloads those two (and the headline's Hebrew
-  face) with the stylesheet.
+- **Fonts.** The text is Heebo (Hebrew UI) / Inter (English), each a variable font ("Heebo Variable" /
+  "Inter Variable"): one file covers every weight, cut to the weights the app uses (400–800, as the static
+  faces were: nothing renders lighter or heavier than before). A Hebrew page needs Hebrew *and* the ASCII
+  letters and digits, which the font packages ship as two files: `scripts/build-fonts.mjs` cuts both from the
+  full fonts (`scripts/font-sources`, Google Fonts' OFL files) into one — Heebo `hebrew-basic`, 31 KB — and
+  the headlines' Frank Ruhl Libre the same way (one file per weight, 18 KB). The home page loads **two font
+  files** (before: four), both preloaded; the combined face is declared after the whole Latin one, so it
+  wins for the ASCII part (the shaping of the text is identical, checked with HarfBuzz on both).
 - The demo video: the poster is a preloaded, optimized image (`fetchpriority=high`); the video (≤ 720p
   H.264, < 800 KB, one file per screen shape through `<source media>`) loads once it is in view and the
   visitor has done something. Its files and the narrated tour's (13 → 6 MB at 720p, captions in the
@@ -161,6 +163,38 @@ What is not within the budget yet:
   preloaded with its priority; the player after the visitor's first interaction (or the play button).
 - The sample invitation in a phone loads when the visitor scrolls toward it.
 - The logo: AVIF / WebP at 2× and 3× of its size; the footer's loads when it is near. The favicon is 96 px.
+
+## The home page is static
+
+`/` and `/en` are two static pages (ISR, one hour; `○` in the build output), so the CDN holds them and the
+document comes from its edge — no server work, no database, no session check per visit. What used to make
+the page dynamic and how it is kept:
+
+- **The language** was read from the `ui_lang` cookie in the root layout (`cookies()` makes a page
+  dynamic). The layout is now `features/site/SiteRoot.tsx`, given the language: the pages that follow the cookie
+  (`(site)/layout.tsx`) resolve it per request as before, the home page's two route groups fix it
+  (`(home-he)` → `/`, `(home-en)` → `/en`, with `canonical` and `hreflang` pointing at each other). The language
+  switch on the home page goes to the other address; a visitor whose cookie says the other language is sent
+  there from <head> before the first paint (`features/site/home/home-boot.ts`).
+- **The middleware** ran on `/` for one thing: sending a signed-in host to their invitations (a Supabase
+  `getUser()` on every visit, and a response that can't be cached). `/` is out of its matcher. The same
+  redirect is made in <head> by `home-boot.ts` — the Supabase session cookie is enough to go to
+  `/app/invitations`, which checks the session itself (a stale cookie ends at the sign-in page). The
+  Supabase-answer redirects (`/?code=…`) still go through it.
+- **CSS** is inlined into the page (`experimental.inlineCss`): measured under real Slow 4G + 4× CPU, first
+  paint at ~650 ms instead of ~1000 ms with two stylesheets to wait for. Everything the first paint needs is
+  in the document: the text fonts and the poster are preloaded in <head>, nothing is rendered after
+  hydration; the sections below the first screen are `Suspense` boundaries, which React hydrates one at a
+  time when idle instead of in the one long task (TBT 200–330 → ~100 ms).
+- **Scripts**: Next splits the code shared by each pair of routes into a chunk of its own; those chunks are kept
+  in the routes that use them (`next.config.ts`, the `default`/`defaultVendors` groups): 8 scripts in the
+  HTML plus the dictionary's two small chunks (before: 18 + 2). Tried and dropped: importing the dictionary
+  in the layout (a module that lives in two layouts' chunks makes a page load both) and a shared "shell"
+  chunk — each loaded more, not less.
+- **LCP picture**: the video poster at quality 60, sized to the page (`100vw − 40px` on a phone); the
+  background still has no priority of its own, so the poster is fetched first. The logo files are 45 % smaller
+  (`scripts/build-brand.mjs`).
+- `/llms.txt` is a static file in `public/`.
 
 ## Caching
 
@@ -182,6 +216,14 @@ outside this list.
   (see "Uploads"); browsers without WebCodecs H.264 encoding send it as recorded (mp4 ≤ 15 MB). A job
   outside the web server (a storage-upload trigger running ffmpeg, or AWS Elemental MediaConvert) would
   cover those too, writing the encoded file and its size back to the document.
-- **A static home page.** `/` is rendered per request (the UI language is a cookie), so its HTML is
-  compressed while it streams (~54 KB for ~200 KB) and the CDN can't cache or recompress it. Giving the
-  two languages their own addresses would let it be a cached, Brotli-compressed file.
+- **LCP ≤ 1.8 s in the simulation.** Under real Slow 4G + 4× CPU the home page paints in ~0.65 s and the invitations in
+  ~0.6–0.9 s; Lighthouse's simulation reads 2.2–2.6 s because it counts every request that finishes before
+  the first paint (the document, two fonts, ~150 KB of script). What is left is bytes: the document (~70 KB
+  gzipped, a third of it the page's CSS and its copy in the page's data), React and Next (~100 KB).
+- **A bilingual invitation opened from an English browser** (PageSpeed's) still renders the sections again in the
+  browser (script 165 → 296 KB, the other language's fonts, TBT 250 ms+). Sending that guest to the page in
+  their language from <head> (`?lang=en`) removes the work but adds a navigation, and the simulation scores it
+  no better; it also changes the address, so it was left as it is.
+- **Hosting.** Time to first byte depends on where the HTML comes from: a static page is served by the CDN's
+  edge, but the first visit after a deploy (or an hour) is rendered at the origin region. Check the region of the
+  Amplify app and the response headers of `/` (`x-cache`, `age`) after the first deployment.
