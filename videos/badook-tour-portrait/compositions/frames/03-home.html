@@ -309,8 +309,8 @@
             <img id="03-home-shot" src="assets/phone-home.png" alt="" />
 
             <!-- frozen tab-bar band: covered with the page's own clean rows -->
-            <div class="03-home-patch" data-patch="0,778,390,852.5,2.5"><img src="assets/phone-home.png" alt="" /></div>
-            <div class="03-home-patch" data-patch="286,756,104,779,2"><img src="assets/phone-home.png" alt="" /></div>
+            <div class="03-home-patch" data-patch="0,778,390,74.5,852.5,2.5"><img src="assets/phone-home.png" alt="" /></div>
+            <div class="03-home-patch" data-patch="286,756,104,23,752,2"><img src="assets/phone-home.png" alt="" /></div>
 
             <!-- road-map cards: a page-colored slot + the real card crop that lifts -->
             <div class="03-home-slot" data-card="plan"></div>
@@ -482,15 +482,15 @@
           " H" + (x + w / 2);
       }
 
-      // tab-bar band patches: data-patch = "x, yTop, w, srcY, srcH" (CSS px); a clean srcH-tall row is stretched over yTop→srcY
+      // tab-bar band patches: data-patch = "x, yTop, w, h, srcY, srcH" (CSS px); a clean srcH-tall row of the page at srcY is stretched over yTop→yTop+h
       Array.prototype.forEach.call(document.querySelectorAll('[class~="03-home-patch"]'), function (el) {
         var p = el.getAttribute("data-patch").split(",").map(Number);
-        var x = p[0], yTop = p[1], w = p[2], srcY = p[3], srcH = p[4];
+        var x = p[0], yTop = p[1], w = p[2], h = p[3], srcY = p[4], srcH = p[5];
         el.style.left = (x * SC) + "px";
         el.style.top = (yTop * SC) + "px";
         el.style.width = (w * SC) + "px";
         el.style.height = (srcH * SC) + "px";
-        el.style.transform = "scaleY(" + ((srcY + srcH - yTop) / srcH) + ")";
+        el.style.transform = "scaleY(" + (h / srcH) + ")";
         var img = el.querySelector("img");
         img.style.left = (-x * SC) + "px";
         img.style.top = (-srcY * SC) + "px";
