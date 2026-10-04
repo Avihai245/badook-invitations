@@ -32,6 +32,8 @@ export const auditEn: typeof auditHe = {
     system: 'System',
   } as Record<string, string>,
   actions: {
+    'users.act_as': 'Opened the customer’s account (remote support)',
+    'users.act_as_end': 'Left the customer’s account',
     'users.credits': 'Credits',
     'users.plan_gift': 'Plan as a gift',
     'users.discount': 'Discount',

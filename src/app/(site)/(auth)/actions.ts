@@ -1,12 +1,15 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { adminDb } from '@/features/admin/server/db';
 import { nudgeAfter } from '@/features/admin/server/nudge';
 import type { AppDict } from '@/lib/i18n/app';
 import { requestBaseUrl } from '@/lib/request-url';
+import { ACT_AS_COOKIE } from '@/lib/supabase/act-as-token';
 import { loginPath, RESET_PATH } from '@/lib/supabase/auth-paths';
 import { googleSignInEnabled } from '@/lib/supabase/providers';
-import { safeNext, sessionDb } from '@/lib/supabase/session';
+import { getActingAs, safeNext, sessionDb } from '@/lib/supabase/session';
 
 export type AuthErrorKey = keyof AppDict['auth']['errors'] | keyof AppDict['accountPage']['auth']['errors'];
 export type AuthState = { error?: AuthErrorKey; sent?: boolean; email?: string } | null;
@@ -120,6 +123,8 @@ export async function requestPasswordReset(_prev: AuthState, form: FormData): Pr
 
 export async function updatePassword(_prev: AuthState, form: FormData): Promise<AuthState> {
   const password = field(form, 'password');
+  // a staff member acting as a customer is signed in as themself: never their password from here
+  if (await getActingAs()) return { error: 'session_missing' };
   if (password.length < MIN_PASSWORD) return { error: 'weak_password' };
   const db = await sessionDb();
   const { data } = await db.auth.getUser();
@@ -154,6 +159,15 @@ export async function continueWithLink(form: FormData): Promise<void> {
 }
 
 export async function signOut(): Promise<void> {
+  // acting as a customer: "sign out" ends that, and the staff member stays signed in as themself
+  const acting = await getActingAs();
+  if (acting) {
+    (await cookies()).delete(ACT_AS_COOKIE);
+    await adminDb
+      .auditAdd(acting.staff.id, 'users.act_as_end', 'user', acting.target.id, {})
+      .catch((err) => console.error('[admin] act as: end', err));
+    redirect(`/app/admin/users/${acting.target.id}`);
+  }
   const db = await sessionDb();
   await db.auth.signOut();
   redirect('/login');

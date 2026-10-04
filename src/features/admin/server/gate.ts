@@ -8,7 +8,7 @@ import { serverEnv } from '@/lib/env';
 import { invitationsEnabled } from '@/lib/feature';
 import { rateKey } from '@/lib/links/tokens';
 import { serviceDb } from '@/lib/supabase/server';
-import { getSessionUser } from '@/lib/supabase/session';
+import { getRealUser } from '@/lib/supabase/session';
 import { can, permissionsOf, type Permission, type StaffRole } from '../permissions';
 import { AdminDbError, adminDb } from './db';
 
@@ -29,7 +29,7 @@ export interface Staff {
 /** The signed-in staff member (null: signed out, or not staff) — asked once per request. */
 export const getStaff = cache(async (): Promise<Staff | null> => {
   if (!invitationsEnabled()) return null;
-  const user = await getSessionUser();
+  const user = await getRealUser();
   if (!user) return null;
   const who = await adminDb.whoami(user.id, serverEnv().INVITES_ADMIN_EMAILS);
   return who
@@ -54,7 +54,7 @@ export async function mayOpenConsole(user: { id: string; email?: string | null }
  */
 export async function requireStaff(perm: Permission, next = '/app/admin'): Promise<Staff> {
   if (!invitationsEnabled()) notFound();
-  if (!(await getSessionUser())) redirect(`/login?next=${encodeURIComponent(next)}`);
+  if (!(await getRealUser())) redirect(`/login?next=${encodeURIComponent(next)}`);
   const staff = await getStaff();
   if (!staff) notFound();
   if (!can(staff.role, perm)) {
@@ -109,7 +109,7 @@ export async function adminRoute(
     }
   }
   try {
-    if (!(await getSessionUser())) return json(401, { ok: false, code: 'unauthorized' });
+    if (!(await getRealUser())) return json(401, { ok: false, code: 'unauthorized' });
     const staff = await getStaff();
     if (!staff) return json(404, { ok: false, code: 'not_found' });
     if (!can(staff.role, perm)) return json(403, { ok: false, code: 'forbidden' });

@@ -2,7 +2,8 @@ import { after } from 'next/server';
 import type { ReactNode } from 'react';
 import { tick } from '@/features/jobs/jobs';
 import { assertInvitationsEnabled } from '@/lib/feature';
-import { requireUser } from '@/lib/supabase/session';
+import { ActingAsBar } from '@/features/admin/ui/ActingAsBar.client';
+import { getActingAs, requireUser } from '@/lib/supabase/session';
 import { SupportChat } from '@/features/support/SupportChat.client';
 import { AppToasts } from '../AppProviders';
 
@@ -15,9 +16,11 @@ import { AppToasts } from '../AppProviders';
 export default async function AppLayout({ children }: { children: ReactNode }) {
   assertInvitationsEnabled();
   await requireUser('/app/invitations');
+  const acting = await getActingAs();
   after(() => tick());
   return (
     <AppToasts>
+      {acting ? <ActingAsBar who={acting.target.email ?? acting.target.id} /> : null}
       {children}
       <SupportChat />
     </AppToasts>
