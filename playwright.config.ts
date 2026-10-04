@@ -80,7 +80,7 @@ export default defineConfig({
           timeout: 30_000,
         },
         {
-          command: `npx next start -p ${port}`,
+          command: `node tests/support/clear-isr-cache.mjs && npx next start -p ${port}`,
           url: `${baseURL}/`,
           reuseExistingServer: !process.env.CI,
           env: {

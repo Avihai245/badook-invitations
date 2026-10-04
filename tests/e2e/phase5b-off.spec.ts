@@ -26,6 +26,8 @@ test('without the package the film and face search are offered, not given; their
   const film = page.getByTestId('gallery-film');
   await expect(film).toContainText('סרט הרגעים כלול בחבילת Business');
   await expect(film.getByTestId('gallery-film-open')).toHaveCount(0);
+  // the face search card is in the settings tab
+  await page.getByRole('tab', { name: 'הגדרות ומחיקה' }).click();
   await expect(page.getByTestId('face-search-card')).toContainText('החיפוש לפי פנים כלול בחבילת Business');
   await expect(page.getByTestId('face-search-prepare')).toHaveCount(0);
   // the studio offers the package

@@ -118,7 +118,7 @@ test('a new host: the three-screen start, planning first, the tour, and a budget
   ]);
   await open(page, `/app/invitations/${id}/edit`);
   await page.getByRole('tab', { name: 'עיצוב' }).click();
-  await page.getByRole('button', { name: 'עיצוב אחר' }).click();
+  await page.getByRole('button', { name: 'עיצוב אחר', exact: true }).click();
   const panel = page.getByTestId('template-panel');
   await expect(panel.locator(`[data-template="${before!.template_id}"]`)).toBeDisabled();
   const other = panel.locator('[data-template]:not([disabled])').first();

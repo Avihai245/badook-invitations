@@ -293,7 +293,6 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   await setPlan(email, 'pro');
   const link = await turnOn(page, id);
   const settings = page.getByTestId('gallery-settings');
-  await expect(settings.getByRole('switch', { name: 'בדיקה אוטומטית' })).toBeChecked();
   // Pro has no venue screen: the card offers Business
   await expect(page.getByTestId('gallery-projector')).toContainText('המסך באולם כלול בחבילת Business');
 
@@ -325,7 +324,10 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   await expect(review).toBeHidden();
   await expect(mine).toContainText('לא יופיע בגלריה', { timeout: 20_000 });
 
-  // approval mode: everything waits
+  // approval mode: everything waits (the settings are on their own tab; the link, the cards and the
+  // review queue on the first)
+  await page.getByRole('tab', { name: 'הגדרות ומחיקה' }).click();
+  await expect(settings.getByRole('switch', { name: 'בדיקה אוטומטית' })).toBeChecked();
   await settings.getByRole('radio', { name: 'אחרי אישור שלכם' }).click();
   await expect(settings.getByRole('radio', { name: 'אחרי אישור שלכם' })).toHaveAttribute(
     'aria-checked',
@@ -334,6 +336,9 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   await expect(guest.getByText('המארחים יאשרו אותם לפני שיופיעו בגלריה.')).toBeVisible({ timeout: 20_000 });
   await choose(guest, [plain!]);
   await expect(progressTitle(guest)).toHaveText('2 מתוך 2 הועלו', { timeout: 30_000 });
+  // back to the first tab with what the server holds now (a tab opened again starts from the page's data)
+  await page.goto(`/app/invitations/${id}/gallery`);
+  await hydrated(page);
   await expect(review).toContainText('ממתין לאישור שלכם', { timeout: 20_000 });
   const [held] = (await itemsOf(id)).filter((r) => r.status === 'pending');
   expect(held).toMatchObject({ status_reason: 'approval' });

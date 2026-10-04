@@ -55,6 +55,8 @@ test('a guest finds the photos they are in, downloads them, and is left out; ano
   // the host: off until they turn it on; then "prepare face search" in their browser
   await page.addInitScript(STAND_IN);
   await open(page, `/app/invitations/${host.id}/gallery`);
+  // the card is in the gallery's settings tab
+  await page.getByRole('tab', { name: 'הגדרות ומחיקה' }).click();
   const card = page.getByTestId('face-search-card');
   await expect(card.getByTestId('face-search-off')).toBeVisible();
   await card.getByRole('button', { name: 'הפעלת החיפוש לפי פנים' }).click();

@@ -120,7 +120,8 @@ test.describe('host: create → edit → publish', () => {
     // not published yet: the share panel says the link isn't live, and a guest opening it gets the
     // friendly "not available" page (a 404, cached like any page — publishing must refresh it)
     await page.getByRole('tab', { name: 'הגדרות' }).click();
-    await page.getByRole('button', { name: 'קישור ושיתוף' }).click();
+    // exactly: the row's "?" is named by its card ("קישור ושיתוף: מה כל דבר עושה"), which contains the name too
+    await page.getByRole('button', { name: 'קישור ושיתוף', exact: true }).click();
     await expect(page.getByText('ההזמנה עוד לא פורסמה — הקישור יתחיל לעבוד אחרי הפרסום.')).toBeVisible();
     const draftPath = new URL(await page.getByRole('textbox', { name: 'כתובת ההזמנה' }).inputValue())
       .pathname;
@@ -160,7 +161,7 @@ test.describe('host: create → edit → publish', () => {
     // …until the host switches it off and publishes again (the cached page is refreshed)
     await open(page, editorUrl);
     await page.getByRole('tab', { name: 'הגדרות' }).click();
-    await page.getByRole('button', { name: 'קישור ושיתוף' }).click();
+    await page.getByRole('button', { name: 'קישור ושיתוף', exact: true }).click();
     const hide = page.getByRole('switch', { name: 'להסתיר ממנועי חיפוש' });
     await expect(hide).toHaveAttribute('aria-checked', 'true');
     await hide.click();
@@ -225,13 +226,14 @@ test.describe('hero background', () => {
       .click();
     await saved(page);
     const video = frame.locator('.hero-media video');
-    await expect(video).toHaveAttribute('poster', /\/invitation-media\/.+\.jpg$/);
+    // the still goes up like any photo: WebP (JPEG where the browser can't write it)
+    await expect(video).toHaveAttribute('poster', /\/invitation-media\/.+\.(webp|jpg)$/);
     await expect(video).toHaveAttribute('muted', '');
     await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
 
     // its sound instead of a song
     await page.getByRole('tab', { name: 'עיצוב' }).click();
-    await page.getByRole('button', { name: 'מוזיקה' }).click();
+    await page.getByRole('button', { name: 'מוזיקה', exact: true }).click();
     await page.getByRole('radio', { name: 'הסאונד של סרטון הרקע' }).click();
     await expect(page.getByText('האורחים ישמעו את הסאונד של הסרטון')).toBeVisible();
     await expect(page.getByRole('radiogroup', { name: 'שירים' })).toHaveCount(0);
