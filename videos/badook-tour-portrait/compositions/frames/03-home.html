@@ -88,10 +88,18 @@
       height: 5907.692px;
       display: block;
     }
-    [class~="03-home-spot"] {
+    [id="03-home-spots"] {
       position: absolute;
-      box-shadow: 0 0 0 4000px rgba(28, 25, 23, 0.38);
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 5907.692px;
+      overflow: visible;
       pointer-events: none;
+    }
+    [class~="03-home-spot"] {
+      fill: rgba(28, 25, 23, 0.38);
+      fill-rule: evenodd;
     }
     [class~="03-home-slot"] {
       position: absolute;
@@ -327,11 +335,13 @@
             </div>
 
             <!-- spotlight cut-outs (veil everything except the measured box) -->
-            <div id="03-home-spot-countdown" class="03-home-spot"></div>
-            <div id="03-home-spot-next" class="03-home-spot"></div>
-            <div id="03-home-spot-budget" class="03-home-spot"></div>
-            <div id="03-home-spot-rsvp" class="03-home-spot"></div>
-            <div id="03-home-spot-tasks" class="03-home-spot"></div>
+            <svg id="03-home-spots" viewBox="0 0 900 5907.692" xmlns="http://www.w3.org/2000/svg">
+              <path id="03-home-spot-countdown" class="03-home-spot" opacity="0" />
+              <path id="03-home-spot-next" class="03-home-spot" opacity="0" />
+              <path id="03-home-spot-budget" class="03-home-spot" opacity="0" />
+              <path id="03-home-spot-rsvp" class="03-home-spot" opacity="0" />
+              <path id="03-home-spot-tasks" class="03-home-spot" opacity="0" />
+            </svg>
 
             <!-- highlight rings, in page (world) coordinates -->
             <svg id="03-home-rings" viewBox="0 0 900 5907.692" xmlns="http://www.w3.org/2000/svg">
@@ -509,12 +519,9 @@
         glow.setAttribute("stroke-width", String(8 / S));
       });
       ["countdown", "next", "budget", "rsvp", "tasks"].forEach(function (k) {
+        // veil = the whole page minus the ring's rounded box (even-odd hole)
         var el = $("spot-" + k), c = content(BOX[k]), S = RING[k].cam.S, p = RING[k].pad / S;
-        el.style.left = (c.x - p) + "px";
-        el.style.top = (c.y - p) + "px";
-        el.style.width = (c.w + 2 * p) + "px";
-        el.style.height = (c.h + 2 * p) + "px";
-        el.style.borderRadius = (16 / S) + "px";
+        el.setAttribute("d", "M0 0 H900 V" + IMG_H + " H0 Z " + rrPath(c.x - p, c.y - p, c.w + 2 * p, c.h + 2 * p, 16 / S) + " Z");
       });
 
       // road-map cards: slot + real crop of the card (lifts 6 screen px)
