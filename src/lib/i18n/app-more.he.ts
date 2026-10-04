@@ -65,6 +65,10 @@ export const heMore = {
       },
       upgrade: 'בחבילה מתקדמת',
       fullScreen: 'נפתח במסך מלא',
+      /** over the sidebar's numbered stages */
+      stagesTitle: 'שלבי האירוע',
+      /** a stage's place in the order (the sidebar's buttons, the phone's sheet) */
+      stepOf: 'שלב {n} מתוך {total}',
       menu: 'האפשרויות של "{stage}"',
       more: 'עוד',
     },

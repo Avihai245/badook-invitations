@@ -4,6 +4,7 @@ import {
   Armchair,
   ChartColumn,
   Check,
+  ChevronDown,
   ChevronLeft,
   ClipboardList,
   DoorOpen,
@@ -29,7 +30,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as RadixDialog from '@radix-ui/react-dialog';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Badge, BrandLogo, Button, cn, useDir } from '@/components/app';
 import { openHelp } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
@@ -43,10 +44,13 @@ import {
   navKeyOf,
   stageItems,
   stageOf,
-  stageStatus,
+  stageOpenByDefault,
+  stageProgress,
+  stageStatusSoFar,
   type NavKey,
-  type StageFacts,
+  type StageFactsSoFar,
   type StageKey,
+  type StageProgress,
   type StageStatus,
   type WorkspaceCaps,
 } from './stages';
@@ -86,15 +90,17 @@ export interface EventSpaceData {
   thumb?: ReactNode;
 }
 
-/** The facts the stages' badges read; the days to the event only once the visitor's own today is known. */
-function useStageFacts(d: EventSpaceData): StageFacts | null {
+/**
+ * The facts the stages' badges read: the server knows them for planning, inviting and arranging; the days
+ * to the event ("celebrate") only once the visitor's own today is known.
+ */
+function useStageFacts(d: EventSpaceData): StageFactsSoFar {
   const today = useToday();
-  if (!today) return null;
   return {
     status: d.item.status,
     guests: d.item.guests,
     sent: d.item.sent,
-    daysLeft: daysUntilEvent(d.item.date, today),
+    daysLeft: today ? daysUntilEvent(d.item.date, today) : null,
     plan: d.plan,
     seating: d.seating,
   };
@@ -126,7 +132,7 @@ function useStatusLabel() {
 }
 
 /** A stage's badge: ✓ when done, the open count, "draft", or the days to the event. */
-function StatusPill({ status, active }: { status: StageStatus; active?: boolean }) {
+function StatusPill({ status }: { status: StageStatus }) {
   const label = useStatusLabel()(status);
   if (!label) return null;
   const done = status.kind === 'done';
@@ -140,9 +146,7 @@ function StatusPill({ status, active }: { status: StageStatus; active?: boolean 
             ? 'bg-subtle text-muted'
             : status.kind === 'today'
               ? 'bg-brand-deep text-white dark:text-[#1c1917]'
-              : active
-                ? 'bg-brand-deep text-white dark:text-[#1c1917]'
-                : 'bg-brand-soft text-brand-deep',
+              : 'bg-brand-soft text-brand-deep',
       )}
     >
       {done ? <Check aria-hidden className="size-3" strokeWidth={3} /> : null}
@@ -151,31 +155,25 @@ function StatusPill({ status, active }: { status: StageStatus; active?: boolean 
   );
 }
 
-/** The stage's number in a circle: a check when it's done, the brand's color when it's where the host is. */
-function StageMark({
-  stage,
-  status,
-  current,
-}: {
-  stage: StageKey;
-  status: StageStatus | null;
-  current: boolean;
-}) {
+/**
+ * A step's circle on the stages' line: a check when the stage is finished, its number in the brand's ring
+ * while there's work going on, a plain number before it begins.
+ */
+function StageMark({ n, progress }: { n: number; progress: StageProgress }) {
   const { number } = useUi();
-  const done = status?.kind === 'done';
   return (
     <span
       aria-hidden
       className={cn(
-        'grid size-6 shrink-0 place-items-center rounded-full text-[11.5px] font-bold tabular-nums',
-        done
+        'relative grid size-6 shrink-0 place-items-center rounded-full text-[11.5px] font-bold tabular-nums',
+        progress === 'done'
           ? 'bg-success text-white dark:text-success-bg'
-          : current
-            ? 'bg-brand-deep text-white dark:text-[#1c1917]'
-            : 'bg-subtle text-muted ring-1 ring-line',
+          : progress === 'active'
+            ? 'bg-brand-soft text-brand-deep ring-[1.5px] ring-brand'
+            : 'bg-surface text-muted ring-1 ring-line-strong',
       )}
     >
-      {done ? <Check className="size-3.5" strokeWidth={3} /> : number(STAGES.indexOf(stage) + 1)}
+      {progress === 'done' ? <Check className="size-3.5" strokeWidth={3} /> : number(n)}
     </span>
   );
 }
@@ -192,6 +190,7 @@ function NavItem({
   locked = false,
   onNavigate,
   size = 'md',
+  onLine = false,
 }: {
   id: string;
   navKey: NavKey;
@@ -199,6 +198,8 @@ function NavItem({
   locked?: boolean;
   onNavigate?: () => void;
   size?: 'md' | 'lg';
+  /** a stage's screen: the "you are here" mark sits on the stages' line */
+  onLine?: boolean;
 }) {
   const { t } = useUi();
   const N = t.workspace.nav;
@@ -219,7 +220,13 @@ function NavItem({
       )}
     >
       {current && size === 'md' ? (
-        <span aria-hidden className="absolute inset-y-2 -start-3 w-[3px] rounded-e-full bg-brand" />
+        <span
+          aria-hidden
+          className={cn(
+            'absolute inset-y-2 w-[3px] bg-brand',
+            onLine ? '-start-[9.5px] rounded-full' : '-start-3 rounded-e-full',
+          )}
+        />
       ) : null}
       <Icon aria-hidden className="size-[17px] shrink-0" strokeWidth={1.8} />
       <span className="min-w-0 flex-1 truncate">{N.items[navKey]}</span>
@@ -235,21 +242,69 @@ function NavItem({
 const lockedOf = (key: NavKey, caps: WorkspaceCaps) =>
   (key === 'seating' && caps.seating === 'plan') || (key === 'live' && caps.eventDay === 'plan');
 
+type StagePrefs = Partial<Record<StageKey, boolean>>;
+const prefsKey = (id: string) => `badook:stages-open:${id}`;
+
+function readPrefs(id: string): StagePrefs {
+  try {
+    const raw = JSON.parse(window.localStorage.getItem(prefsKey(id)) ?? '{}') as unknown;
+    if (!raw || typeof raw !== 'object') return {};
+    const prefs: StagePrefs = {};
+    for (const s of STAGES) {
+      const v = (raw as Record<string, unknown>)[s];
+      if (typeof v === 'boolean') prefs[s] = v;
+    }
+    return prefs;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Which of the sidebar's stages are open: as the host last left each one in this event (this browser),
+ * else stageOpenByDefault() — and the stage of the screen they go to always opens, so where they are is
+ * never folded away.
+ */
+function useOpenStages(id: string, facts: StageFactsSoFar, viewing: StageKey | null) {
+  const [prefs, setPrefs] = useState<StagePrefs | null>(null);
+  useEffect(() => setPrefs(readPrefs(id)), [id]);
+  // going to a screen of a stage the host had folded: the fold is forgotten (back to the default)
+  useEffect(() => {
+    if (viewing) setPrefs((p) => (p?.[viewing] === false ? { ...p, [viewing]: undefined } : p));
+  }, [viewing]);
+  useEffect(() => {
+    if (!prefs) return;
+    try {
+      window.localStorage.setItem(prefsKey(id), JSON.stringify(prefs));
+    } catch {
+      // private mode: remembered for this visit only
+    }
+  }, [id, prefs]);
+  const isOpen = (stage: StageKey) => prefs?.[stage] ?? stageOpenByDefault(stage, facts, viewing);
+  const toggle = (stage: StageKey) => setPrefs((p) => ({ ...p, [stage]: !isOpen(stage) }));
+  return { isOpen, toggle };
+}
+
 /**
  * From 1024px, inside an event, the app's sidebar is the event's: back to every event, the event itself
- * (its poster, names and countdown), its home, the four stages with their screens and each stage's
- * status, then insights, the event's settings, help and the account.
+ * (its poster, names and countdown), its home, then the event's stages as numbered steps on one line —
+ * each with its status, opening to its screens (useOpenStages: what has work left, and where the host
+ * is) — then insights, the event's settings, help and the account.
  */
 export function EventSidebar({ data, account }: { data: EventSpaceData; account: ReactNode }) {
-  const { t, locale } = useUi();
+  const { t, locale, fmt, number } = useUi();
   const N = t.workspace.nav;
   const { item, caps } = data;
   const path = usePathname();
   const current = navKeyOf(path, item.id);
   const currentStage = stageOf(current);
   const facts = useStageFacts(data);
+  const { isOpen, toggle } = useOpenStages(item.id, facts, currentStage);
+  // the stages' folding moves only once the host folds one (not while the page settles)
+  const [moved, setMoved] = useState(false);
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
+  const stages = STAGES.filter((s) => stageItems(s, caps).length);
 
   return (
     <aside
@@ -289,39 +344,89 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
         className="mt-2 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain px-3 pb-2 [scrollbar-width:thin]"
       >
         <NavItem id={item.id} navKey="home" current={current === 'home'} />
-        {STAGES.map((stage) => {
-          const items = stageItems(stage, caps);
-          if (!items.length) return null;
-          const status = facts ? stageStatus(stage, facts) : null;
-          const here = currentStage === stage;
-          return (
-            <section key={stage} className="mt-2" aria-labelledby={`stage-${stage}`} data-stage={stage}>
-              <h2
-                id={`stage-${stage}`}
-                className={cn(
-                  'flex items-center gap-2 px-2 pb-1 text-[12.5px] font-bold',
-                  here ? 'text-ink' : 'text-muted',
+        <h2 className="px-2 pt-3 pb-1.5 text-[11.5px] font-semibold text-faint">{N.stagesTitle}</h2>
+        <ol className="flex flex-col">
+          {stages.map((stage, i) => {
+            const items = stageItems(stage, caps);
+            const status = stageStatusSoFar(stage, facts);
+            const progress = stageProgress(status);
+            const here = currentStage === stage;
+            const open = isOpen(stage);
+            const last = i === stages.length - 1;
+            return (
+              <li key={stage} className={cn('relative', !last && 'pb-1.5')} data-stage={stage}>
+                {last ? null : (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      'absolute start-[19px] top-8 bottom-0 w-0.5 rounded-full',
+                      progress === 'done' ? 'bg-success/45' : 'bg-line',
+                    )}
+                  />
                 )}
-              >
-                <StageMark stage={stage} status={status} current={here} />
-                {N.stages[stage]}
-                {status ? <StatusPill status={status} active={here} /> : null}
-              </h2>
-              <ul className="ms-3 flex flex-col gap-0.5 border-s border-line ps-2">
-                {items.map((key) => (
-                  <li key={key}>
-                    <NavItem
-                      id={item.id}
-                      navKey={key}
-                      current={current === key}
-                      locked={lockedOf(key, caps)}
+                <h3>
+                  <button
+                    type="button"
+                    id={`stage-${stage}`}
+                    aria-expanded={open}
+                    aria-controls={`stage-${stage}-screens`}
+                    data-stage-toggle={stage}
+                    onClick={() => {
+                      setMoved(true);
+                      toggle(stage);
+                    }}
+                    className={cn(
+                      'group flex w-full items-center gap-2 rounded-[10px] px-2 py-1 text-start text-[13px] font-bold transition-colors hover:bg-subtle',
+                      here ? 'text-ink' : 'text-ink/80',
+                    )}
+                  >
+                    <StageMark n={i + 1} progress={progress} />
+                    <span className="sr-only">
+                      {fmt(N.stepOf, { n: number(i + 1), total: number(stages.length) })}:
+                    </span>
+                    <span className="min-w-0 truncate">{N.stages[stage]}</span>
+                    {status ? <StatusPill status={status} /> : <span className="ms-auto" />}
+                    <ChevronDown
+                      aria-hidden
+                      className={cn(
+                        'size-4 shrink-0 text-faint transition-transform duration-200 group-hover:text-muted motion-reduce:transition-none',
+                        open && 'rotate-180',
+                      )}
                     />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          );
-        })}
+                  </button>
+                </h3>
+                <div
+                  id={`stage-${stage}-screens`}
+                  inert={!open}
+                  className={cn(
+                    'grid',
+                    // folded: hidden once the fold has closed (visibility waits for the end of the move)
+                    open ? 'visible grid-rows-[1fr]' : 'invisible grid-rows-[0fr]',
+                    moved &&
+                      'transition-[grid-template-rows,visibility] duration-200 ease-out motion-reduce:transition-none',
+                  )}
+                >
+                  <ul
+                    className="flex min-h-0 flex-col gap-0.5 overflow-hidden p-[3px] ps-7"
+                    aria-label={fmt(N.menu, { stage: N.stages[stage] })}
+                  >
+                    {items.map((key) => (
+                      <li key={key}>
+                        <NavItem
+                          id={item.id}
+                          navKey={key}
+                          current={current === key}
+                          locked={lockedOf(key, caps)}
+                          onLine
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
       </nav>
 
       <div className="flex flex-col gap-0.5 border-t border-line px-3 pt-2 pb-3">
@@ -423,7 +528,7 @@ export function EventBar({ item, thumb }: { item: InvitationSummary; thumb?: Rea
  * the event's home.
  */
 export function EventBottomBar({ data }: { data: EventSpaceData }) {
-  const { t, fmt } = useUi();
+  const { t, fmt, number } = useUi();
   const N = t.workspace.nav;
   const { item, caps } = data;
   const path = usePathname();
@@ -449,7 +554,7 @@ export function EventBottomBar({ data }: { data: EventSpaceData }) {
             href={itemHref(item.id, 'home')}
           />
           {stages.map((s) => {
-            const status = facts ? stageStatus(s, facts) : null;
+            const status = stageStatusSoFar(s, facts);
             return (
               <BarButton
                 key={s}
@@ -469,16 +574,21 @@ export function EventBottomBar({ data }: { data: EventSpaceData }) {
         open={sheet !== null}
         onOpenChange={(open) => !open && setSheet(null)}
         title={sheet && sheet !== 'more' ? N.stages[sheet] : N.more}
+        eyebrow={
+          sheet && sheet !== 'more'
+            ? fmt(N.stepOf, { n: number(stages.indexOf(sheet) + 1), total: number(stages.length) })
+            : undefined
+        }
         description={sheet && sheet !== 'more' ? N.stageHint[sheet] : undefined}
         closeLabel={t.common.close}
       >
         {sheet && sheet !== 'more' ? (
           <>
-            {facts ? (
-              <p className="mb-2 px-1 text-[13px] font-semibold text-muted">
-                {statusLabel(stageStatus(sheet, facts))}
-              </p>
-            ) : null}
+            {(() => {
+              const status = stageStatusSoFar(sheet, facts);
+              const label = status ? statusLabel(status) : null;
+              return label ? <p className="mb-2 px-1 text-[13px] font-semibold text-muted">{label}</p> : null;
+            })()}
             <ul className="flex flex-col gap-1" aria-label={fmt(N.menu, { stage: N.stages[sheet] })}>
               {stageItems(sheet, caps).map((key) => (
                 <li key={key}>
@@ -562,6 +672,7 @@ function Sheet({
   open,
   onOpenChange,
   title,
+  eyebrow,
   description,
   closeLabel,
   children,
@@ -569,6 +680,8 @@ function Sheet({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: ReactNode;
+  /** a line over the title (a stage's "step 2 of 4") */
+  eyebrow?: ReactNode;
   description?: ReactNode;
   closeLabel: string;
   children: ReactNode;
@@ -585,6 +698,7 @@ function Sheet({
             <span aria-hidden className="mx-auto mb-3 block h-1.5 w-10 rounded-full bg-line-strong" />
             <div className="flex items-start justify-between gap-3 px-1">
               <div>
+                {eyebrow ? <p className="text-[12px] font-semibold text-brand-deep">{eyebrow}</p> : null}
                 <RadixDialog.Title className="text-[18px] font-bold">{title}</RadixDialog.Title>
                 {description ? (
                   <RadixDialog.Description className="text-[13px] text-muted">

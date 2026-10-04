@@ -136,6 +136,47 @@ export function stageStatus(stage: StageKey, f: StageFacts): StageStatus {
   }
 }
 
+/** The facts as far as the server knows them: the days to the event wait for the visitor's own today. */
+export type StageFactsSoFar = Omit<StageFacts, 'daysLeft'> & { daysLeft: number | null };
+
+/** A stage's status once it can be told: "celebrate" counts days, the others don't need today. */
+export function stageStatusSoFar(stage: StageKey, f: StageFactsSoFar): StageStatus | null {
+  if (f.daysLeft === null && stage === 'celebrate') return null;
+  return stageStatus(stage, { ...f, daysLeft: f.daysLeft ?? 0 });
+}
+
+/** How a stage's step is drawn: finished, with work going on, or not begun yet. */
+export type StageProgress = 'done' | 'active' | 'waiting';
+
+export function stageProgress(s: StageStatus | null): StageProgress {
+  switch (s?.kind) {
+    case 'done':
+      return 'done';
+    case 'open':
+    case 'toSend':
+    case 'draft':
+    case 'today':
+      return 'active';
+    default:
+      return 'waiting';
+  }
+}
+
+/** "Celebrate" opens by itself this many days before the event (and stays open after it). */
+export const CELEBRATE_OPENS_DAYS = 30;
+
+/**
+ * Whether the sidebar shows a stage open before the host opens or closes it: the stage of the screen
+ * they are on, and every stage with something left to do — a finished stage folds into its ✓ row.
+ * "Celebrate" waits until a month before the event (its screens matter then, and after it: the gallery
+ * and the film), so it stays closed until the visitor's today is known.
+ */
+export function stageOpenByDefault(stage: StageKey, f: StageFactsSoFar, viewing: StageKey | null): boolean {
+  if (stage === viewing) return true;
+  if (stage === 'celebrate') return f.daysLeft !== null && f.daysLeft <= CELEBRATE_OPENS_DAYS;
+  return stageStatusSoFar(stage, f)?.kind !== 'done';
+}
+
 /** Whole days from `today` (YYYY-MM-DD) to the event's date (YYYY-MM-DD). */
 export function daysTo(date: string, today: string): number {
   return Math.round((Date.parse(`${date}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86_400_000);
