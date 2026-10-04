@@ -145,7 +145,8 @@ const saved = (page: Page) =>
 async function designPanel(page: Page, name: string) {
   if (phoneOf(page)) {
     await page.getByRole('navigation', { name: 'מצב העורך' }).getByRole('button', { name: 'עיצוב' }).click();
-    await page.getByRole('dialog', { name: 'כל הסקשנים' }).getByRole('button', { name }).click();
+    // exactly: each row's "?" is named by its card ("עצבו לי: מה כל כפתור עושה"), which contains the name too
+    await page.getByRole('dialog', { name: 'כל הסקשנים' }).getByRole('button', { name, exact: true }).click();
   } else {
     await page.getByRole('tab', { name: 'עיצוב' }).click();
     await page.getByRole('button', { name, exact: true }).click();
