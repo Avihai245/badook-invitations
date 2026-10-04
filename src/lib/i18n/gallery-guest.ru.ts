@@ -173,6 +173,10 @@ export const galleryGuestRu: GalleryGuestDict = {
     privacy: 'Политика конфиденциальности',
     accessibility: 'Доступность',
     made: 'Живая галерея от {brand}',
+    site: 'Цифровые приглашения и организация праздников',
+    visit: 'Перейти на сайт {brand}',
+    events: 'Badook Events',
+    eventsHint: 'Найти площадку для праздника',
   },
   faces: {
     title: 'Фото, где есть я',

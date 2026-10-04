@@ -172,6 +172,10 @@ export const galleryGuestEs: GalleryGuestDict = {
     privacy: 'Política de privacidad',
     accessibility: 'Accesibilidad',
     made: 'Una galería en directo de {brand}',
+    site: 'Invitaciones digitales y organización de eventos',
+    visit: 'Visitar {brand}',
+    events: 'Badook Events',
+    eventsHint: 'Encontrar un lugar para tu evento',
   },
   faces: {
     title: 'Las fotos en las que salgo',

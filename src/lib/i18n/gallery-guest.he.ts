@@ -154,6 +154,10 @@ export const galleryGuestHe = {
     privacy: 'מדיניות פרטיות',
     accessibility: 'הצהרת נגישות',
     made: 'גלריה חיה של {brand}',
+    site: 'הזמנות דיגיטליות וארגון אירועים',
+    visit: 'לאתר {brand}',
+    events: 'Badook אירועים',
+    eventsHint: 'למצוא מקום לאירוע',
   },
   /** "the photos I'm in" (feature face_albums) */
   faces: {

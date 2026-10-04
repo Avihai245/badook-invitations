@@ -186,3 +186,65 @@ test('with no photos yet there are no stories, just the invitation to share', as
   await shot(guest, `he-${testInfo.project.name}-0-empty`);
   await context.close();
 });
+
+test('Badook is plain to see at the bottom, with its site and Badook Events; a button to add photos follows the guest', async ({
+  page,
+  browser,
+}, testInfo) => {
+  const { host, link } = await seeded(page);
+  // a full gallery: the page is long enough to scroll past the upload card without reaching the footer
+  await seedPhotos(
+    host.id,
+    Array.from({ length: 30 }, (_, i) => ({
+      color: [60 + ((i * 37) % 160), 80 + ((i * 53) % 140), 90 + ((i * 29) % 150)] as [
+        number,
+        number,
+        number,
+      ],
+      who: `crowd-${i % 5}`,
+      name: ['מיכל', 'רון', 'שירה', 'עומר', null][i % 5]!,
+      minute: 30 + i,
+    })),
+  );
+  const { page: guest, context } = await guestPage(browser, testInfo.project, link);
+
+  const card = guest.getByTestId('gallery-brand-card');
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toBeVisible();
+  await expect(card.getByRole('img', { name: 'Badook' }).first()).toBeVisible();
+  await expect(card.getByText('גלריה חיה של Badook')).toBeVisible();
+  await expect(card.getByText('הזמנות דיגיטליות וארגון אירועים')).toBeVisible();
+  // the logo and the button go to Badook's site (invitations and events), in a new tab
+  await expect(guest.getByTestId('gallery-brand')).toHaveAttribute('href', '/');
+  const site = card.getByRole('link', { name: /לאתר Badook/ });
+  await expect(site).toHaveAttribute('href', '/');
+  await expect(site).toHaveAttribute('target', '_blank');
+  // and Badook Events, to find a venue
+  const events = card.getByRole('link', { name: /Badook אירועים/ });
+  await expect(events).toHaveAttribute('href', 'https://event.badooks.com/');
+  await expect(events).toHaveAttribute('target', '_blank');
+  await expect(events).toContainText('למצוא מקום לאירוע');
+  // the site's link opens the home page
+  const [home] = await Promise.all([context.waitForEvent('page'), site.click()]);
+  await home.waitForLoadState('domcontentloaded');
+  expect(new URL(home.url()).pathname).toBe('/');
+  await home.close();
+
+  // at the footer the floating button steps aside; in the middle of the photos it is there
+  await expect(guest.getByTestId('gallery-fab')).toHaveCount(0);
+  await guest.getByTestId('gallery-feed').scrollIntoViewIfNeeded();
+  await guest.evaluate(() => {
+    const feed = document.querySelector('[data-testid="gallery-feed"]')!;
+    window.scrollTo(0, feed.getBoundingClientRect().top + window.scrollY + 200);
+  });
+  await expect(guest.getByTestId('gallery-fab')).toBeVisible();
+  await shot(guest, `he-${testInfo.project.name}-4-fab`, false);
+  // and it picks photos like the card's button
+  const chooser = guest.waitForEvent('filechooser');
+  await guest.getByTestId('gallery-fab').click();
+  await chooser;
+  await guest.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(guest.getByTestId('gallery-fab')).toHaveCount(0);
+  await shot(guest, `he-${testInfo.project.name}-5-footer`, false);
+  await context.close();
+});

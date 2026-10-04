@@ -167,7 +167,9 @@ only if the host ticks it. Off: the studio offers the package or the switch, the
   told apart by the feed's opaque `by` key (the start of the uploader's hash — never the device's own id,
   which alone can delete an upload; `gallery_item_json`, migration `20261004000100`); without the migration
   unnamed uploads share one story. The hosts' own items (the highlights film) are one story. The page ends
-  with the Badook logo.
+  with a Badook card: the logo and a button to the invitations site (`/`), and a link to Badook Events
+  (`BADOOK_EVENTS_URL`), both in a new tab. Past the upload card a floating "add photos" button follows the
+  guest (hidden at the footer).
 - **Sending guests the gallery link** (gallery tab → share card): from the system's WhatsApp number once
   the third Meta template is approved and `INVITES_WHATSAPP_GALLERY_TEMPLATE` names it
   (docs/whatsapp-setup.md §9); otherwise per-guest wa.me links and copied messages. In each guest's

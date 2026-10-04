@@ -59,7 +59,7 @@ export function FeedGrid({
 
   return (
     <>
-      <ul className="grid grid-cols-3 gap-1 sm:grid-cols-4 sm:gap-1.5 lg:grid-cols-5" data-testid={testId}>
+      <ul className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 sm:gap-2 lg:grid-cols-5" data-testid={testId}>
         {items.map((item, i) => {
           const kind = item.kind === 'video' ? t.item.video : t.item.photo;
           const label = item.name
@@ -79,7 +79,7 @@ export function FeedGrid({
                 onClick={() => onOpen(i)}
                 aria-label={label}
                 data-item={item.id}
-                className="group relative block aspect-square w-full overflow-hidden rounded-[6px] bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="group relative block aspect-square w-full overflow-hidden rounded-[10px] bg-subtle shadow-[0_1px_2px_rgba(0,0,0,0.06)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 {item.thumb ? (
                   <img

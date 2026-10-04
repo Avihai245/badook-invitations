@@ -150,6 +150,10 @@ export const galleryGuestAm: GalleryGuestDict = {
     privacy: 'የግላዊነት መመሪያ',
     accessibility: 'ተደራሽነት',
     made: 'የቀጥታ የፎቶ ማዕከል በ{brand}',
+    site: 'ዲጂታል ግብዣዎችና የዝግጅት ዕቅድ',
+    visit: 'ወደ {brand} ድረ-ገጽ',
+    events: 'Badook Events',
+    eventsHint: 'ለዝግጅትዎ ቦታ ያግኙ',
   },
   faces: {
     title: 'እኔ ያለሁባቸው ፎቶዎች',

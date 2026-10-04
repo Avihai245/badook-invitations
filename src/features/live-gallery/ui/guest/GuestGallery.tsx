@@ -2,12 +2,15 @@
 /* eslint-disable @next/next/no-img-element -- guests' photos come from short-lived signed URLs of private storage (or the phone itself): nothing for the image optimizer to cache */
 
 import {
+  ArrowLeft,
+  ArrowRight,
   Camera,
   CircleAlert,
   Globe,
   ImagePlus,
   Lock,
   LoaderCircle,
+  MapPin,
   Sparkles,
   Trash2,
   User,
@@ -25,6 +28,7 @@ import {
 import { BrandLogo } from '@/components/app/BrandLogo';
 import { RTL_LOCALES } from '@/features/invitations/contracts/types';
 import { nativeName } from '@/features/invitations/lib/locales';
+import { BADOOK_EVENTS_URL } from '@/features/site/links';
 import { UploadFaceIndexer } from '@/features/faces/client/upload-indexer';
 import { FaceSearch } from '@/features/faces/ui/FaceSearch';
 import { GALLERY } from '../../config';
@@ -399,6 +403,22 @@ function GalleryBody({
   };
 
   const canUpload = phase === 'ready' && (state === 'open' || state === 'paused');
+  // the floating "add" shows once the upload card has scrolled away, and hides at the footer
+  const uploadRef = useRef<HTMLElement>(null);
+  const footerRef = useRef<HTMLElement>(null);
+  const [fab, setFab] = useState(false);
+  useEffect(() => {
+    if (!canUpload || typeof IntersectionObserver === 'undefined') return;
+    const seen = new Map<Element, boolean>();
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) seen.set(e.target, e.isIntersecting);
+      const card = uploadRef.current ? seen.get(uploadRef.current) : true;
+      const foot = footerRef.current ? seen.get(footerRef.current) : false;
+      setFab(card === false && !foot);
+    });
+    for (const el of [uploadRef.current, footerRef.current]) if (el) io.observe(el);
+    return () => io.disconnect();
+  }, [canUpload]);
   const showQueue = roundItems.length > 0 || (snapshot?.preparing ?? 0) > 0;
 
   return (
@@ -510,6 +530,7 @@ function GalleryBody({
 
             {canUpload ? (
               <section
+                ref={uploadRef}
                 className="mt-6 rounded-[28px] border border-line bg-surface p-5 shadow-[0_28px_60px_-34px_rgba(20,10,0,0.45)] sm:p-7"
                 aria-labelledby="gallery-upload"
               >
@@ -733,8 +754,65 @@ function GalleryBody({
           </>
         )}
 
-        <footer className="mt-14 text-center text-[12px] leading-relaxed text-muted">
-          {canUpload ? <p className="mx-auto max-w-[52ch]">{t.footer.consent}</p> : null}
+        <footer ref={footerRef} className="mt-14 text-center text-[12px] leading-relaxed text-muted">
+          {/* whose system this is: Badook, with the way to its site and to Badook Events */}
+          <section
+            aria-label={data.brand}
+            data-testid="gallery-brand-card"
+            className="mx-auto max-w-[460px] rounded-[24px] border border-line bg-surface px-5 pt-6 pb-5 shadow-[0_20px_50px_-30px_rgba(20,10,0,0.35)]"
+          >
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener"
+              data-testid="gallery-brand"
+              className="inline-flex flex-col items-center gap-2 rounded-[14px] px-3 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <BrandLogo label={data.brand} className="text-[22px]" />
+              <span className="text-[14px] font-bold text-ink">
+                {fmt(t.footer.made, { brand: data.brand })}
+              </span>
+            </a>
+            <p className="mt-0.5 text-[13px] text-muted">{t.footer.site}</p>
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener"
+              data-testid="gallery-brand-site"
+              className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-6 text-[14.5px] font-bold text-white shadow-sm transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none"
+            >
+              {fmt(t.footer.visit, { brand: data.brand })}
+              {dir === 'rtl' ? (
+                <ArrowLeft aria-hidden className="size-4" />
+              ) : (
+                <ArrowRight aria-hidden className="size-4" />
+              )}
+            </a>
+            <a
+              href={BADOOK_EVENTS_URL}
+              target="_blank"
+              rel="noopener"
+              data-testid="gallery-brand-events"
+              className="mt-3 flex items-center gap-3 rounded-[16px] border border-line bg-canvas px-4 py-3 text-start transition-colors hover:bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <span
+                aria-hidden
+                className="grid size-10 shrink-0 place-items-center rounded-full bg-[#fdebe4] text-[#e0532b]"
+              >
+                <MapPin className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14px] font-bold text-ink">{t.footer.events}</span>
+                <span className="block text-[12.5px] text-muted">{t.footer.eventsHint}</span>
+              </span>
+              {dir === 'rtl' ? (
+                <ArrowLeft aria-hidden className="size-4 shrink-0 text-muted" />
+              ) : (
+                <ArrowRight aria-hidden className="size-4 shrink-0 text-muted" />
+              )}
+            </a>
+          </section>
+          {canUpload ? <p className="mx-auto mt-6 max-w-[52ch]">{t.footer.consent}</p> : null}
           <p className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
             <a href="/privacy" target="_blank" rel="noopener" className="underline">
               {t.footer.privacy}
@@ -743,18 +821,24 @@ function GalleryBody({
               {t.footer.accessibility}
             </a>
           </p>
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener"
-            data-testid="gallery-brand"
-            className="mx-auto mt-8 inline-flex flex-col items-center gap-2 rounded-[14px] px-4 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            <BrandLogo label={data.brand} className="text-[18px]" />
-            <span className="text-[12.5px] font-medium">{fmt(t.footer.made, { brand: data.brand })}</span>
-          </a>
         </footer>
       </div>
+
+      {/* past the upload card: a button to add photos stays at hand (not over the footer) */}
+      {canUpload && fab ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(16px,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={() => fileInput.current?.click()}
+            disabled={!snapshot}
+            data-testid="gallery-fab"
+            className="pointer-events-auto inline-flex h-13 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-6 text-[15.5px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.55)] transition-transform active:scale-[0.97] disabled:opacity-60 motion-reduce:transition-none"
+          >
+            <ImagePlus aria-hidden className="size-5" />
+            {t.stories.addLabel}
+          </button>
+        </div>
+      ) : null}
 
       {storyOpen ? (
         <StoryViewer

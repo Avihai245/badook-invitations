@@ -153,6 +153,10 @@ export const galleryGuestEn: GalleryGuestDict = {
     privacy: 'Privacy policy',
     accessibility: 'Accessibility',
     made: 'A live gallery by {brand}',
+    site: 'Digital invitations & event planning',
+    visit: 'Visit {brand}',
+    events: 'Badook Events',
+    eventsHint: 'Find a venue for your event',
   },
   /** "the photos I'm in" (feature face_albums) */
   faces: {

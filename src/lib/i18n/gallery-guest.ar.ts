@@ -192,6 +192,10 @@ export const galleryGuestAr: GalleryGuestDict = {
     privacy: 'سياسة الخصوصية',
     accessibility: 'إمكانية الوصول',
     made: 'معرض مباشر من {brand}',
+    site: 'دعوات رقمية وتنظيم المناسبات',
+    visit: 'زيارة موقع {brand}',
+    events: 'Badook Events',
+    eventsHint: 'ابحثوا عن مكان لمناسبتكم',
   },
   faces: {
     title: 'الصور التي أظهر فيها',

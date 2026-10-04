@@ -175,6 +175,10 @@ export const galleryGuestFr: GalleryGuestDict = {
     privacy: 'Politique de confidentialité',
     accessibility: 'Accessibilité',
     made: 'Une galerie en direct par {brand}',
+    site: 'Invitations numériques et organisation d’événements',
+    visit: 'Découvrir {brand}',
+    events: 'Badook Events',
+    eventsHint: 'Trouver un lieu pour votre événement',
   },
   faces: {
     title: 'Les photos où j’apparais',
