@@ -243,6 +243,8 @@
           { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.75, ease: "power3.out" }, pair[1]);
       });
       // brown underline draws under "במקום אחד." at 3.5s (right → left, reading direction)
+      // (the svg stays hidden until the draw starts, so the round cap never shows as a stray dot)
+      tl.fromTo(el("underline"), { opacity: 0 }, { opacity: 1, duration: 0.06, ease: "none" }, 3.5);
       tl.fromTo(el("underline-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut" }, 3.5);
 
       // ── Scene 3 (4.7–8.895s): "יוצאים לדרך" — the lockup steps back, the CTA lands as the hero ──

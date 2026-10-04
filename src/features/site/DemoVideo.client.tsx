@@ -16,9 +16,10 @@ export const DEMO_VIDEO = {
 /** The full narrated tour of every feature, its Hebrew captions part of the picture. */
 export const TOUR_VIDEO = {
   mp4: '/video/badook-tour.mp4',
-  portrait: '/video/badook-tour-portrait.mp4',
+  /** the 9:16 cut for phones; null until it is rendered (then phones get the landscape one) */
+  portrait: null as string | null,
   poster: '/video/tour-poster.jpg',
-  minutes: 2.5,
+  minutes: 3,
 } as const;
 
 /** The tour with its controls (inside a dialog). */
@@ -33,11 +34,13 @@ function TourPlayer() {
       preload="metadata"
       data-testid="tour-player"
     >
-      <source
-        src={TOUR_VIDEO.portrait}
-        type="video/mp4"
-        media="(max-width: 640px) and (orientation: portrait)"
-      />
+      {TOUR_VIDEO.portrait ? (
+        <source
+          src={TOUR_VIDEO.portrait}
+          type="video/mp4"
+          media="(max-width: 640px) and (orientation: portrait)"
+        />
+      ) : null}
       <source src={TOUR_VIDEO.mp4} type="video/mp4" />
       {/* no captions track: the captions are part of the picture (a track would show them twice) */}
     </video>
