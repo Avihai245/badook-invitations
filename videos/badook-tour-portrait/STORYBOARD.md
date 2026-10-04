@@ -1,5 +1,5 @@
 ---
-format: 1920x1080
+format: 1080x1920
 duration: 168s
 message: "באדוק — כל האירוע במקום אחד, מהרעיון הראשון ועד הרגע האחרון. מתחילים בחינם."
 arc: Welcome → Plan (start, home) → Design (gallery, AI, edit) → Invite (share, guests, RSVPs) → Organize (tasks, budget, seating) → Celebrate (event day, live gallery, film) → Help → Free to start
@@ -10,7 +10,7 @@ language: he
 direction: rtl
 ---
 
-# STORYBOARD — Badook, the full tour (סיור מלא במערכת)
+# STORYBOARD — Badook, the full tour — PORTRAIT 9:16 cut (phones)
 
 The user's own recording narrates the whole film, verbatim (`audio_meta.json`; one clip per frame, cut at the
 pauses). Every frame's duration IS its voice clip — the cut lands exactly on the recording. Every cue time below
@@ -29,16 +29,21 @@ screenshots (and the rebuilt budget gauge, which copies them).
 role ≈ 88px) → one supporting line (Heebo, `lead`). Hebrew, `dir="rtl"`, right-aligned. Numbers in Frank Ruhl
 Libre with `tabular-nums`.
 
-**The house layout (landscape).** RTL reading: the TEXT COLUMN sits on the RIGHT (x ≈ 1290–1840, top-aligned at
-y ≈ 120), the REAL SCREEN sits on the LEFT in a "window card" (x ≈ 80–1230): 18px radius, 1px ink@12% hairline,
-soft card shadow, NO browser chrome, NO URL bar. A phone = the screenshot inside a dark device body (radius ≈
-54px, 14px bezel). Vary it: some frames are centered heroes (01, 11, 14, 17), some are triptychs (10), some put a
-phone beside a window (07, 12, 13). Everything important stays in the top 83% (y < 896): the bottom band is the
-caption band.
+**The house layout (PORTRAIT 1080×1920 — this cut is watched on phones).** Top block (y ≈ 90–430): kicker
+(right-aligned, RTL) + headline (Frank Ruhl Libre 500, 100–120px, max 2 lines) + at most one short lead/chip row.
+Middle (y ≈ 450–1570): the REAL PHONE SCREEN of the app, big — either a "screen card" (the 390-CSS-wide phone capture
+shown 900 px wide = 2.3077 px per CSS px, x 90–990, radius 28, hairline + card shadow, its inner `.world` scrolled /
+zoomed to the part being talked about) or a phone device (dark body, radius 64) when the frame is about a guest's
+phone. Pills / chips / count-ups sit ON the screen card's edges or in the top block. Nothing below y = 1594: the
+bottom band is the caption band. The landscape cut's two-column idea becomes top/bottom stacking here.
+
+The phone captures are 390 CSS px wide at 3× (PNG 1170 px wide; many are full-page and tall). Measured element boxes
+are given per frame in CSS px of that 390-wide page — map them with the same formula (X = ox + (x − cx) × scale).
+When a box is missing or marked "verify", VIEW the PNG (Python/PIL crop + Read) to locate the element before placing
+anything on it.
 
 **Placing anything ON a screenshot (the core trick of this film).** Every screenshot is the real app. Element
-boxes are measured from the DOM and given per frame as `[x, y, w, h]` in CSS px of the page (desktop screens are
-1440 CSS px wide, captured at 2× → image px = CSS px × 2). If the screenshot is shown at displayed width `W`
+boxes are measured from the DOM and given per frame as `[x, y, w, h]` in CSS px of the page (phone captures are 390 CSS px wide at 3× → image px = CSS px × 3). If the screenshot is shown at displayed width `W`
 starting at window origin `(ox, oy)` and cropped from CSS offset `(cx, cy)`, then a box maps to screen px as
 `X = ox + (x − cx) × W / cropW_css`, same for y. Rings, spotlights, zooms and labels MUST sit exactly on the
 named element — compute them from the box, never by eye.
@@ -82,13 +87,13 @@ subtitle of the voice — the headline/kicker are titles, not captions.
 - voiceover: "ברוכים הבאים לבאדוק — מקום אחד שבו מתכננים את האירוע, מזמינים את האורחים ומנהלים הכול עד הרגע האחרון. בואו נראה איך זה עובד."
 - duration: 10.306s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/01-intro.html
 - type: hook
 - persuasion: Show-don't-tell proof (the product's own output, the invitation, is the opening image)
 - beat: curiosity + aspiration
 - blueprint: device-surface-showcase (Adapt)
-- asset_candidates: assets/invite-open.mp4 — the sample invitation recorded on a phone: envelope opens, names, countdown; assets/badook-logo.png — Badook wordmark
+- asset_candidates: assets/invite-open.mp4 — the sample invitation recorded on a phone; assets/badook-logo.png — Badook wordmark
 - focal: assets/invite-open.mp4
 - roles: invite-open.mp4 = cutout (phone hero) · badook-logo.png = supporting
 - sfx: none
@@ -119,21 +124,23 @@ Scene 3 (8.9–10.306s): "בואו נראה איך זה עובד" — the promis
 "סיור במערכת ←" (arrow pointing left, RTL "onward") slides in under them at 8.9s; a soft brown glow blooms behind the
 phone (`ambient-glow-bloom`, finite). Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** The phone is the hero, centered: approved frame video geometry x 270, y 470, width 540, height 1100 (fit cover; it is 780×1688 so the bottom few px crop), bezel drawn around it (never moves). Top block: "ברוכים הבאים ל־" + the logo (≈ 420 px wide) at y 90–260, then "מקום אחד" headline at y 280–400. The three verbs become three pills that pop on their cues in a row ABOVE the phone (y ≈ 410–460) or overlapping the phone's left/right edges at y 600 / 820 / 1040 — keep them readable over the cream, not over the video. The "סיור במערכת ←" pill lands at y ≈ 1500 over the phone's lower edge. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 2 — מתחילים באירוע חדש
 
 - scene: The start wizard in three steps, each choice lighting up on its word, then a stopwatch shows "under a minute"
 - voiceover: "מתחילים באירוע חדש: בוחרים את סוג האירוע, מוסיפים תאריך, מספר אורחים משוער ותקציב, ובוחרים מאיפה להתחיל. פחות מדקה, והאירוע מוכן."
 - duration: 11.636s
 - transition_in: blur-crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/02-start.html
 - type: product_intro
 - persuasion: Friction reduction
 - beat: ease + clarity
 - blueprint: device-surface-showcase (Adapt — cursorless stepwise flow)
-- asset_candidates: assets/screen-wizard-1.png — wizard step 1, event types; assets/screen-wizard-2.png — wizard step 2, names/date/guests/budget filled; assets/screen-wizard-3.png — wizard step 3, where to start
-- focal: assets/screen-wizard-2.png
-- roles: screen-wizard-1.png = supporting · screen-wizard-2.png = cutout · screen-wizard-3.png = supporting
+- asset_candidates: assets/phone-wizard-1.png — wizard step 1 on a phone; assets/phone-wizard-2.png — wizard step 2 filled; assets/phone-wizard-3.png — wizard step 3
+- focal: assets/phone-wizard-1.png
+- roles: phone-wizard-1.png = supporting · phone-wizard-2.png = cutout · phone-wizard-3.png = supporting
 - sfx: none
 
 narrativeRole: the first minute — show how little it takes to start.
@@ -159,21 +166,23 @@ Scene 5 (9.2–11.636s): a brown stopwatch chip (circle ring + "00:45") pops bes
 9.2s, its ring SVG-draws and the digits count 00:00→00:45 by 10.3s; at 10.3s a brown check badge pops on `go`
 ("יוצאים לדרך") and the text column's lead becomes "והאירוע מוכן". Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** Screen card shows the wizard phone captures (each 390×844 CSS) — scale so the card shows CSS y 120–620 of each step. phone-wizard-1.png (page 390×844 CSS): `types` [201, 180, 173, 143]; `type-wedding` [201, 180, 173, 143] · phone-wizard-2.png (page 390×844 CSS): `form` [16, 180, 358, 480]; `f-names` [36, 200, 318, 66]; `f-date` [36, 363, 318, 66]; `f-guests` [36, 444, 318, 90]; `f-budget` [36, 550, 318, 90]; `next` [16, 756, 103, 48] · phone-wizard-3.png (page 390×844 CSS): `opt-plan` [16, 202, 358, 182]; `opt-design` [16, 396, 358, 182]; `opt-all` [16, 590, 358, 162]; `go` [16, 819, 142, 48]. The stopwatch chip sits at the card's top-left corner. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 3 — בית האירוע
 
 - scene: The event home — countdown, next step, budget, RSVPs, tasks ring in turn, then the four stages
 - voiceover: "בית האירוע מראה הכול במבט אחד: ספירה לאחור, הצעד הבא שכדאי לעשות עכשיו, מד התקציב, אישורי ההגעה והמשימות. והכול מסודר בארבעה שלבים: מתכננים, מזמינים, מסדרים וחוגגים."
 - duration: 16.932s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/03-home.html
 - type: feature_showcase
 - persuasion: Value stacking
 - beat: clarity + control
 - blueprint: device-surface-showcase (Adapt — floating-window tour with targeted zooms)
-- asset_candidates: assets/screen-home.png — event home full page with countdown, next step, three widgets and the road map
-- focal: assets/screen-home.png
-- roles: screen-home.png = cutout
+- asset_candidates: assets/phone-home.png — event home on a phone, full page
+- focal: assets/phone-home.png
+- roles: phone-home.png = cutout
 - sfx: none
 
 narrativeRole: the hub — everything at a glance.
@@ -203,21 +212,23 @@ travel (10.6–11.6s). Then the four stage cards light up in order on their word
 vertical 1-2-3-4 stage list assembles in sync (brown numbered circles + the stage names, `grid-card-assemble`).
 Held read from 15.9s.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** Screen card scrolls the tall phone page: start at the hero/countdown (CSS y ≈ 380–860), then travel down to the widgets and the road map on their cues. phone-home.png (page 390×2560 CSS): `countdown-hours` [139, 597, 68, 68]; `next-step` [16, 706, 358, 239]; `budget-widget` [16, 1221, 358, 338]; `rsvp-widget` [16, 965, 358, 240]; `tasks-widget` [16, 1575, 358, 188]; `road-plan` [201, 1818, 173, 141]; `road-invite` [16, 1818, 173, 141]; `road-arrange` [201, 1971, 173, 141]; `road-celebrate` [16, 1971, 173, 141]. The countdown "256 ימים" tile is next to `countdown-hours` (VERIFY by viewing). The four stages: ring each road card on its word and build the 1-2-3-4 list in the top block as small pills. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 4 — בוחרים עיצוב
 
 - scene: The design gallery — 60+ animated designs, all already showing נועה & איתי, glide past
 - voiceover: "בוחרים הזמנה מתוך יותר משישים עיצובים מונפשים, עם מוזיקה ואנימציה, שמותאמים לסוג האירוע."
 - duration: 7.506s
 - transition_in: zoom-through
-- status: animated
+- status: outline
 - src: compositions/frames/04-design.html
 - type: feature_showcase
 - persuasion: Statistical proof (breadth)
 - beat: excitement + belonging
 - blueprint: grid-card-assemble (Adapt — 3D page-scroll reveal)
-- asset_candidates: assets/screen-designs.png — design gallery full page, a grid of invitation cards personalised נועה & איתי
-- focal: assets/screen-designs.png
-- roles: screen-designs.png = cutout
+- asset_candidates: assets/phone-designs.png — the design gallery on a phone, full page
+- focal: assets/phone-designs.png
+- roles: phone-designs.png = cutout
 - sfx: none
 
 narrativeRole: open the design chapter with abundance.
@@ -237,21 +248,23 @@ scrolls (power3, finite) from y≈380 to y≈1700 CSS so rows of invitation card
 Scene 3 (4.0–7.506s): two feature chips pop under the number on their words — 4.3s "מוזיקה" (note glyph), 4.8s
 "אנימציה" (sparkle glyph); at 5.5s "מותאם לסוג האירוע" lead line reveals; the scroll settles at 6.6s; hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** Screen card scrolls the gallery page (2-column grid of invitation cards) from CSS y ≈ 380 down ~1400 CSS px; the "60+" count-up is the headline of the top block. phone-designs.png (page 390×4886 CSS): `ai-banner` [33, 385, 324, 40]; `chips` [147, 462, 123, 36]; `card-1` [310, 843, 64, 23]. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 5 — עצבו לי
 
 - scene: Upload a few photos and "עצבו לי" builds a design inspired by them — colours, mood, style
 - voiceover: "רוצים משהו אישי? מעלים כמה תמונות, ועצבו לי בונה עיצוב בהשראתן: צבעים, אווירה וסגנון."
 - duration: 8.214s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/05-ai.html
 - type: feature_showcase
 - persuasion: Feature-to-benefit translation
 - beat: intrigue → delight
 - blueprint: agent-progress-theater (Adapt)
-- asset_candidates: assets/screen-studio.png — the "עצבו לי" dialog over the gallery; assets/photo-couple.jpg — couple at sunset; assets/photo-chuppah.jpg — chuppah on the beach; assets/photo-venue.jpg — the lit hall; assets/screen-designs.png — design cards (for the resulting design)
-- focal: assets/screen-studio.png
-- roles: screen-studio.png = cutout · photo-couple.jpg = supporting · photo-chuppah.jpg = supporting · photo-venue.jpg = supporting · screen-designs.png = supporting (crop of one card)
+- asset_candidates: assets/phone-studio.png — the "עצבו לי" dialog on a phone; assets/photo-couple.jpg — couple at sunset; assets/photo-chuppah.jpg — chuppah on the beach; assets/photo-venue.jpg — the lit hall; assets/phone-designs.png — design cards (for the resulting design)
+- focal: assets/phone-studio.png
+- roles: phone-studio.png = cutout · photo-couple.jpg = supporting · photo-chuppah.jpg = supporting · photo-venue.jpg = supporting · phone-designs.png = supporting (crop of one card)
 - sfx: none
 
 narrativeRole: the AI moment — personal, not generic.
@@ -273,21 +286,23 @@ zoom-through).
 Scene 4 (5.8–8.214s): three swatch chips land beside the card on their words — 5.8s "צבעים" (three dots: bordeaux
 #731F2E, cream, gold), 6.4s "אווירה", 7.1s "סגנון". Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** Screen card shows the dialog. phone-studio.png (page 390×844 CSS): `dialog` [16, 127, 358, 590]. Photos fly in over the card; the resulting design card is a crop of one bordeaux card from phone-designs.png (VIEW it to pick). The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 6 — עורכים ומשתפים את המשפחה
 
 - scene: The editor — text fields ring and the live phone preview answers; a family draft gathers comments; then publish
 - voiceover: "עורכים את הטקסטים, התאריך והמקום, ורואים כל שינוי מיד. אפשר לשלוח טיוטה למשפחה, לקבל הערות, ורק אז לפרסם."
 - duration: 10.247s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/06-edit.html
 - type: feature_showcase
 - persuasion: Risk reversal (review before you publish)
 - beat: control + peace of mind
 - blueprint: panel-edit-live-sync (Adapt)
-- asset_candidates: assets/screen-editor.png — the invitation editor with live phone preview and the section form
-- focal: assets/screen-editor.png
-- roles: screen-editor.png = cutout
+- asset_candidates: assets/phone-editor.png — the editor on a phone (form); assets/phone-personal-hero.png — the invitation as guests see it (the live preview)
+- focal: assets/phone-editor.png
+- roles: phone-editor.png = cutout · phone-personal-hero.png = supporting
 - sfx: none
 
 narrativeRole: you're in control of every word, and the family can weigh in first.
@@ -312,21 +327,23 @@ Scene 4 (5.4–8.6s): zoom back to 1.0; 5.8s ring on `comments`; a rebuilt revie
 Scene 5 (8.6–10.247s): review card tucks away; 9.3s press on `publish` (`press-release-spring`) and a brown check pill
 "פורסם" pops next to it. Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** On a phone the editor shows the form; the "live preview" is shown as a small phone (phone-personal-hero.png cropped to its top half, or the full screen at small size) that slides in beside / over the card on "ורואים כל שינוי מיד". phone-editor.png (page 390×844 CSS): `field-open` [37, 411, 316, 93]; `field-place` [37, 615, 316, 93]; `publish` [12, 12, 38, 32]. VIEW phone-editor.png to find the top-bar buttons (publish at the top-left). The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 7 — קישור, QR וקישור אישי
 
 - scene: After publishing — the invitation's own link and QR, then a guest's personal link greets them by name and fills the RSVP for them
 - voiceover: "אחרי הפרסום, להזמנה יש קישור משלה וקוד QR. וכל מוזמן מקבל קישור אישי, שפונה אליו בשם וממלא את הפרטים בשבילו."
 - duration: 10.27s
 - transition_in: zoom-through
-- status: animated
+- status: outline
 - src: compositions/frames/07-share.html
 - type: feature_showcase
 - persuasion: Show-don't-tell proof
 - beat: delight + trust
 - blueprint: video-text-pivot (Adapt)
-- asset_candidates: assets/screen-share.png — share page with link, QR and WhatsApp preview; assets/phone-personal-hero.png — personal link greeting "משפחת דהן, מחכים לכם!"; assets/phone-personal-rsvp.png — the RSVP form prefilled with the guest's name and phone
-- focal: assets/phone-personal-hero.png
-- roles: screen-share.png = supporting · phone-personal-hero.png = cutout · phone-personal-rsvp.png = cutout
+- asset_candidates: assets/phone-share.png — share page on a phone; assets/phone-personal-hero.png — personal link greeting; assets/phone-personal-rsvp.png — RSVP prefilled
+- focal: assets/phone-share.png
+- roles: phone-share.png = supporting · phone-personal-hero.png = cutout · phone-personal-rsvp.png = cutout
 - sfx: none
 
 narrativeRole: the invite chapter opens — sharing is instant, and personal.
@@ -350,21 +367,23 @@ Scene 3 (4.9–8.1s): the window slides aside; the phone enters showing phone-pe
 Scene 4 (8.1–10.27s): inside the phone, cut-the-curve (upward) to phone-personal-rsvp.png; at 8.5s the prefilled
 name/phone fields ring ("וממלא את הפרטים בשבילו"). Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** phone-share.png (page 390×1714 CSS): `link` [16, 437, 358, 440]; `link-field` [146, 483, 207, 40]; `qr` [16, 896, 358, 610]; `personal` [16, 251, 358, 162]; `wa-preview` [16, 896, 358, 610]; `send-wa` [173, 751, 180, 48]. Scene 3–4 replace the card with a phone device (personal link): greeting line "משפחת דהן, מחכים לכם!" at CSS ≈ [100,222,190,30]; prefilled fields on phone-personal-rsvp.png at ≈ [62,380,266,150]. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 8 — מזמינים בוואטסאפ
 
 - scene: The guest list from Excel, sent on WhatsApp — from Badook's number or your own, one after another
 - voiceover: "מעלים את רשימת המוזמנים מקובץ אקסל, ושולחים לכולם בוואטסאפ: מהמספר של באדוק, או מהוואטסאפ שלכם, אחד אחרי השני."
 - duration: 9.495s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/08-guests.html
 - type: feature_showcase
 - persuasion: Friction reduction
 - beat: ease + momentum
 - blueprint: cursor-ui-demo (Adapt — static stage, element swaps)
-- asset_candidates: assets/screen-guests.png — guest list with Excel upload, WhatsApp sending and stats; assets/screen-whatsapp.png — "send from my WhatsApp" dialog, one guest at a time
-- focal: assets/screen-guests.png
-- roles: screen-guests.png = cutout · screen-whatsapp.png = supporting
+- asset_candidates: assets/phone-guests.png — guest list on a phone; assets/phone-whatsapp.png — send from my WhatsApp dialog on a phone
+- focal: assets/phone-guests.png
+- roles: phone-guests.png = cutout · phone-whatsapp.png = supporting
 - sfx: none
 
 narrativeRole: getting the invitation to everyone.
@@ -389,21 +408,23 @@ Scene 4 (5.0–7.9s): rings on their words — 5.0s `send-auto` (pill "מהמס�
 Scene 5 (7.9–9.495s): cut (inverse zoom-through) to screen-whatsapp.png: the dialog in focus; presses on `open-wa`
 at 7.9s and 8.7s, a small counter pill beside the dialog steps "1 / 6" → "2 / 6" → "3 / 6" ("אחד אחרי השני"). Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** phone-guests.png (page 390×7053 CSS): `excel` [37, 316, 316, 48]; `send-mine` [37, 554, 316, 48]; `send-auto` [193, 610, 160, 28]; `steps` [16, 255, 358, 456]; `st-list` [201, 727, 173, 119]; `st-sent` [16, 727, 173, 119]; `st-opened` [201, 858, 173, 157]; `st-yes` [16, 858, 173, 157] · phone-whatsapp.png (page 390×844 CSS): `dialog` [16, 262, 358, 320]; `open-wa` [193, 522, 161, 40]. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 9 — אישורי הגעה בזמן אמת
 
 - scene: RSVPs update live — who's coming, how many, who isn't, who hasn't answered; a general-link reply assigned in one click
 - voiceover: "אישורי ההגעה מתעדכנים בזמן אמת: מי מגיע, כמה אנשים, מי לא, ומי עוד לא ענה. תשובה שהגיעה מהקישור הכללי משייכים למוזמן בלחיצה אחת."
 - duration: 12.076s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/09-rsvp.html
 - type: feature_showcase
 - persuasion: Statistical proof (live counts)
 - beat: control + relief
 - blueprint: dataviz-countup (Adapt)
-- asset_candidates: assets/screen-responses.png — RSVP page with stat cards, general-link banner and responses table
-- focal: assets/screen-responses.png
-- roles: screen-responses.png = cutout
+- asset_candidates: assets/phone-responses.png — RSVP page on a phone
+- focal: assets/phone-responses.png
+- roles: phone-responses.png = cutout
 - sfx: none
 
 narrativeRole: the payoff of inviting — answers arrive by themselves.
@@ -424,21 +445,23 @@ counts 0→24, matched font/position), 4.0s pill "54 אנשים" on the same car
 Scene 4 (7.5–12.076s): 7.5s ring on the `general` banner (pill "מהקישור הכללי"); 9.6s cursor glides to `assign` and
 clicks (`cursor-click-ripple`), at 10.8s a brown check toast "שויך למוזמן" pops above the banner. Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** phone-responses.png (page 390×3519 CSS): `r-yes` [203, 317, 171, 175]; `r-total` [16, 317, 171, 175]; `r-no` [203, 508, 171, 157]; `r-pending` [16, 508, 171, 157]; `r-deadline` [203, 681, 171, 139]; `general` [16, 836, 358, 124]; `assign` [193, 909, 162, 32]. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 10 — מתכננים: משימות, ספקים, רעיונות
 
 - scene: Three planning tools in a triptych — the task timeline, vendors with quotes, the ideas board
 - voiceover: "בתכנון מחכה לכם רשימת משימות לפי לוח זמנים, ספקים עם הצעות מחיר, ולוח רעיונות להשראה."
 - duration: 7.882s
 - transition_in: zoom-through
-- status: animated
+- status: outline
 - src: compositions/frames/10-tasks.html
 - type: feature_showcase
 - persuasion: Rule of three
 - beat: calm + organized
 - blueprint: grid-card-assemble (Adapt — triptych)
-- asset_candidates: assets/screen-tasks.png — task timeline checklist; assets/screen-vendors.png — vendors board with quotes; assets/screen-ideas.png — ideas board with notes
-- focal: assets/screen-vendors.png
-- roles: screen-tasks.png = supporting · screen-vendors.png = cutout · screen-ideas.png = supporting
+- asset_candidates: assets/phone-tasks.png — task timeline on a phone; assets/phone-vendors.png — vendors on a phone; assets/phone-ideas.png — ideas board on a phone
+- focal: assets/phone-tasks.png
+- roles: phone-tasks.png = supporting · phone-vendors.png = cutout · phone-ideas.png = supporting
 - sfx: none
 
 narrativeRole: the planning chapter — the toolbox.
@@ -459,21 +482,23 @@ Scene 3 (4.0–5.9s): 4.0s the middle card (vendors) assembles, title "ספקי�
 pops on the quote card.
 Scene 4 (5.9–7.882s): 5.9s the left card (ideas) assembles, title "לוח רעיונות"; ring on the pinned note. Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** The triptych becomes a vertical STACK of three cards (each ≈ 900×340, y ≈ 450 / 830 / 1210) assembling top→down on their cues. phone-tasks.png (page 390×1912 CSS): `list` [35, 593, 320, 904] · phone-vendors.png (page 390×1830 CSS): `booked` [16, 1234, 358, 108]; `quote` [22, 405, 333, 62] · phone-ideas.png (page 390×1715 CSS): `pinned` [16, 582, 358, 162]; `songs` [16, 800, 358, 299]; `colors` [16, 1110, 358, 162]. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 11 — מד התקציב
 
 - scene: The budget gauge swings green → amber → red on the words, then expenses, payments and the guest-count what-if
 - voiceover: "מד התקציב מראה מיד איפה אתם עומדים: ירוק, בטוחים. צהוב, מתקרבים לגבול. אדום, חריגה. מוסיפים הוצאות ותשלומים, ובודקים מה יקרה אם ישתנה מספר האורחים."
 - duration: 14.516s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/11-budget.html
 - type: feature_showcase
 - persuasion: Future pacing (see the risk before it happens)
 - beat: anxiety → control
 - blueprint: dataviz-countup (Adapt — gauge as the hero instrument)
-- asset_candidates: assets/screen-budget.png — budget page with the semicircle gauge, figure cards, guests basis and payments
-- focal: assets/screen-budget.png
-- roles: screen-budget.png = cutout
+- asset_candidates: assets/phone-budget.png — budget page on a phone
+- focal: assets/phone-budget.png
+- roles: phone-budget.png = cutout
 - sfx: none
 
 narrativeRole: the budget's single most innovative piece — a gauge that tells you, not a spreadsheet.
@@ -504,21 +529,23 @@ Scene 6 (9.7–14.516s): zoom out to the full page window (9.7–10.4s); rings o
 "הוצאה חדשה"), 10.8s `payments` (pill "תשלומים"), 12.2s `basis` with a what-if chip "240 → 260 אורחים" whose number
 ticks 240→260 at 13.2s. Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** phone-budget.png (page 390×5228 CSS): `gauge-card` [16, 322, 358, 703]; `gauge` [37, 343, 316, 175]; `pct` [155, 515, 80, 65]; `safe` [113, 607, 164, 28]; `edit` [206, 735, 62, 26]; `add` [236, 230, 138, 40]; `basis` [16, 1046, 358, 242]; `payments` [16, 2888, 358, 228]. The gauge is REBUILT over the screenshot exactly as in the landscape cut (app zones: green ≤85%, amber 85–100%, red >100%, arc to 130%; colors #15803D-ish green / #B45309 amber / #B91C1C red; needle 44% → 92% → 104% → 44%) — VIEW a crop of the gauge (CSS [20,330,350,330] ×3) to match pivot/radius/stroke. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 12 — סידור שולחנות
 
 - scene: Drag a whole family onto a table on the hall plan, then every guest gets their table on their phone
 - voiceover: "את סידור השולחנות עושים בגרירה: מושיבים משפחות שלמות, מסדרים על תוכנית האולם, ושולחים לכל אורח את מספר השולחן שלו."
 - duration: 9.243s
 - transition_in: zoom-through
-- status: animated
+- status: outline
 - src: compositions/frames/12-seating.html
 - type: feature_showcase
 - persuasion: Show-don't-tell proof
 - beat: satisfaction + control
 - blueprint: cursor-ui-demo (Adapt)
-- asset_candidates: assets/screen-seating.png — seating canvas with tables and the guests panel; assets/phone-table.png — a guest's own table page with the route on the hall map
-- focal: assets/screen-seating.png
-- roles: screen-seating.png = cutout · phone-table.png = supporting
+- asset_candidates: assets/phone-seating.png — seating on a phone; assets/phone-table.png — a guest's own table page
+- focal: assets/phone-seating.png
+- roles: phone-seating.png = cutout · phone-table.png = supporting
 - sfx: none
 
 narrativeRole: the arranging chapter — the hardest chore made physical.
@@ -543,21 +570,23 @@ Scene 3 (4.4–6.1s): "מסדרים על תוכנית האולם" — zoom-to-ta
 Scene 4 (6.1–9.243s): zoom back; ring on `send` at 6.1s; a phone (phone-table.png, ≈ 340×736 screen) slides in from
 the right over the text column at 6.7s; at 7.6s ring on its "2 · השולחן שלכם" card ("את מספר השולחן שלו"). Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** phone-seating.png (page 390×844 CSS): `canvas` [17, 564, 356, 559]; `auto` [233, 251, 141, 40]; `send` [152, 299, 222, 40]. VIEW phone-seating.png to locate a table with free seats for the drop and the guests list / unseated family; if the phone layout hides the list, the drag chip can come from the top block. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 13 — ביום האירוע
 
 - scene: The entrance station checks guests in by search or code scan, and the host sees arrivals live
 - voiceover: "ביום האירוע, עמדת הכניסה מאשרת הגעה בחיפוש או בסריקת קוד, ואתם רואים מי הגיע בזמן אמת."
 - duration: 7.969s
 - transition_in: zoom-through
-- status: animated
+- status: outline
 - src: compositions/frames/13-eventday.html
 - type: feature_showcase
 - persuasion: Show-don't-tell proof
 - beat: calm on the big day
 - blueprint: comparison-split (Adapt — station phone + host window)
-- asset_candidates: assets/phone-station.png — entrance station on a phone: "29 מתוך 84 הגיעו", scan button, search, arrivals; assets/screen-live.png — the host's event-day page with live arrivals and the hall map
+- asset_candidates: assets/phone-station.png — entrance station on a phone; assets/phone-live.png — host event-day page on a phone
 - focal: assets/phone-station.png
-- roles: phone-station.png = cutout · screen-live.png = supporting
+- roles: phone-station.png = cutout · phone-live.png = supporting
 - sfx: none
 
 narrativeRole: the celebration chapter opens — the door.
@@ -578,20 +607,22 @@ corner brackets) + one finite scan-line sweep over the phone's upper half (4.2�
 Scene 3 (5.5–7.969s): the host window enters from the left wing (5.5s); ring on `stats` with a count-up 0→29 (6.3–7.0s)
 and a "בזמן אמת" chip with live dot. Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** Station phone device as hero; the host page appears as a smaller card overlapping its lower-left at "ואתם רואים". phone-live.png (page 390×2596 CSS): `stats` [201, 362, 173, 153]. Station boxes (VERIFY): progress ≈ [12,60,366,90], "סריקת קוד" ≈ [12,174,366,52], search ≈ [12,262,366,44]. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 14 — גלריה חיה ומסך באולם
 
 - scene: Guests upload photos from their phones; they appear on the hall's big screen; face search finds your photos
 - voiceover: "האורחים מעלים תמונות לגלריה חיה שמוצגת על המסך באולם, וכל אחד יכול למצוא את התמונות שהוא מופיע בהן."
 - duration: 7.915s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/14-gallery.html
 - type: feature_showcase
 - persuasion: Belonging (everyone's photos, together)
 - beat: joy + awe
 - blueprint: camera-journey (Adapt — action roundtrip, cursorless)
-- asset_candidates: assets/phone-upload.png — the guests' upload page on a phone; assets/screen-projector.png — the hall screen showing the couple photo; assets/screen-projector-2.png — the hall screen's next photo; assets/photo-couple.jpg — the couple at sunset; assets/photo-chuppah.jpg — chuppah photo; assets/photo-venue.jpg — the lit hall; assets/photo-ballroom.jpg — the ballroom
-- focal: assets/screen-projector.png
+- asset_candidates: assets/phone-upload.png — the guests' upload page on a phone; assets/screen-projector.png — the hall screen; assets/screen-projector-2.png — the hall screen's next photo; assets/photo-couple.jpg — the couple at sunset; assets/photo-chuppah.jpg — chuppah photo; assets/photo-venue.jpg — the lit hall; assets/photo-ballroom.jpg — the ballroom
+- focal: assets/phone-upload.png
 - roles: phone-upload.png = supporting · screen-projector.png = cutout · screen-projector-2.png = supporting · photo-couple.jpg = supporting · photo-chuppah.jpg = supporting · photo-venue.jpg = supporting · photo-ballroom.jpg = supporting
 - sfx: none
 
@@ -614,21 +645,23 @@ Scene 3 (4.2–7.915s): "וכל אחד יכול למצוא" — a round face-sca
 rotation of 40°) settles on the couple in the projected photo at 5.2s; a feature chip "חיפוש לפי פנים · התמונות שלי"
 pops at 6.4s under the screen. Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** The hall screen (16:9, ≈ 960×540) sits in the middle (y ≈ 480–1020); the phone (≈ 380×822) overlaps below-right (y ≈ 760–1580); the photo flies UP from the phone to the screen. The hall-screen capture shows a sunset; the couple photo is what lands on it (as in the landscape cut). The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 15 — סרט רגעים ותובנות
 
 - scene: After the event, a moments film made from the photos, and insights about views and attendance
 - voiceover: "ואחרי האירוע: סרט רגעים שנוצר מהתמונות, ותובנות על הצפיות וההגעה."
 - duration: 6.444s
 - transition_in: crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/15-film.html
 - type: feature_showcase
 - persuasion: Future pacing (the memory lasts)
 - beat: nostalgia + pride
 - blueprint: video-text-pivot (Adapt)
-- asset_candidates: assets/screen-film.png — moments film page with the chosen photos grid; assets/screen-insights.png — insights with stat cards and charts; assets/photo-couple.jpg — couple photo; assets/photo-chuppah.jpg — chuppah photo; assets/photo-venue.jpg — the hall
-- focal: assets/screen-film.png
-- roles: screen-film.png = cutout · screen-insights.png = supporting · photo-couple.jpg = supporting · photo-chuppah.jpg = supporting · photo-venue.jpg = supporting
+- asset_candidates: assets/phone-film.png — moments film page on a phone; assets/phone-insights.png — insights on a phone; assets/photo-couple.jpg — couple photo; assets/photo-chuppah.jpg — chuppah photo; assets/photo-venue.jpg — the hall
+- focal: assets/phone-film.png
+- roles: phone-film.png = cutout · phone-insights.png = supporting · photo-couple.jpg = supporting · photo-chuppah.jpg = supporting · photo-venue.jpg = supporting
 - sfx: none
 
 narrativeRole: the afterglow.
@@ -648,21 +681,23 @@ Scene 2 (1.9–4.0s): "סרט רגעים" — the filmstrip plays: photo-couple 
 Scene 3 (4.0–6.444s): "ותובנות" — the insights window enters (4.0s); count-ups on `visits` 0→209 (4.9s "הצפיות") and
 the "פתחו" card 0→188 (5.5s "וההגעה"). Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** Player (16:9, 900×506) at y ≈ 470; the insights card below it at y ≈ 1010–1560. phone-insights.png (page 390×3466 CSS): `visits` [201, 305, 173, 139]. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 16 — עזרה בכל שלב
 
 - scene: The help button opens a written guide, a smart assistant that answers any question, and a direct line to the team
 - voiceover: "ובכל שלב, כפתור העזרה פותח מדריך כתוב, עוזר חכם שעונה על כל שאלה, ופנייה ישירה לצוות."
 - duration: 8.599s
 - transition_in: zoom-through
-- status: animated
+- status: outline
 - src: compositions/frames/16-help.html
 - type: benefit_highlight
 - persuasion: Risk reversal (never stuck)
 - beat: reassurance
 - blueprint: grid-card-assemble (Adapt — accumulating benefit list beside the real panel)
-- asset_candidates: assets/screen-help.png — event home with the help panel open (guide, video, search)
-- focal: assets/screen-help.png
-- roles: screen-help.png = cutout
+- asset_candidates: assets/phone-help.png — the help panel open on a phone
+- focal: assets/phone-help.png
+- roles: phone-help.png = cutout
 - sfx: none
 
 narrativeRole: the safety net.
@@ -685,13 +720,15 @@ bubbles: guest "איך שולחים בוואטסאפ?" then assistant "מהמס�
 inside row 2.
 Scene 5 (6.5–8.599s): row 3 "פנייה ישירה לצוות" (person glyph) reveals at 6.5s. Hold.
 
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** phone-help.png (page 390×844 CSS): `panel` [0, 101, 390, 743]; `video` [17, 231, 356, 89]; `search` [17, 336, 356, 44]. The three benefit rows stack in the top block / over the card's lower part. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
 ## Frame 17 — שימוש חינם
 
 - scene: Badook's lockup, the line "from the first idea to the last moment", and the call: free to use
 - voiceover: "באדוק. מהרעיון הראשון ועד הרגע האחרון. יוצאים לדרך."
 - duration: 8.895s
 - transition_in: blur-crossfade
-- status: animated
+- status: outline
 - src: compositions/frames/17-end.html
 - type: cta
 - persuasion: Risk reversal (free to start)
@@ -717,3 +754,6 @@ Scene 3 (4.7–8.895s): on "יוצאים לדרך" the CTA lands: a big solid br
 white, ≈ 120px tall) springs in smoothly at 4.8s; under it "מתחילים בחינם · משדרגים רק כשצריך" (Heebo `lead`, 5.4s)
 and "invitations.badooks.com" (Heebo 600, brown, 5.9s). Hold to the end; the whole card fades to cream over the last
 0.6s (the film's only real exit).
+
+**PORTRAIT ADAPTATION (this cut is 1080×1920 — it overrides the landscape layout above; keep every cue time):** Centered vertical stack: logo (≈ 600 px wide) y ≈ 420, the line "תכנון אירוע מהתחלה ועד הסוף במקום אחד." in TWO lines (break after "ועד הסוף") at ≈ 84px, the big "שימוש חינם" pill (≈ 780×170, the largest element) at y ≈ 960, then "מתחילים בחינם · משדרגים רק כשצריך" and "invitations.badooks.com" below; all above y 1594. The Scene lines above give the beats and the exact cue times; re-lay them out for the portrait house layout. Where they name a desktop screen (screen-*.png) use the phone capture named here instead, and its boxes.
+
