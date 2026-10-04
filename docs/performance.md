@@ -30,27 +30,33 @@ webhook). A page over the budget fails the run and is listed in its summary.
 ## Where it stands
 
 Lighthouse, mobile preset (simulated Slow 4G, 4× CPU), a few runs each (the ranges); the numbers move a few
-points from run to run, TBT most. "Before" is the code at the start of this work, measured over HTTP/1.1.
+points from run to run, TBT most. "Before" is the code at the start of this work, measured over HTTP/1.1; the
+last column is `npm run perf:lhci` on the final code (three runs per page).
 
 | Page                          | Before (HTTP/1.1)                              | After, over HTTP/1.1                | After, over HTTP/2 (as served)          |
 | ----------------------------- | ---------------------------------------------- | ----------------------------------- | --------------------------------------- |
-| Home                          | **31** (PSI 37) · LCP 11.4 s · TBT 4,590 ms    | **91–94** · LCP 3.2 s · TBT 60–160  | **91–96** · LCP 2.3 s · TBT 190–310     |
-|                               | 408 KB JS · 7.5 MB · 16,047 elements           | 159 KB JS · 0.29 MB · 895 elements  | 154 KB JS · 0.29–0.30 MB                |
+| Home                          | **31** (PSI 37) · LCP 11.4 s · TBT 4,590 ms    | **91–94** · LCP 3.2 s · TBT 60–160  | **90–94** · LCP 2.4 s · TBT 210–330     |
+|                               | 408 KB JS · 7.5 MB · 16,047 elements           | 159 KB JS · 0.29 MB · 895 elements  | 155 KB JS · 0.30 MB · 895 elements      |
 | Invitation (ISR sample)       | —                                              | **88–91** · LCP 3.2 s · TBT 130–210 | **93–94** · LCP 2.7–2.9 s · TBT 130–180 |
-| Template demo, sahar-bordeaux | **83** · LCP 3.8 s · TBT 200 ms                | **87–88** · LCP 3.3–3.5 s           | **93–94** · LCP 2.7 s · TBT 140–150     |
-| Template demo, kalanit        | **69** · LCP 3.8 s · TBT 720 ms · 195 KB JS    | **85–86** · LCP 3.2–3.7 s           | **86–94** · LCP 2.4–2.7 s · TBT 150–450 |
-| Template demo, grandma-garden | **88** · LCP 3.2 s · TBT 200 ms                | **85** · LCP 3.7 s · TBT 110 ms     | **85–87** · LCP 2.8–2.9 s · TBT 330–380 |
+| Template demo, sahar-bordeaux | **83** · LCP 3.8 s · TBT 200 ms                | **87–88** · LCP 3.3–3.5 s           | **93–97** · LCP 2.4–2.8 s · TBT 120–160 |
+| Template demo, kalanit        | **69** · LCP 3.8 s · TBT 720 ms · 195 KB JS    | **85–86** · LCP 3.2–3.7 s           | **91–93** · LCP 2.4–2.8 s · TBT 210–250 |
+| Template demo, grandma-garden | **88** · LCP 3.2 s · TBT 200 ms                | **85** · LCP 3.7 s · TBT 110 ms     | **86–93** · LCP 2.4–2.7 s · TBT 170–450 |
 
-Desktop: 99–100 on all of them. Accessibility 100, Best Practices 100, SEO 100 (home). The columns differ by the
-transport alone: a local `next start` speaks HTTP/1.1, a CDN HTTP/2 (see Checks).
+Desktop: 100 on the home page and on the three sample invitations (TBT ≈ 0). Accessibility 100, Best Practices
+100, SEO 100 (home) on every page. The columns differ by the transport alone: a local `next start` speaks
+HTTP/1.1, a CDN HTTP/2 (see Checks). The JavaScript of every page measured is under 170 KB, the whole load under
+0.33 MB.
 
 What is not within the budget yet:
 
-- **LCP ≤ 2.5 s on an invitation** (2.7–3.0 s). The simulation counts everything that finishes loading before
+- **LCP ≤ 2.5 s on an invitation**: 2.4–2.8 s from run to run — the median of three runs is inside the budget on
+  the pages measured, a single run is not always. The simulation counts everything that finishes loading before
   the first paint: the framework (React + Next, 100 KB), the invitation's own client code (~60 KB), its fonts
   (~90 KB a Hebrew page) and CSS (24 KB). The next cut is the renderer's eager client code.
-- **TBT ≤ 200 ms on a heavy invitation** (the kalanit and grandma demos: 300+ ms with 2.6k elements): hydrating the
-  tree, and the layout when the fonts arrive.
+- **TBT ≤ 200 ms**: the home page (210–330 ms), the kalanit demo (210–250 ms) and the grandma demo (170–450 ms, 2.7k
+  elements) sit at or above the line, the median of three runs a few percent over it. What is left after the
+  first layout is the evaluation of React's and Next's own scripts (~45 ms of CPU, 4× in the simulation) and
+  hydrating the tree.
 - **A bilingual invitation opened from an English browser** (what PageSpeed Insights is): the guest's language is
   picked in the browser (`live/detect.ts`), which renders the whole invitation again in the other language
   (~110 KB of script, the `live.json`, the other language's fonts): Performance ~80, TBT ~500 ms.
