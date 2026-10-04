@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CaptionsTrack } from '../../renderer/CaptionsTrack.client';
 import { STILL_EVENT } from '../../renderer/MotionPause.client';
 import { videoEmbedUrl, videoStillUrl, type VideoLink } from '../../lib/video-links';
+import { imageSet } from '../../renderer/images';
 
 /** Starts `v` when the browser hasn't; one it won't play with sound plays muted. */
 const kick = (v: HTMLVideoElement) => {
@@ -33,6 +34,20 @@ function onFirstTap(fn: () => void): () => void {
 }
 
 /**
+ * Runs `fn` once the invitation is open — now when it already is (no cover, or `?open=1`), else when
+ * the guest opens the cover: what plays behind a closed cover waits for it, so the cover's own pictures,
+ * fonts and script aren't competing with a video nobody can see yet.
+ */
+function whenOpen(fn: () => void): () => void {
+  if (document.documentElement.dataset.opened) {
+    fn();
+    return () => undefined;
+  }
+  window.addEventListener('invitation:open', fn, { once: true });
+  return () => window.removeEventListener('invitation:open', fn);
+}
+
+/**
  * The hero's background video: muted, inline and looping, so every browser lets it autoplay. `muted`
  * is set as an attribute as well — React only sets the property on elements it creates (the editor
  * preview, the live language switch), and iOS looks at the attribute — and a browser that still holds
@@ -47,10 +62,16 @@ export function HeroVideo({
   sound,
   calm = false,
   captions = null,
+  behindCover = false,
 }: {
   src: string;
   poster: string | null;
   focal: string;
+  /**
+   * the live page with a cover: nothing downloads (preload none, no autoplay) until the guest opens it —
+   * then it starts, from the gesture
+   */
+  behindCover?: boolean;
   /** the host's volume when its sound is the music (0..1), else null */
   sound: number | null;
   /** its captions in the page's language (WebVTT) */
@@ -78,9 +99,23 @@ export function HeroVideo({
       v.pause();
       return;
     }
-    kick(v);
-    return onFirstTap(() => kick(v));
-  }, [src, sound, calm]);
+    const start = () => {
+      v.preload = 'auto';
+      kick(v);
+    };
+    if (!behindCover) {
+      kick(v);
+      return onFirstTap(() => kick(v));
+    }
+    const stopOpen = whenOpen(start);
+    const stopTap = onFirstTap(() => {
+      if (document.documentElement.dataset.opened) start();
+    });
+    return () => {
+      stopOpen();
+      stopTap();
+    };
+  }, [src, sound, calm, behindCover]);
   return (
     <video
       ref={ref}
@@ -89,8 +124,8 @@ export function HeroVideo({
       muted
       playsInline
       loop
-      autoPlay
-      preload="auto"
+      autoPlay={!behindCover}
+      preload={behindCover ? 'none' : 'auto'}
       data-sound={sound !== null ? '' : undefined}
       data-volume={sound ?? undefined}
       style={{ objectPosition: focal }}
@@ -100,6 +135,12 @@ export function HeroVideo({
       {captions ? <CaptionsTrack {...captions} /> : null}
     </video>
   );
+}
+
+/** A still through the image optimizer (where it may serve it), full-bleed. */
+function optimizedStill(url: string) {
+  const set = imageSet(url, '100vw');
+  return { src: set.src, srcSet: set.srcSet, sizes: set.sizes, 'data-fallback': set.fallback };
 }
 
 type PlayerMessage = { provider: 'youtube' | 'vimeo'; data: unknown };
@@ -187,10 +228,13 @@ export function HeroEmbed({
   captions = false,
   start,
   calm = false,
+  behindCover = false,
 }: {
   link: VideoLink;
   poster: string | null;
   sound: boolean;
+  /** the live page with a cover: the player (a megabyte of YouTube's script) waits until it opens */
+  behindCover?: boolean;
   captions?: boolean;
   /** the second it starts from (the host's link had ?t=…); YouTube also loops back to it */
   start?: number;
@@ -200,10 +244,13 @@ export function HeroEmbed({
   const frame = useRef<HTMLIFrameElement>(null);
   const [origin, setOrigin] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
-  // YouTube: the 16:9 still (HD uploads), else the 4:3 one; Vimeo: the one saved with the link
-  const stills = [videoStillUrl(link, 'maxres'), videoStillUrl(link, 'hq'), poster].filter(
-    (u): u is string => !!u,
-  );
+  // YouTube: the 16:9 still (HD uploads), else the 4:3 one; Vimeo: the one saved with the link. A
+  // full-size still the editor found (it checks which exists) is the only one asked for — through the
+  // image optimizer, in the screen's width — with no 404 to fall back from
+  const known = !!poster && /\/maxresdefault\.jpg$/.test(poster);
+  const stills = known
+    ? [poster]
+    : [videoStillUrl(link, 'maxres'), videoStillUrl(link, 'hq'), poster].filter((u): u is string => !!u);
   const [stillAt, setStillAt] = useState(0);
   const still = stills[stillAt] ?? null;
   const nextStill = () => setStillAt((i) => i + 1);
@@ -212,11 +259,29 @@ export function HeroEmbed({
   // the player's API needs this page's origin: only known in the browser (the iframe is client-only).
   // No player — the still stays — for a guest who prefers less motion (unless the video is the
   // soundtrack), or inside the site's sample when its visitor turned external content off (?external=0).
+  // Behind a cover, it waits for the cover to open; without one, for the guest's first touch, scroll or
+  // key — never with the first paint.
   useEffect(() => {
     const external = new URLSearchParams(window.location.search).get('external') !== '0';
     const still = calm && !sound && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (external && !still) setOrigin(window.location.origin);
-  }, [sound, calm]);
+    if (!external || still) return;
+    const load = () => setOrigin(window.location.origin);
+    if (behindCover) return whenOpen(load);
+    if (calm === false) {
+      // the editor's preview: as it was
+      load();
+      return;
+    }
+    const events = ['pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'] as const;
+    const once = () => {
+      for (const type of events) window.removeEventListener(type, once, true);
+      load();
+    };
+    for (const type of events) window.addEventListener(type, once, { capture: true, passive: true });
+    return () => {
+      for (const type of events) window.removeEventListener(type, once, true);
+    };
+  }, [sound, calm, behindCover]);
 
   useEffect(() => {
     if (!origin) return;
@@ -301,7 +366,15 @@ export function HeroEmbed({
         .join(' ')}
       data-sound={sound ? '' : undefined}
     >
-      {still ? (
+      {still && known ? (
+        <img
+          className="hero-still"
+          {...optimizedStill(still)}
+          alt=""
+          fetchPriority="high"
+          suppressHydrationWarning
+        />
+      ) : still ? (
         <img
           className="hero-still"
           src={still}

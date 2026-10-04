@@ -1,7 +1,7 @@
 import type { SectionOf } from '../../contracts/types';
 import { calendarLabels, calendarLinks, firstVenue } from '../../renderer/calendar-event';
 import { SecHead, editPath, iv, type SectionViewProps } from '../shared';
-import { Reveal } from './Reveal.client';
+import { Reveal } from '../../renderer/lazy.client';
 
 /** Reveal (§2.2 sections 9, §10.3 save-the-date): the date behind a scratch / tap / spin mechanic. */
 export function RevealView({ section, ctx }: SectionViewProps<SectionOf<'reveal'>>) {

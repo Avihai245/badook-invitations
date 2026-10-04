@@ -96,6 +96,7 @@ export const TimezoneSchema = z.string().refine(
 export const L10nSchema = z.partialRecord(LocaleSchema, z.string());
 
 const unit = z.number().min(0).max(1);
+const PixelSizeSchema = z.number().int().positive().max(20_000);
 
 // ---------- document ----------
 export const MediaSchema = z.strictObject({
@@ -106,6 +107,9 @@ export const MediaSchema = z.strictObject({
   // a video's captions (WebVTT per language, lib/captions) and whether it has speech
   captions: z.partialRecord(LocaleSchema, z.string().max(CAPTIONS.maxChars)).nullable().optional(),
   speech: z.boolean().nullable().optional(),
+  // its pixel size (an uploaded photo's, read when it was uploaded): the page reserves its box
+  width: PixelSizeSchema.nullable().optional(),
+  height: PixelSizeSchema.nullable().optional(),
 });
 
 const PaletteShape = {
@@ -353,7 +357,15 @@ export const GallerySectionSchema = section(
   z.strictObject({
     title: L10nSchema.nullable(),
     layout: z.enum(['carousel', 'grid']),
-    images: z.array(z.strictObject({ id: z.string().min(1), src: AssetRefSchema, alt: L10nSchema })),
+    images: z.array(
+      z.strictObject({
+        id: z.string().min(1),
+        src: AssetRefSchema,
+        alt: L10nSchema,
+        width: PixelSizeSchema.optional(),
+        height: PixelSizeSchema.optional(),
+      }),
+    ),
   }),
 );
 

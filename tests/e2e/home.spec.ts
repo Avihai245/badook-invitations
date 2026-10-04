@@ -67,7 +67,10 @@ test('the sample invitation in a phone: without and with the YouTube video; exte
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   // the first screen's link goes to the sample
   await expect(page.getByRole('link', { name: 'לצפייה בהזמנה לדוגמה' })).toHaveAttribute('href', '#sample');
-  // the first screen's background plays from 3:27 right away (YouTube's privacy-enhanced mode)
+  // the first screen's background: its still, and the player only once the visitor is here (moves,
+  // touches, scrolls) — then from 3:27 (YouTube's privacy-enhanced mode)
+  await expect(page.getByTestId('site-hero-video')).toHaveCount(0);
+  await page.mouse.move(40, 40);
   await expect(page.getByTestId('site-hero-video')).toHaveAttribute(
     'src',
     /youtube-nocookie\.com\/embed\/5GvcO2lufGU\?.*cc_load_policy=0.*start=207/,

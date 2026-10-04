@@ -1,7 +1,7 @@
 import type { SectionOf } from '../../contracts/types';
 import { eventRange } from '../../lib/dates';
 import { editPath, type SectionViewProps } from '../shared';
-import { LiveGalleryCard } from './LiveGallery.client';
+import { LiveGalleryCard } from '../../renderer/lazy.client';
 import { galleryPhase } from './phase';
 
 /**

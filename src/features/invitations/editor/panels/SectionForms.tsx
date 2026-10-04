@@ -35,7 +35,7 @@ import {
   hostsText,
 } from '../fields/fields';
 import { ListEditor } from '../fields/ListEditor';
-import { HeroMediaField, IMAGE_TYPES, ImageField, UploadTile, useUploader } from '../fields/media';
+import { HeroMediaField, IMAGE_TYPES, ImageField, UploadTile, size, useUploader } from '../fields/media';
 import { getAt, insertAt, setAt, uniqueId } from '../paths';
 import { useEditor } from '../state/EditorProvider';
 import { SectionCinematic } from './SectionCinematic';
@@ -451,6 +451,7 @@ function GalleryForm({ base, section }: { base: string; section: SectionOf<'gall
           ),
           src: res.ref,
           alt: {},
+          ...size(res),
         };
         return insertAt(d, `${base}.images`, img);
       }, null);

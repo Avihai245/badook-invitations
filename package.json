@@ -6,10 +6,19 @@
   "engines": {
     "node": ">=20"
   },
+  "browserslist": [
+    "chrome >= 93",
+    "edge >= 93",
+    "firefox >= 92",
+    "safari >= 15.4",
+    "ios_saf >= 15.4",
+    "samsung >= 17",
+    "opera >= 79"
+  ],
   "scripts": {
-    "predev": "node scripts/build-fonts.mjs && node scripts/copy-face-models.mjs",
+    "predev": "node scripts/build-fonts.mjs && node scripts/copy-face-models.mjs && npm run poster-art",
     "dev": "next dev",
-    "prebuild": "tsx scripts/validate-templates.ts && node scripts/build-fonts.mjs && node scripts/copy-face-models.mjs",
+    "prebuild": "tsx scripts/validate-templates.ts && node scripts/build-fonts.mjs && node scripts/copy-face-models.mjs && npm run poster-art",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -17,6 +26,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "fonts": "node scripts/build-fonts.mjs",
+    "poster-art": "tsx --tsconfig scripts/tsconfig.jsx.json scripts/build-poster-art.tsx",
     "face-models": "node scripts/copy-face-models.mjs",
     "templates:validate": "tsx scripts/validate-templates.ts",
     "test": "vitest run",
@@ -30,6 +40,8 @@
     "test:db": "vitest run --config vitest.db.config.ts",
     "qa:host": "node scripts/qa-host.mjs",
     "perf:templates": "tsx scripts/perf-templates.ts",
+    "perf:lighthouse": "node scripts/lighthouse-budget.mjs",
+    "perf:lhci": "INVITES_DEV_ROUTES=true npx --yes @lhci/cli@0.15 autorun",
     "video:render": "npm --prefix video ci && npm --prefix video run render",
     "video:tour": "npm --prefix video ci && npm --prefix video run narrate && npm --prefix video run render:tour",
     "video:tour:recorded": "npm --prefix video ci && npm --prefix video run narrate:files && npm --prefix video run render:tour"

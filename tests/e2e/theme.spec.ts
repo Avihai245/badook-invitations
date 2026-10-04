@@ -174,12 +174,13 @@ test.describe('the system’s look', () => {
   }) => {
     await signUpAs(page, unique('theme-brand'), 'Dana Levi');
     // the logo (its name is the image's alt): the dark-lined one on light, the light-lined one on dark
+    // (its files: AVIF / WebP at 2x and 3x, content-hashed — BrandLogo)
     const visibleLogo = () => page.locator('img[alt="Badook"]:visible').first().getAttribute('src');
-    expect(await visibleLogo()).toBe('/brand/badook-logo.png');
+    expect(await visibleLogo()).toMatch(/^\/brand\/badook-logo-240\.[0-9a-f]{10}\.webp$/);
     await page.evaluate((key) => localStorage.setItem(key, 'dark'), THEME_KEY);
     await page.reload();
     await hydrated(page);
-    expect(await visibleLogo()).toBe('/brand/badook-logo-light.png');
+    expect(await visibleLogo()).toMatch(/^\/brand\/badook-logo-light-240\.[0-9a-f]{10}\.webp$/);
     // the browser tab's icon
     const icon = await page.locator('link[rel="icon"]').first().getAttribute('href');
     expect(icon).toBeTruthy();

@@ -10,12 +10,16 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { imageSet } from '../../renderer/images';
 import { Icon } from '../../ui/Icon';
 
 export interface GalleryImage {
   id: string;
   url: string;
   alt: string;
+  /** its pixel size, when the upload recorded it: the picture's box is kept before it loads */
+  width?: number;
+  height?: number;
 }
 
 export interface GalleryLabels {
@@ -50,6 +54,10 @@ export function Gallery({
 }) {
   const [open, setOpen] = useState<number | null>(null);
   const total = images.length;
+  // the guests' phones get each photo in the width it shows (the image optimizer: AVIF / WebP), not
+  // the uploaded original
+  const thumbSizes =
+    layout === 'carousel' ? '(min-width: 600px) 480px, 85vw' : '(min-width: 600px) 240px, 50vw';
   const items = images.map((img, i) => (
     <button
       key={img.id}
@@ -60,7 +68,15 @@ export function Gallery({
         img.alt ? `${img.alt} — ${fill(labels.open, i + 1, total)}` : fill(labels.open, i + 1, total)
       }
     >
-      <img src={img.url} alt="" loading="lazy" decoding="async" draggable={false} />
+      <img
+        {...optimized(img.url, thumbSizes)}
+        width={img.width}
+        height={img.height}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+      />
     </button>
   ));
   return (
@@ -270,7 +286,7 @@ function Lightbox({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <img key={img.id} src={img.url} alt={img.alt} className="lb-img" draggable={false} />
+      <img key={img.id} {...optimized(img.url, '100vw')} alt={img.alt} className="lb-img" draggable={false} />
       <button
         ref={closeButton}
         type="button"
@@ -296,4 +312,10 @@ function Lightbox({
     </div>,
     document.body,
   );
+}
+
+/** An image's optimized src / srcset / sizes (renderer/images.ts), with the original as its fallback. */
+function optimized(url: string, sizes: string) {
+  const set = imageSet(url, sizes);
+  return { src: set.src, srcSet: set.srcSet, sizes: set.sizes, 'data-fallback': set.fallback };
 }

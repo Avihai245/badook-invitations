@@ -1,5 +1,7 @@
 import 'server-only';
 import type { User } from '@supabase/supabase-js';
+import { cache } from 'react';
+import { revalidateInvitationPageById } from '@/features/invitations/server/revalidate';
 import { isAdminEmail, loadAccount } from '@/features/billing/server/account';
 import { effectivePlan, isPlanId, type AccountPlanState, type PlanId } from '@/features/billing/plans';
 import { serverEnv, type ServerEnv } from '@/lib/env';
@@ -86,10 +88,21 @@ export async function accountFeatures(
   return { features, admin: account.admin, plan: account.effective };
 }
 
-/** What an event may use now — for the guest's pages and the host's screens alike. */
-export async function featuresFor(invitationId: string): Promise<Set<Feature>> {
+/**
+ * What an event may use now — for the guest's pages and the host's screens alike. Asked once per
+ * request (React cache): a guest's page asks it for its presentation, its "listen" and its extras.
+ * Outside a render (a route handler) each call reads anew.
+ */
+export const featuresFor = cache(async (invitationId: string): Promise<Set<Feature>> => {
   const input = await featureInput(invitationId);
   return input ? effectiveFeatures(input) : new Set();
+});
+
+/** A feature changed: the event's cached guest page shows the change now, not when its cache ends. */
+function refreshGuestPage(invitationId: string) {
+  return revalidateInvitationPageById(invitationId).catch((err) =>
+    console.error('[flags] the guest page could not be refreshed', err),
+  );
 }
 
 export const flagDeps: FlagDeps = {
@@ -110,6 +123,7 @@ export const flagDeps: FlagDeps = {
           p_off: off,
         });
     if (error) throw new Error(`invitation_feature_${isOptIn(feature) ? 'on' : 'off'}: ${error.message}`);
+    await refreshGuestPage(invitationId);
     return data ? readOverrides(data) : null;
   },
 };
@@ -125,5 +139,6 @@ export async function grantFeature(invitationId: string, feature: Feature, grant
     p_grant: grant,
   });
   if (error) throw new Error(`invitation_feature_grant: ${error.message}`);
+  await refreshGuestPage(invitationId);
   return data ? readOverrides(data) : null;
 }
