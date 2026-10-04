@@ -260,7 +260,8 @@ test.describe('hero video', () => {
     await open(page, `${SINK}?open=1&hero=video`);
     const video = page.locator('.hero-media video');
     await expect(video).toHaveAttribute('muted', '');
-    await expect(video).toHaveAttribute('poster', '/dev/media/cover-poster.png');
+    // the still through the image optimizer, one phone-sized width (a poster takes no srcset)
+    await expect(video).toHaveAttribute('poster', /cover-poster\.png/);
     await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused && v.muted)).toBe(true);
   });
 
@@ -287,6 +288,8 @@ test.describe('hero video', () => {
 
   test('a YouTube link: the muted, looping player without controls, over its still', async ({ page }) => {
     await open(page, `${SINK}?open=1&hero=youtube`);
+    // the player waits for the guest (the cover's opening, or a first touch / scroll without one)
+    await page.mouse.wheel(0, 1);
     const embed = page.locator('.hero-embed');
     await expect(embed.locator('img.hero-still')).toHaveAttribute(
       'src',

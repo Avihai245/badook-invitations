@@ -1,10 +1,12 @@
 'use client';
 
 import { Pause, Play } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/components/app';
-import { videoEmbedUrl, videoStillUrl, type VideoLink } from '@/features/invitations/lib/video-links';
+import { videoEmbedUrl, type VideoLink } from '@/features/invitations/lib/video-links';
 import { mediaAllowed, useConsent } from './CookieConsent.client';
+import { useFirstInteraction } from './first-interaction';
 
 const PLAYER = 'https://www.youtube-nocookie.com';
 
@@ -36,13 +38,19 @@ function read(data: unknown): { event: string | null; state: number | null } {
  * instead of it for visitors who prefer reduced motion or save data, or who turned external content off
  * (cookie settings; the play button loads it for this visit). It pauses while off screen, and the
  * button pauses it for good (WCAG 2.2.2: moving content can be stopped).
+ *
+ * The still (`still`, picked on the server: hero-still.ts) is the first screen's largest picture: it
+ * comes through the image optimizer, preloaded. The YouTube player (~1 MB of script) loads only once
+ * the visitor does something on the page (or presses play) — never on its own with the first paint.
  */
 export function BackgroundVideo({
   link,
+  still,
   labels,
   className,
 }: {
   link: VideoLink;
+  still: string | null;
   labels: { pause: string; play: string };
   className?: string;
 }) {
@@ -53,8 +61,7 @@ export function BackgroundVideo({
   const [playing, setPlaying] = useState(false);
   // null: nobody chose yet — plays unless external content is off; true/false: the button's choice
   const [wanted, setWanted] = useState<boolean | null>(null);
-  const stills = [videoStillUrl(link, 'maxres'), videoStillUrl(link, 'hq')].filter((u): u is string => !!u);
-  const [stillAt, setStillAt] = useState(0);
+  const engaged = useFirstInteraction();
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -70,9 +77,11 @@ export function BackgroundVideo({
   }, []);
 
   const paused = wanted === null ? !mediaAllowed(consent) : !wanted;
+  // the player: once the visitor is here (did anything) or asked for it (the play button)
+  const live = !!origin && !paused && (engaged || wanted === true);
 
   useEffect(() => {
-    if (!origin || paused) return;
+    if (!live) return;
     const post = (message: unknown) =>
       frame.current?.contentWindow?.postMessage(JSON.stringify(message), PLAYER);
     const command = (func: string, args: unknown[] = []) => post({ event: 'command', func, args });
@@ -110,7 +119,7 @@ export function BackgroundVideo({
       iframe?.removeEventListener('load', onLoad);
       seen.disconnect();
     };
-  }, [origin, paused, link.start]);
+  }, [live, link.start]);
 
   const toggle = () => {
     setWanted(paused);
@@ -120,21 +129,10 @@ export function BackgroundVideo({
   return (
     <>
       <div ref={box} aria-hidden className={cn('site-video', playing && !paused && 'playing', className)}>
-        {stills[stillAt] ? (
-          // eslint-disable-next-line @next/next/no-img-element -- YouTube's still, straight from its CDN
-          <img
-            className="site-video-still"
-            src={stills[stillAt]}
-            alt=""
-            fetchPriority="high"
-            onLoad={(e) => {
-              // a missing YouTube still comes back as a 120×90 grey placeholder
-              if (e.currentTarget.naturalWidth <= 120) setStillAt((i) => i + 1);
-            }}
-            onError={() => setStillAt((i) => i + 1)}
-          />
+        {still ? (
+          <Image className="site-video-still" src={still} alt="" fill priority sizes="100vw" quality={70} />
         ) : null}
-        {origin && !paused ? (
+        {live && origin ? (
           <iframe
             ref={frame}
             src={videoEmbedUrl(link, origin, { captions: false, start: link.start })}

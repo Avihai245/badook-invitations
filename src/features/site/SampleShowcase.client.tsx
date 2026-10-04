@@ -4,6 +4,7 @@ import { Check, ExternalLink, Play, RotateCcw } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button, PHONE_VIEWPORT, PhoneFrame, Segmented } from '@/components/app';
 import { mediaAllowed, saveConsent, useConsent } from './CookieConsent.client';
+import { useFirstInteraction } from './first-interaction';
 
 export type SampleKind = 'classic' | 'video';
 
@@ -15,6 +16,10 @@ const PHONE_OUTER = PHONE_VIEWPORT.width + 22;
  * layout guests get on theirs, whatever the visitor's screen — with a switch between the plain opening
  * and the same invitation with a YouTube video behind it. The phone scales to its column; on wide
  * screens the section's title, the switch and the points form one block, centered beside it.
+ *
+ * The invitation (a whole page, on the same main thread as this one) loads only once the visitor is
+ * scrolling toward it — not with the home page's first paint, which a lazy iframe this close to the
+ * top would otherwise share; until then the phone shows its empty screen.
  */
 export function SampleShowcase({
   intro,
@@ -42,6 +47,8 @@ export function SampleShowcase({
   const [run, setRun] = useState(0);
   const column = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.82);
+  const engaged = useFirstInteraction();
+  const [near, setNear] = useState(false);
 
   useEffect(() => {
     const el = column.current;
@@ -50,7 +57,19 @@ export function SampleShowcase({
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
-    return () => ro.disconnect();
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        setNear(true);
+        io.disconnect();
+      },
+      { rootMargin: '50% 0px' },
+    );
+    io.observe(el);
+    return () => {
+      ro.disconnect();
+      io.disconnect();
+    };
   }, []);
 
   const name = kind === 'video' ? labels.video : labels.classic;
@@ -118,6 +137,10 @@ export function SampleShowcase({
                   {labels.allow}
                 </Button>
               </div>
+            </PhoneFrame>
+          ) : !(near && engaged) ? (
+            <PhoneFrame scale={scale} className="shadow-[0_40px_80px_-30px_rgba(60,35,15,0.55)]">
+              {null}
             </PhoneFrame>
           ) : (
             <PhoneFrame

@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { AssetRef, SectionOf } from '../../contracts/types';
-import { imageSet } from '../../renderer/images';
+import { imageAt, imageSet } from '../../renderer/images';
 import { longestWordLength } from '../../lib/text';
 import { parseVideoLink } from '../../lib/video-links';
 import { Ambient } from '../../renderer/fx/Ambient.client';
@@ -72,7 +72,7 @@ export function HeroPlaceholder({ art, date }: { art: PlaceholderArt; date: stri
  * the invitation's only eager picture besides the cover's: React hoists a preload for it into the
  * <head> (with its srcset), while every other picture loads lazily.
  */
-function HeroPicture({ url, focal }: { url: string; focal: string }) {
+function HeroPicture({ url, focal, behindCover }: { url: string; focal: string; behindCover: boolean }) {
   const set = imageSet(url, '100vw');
   return (
     <img
@@ -82,7 +82,8 @@ function HeroPicture({ url, focal }: { url: string; focal: string }) {
       data-fallback={set.fallback}
       alt=""
       style={{ objectPosition: focal }}
-      fetchPriority="high"
+      // behind a cover, the cover's own picture comes first (it is what the guest sees)
+      fetchPriority={behindCover ? 'auto' : 'high'}
       suppressHydrationWarning
     />
   );
@@ -99,6 +100,8 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
   // the host's "video sound" option: this video's sound instead of the track, on the live page
   const sound = ctx.mode === 'live' && doc.music.enabled && doc.music.videoSound;
   const link = d.media.kind === 'video' ? parseVideoLink(d.media.src) : null;
+  // the guest's page opens on its cover: the hero's video waits behind it (HeroMedia)
+  const behindCover = ctx.mode === 'live' && doc.cover.enabled;
 
   let media = null;
   if (link) {
@@ -110,6 +113,7 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
         captions={d.captions}
         start={link.start}
         calm={ctx.mode === 'live'}
+        behindCover={behindCover}
       />
     );
   } else if (d.media.kind === 'video' && src) {
@@ -118,17 +122,19 @@ export function HeroView({ section, ctx }: SectionViewProps<SectionOf<'hero'>>) 
     media = (
       <HeroVideo
         src={src}
-        poster={poster}
+        // one width through the optimizer (a video's poster takes no srcset): a phone's, at 2x
+        poster={poster ? imageAt(poster, 1080) : null}
         focal={focal}
+        behindCover={behindCover}
         sound={sound ? doc.music.volume : null}
         calm={ctx.mode === 'live'}
         captions={vtt ? { vtt, lang: ctx.locale, label: ctx.t('captions.label') } : null}
       />
     );
   } else if (d.media.kind === 'video' && poster) {
-    media = <HeroPicture url={poster} focal={focal} />;
+    media = <HeroPicture url={poster} focal={focal} behindCover={behindCover} />;
   } else if (d.media.kind === 'image' && src) {
-    media = <HeroPicture url={src} focal={focal} />;
+    media = <HeroPicture url={src} focal={focal} behindCover={behindCover} />;
   }
   // Template media only resolves once the file is in the bucket (media-manifest.json), but an uploaded
   // or linked file can be missing (the kit fixtures point at uploads that don't exist; a host may

@@ -38,16 +38,16 @@ npm run dev        # http://localhost:3000
 
 Public routes:
 
-| Route                                  | What                                                                                                    |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `/i/<slug>`                            | Published invitation (ISR, 60 s). `?lang=he\|en` (default: the invitation's), `?open=1` skips the cover |
-| `/i/<slug>/event.ics?venue=<id>&lang=` | Calendar file for one venue; without `venue` the first one, or the event itself when there is none      |
-| `/i/<slug>/opengraph-image?lang=&v=`   | 1200×630 link-preview PNG (next/og on Node; `v` = document hash, linked from the page's `og:image`)     |
-| `POST /api/invitations/rsvp`           | Guest RSVP (`RsvpSubmission` → `RsvpResult`, §4)                                                        |
+| Route                                  | What                                                                                                                                                         |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/i/<slug>`                            | Published invitation (ISR, 10 min; refreshed on publish / edit — docs/performance.md). `?lang=he\|en` (default: the invitation's), `?open=1` skips the cover |
+| `/i/<slug>/event.ics?venue=<id>&lang=` | Calendar file for one venue; without `venue` the first one, or the event itself when there is none                                                           |
+| `/i/<slug>/opengraph-image?lang=&v=`   | 1200×630 link-preview PNG (next/og on Node; `v` = document hash, linked from the page's `og:image`)                                                          |
+| `POST /api/invitations/rsvp`           | Guest RSVP (`RsvpSubmission` → `RsvpResult`, §4)                                                                                                             |
 
 A save-the-date links to its full invitation (created from it in the list) as soon as that one is
 published — and stops when it is archived. Publishing refreshes the cached pages right away (the
-invitation's own and its save-the-date's); otherwise they refresh within a minute.
+invitation's own and its save-the-date's); otherwise they refresh within ten minutes.
 
 **RSVP form options** (editor → RSVP → "Form fields"): guests' names as first + last or one full-name
 line; email not asked / optional / required; the message field on or off (and phone required or

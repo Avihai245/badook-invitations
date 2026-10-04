@@ -1,5 +1,7 @@
 import { execSync } from 'node:child_process';
+import { join } from 'node:path';
 import type { NextConfig } from 'next';
+import { posterArtVersion } from './src/features/invitations/app/poster-art-version';
 import {
   IMAGE_DEVICE_SIZES,
   IMAGE_QUALITIES,
@@ -57,6 +59,8 @@ const imageSources = (() => {
   };
   add(process.env.NEXT_PUBLIC_SUPABASE_URL, () => '/storage/v1/object/public/**');
   add(process.env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL, (u) => `${u.pathname.replace(/\/+$/, '')}/**`);
+  // YouTube's stills (the home page's background, a hero's YouTube link): resized and AVIF / WebP
+  add('https://i.ytimg.com', () => '/vi/**');
   return list;
 })();
 
@@ -98,24 +102,49 @@ const nextConfig: NextConfig = {
     // the running build (the admin console's system page)
     NEXT_PUBLIC_BUILD_COMMIT: buildCommit,
     NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
+    // the pre-rendered poster scenery's folder (scripts/build-poster-art.tsx, app/poster-art.ts)
+    INVITES_POSTER_ART_VERSION: posterArtVersion(),
   },
   // The host app's two dictionaries (lib/i18n/*.he.ts, *.en.ts — the guests' own dictionaries aside)
   // each in a chunk of its own: a page loads its UI language's (lib/i18n/provider.tsx) instead of one
   // shared chunk with both, which was most of every page's JavaScript.
-  webpack(config, { isServer }) {
+  webpack(config, { isServer, webpack }) {
+    if (!isServer) {
+      // Next's polyfills (Array.prototype.at / flat / flatMap, Object.fromEntries, Object.hasOwn…):
+      // every browser in package.json's browserslist has them all — the module is left out
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /[\\/]next[\\/]dist[\\/]build[\\/]polyfills[\\/]polyfill-module(\.js)?$/,
+          join(process.cwd(), 'src/lib/empty-module.js'),
+        ),
+      );
+    }
     const split = config.optimization?.splitChunks;
     if (!isServer && split && typeof split === 'object') {
-      const dictionary = (lang: 'he' | 'en') => ({
-        test: (module: { resource?: string }) =>
-          new RegExp(`[\\\\/]src[\\\\/]lib[\\\\/]i18n[\\\\/][^\\\\/]+\\.${lang}\\.ts$`).test(
-            module.resource ?? '',
-          ) && !/(event-day-guest|event-day-guide|gallery-guest|review-guest)/.test(module.resource ?? ''),
-        name: `ui-${lang}`,
+      // the public pages' part of a dictionary (app-core.<lang>.ts and what it imports) — its own chunk,
+      // so the home page doesn't download the app's screens' strings
+      const SITE = /[\\/](app-core|site|account|tickets)\.(he|en)\.ts$/;
+      const dictionary = (lang: 'he' | 'en', part: 'site' | 'app') => ({
+        test: (module: { resource?: string }) => {
+          const file = module.resource ?? '';
+          return (
+            new RegExp(`[\\\\/]src[\\\\/]lib[\\\\/]i18n[\\\\/][^\\\\/]+\\.${lang}\\.ts$`).test(file) &&
+            !/(event-day-guest|event-day-guide|gallery-guest|review-guest)/.test(file) &&
+            SITE.test(file) === (part === 'site')
+          );
+        },
+        name: part === 'site' ? `ui-site-${lang}` : `ui-${lang}`,
         chunks: 'all' as const,
         enforce: true,
         priority: 60,
       });
-      split.cacheGroups = { ...(split.cacheGroups || {}), uiHe: dictionary('he'), uiEn: dictionary('en') };
+      split.cacheGroups = {
+        ...(split.cacheGroups || {}),
+        uiHe: dictionary('he', 'app'),
+        uiEn: dictionary('en', 'app'),
+        uiSiteHe: dictionary('he', 'site'),
+        uiSiteEn: dictionary('en', 'site'),
+      };
     }
     return config;
   },
@@ -156,10 +185,18 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      {
-        // Font files are versioned by path (/fonts/<family>/<version>/…) — safe to cache forever.
-        source: '/fonts/:path*',
+      // Files versioned by name or folder — safe to cache forever (Amplify's CDN reads the same rules
+      // from customHttp.yml; these serve `next start` and any other host):
+      //   /fonts/<family>/<version>/…   /video/<name>.<hash>.<ext>   /brand/<name>-<w>.<hash>.<ext>
+      //   /poster-art/<hash>/…
+      ...['/fonts/:path*', '/video/:path*', '/brand/:path*', '/poster-art/:path*'].map((source) => ({
+        source,
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      })),
+      {
+        // the templates' own pictures (not versioned by name): a day, then refreshed in the background
+        source: '/templates/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=2592000' }],
       },
       {
         // The draft review page (a private link): never indexed, and its address (the key) is never

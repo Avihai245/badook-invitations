@@ -1,6 +1,6 @@
 import 'server-only';
+import { revalidateInvitationPage } from '@/features/invitations/server/revalidate';
 import type { User } from '@supabase/supabase-js';
-import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { normalizeGuestPhone } from '@/features/invitations/lib/guest-import';
 import type { ApiResult } from '@/features/invitations/server/host-api';
@@ -86,8 +86,7 @@ export async function deleteAccount(user: Pick<User, 'id' | 'email'>, raw: unkno
   if (error) throw new Error(`delete user: ${error.message}`);
   for (const inv of invitations) {
     if (inv.status !== 'published') continue;
-    revalidatePath(`/i/${inv.slug}`);
-    for (const lang of ['he', 'en', 'default']) revalidatePath(`/i/${inv.slug}/${lang}`);
+    revalidateInvitationPage(inv.slug);
   }
   return ok({ ok: true, chargeStopped });
 }

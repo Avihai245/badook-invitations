@@ -1,0 +1,11 @@
+{
+  "demo": {
+    "landscape": "/video/badook-demo.eb62a672f7.mp4",
+    "portrait": "/video/badook-demo-portrait.b385f06346.mp4",
+    "poster": "/video/demo-poster.280f396c12.jpg"
+  },
+  "tour": {
+    "poster": "/video/tour-poster.960b0ea314.jpg",
+    "landscape": "/video/badook-tour.e0fe1a4806.mp4"
+  }
+}

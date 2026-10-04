@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { preload } from 'react-dom';
+import { faceUrl } from '@/features/invitations/fonts';
 import { uiDir } from '@/lib/i18n/app';
 import { UiProvider } from '@/lib/i18n/provider-lazy';
 import { getUiLocale } from '@/lib/i18n/server';
@@ -22,6 +24,13 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
  */
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const locale = await getUiLocale();
+  // the first screen's faces, fetched with the stylesheet rather than after it: the text and the
+  // headlines in the UI language's script (app.css --font-sans / --font-display)
+  const faces =
+    locale === 'he'
+      ? [faceUrl('Heebo', 'hebrew', 400), faceUrl('Frank Ruhl Libre', 'hebrew', 700)]
+      : [faceUrl('Inter', 'latin', 400)];
+  for (const href of faces) if (href) preload(href, { as: 'font', type: 'font/woff2', crossOrigin: '' });
   return (
     <html lang={locale} dir={uiDir(locale)} suppressHydrationWarning>
       <head>
@@ -29,7 +38,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: A11Y_BOOT + THEME_BOOT }} />
       </head>
       <body>
-        <UiProvider locale={locale}>
+        <UiProvider locale={locale} scope="site">
           {children}
           <AccessibilityMenu />
           <ThemeSync />

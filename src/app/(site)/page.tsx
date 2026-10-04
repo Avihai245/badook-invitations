@@ -21,14 +21,15 @@ import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
 import { Button } from '@/components/app';
 import { planPrices } from '@/features/billing/server/account';
-import { posterSample } from '@/features/invitations/app/poster';
-import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
-import { TemplatePoster } from '@/features/invitations/app/TemplatePoster';
+import { posterFontsUrl } from '@/features/invitations/app/poster-art';
+import { PosterArtLoader } from '@/features/invitations/app/PosterArtLoader.client';
+import { LazyTemplatePoster } from '@/features/invitations/app/LazyTemplatePoster';
 import type { EventType } from '@/features/invitations/contracts/types';
 import { parseVideoLink } from '@/features/invitations/lib/video-links';
 import { SAMPLES } from '@/features/invitations/templates/demo';
 import { requireTemplate, TEMPLATES } from '@/features/invitations/templates/registry';
 import { BackgroundVideo } from '@/features/site/BackgroundVideo.client';
+import { heroStill } from '@/features/site/hero-still';
 import { FeatureSpotlight } from '@/features/site/home/FeatureSpotlight.client';
 import { HowItWorks } from '@/features/site/home/HowItWorks';
 import { Journey } from '@/features/site/home/Journey';
@@ -147,8 +148,8 @@ export default async function HomePage() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      {/* the posters write the names in their designs' fonts */}
-      <style dangerouslySetInnerHTML={{ __html: POSTER_FONT_CSS }} />
+      {/* the posters' contents and fonts, fetched as each nears the screen (LazyTemplatePoster) */}
+      <PosterArtLoader fontsUrl={posterFontsUrl()} />
       <SiteHeader overHero />
 
       <main id="main" className="flex-1">
@@ -156,6 +157,7 @@ export default async function HomePage() {
         <section className="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-[#1a130e] text-white">
           <BackgroundVideo
             link={HERO_VIDEO}
+            still={await heroStill(HERO_VIDEO)}
             labels={{ pause: s.hero.pauseVideo, play: s.hero.playVideo }}
             className="-z-20"
           />
@@ -298,7 +300,7 @@ export default async function HomePage() {
         {/* ── how it works: three live scenes along a path ──────────────────────────────────── */}
         <section
           id="how"
-          className="relative isolate scroll-mt-16 overflow-hidden border-y border-line bg-surface"
+          className="site-deferred relative isolate scroll-mt-16 overflow-hidden border-y border-line bg-surface"
         >
           <div
             aria-hidden
@@ -314,11 +316,10 @@ export default async function HomePage() {
               steps={h.how.steps}
               s={s.scenes}
               posters={FAN.map((id) => (
-                <TemplatePoster
+                <LazyTemplatePoster
                   key={id}
                   template={requireTemplate(id).manifest}
                   locale={locale}
-                  text={posterSample(id, locale)}
                   frameless
                 />
               ))}
@@ -327,7 +328,10 @@ export default async function HomePage() {
         </section>
 
         {/* ── the designs ───────────────────────────────────────────────────────────────────── */}
-        <section id="designs" className="mx-auto max-w-[1200px] scroll-mt-16 px-5 py-20 sm:px-6 lg:py-24">
+        <section
+          id="designs"
+          className="site-deferred mx-auto max-w-[1200px] scroll-mt-16 px-5 py-20 [--cv-size:9000px] sm:px-6 sm:[--cv-size:5000px] lg:py-24 lg:[--cv-size:3400px]"
+        >
           <div className="flex flex-wrap items-end justify-between gap-4">
             <SectionTitle title={h.designs.title} subtitle={h.designs.subtitle} />
             <Link
@@ -350,10 +354,9 @@ export default async function HomePage() {
                   className="group relative block rounded-[var(--radius-poster)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
                 >
                   <span className="site-lift block rounded-[var(--radius-poster)]">
-                    <TemplatePoster
+                    <LazyTemplatePoster
                       template={manifest}
                       locale={locale}
-                      text={posterSample(manifest.id, locale)}
                       className="shadow-[0_18px_36px_-18px_rgba(60,35,15,0.45)]"
                     />
                   </span>
@@ -388,7 +391,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── from the invitation to the big day: a lit path through six moments (dark band) ── */}
-        <section className="relative isolate overflow-hidden bg-[#1c1510] text-white">
+        <section className="site-deferred relative isolate overflow-hidden bg-[#1c1510] text-white [--cv-size:1800px]">
           <div
             aria-hidden
             className="absolute inset-0 -z-10"
@@ -409,7 +412,10 @@ export default async function HomePage() {
         </section>
 
         {/* ── pricing ───────────────────────────────────────────────────────────────────────── */}
-        <section id="pricing" className="mx-auto max-w-[1200px] scroll-mt-16 px-5 py-20 sm:px-6 lg:py-24">
+        <section
+          id="pricing"
+          className="site-deferred mx-auto max-w-[1200px] scroll-mt-16 px-5 py-20 [--cv-size:2400px] sm:px-6 lg:py-24 lg:[--cv-size:1100px]"
+        >
           <SectionTitle
             title={s.plans.title}
             subtitle={s.plans.subtitle}
@@ -424,7 +430,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── questions ─────────────────────────────────────────────────────────────────────── */}
-        <section id="faq" className="scroll-mt-16 border-t border-line bg-surface">
+        <section id="faq" className="site-deferred scroll-mt-16 border-t border-line bg-surface">
           <div className="mx-auto max-w-[860px] px-5 py-20 sm:px-6 lg:py-24">
             <SectionTitle title={s.faq.title} className="text-center" />
             <div className="mt-10 flex flex-col gap-3">
@@ -447,7 +453,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── last call ─────────────────────────────────────────────────────────────────────── */}
-        <section className="px-5 py-20 sm:px-6">
+        <section className="site-deferred px-5 py-20 [--cv-size:520px] sm:px-6">
           <Reveal className="relative isolate mx-auto max-w-[1100px] overflow-hidden rounded-[28px] bg-inverse px-6 py-16 text-center text-white sm:py-20">
             <div
               aria-hidden

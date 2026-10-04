@@ -1,13 +1,15 @@
 import type { SectionOf } from '../../contracts/types';
 import { SecHead, editPath, iv, type SectionViewProps } from '../shared';
-import { Gallery } from './Gallery.client';
+import { Gallery } from '../../renderer/lazy.client';
+import type { GalleryImage } from './Gallery.client';
 
 /** Gallery (§2.2 sections 8): the host's photos as a carousel or a grid, each opening full screen. */
 export function GalleryView({ section, ctx }: SectionViewProps<SectionOf<'gallery'>>) {
   const d = section.data;
-  const images = d.images
-    .map((img) => ({ id: img.id, url: ctx.asset(img.src), alt: ctx.text(img.alt) }))
-    .filter((img): img is { id: string; url: string; alt: string } => !!img.url);
+  const images = d.images.flatMap((img): GalleryImage[] => {
+    const url = ctx.asset(img.src);
+    return url ? [{ id: img.id, url, alt: ctx.text(img.alt), width: img.width, height: img.height }] : [];
+  });
   if (!images.length) return null;
   const path = editPath(ctx, section, 'data');
   return (

@@ -9,7 +9,8 @@ import { build } from 'esbuild';
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DURATIONS_FILE = path.join(ROOT, 'src/tour/durations.json');
 export const NARRATION_DIR = path.join(ROOT, 'public/narration');
-export const OUT_DIR = path.resolve(ROOT, '../public/video');
+// rendered masters; ../scripts/encode-site-video.mjs makes the web files in public/video/
+export const OUT_DIR = path.resolve(ROOT, 'out');
 
 /** The schedule module, freshly bundled (reads durations.json as it is on disk now). */
 export async function loadTour() {
