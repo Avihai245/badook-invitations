@@ -1,0 +1,2380 @@
+{
+ "total_duration_s": 168.145,
+ "width": 1920,
+ "height": 1080,
+ "groups": [
+  {
+   "id": "caption-group-0",
+   "frame": 1,
+   "start": 0.0,
+   "end": 1.832,
+   "text": "ברוכים הבאים לבאדוק",
+   "words": [
+    {
+     "id": "caption-word-0-0",
+     "text": "ברוכים",
+     "start": 0.0,
+     "end": 0.539
+    },
+    {
+     "id": "caption-word-0-1",
+     "text": "הבאים",
+     "start": 0.559,
+     "end": 1.023
+    },
+    {
+     "id": "caption-word-0-2",
+     "text": "לבאדוק",
+     "start": 1.043,
+     "end": 1.582
+    }
+   ]
+  },
+  {
+   "id": "caption-group-1",
+   "frame": 1,
+   "start": 1.908,
+   "end": 4.482,
+   "text": "מקום אחד שבו מתכננים את האירוע,",
+   "words": [
+    {
+     "id": "caption-word-1-0",
+     "text": "מקום",
+     "start": 1.908,
+     "end": 2.304
+    },
+    {
+     "id": "caption-word-1-1",
+     "text": "אחד",
+     "start": 2.324,
+     "end": 2.645
+    },
+    {
+     "id": "caption-word-1-2",
+     "text": "שבו",
+     "start": 2.665,
+     "end": 2.985
+    },
+    {
+     "id": "caption-word-1-3",
+     "text": "מתכננים",
+     "start": 3.005,
+     "end": 3.629
+    },
+    {
+     "id": "caption-word-1-4",
+     "text": "את",
+     "start": 3.649,
+     "end": 3.894
+    },
+    {
+     "id": "caption-word-1-5",
+     "text": "האירוע,",
+     "start": 3.914,
+     "end": 4.462
+    }
+   ]
+  },
+  {
+   "id": "caption-group-2",
+   "frame": 1,
+   "start": 4.482,
+   "end": 8.573,
+   "text": "מזמינים את האורחים ומנהלים הכול עד הרגע האחרון.",
+   "words": [
+    {
+     "id": "caption-word-2-0",
+     "text": "מזמינים",
+     "start": 4.482,
+     "end": 5.105
+    },
+    {
+     "id": "caption-word-2-1",
+     "text": "את",
+     "start": 5.125,
+     "end": 5.37
+    },
+    {
+     "id": "caption-word-2-2",
+     "text": "האורחים",
+     "start": 5.39,
+     "end": 6.014
+    },
+    {
+     "id": "caption-word-2-3",
+     "text": "ומנהלים",
+     "start": 6.034,
+     "end": 6.657
+    },
+    {
+     "id": "caption-word-2-4",
+     "text": "הכול",
+     "start": 6.677,
+     "end": 7.074
+    },
+    {
+     "id": "caption-word-2-5",
+     "text": "עד",
+     "start": 7.094,
+     "end": 7.339
+    },
+    {
+     "id": "caption-word-2-6",
+     "text": "הרגע",
+     "start": 7.359,
+     "end": 7.755
+    },
+    {
+     "id": "caption-word-2-7",
+     "text": "האחרון.",
+     "start": 7.775,
+     "end": 8.323
+    }
+   ]
+  },
+  {
+   "id": "caption-group-3",
+   "frame": 1,
+   "start": 8.892,
+   "end": 10.199,
+   "text": "בואו נראה איך זה עובד.",
+   "words": [
+    {
+     "id": "caption-word-3-0",
+     "text": "בואו",
+     "start": 8.892,
+     "end": 9.114
+    },
+    {
+     "id": "caption-word-3-1",
+     "text": "נראה",
+     "start": 9.134,
+     "end": 9.355
+    },
+    {
+     "id": "caption-word-3-2",
+     "text": "איך",
+     "start": 9.375,
+     "end": 9.553
+    },
+    {
+     "id": "caption-word-3-3",
+     "text": "זה",
+     "start": 9.573,
+     "end": 9.707
+    },
+    {
+     "id": "caption-word-3-4",
+     "text": "עובד.",
+     "start": 9.727,
+     "end": 9.949
+    }
+   ]
+  },
+  {
+   "id": "caption-group-4",
+   "frame": 2,
+   "start": 10.644,
+   "end": 12.313,
+   "text": "מתחילים באירוע חדש:",
+   "words": [
+    {
+     "id": "caption-word-4-0",
+     "text": "מתחילים",
+     "start": 10.644,
+     "end": 11.22
+    },
+    {
+     "id": "caption-word-4-1",
+     "text": "באירוע",
+     "start": 11.24,
+     "end": 11.747
+    },
+    {
+     "id": "caption-word-4-2",
+     "text": "חדש:",
+     "start": 11.767,
+     "end": 12.063
+    }
+   ]
+  },
+  {
+   "id": "caption-group-5",
+   "frame": 2,
+   "start": 12.471,
+   "end": 14.021,
+   "text": "בוחרים את סוג האירוע,",
+   "words": [
+    {
+     "id": "caption-word-5-0",
+     "text": "בוחרים",
+     "start": 12.471,
+     "end": 12.882
+    },
+    {
+     "id": "caption-word-5-1",
+     "text": "את",
+     "start": 12.902,
+     "end": 13.083
+    },
+    {
+     "id": "caption-word-5-2",
+     "text": "סוג",
+     "start": 13.103,
+     "end": 13.341
+    },
+    {
+     "id": "caption-word-5-3",
+     "text": "האירוע,",
+     "start": 13.361,
+     "end": 13.771
+    }
+   ]
+  },
+  {
+   "id": "caption-group-6",
+   "frame": 2,
+   "start": 14.044,
+   "end": 17.263,
+   "text": "מוסיפים תאריך, מספר אורחים משוער ותקציב,",
+   "words": [
+    {
+     "id": "caption-word-6-0",
+     "text": "מוסיפים",
+     "start": 14.044,
+     "end": 14.675
+    },
+    {
+     "id": "caption-word-6-1",
+     "text": "תאריך,",
+     "start": 14.695,
+     "end": 15.174
+    },
+    {
+     "id": "caption-word-6-2",
+     "text": "מספר",
+     "start": 15.194,
+     "end": 15.595
+    },
+    {
+     "id": "caption-word-6-3",
+     "text": "אורחים",
+     "start": 15.615,
+     "end": 16.17
+    },
+    {
+     "id": "caption-word-6-4",
+     "text": "משוער",
+     "start": 16.19,
+     "end": 16.668
+    },
+    {
+     "id": "caption-word-6-5",
+     "text": "ותקציב,",
+     "start": 16.688,
+     "end": 17.243
+    }
+   ]
+  },
+  {
+   "id": "caption-group-7",
+   "frame": 2,
+   "start": 17.263,
+   "end": 19.218,
+   "text": "ובוחרים מאיפה להתחיל.",
+   "words": [
+    {
+     "id": "caption-word-7-0",
+     "text": "ובוחרים",
+     "start": 17.263,
+     "end": 17.895
+    },
+    {
+     "id": "caption-word-7-1",
+     "text": "מאיפה",
+     "start": 17.915,
+     "end": 18.393
+    },
+    {
+     "id": "caption-word-7-2",
+     "text": "להתחיל.",
+     "start": 18.413,
+     "end": 18.968
+    }
+   ]
+  },
+  {
+   "id": "caption-group-8",
+   "frame": 2,
+   "start": 19.547,
+   "end": 21.839,
+   "text": "פחות מדקה, והאירוע מוכן.",
+   "words": [
+    {
+     "id": "caption-word-8-0",
+     "text": "פחות",
+     "start": 19.547,
+     "end": 19.923
+    },
+    {
+     "id": "caption-word-8-1",
+     "text": "מדקה,",
+     "start": 19.943,
+     "end": 20.319
+    },
+    {
+     "id": "caption-word-8-2",
+     "text": "והאירוע",
+     "start": 20.596,
+     "end": 21.191
+    },
+    {
+     "id": "caption-word-8-3",
+     "text": "מוכן.",
+     "start": 21.211,
+     "end": 21.589
+    }
+   ]
+  },
+  {
+   "id": "caption-group-9",
+   "frame": 3,
+   "start": 22.275,
+   "end": 26.305,
+   "text": "בית האירוע מראה הכול במבט אחד: ספירה לאחור,",
+   "words": [
+    {
+     "id": "caption-word-9-0",
+     "text": "בית",
+     "start": 22.275,
+     "end": 22.581
+    },
+    {
+     "id": "caption-word-9-1",
+     "text": "האירוע",
+     "start": 22.601,
+     "end": 23.123
+    },
+    {
+     "id": "caption-word-9-2",
+     "text": "מראה",
+     "start": 23.143,
+     "end": 23.521
+    },
+    {
+     "id": "caption-word-9-3",
+     "text": "הכול",
+     "start": 23.541,
+     "end": 23.919
+    },
+    {
+     "id": "caption-word-9-4",
+     "text": "במבט",
+     "start": 23.939,
+     "end": 24.316
+    },
+    {
+     "id": "caption-word-9-5",
+     "text": "אחד:",
+     "start": 24.336,
+     "end": 24.642
+    },
+    {
+     "id": "caption-word-9-6",
+     "text": "ספירה",
+     "start": 25.111,
+     "end": 25.573
+    },
+    {
+     "id": "caption-word-9-7",
+     "text": "לאחור,",
+     "start": 25.593,
+     "end": 26.055
+    }
+   ]
+  },
+  {
+   "id": "caption-group-10",
+   "frame": 3,
+   "start": 26.402,
+   "end": 29.969,
+   "text": "הצעד הבא שכדאי לעשות עכשיו, מד התקציב,",
+   "words": [
+    {
+     "id": "caption-word-10-0",
+     "text": "הצעד",
+     "start": 26.402,
+     "end": 26.765
+    },
+    {
+     "id": "caption-word-10-1",
+     "text": "הבא",
+     "start": 26.785,
+     "end": 27.079
+    },
+    {
+     "id": "caption-word-10-2",
+     "text": "שכדאי",
+     "start": 27.099,
+     "end": 27.532
+    },
+    {
+     "id": "caption-word-10-3",
+     "text": "לעשות",
+     "start": 27.552,
+     "end": 27.985
+    },
+    {
+     "id": "caption-word-10-4",
+     "text": "עכשיו,",
+     "start": 28.005,
+     "end": 28.438
+    },
+    {
+     "id": "caption-word-10-5",
+     "text": "מד",
+     "start": 28.818,
+     "end": 29.091
+    },
+    {
+     "id": "caption-word-10-6",
+     "text": "התקציב,",
+     "start": 29.111,
+     "end": 29.719
+    }
+   ]
+  },
+  {
+   "id": "caption-group-11",
+   "frame": 3,
+   "start": 30.07,
+   "end": 32.178,
+   "text": "אישורי ההגעה והמשימות.",
+   "words": [
+    {
+     "id": "caption-word-11-0",
+     "text": "אישורי",
+     "start": 30.07,
+     "end": 30.649
+    },
+    {
+     "id": "caption-word-11-1",
+     "text": "ההגעה",
+     "start": 30.669,
+     "end": 31.169
+    },
+    {
+     "id": "caption-word-11-2",
+     "text": "והמשימות.",
+     "start": 31.189,
+     "end": 31.928
+    }
+   ]
+  },
+  {
+   "id": "caption-group-12",
+   "frame": 3,
+   "start": 32.543,
+   "end": 36.909,
+   "text": "והכול מסודר בארבעה שלבים: מתכננים, מזמינים,",
+   "words": [
+    {
+     "id": "caption-word-12-0",
+     "text": "והכול",
+     "start": 32.543,
+     "end": 32.988
+    },
+    {
+     "id": "caption-word-12-1",
+     "text": "מסודר",
+     "start": 33.008,
+     "end": 33.454
+    },
+    {
+     "id": "caption-word-12-2",
+     "text": "בארבעה",
+     "start": 33.474,
+     "end": 33.991
+    },
+    {
+     "id": "caption-word-12-3",
+     "text": "שלבים:",
+     "start": 34.011,
+     "end": 34.456
+    },
+    {
+     "id": "caption-word-12-4",
+     "text": "מתכננים,",
+     "start": 34.969,
+     "end": 35.804
+    },
+    {
+     "id": "caption-word-12-5",
+     "text": "מזמינים,",
+     "start": 35.824,
+     "end": 36.659
+    }
+   ]
+  },
+  {
+   "id": "caption-group-13",
+   "frame": 3,
+   "start": 36.935,
+   "end": 38.749,
+   "text": "מסדרים וחוגגים.",
+   "words": [
+    {
+     "id": "caption-word-13-0",
+     "text": "מסדרים",
+     "start": 36.935,
+     "end": 37.658
+    },
+    {
+     "id": "caption-word-13-1",
+     "text": "וחוגגים.",
+     "start": 37.678,
+     "end": 38.499
+    }
+   ]
+  },
+  {
+   "id": "caption-group-14",
+   "frame": 4,
+   "start": 39.229,
+   "end": 42.841,
+   "text": "בוחרים הזמנה מתוך יותר משישים עיצובים מונפשים,",
+   "words": [
+    {
+     "id": "caption-word-14-0",
+     "text": "בוחרים",
+     "start": 39.229,
+     "end": 39.721
+    },
+    {
+     "id": "caption-word-14-1",
+     "text": "הזמנה",
+     "start": 39.741,
+     "end": 40.165
+    },
+    {
+     "id": "caption-word-14-2",
+     "text": "מתוך",
+     "start": 40.185,
+     "end": 40.541
+    },
+    {
+     "id": "caption-word-14-3",
+     "text": "יותר",
+     "start": 40.561,
+     "end": 40.917
+    },
+    {
+     "id": "caption-word-14-4",
+     "text": "משישים",
+     "start": 40.937,
+     "end": 41.43
+    },
+    {
+     "id": "caption-word-14-5",
+     "text": "עיצובים",
+     "start": 41.45,
+     "end": 42.011
+    },
+    {
+     "id": "caption-word-14-6",
+     "text": "מונפשים,",
+     "start": 42.031,
+     "end": 42.591
+    }
+   ]
+  },
+  {
+   "id": "caption-group-15",
+   "frame": 4,
+   "start": 42.886,
+   "end": 44.396,
+   "text": "עם מוזיקה ואנימציה,",
+   "words": [
+    {
+     "id": "caption-word-15-0",
+     "text": "עם",
+     "start": 42.886,
+     "end": 43.124
+    },
+    {
+     "id": "caption-word-15-1",
+     "text": "מוזיקה",
+     "start": 43.144,
+     "end": 43.676
+    },
+    {
+     "id": "caption-word-15-2",
+     "text": "ואנימציה,",
+     "start": 43.696,
+     "end": 44.376
+    }
+   ]
+  },
+  {
+   "id": "caption-group-16",
+   "frame": 4,
+   "start": 44.396,
+   "end": 46.283,
+   "text": "שמותאמים לסוג האירוע.",
+   "words": [
+    {
+     "id": "caption-word-16-0",
+     "text": "שמותאמים",
+     "start": 44.396,
+     "end": 45.076
+    },
+    {
+     "id": "caption-word-16-1",
+     "text": "לסוג",
+     "start": 45.096,
+     "end": 45.481
+    },
+    {
+     "id": "caption-word-16-2",
+     "text": "האירוע.",
+     "start": 45.501,
+     "end": 46.033
+    }
+   ]
+  },
+  {
+   "id": "caption-group-17",
+   "frame": 5,
+   "start": 46.707,
+   "end": 47.908,
+   "text": "רוצים משהו אישי?",
+   "words": [
+    {
+     "id": "caption-word-17-0",
+     "text": "רוצים",
+     "start": 46.707,
+     "end": 47.047
+    },
+    {
+     "id": "caption-word-17-1",
+     "text": "משהו",
+     "start": 47.067,
+     "end": 47.352
+    },
+    {
+     "id": "caption-word-17-2",
+     "text": "אישי?",
+     "start": 47.372,
+     "end": 47.658
+    }
+   ]
+  },
+  {
+   "id": "caption-group-18",
+   "frame": 5,
+   "start": 48.263,
+   "end": 49.59,
+   "text": "מעלים כמה תמונות,",
+   "words": [
+    {
+     "id": "caption-word-18-0",
+     "text": "מעלים",
+     "start": 48.263,
+     "end": 48.709
+    },
+    {
+     "id": "caption-word-18-1",
+     "text": "כמה",
+     "start": 48.729,
+     "end": 49.032
+    },
+    {
+     "id": "caption-word-18-2",
+     "text": "תמונות,",
+     "start": 49.052,
+     "end": 49.57
+    }
+   ]
+  },
+  {
+   "id": "caption-group-19",
+   "frame": 5,
+   "start": 49.59,
+   "end": 52.009,
+   "text": "ועצבו לי בונה עיצוב בהשראתן:",
+   "words": [
+    {
+     "id": "caption-word-19-0",
+     "text": "ועצבו",
+     "start": 49.59,
+     "end": 50.037
+    },
+    {
+     "id": "caption-word-19-1",
+     "text": "לי",
+     "start": 50.057,
+     "end": 50.288
+    },
+    {
+     "id": "caption-word-19-2",
+     "text": "בונה",
+     "start": 50.308,
+     "end": 50.683
+    },
+    {
+     "id": "caption-word-19-3",
+     "text": "עיצוב",
+     "start": 50.703,
+     "end": 51.149
+    },
+    {
+     "id": "caption-word-19-4",
+     "text": "בהשראתן:",
+     "start": 51.169,
+     "end": 51.759
+    }
+   ]
+  },
+  {
+   "id": "caption-group-20",
+   "frame": 5,
+   "start": 52.16,
+   "end": 54.482,
+   "text": "צבעים, אווירה וסגנון.",
+   "words": [
+    {
+     "id": "caption-word-20-0",
+     "text": "צבעים,",
+     "start": 52.16,
+     "end": 52.772
+    },
+    {
+     "id": "caption-word-20-1",
+     "text": "אווירה",
+     "start": 52.792,
+     "end": 53.502
+    },
+    {
+     "id": "caption-word-20-2",
+     "text": "וסגנון.",
+     "start": 53.522,
+     "end": 54.232
+    }
+   ]
+  },
+  {
+   "id": "caption-group-21",
+   "frame": 6,
+   "start": 54.936,
+   "end": 57.755,
+   "text": "עורכים את הטקסטים, התאריך והמקום,",
+   "words": [
+    {
+     "id": "caption-word-21-0",
+     "text": "עורכים",
+     "start": 54.936,
+     "end": 55.479
+    },
+    {
+     "id": "caption-word-21-1",
+     "text": "את",
+     "start": 55.499,
+     "end": 55.742
+    },
+    {
+     "id": "caption-word-21-2",
+     "text": "הטקסטים,",
+     "start": 55.762,
+     "end": 56.38
+    },
+    {
+     "id": "caption-word-21-3",
+     "text": "התאריך",
+     "start": 56.4,
+     "end": 56.942
+    },
+    {
+     "id": "caption-word-21-4",
+     "text": "והמקום,",
+     "start": 56.962,
+     "end": 57.505
+    }
+   ]
+  },
+  {
+   "id": "caption-group-22",
+   "frame": 6,
+   "start": 57.828,
+   "end": 59.664,
+   "text": "ורואים כל שינוי מיד.",
+   "words": [
+    {
+     "id": "caption-word-22-0",
+     "text": "ורואים",
+     "start": 57.828,
+     "end": 58.356
+    },
+    {
+     "id": "caption-word-22-1",
+     "text": "כל",
+     "start": 58.376,
+     "end": 58.611
+    },
+    {
+     "id": "caption-word-22-2",
+     "text": "שינוי",
+     "start": 58.631,
+     "end": 59.086
+    },
+    {
+     "id": "caption-word-22-3",
+     "text": "מיד.",
+     "start": 59.106,
+     "end": 59.414
+    }
+   ]
+  },
+  {
+   "id": "caption-group-23",
+   "frame": 6,
+   "start": 60.0,
+   "end": 63.152,
+   "text": "אפשר לשלוח טיוטה למשפחה, לקבל הערות,",
+   "words": [
+    {
+     "id": "caption-word-23-0",
+     "text": "אפשר",
+     "start": 60.0,
+     "end": 60.403
+    },
+    {
+     "id": "caption-word-23-1",
+     "text": "לשלוח",
+     "start": 60.423,
+     "end": 60.903
+    },
+    {
+     "id": "caption-word-23-2",
+     "text": "טיוטה",
+     "start": 60.923,
+     "end": 61.402
+    },
+    {
+     "id": "caption-word-23-3",
+     "text": "למשפחה,",
+     "start": 61.422,
+     "end": 61.979
+    },
+    {
+     "id": "caption-word-23-4",
+     "text": "לקבל",
+     "start": 61.999,
+     "end": 62.402
+    },
+    {
+     "id": "caption-word-23-5",
+     "text": "הערות,",
+     "start": 62.422,
+     "end": 62.902
+    }
+   ]
+  },
+  {
+   "id": "caption-group-24",
+   "frame": 6,
+   "start": 63.193,
+   "end": 64.689,
+   "text": "ורק אז לפרסם.",
+   "words": [
+    {
+     "id": "caption-word-24-0",
+     "text": "ורק",
+     "start": 63.193,
+     "end": 63.566
+    },
+    {
+     "id": "caption-word-24-1",
+     "text": "אז",
+     "start": 63.586,
+     "end": 63.872
+    },
+    {
+     "id": "caption-word-24-2",
+     "text": "לפרסם.",
+     "start": 63.892,
+     "end": 64.439
+    }
+   ]
+  },
+  {
+   "id": "caption-group-25",
+   "frame": 7,
+   "start": 65.223,
+   "end": 69.477,
+   "text": "אחרי הפרסום, להזמנה יש קישור משלה וקוד QR.",
+   "words": [
+    {
+     "id": "caption-word-25-0",
+     "text": "אחרי",
+     "start": 65.223,
+     "end": 65.695
+    },
+    {
+     "id": "caption-word-25-1",
+     "text": "הפרסום,",
+     "start": 65.715,
+     "end": 66.365
+    },
+    {
+     "id": "caption-word-25-2",
+     "text": "להזמנה",
+     "start": 66.385,
+     "end": 67.036
+    },
+    {
+     "id": "caption-word-25-3",
+     "text": "יש",
+     "start": 67.056,
+     "end": 67.349
+    },
+    {
+     "id": "caption-word-25-4",
+     "text": "קישור",
+     "start": 67.369,
+     "end": 67.93
+    },
+    {
+     "id": "caption-word-25-5",
+     "text": "משלה",
+     "start": 67.95,
+     "end": 68.422
+    },
+    {
+     "id": "caption-word-25-6",
+     "text": "וקוד",
+     "start": 68.442,
+     "end": 68.914
+    },
+    {
+     "id": "caption-word-25-7",
+     "text": "QR.",
+     "start": 68.934,
+     "end": 69.227
+    }
+   ]
+  },
+  {
+   "id": "caption-group-26",
+   "frame": 7,
+   "start": 69.75,
+   "end": 71.764,
+   "text": "וכל מוזמן מקבל קישור אישי,",
+   "words": [
+    {
+     "id": "caption-word-26-0",
+     "text": "וכל",
+     "start": 69.75,
+     "end": 70.048
+    },
+    {
+     "id": "caption-word-26-1",
+     "text": "מוזמן",
+     "start": 70.068,
+     "end": 70.507
+    },
+    {
+     "id": "caption-word-26-2",
+     "text": "מקבל",
+     "start": 70.527,
+     "end": 70.896
+    },
+    {
+     "id": "caption-word-26-3",
+     "text": "קישור",
+     "start": 70.916,
+     "end": 71.355
+    },
+    {
+     "id": "caption-word-26-4",
+     "text": "אישי,",
+     "start": 71.375,
+     "end": 71.744
+    }
+   ]
+  },
+  {
+   "id": "caption-group-27",
+   "frame": 7,
+   "start": 71.764,
+   "end": 74.926,
+   "text": "שפונה אליו בשם וממלא את הפרטים בשבילו.",
+   "words": [
+    {
+     "id": "caption-word-27-0",
+     "text": "שפונה",
+     "start": 71.764,
+     "end": 72.203
+    },
+    {
+     "id": "caption-word-27-1",
+     "text": "אליו",
+     "start": 72.223,
+     "end": 72.592
+    },
+    {
+     "id": "caption-word-27-2",
+     "text": "בשם",
+     "start": 72.612,
+     "end": 72.91
+    },
+    {
+     "id": "caption-word-27-3",
+     "text": "וממלא",
+     "start": 72.93,
+     "end": 73.369
+    },
+    {
+     "id": "caption-word-27-4",
+     "text": "את",
+     "start": 73.389,
+     "end": 73.616
+    },
+    {
+     "id": "caption-word-27-5",
+     "text": "הפרטים",
+     "start": 73.636,
+     "end": 74.146
+    },
+    {
+     "id": "caption-word-27-6",
+     "text": "בשבילו.",
+     "start": 74.166,
+     "end": 74.676
+    }
+   ]
+  },
+  {
+   "id": "caption-group-28",
+   "frame": 8,
+   "start": 75.526,
+   "end": 78.07,
+   "text": "מעלים את רשימת המוזמנים מקובץ אקסל,",
+   "words": [
+    {
+     "id": "caption-word-28-0",
+     "text": "מעלים",
+     "start": 75.526,
+     "end": 75.941
+    },
+    {
+     "id": "caption-word-28-1",
+     "text": "את",
+     "start": 75.961,
+     "end": 76.176
+    },
+    {
+     "id": "caption-word-28-2",
+     "text": "רשימת",
+     "start": 76.196,
+     "end": 76.611
+    },
+    {
+     "id": "caption-word-28-3",
+     "text": "המוזמנים",
+     "start": 76.631,
+     "end": 77.247
+    },
+    {
+     "id": "caption-word-28-4",
+     "text": "מקובץ",
+     "start": 77.267,
+     "end": 77.682
+    },
+    {
+     "id": "caption-word-28-5",
+     "text": "אקסל,",
+     "start": 77.702,
+     "end": 78.05
+    }
+   ]
+  },
+  {
+   "id": "caption-group-29",
+   "frame": 8,
+   "start": 78.07,
+   "end": 79.94,
+   "text": "ושולחים לכולם בוואטסאפ:",
+   "words": [
+    {
+     "id": "caption-word-29-0",
+     "text": "ושולחים",
+     "start": 78.07,
+     "end": 78.619
+    },
+    {
+     "id": "caption-word-29-1",
+     "text": "לכולם",
+     "start": 78.639,
+     "end": 79.054
+    },
+    {
+     "id": "caption-word-29-2",
+     "text": "בוואטסאפ:",
+     "start": 79.074,
+     "end": 79.69
+    }
+   ]
+  },
+  {
+   "id": "caption-group-30",
+   "frame": 8,
+   "start": 80.066,
+   "end": 81.478,
+   "text": "מהמספר של באדוק,",
+   "words": [
+    {
+     "id": "caption-word-30-0",
+     "text": "מהמספר",
+     "start": 80.066,
+     "end": 80.553
+    },
+    {
+     "id": "caption-word-30-1",
+     "text": "של",
+     "start": 80.573,
+     "end": 80.789
+    },
+    {
+     "id": "caption-word-30-2",
+     "text": "באדוק,",
+     "start": 80.809,
+     "end": 81.228
+    }
+   ]
+  },
+  {
+   "id": "caption-group-31",
+   "frame": 8,
+   "start": 81.538,
+   "end": 82.994,
+   "text": "או מהוואטסאפ שלכם,",
+   "words": [
+    {
+     "id": "caption-word-31-0",
+     "text": "או",
+     "start": 81.538,
+     "end": 81.738
+    },
+    {
+     "id": "caption-word-31-1",
+     "text": "מהוואטסאפ",
+     "start": 81.758,
+     "end": 82.399
+    },
+    {
+     "id": "caption-word-31-2",
+     "text": "שלכם,",
+     "start": 82.419,
+     "end": 82.744
+    }
+   ]
+  },
+  {
+   "id": "caption-group-32",
+   "frame": 8,
+   "start": 83.028,
+   "end": 84.45,
+   "text": "אחד אחרי השני.",
+   "words": [
+    {
+     "id": "caption-word-32-0",
+     "text": "אחד",
+     "start": 83.028,
+     "end": 83.354
+    },
+    {
+     "id": "caption-word-32-1",
+     "text": "אחרי",
+     "start": 83.374,
+     "end": 83.777
+    },
+    {
+     "id": "caption-word-32-2",
+     "text": "השני.",
+     "start": 83.797,
+     "end": 84.2
+    }
+   ]
+  },
+  {
+   "id": "caption-group-33",
+   "frame": 9,
+   "start": 84.991,
+   "end": 87.594,
+   "text": "אישורי ההגעה מתעדכנים בזמן אמת:",
+   "words": [
+    {
+     "id": "caption-word-33-0",
+     "text": "אישורי",
+     "start": 84.991,
+     "end": 85.503
+    },
+    {
+     "id": "caption-word-33-1",
+     "text": "ההגעה",
+     "start": 85.523,
+     "end": 85.963
+    },
+    {
+     "id": "caption-word-33-2",
+     "text": "מתעדכנים",
+     "start": 85.983,
+     "end": 86.636
+    },
+    {
+     "id": "caption-word-33-3",
+     "text": "בזמן",
+     "start": 86.656,
+     "end": 87.026
+    },
+    {
+     "id": "caption-word-33-4",
+     "text": "אמת:",
+     "start": 87.046,
+     "end": 87.344
+    }
+   ]
+  },
+  {
+   "id": "caption-group-34",
+   "frame": 9,
+   "start": 87.756,
+   "end": 90.496,
+   "text": "מי מגיע, כמה אנשים, מי לא,",
+   "words": [
+    {
+     "id": "caption-word-34-0",
+     "text": "מי",
+     "start": 87.756,
+     "end": 88.061
+    },
+    {
+     "id": "caption-word-34-1",
+     "text": "מגיע,",
+     "start": 88.081,
+     "end": 88.572
+    },
+    {
+     "id": "caption-word-34-2",
+     "text": "כמה",
+     "start": 88.592,
+     "end": 88.991
+    },
+    {
+     "id": "caption-word-34-3",
+     "text": "אנשים,",
+     "start": 89.011,
+     "end": 89.595
+    },
+    {
+     "id": "caption-word-34-4",
+     "text": "מי",
+     "start": 89.615,
+     "end": 89.921
+    },
+    {
+     "id": "caption-word-34-5",
+     "text": "לא,",
+     "start": 89.941,
+     "end": 90.246
+    }
+   ]
+  },
+  {
+   "id": "caption-group-35",
+   "frame": 9,
+   "start": 90.546,
+   "end": 91.685,
+   "text": "ומי עוד לא ענה.",
+   "words": [
+    {
+     "id": "caption-word-35-0",
+     "text": "ומי",
+     "start": 90.546,
+     "end": 90.767
+    },
+    {
+     "id": "caption-word-35-1",
+     "text": "עוד",
+     "start": 90.787,
+     "end": 91.007
+    },
+    {
+     "id": "caption-word-35-2",
+     "text": "לא",
+     "start": 91.027,
+     "end": 91.194
+    },
+    {
+     "id": "caption-word-35-3",
+     "text": "ענה.",
+     "start": 91.214,
+     "end": 91.435
+    }
+   ]
+  },
+  {
+   "id": "caption-group-36",
+   "frame": 9,
+   "start": 92.115,
+   "end": 94.127,
+   "text": "תשובה שהגיעה מהקישור הכללי",
+   "words": [
+    {
+     "id": "caption-word-36-0",
+     "text": "תשובה",
+     "start": 92.115,
+     "end": 92.495
+    },
+    {
+     "id": "caption-word-36-1",
+     "text": "שהגיעה",
+     "start": 92.515,
+     "end": 92.955
+    },
+    {
+     "id": "caption-word-36-2",
+     "text": "מהקישור",
+     "start": 92.975,
+     "end": 93.478
+    },
+    {
+     "id": "caption-word-36-3",
+     "text": "הכללי",
+     "start": 93.498,
+     "end": 93.877
+    }
+   ]
+  },
+  {
+   "id": "caption-group-37",
+   "frame": 9,
+   "start": 94.164,
+   "end": 96.526,
+   "text": "משייכים למוזמן בלחיצה אחת.",
+   "words": [
+    {
+     "id": "caption-word-37-0",
+     "text": "משייכים",
+     "start": 94.164,
+     "end": 94.791
+    },
+    {
+     "id": "caption-word-37-1",
+     "text": "למוזמן",
+     "start": 94.811,
+     "end": 95.362
+    },
+    {
+     "id": "caption-word-37-2",
+     "text": "בלחיצה",
+     "start": 95.382,
+     "end": 95.933
+    },
+    {
+     "id": "caption-word-37-3",
+     "text": "אחת.",
+     "start": 95.953,
+     "end": 96.276
+    }
+   ]
+  },
+  {
+   "id": "caption-group-38",
+   "frame": 10,
+   "start": 97.068,
+   "end": 100.157,
+   "text": "בתכנון מחכה לכם רשימת משימות לפי לוח",
+   "words": [
+    {
+     "id": "caption-word-38-0",
+     "text": "בתכנון",
+     "start": 97.068,
+     "end": 97.62
+    },
+    {
+     "id": "caption-word-38-1",
+     "text": "מחכה",
+     "start": 97.64,
+     "end": 98.039
+    },
+    {
+     "id": "caption-word-38-2",
+     "text": "לכם",
+     "start": 98.059,
+     "end": 98.383
+    },
+    {
+     "id": "caption-word-38-3",
+     "text": "רשימת",
+     "start": 98.403,
+     "end": 98.878
+    },
+    {
+     "id": "caption-word-38-4",
+     "text": "משימות",
+     "start": 98.898,
+     "end": 99.45
+    },
+    {
+     "id": "caption-word-38-5",
+     "text": "לפי",
+     "start": 99.47,
+     "end": 99.793
+    },
+    {
+     "id": "caption-word-38-6",
+     "text": "לוח",
+     "start": 99.813,
+     "end": 100.137
+    }
+   ]
+  },
+  {
+   "id": "caption-group-39",
+   "frame": 10,
+   "start": 100.157,
+   "end": 102.56,
+   "text": "זמנים, ספקים עם הצעות מחיר,",
+   "words": [
+    {
+     "id": "caption-word-39-0",
+     "text": "זמנים,",
+     "start": 100.157,
+     "end": 100.632
+    },
+    {
+     "id": "caption-word-39-1",
+     "text": "ספקים",
+     "start": 100.652,
+     "end": 101.128
+    },
+    {
+     "id": "caption-word-39-2",
+     "text": "עם",
+     "start": 101.148,
+     "end": 101.395
+    },
+    {
+     "id": "caption-word-39-3",
+     "text": "הצעות",
+     "start": 101.415,
+     "end": 101.891
+    },
+    {
+     "id": "caption-word-39-4",
+     "text": "מחיר,",
+     "start": 101.911,
+     "end": 102.31
+    }
+   ]
+  },
+  {
+   "id": "caption-group-40",
+   "frame": 10,
+   "start": 102.621,
+   "end": 104.386,
+   "text": "ולוח רעיונות להשראה.",
+   "words": [
+    {
+     "id": "caption-word-40-0",
+     "text": "ולוח",
+     "start": 102.621,
+     "end": 102.994
+    },
+    {
+     "id": "caption-word-40-1",
+     "text": "רעיונות",
+     "start": 103.014,
+     "end": 103.601
+    },
+    {
+     "id": "caption-word-40-2",
+     "text": "להשראה.",
+     "start": 103.621,
+     "end": 104.136
+    }
+   ]
+  },
+  {
+   "id": "caption-group-41",
+   "frame": 11,
+   "start": 104.972,
+   "end": 107.834,
+   "text": "מד התקציב מראה מיד איפה אתם עומדים:",
+   "words": [
+    {
+     "id": "caption-word-41-0",
+     "text": "מד",
+     "start": 104.972,
+     "end": 105.191
+    },
+    {
+     "id": "caption-word-41-1",
+     "text": "התקציב",
+     "start": 105.211,
+     "end": 105.704
+    },
+    {
+     "id": "caption-word-41-2",
+     "text": "מראה",
+     "start": 105.724,
+     "end": 106.08
+    },
+    {
+     "id": "caption-word-41-3",
+     "text": "מיד",
+     "start": 106.1,
+     "end": 106.388
+    },
+    {
+     "id": "caption-word-41-4",
+     "text": "איפה",
+     "start": 106.408,
+     "end": 106.764
+    },
+    {
+     "id": "caption-word-41-5",
+     "text": "אתם",
+     "start": 106.784,
+     "end": 107.071
+    },
+    {
+     "id": "caption-word-41-6",
+     "text": "עומדים:",
+     "start": 107.091,
+     "end": 107.584
+    }
+   ]
+  },
+  {
+   "id": "caption-group-42",
+   "frame": 11,
+   "start": 108.09,
+   "end": 109.635,
+   "text": "ירוק, בטוחים.",
+   "words": [
+    {
+     "id": "caption-word-42-0",
+     "text": "ירוק,",
+     "start": 108.09,
+     "end": 108.626
+    },
+    {
+     "id": "caption-word-42-1",
+     "text": "בטוחים.",
+     "start": 108.646,
+     "end": 109.385
+    }
+   ]
+  },
+  {
+   "id": "caption-group-43",
+   "frame": 11,
+   "start": 109.917,
+   "end": 111.966,
+   "text": "צהוב, מתקרבים לגבול.",
+   "words": [
+    {
+     "id": "caption-word-43-0",
+     "text": "צהוב,",
+     "start": 109.917,
+     "end": 110.419
+    },
+    {
+     "id": "caption-word-43-1",
+     "text": "מתקרבים",
+     "start": 110.715,
+     "end": 111.274
+    },
+    {
+     "id": "caption-word-43-2",
+     "text": "לגבול.",
+     "start": 111.294,
+     "end": 111.716
+    }
+   ]
+  },
+  {
+   "id": "caption-group-44",
+   "frame": 11,
+   "start": 112.224,
+   "end": 113.763,
+   "text": "אדום, חריגה.",
+   "words": [
+    {
+     "id": "caption-word-44-0",
+     "text": "אדום,",
+     "start": 112.224,
+     "end": 112.659
+    },
+    {
+     "id": "caption-word-44-1",
+     "text": "חריגה.",
+     "start": 113.001,
+     "end": 113.513
+    }
+   ]
+  },
+  {
+   "id": "caption-group-45",
+   "frame": 11,
+   "start": 114.266,
+   "end": 115.943,
+   "text": "מוסיפים הוצאות ותשלומים,",
+   "words": [
+    {
+     "id": "caption-word-45-0",
+     "text": "מוסיפים",
+     "start": 114.266,
+     "end": 114.805
+    },
+    {
+     "id": "caption-word-45-1",
+     "text": "הוצאות",
+     "start": 114.825,
+     "end": 115.298
+    },
+    {
+     "id": "caption-word-45-2",
+     "text": "ותשלומים,",
+     "start": 115.318,
+     "end": 115.923
+    }
+   ]
+  },
+  {
+   "id": "caption-group-46",
+   "frame": 11,
+   "start": 115.943,
+   "end": 118.903,
+   "text": "ובודקים מה יקרה אם ישתנה מספר האורחים.",
+   "words": [
+    {
+     "id": "caption-word-46-0",
+     "text": "ובודקים",
+     "start": 115.943,
+     "end": 116.482
+    },
+    {
+     "id": "caption-word-46-1",
+     "text": "מה",
+     "start": 116.502,
+     "end": 116.713
+    },
+    {
+     "id": "caption-word-46-2",
+     "text": "יקרה",
+     "start": 116.733,
+     "end": 117.074
+    },
+    {
+     "id": "caption-word-46-3",
+     "text": "אם",
+     "start": 117.094,
+     "end": 117.305
+    },
+    {
+     "id": "caption-word-46-4",
+     "text": "ישתנה",
+     "start": 117.325,
+     "end": 117.732
+    },
+    {
+     "id": "caption-word-46-5",
+     "text": "מספר",
+     "start": 117.752,
+     "end": 118.094
+    },
+    {
+     "id": "caption-word-46-6",
+     "text": "האורחים.",
+     "start": 118.114,
+     "end": 118.653
+    }
+   ]
+  },
+  {
+   "id": "caption-group-47",
+   "frame": 12,
+   "start": 119.487,
+   "end": 121.655,
+   "text": "את סידור השולחנות עושים בגרירה:",
+   "words": [
+    {
+     "id": "caption-word-47-0",
+     "text": "את",
+     "start": 119.487,
+     "end": 119.669
+    },
+    {
+     "id": "caption-word-47-1",
+     "text": "סידור",
+     "start": 119.689,
+     "end": 120.046
+    },
+    {
+     "id": "caption-word-47-2",
+     "text": "השולחנות",
+     "start": 120.066,
+     "end": 120.595
+    },
+    {
+     "id": "caption-word-47-3",
+     "text": "עושים",
+     "start": 120.615,
+     "end": 120.971
+    },
+    {
+     "id": "caption-word-47-4",
+     "text": "בגרירה:",
+     "start": 120.991,
+     "end": 121.405
+    }
+   ]
+  },
+  {
+   "id": "caption-group-48",
+   "frame": 12,
+   "start": 121.875,
+   "end": 123.441,
+   "text": "מושיבים משפחות שלמות,",
+   "words": [
+    {
+     "id": "caption-word-48-0",
+     "text": "מושיבים",
+     "start": 121.875,
+     "end": 122.447
+    },
+    {
+     "id": "caption-word-48-1",
+     "text": "משפחות",
+     "start": 122.467,
+     "end": 122.969
+    },
+    {
+     "id": "caption-word-48-2",
+     "text": "שלמות,",
+     "start": 122.989,
+     "end": 123.421
+    }
+   ]
+  },
+  {
+   "id": "caption-group-49",
+   "frame": 12,
+   "start": 123.441,
+   "end": 125.181,
+   "text": "מסדרים על תוכנית האולם,",
+   "words": [
+    {
+     "id": "caption-word-49-0",
+     "text": "מסדרים",
+     "start": 123.441,
+     "end": 123.943
+    },
+    {
+     "id": "caption-word-49-1",
+     "text": "על",
+     "start": 123.963,
+     "end": 124.187
+    },
+    {
+     "id": "caption-word-49-2",
+     "text": "תוכנית",
+     "start": 124.207,
+     "end": 124.709
+    },
+    {
+     "id": "caption-word-49-3",
+     "text": "האולם,",
+     "start": 124.729,
+     "end": 125.161
+    }
+   ]
+  },
+  {
+   "id": "caption-group-50",
+   "frame": 12,
+   "start": 125.181,
+   "end": 128.161,
+   "text": "ושולחים לכל אורח את מספר השולחן שלו.",
+   "words": [
+    {
+     "id": "caption-word-50-0",
+     "text": "ושולחים",
+     "start": 125.181,
+     "end": 125.753
+    },
+    {
+     "id": "caption-word-50-1",
+     "text": "לכל",
+     "start": 125.773,
+     "end": 126.066
+    },
+    {
+     "id": "caption-word-50-2",
+     "text": "אורח",
+     "start": 126.086,
+     "end": 126.449
+    },
+    {
+     "id": "caption-word-50-3",
+     "text": "את",
+     "start": 126.469,
+     "end": 126.693
+    },
+    {
+     "id": "caption-word-50-4",
+     "text": "מספר",
+     "start": 126.713,
+     "end": 127.076
+    },
+    {
+     "id": "caption-word-50-5",
+     "text": "השולחן",
+     "start": 127.096,
+     "end": 127.598
+    },
+    {
+     "id": "caption-word-50-6",
+     "text": "שלו.",
+     "start": 127.618,
+     "end": 127.911
+    }
+   ]
+  },
+  {
+   "id": "caption-group-51",
+   "frame": 13,
+   "start": 128.715,
+   "end": 131.668,
+   "text": "ביום האירוע, עמדת הכניסה מאשרת הגעה",
+   "words": [
+    {
+     "id": "caption-word-51-0",
+     "text": "ביום",
+     "start": 128.715,
+     "end": 129.122
+    },
+    {
+     "id": "caption-word-51-1",
+     "text": "האירוע,",
+     "start": 129.142,
+     "end": 129.705
+    },
+    {
+     "id": "caption-word-51-2",
+     "text": "עמדת",
+     "start": 129.725,
+     "end": 130.133
+    },
+    {
+     "id": "caption-word-51-3",
+     "text": "הכניסה",
+     "start": 130.153,
+     "end": 130.715
+    },
+    {
+     "id": "caption-word-51-4",
+     "text": "מאשרת",
+     "start": 130.735,
+     "end": 131.22
+    },
+    {
+     "id": "caption-word-51-5",
+     "text": "הגעה",
+     "start": 131.24,
+     "end": 131.648
+    }
+   ]
+  },
+  {
+   "id": "caption-group-52",
+   "frame": 13,
+   "start": 131.668,
+   "end": 133.685,
+   "text": "בחיפוש או בסריקת קוד,",
+   "words": [
+    {
+     "id": "caption-word-52-0",
+     "text": "בחיפוש",
+     "start": 131.668,
+     "end": 132.231
+    },
+    {
+     "id": "caption-word-52-1",
+     "text": "או",
+     "start": 132.251,
+     "end": 132.503
+    },
+    {
+     "id": "caption-word-52-2",
+     "text": "בסריקת",
+     "start": 132.523,
+     "end": 133.085
+    },
+    {
+     "id": "caption-word-52-3",
+     "text": "קוד,",
+     "start": 133.105,
+     "end": 133.435
+    }
+   ]
+  },
+  {
+   "id": "caption-group-53",
+   "frame": 13,
+   "start": 133.798,
+   "end": 136.152,
+   "text": "ואתם רואים מי הגיע בזמן אמת.",
+   "words": [
+    {
+     "id": "caption-word-53-0",
+     "text": "ואתם",
+     "start": 133.798,
+     "end": 134.155
+    },
+    {
+     "id": "caption-word-53-1",
+     "text": "רואים",
+     "start": 134.175,
+     "end": 134.6
+    },
+    {
+     "id": "caption-word-53-2",
+     "text": "מי",
+     "start": 134.62,
+     "end": 134.84
+    },
+    {
+     "id": "caption-word-53-3",
+     "text": "הגיע",
+     "start": 134.86,
+     "end": 135.217
+    },
+    {
+     "id": "caption-word-53-4",
+     "text": "בזמן",
+     "start": 135.237,
+     "end": 135.594
+    },
+    {
+     "id": "caption-word-53-5",
+     "text": "אמת.",
+     "start": 135.614,
+     "end": 135.902
+    }
+   ]
+  },
+  {
+   "id": "caption-group-54",
+   "frame": 14,
+   "start": 136.662,
+   "end": 139.458,
+   "text": "האורחים מעלים תמונות לגלריה חיה שמוצגת",
+   "words": [
+    {
+     "id": "caption-word-54-0",
+     "text": "האורחים",
+     "start": 136.662,
+     "end": 137.208
+    },
+    {
+     "id": "caption-word-54-1",
+     "text": "מעלים",
+     "start": 137.228,
+     "end": 137.641
+    },
+    {
+     "id": "caption-word-54-2",
+     "text": "תמונות",
+     "start": 137.661,
+     "end": 138.14
+    },
+    {
+     "id": "caption-word-54-3",
+     "text": "לגלריה",
+     "start": 138.16,
+     "end": 138.639
+    },
+    {
+     "id": "caption-word-54-4",
+     "text": "חיה",
+     "start": 138.659,
+     "end": 138.939
+    },
+    {
+     "id": "caption-word-54-5",
+     "text": "שמוצגת",
+     "start": 138.959,
+     "end": 139.438
+    }
+   ]
+  },
+  {
+   "id": "caption-group-55",
+   "frame": 14,
+   "start": 139.458,
+   "end": 140.49,
+   "text": "על המסך באולם,",
+   "words": [
+    {
+     "id": "caption-word-55-0",
+     "text": "על",
+     "start": 139.458,
+     "end": 139.671
+    },
+    {
+     "id": "caption-word-55-1",
+     "text": "המסך",
+     "start": 139.691,
+     "end": 140.037
+    },
+    {
+     "id": "caption-word-55-2",
+     "text": "באולם,",
+     "start": 140.057,
+     "end": 140.47
+    }
+   ]
+  },
+  {
+   "id": "caption-group-56",
+   "frame": 14,
+   "start": 140.49,
+   "end": 143.053,
+   "text": "וכל אחד יכול למצוא את התמונות שהוא",
+   "words": [
+    {
+     "id": "caption-word-56-0",
+     "text": "וכל",
+     "start": 140.49,
+     "end": 140.769
+    },
+    {
+     "id": "caption-word-56-1",
+     "text": "אחד",
+     "start": 140.789,
+     "end": 141.069
+    },
+    {
+     "id": "caption-word-56-2",
+     "text": "יכול",
+     "start": 141.089,
+     "end": 141.435
+    },
+    {
+     "id": "caption-word-56-3",
+     "text": "למצוא",
+     "start": 141.455,
+     "end": 141.868
+    },
+    {
+     "id": "caption-word-56-4",
+     "text": "את",
+     "start": 141.888,
+     "end": 142.101
+    },
+    {
+     "id": "caption-word-56-5",
+     "text": "התמונות",
+     "start": 142.121,
+     "end": 142.667
+    },
+    {
+     "id": "caption-word-56-6",
+     "text": "שהוא",
+     "start": 142.687,
+     "end": 143.033
+    }
+   ]
+  },
+  {
+   "id": "caption-group-57",
+   "frame": 14,
+   "start": 143.053,
+   "end": 144.015,
+   "text": "מופיע בהן.",
+   "words": [
+    {
+     "id": "caption-word-57-0",
+     "text": "מופיע",
+     "start": 143.053,
+     "end": 143.465
+    },
+    {
+     "id": "caption-word-57-1",
+     "text": "בהן.",
+     "start": 143.485,
+     "end": 143.765
+    }
+   ]
+  },
+  {
+   "id": "caption-group-58",
+   "frame": 15,
+   "start": 144.629,
+   "end": 145.923,
+   "text": "ואחרי האירוע:",
+   "words": [
+    {
+     "id": "caption-word-58-0",
+     "text": "ואחרי",
+     "start": 144.629,
+     "end": 145.103
+    },
+    {
+     "id": "caption-word-58-1",
+     "text": "האירוע:",
+     "start": 145.123,
+     "end": 145.673
+    }
+   ]
+  },
+  {
+   "id": "caption-group-59",
+   "frame": 15,
+   "start": 146.067,
+   "end": 148.186,
+   "text": "סרט רגעים שנוצר מהתמונות,",
+   "words": [
+    {
+     "id": "caption-word-59-0",
+     "text": "סרט",
+     "start": 146.067,
+     "end": 146.4
+    },
+    {
+     "id": "caption-word-59-1",
+     "text": "רגעים",
+     "start": 146.42,
+     "end": 146.91
+    },
+    {
+     "id": "caption-word-59-2",
+     "text": "שנוצר",
+     "start": 146.93,
+     "end": 147.42
+    },
+    {
+     "id": "caption-word-59-3",
+     "text": "מהתמונות,",
+     "start": 147.44,
+     "end": 148.166
+    }
+   ]
+  },
+  {
+   "id": "caption-group-60",
+   "frame": 15,
+   "start": 148.186,
+   "end": 150.535,
+   "text": "ותובנות על הצפיות וההגעה.",
+   "words": [
+    {
+     "id": "caption-word-60-0",
+     "text": "ותובנות",
+     "start": 148.186,
+     "end": 148.833
+    },
+    {
+     "id": "caption-word-60-1",
+     "text": "על",
+     "start": 148.853,
+     "end": 149.108
+    },
+    {
+     "id": "caption-word-60-2",
+     "text": "הצפיות",
+     "start": 149.128,
+     "end": 149.696
+    },
+    {
+     "id": "caption-word-60-3",
+     "text": "וההגעה.",
+     "start": 149.716,
+     "end": 150.285
+    }
+   ]
+  },
+  {
+   "id": "caption-group-61",
+   "frame": 16,
+   "start": 150.997,
+   "end": 152.12,
+   "text": "ובכל שלב,",
+   "words": [
+    {
+     "id": "caption-word-61-0",
+     "text": "ובכל",
+     "start": 150.997,
+     "end": 151.468
+    },
+    {
+     "id": "caption-word-61-1",
+     "text": "שלב,",
+     "start": 151.488,
+     "end": 151.87
+    }
+   ]
+  },
+  {
+   "id": "caption-group-62",
+   "frame": 16,
+   "start": 152.173,
+   "end": 154.71,
+   "text": "כפתור העזרה פותח מדריך כתוב,",
+   "words": [
+    {
+     "id": "caption-word-62-0",
+     "text": "כפתור",
+     "start": 152.173,
+     "end": 152.645
+    },
+    {
+     "id": "caption-word-62-1",
+     "text": "העזרה",
+     "start": 152.665,
+     "end": 153.136
+    },
+    {
+     "id": "caption-word-62-2",
+     "text": "פותח",
+     "start": 153.156,
+     "end": 153.552
+    },
+    {
+     "id": "caption-word-62-3",
+     "text": "מדריך",
+     "start": 153.572,
+     "end": 154.044
+    },
+    {
+     "id": "caption-word-62-4",
+     "text": "כתוב,",
+     "start": 154.064,
+     "end": 154.46
+    }
+   ]
+  },
+  {
+   "id": "caption-group-63",
+   "frame": 16,
+   "start": 154.811,
+   "end": 157.168,
+   "text": "עוזר חכם שעונה על כל שאלה,",
+   "words": [
+    {
+     "id": "caption-word-63-0",
+     "text": "עוזר",
+     "start": 154.811,
+     "end": 155.238
+    },
+    {
+     "id": "caption-word-63-1",
+     "text": "חכם",
+     "start": 155.258,
+     "end": 155.604
+    },
+    {
+     "id": "caption-word-63-2",
+     "text": "שעונה",
+     "start": 155.624,
+     "end": 156.132
+    },
+    {
+     "id": "caption-word-63-3",
+     "text": "על",
+     "start": 156.152,
+     "end": 156.416
+    },
+    {
+     "id": "caption-word-63-4",
+     "text": "כל",
+     "start": 156.436,
+     "end": 156.701
+    },
+    {
+     "id": "caption-word-63-5",
+     "text": "שאלה,",
+     "start": 156.721,
+     "end": 157.148
+    }
+   ]
+  },
+  {
+   "id": "caption-group-64",
+   "frame": 16,
+   "start": 157.168,
+   "end": 159.064,
+   "text": "ופנייה ישירה לצוות.",
+   "words": [
+    {
+     "id": "caption-word-64-0",
+     "text": "ופנייה",
+     "start": 157.168,
+     "end": 157.757
+    },
+    {
+     "id": "caption-word-64-1",
+     "text": "ישירה",
+     "start": 157.777,
+     "end": 158.286
+    },
+    {
+     "id": "caption-word-64-2",
+     "text": "לצוות.",
+     "start": 158.306,
+     "end": 158.814
+    }
+   ]
+  },
+  {
+   "id": "caption-group-65",
+   "frame": 17,
+   "start": 159.666,
+   "end": 160.447,
+   "text": "באדוק.",
+   "words": [
+    {
+     "id": "caption-word-65-0",
+     "text": "באדוק.",
+     "start": 159.666,
+     "end": 160.197
+    }
+   ]
+  },
+  {
+   "id": "caption-group-66",
+   "frame": 17,
+   "start": 163.981,
+   "end": 165.375,
+   "text": "יוצאים לדרך.",
+   "words": [
+    {
+     "id": "caption-word-66-0",
+     "text": "יוצאים",
+     "start": 163.981,
+     "end": 164.633
+    },
+    {
+     "id": "caption-word-66-1",
+     "text": "לדרך.",
+     "start": 164.653,
+     "end": 165.125
+    }
+   ]
+  }
+ ]
+}

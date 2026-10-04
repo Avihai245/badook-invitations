@@ -13,18 +13,16 @@ export const DEMO_VIDEO = {
   poster: '/video/poster.jpg',
 } as const;
 
-/** The full narrated tour of every feature (video/: `npm run video:tour`), with Hebrew captions. */
+/** The full narrated tour of every feature, its Hebrew captions part of the picture. */
 export const TOUR_VIDEO = {
   mp4: '/video/badook-tour.mp4',
   portrait: '/video/badook-tour-portrait.mp4',
   poster: '/video/tour-poster.jpg',
-  captions: '/video/badook-tour.he.vtt',
   minutes: 2.5,
 } as const;
 
-/** The tour with its controls and captions (inside a dialog). */
+/** The tour with its controls (inside a dialog). */
 function TourPlayer() {
-  const { t } = useUi();
   return (
     <video
       className="mt-3 max-h-[78dvh] w-full rounded-[14px] bg-black"
@@ -41,13 +39,7 @@ function TourPlayer() {
         media="(max-width: 640px) and (orientation: portrait)"
       />
       <source src={TOUR_VIDEO.mp4} type="video/mp4" />
-      <track
-        kind="captions"
-        srcLang="he"
-        label={t.demoVideo.tour.captions}
-        src={TOUR_VIDEO.captions}
-        default
-      />
+      {/* no captions track: the captions are part of the picture (a track would show them twice) */}
     </video>
   );
 }

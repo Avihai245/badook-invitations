@@ -1,0 +1,363 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="10-tasks-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 760px at 92% 4%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    [id="10-tasks-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ── kicker + hairline section rule ── */
+    [id="10-tasks-kicker"] {
+      position: absolute;
+      right: 90px;
+      top: 104px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      text-align: right;
+      white-space: nowrap;
+    }
+    [id="10-tasks-rule"] {
+      position: absolute;
+      left: 90px;
+      top: 168px;
+      width: 900px;
+      height: 1px;
+      background: rgba(28, 25, 23, 0.12);
+      transform-origin: 100% 50%;
+    }
+
+    /* ── empty slots (the stack region before the cards land) ── */
+    [class~="10-tasks-slot"] {
+      position: absolute;
+      left: 90px;
+      width: 900px;
+      height: 420px;
+      box-sizing: border-box;
+      border: 1.5px dashed rgba(28, 25, 23, 0.16);
+      border-radius: 28px;
+    }
+
+    /* ── stacked cards: 900×420 at y 220 / 680 / 1140 (top → down) ── */
+    [class~="10-tasks-card"] {
+      position: absolute;
+      left: 90px;
+      width: 900px;
+      height: 420px;
+      box-sizing: border-box;
+      border-radius: 28px;
+      background: #F3E8DB;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+    }
+
+    /* the real phone screen — window on the card's left; 390 CSS px → 520 px (scale 1.33333), shows 288 CSS px tall */
+    [class~="10-tasks-win"] {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 520px;
+      height: 384px;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-sizing: border-box;
+      background: #fff;
+    }
+    [class~="10-tasks-world"] {
+      position: absolute;
+      inset: 0;
+      transform-origin: 50% 50%;
+    }
+    [class~="10-tasks-scroll"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 520px;
+    }
+    [class~="10-tasks-scroll"] img {
+      position: absolute;
+      left: 0;
+      display: block;
+      width: 520px;
+      max-width: none;
+    }
+    /* phone-tasks 390×1912 CSS → 520×2549.33; crop CSS y 150 (heading) → scrolls to 412 (the list) */
+    [id="10-tasks-img-tasks"] { height: 2549.33px; top: -200px; }
+    /* phone-vendors 390×1830 CSS → 520×2440; crop CSS y 925 (the "quote" column of the status board) */
+    [id="10-tasks-img-vendors"] { height: 2440px; top: -1233.33px; }
+    /* phone-ideas 390×1715 CSS → 520×2286.67; crop CSS y 470 (the pinned note) */
+    [id="10-tasks-img-ideas"] { height: 2286.67px; top: -626.67px; }
+
+    /* ── title column (right side of each card, RTL first) ── */
+    [class~="10-tasks-idx"] {
+      position: absolute;
+      right: 36px;
+      top: 34px;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 64px;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: rgba(28, 25, 23, 0.28);
+      font-variant-numeric: tabular-nums;
+    }
+    [class~="10-tasks-title"] {
+      position: absolute;
+      right: 36px;
+      bottom: 40px;
+      width: 290px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 44px;
+      line-height: 1.2;
+      color: #1C1917;
+      text-align: right;
+    }
+
+    /* ── vendors: spotlight on the quote card "קייטרינג שפע" (CSS [16,960,358,108] → win [21.33,46.67,477.33,144], padded 6) ── */
+    [id="10-tasks-vspot"] {
+      position: absolute;
+      left: 15.33px;
+      top: 40.67px;
+      width: 489.33px;
+      height: 156px;
+      border-radius: 16px;
+      box-shadow: 0 0 0 900px rgba(251, 247, 241, 0.55);
+      pointer-events: none;
+    }
+    /* callout: dot on the card's bottom edge under the price (CSS x≈270), leader down to the pill */
+    [id="10-tasks-dot"] {
+      position: absolute;
+      left: 373px;
+      top: 203.67px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #A0703F;
+      box-shadow: 0 0 0 4px rgba(160, 112, 63, 0.18);
+    }
+    [id="10-tasks-leader"] {
+      position: absolute;
+      left: 377.25px;
+      top: 213.67px;
+      width: 1.5px;
+      height: 38px;
+      background: #A0703F;
+      transform-origin: 50% 0%;
+    }
+    [id="10-tasks-pill-row"] {
+      position: absolute;
+      left: 18px;
+      top: 251.67px;
+      width: 520px;
+      display: flex;
+      justify-content: center;
+    }
+    [id="10-tasks-pill"] {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 30px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 10px 28px -12px rgba(60, 35, 15, 0.35);
+      color: #A0703F;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1;
+      white-space: nowrap;
+      transform-origin: 50% 0%;
+    }
+    [id="10-tasks-pill"] svg { width: 30px; height: 30px; flex: none; }
+
+    /* ── ideas: ring + spotlight on the pinned note (CSS [16,582,358,162] → win [21.33,149.33,477.33,216], padded 6) ── */
+    [id="10-tasks-spot"] {
+      position: absolute;
+      left: 15.33px;
+      top: 143.33px;
+      width: 489.33px;
+      height: 228px;
+      border-radius: 16px;
+      box-shadow: 0 0 0 900px rgba(251, 247, 241, 0.55);
+      pointer-events: none;
+    }
+    [id="10-tasks-ring-glow"] {
+      position: absolute;
+      left: 33.33px;
+      top: 161.33px;
+      width: 489.33px;
+      height: 228px;
+      border-radius: 16px;
+      box-shadow: 0 0 0 8px rgba(160, 112, 63, 0.18);
+      pointer-events: none;
+    }
+    [id="10-tasks-ring"] {
+      position: absolute;
+      left: 33.33px;
+      top: 161.33px;
+      width: 489.33px;
+      height: 228px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [id="10-tasks-ring-path"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+  </style>
+
+  <div id="root" data-composition-id="10-tasks" data-width="1080" data-height="1920" data-duration="7.882">
+
+    <!-- full-bleed cream ground -->
+    <div id="10-tasks-bg" class="clip" data-start="0" data-duration="7.882" data-track-index="0"></div>
+
+    <!-- stacked-card stage -->
+    <div id="10-tasks-stage" class="clip" data-start="0" data-duration="7.882" data-track-index="1">
+
+      <div id="10-tasks-kicker" dir="rtl" lang="he">09 · מתכננים</div>
+      <div id="10-tasks-rule"></div>
+
+      <div class="10-tasks-slot" id="10-tasks-slot1" style="top: 220px;"></div>
+      <div class="10-tasks-slot" id="10-tasks-slot2" style="top: 680px;"></div>
+      <div class="10-tasks-slot" id="10-tasks-slot3" style="top: 1140px;"></div>
+
+      <!-- card 1 (top): tasks timeline -->
+      <div class="10-tasks-card" id="10-tasks-card1" style="top: 220px;">
+        <div class="10-tasks-win">
+          <div class="10-tasks-world" id="10-tasks-world1">
+            <div class="10-tasks-scroll" id="10-tasks-scroll1">
+              <img id="10-tasks-img-tasks" src="assets/phone-tasks.png" alt="" />
+            </div>
+          </div>
+        </div>
+        <div class="10-tasks-idx" id="10-tasks-idx1">01</div>
+        <div class="10-tasks-title" id="10-tasks-title1" dir="rtl" lang="he">משימות לפי לוח זמנים</div>
+      </div>
+
+      <!-- card 2 (middle): vendors board with quotes — focal cutout -->
+      <div class="10-tasks-card" id="10-tasks-card2" style="top: 680px;">
+        <div class="10-tasks-win">
+          <div class="10-tasks-world" id="10-tasks-world2">
+            <div class="10-tasks-scroll">
+              <img id="10-tasks-img-vendors" src="assets/phone-vendors.png" alt="" />
+            </div>
+          </div>
+          <div id="10-tasks-vspot"></div>
+        </div>
+        <div id="10-tasks-dot"></div>
+        <div id="10-tasks-leader"></div>
+        <div id="10-tasks-pill-row">
+          <div id="10-tasks-pill" dir="rtl" lang="he">
+            <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M15.5 4.5 H 23.5 V 12.5 L 13 23 a 2 2 0 0 1 -2.8 0 L 5 17.8 a 2 2 0 0 1 0 -2.8 Z" fill="none" stroke="#A0703F" stroke-width="2.2" stroke-linejoin="round" /><circle cx="19.4" cy="8.6" r="1.7" fill="#A0703F" /></svg>
+            <span>₪24,500 · הצעת מחיר</span>
+          </div>
+        </div>
+        <div class="10-tasks-idx" id="10-tasks-idx2">02</div>
+        <div class="10-tasks-title" id="10-tasks-title2" dir="rtl" lang="he">ספקים והצעות מחיר</div>
+      </div>
+
+      <!-- card 3 (bottom): ideas board -->
+      <div class="10-tasks-card" id="10-tasks-card3" style="top: 1140px;">
+        <div class="10-tasks-win">
+          <div class="10-tasks-world" id="10-tasks-world3">
+            <div class="10-tasks-scroll">
+              <img id="10-tasks-img-ideas" src="assets/phone-ideas.png" alt="" />
+            </div>
+          </div>
+          <div id="10-tasks-spot"></div>
+        </div>
+        <div id="10-tasks-ring-glow"></div>
+        <svg id="10-tasks-ring" viewBox="0 0 489.33 228" aria-hidden="true"><path id="10-tasks-ring-path" pathLength="1" d="M471.33 2 H 18 A 16 16 0 0 0 2 18 V 210 A 16 16 0 0 0 18 226 H 471.33 A 16 16 0 0 0 487.33 210 V 18 A 16 16 0 0 0 471.33 2 Z" /></svg>
+        <div class="10-tasks-idx" id="10-tasks-idx3">03</div>
+        <div class="10-tasks-title" id="10-tasks-title3" dir="rtl" lang="he">לוח רעיונות</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="10-tasks"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="10-tasks-' + name + '"]') || document.getElementById("10-tasks-" + name);
+      }
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–1.7s): kicker reveal; the empty stage (rule + three stacked slots) ──
+      tl.fromTo(el("kicker"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 0.1);
+      tl.fromTo(el("rule"), { scaleX: 0 }, { scaleX: 1, duration: 1.0, ease: "power3.inOut" }, 0.3);
+      tl.fromTo(el("slot1"), { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 0.5);
+      tl.fromTo(el("slot2"), { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 0.62);
+      tl.fromTo(el("slot3"), { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 0.74);
+
+      // card assemble — fade + short rise + slight scale straight into its slot (grid-card-assemble, short-path form)
+      function assemble(n, at) {
+        tl.fromTo(el("card" + n), { opacity: 0, y: 70, scale: 0.965 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, at);
+        tl.fromTo(el("world" + n), { scale: 1.08 }, { scale: 1, duration: 1.1, ease: "power3.out" }, at);
+        tl.fromTo(el("idx" + n), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, at + 0.2);
+        tl.fromTo(el("title" + n), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, at + 0.3);
+      }
+
+      // ── Scene 2 (1.7–4.0s): the top card — tasks; the screen scrolls from the page heading down to the task list ──
+      assemble(1, 1.7);
+      tl.fromTo(el("scroll1"), { y: 0 }, { y: -349.33, duration: 1.3, ease: "power3.inOut" }, 2.5);
+
+      // ── Scene 3 (4.0–5.9s): the middle card — vendors; quote pill pops on the quote card ──
+      assemble(2, 4.0);
+      tl.fromTo(el("vspot"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 4.7);
+      tl.fromTo(el("dot"), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "power3.out" }, 4.75);
+      tl.fromTo(el("leader"), { scaleY: 0 }, { scaleY: 1, duration: 0.35, ease: "power2.out" }, 4.85);
+      tl.fromTo(el("pill"), { opacity: 0, scale: 0.7, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 5.02);
+
+      // ── Scene 4 (5.9–7.882s): the bottom card — ideas; ring draws on the pinned note, then hold ──
+      assemble(3, 5.9);
+      tl.fromTo(el("vspot"), { opacity: 1 }, { opacity: 0.4, duration: 0.6, ease: "power2.inOut", immediateRender: false }, 5.9);
+      tl.fromTo(el("spot"), { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 6.55);
+      tl.fromTo(el("ring-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut" }, 6.55);
+      tl.fromTo(el("ring-glow"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 7.2);
+
+      // hold to the last frame
+      tl.set({}, {}, 7.85);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["10-tasks"] = tl;
+    })();
+  </script>
+</template>

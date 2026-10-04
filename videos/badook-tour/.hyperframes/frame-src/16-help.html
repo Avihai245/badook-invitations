@@ -1,0 +1,486 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="16-help-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 1150px 820px at 86% 8%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── window card LEFT: screen-help.png cropped to CSS x 0–760, y 100–900, shown 1:1 at frame (90,60) ── */
+    [id="16-help-winlayer"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="16-help-win"] {
+      position: absolute;
+      left: 90px;
+      top: 60px;
+      width: 760px;
+      height: 800px;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 18px 48px -18px rgba(60, 35, 15, 0.35);
+      transform-origin: 50% 50%;
+    }
+    [id="16-help-shot"] {
+      position: absolute;
+      left: 0;
+      top: -100px;
+      width: 1440px;
+      height: 900px;
+      display: block;
+    }
+    /* spotlight cut-outs (window-local coords = CSS box − crop offset) */
+    [class~="16-help-spot"] {
+      position: absolute;
+      opacity: 0;
+      box-shadow: 0 0 0 1800px rgba(28, 25, 23, 0.36);
+      pointer-events: none;
+    }
+    [id="16-help-win-hair"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.12);
+      pointer-events: none;
+    }
+
+    /* ── highlight rings (frame coords) ── */
+    [id="16-help-rings"] {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    [id="16-help-ringsvg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: visible;
+    }
+    [class~="16-help-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 3;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    [class~="16-help-glow"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-width: 15;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    /* ── text column RIGHT (x 1080–1840) ── */
+    [id="16-help-col"] {
+      position: absolute;
+      left: 1080px;
+      top: 0;
+      width: 760px;
+      height: 896px;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="16-help-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 92px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="16-help-head"] {
+      position: absolute;
+      right: 0;
+      top: 140px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 112px;
+      line-height: 1.06;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [class~="16-help-word"] {
+      display: inline-block;
+    }
+    [class~="16-help-rule"] {
+      position: absolute;
+      right: 0;
+      width: 680px;
+      height: 1px;
+      background: rgba(28, 25, 23, 0.12);
+      transform-origin: 100% 50%;
+    }
+
+    [class~="16-help-row"] {
+      position: absolute;
+      right: 0;
+      width: 680px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 26px;
+      direction: rtl;
+    }
+    [class~="16-help-tile"] {
+      flex: 0 0 76px;
+      width: 76px;
+      height: 76px;
+      border-radius: 16px;
+      background: #F3E8DB;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: 50% 50%;
+    }
+    [class~="16-help-icon"] {
+      display: block;
+      width: 44px;
+      height: 44px;
+      overflow: visible;
+    }
+    [class~="16-help-icon"] path {
+      fill: none;
+      stroke: #7A5230;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    [class~="16-help-text"] {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding-top: 2px;
+    }
+    [class~="16-help-titleline"] {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 18px;
+      direction: rtl;
+    }
+    [class~="16-help-title"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 44px;
+      line-height: 1.2;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [class~="16-help-sub"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 400;
+      font-size: 30px;
+      line-height: 1.3;
+      color: rgba(28, 25, 23, 0.68);
+      white-space: nowrap;
+    }
+
+    /* feature chip "AI" */
+    [id="16-help-chip"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      direction: ltr;
+      padding: 7px 20px 8px 16px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      line-height: 1.0;
+      letter-spacing: 0.04em;
+      transform-origin: 50% 50%;
+    }
+    [id="16-help-chip-star"] {
+      display: block;
+      width: 20px;
+      height: 20px;
+    }
+
+    /* rebuilt mini chat inside row 2 */
+    [id="16-help-chat"] {
+      position: relative;
+      width: 578px;
+      height: 124px;
+      margin-top: 12px;
+    }
+    [class~="16-help-bubble"] {
+      position: absolute;
+      font-family: "Heebo", sans-serif;
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 1.3;
+      white-space: nowrap;
+      padding: 9px 22px 10px;
+      direction: rtl;
+    }
+    [id="16-help-guest"] {
+      right: 0;
+      top: 0;
+      background: #F3E8DB;
+      color: #1C1917;
+      border-radius: 22px 22px 6px 22px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.08);
+      transform-origin: 100% 100%;
+    }
+    [id="16-help-dots"] {
+      left: 0;
+      top: 66px;
+      height: 56px;
+      box-sizing: border-box;
+      padding: 0 22px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 9px;
+      background: #FFFDF9;
+      border-radius: 22px 22px 22px 6px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.14);
+      transform-origin: 0% 100%;
+    }
+    [class~="16-help-dot"] {
+      width: 11px;
+      height: 11px;
+      border-radius: 9999px;
+      background: rgba(122, 82, 48, 0.55);
+    }
+    [id="16-help-bot"] {
+      left: 0;
+      top: 66px;
+      background: #FFFDF9;
+      color: #1C1917;
+      border-radius: 22px 22px 22px 6px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.14);
+      transform-origin: 0% 100%;
+    }
+    [id="16-help-bot-text"] {
+      display: inline-block;
+      clip-path: inset(0% 0% 0% 100%);
+    }
+  </style>
+
+  <div id="root" data-composition-id="16-help" data-width="1920" data-height="1080" data-duration="9.199">
+
+    <!-- full-bleed cream ground -->
+    <div id="16-help-bg" class="clip" data-start="0" data-duration="9.199" data-track-index="0"></div>
+
+    <!-- the real help panel: window card LEFT -->
+    <div id="16-help-winlayer" class="clip" data-start="0" data-duration="9.199" data-track-index="1">
+      <div id="16-help-win">
+        <img id="16-help-shot" src="assets/screen-help.png" alt="" />
+        <!-- panel [24,156,440,720] → local (24,56) padded 8 -->
+        <div class="16-help-spot" id="16-help-spot-panel" style="left: 16px; top: 48px; width: 456px; height: 736px; border-radius: 26px;"></div>
+        <!-- article list CSS [41,452,406,414] → local (41,352) padded 6 -->
+        <div class="16-help-spot" id="16-help-spot-list" style="left: 35px; top: 346px; width: 418px; height: 426px; border-radius: 16px;"></div>
+        <div id="16-help-win-hair"></div>
+      </div>
+    </div>
+
+    <!-- highlight rings, computed from the measured boxes: X = 90 + x, Y = 60 + (y − 100) -->
+    <div id="16-help-rings" class="clip" data-start="0" data-duration="9.199" data-track-index="2">
+      <svg id="16-help-ringsvg" viewBox="0 0 1920 1080" aria-hidden="true">
+        <!-- panel → frame (114,116,440,720), ring padded 8: x106 y108 w456 h736 r26 -->
+        <path class="16-help-glow" id="16-help-glow-panel" pathLength="1" d="M536 108 H132 A26 26 0 0 0 106 134 V818 A26 26 0 0 0 132 844 H536 A26 26 0 0 0 562 818 V134 A26 26 0 0 0 536 108 Z" />
+        <path class="16-help-ring" id="16-help-ring-panel" pathLength="1" d="M536 108 H132 A26 26 0 0 0 106 134 V818 A26 26 0 0 0 132 844 H536 A26 26 0 0 0 562 818 V134 A26 26 0 0 0 536 108 Z" />
+        <!-- article list → frame (131,412,406,414), ring padded 6: x125 y406 w418 h426 r16 -->
+        <path class="16-help-glow" id="16-help-glow-list" pathLength="1" d="M527 406 H141 A16 16 0 0 0 125 422 V816 A16 16 0 0 0 141 832 H527 A16 16 0 0 0 543 816 V422 A16 16 0 0 0 527 406 Z" />
+        <path class="16-help-ring" id="16-help-ring-list" pathLength="1" d="M527 406 H141 A16 16 0 0 0 125 422 V816 A16 16 0 0 0 141 832 H527 A16 16 0 0 0 543 816 V422 A16 16 0 0 0 527 406 Z" />
+      </svg>
+    </div>
+
+    <!-- text column RIGHT: kicker, headline, three accumulating benefit rows -->
+    <div id="16-help-col" class="clip" data-start="0" data-duration="9.199" data-track-index="3" dir="rtl" lang="he">
+      <div id="16-help-kicker" dir="rtl" lang="he">15 · עזרה</div>
+      <h1 id="16-help-head" dir="rtl" lang="he"><span class="16-help-word" id="16-help-w1">תמיד</span> <span class="16-help-word" id="16-help-w2">יש</span> <span class="16-help-word" id="16-help-w3">עזרה</span></h1>
+
+      <div class="16-help-rule" id="16-help-rule1" style="top: 306px;"></div>
+
+      <!-- row 1 — guide -->
+      <div class="16-help-row" id="16-help-row1" style="top: 336px;" dir="rtl" lang="he">
+        <div class="16-help-tile" id="16-help-tile1">
+          <svg class="16-help-icon" viewBox="0 0 40 40" aria-hidden="true">
+            <path id="16-help-i1a" pathLength="1" d="M20 11 C 16 8, 10 8, 5 9 V 31 C 10 30, 16 30, 20 33 C 24 30, 30 30, 35 31 V 9 C 30 8, 24 8, 20 11 Z" />
+            <path id="16-help-i1b" pathLength="1" d="M20 11 V 33" />
+            <path id="16-help-i1c" pathLength="1" d="M24 16 H 31 M 24 21 H 31 M 9 16 H 16 M 9 21 H 16" />
+          </svg>
+        </div>
+        <div class="16-help-text">
+          <div class="16-help-title" id="16-help-t1">מדריך כתוב</div>
+          <div class="16-help-sub" id="16-help-s1">הסבר לכל מסך במערכת</div>
+        </div>
+      </div>
+
+      <div class="16-help-rule" id="16-help-rule2" style="top: 456px;"></div>
+
+      <!-- row 2 — smart assistant + rebuilt mini chat -->
+      <div class="16-help-row" id="16-help-row2" style="top: 476px;" dir="rtl" lang="he">
+        <div class="16-help-tile" id="16-help-tile2">
+          <svg class="16-help-icon" viewBox="0 0 40 40" aria-hidden="true">
+            <path id="16-help-i2a" pathLength="1" d="M18 7 C 19 15, 22 18, 30 20 C 22 22, 19 25, 18 33 C 17 25, 14 22, 6 20 C 14 18, 17 15, 18 7 Z" />
+            <path id="16-help-i2b" pathLength="1" d="M31 5 V 13 M 27 9 H 35" />
+          </svg>
+        </div>
+        <div class="16-help-text">
+          <div class="16-help-titleline">
+            <div class="16-help-title" id="16-help-t2">עוזר חכם</div>
+            <div id="16-help-chip">
+              <svg id="16-help-chip-star" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1 C 10.6 6.5, 13.5 9.4, 19 10 C 13.5 10.6, 10.6 13.5, 10 19 C 9.4 13.5, 6.5 10.6, 1 10 C 6.5 9.4, 9.4 6.5, 10 1 Z" fill="#FBF7F1" /></svg>
+              <span>AI</span>
+            </div>
+          </div>
+          <div id="16-help-chat">
+            <div class="16-help-bubble" id="16-help-guest" dir="rtl" lang="he">איך שולחים בוואטסאפ?</div>
+            <div class="16-help-bubble" id="16-help-dots" aria-hidden="true">
+              <div class="16-help-dot" id="16-help-d1"></div>
+              <div class="16-help-dot" id="16-help-d2"></div>
+              <div class="16-help-dot" id="16-help-d3"></div>
+            </div>
+            <div class="16-help-bubble" id="16-help-bot" dir="rtl" lang="he"><span id="16-help-bot-text">מהמסך מוזמנים, בלחיצה על…</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="16-help-rule" id="16-help-rule3" style="top: 690px;"></div>
+
+      <!-- row 3 — direct line to the team -->
+      <div class="16-help-row" id="16-help-row3" style="top: 710px;" dir="rtl" lang="he">
+        <div class="16-help-tile" id="16-help-tile3">
+          <svg class="16-help-icon" viewBox="0 0 40 40" aria-hidden="true">
+            <path id="16-help-i3a" pathLength="1" d="M26 14 A 6 6 0 1 1 14 14 A 6 6 0 1 1 26 14 Z" />
+            <path id="16-help-i3b" pathLength="1" d="M8 34 C 8 26, 14 23, 20 23 C 26 23, 32 26, 32 34" />
+          </svg>
+        </div>
+        <div class="16-help-text">
+          <div class="16-help-title" id="16-help-t3">פנייה ישירה לצוות</div>
+          <div class="16-help-sub" id="16-help-s3">תשובה מאדם אמיתי</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="16-help"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="16-help-' + name + '"]') || document.getElementById("16-help-" + name);
+      }
+      function later(vars) {
+        vars.immediateRender = false;
+        return vars;
+      }
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–1.5s): window enters with the open panel; kicker + headline ──
+      tl.fromTo(el("win"), { opacity: 0, y: 40, scale: 0.965 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.15);
+      tl.fromTo(el("w1"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.35);
+      tl.fromTo(el("w2"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.5);
+      tl.fromTo(el("w3"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.65);
+      tl.fromTo(el("rule1"), { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 0.95);
+
+      // ── Scene 2 (1.5–2.9s): "כפתור העזרה פותח" — ring draws around the panel, page dims ──
+      tl.fromTo(el("spot-panel"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 1.5);
+      tl.fromTo(el("glow-panel"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.75, ease: "power2.inOut" }, 1.5);
+      tl.fromTo(el("ring-panel"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.75, ease: "power2.inOut" }, 1.5);
+
+      // ── Scene 3 (2.9–4.2s): row 1 "מדריך כתוב"; ring moves onto the article list ──
+      tl.fromTo(el("ring-panel"), { opacity: 1 }, later({ opacity: 0, duration: 0.35, ease: "power2.out" }), 2.9);
+      tl.fromTo(el("glow-panel"), { opacity: 1 }, later({ opacity: 0, duration: 0.35, ease: "power2.out" }), 2.9);
+      tl.fromTo(el("spot-panel"), { opacity: 1 }, later({ opacity: 0, duration: 0.45, ease: "power2.inOut" }), 2.9);
+      tl.fromTo(el("spot-list"), { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.inOut" }, 2.9);
+      tl.fromTo(el("glow-list"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 2.95);
+      tl.fromTo(el("ring-list"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 2.95);
+
+      function revealRow(n, at, icons) {
+        tl.fromTo(el("tile" + n), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.55, ease: "power3.out" }, at);
+        icons.forEach(function (id, i) {
+          tl.fromTo(el(id), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, at + 0.12 + i * 0.1);
+        });
+        tl.fromTo(el("t" + n), { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, at + 0.08);
+      }
+
+      revealRow(1, 2.9, ["i1a", "i1b", "i1c"]);
+      tl.fromTo(el("s1"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 3.05);
+
+      // ── Scene 4 (4.2–6.5s): row 2 "עוזר חכם" + AI chip; the mini chat builds 4.6–6.2s ──
+      tl.fromTo(el("ring-list"), { opacity: 1 }, later({ opacity: 0, duration: 0.4, ease: "power2.out" }), 4.2);
+      tl.fromTo(el("glow-list"), { opacity: 1 }, later({ opacity: 0, duration: 0.4, ease: "power2.out" }), 4.2);
+      tl.fromTo(el("spot-list"), { opacity: 1 }, later({ opacity: 0, duration: 0.5, ease: "power2.inOut" }), 4.2);
+
+      tl.fromTo(el("rule2"), { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, 4.2);
+      revealRow(2, 4.2, ["i2a", "i2b"]);
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 4.4);
+
+      // guest asks
+      tl.fromTo(el("guest"), { opacity: 0, scale: 0.85, y: 12 }, { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "power3.out" }, 4.6);
+      // assistant typing dots
+      tl.fromTo(el("dots"), { opacity: 0, scale: 0.85, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: "power3.out" }, 5.0);
+      [0, 1].forEach(function (k) {
+        ["d1", "d2", "d3"].forEach(function (d, i) {
+          var at = 5.1 + k * 0.24 + i * 0.07;
+          tl.fromTo(el(d), { y: 0 }, later({ y: -6, duration: 0.1, ease: "power1.out" }), at);
+          tl.fromTo(el(d), { y: -6 }, later({ y: 0, duration: 0.1, ease: "power1.in" }), at + 0.1);
+        });
+      });
+      // dots resolve into the answer (whole-state swap, then a right→left type-on wipe)
+      tl.fromTo(el("dots"), { opacity: 1 }, later({ opacity: 0, duration: 0.15, ease: "power1.out" }), 5.6);
+      tl.fromTo(el("bot"), { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 5.6);
+      tl.fromTo(el("bot-text"), { clipPath: "inset(0% 0% 0% 100%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.55, ease: "power1.inOut" }, 5.65);
+
+      // ── Scene 5 (6.5–8.599s): row 3 "פנייה ישירה לצוות"; hold ──
+      tl.fromTo(el("rule3"), { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, 6.5);
+      revealRow(3, 6.5, ["i3a", "i3b"]);
+      tl.fromTo(el("s3"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 6.65);
+
+      // hold to the last frame
+      tl.set({}, {}, 8.55);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["16-help"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,618 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="09-rsvp-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 1150px 820px at 86% 8%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── stage: window card (LEFT) + unclipped annotation layer ──
+       crop CSS x 48–1176, y 60–860 → displayed 1150 px wide; k = 1150/1128 = 1.0195035
+       screen X = 80 + (x − 48)·k ; screen Y = 60 + (y − 60)·k                         */
+    [id="09-rsvp-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="09-rsvp-window"] {
+      position: absolute;
+      left: 80px;
+      top: 60px;
+      width: 1150px;
+      height: 815.6px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-sizing: border-box;
+      border-radius: 18px;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 18px 48px -18px rgba(60, 35, 15, 0.35);
+    }
+    /* world = the page in CSS px (1440×2076), scaled by k, offset by the crop origin */
+    [id="09-rsvp-world"] {
+      position: absolute;
+      left: -48.936px;
+      top: -61.170px;
+      width: 1440px;
+      height: 2076px;
+      transform-origin: 0 0;
+      transform: scale(1.0195035);
+    }
+    [id="09-rsvp-shot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1440px;
+      height: 2076px;
+      display: block;
+    }
+    [id="09-rsvp-nums"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1440px;
+      height: 2076px;
+      overflow: visible;
+    }
+    [class~="09-rsvp-num"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      fill: #1C1917;
+      font-variant-numeric: tabular-nums;
+    }
+    /* spotlight cut-out: the box stays clear, the rest of the page recedes */
+    [id="09-rsvp-spot"] {
+      position: absolute;
+      left: 944px;
+      top: 150px;
+      width: 213px;
+      height: 167px;
+      border-radius: 14px;
+      box-shadow: 0 0 0 2600px rgba(251, 247, 241, 0.55);
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* pixel-exact copy of the real "assign" button so it can depress on click */
+    [id="09-rsvp-btn-plate"] {
+      position: absolute;
+      left: 86px;
+      top: 342px;
+      width: 172px;
+      height: 42px;
+      background: #fff;
+    }
+    [id="09-rsvp-btn"] {
+      position: absolute;
+      left: 89px;
+      top: 345px;
+      width: 166px;
+      height: 36px;
+      overflow: hidden;
+      border-radius: 9px;
+      transform-origin: 50% 50%;
+    }
+    [id="09-rsvp-btn-img"] {
+      position: absolute;
+      left: -89px;
+      top: -345px;
+      width: 1440px;
+      height: 2076px;
+      display: block;
+    }
+
+    /* annotation layer: same page-CSS coordinate space, NOT clipped by the window */
+    [id="09-rsvp-annot"] {
+      position: absolute;
+      left: 31.064px;
+      top: -1.170px;
+      width: 1440px;
+      height: 2076px;
+      transform-origin: 0 0;
+      transform: scale(1.0195035);
+      pointer-events: none;
+    }
+    [id="09-rsvp-rings"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1440px;
+      height: 2076px;
+      overflow: visible;
+    }
+    [class~="09-rsvp-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 3;
+      stroke-linecap: butt;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    [class~="09-rsvp-halo"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-width: 12;
+      opacity: 0;
+    }
+    [class~="09-rsvp-leader"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 1.5;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    [class~="09-rsvp-pill"] {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      direction: rtl;
+      padding: 13px 26px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      border-radius: 9999px;
+      color: #A0703F;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      line-height: 1.1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 10px 24px -14px rgba(60, 35, 15, 0.35);
+    }
+    [class~="09-rsvp-pill"] svg {
+      width: 30px;
+      height: 30px;
+      flex: none;
+    }
+    [id="09-rsvp-pill-ppl"] {
+      right: 494px; /* right edge at page x 946 */
+      top: 82px;
+      transform-origin: 100% 100%;
+    }
+    [id="09-rsvp-pill-gen"] {
+      right: 300px; /* right edge at page x 1140 */
+      top: 428px;
+      transform-origin: 85% 0%;
+    }
+
+    [id="09-rsvp-toast"] {
+      position: absolute;
+      left: 60px;
+      top: 252px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      direction: rtl;
+      padding: 13px 28px 13px 26px;
+      background: #7A5230;
+      border-radius: 9999px;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      line-height: 1.1;
+      white-space: nowrap;
+      transform-origin: 50% 100%;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 14px 30px -14px rgba(60, 35, 15, 0.55);
+    }
+    [id="09-rsvp-toast-check"] {
+      width: 34px;
+      height: 34px;
+      flex: none;
+    }
+    [id="09-rsvp-check-path"] {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    /* cursor click (tip of the arrow = element origin, parked on the assign centre) */
+    [id="09-rsvp-cursor"] {
+      position: absolute;
+      left: 172px;
+      top: 363px;
+      width: 38px;
+      height: 46px;
+      transform-origin: 0 0;
+      z-index: 5;
+    }
+    [id="09-rsvp-cursor"] svg {
+      display: block;
+      width: 38px;
+      height: 46px;
+      overflow: visible;
+    }
+    [class~="09-rsvp-ripple"] {
+      position: absolute;
+      left: 142px; /* centre 172,363 − 30 */
+      top: 333px;
+      width: 60px;
+      height: 60px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      border: 2px solid #A0703F;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    /* ── text column (RTL, right side x 1290–1840) ── */
+    [id="09-rsvp-col"] {
+      position: absolute;
+      left: 1290px;
+      top: 0;
+      width: 550px;
+      height: 896px;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="09-rsvp-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 104px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="09-rsvp-headrow"] {
+      position: absolute;
+      right: 0;
+      top: 158px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 26px;
+      direction: rtl;
+    }
+    [id="09-rsvp-head"] {
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 116px;
+      line-height: 1.06;
+      letter-spacing: -0.018em;
+      white-space: nowrap;
+      color: #1C1917;
+    }
+    [class~="09-rsvp-word"] {
+      display: inline-block;
+    }
+    [id="09-rsvp-chip"] {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      height: 66px;
+      padding: 0 24px;
+      margin-top: 14px;
+      border-radius: 9999px;
+      background: #A0703F;
+      transform-origin: 100% 50%;
+      flex: none;
+    }
+    [id="09-rsvp-chip"] svg {
+      width: 22px;
+      height: 34px;
+      display: block;
+      flex: none;
+    }
+    [id="09-rsvp-dot-wrap"] {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      flex: none;
+    }
+    [id="09-rsvp-dot"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: #FBF7F1;
+    }
+    [id="09-rsvp-dot-pulse"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid #FBF7F1;
+      box-sizing: border-box;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    [id="09-rsvp-grid-rule"] {
+      position: absolute;
+      right: 0;
+      top: 340px;
+      width: 550px;
+      height: 1px;
+      background: rgba(28, 25, 23, 0.12);
+      transform-origin: 100% 50%;
+    }
+    [id="09-rsvp-grid"] {
+      position: absolute;
+      right: 0;
+      top: 362px;
+      width: 550px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 30px;
+      row-gap: 34px;
+      direction: rtl;
+    }
+    [class~="09-rsvp-cell"] {
+      position: relative;
+      height: 200px;
+      text-align: right;
+    }
+    [class~="09-rsvp-big"] {
+      display: block;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 132px;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: #1C1917;
+      direction: ltr;
+      text-align: right;
+      height: 140px;
+    }
+    [class~="09-rsvp-lab"] {
+      display: block;
+      margin-top: 10px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 36px;
+      line-height: 1.2;
+      color: rgba(28, 25, 23, 0.72);
+      white-space: nowrap;
+    }
+    [class~="09-rsvp-tick"] {
+      position: absolute;
+      right: 0;
+      top: -18px;
+      width: 56px;
+      height: 3px;
+      border-radius: 2px;
+      background: #A0703F;
+      transform-origin: 100% 50%;
+    }
+  </style>
+
+  <div id="root" data-composition-id="09-rsvp" data-width="1920" data-height="1080" data-duration="12.476">
+    <!-- ground -->
+    <div id="09-rsvp-bg" class="clip" data-start="0" data-duration="12.476" data-track-index="0"></div>
+
+    <!-- window + overlays -->
+    <div id="09-rsvp-stage" class="clip" data-start="0" data-duration="12.476" data-track-index="1">
+      <div id="09-rsvp-window">
+        <div id="09-rsvp-world">
+          <img id="09-rsvp-shot" src="assets/screen-responses.png" alt="" />
+          <!-- count-up overlays: white plates cover the printed numbers; numbers re-set at the card's exact baseline/right edge -->
+          <svg id="09-rsvp-nums" viewBox="0 0 1440 2076" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1040" y="211" width="102" height="38" fill="#fff" />
+            <rect x="820" y="211" width="102" height="38" fill="#fff" />
+            <rect x="600" y="211" width="103" height="38" fill="#fff" />
+            <rect x="380" y="211" width="104" height="38" fill="#fff" />
+            <text id="09-rsvp-n-yes" class="09-rsvp-num" x="1132.5" y="240.5" text-anchor="end">0</text>
+            <text id="09-rsvp-n-total" class="09-rsvp-num" x="913" y="240.5" text-anchor="end">0</text>
+            <text id="09-rsvp-n-no" class="09-rsvp-num" x="693.5" y="240.5" text-anchor="end">0</text>
+            <text id="09-rsvp-n-pend" class="09-rsvp-num" x="475" y="240.5" text-anchor="end">0</text>
+          </svg>
+          <div id="09-rsvp-btn-plate"></div>
+          <div id="09-rsvp-btn"><img id="09-rsvp-btn-img" src="assets/screen-responses.png" alt="" /></div>
+          <div id="09-rsvp-spot"></div>
+        </div>
+      </div>
+
+      <div id="09-rsvp-annot">
+        <svg id="09-rsvp-rings" viewBox="0 0 1440 2076" xmlns="http://www.w3.org/2000/svg">
+          <path id="09-rsvp-halo-yes" class="09-rsvp-halo" />
+          <path id="09-rsvp-ring-yes" class="09-rsvp-ring" pathLength="1" />
+          <path id="09-rsvp-halo-no" class="09-rsvp-halo" />
+          <path id="09-rsvp-ring-no" class="09-rsvp-ring" pathLength="1" />
+          <path id="09-rsvp-halo-pend" class="09-rsvp-halo" />
+          <path id="09-rsvp-ring-pend" class="09-rsvp-ring" pathLength="1" />
+          <path id="09-rsvp-halo-gen" class="09-rsvp-halo" />
+          <path id="09-rsvp-ring-gen" class="09-rsvp-ring" pathLength="1" />
+          <!-- leaders: pill → ring -->
+          <path id="09-rsvp-lead-ppl" class="09-rsvp-leader" pathLength="1" d="M 946 122 L 962 122 Q 972 122 972 132 L 972 150" />
+          <path id="09-rsvp-lead-gen" class="09-rsvp-leader" pathLength="1" d="M 1100 403 L 1100 428" />
+        </svg>
+
+        <div id="09-rsvp-pill-ppl" class="09-rsvp-pill" dir="rtl" lang="he">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#A0703F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2" /><circle cx="17" cy="9" r="2.8" /><path d="M16.5 14c2.9.2 5 2.4 5 5.4" /></svg>
+          <span>54 אנשים</span>
+        </div>
+
+        <div id="09-rsvp-pill-gen" class="09-rsvp-pill" dir="rtl" lang="he">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#A0703F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4l-1.1 1.1" /><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.1-1.1" /></svg>
+          <span>מהקישור הכללי</span>
+        </div>
+
+        <div id="09-rsvp-toast" dir="rtl" lang="he">
+          <svg id="09-rsvp-toast-check" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.5" fill="#FBF7F1" /><path id="09-rsvp-check-path" d="M10 17.5 L15 22.5 L24.5 12" stroke="#7A5230" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" pathLength="1" /></svg>
+          <span>שויך למוזמן</span>
+        </div>
+
+        <div id="09-rsvp-ripple-1" class="09-rsvp-ripple"></div>
+        <div id="09-rsvp-ripple-2" class="09-rsvp-ripple"></div>
+
+        <div id="09-rsvp-cursor">
+          <svg viewBox="0 0 19 23" xmlns="http://www.w3.org/2000/svg"><path d="M0.5 0.5 L0.5 18.2 L5.1 14.1 L8.1 21.2 L11.2 19.9 L8.3 12.9 L14.4 12.6 Z" fill="#FFFFFF" stroke="#1C1917" stroke-width="1.3" stroke-linejoin="round" /></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- text column -->
+    <div id="09-rsvp-col" class="clip" data-start="0" data-duration="12.476" data-track-index="2" dir="rtl" lang="he">
+      <div id="09-rsvp-kicker">08 · אישורי הגעה</div>
+      <div id="09-rsvp-headrow">
+        <h1 id="09-rsvp-head"><span id="09-rsvp-w1" class="09-rsvp-word">בזמן</span> <span id="09-rsvp-w2" class="09-rsvp-word">אמת</span></h1>
+        <div id="09-rsvp-chip">
+          <svg viewBox="0 0 11 17" fill="none" stroke="#FBF7F1" stroke-width="1.8" stroke-linecap="round"><path d="M4 2.5 Q 1 8.5 4 14.5" /><path d="M8.5 5 Q 7 8.5 8.5 12" /></svg>
+          <div id="09-rsvp-dot-wrap"><div id="09-rsvp-dot-pulse"></div><div id="09-rsvp-dot"></div></div>
+          <svg viewBox="0 0 11 17" fill="none" stroke="#FBF7F1" stroke-width="1.8" stroke-linecap="round"><path d="M7 2.5 Q 10 8.5 7 14.5" /><path d="M2.5 5 Q 4 8.5 2.5 12" /></svg>
+        </div>
+      </div>
+
+      <div id="09-rsvp-grid-rule"></div>
+      <div id="09-rsvp-grid">
+        <div id="09-rsvp-c1" class="09-rsvp-cell"><div id="09-rsvp-t1" class="09-rsvp-tick"></div><span id="09-rsvp-b1" class="09-rsvp-big">0</span><span class="09-rsvp-lab">מגיעים</span></div>
+        <div id="09-rsvp-c2" class="09-rsvp-cell"><div id="09-rsvp-t2" class="09-rsvp-tick"></div><span id="09-rsvp-b2" class="09-rsvp-big">0</span><span class="09-rsvp-lab">אנשים</span></div>
+        <div id="09-rsvp-c3" class="09-rsvp-cell"><div id="09-rsvp-t3" class="09-rsvp-tick"></div><span id="09-rsvp-b3" class="09-rsvp-big">0</span><span class="09-rsvp-lab">לא מגיעים</span></div>
+        <div id="09-rsvp-c4" class="09-rsvp-cell"><div id="09-rsvp-t4" class="09-rsvp-tick"></div><span id="09-rsvp-b4" class="09-rsvp-big">0</span><span class="09-rsvp-lab">עוד לא ענו</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="09-rsvp"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="09-rsvp-' + name + '"]') || document.getElementById("09-rsvp-" + name);
+      }
+
+      // rounded-rect ring path (page CSS px), drawn from the top-right corner leftwards (RTL reading)
+      function rr(b, pad, r) {
+        var x = b[0] - pad, y = b[1] - pad, w = b[2] + pad * 2, h = b[3] + pad * 2;
+        return "M " + (x + w - r) + " " + y +
+          " L " + (x + r) + " " + y +
+          " A " + r + " " + r + " 0 0 0 " + x + " " + (y + r) +
+          " L " + x + " " + (y + h - r) +
+          " A " + r + " " + r + " 0 0 0 " + (x + r) + " " + (y + h) +
+          " L " + (x + w - r) + " " + (y + h) +
+          " A " + r + " " + r + " 0 0 0 " + (x + w) + " " + (y + h - r) +
+          " L " + (x + w) + " " + (y + r) +
+          " A " + r + " " + r + " 0 0 0 " + (x + w - r) + " " + y;
+      }
+      // measured boxes (CSS px, page 1440×2076)
+      var BOX = {
+        yes: [949, 155, 203, 157],
+        no: [510, 155, 203, 157],
+        pend: [291, 155, 203, 157],
+        gen: [72, 328, 1080, 70]
+      };
+      ["yes", "no", "pend", "gen"].forEach(function (k) {
+        var d = rr(BOX[k], 5, 14);
+        el("ring-" + k).setAttribute("d", d);
+        el("halo-" + k).setAttribute("d", d);
+      });
+      function spotBox(k) {
+        var b = BOX[k];
+        return { left: b[0] - 5, top: b[1] - 5, width: b[2] + 10, height: b[3] + 10 };
+      }
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–2.0s): window enters; kicker + headline per-word reveal ──
+      tl.fromTo(el("window"), { opacity: 0, y: 46 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.15);
+      tl.fromTo(el("w1"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.4);
+      tl.fromTo(el("w2"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.66);
+
+      // ── Scene 2 (2.0–3.1s): feature chip pops; live dot does ONE finite pulse 2.0–3.1 ──
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 2.0);
+      tl.fromTo(el("dot-pulse"), { opacity: 0.9, scale: 1 }, { opacity: 0, scale: 3, duration: 1.0, ease: "power2.out", immediateRender: false }, 2.1);
+      tl.fromTo(el("dot"), { scale: 1 }, { scale: 1.25, duration: 0.18, ease: "power2.out", immediateRender: false }, 2.1);
+      tl.to(el("dot"), { scale: 1, duration: 0.5, ease: "power2.inOut" }, 2.28);
+      tl.fromTo(el("grid-rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 2.4);
+
+      // ── Scene 3 (3.1–7.5s): rings + count-ups on their words ──
+      function ring(k, at) {
+        tl.fromTo(el("ring-" + k), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, at);
+        tl.fromTo(el("halo-" + k), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, at + 0.4);
+      }
+      function count(target, from, to, at, dur, immediate) {
+        tl.fromTo(target, { textContent: from }, { textContent: to, snap: { textContent: 1 }, duration: dur, ease: "power3.out", immediateRender: immediate }, at);
+      }
+      function cell(n, at) {
+        tl.fromTo(el("c" + n), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, at);
+        tl.fromTo(el("t" + n), { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power3.out" }, at + 0.1);
+      }
+
+      // 3.1s — r-yes: spotlight + ring, card number counts 0→24 (responses card ticks with it)
+      tl.fromTo(el("spot"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 3.1);
+      ring("yes", 3.1);
+      count(el("n-yes"), 0, 24, 3.1, 1.3, true);
+      count(el("n-total"), 0, 24, 3.1, 1.3, true);
+      cell(1, 3.1);
+      count(el("b1"), 0, 24, 3.1, 1.3, true);
+
+      // 4.0s — pill "54 אנשים" on the same card
+      tl.fromTo(el("lead-ppl"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" }, 4.0);
+      tl.fromTo(el("pill-ppl"), { opacity: 0, scale: 0.82, y: 8 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 4.05);
+      cell(2, 4.0);
+      count(el("b2"), 0, 54, 4.0, 1.3, true);
+
+      // 5.0s — r-no 0→3 (responses card 24→27)
+      tl.to(el("spot"), Object.assign({ duration: 0.6, ease: "power3.inOut" }, spotBox("no")), 5.0);
+      tl.to([el("ring-yes"), el("halo-yes"), el("lead-ppl")], { opacity: 0.3, duration: 0.5, ease: "power2.out" }, 5.0);
+      tl.to(el("pill-ppl"), { opacity: 0.45, duration: 0.5, ease: "power2.out" }, 5.0);
+      ring("no", 5.0);
+      count(el("n-no"), 0, 3, 5.05, 0.7, true);
+      count(el("n-total"), 24, 27, 5.05, 0.7, false);
+      cell(3, 5.0);
+      count(el("b3"), 0, 3, 5.05, 0.7, true);
+
+      // 5.9s — r-pending 0→14
+      tl.to(el("spot"), Object.assign({ duration: 0.6, ease: "power3.inOut" }, spotBox("pend")), 5.9);
+      tl.to([el("ring-no"), el("halo-no")], { opacity: 0.3, duration: 0.5, ease: "power2.out" }, 5.9);
+      ring("pend", 5.9);
+      count(el("n-pend"), 0, 14, 5.95, 1.0, true);
+      cell(4, 5.9);
+      count(el("b4"), 0, 14, 5.95, 1.0, true);
+
+      // ── Scene 4 (7.5–12.076s): general-link banner → one click assigns it ──
+      tl.to(el("spot"), Object.assign({ duration: 0.75, ease: "power3.inOut" }, spotBox("gen")), 7.5);
+      tl.to([el("ring-yes"), el("halo-yes"), el("lead-ppl"), el("ring-no"), el("halo-no"), el("ring-pend"), el("halo-pend")], { opacity: 0, duration: 0.5, ease: "power2.out" }, 7.5);
+      tl.to(el("pill-ppl"), { opacity: 0, duration: 0.5, ease: "power2.out" }, 7.5);
+      ring("gen", 7.55);
+      tl.fromTo(el("lead-gen"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.3, ease: "power2.out" }, 8.0);
+      tl.fromTo(el("pill-gen"), { opacity: 0, scale: 0.82, y: -8 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 8.05);
+
+      // 9.6s — cursor-click-ripple: move → click (cursor + button depress together) → ripple
+      tl.fromTo(el("cursor"), { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 9.45);
+      tl.fromTo(el("cursor"), { x: 400, y: 250 }, { x: 0, y: 0, duration: 0.8, ease: "power2.inOut" }, 9.6);
+      tl.to(el("cursor"), { scale: 0.85, duration: 0.08, ease: "power2.in" }, 10.55);
+      tl.to(el("cursor"), { scale: 1, duration: 0.08, ease: "power2.out" }, 10.63);
+      tl.to(el("btn"), { scale: 0.95, duration: 0.08, ease: "power2.in" }, 10.55);
+      tl.to(el("btn"), { scale: 1, duration: 0.08, ease: "power2.out" }, 10.63);
+      tl.fromTo([el("ripple-1"), el("ripple-2")], { scale: 0, opacity: 0.9 }, { scale: 3.6, opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.09, immediateRender: false }, 10.58);
+
+      // 10.8s — brown check toast pops above the banner
+      tl.fromTo(el("toast"), { opacity: 0, scale: 0.7, y: 16 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 10.8);
+      tl.fromTo(el("check-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, 11.0);
+
+      // hold to the last frame
+      tl.set({}, {}, 12.076);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["09-rsvp"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,480 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="14-gallery-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 1150px 820px at 86% 8%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── camera: one .world wrapper, transform written only by applyCamera() ── */
+    [id="14-gallery-stage"] {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    [id="14-gallery-world"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: 0 0;
+    }
+
+    /* ── the hall screen (hero): outer 1180×676 at x 80, y 70; 14px bezel; inner 1152×648 at 94,84 ── */
+    [id="14-gallery-stand"] {
+      position: absolute;
+      left: 230px;
+      top: 724px;
+      width: 880px;
+      height: 70px;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(60, 35, 15, 0.30) 0%, rgba(60, 35, 15, 0.12) 55%, rgba(60, 35, 15, 0) 100%);
+    }
+    [id="14-gallery-screen"] {
+      position: absolute;
+      left: 80px;
+      top: 70px;
+      width: 1180px;
+      height: 676px;
+      box-sizing: border-box;
+      border: 14px solid #1C1917;
+      border-radius: 18px;
+      background: #181615;
+      box-shadow:
+        0 1px 3px rgba(28, 25, 23, 0.08),
+        0 18px 48px -18px rgba(60, 35, 15, 0.35);
+    }
+    [id="14-gallery-screen-inner"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1152px;
+      height: 648px;
+      border-radius: 5px;
+      overflow: hidden;
+      background: #181615;
+      box-shadow: inset 0 0 0 1px rgba(251, 247, 241, 0.06);
+    }
+    [class~="14-gallery-shot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1152px;
+      height: 648px;
+      transform-origin: 50% 50%;
+    }
+    [class~="14-gallery-shot"] > img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1152px;
+      height: 648px;
+      display: block;
+    }
+    /* projected photo rect, measured on screen-projector.png: x 189–1731, y 25–1054 (capture px) × 0.6 → 113.4, 15, 925.2×617.4 */
+    [id="14-gallery-couple"] {
+      position: absolute;
+      left: 113.4px;
+      top: 15px;
+      width: 925.2px;
+      height: 617.4px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    /* cover crop of photo-couple.jpg (1200×1500 → 925.2×1156.5, centred) */
+    [id="14-gallery-couple-img"] {
+      position: absolute;
+      left: 0;
+      top: -269.55px;
+      width: 925.2px;
+      height: 1156.5px;
+      display: block;
+    }
+    /* spotlight: dims the projected photo except around the couple (faces at 471,364 in this box) */
+    [id="14-gallery-dim"] {
+      position: absolute;
+      left: 113.4px;
+      top: 15px;
+      width: 925.2px;
+      height: 617.4px;
+      border-radius: 4px;
+      background: radial-gradient(circle at 471px 364px, rgba(14, 9, 10, 0) 0px, rgba(14, 9, 10, 0) 118px, rgba(14, 9, 10, 0.5) 190px);
+    }
+
+    /* ── face-scan ring, centred on the couple's faces (world 678.5, 463.2) ── */
+    [id="14-gallery-ring"] {
+      position: absolute;
+      left: 548.5px;
+      top: 333.2px;
+      width: 260px;
+      height: 260px;
+      transform-origin: 50% 50%;
+      overflow: visible;
+    }
+    [id="14-gallery-ring"] svg {
+      display: block;
+      width: 260px;
+      height: 260px;
+      overflow: visible;
+    }
+
+    /* leader from the ring down to the feature chip */
+    [id="14-gallery-leader"] {
+      position: absolute;
+      left: 677.5px;
+      top: 572px;
+      width: 2px;
+      height: 214px;
+      background: #A0703F;
+      box-shadow: 0 0 0 1px rgba(251, 247, 241, 0.35);
+      transform-origin: 50% 0%;
+    }
+
+    /* ── phone: device 324×673 at x 1398, y 118; 12px bezel; screen 300×649 at 1410,130 ── */
+    [id="14-gallery-phone"] {
+      position: absolute;
+      left: 1398px;
+      top: 118px;
+      width: 324px;
+      height: 673px;
+    }
+    [id="14-gallery-phone-body"] {
+      position: absolute;
+      inset: 0;
+      box-sizing: border-box;
+      border: 12px solid #1C1917;
+      border-radius: 46px;
+      background: #FBF7F1;
+      overflow: hidden;
+      box-shadow:
+        0 1px 3px rgba(28, 25, 23, 0.08),
+        0 22px 44px -18px rgba(60, 35, 15, 0.42),
+        0 6px 18px rgba(28, 25, 23, 0.06);
+    }
+    [id="14-gallery-phone-screen"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 300px;
+      height: 649px;
+      border-radius: 34px;
+      overflow: hidden;
+    }
+    /* phone-upload.png 1170×4893 shown at 300 wide (×0.2564) */
+    [id="14-gallery-phone-img"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 300px;
+      height: 1254.6px;
+      display: block;
+    }
+    [class~="14-gallery-key"] {
+      position: absolute;
+      width: 4px;
+      background: #2A2522;
+      border-radius: 2px;
+    }
+
+    /* ── photo tiles on the "בחירת תמונות וסרטונים" area (button: world x 1438–1681, y 316–356) ── */
+    [class~="14-gallery-tile"] {
+      position: absolute;
+      top: 260px;
+      width: 64px;
+      height: 64px;
+      box-sizing: border-box;
+      border: 3px solid #FBF7F1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #F3E8DB;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 8px 18px -6px rgba(60, 35, 15, 0.40);
+      transform-origin: 50% 50%;
+    }
+    [class~="14-gallery-tile"] img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* flying tile: outer = flight path (written by applyFly), inner = scale/opacity tweens */
+    [id="14-gallery-fly"] {
+      position: absolute;
+      left: 1528px;
+      top: 260px;
+      width: 64px;
+      height: 64px;
+    }
+    [id="14-gallery-fly-inner"] {
+      position: absolute;
+      inset: 0;
+      box-sizing: border-box;
+      border: 3px solid #FBF7F1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #F3E8DB;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.12), 0 10px 22px -6px rgba(60, 35, 15, 0.45);
+      transform-origin: 50% 50%;
+    }
+    [id="14-gallery-fly-inner"] img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 52%;
+    }
+
+    /* ── callout pill + feature chip, under the screen ── */
+    [id="14-gallery-pill"] {
+      position: absolute;
+      right: 660px; /* right edge at x 1260 (screen right) */
+      top: 784px;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      direction: rtl;
+      padding: 14px 26px;
+      border-radius: 9999px;
+      border: 1px solid #A0703F;
+      background: #FBF7F1;
+      color: #A0703F;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 30px;
+      line-height: 1.1;
+      white-space: nowrap;
+      transform-origin: 100% 50%;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.04);
+    }
+    [id="14-gallery-chip-wrap"] {
+      position: absolute;
+      left: 378.5px;
+      top: 784px;
+      width: 600px;
+      display: flex;
+      justify-content: center;
+    }
+    [id="14-gallery-chip"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      direction: rtl;
+      padding: 14px 28px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 31px;
+      line-height: 1.1;
+      white-space: nowrap;
+      transform-origin: 50% 0%;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 10px 26px -10px rgba(60, 35, 15, 0.45);
+    }
+    [class~="14-gallery-ico"] {
+      display: block;
+      flex: 0 0 auto;
+      overflow: visible;
+    }
+
+    /* ── kicker (chrome, outside the camera) — right edge over the phone's right edge ── */
+    [id="14-gallery-kicker"] {
+      position: absolute;
+      right: 198px;
+      top: 30px;
+      direction: rtl;
+      text-align: right;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+  </style>
+
+  <div id="root" data-composition-id="14-gallery" data-width="1920" data-height="1080" data-duration="8.415">
+
+    <!-- full-bleed cream ground -->
+    <div id="14-gallery-bg" class="clip" data-start="0" data-duration="8.415" data-track-index="0"></div>
+
+    <!-- the one continuous world, carried by a single virtual camera -->
+    <div id="14-gallery-stage" class="clip" data-start="0" data-duration="8.415" data-track-index="1">
+      <div id="14-gallery-world" data-layout-allow-overflow>
+
+        <!-- hall screen -->
+        <div id="14-gallery-stand"></div>
+        <div id="14-gallery-screen">
+          <div id="14-gallery-screen-inner">
+            <div class="14-gallery-shot" id="14-gallery-shot-a">
+              <img src="assets/screen-projector-2.png" alt="" />
+            </div>
+            <div class="14-gallery-shot" id="14-gallery-shot-b">
+              <img src="assets/screen-projector.png" alt="" />
+              <div id="14-gallery-couple"><img id="14-gallery-couple-img" src="assets/photo-couple.jpg" alt="" /></div>
+            </div>
+            <div id="14-gallery-dim"></div>
+          </div>
+        </div>
+
+        <!-- face-scan ring: dashed brown circle + 4 corner ticks -->
+        <div id="14-gallery-ring">
+          <svg viewBox="0 0 260 260" aria-hidden="true">
+            <circle cx="130" cy="130" r="108" fill="none" stroke="rgba(251,247,241,0.45)" stroke-width="7" />
+            <circle cx="130" cy="130" r="108" fill="none" stroke="#A0703F" stroke-width="4" stroke-dasharray="14 9" stroke-linecap="round" />
+            <g fill="none" stroke="#A0703F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 40 V 8 H 40" />
+              <path d="M220 8 H 252 V 40" />
+              <path d="M252 220 V 252 H 220" />
+              <path d="M40 252 H 8 V 220" />
+            </g>
+          </svg>
+        </div>
+        <div id="14-gallery-leader"></div>
+
+        <!-- phone: the guests' upload page -->
+        <div id="14-gallery-phone">
+          <div id="14-gallery-phone-body">
+            <div id="14-gallery-phone-screen">
+              <img id="14-gallery-phone-img" src="assets/phone-upload.png" alt="" />
+            </div>
+          </div>
+          <div class="14-gallery-key" style="left: -4px; top: 150px; height: 50px;"></div>
+          <div class="14-gallery-key" style="left: -4px; top: 214px; height: 84px;"></div>
+          <div class="14-gallery-key" style="left: 324px; top: 180px; height: 106px;"></div>
+        </div>
+
+        <!-- three selected photos pop on the upload button area (RTL: right first) -->
+        <div class="14-gallery-tile" id="14-gallery-tile1" style="left: 1602px;"><img src="assets/photo-chuppah.jpg" alt="" /></div>
+        <div class="14-gallery-tile" id="14-gallery-tile2" style="left: 1528px;"><img src="assets/photo-venue.jpg" alt="" /></div>
+        <div class="14-gallery-tile" id="14-gallery-tile3" style="left: 1454px;"><img src="assets/photo-ballroom.jpg" alt="" /></div>
+
+        <!-- the uploaded photo that travels phone → hall screen -->
+        <div id="14-gallery-fly">
+          <div id="14-gallery-fly-inner"><img src="assets/photo-couple.jpg" alt="" /></div>
+        </div>
+
+        <!-- callout pill + feature chip -->
+        <div id="14-gallery-pill" dir="rtl" lang="he">
+          <svg class="14-gallery-ico" width="30" height="26" viewBox="0 0 30 26" aria-hidden="true"><g fill="none" stroke="#A0703F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="26" height="16" rx="2.5" /><path d="M15 18 V 23 M 9 24 H 21" /></g></svg>
+          <span>מסך באולם</span>
+        </div>
+        <div id="14-gallery-chip-wrap">
+          <div id="14-gallery-chip" dir="rtl" lang="he">
+            <svg class="14-gallery-ico" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke="#FBF7F1" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 V 3 H 10 M 22 3 H 29 V 10 M 29 22 V 29 H 22 M 10 29 H 3 V 22" /><circle cx="16" cy="14" r="5" /><path d="M8.5 25 C 10 20.5, 22 20.5, 23.5 25" /></g></svg>
+            <span>חיפוש לפי פנים · התמונות שלי</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- kicker -->
+    <div id="14-gallery-kicker" class="clip" data-start="0" data-duration="8.415" data-track-index="2" dir="rtl" lang="he">13 · גלריה חיה</div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="14-gallery"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="14-gallery-' + name + '"]') || document.getElementById("14-gallery-" + name);
+      }
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── camera: one state, one writer ──
+      var world = el("world");
+      var cam = { s: 1.08, x: -185, y: -40 };
+      function applyCamera() {
+        world.style.transform = "translate(" + cam.x + "px," + cam.y + "px) scale(" + cam.s + ")";
+      }
+      applyCamera();
+
+      // ── flight path: quadratic arc phone tile (1560,292) → projected photo centre (670,408) ──
+      var fly = el("fly");
+      var path = { p: 0 };
+      var P0 = { x: 1560, y: 292 }, P1 = { x: 1120, y: -60 }, P2 = { x: 670, y: 408 };
+      function applyFly() {
+        var t = path.p, u = 1 - t;
+        var bx = u * u * P0.x + 2 * u * t * P1.x + t * t * P2.x;
+        var by = u * u * P0.y + 2 * u * t * P1.y + t * t * P2.y;
+        fly.style.transform = "translate(" + (bx - P0.x) + "px," + (by - P0.y) + "px)";
+      }
+      applyFly();
+
+      // ── Scene 1 (0.0–1.9s): the phone enters right; three photos pop on "מעלים תמונות" ──
+      // LEG 1 — camera starts close on the phone, slow steady push
+      tl.fromTo(cam, { s: 1.08, x: -185, y: -40 }, { s: 1.09, x: -200.4, y: -44.9, duration: 1.9, ease: "power1.inOut", onUpdate: applyCamera }, 0);
+
+      tl.fromTo(el("phone"), { x: 260, opacity: 0 }, { x: 0, opacity: 1, duration: 0.85, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.2);
+      // the hall screen sits dark ("off") in the room from the start
+      tl.fromTo([el("screen"), el("stand")], { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 0.15);
+
+      [["tile1", 0.9], ["tile2", 1.05], ["tile3", 1.2]].forEach(function (pair) {
+        tl.fromTo(el(pair[0]), { opacity: 0, scale: 0.4, y: 18 }, { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "power3.out" }, pair[1]);
+      });
+
+      // ── Scene 2 (1.9–4.2s): screen fades up; a photo flies phone → screen; crossfade as it lands ──
+      // LEG 2 — camera pulls back to the whole room, carrying the flight
+      tl.fromTo(cam, { s: 1.09, x: -200.4, y: -44.9 }, { s: 1, x: 0, y: 0, duration: 1.0, ease: "power2.inOut", onUpdate: applyCamera, immediateRender: false }, 1.9);
+
+      // "לגלריה חיה" — the screen turns on
+      tl.fromTo(el("shot-a"), { opacity: 0, scale: 1.03 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 1.9);
+
+      // the uploaded photo lifts off the middle tile…
+      tl.fromTo(el("fly-inner"), { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1.12, duration: 0.2, ease: "power3.out" }, 2.2);
+      // …arcs to the hall screen (2.4–3.2s), growing as it travels
+      tl.fromTo(path, { p: 0 }, { p: 1, duration: 0.8, ease: "power2.inOut", onUpdate: applyFly }, 2.4);
+      tl.fromTo(el("fly-inner"), { scale: 1.12 }, { scale: 2.4, duration: 0.8, ease: "power2.inOut", immediateRender: false }, 2.4);
+      // lands: the tile dissolves into the projection as the screen crossfades to the next photo ("על המסך באולם")
+      tl.fromTo(el("fly-inner"), { opacity: 1, scale: 2.4 }, { opacity: 0, scale: 3.4, duration: 0.4, ease: "power2.out", immediateRender: false }, 3.2);
+      tl.fromTo(el("shot-b"), { opacity: 0, scale: 1.02 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" }, 3.2);
+
+      // callout pill "מסך באולם"
+      tl.fromTo(el("pill"), { opacity: 0, scale: 0.6, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.45);
+
+      // ── Scene 3 (4.2–7.915s): face scan finds the couple; the feature chip pops ──
+      // LEG 3 — camera pushes toward the couple on the screen, then a near-still drift
+      tl.fromTo(cam, { s: 1, x: 0, y: 0 }, { s: 1.06, x: -18.7, y: -30.8, duration: 1.0, ease: "power3.out", onUpdate: applyCamera, immediateRender: false }, 4.3);
+      tl.fromTo(cam, { s: 1.06, x: -18.7, y: -30.8 }, { s: 1.075, x: -28.9, y: -37.7, duration: 2.615, ease: "none", onUpdate: applyCamera, immediateRender: false }, 5.3);
+
+      // face-scan ring: finite 40° rotation, settles on the couple at 5.2s
+      tl.fromTo(el("ring"), { opacity: 0, scale: 1.5, rotation: -40 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.75, ease: "power3.out" }, 4.45);
+      // spotlight: the rest of the projected photo dims while the ring is the subject
+      tl.fromTo(el("dim"), { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 4.8);
+
+      // leader draws down from the ring, then the feature chip pops (6.4s)
+      tl.fromTo(el("leader"), { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power2.out" }, 6.15);
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.6, y: 12 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 6.4);
+
+      // hold to the last frame
+      tl.set({}, {}, 7.9);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["14-gallery"] = tl;
+    })();
+  </script>
+</template>

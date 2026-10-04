@@ -1,0 +1,9 @@
+# heavy, regenerable: captured screens/recordings, staged assets, renders, previews
+capture/
+assets/
+renders/
+snapshots/
+node_modules/
+.hyperframes/frame-packets/
+audio_request.json
+audio_engine_meta.json
