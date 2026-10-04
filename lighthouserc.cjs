@@ -22,7 +22,9 @@ const only = (process.env.LHCI_TEMPLATES || '')
   .map((s) => s.trim())
   .filter(Boolean);
 const templates = only.length ? all.filter((id) => only.includes(id)) : all;
-const base = 'http://localhost:3000';
+// scripts/lhci-server.mjs: `next start` behind an HTTP/2 TLS front, the way a CDN serves the site — over plain
+// HTTP/1.1 the simulation of Slow 4G puts every request on a connection of its own and scores ~0.9 s worse in LCP
+const base = 'https://localhost:3443';
 
 // what every page must meet
 const perf = {
@@ -39,13 +41,14 @@ const perf = {
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: 'npm run start',
-      startServerReadyPattern: 'Ready in',
+      startServerCommand: 'node scripts/lhci-server.mjs',
+      startServerReadyPattern: 'Ready in https',
       url: [`${base}/`, ...templates.map((id) => `${base}/dev/invitations/render/${id}/he/demo`)],
       numberOfRuns: Number(process.env.LHCI_RUNS || 1),
       settings: {
         // the mobile preset (Lighthouse's default): Moto G Power, Slow 4G, 4x CPU
-        chromeFlags: '--no-sandbox --headless=new',
+        // (the front's certificate is a throw-away one)
+        chromeFlags: '--no-sandbox --headless=new --ignore-certificate-errors',
       },
     },
     assert: {
