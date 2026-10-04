@@ -88,6 +88,11 @@ const nextConfig: NextConfig = {
   // `ANALYZE_SOURCEMAPS=1 npm run build`: the browser bundles with source maps, to see which modules weigh
   // what in each chunk (scripts/analyze-bundles.mjs). Off in the real build.
   productionBrowserSourceMaps: process.env.ANALYZE_SOURCEMAPS === '1',
+  // Amplify builds: Next's own version-skew protection (a tab on an older deployment loads pages in
+  // full instead of mixing builds) — features/site/StaleBuildGuard.client.tsx covers the rest
+  ...(process.env.AWS_COMMIT_ID?.trim()
+    ? { deploymentId: process.env.AWS_COMMIT_ID.trim().slice(0, 32) }
+    : {}),
   images: imageSources
     ? {
         formats: ['image/avif', 'image/webp'],

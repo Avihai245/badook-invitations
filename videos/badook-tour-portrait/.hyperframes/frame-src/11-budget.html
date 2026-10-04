@@ -1,0 +1,650 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed cream ground (own clip, lowest track) ── */
+    [id="11-budget-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 820px at 92% 5%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── shared: the 390-CSS-px phone page (phone-budget.png at CSS scale) ── */
+    [class~="11-budget-world"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 390px;
+      height: 5228px;
+      transform-origin: 0 0;
+    }
+    [class~="11-budget-shot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 390px;
+      height: 5228px;
+      display: block;
+    }
+    [class~="11-budget-plate"] {
+      position: absolute;
+      background: #FFFFFF;
+    }
+
+    /* ── WINDOW: the house screen card (x 90–990, y 450–1570, 2.3077 px per CSS px) ── */
+    [id="11-budget-window"] {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    [id="11-budget-win"] {
+      position: absolute;
+      left: 90px;
+      top: 450px;
+      width: 900px;
+      height: 1120px;
+      overflow: hidden;
+      border-radius: 28px;
+      background: #FFFFFF;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+    }
+    /* the scroll layer: card-local px (CSS y × 2.3077); only its y (and a cut blur) is animated */
+    [id="11-budget-wscroll"] {
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 900px;
+      height: 12065px;
+    }
+    [id="11-budget-wworld"] {
+      /* static: 900 / 390 = 2.307692 px per CSS px — never animated */
+      transform: scale(2.307692);
+    }
+    [class~="11-budget-hole"] {
+      position: absolute;
+      border-radius: 16px;
+      box-shadow: 0 0 0 2600px rgba(251, 247, 241, 0.5);
+      pointer-events: none;
+    }
+    [id="11-budget-marks"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 12065px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [class~="11-budget-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 4;
+    }
+    [class~="11-budget-ringglow"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-width: 16;
+    }
+    [class~="11-budget-callout"] {
+      position: absolute;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      direction: rtl;
+      padding: 15px 30px 16px 28px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      color: #A0703F;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1.1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.06);
+    }
+    [class~="11-budget-callout"] svg {
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      display: block;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    [id="11-budget-c-add"] {
+      right: 28.85px;
+      top: 646px;
+      transform-origin: 100% 0%;
+    }
+    [id="11-budget-c-pay"] {
+      left: 64px;
+      top: 6620px;
+      transform-origin: 0% 50%;
+    }
+
+    /* the what-if chip, straddling the basis ring's bottom edge (centered via its row, never via transform) */
+    [id="11-budget-chiprow"] {
+      position: absolute;
+      left: 0;
+      top: 2946px;
+      width: 900px;
+      height: 84px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    [id="11-budget-chip"] {
+      height: 84px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      direction: rtl;
+      padding: 0 40px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 38px;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.1), 0 8px 24px -6px rgba(60, 35, 15, 0.35);
+      transform-origin: 50% 50%;
+    }
+    [class~="11-budget-chipnum"] {
+      font-weight: 700;
+      font-size: 44px;
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+    }
+    [id="11-budget-chip-arrow"] {
+      width: 38px;
+      height: 22px;
+      flex: 0 0 38px;
+      display: block;
+      overflow: visible;
+    }
+
+    /* ── HERO: the gauge card, zoomed (CSS [17,323 → 373,685] → screen 30,476 · 1020 × 1037.2) ── */
+    [id="11-budget-hero"] {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+    }
+    [id="11-budget-hero-cam"] {
+      position: absolute;
+      inset: 0;
+      transform-origin: 0 0;
+    }
+    [id="11-budget-hero-in"] {
+      position: absolute;
+      inset: 0;
+      transform-origin: 540px 994px;
+    }
+    [id="11-budget-hero-card"] {
+      position: absolute;
+      left: 30px;
+      top: 476px;
+      width: 1020px;
+      height: 1037.2px;
+      overflow: hidden;
+      border-radius: 46px;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 1px rgba(28, 25, 23, 0.1), 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+    }
+    [id="11-budget-hworld"] {
+      /* static: page CSS (17,323) lands at the card's corner, 2.865169 px per CSS px — never animated */
+      transform: translate(-48.708px, -925.449px) scale(2.865169);
+    }
+
+    /* the rebuilt gauge: viewBox == the app's gauge (w 360, stroke 22, r 155, pivot 180,180), drawn 316 CSS wide */
+    [id="11-budget-gauge"] {
+      position: absolute;
+      left: 37px;
+      top: 343px;
+      width: 316px;
+      height: 174.68px;
+      overflow: visible;
+    }
+    [class~="11-budget-glabel"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      fill: #6D6660;
+    }
+    [id="11-budget-pct"] {
+      position: absolute;
+      left: 45px;
+      top: 525.7px;
+      width: 300px;
+      height: 44px;
+      direction: ltr;
+      text-align: center;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 44px;
+      line-height: 44px;
+      letter-spacing: -0.025em;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [class~="11-budget-pillbox"] {
+      position: absolute;
+      left: 45px;
+      top: 601px;
+      width: 300px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+    }
+    [class~="11-budget-zpill"] {
+      grid-area: 1 / 1;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 5px;
+      direction: rtl;
+      padding: 5px 13px 6px 12px;
+      border-radius: 9999px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.2;
+      white-space: nowrap;
+      transform-origin: 50% 50%;
+    }
+    [class~="11-budget-zpill"] svg {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 15px;
+      display: block;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    [class~="11-budget-z-safe"] { background: #F0FDF4; color: #15803D; }
+    [class~="11-budget-z-close"] { background: #FFFBEB; color: #B45309; }
+    [class~="11-budget-z-over"] { background: #FEF2F2; color: #B91C1C; }
+
+    /* ── TOP BLOCK (RTL, right-aligned, y 100–410) ── */
+    [id="11-budget-top"] {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      direction: rtl;
+      text-align: right;
+      pointer-events: none;
+    }
+    [id="11-budget-kicker"] {
+      position: absolute;
+      right: 90px;
+      top: 100px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="11-budget-head"] {
+      position: absolute;
+      right: 90px;
+      top: 158px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 116px;
+      line-height: 1.04;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+    }
+    [class~="11-budget-hl"] {
+      display: block;
+      white-space: nowrap;
+    }
+  </style>
+
+  <div id="root" data-composition-id="11-budget" data-width="1080" data-height="1920" data-duration="14.516">
+
+    <!-- full-bleed cream ground -->
+    <div id="11-budget-bg" class="clip" data-start="0" data-duration="14.516" data-track-index="0"></div>
+
+    <!-- WINDOW: the phone page in the house screen card; it scrolls (cut-the-curve) to each subject -->
+    <div id="11-budget-window" class="clip" data-start="0" data-duration="14.516" data-track-index="1">
+      <div id="11-budget-win">
+        <div id="11-budget-wscroll">
+          <div id="11-budget-wworld" class="11-budget-world">
+            <img class="11-budget-shot" src="assets/phone-budget.png" alt="" />
+            <!-- the gauge's pill as the hero leaves it -->
+            <div class="11-budget-plate" style="left: 108px; top: 603px; width: 174px; height: 36px;"></div>
+            <div class="11-budget-pillbox" dir="rtl" lang="he">
+              <div class="11-budget-zpill 11-budget-z-safe">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg>
+                <span>בטוחים</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- spotlight cut-outs (card-local px = CSS × 2.3077, ring boxes padded 3.5 CSS) -->
+          <div id="11-budget-hole-add" class="11-budget-hole" style="left: 536.54px; top: 522.69px; width: 334.62px; height: 108.46px;"></div>
+          <div id="11-budget-hole-pay" class="11-budget-hole" style="left: 28.85px; top: 6656.54px; width: 842.31px; height: 542.31px;"></div>
+          <div id="11-budget-hole-basis" class="11-budget-hole" style="left: 28.85px; top: 2405.77px; width: 842.31px; height: 574.62px;"></div>
+
+          <svg id="11-budget-marks" viewBox="0 0 900 12065" aria-hidden="true">
+            <!-- add [236,230,138,40] -->
+            <rect id="11-budget-rg-add" class="11-budget-ringglow" x="536.54" y="522.69" width="334.62" height="108.46" rx="16" />
+            <rect id="11-budget-r-add" class="11-budget-ring" x="536.54" y="522.69" width="334.62" height="108.46" rx="16" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+            <!-- payments [16,2888,358,228] -->
+            <rect id="11-budget-rg-pay" class="11-budget-ringglow" x="28.85" y="6656.54" width="842.31" height="542.31" rx="16" />
+            <rect id="11-budget-r-pay" class="11-budget-ring" x="28.85" y="6656.54" width="842.31" height="542.31" rx="16" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+            <!-- basis [16,1046,358,242] -->
+            <rect id="11-budget-rg-basis" class="11-budget-ringglow" x="28.85" y="2405.77" width="842.31" height="574.62" rx="16" />
+            <rect id="11-budget-r-basis" class="11-budget-ring" x="28.85" y="2405.77" width="842.31" height="574.62" rx="16" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+          </svg>
+
+          <div id="11-budget-c-add" class="11-budget-callout" dir="rtl" lang="he">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 8v8" /><path d="M8 12h8" /></svg>
+            <span>הוצאה חדשה</span>
+          </div>
+          <div id="11-budget-c-pay" class="11-budget-callout" dir="rtl" lang="he">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h18" /></svg>
+            <span>תשלומים</span>
+          </div>
+          <div id="11-budget-chiprow">
+            <div id="11-budget-chip" dir="rtl" lang="he">
+              <span class="11-budget-chipnum">240</span>
+              <svg id="11-budget-chip-arrow" viewBox="0 0 38 22" aria-hidden="true"><path d="M36 11 H 3 M 12 2 L 3 11 L 12 20" fill="none" stroke="#FBF7F1" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <span class="11-budget-chipnum" id="11-budget-chip-num">240</span>
+              <span>אורחים</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO: the gauge card zoomed; the gauge itself is rebuilt exactly over the screenshot's gauge -->
+    <div id="11-budget-hero" class="clip" data-start="0" data-duration="14.516" data-track-index="2">
+      <div id="11-budget-hero-cam">
+        <div id="11-budget-hero-in">
+          <div id="11-budget-hero-card">
+            <div id="11-budget-hworld" class="11-budget-world">
+              <img class="11-budget-shot" src="assets/phone-budget.png" alt="" />
+
+              <!-- white plates over the screenshot's gauge, percent and status pill (card is #fff) -->
+              <div class="11-budget-plate" style="left: 22px; top: 328px; width: 350px; height: 192px;"></div>
+              <div class="11-budget-plate" style="left: 132px; top: 524px; width: 126px; height: 42px;"></div>
+              <div class="11-budget-plate" style="left: 108px; top: 603px; width: 174px; height: 36px;"></div>
+              <!-- hides "נשארו ₪55,900" while the needle is away from 44% -->
+              <div id="11-budget-lineplate" class="11-budget-plate" style="left: 138px; top: 578px; width: 116px; height: 20px;"></div>
+
+              <svg id="11-budget-gauge" viewBox="0 0 360 199" aria-hidden="true">
+                <defs>
+                  <filter id="11-budget-blur" x="-40" y="-40" width="440" height="280" filterUnits="userSpaceOnUse">
+                    <feGaussianBlur stdDeviation="8" />
+                  </filter>
+                </defs>
+                <!-- zone tracks: tint(success) 0–85%, tint(warning) 85–100%, tint(danger) 100–130% -->
+                <path d="M 335.00 180.00 A 155 155 0 0 0 107.97 42.75" stroke="#C4D9C6" stroke-width="22" fill="none" stroke-linecap="round" />
+                <path d="M 107.97 42.75 A 155 155 0 0 0 63.98 77.22" stroke="#E9CEC0" stroke-width="22" fill="none" />
+                <path d="M 63.98 77.22 A 155 155 0 0 0 25.00 180.00" stroke="#EDC6C0" stroke-width="22" fill="none" stroke-linecap="round" />
+
+                <!-- zone glows (one per zone, faded in on its word) -->
+                <g id="11-budget-glow-safe" opacity="0">
+                  <path d="M 335.00 180.00 A 155 155 0 0 0 107.97 42.75" stroke="#15803D" stroke-width="24" fill="none" stroke-linecap="round" opacity="0.5" filter="url(#11-budget-blur)" />
+                  <path d="M 335.00 180.00 A 155 155 0 0 0 107.97 42.75" stroke="#15803D" stroke-width="22" fill="none" stroke-linecap="round" opacity="0.3" />
+                </g>
+                <g id="11-budget-glow-close" opacity="0">
+                  <path d="M 107.97 42.75 A 155 155 0 0 0 63.98 77.22" stroke="#B45309" stroke-width="24" fill="none" opacity="0.55" filter="url(#11-budget-blur)" />
+                  <path d="M 107.97 42.75 A 155 155 0 0 0 63.98 77.22" stroke="#B45309" stroke-width="22" fill="none" opacity="0.32" />
+                </g>
+                <g id="11-budget-glow-over" opacity="0">
+                  <path d="M 63.98 77.22 A 155 155 0 0 0 25.00 180.00" stroke="#B91C1C" stroke-width="24" fill="none" stroke-linecap="round" opacity="0.55" filter="url(#11-budget-blur)" />
+                  <path d="M 63.98 77.22 A 155 155 0 0 0 25.00 180.00" stroke="#B91C1C" stroke-width="22" fill="none" stroke-linecap="round" opacity="0.32" />
+                </g>
+
+                <!-- what is used: 0 → needle, in the zone's color (pathLength 130 = percent units) -->
+                <g id="11-budget-fills" opacity="0">
+                  <path id="11-budget-fill-safe" class="11-budget-fill" d="M 335.00 180.00 A 155 155 0 0 0 25.00 180.00" pathLength="130" stroke="#15803D" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="130 400" stroke-dashoffset="130" />
+                  <path id="11-budget-fill-close" class="11-budget-fill" d="M 335.00 180.00 A 155 155 0 0 0 25.00 180.00" pathLength="130" stroke="#B45309" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="130 400" stroke-dashoffset="130" opacity="0" />
+                  <path id="11-budget-fill-over" class="11-budget-fill" d="M 335.00 180.00 A 155 155 0 0 0 25.00 180.00" pathLength="130" stroke="#B91C1C" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="130 400" stroke-dashoffset="130" opacity="0" />
+                </g>
+
+                <!-- what is paid (7%): a thin mark across the arc -->
+                <line x1="319.97" y1="156.09" x2="345.60" y2="151.72" stroke="#1C1917" stroke-width="2" stroke-linecap="round" />
+
+                <!-- scale ticks every 10%, majors at 0 / 50 / 100 -->
+                <g stroke="#D6D3D1">
+                  <line x1="349.00" y1="180.00" x2="356.00" y2="180.00" stroke-width="1.5" />
+                  <line x1="344.09" y1="139.56" x2="347.00" y2="138.84" stroke-width="1" />
+                  <line x1="329.64" y1="101.46" x2="332.30" y2="100.07" stroke-width="1" />
+                  <line x1="306.50" y1="67.93" x2="308.74" y2="65.94" stroke-width="1" />
+                  <line x1="276.00" y1="40.92" x2="277.71" y2="38.45" stroke-width="1" />
+                  <line x1="239.93" y1="21.98" x2="242.41" y2="15.44" stroke-width="1.5" />
+                  <line x1="200.37" y1="12.23" x2="200.73" y2="9.25" stroke-width="1" />
+                  <line x1="159.63" y1="12.23" x2="159.27" y2="9.25" stroke-width="1" />
+                  <line x1="120.07" y1="21.98" x2="119.01" y2="19.18" stroke-width="1" />
+                  <line x1="84.00" y1="40.92" x2="82.29" y2="38.45" stroke-width="1" />
+                  <line x1="53.50" y1="67.93" x2="48.26" y2="63.29" stroke-width="1.5" />
+                  <line x1="30.36" y1="101.46" x2="27.70" y2="100.07" stroke-width="1" />
+                  <line x1="15.91" y1="139.56" x2="13.00" y2="138.84" stroke-width="1" />
+                  <line x1="11.00" y1="180.00" x2="8.00" y2="180.00" stroke-width="1" />
+                </g>
+                <text class="11-budget-glabel" x="366.00" y="180.00" text-anchor="middle" dominant-baseline="middle">0%</text>
+                <text class="11-budget-glabel" x="245.96" y="6.09" text-anchor="middle" dominant-baseline="middle">50%</text>
+                <text class="11-budget-glabel" x="40.78" y="56.66" text-anchor="middle" dominant-baseline="middle">100%</text>
+
+                <!-- the plan (121%): the ghost needle -->
+                <line x1="180" y1="180" x2="45.21" y2="150.40" stroke="#1C1917" stroke-opacity="0.22" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="4 4" />
+
+                <!-- the needle: drawn at 0% (pointing right), rotated −(v / 130%) × 180° about the pivot -->
+                <g id="11-budget-needle">
+                  <line x1="180" y1="180" x2="318" y2="180" stroke="#1C1917" stroke-width="3.5" stroke-linecap="round" />
+                </g>
+                <circle cx="180" cy="180" r="8.4" fill="#1C1917" />
+                <circle cx="180" cy="180" r="3.5" fill="#FFFFFF" />
+              </svg>
+
+              <!-- the percent, counting with the needle -->
+              <div id="11-budget-pct"><span id="11-budget-pct-num">0</span><span>%</span></div>
+
+              <!-- the status pill: changes text + color with the zone -->
+              <div class="11-budget-pillbox" dir="rtl" lang="he">
+                <div id="11-budget-zp-safe" class="11-budget-zpill 11-budget-z-safe">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg>
+                  <span>בטוחים</span>
+                </div>
+                <div id="11-budget-zp-close" class="11-budget-zpill 11-budget-z-close">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
+                  <span>מתקרבים לגבול</span>
+                </div>
+                <div id="11-budget-zp-over" class="11-budget-zpill 11-budget-z-over">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 8v4" /><path d="M12 16h.01" /></svg>
+                  <span>חריגה</span>
+                </div>
+                <div id="11-budget-zp-safe2" class="11-budget-zpill 11-budget-z-safe">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg>
+                  <span>בטוחים</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP BLOCK: kicker + headline, on their words -->
+    <div id="11-budget-top" class="clip" data-start="0" data-duration="14.516" data-track-index="3" dir="rtl" lang="he">
+      <div id="11-budget-kicker">10 · תקציב</div>
+      <h1 id="11-budget-head">
+        <span class="11-budget-hl" id="11-budget-hl1">איפה אתם</span>
+        <span class="11-budget-hl" id="11-budget-hl2">עומדים</span>
+      </h1>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="11-budget"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="11-budget-' + name + '"]') || document.getElementById("11-budget-" + name);
+      }
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── gauge model (app: half circle to 130%, safe ≤ 85%, close 85–100%, over > 100%) ──
+      function deg(pct) { return -(pct / 130) * 180; }   // needle rotation (screen CCW from the right)
+      function off(pct) { return 130 - pct; }            // fill dash offset (pathLength 130)
+      var needle = el("needle");
+      var fills = scope.querySelectorAll('[class~="11-budget-fill"]');
+      var pctNum = el("pct-num");   // the percent counts with the needle (snapped textContent tween: seek-safe, no callbacks)
+
+      // one needle move = rotation + fill + percent on the SAME window and ease
+      function swing(from, to, at, dur, ease, first) {
+        var ir = !!first;
+        tl.fromTo(needle, { rotation: deg(from), svgOrigin: "180 180" }, { rotation: deg(to), svgOrigin: "180 180", duration: dur, ease: ease, immediateRender: ir }, at);
+        tl.fromTo(fills, { attr: { "stroke-dashoffset": off(from) } }, { attr: { "stroke-dashoffset": off(to) }, duration: dur, ease: ease, immediateRender: ir }, at);
+        tl.fromTo(pctNum, { textContent: from }, { textContent: to, snap: { textContent: 1 }, duration: dur, ease: ease, immediateRender: ir }, at);
+      }
+      function fade(name, a, b, at, dur, ease, first) {
+        tl.fromTo(el(name), { opacity: a }, { opacity: b, duration: dur, ease: ease || "power2.out", immediateRender: !!first }, at);
+      }
+      function pop(name, at, first) {
+        tl.fromTo(el(name), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", immediateRender: !!first }, at);
+      }
+
+      // initial gauge state: 0%
+      tl.set(needle, { rotation: 0, svgOrigin: "180 180" }, 0);
+      tl.set(el("zp-safe"), { opacity: 0 }, 0);
+      tl.set(el("zp-close"), { opacity: 0 }, 0);
+      tl.set(el("zp-over"), { opacity: 0 }, 0);
+      tl.set(el("zp-safe2"), { opacity: 0 }, 0);
+
+      // ── Scene 1 (0.0–2.5s): the gauge card hero enters, zoomed; needle at 0%; kicker + headline on their words ──
+      tl.fromTo(el("hero-in"), { opacity: 0, scale: 0.955, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 1.2, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.35);
+      tl.fromTo(el("hl1"), { opacity: 0, y: 48 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 1.84);   // "איפה אתם"
+      tl.fromTo(el("hl2"), { opacity: 0, y: 48 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 2.5);    // "עומדים"
+
+      // ── Scene 2 (2.5–3.5s): needle sweeps to 44%, percent counts with it ──
+      tl.fromTo(el("fills"), { opacity: 0 }, { opacity: 1, duration: 0.06, ease: "none" }, 2.5);
+      swing(0, 44.1, 2.5, 0.9, "power3.out", true);
+      // "נשארו ₪55,900" belongs to 44%: hidden until the needle lands there
+      fade("lineplate", 1, 0, 3.25, 0.3, "power2.out", true);
+
+      // ── Scene 3 (3.5–5.4s): "ירוק, בטוחים" — green zone glows, pill pops ──
+      fade("glow-safe", 0, 1, 3.6, 0.6, "power2.out", true);
+      pop("zp-safe", 4.1, true);
+
+      // ── Scene 4 (5.4–7.7s): "צהוב, מתקרבים לגבול" — swing into the amber zone ──
+      fade("glow-safe", 1, 0, 5.4, 0.5, "power2.inOut");
+      fade("lineplate", 0, 1, 5.4, 0.3, "power2.out");
+      swing(44.1, 92, 5.4, 0.6, "power3.inOut");
+      fade("fill-close", 0, 1, 5.76, 0.12, "none", true);
+      fade("fill-safe", 1, 0, 5.8, 0.1, "none", true);
+      fade("glow-close", 0, 1, 5.85, 0.55, "power2.out", true);
+      fade("zp-safe", 1, 0, 6.2, 0.2, "power2.out");
+      pop("zp-close", 6.2, true);
+
+      // ── Scene 5 (7.7–9.7s): "אדום, חריגה" — past the red line, held, then back to 44% ──
+      swing(92, 104, 7.7, 0.5, "power3.out");
+      fade("fill-over", 0, 1, 7.83, 0.1, "none", true);
+      fade("fill-close", 1, 0, 7.86, 0.08, "none");
+      fade("glow-close", 1, 0, 7.85, 0.4, "power2.inOut");
+      fade("glow-over", 0, 1, 7.85, 0.5, "power2.out", true);
+      fade("zp-close", 1, 0, 8.4, 0.2, "power2.out");
+      pop("zp-over", 8.4, true);
+      // HOLD 8.6–9.35: nothing moves — the red needle sits past the line
+      swing(104, 44.1, 9.35, 0.5, "power2.inOut");
+      fade("glow-over", 1, 0, 9.35, 0.35, "power2.inOut");
+      fade("fill-close", 0, 1, 9.42, 0.06, "none");
+      fade("fill-over", 1, 0, 9.44, 0.06, "none");
+      fade("fill-safe", 0, 1, 9.53, 0.06, "none");
+      fade("fill-close", 1, 0, 9.55, 0.06, "none");
+      fade("zp-over", 1, 0, 9.6, 0.2, "power2.out");
+      pop("zp-safe2", 9.6, true);
+      fade("lineplate", 1, 0, 9.6, 0.25, "power2.out");
+
+      // ── Scene 6a (9.72–10.3s): zoom out — the hero card shrinks exactly onto the gauge card inside the
+      // screen card while the rest of the page fades in around it (hero card 30,476 · 1020 wide ↔ page CSS
+      // (17,323) in the card at crop y 200: 129.2,733.8 · 821.5 wide) ──
+      var S = 900 / 390;
+      var HX = 30, HY = 476, HW = 1020;
+      var WX = 90 + 17 * S, WY = 450 + (323 - 200) * S, WW = 356 * S;
+      var k1 = WW / HW;
+      tl.fromTo(el("hero-cam"), { x: 0, y: 0, scale: 1 }, { x: WX - k1 * HX, y: WY - k1 * HY, scale: k1, duration: 0.55, ease: "power3.inOut" }, 9.72);
+      fade("window", 0, 1, 9.75, 0.35, "power1.out", true);
+      fade("hero", 1, 0, 10.2, 0.1, "none", true);
+
+      // spotlight rings: ring draws on, glow + dim cut-out follow
+      function ring(name, at) {
+        tl.fromTo(el("r-" + name), { attr: { "stroke-dashoffset": 1 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.45, ease: "power2.inOut" }, at);
+        tl.fromTo(el("rg-" + name), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, at + 0.3);
+        tl.fromTo(el("hole-" + name), { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, at);
+      }
+
+      // the page's scroll positions (card-local px): crop y 200 (add + gauge), 2759 (payments), 935 (basis)
+      var wscroll = el("wscroll");
+      var Y0 = -200 * S, YPAY = -2759.3 * S, YBASIS = -935 * S, D = 240;
+
+      // 10.3s "הוצאות" — add expense
+      ring("add", 10.32);
+      tl.fromTo(el("c-add"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 10.4);
+
+      // ── Scene 6b (10.75s): cut-the-curve scroll down to payments (accelerate out → jump → decelerate in) ──
+      tl.fromTo(el("hole-add"), { opacity: 1 }, { opacity: 0, duration: 0.18, ease: "power2.in", immediateRender: false }, 10.75);
+      tl.fromTo(wscroll, { y: Y0, filter: "blur(0px)" }, { y: Y0 - D, filter: "blur(8px)", duration: 0.18, ease: "power2.in" }, 10.75);
+      tl.fromTo(wscroll, { y: YPAY + D, filter: "blur(8px)" }, { y: YPAY, filter: "blur(0px)", duration: 0.3, ease: "power3.out", immediateRender: false }, 10.93);
+      // "ותשלומים" — payments
+      ring("pay", 11.08);
+      tl.fromTo(el("c-pay"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 11.22);
+
+      // ── Scene 6c (12.15s): cut-the-curve scroll back up to the guests basis ──
+      tl.fromTo(el("hole-pay"), { opacity: 1 }, { opacity: 0, duration: 0.18, ease: "power2.in", immediateRender: false }, 12.15);
+      tl.fromTo(wscroll, { y: YPAY, filter: "blur(0px)" }, { y: YPAY + D, filter: "blur(8px)", duration: 0.18, ease: "power2.in", immediateRender: false }, 12.15);
+      tl.fromTo(wscroll, { y: YBASIS - D, filter: "blur(8px)" }, { y: YBASIS, filter: "blur(0px)", duration: 0.3, ease: "power3.out", immediateRender: false }, 12.33);
+      // "מה יקרה אם ישתנה מספר האורחים" — the guests basis + the what-if chip
+      ring("basis", 12.5);
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 12.7);
+      // 13.2s the what-if number ticks 240 → 260
+      tl.fromTo(el("chip-num"), { textContent: 240 }, { textContent: 260, snap: { textContent: 1 }, duration: 0.7, ease: "power2.out" }, 13.2);
+
+      // hold to the last frame
+      tl.set({}, {}, 14.5);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["11-budget"] = tl;
+    })();
+  </script>
+</template>

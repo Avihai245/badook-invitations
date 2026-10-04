@@ -8,6 +8,7 @@ import { Button } from '@/components/app/Button';
 import { StatusPage } from '@/components/app/StatusPage';
 import { BrokenSealArt } from '@/features/invitations/app/status-art';
 import { useUi } from '@/lib/i18n/client';
+import { isStaleBuildError, reloadForNewBuild } from '@/lib/stale-build';
 
 /**
  * "Something went wrong" for the site and the host app (a server error while loading a page): in the
@@ -27,6 +28,8 @@ export default function SiteError({
   const [pending, start] = useTransition();
   useEffect(() => {
     console.error(error);
+    // a tab still on the previous deployment: the new build's page, not an error screen
+    if (isStaleBuildError(error)) reloadForNewBuild();
   }, [error]);
   return (
     <StatusPage

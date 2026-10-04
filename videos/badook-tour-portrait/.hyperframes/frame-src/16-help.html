@@ -1,0 +1,508 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="16-help-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 760px at 92% 4%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── top block: kicker + headline (right-aligned, RTL) ── */
+    [id="16-help-top"] {
+      position: absolute;
+      inset: 0;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="16-help-kicker"] {
+      position: absolute;
+      right: 90px;
+      top: 96px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="16-help-head"] {
+      position: absolute;
+      right: 90px;
+      top: 148px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 120px;
+      line-height: 1.06;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [class~="16-help-word"] {
+      display: inline-block;
+    }
+
+    /* ── screen card: phone-help.png, 900 wide (2.3077 px / CSS px), x 90–990, y 330–1556 ── */
+    [id="16-help-cardlayer"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="16-help-card"] {
+      position: absolute;
+      left: 90px;
+      top: 330px;
+      width: 900px;
+      height: 1226px;
+      overflow: hidden;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+      transform-origin: 50% 30%;
+    }
+    /* cam = the animated scroll layer; world = static crop offset (CSS y 80 at card top) */
+    [id="16-help-cam"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1948px;
+    }
+    [id="16-help-world"] {
+      position: absolute;
+      left: 0;
+      top: -184.62px;
+      width: 900px;
+      height: 1948px;
+    }
+    [id="16-help-shot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1948px;
+      display: block;
+    }
+    /* spotlight cut-outs (world px = CSS px × 2.3077) */
+    [class~="16-help-spot"] {
+      position: absolute;
+      opacity: 0;
+      box-shadow: 0 0 0 2400px rgba(28, 25, 23, 0.36);
+      pointer-events: none;
+    }
+    [id="16-help-ringsvg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1948px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [class~="16-help-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 4;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    [class~="16-help-glow"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-width: 18;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    [id="16-help-card-hair"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.12);
+      pointer-events: none;
+    }
+
+    /* ── three accumulating benefit rows over the card's lower part ── */
+    [id="16-help-rows"] {
+      position: absolute;
+      inset: 0;
+    }
+    [class~="16-help-row"] {
+      position: absolute;
+      left: 70px;
+      width: 940px;
+      box-sizing: border-box;
+      padding: 20px 28px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 26px;
+      direction: rtl;
+      background: #FBF7F1;
+      border-radius: 24px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.12), 0 1px 3px rgba(28, 25, 23, 0.08), 0 20px 44px -22px rgba(60, 35, 15, 0.42);
+      transform-origin: 50% 100%;
+    }
+    [class~="16-help-tile"] {
+      flex: 0 0 84px;
+      width: 84px;
+      height: 84px;
+      border-radius: 18px;
+      background: #F3E8DB;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: 50% 50%;
+    }
+    [class~="16-help-icon"] {
+      display: block;
+      width: 48px;
+      height: 48px;
+      overflow: visible;
+    }
+    [class~="16-help-icon"] path {
+      fill: none;
+      stroke: #7A5230;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    [class~="16-help-text"] {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    [class~="16-help-titleline"] {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 18px;
+      direction: rtl;
+    }
+    [class~="16-help-title"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 46px;
+      line-height: 1.2;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [class~="16-help-sub"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 400;
+      font-size: 32px;
+      line-height: 1.3;
+      color: rgba(28, 25, 23, 0.68);
+      white-space: nowrap;
+    }
+
+    /* feature chip "AI" */
+    [id="16-help-chip"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      direction: ltr;
+      padding: 8px 22px 9px 18px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      line-height: 1.0;
+      letter-spacing: 0.04em;
+      transform-origin: 50% 50%;
+    }
+    [id="16-help-chip-star"] {
+      display: block;
+      width: 22px;
+      height: 22px;
+    }
+
+    /* rebuilt mini chat inside row 2 */
+    [id="16-help-chat"] {
+      position: relative;
+      width: 774px;
+      height: 132px;
+      margin-top: 12px;
+    }
+    [class~="16-help-bubble"] {
+      position: absolute;
+      font-family: "Heebo", sans-serif;
+      font-weight: 400;
+      font-size: 30px;
+      line-height: 1.3;
+      white-space: nowrap;
+      padding: 10px 24px 11px;
+      direction: rtl;
+    }
+    [id="16-help-guest"] {
+      right: 0;
+      top: 0;
+      background: #F3E8DB;
+      color: #1C1917;
+      border-radius: 24px 24px 6px 24px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.08);
+      transform-origin: 100% 100%;
+    }
+    [id="16-help-dots"] {
+      left: 0;
+      top: 72px;
+      height: 60px;
+      box-sizing: border-box;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      background: #FFFDF9;
+      border-radius: 24px 24px 24px 6px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.14);
+      transform-origin: 0% 100%;
+    }
+    [class~="16-help-dot"] {
+      width: 12px;
+      height: 12px;
+      border-radius: 9999px;
+      background: rgba(122, 82, 48, 0.55);
+    }
+    [id="16-help-bot"] {
+      left: 0;
+      top: 72px;
+      background: #FFFDF9;
+      color: #1C1917;
+      border-radius: 24px 24px 24px 6px;
+      box-shadow: inset 0 0 0 1px rgba(28, 25, 23, 0.14);
+      transform-origin: 0% 100%;
+    }
+    [id="16-help-bot-text"] {
+      display: inline-block;
+      clip-path: inset(0% 0% 0% 100%);
+    }
+  </style>
+
+  <div id="root" data-composition-id="16-help" data-width="1080" data-height="1920" data-duration="8.599">
+
+    <!-- full-bleed cream ground -->
+    <div id="16-help-bg" class="clip" data-start="0" data-duration="8.599" data-track-index="0"></div>
+
+    <!-- the real help panel on the phone: screen card, middle -->
+    <div id="16-help-cardlayer" class="clip" data-start="0" data-duration="8.599" data-track-index="1">
+      <div id="16-help-card">
+        <div id="16-help-cam">
+          <div id="16-help-world">
+            <img id="16-help-shot" src="assets/phone-help.png" alt="" />
+            <!-- spotlights (world px): panel head+tabs CSS [0,101,390,113]; article card CSS [17,428,356,101]; tabs CSS [134,174,122,38] / [18,174,104,38] -->
+            <div class="16-help-spot" id="16-help-spot-panel" style="left: 6px; top: 227px; width: 888px; height: 273px; border-radius: 36px;"></div>
+            <div class="16-help-spot" id="16-help-spot-list" style="left: 31px; top: 980px; width: 838px; height: 249px; border-radius: 36px;"></div>
+            <div class="16-help-spot" id="16-help-spot-tab2" style="left: 309px; top: 401px; width: 282px; height: 88px; border-radius: 16px;"></div>
+            <div class="16-help-spot" id="16-help-spot-tab3" style="left: 41px; top: 401px; width: 241px; height: 88px; border-radius: 16px;"></div>
+            <svg id="16-help-ringsvg" viewBox="0 0 900 1948" aria-hidden="true">
+              <path class="16-help-glow" id="16-help-glow-panel" pathLength="1" d="M858 227.1 H42 A36 36 0 0 0 6 263.1 V463.8 A36 36 0 0 0 42 499.8 H858 A36 36 0 0 0 894 463.8 V263.1 A36 36 0 0 0 858 227.1 Z" />
+              <path class="16-help-ring" id="16-help-ring-panel" pathLength="1" d="M858 227.1 H42 A36 36 0 0 0 6 263.1 V463.8 A36 36 0 0 0 42 499.8 H858 A36 36 0 0 0 894 463.8 V263.1 A36 36 0 0 0 858 227.1 Z" />
+              <path class="16-help-glow" id="16-help-glow-list" pathLength="1" d="M832.8 979.7 H67.2 A36 36 0 0 0 31.2 1015.7 V1192.8 A36 36 0 0 0 67.2 1228.8 H832.8 A36 36 0 0 0 868.8 1192.8 V1015.7 A36 36 0 0 0 832.8 979.7 Z" />
+              <path class="16-help-ring" id="16-help-ring-list" pathLength="1" d="M832.8 979.7 H67.2 A36 36 0 0 0 31.2 1015.7 V1192.8 A36 36 0 0 0 67.2 1228.8 H832.8 A36 36 0 0 0 868.8 1192.8 V1015.7 A36 36 0 0 0 832.8 979.7 Z" />
+              <path class="16-help-glow" id="16-help-glow-tab2" pathLength="1" d="M574.8 401.5 H325.2 A16 16 0 0 0 309.2 417.5 V473.2 A16 16 0 0 0 325.2 489.2 H574.8 A16 16 0 0 0 590.8 473.2 V417.5 A16 16 0 0 0 574.8 401.5 Z" />
+              <path class="16-help-ring" id="16-help-ring-tab2" pathLength="1" d="M574.8 401.5 H325.2 A16 16 0 0 0 309.2 417.5 V473.2 A16 16 0 0 0 325.2 489.2 H574.8 A16 16 0 0 0 590.8 473.2 V417.5 A16 16 0 0 0 574.8 401.5 Z" />
+              <path class="16-help-glow" id="16-help-glow-tab3" pathLength="1" d="M265.5 401.5 H57.5 A16 16 0 0 0 41.5 417.5 V473.2 A16 16 0 0 0 57.5 489.2 H265.5 A16 16 0 0 0 281.5 473.2 V417.5 A16 16 0 0 0 265.5 401.5 Z" />
+              <path class="16-help-ring" id="16-help-ring-tab3" pathLength="1" d="M265.5 401.5 H57.5 A16 16 0 0 0 41.5 417.5 V473.2 A16 16 0 0 0 57.5 489.2 H265.5 A16 16 0 0 0 281.5 473.2 V417.5 A16 16 0 0 0 265.5 401.5 Z" />
+            </svg>
+          </div>
+        </div>
+        <div id="16-help-card-hair"></div>
+      </div>
+    </div>
+
+    <!-- top block: kicker + headline -->
+    <div id="16-help-top" class="clip" data-start="0" data-duration="8.599" data-track-index="2" dir="rtl" lang="he">
+      <div id="16-help-kicker" dir="rtl" lang="he">15 · עזרה</div>
+      <h1 id="16-help-head" dir="rtl" lang="he"><span class="16-help-word" id="16-help-w1">תמיד</span> <span class="16-help-word" id="16-help-w2">יש</span> <span class="16-help-word" id="16-help-w3">עזרה</span></h1>
+    </div>
+
+    <!-- three accumulating benefit rows, floating over the card's lower part -->
+    <div id="16-help-rows" class="clip" data-start="0" data-duration="8.599" data-track-index="3" dir="rtl" lang="he">
+
+      <!-- row 1 — written guide -->
+      <div class="16-help-row" id="16-help-row1" style="top: 1022px;" dir="rtl" lang="he">
+        <div class="16-help-tile" id="16-help-tile1">
+          <svg class="16-help-icon" viewBox="0 0 40 40" aria-hidden="true">
+            <path id="16-help-i1a" pathLength="1" d="M20 11 C 16 8, 10 8, 5 9 V 31 C 10 30, 16 30, 20 33 C 24 30, 30 30, 35 31 V 9 C 30 8, 24 8, 20 11 Z" />
+            <path id="16-help-i1b" pathLength="1" d="M20 11 V 33" />
+            <path id="16-help-i1c" pathLength="1" d="M24 16 H 31 M 24 21 H 31 M 9 16 H 16 M 9 21 H 16" />
+          </svg>
+        </div>
+        <div class="16-help-text">
+          <div class="16-help-title" id="16-help-t1">מדריך כתוב</div>
+          <div class="16-help-sub" id="16-help-s1">הסבר לכל מסך במערכת</div>
+        </div>
+      </div>
+
+      <!-- row 2 — smart assistant + rebuilt mini chat -->
+      <div class="16-help-row" id="16-help-row2" style="top: 1175px;" dir="rtl" lang="he">
+        <div class="16-help-tile" id="16-help-tile2">
+          <svg class="16-help-icon" viewBox="0 0 40 40" aria-hidden="true">
+            <path id="16-help-i2a" pathLength="1" d="M18 7 C 19 15, 22 18, 30 20 C 22 22, 19 25, 18 33 C 17 25, 14 22, 6 20 C 14 18, 17 15, 18 7 Z" />
+            <path id="16-help-i2b" pathLength="1" d="M31 5 V 13 M 27 9 H 35" />
+          </svg>
+        </div>
+        <div class="16-help-text">
+          <div class="16-help-titleline">
+            <div class="16-help-title" id="16-help-t2">עוזר חכם</div>
+            <div id="16-help-chip">
+              <svg id="16-help-chip-star" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1 C 10.6 6.5, 13.5 9.4, 19 10 C 13.5 10.6, 10.6 13.5, 10 19 C 9.4 13.5, 6.5 10.6, 1 10 C 6.5 9.4, 9.4 6.5, 10 1 Z" fill="#FBF7F1" /></svg>
+              <span>AI</span>
+            </div>
+          </div>
+          <div id="16-help-chat">
+            <div class="16-help-bubble" id="16-help-guest" dir="rtl" lang="he">איך שולחים בוואטסאפ?</div>
+            <div class="16-help-bubble" id="16-help-dots" aria-hidden="true">
+              <div class="16-help-dot" id="16-help-d1"></div>
+              <div class="16-help-dot" id="16-help-d2"></div>
+              <div class="16-help-dot" id="16-help-d3"></div>
+            </div>
+            <div class="16-help-bubble" id="16-help-bot" dir="rtl" lang="he"><span id="16-help-bot-text">מהמסך מוזמנים, בלחיצה על…</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- row 3 — direct line to the team -->
+      <div class="16-help-row" id="16-help-row3" style="top: 1430px;" dir="rtl" lang="he">
+        <div class="16-help-tile" id="16-help-tile3">
+          <svg class="16-help-icon" viewBox="0 0 40 40" aria-hidden="true">
+            <path id="16-help-i3a" pathLength="1" d="M26 14 A 6 6 0 1 1 14 14 A 6 6 0 1 1 26 14 Z" />
+            <path id="16-help-i3b" pathLength="1" d="M8 34 C 8 26, 14 23, 20 23 C 26 23, 32 26, 32 34" />
+          </svg>
+        </div>
+        <div class="16-help-text">
+          <div class="16-help-title" id="16-help-t3">פנייה ישירה לצוות</div>
+          <div class="16-help-sub" id="16-help-s3">תשובה מאדם אמיתי</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="16-help"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="16-help-' + name + '"]') || document.getElementById("16-help-" + name);
+      }
+      function later(vars) {
+        vars.immediateRender = false;
+        return vars;
+      }
+
+      // scroll stop for the article list: CSS y 300 at the card top → Δ = (300 − 80) × 2.3077
+      var LIST_Y = -507.69;
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–1.5s): screen card enters with the open help panel; kicker + headline ──
+      tl.fromTo(el("card"), { opacity: 0, y: 60, scale: 0.965 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.15);
+      tl.fromTo(el("w1"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.35);
+      tl.fromTo(el("w2"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.5);
+      tl.fromTo(el("w3"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.65);
+
+      // ── Scene 2 (1.5–2.9s): "כפתור העזרה פותח" — ring draws around the panel head, page dims ──
+      tl.fromTo(el("spot-panel"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 1.5);
+      tl.fromTo(el("glow-panel"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.75, ease: "power2.inOut" }, 1.5);
+      tl.fromTo(el("ring-panel"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.75, ease: "power2.inOut" }, 1.5);
+
+      // ── Scene 3 (2.9–4.2s): row 1 "מדריך כתוב"; screen scrolls to the article list, ring lands on it ──
+      tl.fromTo(el("ring-panel"), { opacity: 1 }, later({ opacity: 0, duration: 0.3, ease: "power2.out" }), 2.9);
+      tl.fromTo(el("glow-panel"), { opacity: 1 }, later({ opacity: 0, duration: 0.3, ease: "power2.out" }), 2.9);
+      tl.fromTo(el("spot-panel"), { opacity: 1 }, later({ opacity: 0, duration: 0.35, ease: "power2.inOut" }), 2.9);
+      tl.fromTo(el("cam"), { y: 0 }, { y: LIST_Y, duration: 0.75, ease: "power3.inOut" }, 2.9);
+      tl.fromTo(el("spot-list"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.inOut" }, 3.35);
+      tl.fromTo(el("glow-list"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.65, ease: "power2.inOut" }, 3.4);
+      tl.fromTo(el("ring-list"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.65, ease: "power2.inOut" }, 3.4);
+
+      function revealRow(n, at, icons) {
+        tl.fromTo(el("row" + n), { opacity: 0, y: 44, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.65, ease: "power3.out" }, at);
+        tl.fromTo(el("tile" + n), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.55, ease: "power3.out" }, at + 0.08);
+        icons.forEach(function (id, i) {
+          tl.fromTo(el(id), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, at + 0.18 + i * 0.1);
+        });
+        tl.fromTo(el("t" + n), { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, at + 0.12);
+      }
+
+      revealRow(1, 2.9, ["i1a", "i1b", "i1c"]);
+      tl.fromTo(el("s1"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 3.05);
+
+      // ── Scene 4 (4.2–6.5s): row 2 "עוזר חכם" + AI chip; screen returns to the tabs, ring on "שאלו את העוזר"; mini chat builds 4.6–6.2s ──
+      tl.fromTo(el("ring-list"), { opacity: 1 }, later({ opacity: 0, duration: 0.3, ease: "power2.out" }), 4.2);
+      tl.fromTo(el("glow-list"), { opacity: 1 }, later({ opacity: 0, duration: 0.3, ease: "power2.out" }), 4.2);
+      tl.fromTo(el("spot-list"), { opacity: 1 }, later({ opacity: 0, duration: 0.35, ease: "power2.inOut" }), 4.2);
+      tl.fromTo(el("cam"), { y: LIST_Y }, later({ y: 0, duration: 0.8, ease: "power3.inOut" }), 4.25);
+      tl.fromTo(el("spot-tab2"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.inOut" }, 4.85);
+      tl.fromTo(el("glow-tab2"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.inOut" }, 4.9);
+      tl.fromTo(el("ring-tab2"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.inOut" }, 4.9);
+
+      revealRow(2, 4.2, ["i2a", "i2b"]);
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 4.4);
+
+      // guest asks
+      tl.fromTo(el("guest"), { opacity: 0, scale: 0.85, y: 12 }, { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "power3.out" }, 4.6);
+      // assistant typing dots
+      tl.fromTo(el("dots"), { opacity: 0, scale: 0.85, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: "power3.out" }, 5.0);
+      [0, 1].forEach(function (k) {
+        ["d1", "d2", "d3"].forEach(function (d, i) {
+          var at = 5.1 + k * 0.24 + i * 0.07;
+          tl.fromTo(el(d), { y: 0 }, later({ y: -6, duration: 0.1, ease: "power1.out" }), at);
+          tl.fromTo(el(d), { y: -6 }, later({ y: 0, duration: 0.1, ease: "power1.in" }), at + 0.1);
+        });
+      });
+      // dots resolve into the answer (whole-state swap, then a right→left type-on wipe)
+      tl.fromTo(el("dots"), { opacity: 1 }, later({ opacity: 0, duration: 0.15, ease: "power1.out" }), 5.6);
+      tl.fromTo(el("bot"), { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 5.6);
+      tl.fromTo(el("bot-text"), { clipPath: "inset(0% 0% 0% 100%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.6, ease: "power1.inOut" }, 5.65);
+
+      // ── Scene 5 (6.5–8.599s): row 3 "פנייה ישירה לצוות"; ring hops to the "פנייה לצוות" tab; hold ──
+      tl.fromTo(el("ring-tab2"), { opacity: 1 }, later({ opacity: 0, duration: 0.3, ease: "power2.out" }), 6.5);
+      tl.fromTo(el("glow-tab2"), { opacity: 1 }, later({ opacity: 0, duration: 0.3, ease: "power2.out" }), 6.5);
+      tl.fromTo(el("spot-tab2"), { opacity: 1 }, later({ opacity: 0, duration: 0.4, ease: "power2.inOut" }), 6.5);
+      tl.fromTo(el("spot-tab3"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.inOut" }, 6.5);
+      tl.fromTo(el("glow-tab3"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.inOut" }, 6.6);
+      tl.fromTo(el("ring-tab3"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.inOut" }, 6.6);
+
+      revealRow(3, 6.5, ["i3a", "i3b"]);
+      tl.fromTo(el("s3"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 6.65);
+
+      // hold to the last frame
+      tl.set({}, {}, 8.55);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["16-help"] = tl;
+    })();
+  </script>
+</template>

@@ -221,6 +221,7 @@
       font-weight: 700;
       font-size: 30.4px;
       line-height: 1;
+      letter-spacing: -0.028em;
       font-variant-numeric: tabular-nums;
       color: #1C1917;
       white-space: nowrap;
@@ -245,13 +246,13 @@
     }
   </style>
 
-  <div id="root" data-composition-id="15-film" data-width="1080" data-height="1920" data-duration="6.444">
+  <div id="root" data-composition-id="15-film" data-width="1080" data-height="1920" data-duration="6.844">
 
     <!-- full-bleed cream ground -->
-    <div id="15-film-bg" class="clip" data-start="0" data-duration="6.444" data-track-index="0"></div>
+    <div id="15-film-bg" class="clip" data-start="0" data-duration="6.844" data-track-index="0"></div>
 
     <!-- the real film page: the photos the film is made from -->
-    <div id="15-film-page-layer" class="clip 15-film-layer" data-start="0" data-duration="6.444" data-track-index="1">
+    <div id="15-film-page-layer" class="clip 15-film-layer" data-start="0" data-duration="6.844" data-track-index="1">
       <div id="15-film-page-wrap">
         <div id="15-film-page" class="15-film-card">
           <div id="15-film-page-world"><img src="assets/phone-film.png" alt="" /></div>
@@ -260,7 +261,7 @@
     </div>
 
     <!-- the moments-film player -->
-    <div id="15-film-player-layer" class="clip 15-film-layer" data-start="0" data-duration="6.444" data-track-index="2">
+    <div id="15-film-player-layer" class="clip 15-film-layer" data-start="0" data-duration="6.844" data-track-index="2">
       <div id="15-film-player-wrap">
         <div id="15-film-player">
           <div class="15-film-shot" id="15-film-shot-couple"><img id="15-film-img-couple" src="assets/photo-couple.jpg" alt="" /></div>
@@ -276,16 +277,16 @@
     </div>
 
     <!-- the real insights screen with count-ups on the measured stat cards -->
-    <div id="15-film-insights-layer" class="clip 15-film-layer" data-start="0" data-duration="6.444" data-track-index="3">
+    <div id="15-film-insights-layer" class="clip 15-film-layer" data-start="0" data-duration="6.844" data-track-index="3">
       <div id="15-film-insights" class="15-film-card">
         <div id="15-film-ins-world">
           <img src="assets/phone-insights.png" alt="" />
           <!-- visits card [201,305,173,139]: printed "209" ink x 306.3–353.7, y 369.3–391 -->
           <div class="15-film-plate" style="left: 303px; top: 366px; width: 54px; height: 28px;"></div>
-          <div class="15-film-num" id="15-film-num-visits" style="left: 274.6px; top: 365.4px;">0</div>
+          <div class="15-film-num" id="15-film-num-visits" style="left: 274.7px; top: 367.0px;">0</div>
           <!-- "פתחו" card [16,305,173,139]: printed "188" ink x 122.7–168.7, y 369.3–391 -->
           <div class="15-film-plate" style="left: 119px; top: 366px; width: 53px; height: 28px;"></div>
-          <div class="15-film-num" id="15-film-num-opens" style="left: 89.6px; top: 365.4px;">0</div>
+          <div class="15-film-num" id="15-film-num-opens" style="left: 89.5px; top: 367.0px;">0</div>
         </div>
         <!-- rings: card box → card px (x·k, (y−250)·k), padded 8px -->
         <svg class="15-film-ring" style="left: 455.85px; top: 118.92px; width: 415.23px; height: 336.77px;" viewBox="0 0 415.23 336.77" aria-hidden="true">
@@ -300,7 +301,7 @@
     </div>
 
     <!-- top block: kicker + headline -->
-    <div id="15-film-text-layer" class="clip 15-film-layer" data-start="0" data-duration="6.444" data-track-index="4">
+    <div id="15-film-text-layer" class="clip 15-film-layer" data-start="0" data-duration="6.844" data-track-index="4">
       <div id="15-film-kicker" dir="rtl" lang="he">14 · אחרי האירוע</div>
       <div id="15-film-head-1" class="15-film-head" dir="rtl" lang="he">סרט רגעים</div>
       <div id="15-film-head-2" class="15-film-head" dir="rtl" lang="he">ותובנות</div>
@@ -344,7 +345,7 @@
 
       // ── Scene 3 (4.0–6.444s): "ותובנות" — the film page yields, the insights card takes its place ──
       tl.fromTo(el("head-2"), { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 4.0);
-      tl.fromTo(el("page-wrap"), { scale: 1, y: 0, opacity: 1 }, { scale: 0.92, y: -36, opacity: 0.6, duration: 0.9, ease: "power3.out" }, 4.0);
+      tl.fromTo(el("page-wrap"), { scale: 1, y: 0, opacity: 1 }, { scale: 0.9, y: 16, opacity: 0.6, duration: 0.9, ease: "power3.out" }, 4.0);
       tl.fromTo(el("insights"), { x: -1040 }, { x: 0, duration: 0.9, ease: "power3.out" }, 4.0);
 
       // count-up 0→209 on "הצפיות" (4.9s) — text only, no size growth

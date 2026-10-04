@@ -5,7 +5,9 @@ import { sessionDb } from '@/lib/supabase/session';
 
 /** POST /api/account/delete — { confirm: true }: deletes the account and everything it owns. */
 export async function POST(request: Request) {
-  const response = await userRoute(request, (user, body) => deleteAccount(user, body));
+  const response = await userRoute(request, (user, body) => deleteAccount(user, body), {
+    ownerOnly: true,
+  });
   // the session cookies go too
   if (response.ok) await (await sessionDb()).auth.signOut({ scope: 'local' }).catch(() => undefined);
   // the admin console's numbers

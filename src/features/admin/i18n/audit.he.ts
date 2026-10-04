@@ -31,6 +31,8 @@ export const auditHe = {
     system: 'מערכת',
   } as Record<string, string>,
   actions: {
+    'users.act_as': 'כניסה לחשבון הלקוח (תמיכה מרחוק)',
+    'users.act_as_end': 'יציאה מחשבון הלקוח',
     'users.credits': 'קרדיטים',
     'users.plan_gift': 'חבילה במתנה',
     'users.discount': 'הנחה',

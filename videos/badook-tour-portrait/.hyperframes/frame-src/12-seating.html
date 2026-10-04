@@ -1,0 +1,652 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="12-seating-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 760px at 92% 4%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── screen card: phone-seating.png (390×844 CSS) shown 900 px wide, S = 900/390 = 2.307692 px per CSS px.
+         crop CSS y 286 → 779 (ends just above the app's bottom nav) → height 493·S = 1137.7 px.
+         card content origin on canvas (90, 420); local X = x·S, local Y = (y − 286)·S ── */
+    [id="12-seating-cardlayer"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="12-seating-card"] {
+      position: absolute;
+      left: 89px;
+      top: 419px;
+      width: 902px;
+      height: 1139.7px;
+      box-sizing: border-box;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      border-radius: 28px;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+    }
+    [id="12-seating-world"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1137.7px;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+    [id="12-seating-shot"] {
+      position: absolute;
+      left: 0;
+      top: -660.0px;     /* −286·S */
+      width: 900px;
+      height: 1947.69px; /* 844·S */
+      display: block;
+    }
+
+    /* live-state patches over the real UI (all measured from the capture, CSS px → local) */
+    [class~="12-seating-patch"] {
+      position: absolute;
+      opacity: 0;
+    }
+    [class~="12-seating-num"] {
+      position: absolute;
+      font-family: "Heebo", sans-serif;
+      font-size: 32.31px;   /* 14 CSS px · S */
+      line-height: 1;
+      white-space: nowrap;
+      direction: ltr;
+      font-variant-numeric: tabular-nums;
+      opacity: 0;
+    }
+    /* "47 מתוך 54 מאשרי הגעה יושבים" — the 47 (CSS x 359.7–373.3, glyph top 407.7) */
+    [id="12-seating-statpatch"] {
+      left: 827.3px;
+      top: 278.3px;
+      width: 36.9px;
+      height: 26.5px;
+      background: #FAFAF9;
+    }
+    [class~="12-seating-stat"] {
+      left: 782px;
+      top: 278.4px;         /* (407.0 − 286)·S */
+      width: 82.0px;
+      text-align: right;
+      font-weight: 700;
+      color: #1C1917;
+    }
+    /* "3 משפחות עוד בלי שולחן" — the 3 (CSS x 367.3–372.7, glyph top 433.7) */
+    [id="12-seating-fampatch"] {
+      left: 845.0px;
+      top: 337.0px;
+      width: 17.5px;
+      height: 27.7px;
+      background: #FAFAF9;
+    }
+    [id="12-seating-fam2"] {
+      left: 820px;
+      top: 339.2px;         /* (433.0 − 286)·S */
+      width: 41.7px;
+      text-align: right;
+      font-weight: 400;
+      color: #B45309;
+    }
+    /* the line dims while its family is lifted out */
+    /* the crop starts 5 CSS px below the "סידור אוטומטי" button — clear its last sliver */
+    [id="12-seating-topclean"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 15.0px;      /* CSS 286 → 292.5 */
+      background: #FAFAF9;
+    }
+    [id="12-seating-famdim"] {
+      position: absolute;
+      left: 549.2px;
+      top: 334.6px;
+      width: 316.2px;
+      height: 36.9px;
+      background: rgba(250, 250, 249, 0.66);
+      opacity: 0;
+    }
+    /* tab "אורחים (3)" — the 3 (CSS x 162.7–168.3) */
+    [id="12-seating-tabpatch"] {
+      left: 373.8px;
+      top: 447.5px;
+      width: 16.4px;
+      height: 28.0px;
+      background: #F5F5F4;
+    }
+    [id="12-seating-tab2"] {
+      left: 374.4px;
+      top: 445.5px;         /* (479.33 − 286)·S */
+      font-weight: 400;
+      color: #6D6B69;
+    }
+
+    /* table 1 (head table, CSS 155.7–234.7 × 765.3–777.3): its label 6/14 → 9/14, the open seat fills */
+    [id="12-seating-lblpatch"] {
+      left: 428.0px;      /* label "6/14" CSS 186.7–206.3 × 774.3–776.7 */
+      top: 1124.6px;      /* CSS 773.3 → 776.3 (stops at the table's border) */
+      width: 51.0px;
+      height: 8.6px;      /* + the border row the old glyphs touch */
+      background: linear-gradient(to bottom, #EDE3D8 0, #EDE3D8 6.9px, #996B3D 6.9px, #996B3D 100%);
+    }
+    [id="12-seating-lbl"] {
+      position: absolute;
+      left: 423.5px;
+      top: 1126.5px;
+      width: 60px;
+      text-align: center;
+      font-family: "Heebo", sans-serif;
+      font-weight: 400;
+      font-size: 8.1px;
+      line-height: 1;
+      color: #44403C;
+      direction: ltr;
+      white-space: nowrap;
+      opacity: 0;
+    }
+    [id="12-seating-chair"] {
+      position: absolute;
+      left: 520.05px;   /* center (228.17·S, (762.33 − 286)·S) = (526.55, 1099.22) − 6.5 */
+      top: 1092.72px;
+      width: 13px;
+      height: 13px;
+      box-sizing: border-box;
+      border-radius: 9999px;
+      background: #FFFFFF;
+      border: 1.3px solid #D6D3D1;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+    [id="12-seating-tpulse"] {
+      position: absolute;
+      left: 353.2px;
+      top: 1086.0px;
+      width: 194.3px;
+      height: 53.0px;
+      box-sizing: border-box;
+      border-radius: 14px;
+      border: 3px solid #A0703F;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    [id="12-seating-wrings"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1137.7px;
+      overflow: visible;
+    }
+    [class~="12-seating-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      opacity: 0;
+    }
+    [class~="12-seating-ring-glow"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      opacity: 0;
+    }
+
+    /* card-space spotlight + plan ring for the zoomed state (the plan is wider than the zoomed view) */
+    [id="12-seating-dim"] {
+      position: absolute;
+      left: 16px;
+      top: 478.7px;
+      width: 868px;
+      height: 643px;
+      border-radius: 16px;
+      box-shadow: 0 0 0 2400px rgba(28, 25, 23, 0.30);
+      opacity: 0;
+    }
+    [id="12-seating-crings"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1137.7px;
+      overflow: visible;
+    }
+
+    /* ── drag carrier (card-space, unclipped, never zoomed — a screen cursor): origin = cursor tip;
+         the chip center rides at (−44, +12) from the tip; both inside one lift wrapper (lockstep) ── */
+    [id="12-seating-cursorlayer"] {
+      position: absolute;
+      left: 90px;
+      top: 420px;
+      width: 900px;
+      height: 1137.7px;
+      pointer-events: none;
+    }
+    [id="12-seating-carrier"],
+    [id="12-seating-lift"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+    }
+    [id="12-seating-chipbox"] {
+      position: absolute;
+      left: -264px;
+      top: -28px;
+      width: 440px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    [id="12-seating-chip"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      direction: rtl;
+      padding: 12px 26px 13px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 2px solid #A0703F;
+      color: #7A5230;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 30px;
+      line-height: 1.1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 18px 34px -12px rgba(60, 35, 15, 0.45);
+      transform-origin: 50% 50%;
+    }
+    [class~="12-seating-glyph"] {
+      display: block;
+      flex: 0 0 auto;
+      overflow: visible;
+    }
+    [id="12-seating-cursor"] {
+      position: absolute;
+      left: -2px;
+      top: -2px;
+      width: 40px;
+      height: 52px;
+      overflow: visible;
+      transform-origin: 2px 2px;
+    }
+    [id="12-seating-ripple"] {
+      position: absolute;
+      left: 573.0px;   /* send center (607.0, 76.2) − 34 */
+      top: 42.2px;
+      width: 68px;
+      height: 68px;
+      box-sizing: border-box;
+      border-radius: 9999px;
+      border: 3px solid #A0703F;
+      background: rgba(160, 112, 63, 0.12);
+      opacity: 0;
+    }
+
+    /* ── top block (RTL, right edge 990): kicker, headline, callout pill ── */
+    [id="12-seating-top"] {
+      position: absolute;
+      left: 90px;
+      top: 0;
+      width: 900px;
+      height: 420px;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="12-seating-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 88px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="12-seating-headmask"] {
+      position: absolute;
+      right: 0;
+      top: 134px;
+      height: 150px;
+      padding: 0 4px;
+      overflow: hidden;
+    }
+    [id="12-seating-head"] {
+      display: block;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 120px;
+      line-height: 1.25;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [id="12-seating-pill"] {
+      position: absolute;
+      right: 0;
+      top: 306px;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+      direction: rtl;
+      padding: 16px 30px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      color: #A0703F;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1.1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.04);
+      transform-origin: 100% 50%;
+    }
+
+    /* ── the guest's phone: body (588, 610) 452×941, 16px bezel → screen (604, 626) 420×909 = phone-table.png at 420/390 ── */
+    [id="12-seating-phonelayer"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="12-seating-phone"] {
+      position: absolute;
+      left: 588px;
+      top: 610px;
+      width: 452px;
+      height: 940.9px;
+      box-sizing: border-box;
+      padding: 16px;
+      border-radius: 64px;
+      background: #1C1917;
+      box-shadow:
+        inset 0 0 0 1px rgba(251, 247, 241, 0.10),
+        0 1px 3px rgba(28, 25, 23, 0.10),
+        0 30px 64px -22px rgba(60, 35, 15, 0.55);
+    }
+    [id="12-seating-screen"] {
+      position: relative;
+      width: 420px;
+      height: 908.9px;
+      border-radius: 50px;
+      overflow: hidden;
+      background: #FBF7F1;
+    }
+    [id="12-seating-phoneshot"] {
+      display: block;
+      width: 420px;
+      height: 908.9px;
+    }
+    [id="12-seating-phonerings"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: visible;
+      pointer-events: none;
+    }
+  </style>
+
+  <div id="root" data-composition-id="12-seating" data-width="1080" data-height="1920" data-duration="9.243">
+
+    <!-- full-bleed cream ground -->
+    <div id="12-seating-bg" class="clip" data-start="0" data-duration="9.243" data-track-index="0"></div>
+
+    <!-- the real seating screen (phone capture) in a screen card; patches + rings live in the zoomable world -->
+    <div id="12-seating-cardlayer" class="clip" data-start="0" data-duration="9.243" data-track-index="1">
+      <div id="12-seating-card">
+        <div id="12-seating-world">
+          <img id="12-seating-shot" src="assets/phone-seating.png" alt="" />
+
+          <div id="12-seating-topclean"></div>
+          <div id="12-seating-famdim"></div>
+
+          <div class="12-seating-patch" id="12-seating-statpatch"></div>
+          <div class="12-seating-num 12-seating-stat" id="12-seating-s48">48</div>
+          <div class="12-seating-num 12-seating-stat" id="12-seating-s49">49</div>
+          <div class="12-seating-num 12-seating-stat" id="12-seating-s50">50</div>
+
+          <div class="12-seating-patch" id="12-seating-fampatch"></div>
+          <div class="12-seating-num" id="12-seating-fam2">2</div>
+
+          <div class="12-seating-patch" id="12-seating-tabpatch"></div>
+          <div class="12-seating-num" id="12-seating-tab2">2</div>
+
+          <div class="12-seating-patch" id="12-seating-lblpatch"></div>
+          <div id="12-seating-lbl">9/14</div>
+          <div id="12-seating-chair"></div>
+          <div id="12-seating-tpulse"></div>
+
+          <svg id="12-seating-wrings" viewBox="0 0 900 1137.7" aria-hidden="true">
+            <path id="12-seating-sendglow" class="12-seating-ring-glow" pathLength="1" stroke-width="20" d="" />
+            <path id="12-seating-sendring" class="12-seating-ring" pathLength="1" stroke-width="4" d="" />
+          </svg>
+        </div>
+
+        <div id="12-seating-dim"></div>
+        <svg id="12-seating-crings" viewBox="0 0 900 1137.7" aria-hidden="true">
+          <path id="12-seating-planglow" class="12-seating-ring-glow" pathLength="1" stroke-width="20" d="" />
+          <path id="12-seating-planring" class="12-seating-ring" pathLength="1" stroke-width="4" d="" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- top block: kicker, headline, callout pill -->
+    <div id="12-seating-top" class="clip" data-start="0" data-duration="9.243" data-track-index="2" dir="rtl" lang="he">
+      <div id="12-seating-kicker">11 · מושיבים</div>
+      <div id="12-seating-headmask"><h1 id="12-seating-head">בגרירה</h1></div>
+      <div id="12-seating-pill" dir="rtl" lang="he">
+        <svg class="12-seating-glyph" width="40" height="32" viewBox="0 0 30 24" aria-hidden="true"><g fill="none" stroke="#A0703F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="6.5" r="3.6" /><path d="M8.5 21 C 8.5 15.5, 11.5 12.6, 15 12.6 S 21.5 15.5, 21.5 21" /><circle cx="6" cy="9" r="2.7" /><path d="M1.5 20 C 1.5 16, 3.4 14, 6 14 C 7 14, 7.8 14.3, 8.5 14.8" /><circle cx="24" cy="9" r="2.7" /><path d="M28.5 20 C 28.5 16, 26.6 14, 24 14 C 23 14, 22.2 14.3, 21.5 14.8" /></g></svg>
+        <span>משפחה שלמה בגרירה</span>
+      </div>
+    </div>
+
+    <!-- the guest's phone: their own table page -->
+    <div id="12-seating-phonelayer" class="clip" data-start="0" data-duration="9.243" data-track-index="3">
+      <div id="12-seating-phone">
+        <div id="12-seating-screen">
+          <img id="12-seating-phoneshot" src="assets/phone-table.png" alt="" />
+        </div>
+      </div>
+      <svg id="12-seating-phonerings" viewBox="0 0 1080 1920" aria-hidden="true">
+        <path id="12-seating-cardglow" class="12-seating-ring-glow" pathLength="1" stroke-width="20" d="" />
+        <path id="12-seating-cardring" class="12-seating-ring" pathLength="1" stroke-width="4" d="" />
+      </svg>
+    </div>
+
+    <!-- the cursor + dragged family chip (screen-space over the card) -->
+    <div id="12-seating-cursorlayer" class="clip" data-start="0" data-duration="9.243" data-track-index="4">
+      <div id="12-seating-ripple"></div>
+      <div id="12-seating-carrier">
+        <div id="12-seating-lift">
+          <div id="12-seating-chipbox">
+            <div id="12-seating-chip" dir="rtl" lang="he">
+              <svg class="12-seating-glyph" width="38" height="30" viewBox="0 0 30 24" aria-hidden="true"><g fill="none" stroke="#A0703F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="6.5" r="3.6" /><path d="M8.5 21 C 8.5 15.5, 11.5 12.6, 15 12.6 S 21.5 15.5, 21.5 21" /><circle cx="6" cy="9" r="2.7" /><path d="M1.5 20 C 1.5 16, 3.4 14, 6 14 C 7 14, 7.8 14.3, 8.5 14.8" /><circle cx="24" cy="9" r="2.7" /><path d="M28.5 20 C 28.5 16, 26.6 14, 24 14 C 23 14, 22.2 14.3, 21.5 14.8" /></g></svg>
+              <span>משפחת אזולאי · 3</span>
+            </div>
+          </div>
+          <svg id="12-seating-cursor" viewBox="-2 -2 40 52" aria-hidden="true"><path d="M0 0 L0 38 L10.6 28.6 L17.6 44 L24.2 41.2 L17.4 26 L31.4 26 Z" fill="#1C1917" stroke="#FBF7F1" stroke-width="2.4" stroke-linejoin="round" /></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="12-seating"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="12-seating-' + name + '"]') || document.getElementById("12-seating-" + name);
+      }
+
+      // ── coordinate mapping (phone-seating.png, page CSS px → card-local px) ──
+      var S = 900 / 390;
+      var CY = 286;
+      var CARD_H = 493 * S;                        // 1137.7
+      function LX(x) { return x * S; }
+      function LY(y) { return (y - CY) * S; }
+
+      // rounded-rect path starting top-middle, clockwise
+      function rr(x, y, w, h, r) {
+        return "M" + (x + w / 2) + " " + y +
+          " H" + (x + w - r) + " A" + r + " " + r + " 0 0 1 " + (x + w) + " " + (y + r) +
+          " V" + (y + h - r) + " A" + r + " " + r + " 0 0 1 " + (x + w - r) + " " + (y + h) +
+          " H" + (x + r) + " A" + r + " " + r + " 0 0 1 " + x + " " + (y + h - r) +
+          " V" + (y + r) + " A" + r + " " + r + " 0 0 1 " + (x + r) + " " + y + " Z";
+      }
+
+      // measured boxes (CSS px of the 390-wide page)
+      var SEND = { x: LX(152), y: LY(299), w: 222 * S, h: 40 * S };            // לשלוח לאורחים את השולחן
+      var FAM = { x: LX(306), y: LY(439) };                                     // "3 משפחות עוד בלי שולחן" line center
+      var T1 = { x: LX(195.17), y: LY(771.33) };                                // table 1 center
+      var CANVAS_TOP = LY(564);                                                 // `canvas` [17, 564, 356, 559]
+
+      // zoom-to-target on the plan: 1.3×, centred on the canvas column, bottom held on the crop edge
+      var ZS = 1.3;
+      var ZX = 450 - LX(195) * ZS;                                              // canvas center x stays centred
+      var ZY = CARD_H - CARD_H * ZS;                                            // never reveals the nav below the crop
+      var PLAN_TOP = ZY + CANVAS_TOP * ZS;                                      // canvas top on the zoomed card
+
+      // phone-table.png in the device screen: "2 · השולחן שלכם" card [16, 106, 357.67, 115.67]
+      var PH = 420 / 390;
+      var CARD = { x: 604 + 16 * PH, y: 626 + 106 * PH, w: 357.67 * PH, h: 115.67 * PH };
+
+      // rings (paths computed from the boxes)
+      var sendD = rr(SEND.x - 10, SEND.y - 10, SEND.w + 20, SEND.h + 20, 16);
+      el("sendring").setAttribute("d", sendD);
+      el("sendglow").setAttribute("d", sendD);
+      var planD = rr(16, PLAN_TOP - 14, 868, CARD_H - 16 - (PLAN_TOP - 14), 16);
+      el("planring").setAttribute("d", planD);
+      el("planglow").setAttribute("d", planD);
+      var cardD = rr(CARD.x - 8, CARD.y - 8, CARD.w + 16, CARD.h + 16, 30);
+      el("cardring").setAttribute("d", cardD);
+      el("cardglow").setAttribute("d", cardD);
+
+      // drag geometry (card-space; world is at 1× during the drag): carrier origin = cursor tip, chip center = tip + (−44, +12)
+      var CHIP_DX = -44, CHIP_DY = 12;
+      var START = { x: 830, y: 760 };
+      var GRAB = { x: FAM.x - 26 - CHIP_DX, y: FAM.y - CHIP_DY };   // chip lifts off the line, centred on it
+      var DROP = { x: T1.x - CHIP_DX, y: T1.y - CHIP_DY };           // chip center lands exactly on table 1
+      var REST = { x: 650, y: 980 };
+      var CLICK = { x: SEND.x + SEND.w / 2, y: SEND.y + SEND.h / 2 };
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–1.9s): screen card enters, kicker, cursor arrives ──
+      tl.fromTo(el("card"), { opacity: 0, y: 40, scale: 0.985 }, { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 0.35);
+
+      tl.fromTo(el("cursor"), { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 1.1);
+      tl.fromTo(el("carrier"), { x: START.x, y: START.y }, { x: GRAB.x, y: GRAB.y, duration: 0.7, ease: "power2.inOut" }, 1.12);
+
+      // ── Scene 2 (1.9–4.4s): headline, grab → arc drag → drop on table 1 ──
+      tl.fromTo(el("head"), { yPercent: 105 }, { yPercent: 0, duration: 0.8, ease: "power3.out" }, 1.9);
+
+      // grab: press dip, chip lifts off the line, the line dims
+      tl.fromTo(el("cursor"), { scale: 1 }, { scale: 0.86, duration: 0.08, ease: "power2.out" }, 1.9);
+      tl.fromTo(el("cursor"), { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "power2.out", immediateRender: false }, 1.98);
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1.05, duration: 0.24, ease: "power3.out" }, 1.92);
+      tl.fromTo(el("famdim"), { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, 1.95);
+
+      // travel 2.2–3.4: carrier (cursor + chip, rigid) power3 in-out + a sideways arc on the lift wrapper
+      tl.fromTo(el("carrier"), { x: GRAB.x, y: GRAB.y }, { x: DROP.x, y: DROP.y, duration: 1.2, ease: "power3.inOut", immediateRender: false }, 2.2);
+      tl.fromTo(el("lift"), { x: 0, y: 0 }, { x: 96, y: -36, duration: 0.6, ease: "power2.out" }, 2.2);
+      tl.fromTo(el("lift"), { x: 96, y: -36 }, { x: 0, y: 0, duration: 0.6, ease: "power2.in", immediateRender: false }, 2.8);
+
+      // drop 3.4 — state commit: chip sinks into the table, the table answers
+      tl.fromTo(el("cursor"), { scale: 1 }, { scale: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, 3.4);
+      tl.fromTo(el("cursor"), { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "power2.out", immediateRender: false }, 3.47);
+      tl.fromTo(el("chip"), { opacity: 1, scale: 1.05 }, { opacity: 0, scale: 0.3, duration: 0.2, ease: "power2.in", immediateRender: false }, 3.4);
+      tl.fromTo(el("tpulse"), { opacity: 0.7, scale: 1 }, { opacity: 0, scale: 1.3, duration: 0.7, ease: "power2.out", immediateRender: false }, 3.42);
+
+      // the open seat fills, table label 6/14 → 9/14
+      tl.set([el("chair"), el("lblpatch"), el("lbl")], { opacity: 1 }, 3.46);
+      tl.fromTo(el("chair"), { scale: 0.55, backgroundColor: "#FFFFFF", borderColor: "#D6D3D1" },
+        { scale: 1, backgroundColor: "#E9D7BF", borderColor: "#9F6F3E", duration: 0.28, ease: "power3.out", immediateRender: false }, 3.48);
+
+      // seated count climbs 47 → 48 → 49 → 50 (one per family member)
+      tl.set(el("statpatch"), { opacity: 1 }, 3.48);
+      [["s48", 3.48, null], ["s49", 3.58, "s48"], ["s50", 3.68, "s49"]].forEach(function (s) {
+        tl.set(el(s[0]), { opacity: 1 }, s[1]);
+        if (s[2]) tl.set(el(s[2]), { opacity: 0 }, s[1]);
+      });
+
+      // the unseated line commits: dim lifts, 3 → 2 families; guests tab (3) → (2)
+      tl.fromTo(el("famdim"), { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power2.out", immediateRender: false }, 3.5);
+      tl.set([el("fampatch"), el("fam2")], { opacity: 1 }, 3.56);
+      tl.set([el("tabpatch"), el("tab2")], { opacity: 1 }, 3.62);
+
+      // cursor steps off the table so the result reads
+      tl.fromTo(el("carrier"), { x: DROP.x, y: DROP.y }, { x: REST.x, y: REST.y, duration: 0.5, ease: "power2.inOut", immediateRender: false }, 3.65);
+
+      // callout pill on its word (spring-pop: smooth settle, no bounce)
+      tl.fromTo(el("pill"), { opacity: 0, scale: 0.82, y: 14 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.9);
+
+      // ── Scene 3 (4.4–6.1s): zoom-to-target 1.3× on the hall plan + spotlight + ring ──
+      tl.fromTo(el("world"), { x: 0, y: 0, scale: 1 }, { x: ZX, y: ZY, scale: ZS, duration: 1.0, ease: "power3.inOut" }, 4.4);
+      tl.fromTo(el("dim"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 4.9);
+      tl.set([el("planring"), el("planglow")], { opacity: 1 }, 5.0);
+      tl.fromTo([el("planring"), el("planglow")], { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 5.0);
+
+      // ── Scene 4 (6.1–9.243s): zoom back, ring on send, click, phone arrives, ring on its table card ──
+      tl.fromTo(el("world"), { x: ZX, y: ZY, scale: ZS }, { x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.inOut", immediateRender: false }, 6.1);
+      tl.fromTo(el("dim"), { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power2.out", immediateRender: false }, 6.1);
+      tl.fromTo([el("planring"), el("planglow")], { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power2.out", immediateRender: false }, 6.1);
+      tl.set([el("sendring"), el("sendglow")], { opacity: 1 }, 6.1);
+      tl.fromTo([el("sendring"), el("sendglow")], { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 6.1);
+
+      tl.fromTo(el("carrier"), { x: REST.x, y: REST.y }, { x: CLICK.x, y: CLICK.y, duration: 0.5, ease: "power2.inOut", immediateRender: false }, 6.05);
+      tl.fromTo(el("cursor"), { scale: 1 }, { scale: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, 6.58);
+      tl.fromTo(el("cursor"), { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "power2.out", immediateRender: false }, 6.65);
+      tl.fromTo(el("ripple"), { opacity: 0.7, scale: 0.3 }, { opacity: 0, scale: 1.5, duration: 0.55, ease: "power2.out", immediateRender: false }, 6.58);
+
+      tl.fromTo(el("phone"), { x: 640, opacity: 0 }, { x: 0, opacity: 1, duration: 0.85, ease: "power3.out" }, 6.7);
+      tl.set([el("cardring"), el("cardglow")], { opacity: 1 }, 7.6);
+      tl.fromTo([el("cardring"), el("cardglow")], { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.65, ease: "power2.inOut" }, 7.6);
+
+      // hold to the last frame
+      tl.set({}, {}, 9.243);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["12-seating"] = tl;
+    })();
+  </script>
+</template>

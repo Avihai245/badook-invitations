@@ -3,15 +3,20 @@ import type { User } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import type { ApiResult } from '@/features/invitations/server/host-api';
 import { invitationsEnabled } from '@/lib/feature';
-import { getSessionUser } from '@/lib/supabase/session';
+import { getActingAs, getSessionUser } from '@/lib/supabase/session';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 const json = (status: number, body: unknown) => NextResponse.json(body, { status, headers: NO_STORE });
 
-/** A signed-in JSON route of the billing screen (same rules as the host API: JSON bodies only). */
+/**
+ * A signed-in JSON route of the billing screen (same rules as the host API: JSON bodies only).
+ * `ownerOnly`: what only the account's owner may do (pay, cancel, delete the account) — refused to a
+ * staff member acting as them for support.
+ */
 export async function userRoute(
   request: Request,
   handler: (user: User, body: unknown) => Promise<ApiResult>,
+  { ownerOnly = false }: { ownerOnly?: boolean } = {},
 ): Promise<Response> {
   if (!invitationsEnabled()) return json(404, { ok: false, code: 'not_found' });
   if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
@@ -26,6 +31,7 @@ export async function userRoute(
   }
   const user = await getSessionUser();
   if (!user) return json(401, { ok: false, code: 'unauthorized' });
+  if (ownerOnly && (await getActingAs())) return json(403, { ok: false, code: 'acting_as' });
   try {
     const result = await handler(user, body);
     return json(result.status, result.body);

@@ -1,0 +1,650 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="06-edit-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 700px at 92% 4%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    [id="06-edit-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ── editor screen card: x 330–990, y 460–1570 (390-CSS page @ 1.6923 px/CSS px) ── */
+    [id="06-edit-card"] {
+      position: absolute;
+      left: 330px;
+      top: 460px;
+      width: 660px;
+      height: 1110px;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+      transform-origin: 50% 50%;
+    }
+    [id="06-edit-world"] {
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 660px;
+      height: 1428.3px;
+      transform-origin: 0 0;
+    }
+    [id="06-edit-shot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 660px;
+      height: 1428.3px;
+      display: block;
+    }
+    [id="06-edit-wsvg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 660px;
+      height: 1428.3px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [id="06-edit-dim"] {
+      position: absolute;
+      inset: 0;
+      background: #FBF7F1;
+      opacity: 0;
+      pointer-events: none;
+    }
+    [class~="06-edit-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 4;
+      stroke-dasharray: 1 1;
+      stroke-linejoin: round;
+    }
+    [class~="06-edit-ring-glow"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-width: 16;
+      stroke-dasharray: 1 1;
+      stroke-linejoin: round;
+    }
+    [class~="06-edit-ring-sm"] { stroke-width: 2.6; }
+    [class~="06-edit-ring-glow-sm"] { stroke-width: 10; }
+
+    /* publish press: a lifted crop of the REAL button (same screenshot, same mapping) */
+    [id="06-edit-burst"] {
+      position: absolute;
+      border-radius: 14px;
+      background: radial-gradient(closest-side, rgba(122, 82, 48, 0.85), rgba(160, 112, 63, 0.35) 60%, rgba(160, 112, 63, 0) 100%);
+      filter: blur(10px);
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+    [id="06-edit-lift"] {
+      position: absolute;
+      overflow: hidden;
+      border-radius: 10px;
+      transform-origin: 50% 50%;
+    }
+    [id="06-edit-lift-img"] {
+      position: absolute;
+      width: 660px;
+      height: 1428.3px;
+      display: block;
+    }
+
+    /* "פורסם" check pill (inside the world; authored at world scale, read at ×1.6 after the punch-in) */
+    [id="06-edit-pill"] {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      direction: rtl;
+      padding: 9px 17px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 22px;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 8px 18px -8px rgba(60, 35, 15, 0.45);
+      transform-origin: 0% 50%;
+    }
+    [id="06-edit-pill"] svg {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
+    }
+
+    /* ── live preview phone (device), left, overlapping the card's margin ── */
+    [id="06-edit-phone"] {
+      position: absolute;
+      left: 40px;
+      top: 700px;
+      width: 350px;
+      height: 720.2px;
+      box-sizing: border-box;
+      padding: 16px;
+      border-radius: 64px;
+      background: #1C1917;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 30px 70px -26px rgba(60, 35, 15, 0.55);
+      transform-origin: 50% 50%;
+    }
+    [id="06-edit-pscreen"] {
+      position: relative;
+      width: 318px;
+      height: 688.2px;
+      border-radius: 50px;
+      overflow: hidden;
+      background: #731F2E;
+    }
+    [id="06-edit-pshot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 318px;
+      height: 688.2px;
+      display: block;
+    }
+    [id="06-edit-psvg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 318px;
+      height: 688.2px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [class~="06-edit-pring"] {
+      fill: none;
+      stroke: #FBF7F1;
+      stroke-width: 2.5;
+      stroke-dasharray: 1 1;
+      stroke-linejoin: round;
+    }
+    [class~="06-edit-pring-glow"] {
+      fill: rgba(251, 247, 241, 0.10);
+      stroke: rgba(251, 247, 241, 0.28);
+      stroke-width: 9;
+      stroke-dasharray: 1 1;
+      stroke-linejoin: round;
+    }
+
+    /* stage-level overlay: live-link arcs field → preview line */
+    [id="06-edit-ssvg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [class~="06-edit-arc-halo"] {
+      fill: none;
+      stroke: rgba(251, 247, 241, 0.85);
+      stroke-width: 6;
+      stroke-dasharray: 1 1;
+      stroke-linecap: round;
+    }
+    [class~="06-edit-arc"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 2.5;
+      stroke-dasharray: 1 1;
+      stroke-linecap: round;
+    }
+    [class~="06-edit-dot"] {
+      fill: #A0703F;
+      stroke: #FBF7F1;
+      stroke-width: 2.5;
+    }
+
+    /* feature chip — solid brown, cream text, live dot (positioned by script on the phone's top edge) */
+    [id="06-edit-chip-anchor"] {
+      position: absolute;
+      width: 520px;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    [id="06-edit-chip"] {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      direction: rtl;
+      padding: 16px 30px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 12px 28px -10px rgba(60, 35, 15, 0.5);
+      transform-origin: 50% 50%;
+    }
+    [id="06-edit-live"] {
+      position: relative;
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+    }
+    [id="06-edit-live-core"],
+    [id="06-edit-live-halo"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: #FBF7F1;
+    }
+    [id="06-edit-live-halo"] {
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    /* rebuilt review card — cream popover beneath the overflow (⋯) button */
+    [id="06-edit-review"] {
+      position: absolute;
+      width: 570px;
+      box-sizing: border-box;
+      padding: 26px 26px 26px;
+      border-radius: 16px;
+      background: #FBF7F1;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 50px -18px rgba(60, 35, 15, 0.45);
+      direction: rtl;
+      text-align: right;
+      font-family: "Heebo", sans-serif;
+    }
+    [id="06-edit-review-notch"] {
+      position: absolute;
+      top: -10px;
+      width: 18px;
+      height: 18px;
+      background: #FBF7F1;
+      border-left: 1px solid rgba(28, 25, 23, 0.12);
+      border-top: 1px solid rgba(28, 25, 23, 0.12);
+      transform: rotate(45deg);
+    }
+    [id="06-edit-review-title"] {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      font-size: 36px;
+      line-height: 1.2;
+      color: #1C1917;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(28, 25, 23, 0.12);
+    }
+    [id="06-edit-review-title"] svg {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+    }
+    [class~="06-edit-bubble"] {
+      background: #F3E8DB;
+      border-radius: 16px 16px 5px 16px;
+      padding: 14px 20px;
+      font-size: 31px;
+      line-height: 1.35;
+      font-weight: 400;
+      color: #1C1917;
+      transform-origin: 100% 0%;
+    }
+    [class~="06-edit-bubble"] + [class~="06-edit-bubble"] {
+      margin-top: 14px;
+    }
+    [class~="06-edit-who"] {
+      font-weight: 700;
+      color: #7A5230;
+    }
+
+    /* ── top block (RTL, right-aligned, y ≈ 100–420) ── */
+    [id="06-edit-top"] {
+      position: absolute;
+      left: 90px;
+      top: 0;
+      width: 900px;
+      height: 440px;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="06-edit-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 112px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="06-edit-head"] {
+      position: absolute;
+      right: 0;
+      top: 168px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 116px;
+      line-height: 1.06;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+    }
+    [class~="06-edit-line"] {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      padding-bottom: 6px;
+    }
+    [class~="06-edit-word"] {
+      display: inline-block;
+    }
+  </style>
+
+  <div id="root" data-composition-id="06-edit" data-width="1080" data-height="1920" data-duration="10.247">
+    <div id="06-edit-bg" class="clip" data-start="0" data-duration="10.247" data-track-index="0"></div>
+
+    <div id="06-edit-stage" class="clip" data-start="0" data-duration="10.247" data-track-index="1">
+      <div id="06-edit-card">
+        <div id="06-edit-world">
+          <img id="06-edit-shot" src="assets/phone-editor.png" alt="" />
+          <svg id="06-edit-wsvg" viewBox="0 0 660 1428.3" aria-hidden="true">
+            <!-- field rings -->
+            <path id="06-edit-r1-glow" class="06-edit-ring-glow" pathLength="1" d="" />
+            <path id="06-edit-r1" class="06-edit-ring" pathLength="1" d="" />
+            <path id="06-edit-r2-glow" class="06-edit-ring-glow" pathLength="1" d="" />
+            <path id="06-edit-r2" class="06-edit-ring" pathLength="1" d="" />
+            <!-- overflow (comments) + publish rings -->
+            <path id="06-edit-rc-glow" class="06-edit-ring-glow" pathLength="1" d="" />
+            <path id="06-edit-rc" class="06-edit-ring" pathLength="1" d="" />
+            <path id="06-edit-rp-glow" class="06-edit-ring-glow 06-edit-ring-glow-sm" pathLength="1" d="" />
+            <path id="06-edit-rp" class="06-edit-ring 06-edit-ring-sm" pathLength="1" d="" />
+          </svg>
+          <div id="06-edit-burst"></div>
+          <div id="06-edit-lift"><img id="06-edit-lift-img" src="assets/phone-editor.png" alt="" /></div>
+          <div id="06-edit-pill" dir="rtl" lang="he">
+            <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="#FBF7F1" /><path d="M7.5 13.5 L11.5 17.2 L18.8 9.4" fill="none" stroke="#A0703F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span>פורסם</span>
+          </div>
+        </div>
+        <div id="06-edit-dim"></div>
+      </div>
+
+      <div id="06-edit-phone">
+        <div id="06-edit-pscreen">
+          <img id="06-edit-pshot" src="assets/phone-personal-hero.png" alt="" />
+          <svg id="06-edit-psvg" viewBox="0 0 318 688.2" aria-hidden="true">
+            <path id="06-edit-p1-glow" class="06-edit-pring-glow" pathLength="1" d="" />
+            <path id="06-edit-p1" class="06-edit-pring" pathLength="1" d="" />
+            <path id="06-edit-p2-glow" class="06-edit-pring-glow" pathLength="1" d="" />
+            <path id="06-edit-p2" class="06-edit-pring" pathLength="1" d="" />
+          </svg>
+        </div>
+      </div>
+
+      <svg id="06-edit-ssvg" viewBox="0 0 1080 1920" aria-hidden="true">
+        <path id="06-edit-a1-halo" class="06-edit-arc-halo" pathLength="1" d="" />
+        <path id="06-edit-a1" class="06-edit-arc" pathLength="1" d="" />
+        <path id="06-edit-a2-halo" class="06-edit-arc-halo" pathLength="1" d="" />
+        <path id="06-edit-a2" class="06-edit-arc" pathLength="1" d="" />
+        <circle id="06-edit-d1" class="06-edit-dot" r="8" cx="0" cy="0" />
+        <circle id="06-edit-d2" class="06-edit-dot" r="8" cx="0" cy="0" />
+      </svg>
+
+      <div id="06-edit-chip-anchor">
+        <div id="06-edit-chip" dir="rtl" lang="he">
+          <span id="06-edit-live"><span id="06-edit-live-halo"></span><span id="06-edit-live-core"></span></span>
+          <span>מתעדכן בזמן אמת</span>
+        </div>
+      </div>
+
+      <div id="06-edit-review" dir="rtl" lang="he">
+        <div id="06-edit-review-notch"></div>
+        <div id="06-edit-review-title">
+          <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M4 6.5 Q4 4 6.5 4 H19.5 Q22 4 22 6.5 V15.5 Q22 18 19.5 18 H11 L6 22 V18 H6.5 Q4 18 4 15.5 Z" fill="none" stroke="#A0703F" stroke-width="2" stroke-linejoin="round" /></svg>
+          <span>טיוטה למשפחה</span>
+        </div>
+        <div id="06-edit-b1" class="06-edit-bubble"><span class="06-edit-who">אמא:</span> מהמם!</div>
+        <div id="06-edit-b2" class="06-edit-bubble"><span class="06-edit-who">סבתא שושנה:</span> להוסיף את שעת החופה</div>
+      </div>
+    </div>
+
+    <div id="06-edit-top" class="clip" data-start="0" data-duration="10.247" data-track-index="2" dir="rtl" lang="he">
+      <div id="06-edit-kicker" dir="rtl" lang="he">05 · עורכים</div>
+      <h1 id="06-edit-head" dir="rtl" lang="he">
+        <span class="06-edit-line"><span id="06-edit-w1" class="06-edit-word">רואים</span> <span id="06-edit-w2" class="06-edit-word">כל</span></span>
+        <span class="06-edit-line"><span id="06-edit-w3" class="06-edit-word">שינוי</span> <span id="06-edit-w4" class="06-edit-word">מיד</span></span>
+      </h1>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="06-edit"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="06-edit-' + name + '"]') || document.getElementById("06-edit-" + name);
+      }
+
+      // ── editor card mapping: phone page 390×844 CSS → card world 660 px wide ──
+      var CARD_X = 330, CARD_Y = 460;          // card origin on stage (world sits at -1,-1 inside the 1px border → content box origin)
+      var S = 660 / 390;                       // 1.6923 px per CSS px
+      var CROP_Y = 188;                        // Scenes 1–3: page scrolled to the form (CSS 188–844)
+      var BOX = {
+        fieldOpen: [37, 411, 316, 93],
+        fieldPlace: [37, 615, 316, 93],
+        more: [55, 12, 38, 32],                // the overflow (⋯) button — drafts / comments live behind it
+        publish: [12, 12, 38, 32]
+      };
+      // input value rows inside each field (where the typed text sits)
+      var INPUT_OPEN_CY = 462, INPUT_PLACE_CY = 665;
+
+      // ── preview phone mapping: page 390×844 CSS → 318 px screen ──
+      var PH_X = 40, PH_Y = 700, PH_W = 350, PH_H = 720.2, BEZEL = 16;
+      var P = 318 / 390;                       // 0.8154 px per CSS px
+      var PBOX = {
+        open: [140, 274, 110, 12],             // "אנחנו מתחתנים" line on the invitation
+        place: [165, 601, 60, 12]              // "זכרון יעקב" line
+      };
+
+      function rr(x, y, w, h, rad) {
+        var cx = x + w / 2;
+        rad = Math.min(rad, w / 2, h / 2);
+        return "M" + cx + " " + y +
+          " H" + (x + w - rad) + " A" + rad + " " + rad + " 0 0 1 " + (x + w) + " " + (y + rad) +
+          " V" + (y + h - rad) + " A" + rad + " " + rad + " 0 0 1 " + (x + w - rad) + " " + (y + h) +
+          " H" + (x + rad) + " A" + rad + " " + rad + " 0 0 1 " + x + " " + (y + h - rad) +
+          " V" + (y + rad) + " A" + rad + " " + rad + " 0 0 1 " + (x + rad) + " " + y +
+          " H" + cx + " Z";
+      }
+      function wring(b, pad, rad) { // world coords (unscrolled page × S)
+        return rr(b[0] * S - pad, b[1] * S - pad, b[2] * S + 2 * pad, b[3] * S + 2 * pad, rad);
+      }
+      function pring(b, padX, padY, rad) { // phone-screen coords
+        return rr(b[0] * P - padX, b[1] * P - padY, b[2] * P + 2 * padX, b[3] * P + 2 * padY, rad);
+      }
+      function setD(name, d) { el(name).setAttribute("d", d); }
+
+      setD("r1", wring(BOX.fieldOpen, 8, 16)); setD("r1-glow", wring(BOX.fieldOpen, 8, 16));
+      setD("r2", wring(BOX.fieldPlace, 8, 16)); setD("r2-glow", wring(BOX.fieldPlace, 8, 16));
+      setD("rc", wring(BOX.more, 4, 14)); setD("rc-glow", wring(BOX.more, 4, 14));
+      setD("rp", wring(BOX.publish, 4, 12)); setD("rp-glow", wring(BOX.publish, 4, 12));
+      setD("p1", pring(PBOX.open, 10, 9, 12)); setD("p1-glow", pring(PBOX.open, 10, 9, 12));
+      setD("p2", pring(PBOX.place, 10, 9, 12)); setD("p2-glow", pring(PBOX.place, 10, 9, 12));
+
+      // ── live-link arcs (stage coords): field's left edge at the input row → right end of the matching preview line ──
+      function stageField(xCss, yCss) { return [CARD_X + xCss * S, CARD_Y + (yCss - CROP_Y) * S]; }
+      function stagePhone(xCss, yCss) { return [PH_X + BEZEL + xCss * P, PH_Y + BEZEL + yCss * P]; }
+      function arc(a, d, from, to) {
+        var x0 = from[0], y0 = from[1], x1 = to[0] + 14, y1 = to[1];
+        var lift = 80;
+        var path = "M" + x0 + " " + y0 + " C" + (x0 - 40) + " " + (Math.min(y0, y1) - lift) + ", " + (x1 + 60) + " " + (Math.min(y0, y1) - lift) + ", " + x1 + " " + y1;
+        el(a).setAttribute("d", path);
+        el(a + "-halo").setAttribute("d", path);
+        el(d).setAttribute("cx", x1);
+        el(d).setAttribute("cy", y1);
+      }
+      arc("a1", "d1", stageField(BOX.fieldOpen[0], INPUT_OPEN_CY), stagePhone(PBOX.open[0] + PBOX.open[2], PBOX.open[1] + PBOX.open[3] / 2));
+      arc("a2", "d2", stageField(BOX.fieldPlace[0], INPUT_PLACE_CY), stagePhone(PBOX.place[0] + PBOX.place[2], PBOX.place[1] + PBOX.place[3] / 2));
+
+      // ── zoom-to-target on the preview phone (1.25×, nudged right so it stays inside the frame) ──
+      var Z = 1.25, ZX = 40;
+      var phCx = PH_X + PH_W / 2, phCy = PH_Y + PH_H / 2;
+
+      // feature chip: centred on the phone, straddling its top edge (zoomed state, then rest state)
+      var chipAnchor = el("chip-anchor");
+      chipAnchor.style.left = (phCx - 260) + "px";
+      chipAnchor.style.top = (PH_Y - 40) + "px";
+      var chipZoomX = ZX, chipZoomY = -(PH_H * (Z - 1) / 2);   // top edge moves up by (Z-1)/2 · H when zoomed
+
+      // ── review card: popover beneath the ⋯ button (page scrolled to top in Scene 4) ──
+      var review = el("review");
+      var moreCx = CARD_X + (BOX.more[0] + BOX.more[2] / 2) * S;
+      var moreBottom = CARD_Y + (BOX.more[1] + BOX.more[3]) * S;
+      var REV_LEFT = 410;
+      review.style.left = REV_LEFT + "px";
+      review.style.top = (moreBottom + 22) + "px";
+      el("review-notch").style.left = (moreCx - REV_LEFT - 9) + "px";
+
+      // ── publish lift + burst + pill (world coords) ──
+      var pub = { x: BOX.publish[0] * S, y: BOX.publish[1] * S, w: BOX.publish[2] * S, h: BOX.publish[3] * S };
+      var lift = el("lift");
+      lift.style.left = pub.x + "px"; lift.style.top = pub.y + "px";
+      lift.style.width = pub.w + "px"; lift.style.height = pub.h + "px";
+      el("lift-img").style.left = (-pub.x) + "px";
+      el("lift-img").style.top = (-pub.y) + "px";
+      var burst = el("burst");
+      burst.style.left = pub.x + "px"; burst.style.top = pub.y + "px";
+      burst.style.width = pub.w + "px"; burst.style.height = pub.h + "px";
+      var pill = el("pill");
+      pill.style.left = pub.x + "px";
+      pill.style.top = (pub.y + pub.h + 14) + "px";
+
+      var world = el("world"), card = el("card"), phone = el("phone");
+      var W_SCROLL = -CROP_Y * S;
+      var PUNCH = 1.6;
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–1.2s): screen card enters; headline at 0.3s ──
+      tl.set(world, { x: 0, y: W_SCROLL, scale: 1 }, 0);
+      tl.fromTo(card, { opacity: 0, y: 40, scale: 0.975 }, { opacity: 1, y: 0, scale: 1, duration: 1.0, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.15);
+      ["w1", "w2", "w3", "w4"].forEach(function (w, i) {
+        tl.fromTo(el(w), { yPercent: 105, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.75, ease: "power3.out" }, 0.3 + i * 0.12);
+      });
+
+      // ── Scene 2 (1.2–3.2s): field rings on their words; the preview phone docks; arc field → preview line; the line answers ──
+      var dashed = ["r1", "r1-glow", "r2", "r2-glow", "rc", "rc-glow", "rp", "rp-glow", "p1", "p1-glow", "p2", "p2-glow", "a1", "a1-halo", "a2", "a2-halo"];
+      tl.set(dashed.map(el), { strokeDashoffset: 1 }, 0);
+      tl.set([el("d1"), el("d2")], { opacity: 0 }, 0);
+
+      function ring(name, at, dur) {
+        dur = dur || 0.6;
+        tl.fromTo(el(name), { strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: dur, ease: "power2.inOut" }, at);
+        tl.fromTo(el(name + "-glow"), { strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: dur, ease: "power2.inOut" }, at);
+      }
+      function link(a, d, at) {
+        tl.fromTo([el(a + "-halo"), el(a)], { strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: 0.5, ease: "power2.inOut" }, at);
+        tl.fromTo(el(d), { scale: 0, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, duration: 0.35, ease: "power3.out" }, at + 0.42);
+      }
+
+      // the live preview docks beside the form with the first edit (co-visible couple)
+      tl.fromTo(phone, { x: -440, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 1.15);
+
+      ring("r1", 1.2);
+      link("a1", "d1", 1.45);
+      ring("p1", 1.9, 0.45);
+
+      tl.to([el("r1"), el("r1-glow")], { opacity: 0.35, duration: 0.4, ease: "power2.out" }, 2.4);
+      tl.to([el("a1"), el("a1-halo"), el("d1"), el("p1"), el("p1-glow")], { opacity: 0.4, duration: 0.4, ease: "power2.out" }, 2.4);
+      ring("r2", 2.4);
+      link("a2", "d2", 2.65);
+      ring("p2", 3.1, 0.45);
+
+      // ── Scene 3 (3.2–5.4s): zoom-to-target ≈1.25× on the preview phone; the form steps back but stays legible ──
+      tl.to([el("a1"), el("a1-halo"), el("d1"), el("a2"), el("a2-halo"), el("d2")], { opacity: 0, duration: 0.3, ease: "power2.out" }, 3.2);
+      tl.to([el("p1"), el("p1-glow")], { opacity: 1, duration: 0.3, ease: "power2.out" }, 3.2);
+      tl.fromTo(phone, { scale: 1 }, { scale: Z, x: ZX, duration: 0.95, ease: "power3.inOut" }, 3.2);
+      tl.fromTo(el("dim"), { opacity: 0 }, { opacity: 0.4, duration: 0.8, ease: "power2.inOut" }, 3.25);
+      // feature chip pops at the phone's top edge at 3.8s
+      tl.set(chipAnchor, { x: chipZoomX, y: chipZoomY }, 0);
+      tl.fromTo(el("chip"), { scale: 0.6, opacity: 0, y: 12 }, { scale: 1, opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 3.8);
+      [4.3, 5.0].forEach(function (t) {
+        tl.fromTo(el("live-halo"), { scale: 1, opacity: 0.7 }, { scale: 2.6, opacity: 0, duration: 0.65, ease: "power2.out" }, t);
+      });
+
+      // ── Scene 4 (5.4–8.6s): zoom back; form scrolls to its top bar; ring on ⋯; review card; comments ──
+      tl.to(phone, { scale: 1, x: 0, duration: 0.8, ease: "power3.inOut" }, 5.4);
+      tl.to(chipAnchor, { x: 0, y: 0, duration: 0.8, ease: "power3.inOut" }, 5.4);
+      tl.to(el("dim"), { opacity: 0, duration: 0.6, ease: "power2.inOut" }, 5.4);
+      tl.to([el("r1"), el("r1-glow"), el("r2"), el("r2-glow"), el("p1"), el("p1-glow"), el("p2"), el("p2-glow")], { opacity: 0, duration: 0.4, ease: "power2.out" }, 5.4);
+      tl.to(world, { y: 0, duration: 0.8, ease: "power3.inOut" }, 5.45);
+
+      ring("rc", 5.8);
+
+      tl.fromTo(review, { opacity: 0, y: -16, clipPath: "inset(-20px 0px 100% 0px round 16px)" }, { opacity: 1, y: 0, clipPath: "inset(-20px 0px 0% 0px round 16px)", duration: 0.6, ease: "power3.out" }, 6.3);
+      tl.fromTo(el("b1"), { opacity: 0, y: 12, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 6.8);
+      tl.fromTo(el("b2"), { opacity: 0, y: 12, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 7.8);
+
+      // ── Scene 5 (8.6–10.247s): card tucks away; punch-in on the top bar; press on publish; "פורסם" pops ──
+      tl.to(review, { opacity: 0, y: -12, clipPath: "inset(-20px 0px 100% 0px round 16px)", duration: 0.45, ease: "power3.in" }, 8.6);
+      tl.to([el("rc"), el("rc-glow")], { opacity: 0, duration: 0.35, ease: "power2.out" }, 8.65);
+      tl.to(world, { scale: PUNCH, duration: 0.7, ease: "power3.inOut" }, 8.6);
+      ring("rp", 8.9, 0.45);
+
+      // press-release-spring (subtle variant): linear compression, spring release, burst behind
+      var PRESS_START = 9.3, PRESS_DUR = 0.15, RELEASE_START = PRESS_START + PRESS_DUR;
+      tl.fromTo(lift, { scale: 1, boxShadow: "0 0px 0px 0px rgba(28,25,23,0)" }, { scale: 1, boxShadow: "0 5px 12px -3px rgba(28,25,23,0.35)", duration: 0.35, ease: "power2.out" }, 8.95);
+      tl.to(lift, { scale: 0.9, boxShadow: "0 1px 2px 0px rgba(28,25,23,0.25)", duration: PRESS_DUR, ease: "power1.in" }, PRESS_START);
+      tl.to(lift, { scale: 1, boxShadow: "0 5px 12px -3px rgba(28,25,23,0.35)", duration: 0.55, ease: "back.out(1.4)" }, RELEASE_START);
+      tl.fromTo(burst, { scale: 1, opacity: 0 }, { scale: 2.6, opacity: 0.55, duration: 0.4, ease: "power2.out" }, RELEASE_START);
+      tl.to(burst, { opacity: 0, duration: 0.4, ease: "power2.in" }, RELEASE_START + 0.4);
+
+      // state change at release: the check pill stamps in beneath the button, then holds
+      tl.fromTo(pill, { scale: 0.5, opacity: 0, x: -6 }, { scale: 1, opacity: 1, x: 0, duration: 0.45, ease: "back.out(1.6)" }, RELEASE_START);
+
+      // pin the timeline to the frame duration (hold)
+      tl.set({}, {}, 10.247);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["06-edit"] = tl;
+    })();
+  </script>
+</template>

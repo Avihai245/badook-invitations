@@ -5,5 +5,7 @@ import { getUiLocale } from '@/lib/i18n/server';
 /** POST /api/billing/checkout — { product } → { url } of the payment page. */
 export async function POST(request: Request) {
   const locale = await getUiLocale();
-  return userRoute(request, (user, body) => startCheckout(user, body, locale));
+  return userRoute(request, (user, body) => startCheckout(user, body, locale), {
+    ownerOnly: true,
+  });
 }

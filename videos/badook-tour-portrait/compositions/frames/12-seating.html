@@ -90,7 +90,7 @@
       background: #FAFAF9;
     }
     [class~="12-seating-stat"] {
-      left: 780px;
+      left: 782px;
       top: 278.4px;         /* (407.0 − 286)·S */
       width: 82.0px;
       text-align: right;
@@ -114,6 +114,15 @@
       color: #B45309;
     }
     /* the line dims while its family is lifted out */
+    /* the crop starts 5 CSS px below the "סידור אוטומטי" button — clear its last sliver */
+    [id="12-seating-topclean"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 15.0px;      /* CSS 286 → 292.5 */
+      background: #FAFAF9;
+    }
     [id="12-seating-famdim"] {
       position: absolute;
       left: 549.2px;
@@ -140,16 +149,16 @@
 
     /* table 1 (head table, CSS 155.7–234.7 × 765.3–777.3): its label 6/14 → 9/14, the open seat fills */
     [id="12-seating-lblpatch"] {
-      left: 428.0px;
-      top: 1120.0px;
-      width: 46.0px;
-      height: 10.0px;
-      background: #F1E8DC;
+      left: 428.0px;      /* label "6/14" CSS 186.7–206.3 × 774.3–776.7 */
+      top: 1124.6px;      /* CSS 773.3 → 776.3 (stops at the table's border) */
+      width: 51.0px;
+      height: 8.6px;      /* + the border row the old glyphs touch */
+      background: linear-gradient(to bottom, #EDE3D8 0, #EDE3D8 6.9px, #996B3D 6.9px, #996B3D 100%);
     }
     [id="12-seating-lbl"] {
       position: absolute;
-      left: 421.4px;
-      top: 1119.6px;
+      left: 423.5px;
+      top: 1126.5px;
       width: 60px;
       text-align: center;
       font-family: "Heebo", sans-serif;
@@ -416,17 +425,18 @@
     }
   </style>
 
-  <div id="root" data-composition-id="12-seating" data-width="1080" data-height="1920" data-duration="9.243">
+  <div id="root" data-composition-id="12-seating" data-width="1080" data-height="1920" data-duration="9.643">
 
     <!-- full-bleed cream ground -->
-    <div id="12-seating-bg" class="clip" data-start="0" data-duration="9.243" data-track-index="0"></div>
+    <div id="12-seating-bg" class="clip" data-start="0" data-duration="9.643" data-track-index="0"></div>
 
     <!-- the real seating screen (phone capture) in a screen card; patches + rings live in the zoomable world -->
-    <div id="12-seating-cardlayer" class="clip" data-start="0" data-duration="9.243" data-track-index="1">
+    <div id="12-seating-cardlayer" class="clip" data-start="0" data-duration="9.643" data-track-index="1">
       <div id="12-seating-card">
         <div id="12-seating-world">
           <img id="12-seating-shot" src="assets/phone-seating.png" alt="" />
 
+          <div id="12-seating-topclean"></div>
           <div id="12-seating-famdim"></div>
 
           <div class="12-seating-patch" id="12-seating-statpatch"></div>
@@ -460,7 +470,7 @@
     </div>
 
     <!-- top block: kicker, headline, callout pill -->
-    <div id="12-seating-top" class="clip" data-start="0" data-duration="9.243" data-track-index="2" dir="rtl" lang="he">
+    <div id="12-seating-top" class="clip" data-start="0" data-duration="9.643" data-track-index="2" dir="rtl" lang="he">
       <div id="12-seating-kicker">11 · מושיבים</div>
       <div id="12-seating-headmask"><h1 id="12-seating-head">בגרירה</h1></div>
       <div id="12-seating-pill" dir="rtl" lang="he">
@@ -470,7 +480,7 @@
     </div>
 
     <!-- the guest's phone: their own table page -->
-    <div id="12-seating-phonelayer" class="clip" data-start="0" data-duration="9.243" data-track-index="3">
+    <div id="12-seating-phonelayer" class="clip" data-start="0" data-duration="9.643" data-track-index="3">
       <div id="12-seating-phone">
         <div id="12-seating-screen">
           <img id="12-seating-phoneshot" src="assets/phone-table.png" alt="" />
@@ -483,7 +493,7 @@
     </div>
 
     <!-- the cursor + dragged family chip (screen-space over the card) -->
-    <div id="12-seating-cursorlayer" class="clip" data-start="0" data-duration="9.243" data-track-index="4">
+    <div id="12-seating-cursorlayer" class="clip" data-start="0" data-duration="9.643" data-track-index="4">
       <div id="12-seating-ripple"></div>
       <div id="12-seating-carrier">
         <div id="12-seating-lift">
@@ -585,7 +595,7 @@
       tl.fromTo(el("cursor"), { scale: 1 }, { scale: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, 3.4);
       tl.fromTo(el("cursor"), { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "power2.out", immediateRender: false }, 3.47);
       tl.fromTo(el("chip"), { opacity: 1, scale: 1.05 }, { opacity: 0, scale: 0.3, duration: 0.2, ease: "power2.in", immediateRender: false }, 3.4);
-      tl.fromTo(el("tpulse"), { opacity: 0.7, scale: 1 }, { opacity: 0, scale: 1.3, duration: 0.7, ease: "power2.out" }, 3.42);
+      tl.fromTo(el("tpulse"), { opacity: 0.7, scale: 1 }, { opacity: 0, scale: 1.3, duration: 0.7, ease: "power2.out", immediateRender: false }, 3.42);
 
       // the open seat fills, table label 6/14 → 9/14
       tl.set([el("chair"), el("lblpatch"), el("lbl")], { opacity: 1 }, 3.46);
@@ -626,7 +636,7 @@
       tl.fromTo(el("carrier"), { x: REST.x, y: REST.y }, { x: CLICK.x, y: CLICK.y, duration: 0.5, ease: "power2.inOut", immediateRender: false }, 6.05);
       tl.fromTo(el("cursor"), { scale: 1 }, { scale: 0.86, duration: 0.07, ease: "power2.out", immediateRender: false }, 6.58);
       tl.fromTo(el("cursor"), { scale: 0.86 }, { scale: 1, duration: 0.12, ease: "power2.out", immediateRender: false }, 6.65);
-      tl.fromTo(el("ripple"), { opacity: 0.7, scale: 0.3 }, { opacity: 0, scale: 1.5, duration: 0.55, ease: "power2.out" }, 6.58);
+      tl.fromTo(el("ripple"), { opacity: 0.7, scale: 0.3 }, { opacity: 0, scale: 1.5, duration: 0.55, ease: "power2.out", immediateRender: false }, 6.58);
 
       tl.fromTo(el("phone"), { x: 640, opacity: 0 }, { x: 0, opacity: 1, duration: 0.85, ease: "power3.out" }, 6.7);
       tl.set([el("cardring"), el("cardglow")], { opacity: 1 }, 7.6);

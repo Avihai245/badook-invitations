@@ -1,7 +1,7 @@
 import 'server-only';
 import { NextResponse } from 'next/server';
 import { invitationsEnabled } from '@/lib/feature';
-import { getSessionUser } from '@/lib/supabase/session';
+import { getRealUser } from '@/lib/supabase/session';
 import { can, type Permission } from '../permissions';
 import { AdminDbError } from '../server/db';
 import { getStaff, type Staff } from '../server/gate';
@@ -23,7 +23,7 @@ export async function adminDownload(
 ): Promise<Response> {
   if (!invitationsEnabled()) return json(404, { ok: false, code: 'not_found' });
   try {
-    if (!(await getSessionUser())) return json(401, { ok: false, code: 'unauthorized' });
+    if (!(await getRealUser())) return json(401, { ok: false, code: 'unauthorized' });
     const staff = await getStaff();
     if (!staff) return json(404, { ok: false, code: 'not_found' });
     if (!can(staff.role, perm)) return json(403, { ok: false, code: 'forbidden' });

@@ -1,6 +1,6 @@
 'use client';
 
-import { Ban, Coins, Gift, Percent, RotateCcw, Undo2 } from 'lucide-react';
+import { Ban, Coins, Gift, LogIn, Percent, RotateCcw, Undo2 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Button, Card, Field, Hint, Input, Segmented } from '@/components/app';
 import { CREDIT_CAPS, STAFF_RANK } from '../../lists';
@@ -10,7 +10,8 @@ import { ActionDialog } from '../core/ActionDialog.client';
 import { addDays, addYear } from '../core/dates';
 import { adminCall } from '../core/post';
 
-type Dialog = 'credits' | 'gift' | 'ungift' | 'discount' | 'undiscount' | 'suspend' | 'restore' | null;
+type Dialog =
+  'actAs' | 'credits' | 'gift' | 'ungift' | 'discount' | 'undiscount' | 'suspend' | 'restore' | null;
 
 /** One action's button: what it does on hover and focus, and why it can't be used when it can't. */
 function ActionButton({
@@ -89,6 +90,15 @@ export function UserActions({ user, self, today }: { user: UserDetail; self: boo
       : user.staff && STAFF_RANK[user.staff.role] >= STAFF_RANK[staff.role]
         ? u.actions.staffRank
         : null;
+  const actAsWhy = !can('support.reply')
+    ? noPermission
+    : self
+      ? (u.errors.self ?? null)
+      : user.staff
+        ? u.actions.actAsStaff
+        : user.suspended
+          ? u.actions.actAsSuspended
+          : null;
   const url = (action: string) => `/api/admin/users/${user.id}/${action}`;
   const replacing =
     user.plan.plan !== 'free' && !user.plan.gift && !user.plan.running && user.plan.effective !== 'free';
@@ -97,6 +107,14 @@ export function UserActions({ user, self, today }: { user: UserDetail; self: boo
     <Card padding="md" data-testid="admin-user-actions">
       <h2 className="mb-3 text-[15px] font-bold">{u.actions.title}</h2>
       <div className="flex flex-col gap-2">
+        <ActionButton
+          label={u.actions.actAs}
+          help={u.actions.actAsHelp}
+          why={actAsWhy}
+          icon={<LogIn className="icon-dir" />}
+          onClick={() => setOpen('actAs')}
+          testId="admin-action-act-as"
+        />
         <ActionButton
           label={u.actions.credits}
           help={u.actions.creditsHelp}
@@ -162,6 +180,23 @@ export function UserActions({ user, self, today }: { user: UserDetail; self: boo
           />
         )}
       </div>
+
+      <ActionDialog
+        open={open === 'actAs'}
+        onOpenChange={onOpenChange}
+        testId="admin-act-as-dialog"
+        title={fmt(u.actAsDialog.title, { name })}
+        description={u.actAsDialog.description}
+        confirmLabel={u.actAsDialog.confirm}
+        confirmHelp={u.actAsDialog.confirmHelp}
+        errors={u.errors}
+        success={fmt(u.actAsDialog.done, { name })}
+        onConfirm={async (reason) => {
+          const answer = await adminCall<{ redirect?: string }>(url('act-as'), { reason });
+          if (answer.ok) window.location.assign(answer.body.redirect ?? '/app/invitations');
+          return answer;
+        }}
+      />
 
       <ActionDialog
         open={open === 'credits'}

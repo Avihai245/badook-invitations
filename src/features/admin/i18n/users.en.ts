@@ -140,6 +140,11 @@ export const usersEn: typeof usersHe = {
     notFound: 'User not found.',
   },
   actions: {
+    actAs: 'Open the customer’s account',
+    actAsHelp:
+      'Opens the customer’s own area exactly as they see it, to help them remotely. You stay signed in as yourself, and it’s recorded in the log.',
+    actAsStaff: 'You can’t open a staff member’s account.',
+    actAsSuspended: 'The customer’s sign-in is suspended.',
     title: 'Actions',
     credits: 'Credits',
     creditsHelp: 'Add or remove credits for sending on WhatsApp, with a reason.',
@@ -154,6 +159,14 @@ export const usersEn: typeof usersHe = {
     noPermission: 'Your role doesn’t have permission for this.',
     selfSuspend: 'You can’t suspend yourself.',
     staffRank: 'You can’t suspend a staff member of your role or above.',
+  },
+  actAsDialog: {
+    title: 'Open {name}’s account',
+    description:
+      'You’ll be in the customer’s area and can do anything they can: invitations, guests, seating and more. Paying, cancelling a plan, deleting the account and changing the password are blocked. Access ends after an hour or when you click “Back to the console”.',
+    confirm: 'Open the account',
+    confirmHelp: 'Recorded in the log with the reason, then opens the customer’s area.',
+    done: 'Opening {name}’s account…',
   },
   credits: {
     title: 'Credits for {name}',
@@ -229,6 +242,8 @@ export const usersEn: typeof usersHe = {
     restoreDone: '{name}’s sign-in was restored',
   },
   errors: {
+    staff: 'You can’t open a staff member’s account.',
+    suspended: 'The customer’s sign-in is suspended.',
     over_cap: 'Too many credits in one action for your role.',
     below_zero: 'You can’t remove more credits than the account has.',
     invalid_delta: 'Choose a number of credits.',

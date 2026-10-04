@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000;width:1080px;height:1920px;overflow:hidden}</style></head><body>
+<template>
   <style>
     @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
     @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
@@ -221,6 +221,7 @@
       font-weight: 700;
       font-size: 30.4px;
       line-height: 1;
+      letter-spacing: -0.028em;
       font-variant-numeric: tabular-nums;
       color: #1C1917;
       white-space: nowrap;
@@ -282,10 +283,10 @@
           <img src="assets/phone-insights.png" alt="" />
           <!-- visits card [201,305,173,139]: printed "209" ink x 306.3–353.7, y 369.3–391 -->
           <div class="15-film-plate" style="left: 303px; top: 366px; width: 54px; height: 28px;"></div>
-          <div class="15-film-num" id="15-film-num-visits" style="left: 274.6px; top: 365.4px;">0</div>
+          <div class="15-film-num" id="15-film-num-visits" style="left: 274.7px; top: 367.0px;">0</div>
           <!-- "פתחו" card [16,305,173,139]: printed "188" ink x 122.7–168.7, y 369.3–391 -->
           <div class="15-film-plate" style="left: 119px; top: 366px; width: 53px; height: 28px;"></div>
-          <div class="15-film-num" id="15-film-num-opens" style="left: 89.6px; top: 365.4px;">0</div>
+          <div class="15-film-num" id="15-film-num-opens" style="left: 89.5px; top: 367.0px;">0</div>
         </div>
         <!-- rings: card box → card px (x·k, (y−250)·k), padded 8px -->
         <svg class="15-film-ring" style="left: 455.85px; top: 118.92px; width: 415.23px; height: 336.77px;" viewBox="0 0 415.23 336.77" aria-hidden="true">
@@ -344,7 +345,7 @@
 
       // ── Scene 3 (4.0–6.444s): "ותובנות" — the film page yields, the insights card takes its place ──
       tl.fromTo(el("head-2"), { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 4.0);
-      tl.fromTo(el("page-wrap"), { scale: 1, y: 0, opacity: 1 }, { scale: 0.92, y: -36, opacity: 0.6, duration: 0.9, ease: "power3.out" }, 4.0);
+      tl.fromTo(el("page-wrap"), { scale: 1, y: 0, opacity: 1 }, { scale: 0.9, y: 16, opacity: 0.6, duration: 0.9, ease: "power3.out" }, 4.0);
       tl.fromTo(el("insights"), { x: -1040 }, { x: 0, duration: 0.9, ease: "power3.out" }, 4.0);
 
       // count-up 0→209 on "הצפיות" (4.9s) — text only, no size growth
@@ -374,4 +375,4 @@
       window.__timelines["15-film"] = tl;
     })();
   </script>
-</body></html>
+</template>

@@ -1,0 +1,577 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="05-ai-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 760px at 88% 6%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── top block (RTL, right-aligned, y ≈ 100–360) ── */
+    [id="05-ai-top"] {
+      position: absolute;
+      inset: 0;
+      direction: rtl;
+    }
+    [id="05-ai-kick-row"] {
+      position: absolute;
+      right: 90px;
+      top: 104px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 22px;
+      direction: rtl;
+    }
+    [id="05-ai-kicker"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="05-ai-aichip"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      direction: rtl;
+      padding: 12px 26px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 32px;
+      line-height: 1;
+      white-space: nowrap;
+      transform-origin: 50% 50%;
+    }
+    [id="05-ai-aichip"] svg {
+      display: block;
+      width: 26px;
+      height: 26px;
+    }
+    [id="05-ai-head"] {
+      position: absolute;
+      right: 90px;
+      top: 168px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 120px;
+      line-height: 1.1;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+      white-space: nowrap;
+      direction: rtl;
+    }
+    [class~="05-ai-word"] {
+      display: inline-block;
+    }
+    [id="05-ai-rule"] {
+      position: absolute;
+      right: 94px;
+      top: 340px;
+      width: 150px;
+      height: 3px;
+      border-radius: 2px;
+      background: #A0703F;
+      transform-origin: 100% 50%;
+    }
+
+    /* ── stage: screen card (dialog) + photos + working state + design card + swatches ── */
+    [id="05-ai-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* screen card: phone-studio.png (390 CSS wide) at 900 px → s = 2.3077;
+       crop from CSS y 119 (dialog [16,127,358,590] top lands at y 458), card 900×1120 at (90, 440) */
+    [id="05-ai-window"] {
+      position: absolute;
+      left: 90px;
+      top: 440px;
+      width: 900px;
+      height: 1120px;
+      z-index: 1;
+      overflow: hidden;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      border-radius: 28px;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+      transform-origin: 50% 50%;
+    }
+    [id="05-ai-world"] {
+      position: absolute;
+      left: 0;
+      top: -274.6px;   /* -119 · 2.3077 */
+      width: 900px;
+      height: 1947.7px;
+    }
+    [id="05-ai-studio"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: auto;
+      display: block;
+      max-width: none;
+    }
+    [id="05-ai-veil"] {
+      position: absolute;
+      inset: 0;
+      background: rgba(251, 247, 241, 0.66);
+      opacity: 0;
+    }
+
+    /* working-state status pill, beside the stack at (600, 1150) — inside the design card's landing box */
+    [id="05-ai-status-wrap"] {
+      position: absolute;
+      left: 300px;
+      top: 1112px;
+      width: 600px;
+      height: 76px;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    [id="05-ai-status"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+      direction: rtl;
+      padding: 16px 32px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.04);
+      white-space: nowrap;
+    }
+    [id="05-ai-status-text"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 36px;
+      line-height: 1.1;
+      background: linear-gradient(90deg, #7A5230 0%, #7A5230 40%, #E2C29C 50%, #7A5230 60%, #7A5230 100%);
+      background-size: 300% 100%;
+      background-position: 0% 50%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    [id="05-ai-status-spin"] {
+      display: block;
+      width: 34px;
+      height: 34px;
+      transform-origin: 50% 50%;
+    }
+
+    /* three photo cards — 4:5, 250px, white 8px border, small tilt; stack center (290, 1150),
+       over the dialog's left column */
+    [id="05-ai-stack"] {
+      position: absolute;
+      left: 165px;
+      top: 994px;
+      width: 250px;
+      height: 312px;
+      z-index: 3;
+      transform-origin: 50% 50%;
+    }
+    [class~="05-ai-photo"] {
+      position: absolute;
+      width: 250px;
+      height: 312px;
+      box-sizing: border-box;
+      border: 8px solid #fff;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 16px 34px -12px rgba(60, 35, 15, 0.40);
+      transform-origin: 50% 50%;
+    }
+    [class~="05-ai-photo-in"] {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    [class~="05-ai-photo-in"] img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    [class~="05-ai-sheen"] {
+      position: absolute;
+      top: -10%;
+      left: 0;
+      width: 70%;
+      height: 120%;
+      background: linear-gradient(105deg, rgba(255, 248, 236, 0) 0%, rgba(255, 248, 236, 0) 30%, rgba(255, 248, 236, 0.42) 50%, rgba(255, 248, 236, 0) 70%, rgba(255, 248, 236, 0) 100%);
+    }
+
+    /* the "עצבו לי" sparkle chip — pops above the stack */
+    [id="05-ai-magic-wrap"] {
+      position: absolute;
+      left: 140px;
+      top: 880px;
+      width: 300px;
+      height: 76px;
+      z-index: 4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    [id="05-ai-magic"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      direction: rtl;
+      padding: 16px 30px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1.1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 10px 24px -10px rgba(90, 55, 20, 0.45);
+      transform-origin: 50% 50%;
+    }
+    [id="05-ai-magic"] svg {
+      display: block;
+      width: 30px;
+      height: 30px;
+    }
+
+    /* the resulting design card — crop of "סהר בורדו" from phone-designs.png:
+       crop CSS [201,526,173,248] (stops above the fixed tab bar), shown 416 wide → s = 2.4046,
+       height 248·s ≈ 596; lands centered on the screen card at (540, 985) */
+    [id="05-ai-card-gate"] {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+    [id="05-ai-card"] {
+      position: absolute;
+      left: 332px;
+      top: 687px;
+      width: 416px;
+      height: 596px;
+      overflow: hidden;
+      border-radius: 26px;
+      background: #731F2E;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 30px 60px -18px rgba(70, 25, 25, 0.55);
+      transform-origin: 50% 50%;
+    }
+    [id="05-ai-card-img"] {
+      position: absolute;
+      left: -483.3px;   /* -201 · 2.4046 */
+      top: -1264.8px;   /* -526 · 2.4046 */
+      width: 937.8px;   /* 390 · 2.4046 */
+      height: auto;
+      display: block;
+      max-width: none;
+    }
+
+    /* leader tree from the card's bottom edge to the three swatch chips */
+    [class~="05-ai-ln"] {
+      position: absolute;
+      z-index: 6;
+      background: #A0703F;
+    }
+    [id="05-ai-stem"]  { left: 539px; top: 1283px; width: 2px; height: 34px; transform-origin: 50% 0%; }
+    [id="05-ai-barR"]  { left: 540px; top: 1316px; width: 281px; height: 2px; transform-origin: 0% 50%; }
+    [id="05-ai-barL"]  { left: 240px; top: 1316px; width: 300px; height: 2px; transform-origin: 100% 50%; }
+    [id="05-ai-dropR"] { left: 819px; top: 1316px; width: 2px; height: 36px; transform-origin: 50% 0%; }
+    [id="05-ai-dropC"] { left: 539px; top: 1316px; width: 2px; height: 36px; transform-origin: 50% 0%; }
+    [id="05-ai-dropL"] { left: 239px; top: 1316px; width: 2px; height: 36px; transform-origin: 50% 0%; }
+
+    /* swatch chips: three 280-wide slots centered at x 820 / 540 / 240 (RTL reading order) */
+    [class~="05-ai-slot"] {
+      position: absolute;
+      top: 1352px;
+      width: 280px;
+      height: 78px;
+      z-index: 6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    [class~="05-ai-chip"] {
+      box-sizing: border-box;
+      height: 78px;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+      direction: rtl;
+      padding: 0 30px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      color: #7A5230;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.04);
+      transform-origin: 50% 0%;
+    }
+    [class~="05-ai-dots"] {
+      display: inline-flex;
+      flex-direction: row;
+      gap: 6px;
+      direction: ltr;
+    }
+    [class~="05-ai-dot"] {
+      display: block;
+      width: 26px;
+      height: 26px;
+      box-sizing: border-box;
+      border-radius: 9999px;
+      transform-origin: 50% 50%;
+    }
+    [class~="05-ai-icon"] {
+      display: block;
+      width: 32px;
+      height: 32px;
+    }
+    [id="05-ai-glyph"] {
+      display: block;
+      width: 40px;
+      height: 40px;
+      box-sizing: border-box;
+      border: 1.5px solid #A0703F;
+      border-radius: 9999px;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 26px;
+      line-height: 36px;
+      text-align: center;
+      color: #731F2E;
+      transform-origin: 50% 50%;
+    }
+  </style>
+
+  <div id="root" data-composition-id="05-ai" data-width="1080" data-height="1920" data-duration="8.214">
+
+    <!-- full-bleed cream ground -->
+    <div id="05-ai-bg" class="clip" data-start="0" data-duration="8.214" data-track-index="0"></div>
+
+    <!-- stage: dialog screen card → photos → working state → design card → swatches -->
+    <div id="05-ai-stage" class="clip" data-start="0" data-duration="8.214" data-track-index="1">
+
+      <div id="05-ai-window">
+        <div id="05-ai-world">
+          <img id="05-ai-studio" src="assets/phone-studio.png" alt="" />
+        </div>
+        <div id="05-ai-veil"></div>
+      </div>
+
+      <div id="05-ai-status-wrap">
+        <div id="05-ai-status" dir="rtl" lang="he">
+          <span id="05-ai-status-text">בונה עיצוב…</span>
+          <svg id="05-ai-status-spin" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 2 C 16 10, 20 14, 28 15 C 20 16, 16 20, 15 28 C 14 20, 10 16, 2 15 C 10 14, 14 10, 15 2 Z" fill="#A0703F" /></svg>
+        </div>
+      </div>
+
+      <div id="05-ai-stack">
+        <div class="05-ai-photo" id="05-ai-p1" style="left: -22px; top: -20px;">
+          <div class="05-ai-photo-in"><img src="assets/photo-couple.jpg" alt="" /><div class="05-ai-sheen" id="05-ai-s1"></div></div>
+        </div>
+        <div class="05-ai-photo" id="05-ai-p2" style="left: 18px; top: -5px;">
+          <div class="05-ai-photo-in"><img src="assets/photo-chuppah.jpg" alt="" /><div class="05-ai-sheen" id="05-ai-s2"></div></div>
+        </div>
+        <div class="05-ai-photo" id="05-ai-p3" style="left: -3px; top: 18px;">
+          <div class="05-ai-photo-in"><img src="assets/photo-venue.jpg" alt="" /><div class="05-ai-sheen" id="05-ai-s3"></div></div>
+        </div>
+      </div>
+
+      <div id="05-ai-magic-wrap">
+        <div id="05-ai-magic" dir="rtl" lang="he">
+          <span>עצבו לי</span>
+          <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M13 3 C 14 10, 17 12, 24 13 C 17 14, 14 16, 13 23 C 12 16, 9 14, 2 13 C 9 12, 12 10, 13 3 Z" fill="#FBF7F1" /><path d="M23 2 C 23.4 4.6, 24.2 5.4, 26.8 5.8 C 24.2 6.2, 23.4 7, 23 9.6 C 22.6 7, 21.8 6.2, 19.2 5.8 C 21.8 5.4, 22.6 4.6, 23 2 Z" fill="#FBF7F1" /></svg>
+        </div>
+      </div>
+
+      <div id="05-ai-card-gate">
+        <div id="05-ai-card">
+          <img id="05-ai-card-img" src="assets/phone-designs.png" alt="" />
+        </div>
+      </div>
+
+      <div class="05-ai-ln" id="05-ai-stem"></div>
+      <div class="05-ai-ln" id="05-ai-barR"></div>
+      <div class="05-ai-ln" id="05-ai-barL"></div>
+      <div class="05-ai-ln" id="05-ai-dropR"></div>
+      <div class="05-ai-ln" id="05-ai-dropC"></div>
+      <div class="05-ai-ln" id="05-ai-dropL"></div>
+
+      <div class="05-ai-slot" style="left: 680px;">
+        <div class="05-ai-chip" id="05-ai-c1" dir="rtl" lang="he">
+          <span>צבעים</span>
+          <span class="05-ai-dots">
+            <span class="05-ai-dot" id="05-ai-d1" style="background: #731F2E;"></span>
+            <span class="05-ai-dot" id="05-ai-d2" style="background: #F3E8DB; border: 1px solid rgba(28, 25, 23, 0.2);"></span>
+            <span class="05-ai-dot" id="05-ai-d3" style="background: #C9A35B;"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="05-ai-slot" style="left: 400px;">
+        <div class="05-ai-chip" id="05-ai-c2" dir="rtl" lang="he">
+          <span>אווירה</span>
+          <svg class="05-ai-icon" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 3 C 19 9, 22 12, 22 17 A 7 7 0 0 1 8 17 C 8 12, 11 9, 15 3 Z" fill="none" stroke="#A0703F" stroke-width="2" stroke-linejoin="round" /><path d="M15 13 C 17 16, 18 17.5, 18 19 A 3 3 0 0 1 12 19 C 12 17.5, 13 16, 15 13 Z" fill="#A0703F" /></svg>
+        </div>
+      </div>
+
+      <div class="05-ai-slot" style="left: 100px;">
+        <div class="05-ai-chip" id="05-ai-c3" dir="rtl" lang="he">
+          <span>סגנון</span>
+          <span id="05-ai-glyph">א</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- top block: kicker + AI chip, headline -->
+    <div id="05-ai-top" class="clip" data-start="0" data-duration="8.214" data-track-index="2" dir="rtl" lang="he">
+      <div id="05-ai-kick-row" dir="rtl" lang="he">
+        <div id="05-ai-kicker">04 · עצבו לי</div>
+        <div id="05-ai-aichip">
+          <span>AI</span>
+          <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M13 3 C 14 10, 17 12, 24 13 C 17 14, 14 16, 13 23 C 12 16, 9 14, 2 13 C 9 12, 12 10, 13 3 Z" fill="#FBF7F1" /><path d="M23 2 C 23.4 4.6, 24.2 5.4, 26.8 5.8 C 24.2 6.2, 23.4 7, 23 9.6 C 22.6 7, 21.8 6.2, 19.2 5.8 C 21.8 5.4, 22.6 4.6, 23 2 Z" fill="#FBF7F1" /></svg>
+        </div>
+      </div>
+      <h1 id="05-ai-head" dir="rtl" lang="he"><span class="05-ai-word" id="05-ai-h1">משהו</span> <span class="05-ai-word" id="05-ai-h2">אישי</span></h1>
+      <div id="05-ai-rule"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="05-ai"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="05-ai-' + name + '"]') || document.getElementById("05-ai-" + name);
+      }
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–1.9s): the "עצבו לי" dialog screen card enters; headline on "רוצים משהו אישי?" ──
+      tl.fromTo(el("window"), { opacity: 0, y: 60, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.12);
+      tl.fromTo(el("aichip"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 0.4);
+      tl.fromTo(el("h1"), { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.3);
+      tl.fromTo(el("h2"), { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.5);
+      tl.fromTo(el("rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, 0.95);
+
+      // ── Scene 2 (1.9–3.2s): "מעלים כמה תמונות" — three photos fly in and stack over the dialog's left column ──
+      [["p1", -8, 1.9], ["p2", 6, 2.3], ["p3", -2, 2.7]].forEach(function (p) {
+        tl.fromTo(
+          el(p[0]),
+          { opacity: 0, x: -240, y: 300, rotation: p[1] - 14, scale: 1.18 },
+          { opacity: 1, x: 0, y: 0, rotation: p[1], scale: 1, duration: 0.7, ease: "power3.out" },
+          p[2]
+        );
+      });
+
+      // ── Scene 3 (3.2–5.8s): "ועצבו לי בונה עיצוב" — trigger → working state → receipt ──
+      // trigger: the brown sparkle chip pops above the stack (smooth settle, no bounce)
+      tl.fromTo(el("magic"), { opacity: 0, scale: 0.4, y: 16 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.2);
+
+      // working state: "בונה עיצוב…" status pill + text shimmer (bounded, resolved at 4.3s)
+      tl.fromTo(el("status"), { opacity: 0, y: 18, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power3.out" }, 3.3);
+      var statusText = el("status-text");
+      var shimmer = { p: 0 };
+      var STATUS_START = 3.35;
+      var STATUS_DUR = 0.95;
+      tl.fromTo(
+        shimmer,
+        { p: 0 },
+        {
+          p: 1,
+          duration: STATUS_DUR,
+          ease: "none",
+          onUpdate: function () {
+            statusText.style.backgroundPosition = (shimmer.p * 100) + "% 50%";
+          }
+        },
+        STATUS_START
+      );
+      tl.fromTo(el("status-spin"), { rotation: 0 }, { rotation: 180, duration: STATUS_DUR, ease: "power1.inOut" }, STATUS_START);
+
+      // shimmer sweep across the stacked photos — ONE pass, right→left, staggered card to card
+      [["s3", 3.4], ["s2", 3.52], ["s1", 3.64]].forEach(function (s) {
+        tl.fromTo(el(s[0]), { xPercent: 160 }, { xPercent: -160, duration: 0.8, ease: "power2.inOut" }, s[1]);
+      });
+
+      // receipt (inverse zoom-through): the stack recedes, the design card rises out of it
+      // oversized + blurred and retracts into the screen card's center
+      tl.fromTo(el("stack"), { scale: 1, opacity: 1 }, { scale: 0.9, opacity: 0.82, duration: 0.5, ease: "power3.inOut" }, 4.05);
+      tl.fromTo(el("veil"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 4.3);
+      tl.fromTo(el("card-gate"), { opacity: 0 }, { opacity: 1, duration: 0.02, ease: "none" }, 4.3);
+      tl.fromTo(el("card"), { x: -250, y: 165 }, { x: 0, y: 0, duration: 0.7, ease: "power3.out" }, 4.3);
+      tl.fromTo(
+        el("card"),
+        { opacity: 0.15, scale: 1.25, filter: "blur(18px)" },
+        { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.55, ease: "expo.out" },
+        4.3
+      );
+
+      // ── Scene 4 (5.8–8.214s): swatch chips land under the card on their words ──
+      // 5.8 "צבעים" — stem + right branch draw, chip drops in, three colour dots pop
+      tl.fromTo(el("stem"), { scaleY: 0 }, { scaleY: 1, duration: 0.2, ease: "power2.out" }, 5.7);
+      tl.fromTo(el("barR"), { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power3.out" }, 5.78);
+      tl.fromTo(el("dropR"), { scaleY: 0 }, { scaleY: 1, duration: 0.2, ease: "power2.out" }, 5.95);
+      tl.fromTo(el("c1"), { opacity: 0, y: -24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, 5.8);
+      [["d1", 5.95], ["d2", 6.03], ["d3", 6.11]].forEach(function (d) {
+        tl.fromTo(el(d[0]), { scale: 0 }, { scale: 1, duration: 0.4, ease: "power3.out" }, d[1]);
+      });
+      // 6.4 "אווירה" — centre drop + chip
+      tl.fromTo(el("dropC"), { scaleY: 0 }, { scaleY: 1, duration: 0.2, ease: "power2.out" }, 6.35);
+      tl.fromTo(el("c2"), { opacity: 0, y: -24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, 6.4);
+      // 7.1 "סגנון" — left branch + drop + chip, then the letter glyph
+      tl.fromTo(el("barL"), { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power3.out" }, 7.0);
+      tl.fromTo(el("dropL"), { scaleY: 0 }, { scaleY: 1, duration: 0.2, ease: "power2.out" }, 7.2);
+      tl.fromTo(el("c3"), { opacity: 0, y: -24, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, 7.1);
+      tl.fromTo(el("glyph"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, 7.2);
+
+      // hold to the last frame
+      tl.set({}, {}, 8.2);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-ai"] = tl;
+    })();
+  </script>
+</template>

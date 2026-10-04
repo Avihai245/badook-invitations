@@ -88,10 +88,18 @@
       height: 5907.692px;
       display: block;
     }
-    [class~="03-home-spot"] {
+    [id="03-home-spots"] {
       position: absolute;
-      box-shadow: 0 0 0 4000px rgba(28, 25, 23, 0.38);
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 5907.692px;
+      overflow: visible;
       pointer-events: none;
+    }
+    [class~="03-home-spot"] {
+      fill: rgba(28, 25, 23, 0.38);
+      fill-rule: evenodd;
     }
     [class~="03-home-slot"] {
       position: absolute;
@@ -289,10 +297,10 @@
     }
   </style>
 
-  <div id="root" data-composition-id="03-home" data-width="1080" data-height="1920" data-start="0" data-duration="16.932">
-    <div id="03-home-bg" class="clip" data-start="0" data-duration="16.932" data-track-index="0"></div>
+  <div id="root" data-composition-id="03-home" data-width="1080" data-height="1920" data-start="0" data-duration="17.332">
+    <div id="03-home-bg" class="clip" data-start="0" data-duration="17.332" data-track-index="0"></div>
 
-    <div id="03-home-stage" class="clip" data-start="0" data-duration="16.932" data-track-index="1">
+    <div id="03-home-stage" class="clip" data-start="0" data-duration="17.332" data-track-index="1">
 
       <!-- the real event-home page (phone capture) in a screen card -->
       <div id="03-home-card">
@@ -301,8 +309,8 @@
             <img id="03-home-shot" src="assets/phone-home.png" alt="" />
 
             <!-- frozen tab-bar band: covered with the page's own clean rows -->
-            <div class="03-home-patch" data-patch="0,778,390,852.5,2.5"><img src="assets/phone-home.png" alt="" /></div>
-            <div class="03-home-patch" data-patch="286,756,104,779,2"><img src="assets/phone-home.png" alt="" /></div>
+            <div class="03-home-patch" data-patch="0,778,390,74.5,852.5,2.5"><img src="assets/phone-home.png" alt="" /></div>
+            <div class="03-home-patch" data-patch="286,756,104,23,752,2"><img src="assets/phone-home.png" alt="" /></div>
 
             <!-- road-map cards: a page-colored slot + the real card crop that lifts -->
             <div class="03-home-slot" data-card="plan"></div>
@@ -327,11 +335,13 @@
             </div>
 
             <!-- spotlight cut-outs (veil everything except the measured box) -->
-            <div id="03-home-spot-countdown" class="03-home-spot"></div>
-            <div id="03-home-spot-next" class="03-home-spot"></div>
-            <div id="03-home-spot-budget" class="03-home-spot"></div>
-            <div id="03-home-spot-rsvp" class="03-home-spot"></div>
-            <div id="03-home-spot-tasks" class="03-home-spot"></div>
+            <svg id="03-home-spots" viewBox="0 0 900 5907.692" xmlns="http://www.w3.org/2000/svg">
+              <path id="03-home-spot-countdown" class="03-home-spot" opacity="0" />
+              <path id="03-home-spot-next" class="03-home-spot" opacity="0" />
+              <path id="03-home-spot-budget" class="03-home-spot" opacity="0" />
+              <path id="03-home-spot-rsvp" class="03-home-spot" opacity="0" />
+              <path id="03-home-spot-tasks" class="03-home-spot" opacity="0" />
+            </svg>
 
             <!-- highlight rings, in page (world) coordinates -->
             <svg id="03-home-rings" viewBox="0 0 900 5907.692" xmlns="http://www.w3.org/2000/svg">
@@ -472,15 +482,15 @@
           " H" + (x + w / 2);
       }
 
-      // tab-bar band patches: data-patch = "x, yTop, w, srcY, srcH" (CSS px); a clean srcH-tall row is stretched over yTop→srcY
+      // tab-bar band patches: data-patch = "x, yTop, w, h, srcY, srcH" (CSS px); a clean srcH-tall row of the page at srcY is stretched over yTop→yTop+h
       Array.prototype.forEach.call(document.querySelectorAll('[class~="03-home-patch"]'), function (el) {
         var p = el.getAttribute("data-patch").split(",").map(Number);
-        var x = p[0], yTop = p[1], w = p[2], srcY = p[3], srcH = p[4];
+        var x = p[0], yTop = p[1], w = p[2], h = p[3], srcY = p[4], srcH = p[5];
         el.style.left = (x * SC) + "px";
         el.style.top = (yTop * SC) + "px";
         el.style.width = (w * SC) + "px";
         el.style.height = (srcH * SC) + "px";
-        el.style.transform = "scaleY(" + ((srcY + srcH - yTop) / srcH) + ")";
+        el.style.transform = "scaleY(" + (h / srcH) + ")";
         var img = el.querySelector("img");
         img.style.left = (-x * SC) + "px";
         img.style.top = (-srcY * SC) + "px";
@@ -509,12 +519,9 @@
         glow.setAttribute("stroke-width", String(8 / S));
       });
       ["countdown", "next", "budget", "rsvp", "tasks"].forEach(function (k) {
+        // veil = the whole page minus the ring's rounded box (even-odd hole)
         var el = $("spot-" + k), c = content(BOX[k]), S = RING[k].cam.S, p = RING[k].pad / S;
-        el.style.left = (c.x - p) + "px";
-        el.style.top = (c.y - p) + "px";
-        el.style.width = (c.w + 2 * p) + "px";
-        el.style.height = (c.h + 2 * p) + "px";
-        el.style.borderRadius = (16 / S) + "px";
+        el.setAttribute("d", "M0 0 H900 V" + IMG_H + " H0 Z " + rrPath(c.x - p, c.y - p, c.w + 2 * p, c.h + 2 * p, 16 / S) + " Z");
       });
 
       // road-map cards: slot + real crop of the card (lifts 6 screen px)

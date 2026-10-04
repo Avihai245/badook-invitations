@@ -3,9 +3,10 @@ import type { ReactNode } from 'react';
 import '@/styles/app.css';
 import { tick } from '@/features/jobs/jobs';
 import { assertInvitationsEnabled } from '@/lib/feature';
+import { ActingAsBar } from '@/features/admin/ui/ActingAsBar.client';
 import { UiProvider } from '@/lib/i18n/provider-lazy';
 import { getUiLocale } from '@/lib/i18n/server';
-import { requireUser } from '@/lib/supabase/session';
+import { getActingAs, requireUser } from '@/lib/supabase/session';
 import { SupportChat } from '@/features/support/SupportChat.client';
 import { AppToasts } from '../AppProviders';
 
@@ -19,10 +20,12 @@ import { AppToasts } from '../AppProviders';
 export default async function AppLayout({ children }: { children: ReactNode }) {
   assertInvitationsEnabled();
   const [, locale] = await Promise.all([requireUser('/app/invitations'), getUiLocale()]);
+  const acting = await getActingAs();
   after(() => tick());
   return (
     <UiProvider locale={locale}>
       <AppToasts>
+        {acting ? <ActingAsBar who={acting.target.email ?? acting.target.id} /> : null}
         {children}
         <SupportChat />
       </AppToasts>
