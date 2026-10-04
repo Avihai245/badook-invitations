@@ -47,6 +47,12 @@ Desktop: 100 on the home page and on the three sample invitations (TBT ≈ 0). A
 HTTP/1.1, a CDN HTTP/2 (see Checks). The JavaScript of every page measured is under 170 KB, the whole load under
 0.33 MB.
 
+Ten more template demos, one run each (atara, bukhara, caesarea-shore, golden-years, jerusalem-stone, lumiere,
+midnight-bloom, retro-80s, rocket-launch, unicorn-dream): Performance 91–96, LCP 2.0–2.8 s, TBT 130–290 ms, CLS
+≤ 0.006, 161–163 KB of JavaScript, 0.28–0.38 MB in all, Accessibility and Best Practices 100. All of them meet the
+score, the JavaScript, the weight and the layout-shift budgets; about half of the single runs are a little over on
+LCP or TBT (below).
+
 What is not within the budget yet:
 
 - **LCP ≤ 2.5 s on an invitation**: 2.4–2.8 s from run to run — the median of three runs is inside the budget on
