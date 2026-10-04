@@ -20,6 +20,7 @@ import { useEditor } from '../state/EditorProvider';
 import { CaptionsField } from './captions';
 import { FieldFrame } from './fields';
 import { prepareImage } from './prepare-image';
+import { prepareVideo } from './prepare-video';
 
 export const IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/avif';
 export const VIDEO_TYPES = 'video/mp4';
@@ -72,7 +73,11 @@ export async function uploadFile(
   onProgress?: (percent: number) => void,
 ): Promise<{ ref: AssetRef; kind: UploadKind; width?: number; height?: number }> {
   // a photo goes up ready for phones: upright, ≤ 2560px, WebP (prepare-image.ts), with its size
-  const prepared = await prepareImage(original);
+  const photo = await prepareImage(original);
+  // and a video: 720p H.264 that starts at once on a phone (prepare-video.ts) — it takes about as long
+  // as the clip, so it fills the first half of the progress bar and the upload the second
+  const video = photo ? null : await prepareVideo(original, (done) => onProgress?.(Math.round(done * 50)));
+  const prepared = photo ?? video;
   const file = prepared?.file ?? original;
   const res = await hostApi<UploadTicket>(`/api/invitations/${invitationId}/uploads`, {
     method: 'POST',
@@ -84,7 +89,11 @@ export async function uploadFile(
       res.status === 413 ? 'too_large' : res.status === 415 ? 'unsupported_type' : 'failed',
       body && !body.ok ? body.max : undefined,
     );
-  await put(body.url, file, onProgress);
+  await put(
+    body.url,
+    file,
+    video?.transcoded && onProgress ? (percent) => onProgress(50 + Math.round(percent / 2)) : onProgress,
+  );
   return prepared
     ? { ref: body.ref, kind: body.kind, width: prepared.width, height: prepared.height }
     : { ref: body.ref, kind: body.kind };

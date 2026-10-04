@@ -68,6 +68,22 @@ for (const folder of await list('')) {
   );
 }
 
+// Files that are heavier than a phone on mobile data should carry (docs/template-media.md): a hint, not an error
+const HEAVY = [
+  { test: /\.(webp|avif|jpe?g|png)$/i, limit: 450 * 1024, what: 'a picture' },
+  { test: /\.(mp4|webm|mov)$/i, limit: 3 * 1024 * 1024, what: 'a video' },
+];
+const heavy = Object.entries(templates).flatMap(([id, files]) =>
+  Object.entries(files).flatMap(([name, { bytes }]) => {
+    const kind = HEAVY.find((h) => h.test.test(name));
+    return kind && bytes && bytes > kind.limit
+      ? [
+          `${id}/${name}: ${(bytes / 1024 / 1024).toFixed(1)} MB for ${kind.what} (over ${Math.round(kind.limit / 1024)} KB)`,
+        ]
+      : [];
+  }),
+);
+
 const manifest = {
   generatedBy:
     'scripts/media-sync.ts — template media present in the Supabase Storage bucket `template-media`',
@@ -77,6 +93,10 @@ const next = `${JSON.stringify(manifest, null, 2)}\n`;
 const current = readFileSync(OUT, 'utf8');
 const count = Object.values(templates).reduce((n, files) => n + Object.keys(files).length, 0);
 if (unknown.length) console.warn(`folders that are no template id (ignored): ${unknown.join(', ')}`);
+if (heavy.length)
+  console.warn(
+    `⚠ ${heavy.length} file(s) heavier than a phone should load — \`npm run media:optimize\` makes them light:\n  ${heavy.join('\n  ')}`,
+  );
 if (process.argv.includes('--check')) {
   if (current !== next) {
     console.error(`media-manifest.json is out of date (${count} files in the bucket) — run without --check`);

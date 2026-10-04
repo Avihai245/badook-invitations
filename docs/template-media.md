@@ -24,10 +24,29 @@ The file names are the last part of each path in the template's `assets` (for ex
 `"hero": "/templates/sahar-bordeaux/hero.mp4"` → upload `hero.mp4` into `sahar-bordeaux/`). What each
 file should look like (sizes, length, loop, tone) is in the template's `ASSETS.md`.
 
+## Preparing the files for the web
+
+Guests open an invitation on a phone, often on mobile data: a picture should weigh well under 450 KB and
+a video about 140 KB a second at most (a 15-second hero ≈ 2 MB). `npm run media:optimize` does what the
+editor does for a host's uploads, for the team's own files:
+
+```
+npm run media:optimize -- <folder or file …> [--out <folder>] [--max 2560] [--mute]
+```
+
+- every picture → upright (EXIF), at most 2560 px on its long edge, WebP;
+- every video → H.264 at most 1280 px on its long edge (720p), 30 fps, faststart, AAC audio (`--mute`
+  drops the sound — a background hero usually has none) and a poster of it, as WebP;
+- `media-info.json` next to the results lists each file's pixel size, length and bytes, and the command
+  warns about anything still over the weights above.
+
+It needs `ffmpeg` and `ffprobe` on the PATH for videos (pictures use `sharp`, already installed with Next).
+The originals are left as they are; the results go to `<folder>/optimized` — upload those.
+
 ## Adding or replacing files
 
 1. Supabase → Storage → `template-media` → the template's folder (create it if needed, named exactly
-   like the template id) → upload the files.
+   like the template id) → upload the files (the optimized ones).
 2. On a machine with the project: `npm run media:sync` with `NEXT_PUBLIC_SUPABASE_URL` and
    `SUPABASE_SECRET_KEY` set (the production values; never commit them). It lists the bucket and
    rewrites `src/features/invitations/templates/media-manifest.json`.
