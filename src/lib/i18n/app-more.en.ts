@@ -60,6 +60,10 @@ export const enMore: Pick<AppDict, MoreKey> = {
       },
       upgrade: 'On a higher plan',
       fullScreen: 'Opens full screen',
+      /** over the sidebar's numbered stages */
+      stagesTitle: 'Event stages',
+      /** a stage's place in the order (the sidebar's buttons, the phone's sheet) */
+      stepOf: 'Step {n} of {total}',
       menu: '“{stage}” options',
       more: 'More',
     },

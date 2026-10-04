@@ -23,14 +23,19 @@ const STAGE_OF: Record<string, string> = {
 export const navItem = (page: Page, key: string) =>
   page.getByTestId('event-sidebar').locator(`[data-nav="${key}"]`);
 
-/** Goes to a screen of the event the way a host does: the sidebar on a computer, the stage's sheet on a phone. */
+/**
+ * Goes to a screen of the event the way a host does: the sidebar on a computer (opening its stage first
+ * when it's folded), the stage's sheet on a phone.
+ */
 export async function navTo(page: Page, key: string) {
   const side = page.getByTestId('event-sidebar');
+  const stage = STAGE_OF[key];
   if (await side.isVisible()) {
+    const toggle = side.locator(`[data-stage-toggle="${stage}"]`);
+    if (stage && (await toggle.getAttribute('aria-expanded')) === 'false') await toggle.click();
     await side.locator(`[data-nav="${key}"]`).click();
     return;
   }
-  const stage = STAGE_OF[key];
   if (stage) {
     await page.getByTestId('event-bottom-bar').locator(`[data-stage-button="${stage}"]`).click();
     await page.getByRole('dialog').locator(`[data-nav="${key}"]`).click();
