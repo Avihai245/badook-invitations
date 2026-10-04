@@ -371,9 +371,17 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
                     aria-expanded={open}
                     aria-controls={`stage-${stage}-screens`}
                     data-stage-toggle={stage}
-                    onClick={() => {
+                    onClick={(e) => {
                       setMoved(true);
                       toggle(stage);
+                      // opened near the bottom: its screens come into view instead of below the fold
+                      const row = e.currentTarget.closest('li');
+                      if (open || !row) return;
+                      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                      window.setTimeout(
+                        () => row.scrollIntoView({ block: 'nearest', behavior: still ? 'auto' : 'smooth' }),
+                        still ? 0 : 220,
+                      );
                     }}
                     className={cn(
                       'group flex w-full items-center gap-2 rounded-[10px] px-2 py-1 text-start text-[13px] font-bold transition-colors hover:bg-subtle',

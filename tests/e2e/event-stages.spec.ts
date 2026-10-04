@@ -55,6 +55,8 @@ test.describe('the event’s stages', () => {
     await toggle(page, 'celebrate').click();
     await expect(toggle(page, 'celebrate')).toHaveAttribute('aria-expanded', 'true');
     await expect(navItem(page, 'gallery')).toBeVisible();
+    // the last stage opens below the fold of a laptop's sidebar: it scrolls into view
+    await expect(navItem(page, 'film')).toBeInViewport();
     await open(page, guests);
     await expect(toggle(page, 'celebrate')).toHaveAttribute('aria-expanded', 'true');
 
