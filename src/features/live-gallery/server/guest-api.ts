@@ -152,6 +152,7 @@ export function feedItem(
     takenAt: r.takenAt,
     at: r.publishedAt ?? r.createdAt,
     name: r.name,
+    by: r.by ?? null,
   };
 }
 

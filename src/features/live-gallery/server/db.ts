@@ -62,6 +62,8 @@ export interface ItemRow {
   aiQuality: number | null;
   phash: string | null;
   name: string | null;
+  /** an opaque key of the uploader ('host' for the hosts' items): see gallery_item_json */
+  by?: string | null;
   guestId: string | null;
   /** who added it: a guest, or the host (their highlights film) */
   source?: 'guest' | 'host';

@@ -159,6 +159,15 @@ only if the host ticks it. Off: the studio offers the package or the switch, the
   carrying the guest's personal link and the language they read in; after the event, "see the album".
   The ISR page renders the same HTML for everyone; the phase is decided in the browser. Without a gallery
   (or the feature) the section renders nothing.
+- **The guests' page as stories** (`/e/<slug>/upload`): a circle for each person who shared (the "+" to add
+  your own first), newest first, opening a full-screen viewer that plays one person's photos and videos in
+  the order they were shared and then the next person's (tap the start side to go back, the rest to go on,
+  hold to pause, swipe down to close; with "reduce motion" nothing moves by itself). A ring turns grey once
+  the last item was watched — kept on that phone only. Named guests are one story by name; unnamed ones are
+  told apart by the feed's opaque `by` key (the start of the uploader's hash — never the device's own id,
+  which alone can delete an upload; `gallery_item_json`, migration `20261004000100`); without the migration
+  unnamed uploads share one story. The hosts' own items (the highlights film) are one story. The page ends
+  with the Badook logo.
 - **Sending guests the gallery link** (gallery tab → share card): from the system's WhatsApp number once
   the third Meta template is approved and `INVITES_WHATSAPP_GALLERY_TEMPLATE` names it
   (docs/whatsapp-setup.md §9); otherwise per-guest wa.me links and copied messages. In each guest's

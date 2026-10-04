@@ -1,7 +1,17 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- guests' photos come from short-lived signed URLs of private storage (or the phone itself): nothing for the image optimizer to cache */
 
-import { Camera, CircleAlert, Globe, ImagePlus, Lock, LoaderCircle, Trash2 } from 'lucide-react';
+import {
+  Camera,
+  CircleAlert,
+  Globe,
+  ImagePlus,
+  Lock,
+  LoaderCircle,
+  Sparkles,
+  Trash2,
+  User,
+} from 'lucide-react';
 import {
   useCallback,
   useEffect,
@@ -12,6 +22,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from 'react';
+import { BrandLogo } from '@/components/app/BrandLogo';
 import { RTL_LOCALES } from '@/features/invitations/contracts/types';
 import { nativeName } from '@/features/invitations/lib/locales';
 import { UploadFaceIndexer } from '@/features/faces/client/upload-indexer';
@@ -27,6 +38,9 @@ import { MediaViewer } from '../MediaViewer';
 import { GuestTextProvider, fmt, formatBytes, useGuestText, type GuestLocale } from '../guest-text';
 import { FeedGrid } from './FeedGrid';
 import { QueuePanel } from './QueuePanel';
+import { StoriesTray } from './StoriesTray';
+import { StoryViewer } from './StoryViewer';
+import { groupStories, isUnseen, readSeen, writeSeen, type Story } from './stories';
 
 /**
  * The guests' page of the live gallery (/e/<slug>/upload?t=…): no sign-up, no app. Pick photos and
@@ -102,6 +116,10 @@ function GalleryBody({
   const [mine, setMine] = useState<MineItem[]>([]);
   const [fresh, setFresh] = useState<ReadonlySet<string>>(new Set());
   const [open, setOpen] = useState<number | null>(null);
+  // the stories: which person's is open, and what this phone has already watched
+  const [storyOpen, setStoryOpen] = useState<string | null>(null);
+  const [seen, setSeen] = useState<Record<string, string>>({});
+  useEffect(() => setSeen(readSeen(token)), [token]);
   const [loadingMore, setLoadingMore] = useState(false);
   const since = useRef<string | null>(data.initial?.now ?? null);
   const expires = useRef<number>(data.initial?.expiresAt ?? 0);
@@ -337,6 +355,20 @@ function GalleryBody({
 
   // ── this phone's own uploads that aren't in the feed ──
   const mineIds = useMemo(() => new Set(mine.map((m) => m.id)), [mine]);
+  const stories = useMemo(() => groupStories(items), [items]);
+  const storyName = (s: Story) =>
+    s.host ? t.stories.host : (s.name ?? fmt(t.stories.anonymous, { n: number(s.anonymous ?? 1) }));
+  const watched = useCallback(
+    (story: Story) =>
+      setSeen((cur) => {
+        if (!isUnseen(story, cur)) return cur;
+        const next = { ...cur, [story.key]: story.newestId };
+        writeSeen(token, next);
+        return next;
+      }),
+    [token],
+  );
+  const guests = stories.filter((s) => !s.host).length;
   const waiting = mine.filter((m) => m.status !== 'published');
   const [confirming, setConfirming] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -353,6 +385,7 @@ function GalleryBody({
     setMine((m) => m.filter((x) => x.id !== id));
     setItems((cur) => cur.filter((x) => x.id !== id));
     setOpen(null);
+    setStoryOpen(null);
   };
 
   const onName = (value: string) => {
@@ -369,9 +402,14 @@ function GalleryBody({
   const showQueue = roundItems.length > 0 || (snapshot?.preparing ?? 0) > 0;
 
   return (
-    <div style={accent} className="min-h-svh bg-canvas" dir={dir}>
-      <div className="mx-auto w-full max-w-[720px] px-4 pt-5 pb-10 sm:px-6 sm:pt-8">
-        <header className="relative text-center">
+    <div style={accent} className="relative min-h-svh overflow-x-clip bg-canvas" dir={dir}>
+      {/* the event's colour, washed over the top of the page */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[440px] bg-[radial-gradient(110%_90%_at_50%_0%,color-mix(in_oklab,var(--gallery-accent)_26%,transparent),transparent_72%)]"
+      />
+      <div className="relative mx-auto w-full max-w-[720px] px-4 pt-5 pb-10 sm:px-6 sm:pt-8">
+        <header className={`relative text-center ${others.length ? 'pt-11 sm:pt-0' : ''}`}>
           {others.length === 1 ? (
             <button
               type="button"
@@ -400,23 +438,38 @@ function GalleryBody({
               </select>
             </label>
           ) : null}
-          {/* on a phone, a longer language's eyebrow wraps beside the language button, not under it */}
-          <p
-            className={`text-[12.5px] font-semibold tracking-[0.08em] text-[var(--gallery-accent)] uppercase ${others.length ? 'max-sm:px-[6.25rem]' : ''}`}
-          >
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_14%,transparent)] px-3.5 py-1.5 text-[12.5px] font-bold text-[var(--gallery-accent)]">
+            <Sparkles aria-hidden className="size-3.5" />
             {t.eyebrow}
           </p>
-          <h1 className="mt-2 font-display text-[30px] leading-[1.15] font-bold text-balance sm:text-[36px]">
+          <h1 className="mt-3 font-display text-[34px] leading-[1.1] font-bold text-balance sm:text-[42px]">
             <bdi>{title}</bdi>
           </h1>
           {data.event.date ? (
-            <p className="mt-1.5 text-[14px] text-muted">
+            <p className="mt-2 text-[14.5px] text-muted">
               {date(`${data.event.date}T12:00:00Z`, {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
                 timeZone: 'UTC',
               })}
+            </p>
+          ) : null}
+          {phase === 'ready' && items.length ? (
+            <p className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[13px] font-semibold">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3.5 py-1.5 shadow-sm ring-1 ring-line">
+                <Camera aria-hidden className="size-4 text-[var(--gallery-accent)]" />
+                {plural(t.feed.count, items.length, { n: `${number(items.length)}${next ? '+' : ''}` })}
+              </span>
+              {guests ? (
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3.5 py-1.5 shadow-sm ring-1 ring-line"
+                  data-testid="gallery-people"
+                >
+                  <User aria-hidden className="size-4 text-[var(--gallery-accent)]" />
+                  {plural(t.hero.people, guests, { n: `${number(guests)}${next ? '+' : ''}` })}
+                </span>
+              ) : null}
             </p>
           ) : null}
         </header>
@@ -445,23 +498,75 @@ function GalleryBody({
               <Banner text={t.ended} />
             ) : null}
 
+            {stories.length ? (
+              <StoriesTray
+                stories={stories}
+                seen={seen}
+                nameOf={storyName}
+                onOpen={setStoryOpen}
+                onAdd={canUpload ? () => fileInput.current?.click() : undefined}
+              />
+            ) : null}
+
             {canUpload ? (
               <section
-                className="mt-6 rounded-[20px] border border-line bg-surface p-5 shadow-sm sm:p-6"
+                className="mt-6 rounded-[28px] border border-line bg-surface p-5 shadow-[0_28px_60px_-34px_rgba(20,10,0,0.45)] sm:p-7"
                 aria-labelledby="gallery-upload"
               >
-                <h2 id="gallery-upload" className="text-[18px] font-bold">
-                  {t.upload.title}
-                </h2>
-                <p className="mt-1 text-[14px] text-muted">
-                  {mode === 'approval' ? t.upload.approvalBody : t.upload.body}
-                </p>
+                <div className="flex items-start gap-3.5">
+                  <span
+                    aria-hidden
+                    className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] shadow-[0_10px_24px_-12px_rgba(0,0,0,0.55)]"
+                  >
+                    <ImagePlus className="size-6" />
+                  </span>
+                  <div className="min-w-0">
+                    <h2 id="gallery-upload" className="text-[20px] leading-tight font-bold">
+                      {t.upload.title}
+                    </h2>
+                    <p className="mt-1 text-[14px] text-muted">
+                      {mode === 'approval' ? t.upload.approvalBody : t.upload.body}
+                    </p>
+                  </div>
+                </div>
+                {/* the name comes first: it is the name on this person's story */}
+                <div className="mt-5">
+                  <label
+                    htmlFor="gallery-name"
+                    className="flex items-baseline gap-1.5 text-[13px] font-semibold"
+                  >
+                    {t.upload.name}
+                    <span className="text-[12px] font-normal text-muted">({t.upload.optional})</span>
+                  </label>
+                  <div className="mt-1.5 flex items-center gap-2.5">
+                    <span
+                      aria-hidden
+                      className="grid size-11 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_16%,white)] font-display text-[18px] font-bold text-[var(--gallery-accent)]"
+                    >
+                      {(Array.from(name.trim())[0] ?? '').toLocaleUpperCase() || <User className="size-5" />}
+                    </span>
+                    <input
+                      id="gallery-name"
+                      value={name}
+                      maxLength={GALLERY.limits.nameLength}
+                      onChange={(e) => onName(e.target.value)}
+                      placeholder={t.upload.namePlaceholder}
+                      dir="auto"
+                      autoComplete="name"
+                      aria-describedby="gallery-name-help"
+                      className="h-11 min-w-0 flex-1 rounded-[12px] border border-line bg-surface px-3.5 text-[15px] focus:border-ink focus:shadow-ring focus:outline-hidden"
+                    />
+                  </div>
+                  <p id="gallery-name-help" className="mt-1.5 text-[12px] text-muted">
+                    {t.upload.nameHelp}
+                  </p>
+                </div>
                 <div className="mt-4 grid gap-2.5 sm:grid-cols-[1fr_auto]">
                   <button
                     type="button"
                     onClick={() => fileInput.current?.click()}
                     disabled={!snapshot}
-                    className="inline-flex h-13 items-center justify-center gap-2 rounded-[12px] bg-[var(--gallery-accent)] px-5 text-[16px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_10px_24px_-14px_rgba(0,0,0,0.6)] transition-transform active:scale-[0.98] disabled:opacity-60 motion-reduce:transition-none"
+                    className="inline-flex h-14 items-center justify-center gap-2.5 rounded-[16px] bg-[linear-gradient(135deg,var(--gallery-accent),color-mix(in_oklab,var(--gallery-accent)_78%,black))] px-5 text-[17px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_14px_28px_-14px_rgba(0,0,0,0.65)] transition-transform active:scale-[0.98] disabled:opacity-60 motion-reduce:transition-none"
                   >
                     <ImagePlus aria-hidden className="size-5" />
                     {t.upload.pick}
@@ -470,7 +575,7 @@ function GalleryBody({
                     type="button"
                     onClick={() => cameraInput.current?.click()}
                     disabled={!snapshot}
-                    className="inline-flex h-13 items-center justify-center gap-2 rounded-[12px] border border-line bg-surface px-5 text-[15px] font-semibold text-ink shadow-sm disabled:opacity-60"
+                    className="inline-flex h-14 items-center justify-center gap-2 rounded-[16px] border border-line bg-surface px-5 text-[15px] font-semibold text-ink shadow-sm disabled:opacity-60"
                   >
                     <Camera aria-hidden className="size-5" />
                     {t.upload.camera}
@@ -507,29 +612,6 @@ function GalleryBody({
                     minutes: number(data.limits.videoMinutes),
                   })}
                 </p>
-                <div className="mt-4">
-                  <label
-                    htmlFor="gallery-name"
-                    className="flex items-baseline gap-1.5 text-[13px] font-semibold"
-                  >
-                    {t.upload.name}
-                    <span className="text-[12px] font-normal text-muted">({t.upload.optional})</span>
-                  </label>
-                  <input
-                    id="gallery-name"
-                    value={name}
-                    maxLength={GALLERY.limits.nameLength}
-                    onChange={(e) => onName(e.target.value)}
-                    placeholder={t.upload.namePlaceholder}
-                    dir="auto"
-                    autoComplete="name"
-                    aria-describedby="gallery-name-help"
-                    className="mt-1.5 h-11 w-full rounded-[10px] border border-line bg-surface px-3 text-[15px] focus:border-ink focus:shadow-ring focus:outline-hidden"
-                  />
-                  <p id="gallery-name-help" className="mt-1 text-[12px] text-muted">
-                    {t.upload.nameHelp}
-                  </p>
-                </div>
                 {skipped.length ? (
                   <p
                     role="alert"
@@ -651,7 +733,7 @@ function GalleryBody({
           </>
         )}
 
-        <footer className="mt-12 text-center text-[12px] leading-relaxed text-muted">
+        <footer className="mt-14 text-center text-[12px] leading-relaxed text-muted">
           {canUpload ? <p className="mx-auto max-w-[52ch]">{t.footer.consent}</p> : null}
           <p className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
             <a href="/privacy" target="_blank" rel="noopener" className="underline">
@@ -661,9 +743,31 @@ function GalleryBody({
               {t.footer.accessibility}
             </a>
           </p>
-          <p className="mt-2 text-muted">{fmt(t.footer.made, { brand: data.brand })}</p>
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener"
+            data-testid="gallery-brand"
+            className="mx-auto mt-8 inline-flex flex-col items-center gap-2 rounded-[14px] px-4 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            <BrandLogo label={data.brand} className="text-[18px]" />
+            <span className="text-[12.5px] font-medium">{fmt(t.footer.made, { brand: data.brand })}</span>
+          </a>
         </footer>
       </div>
+
+      {storyOpen ? (
+        <StoryViewer
+          stories={stories}
+          startKey={storyOpen}
+          nameOf={storyName}
+          onClose={() => setStoryOpen(null)}
+          onWatched={watched}
+          canDelete={(item) => mineIds.has(item.id)}
+          onDelete={(item) => setConfirming(item.id)}
+          suspended={!!confirming}
+        />
+      ) : null}
 
       {open !== null && items[open] ? (
         <MediaViewer

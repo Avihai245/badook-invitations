@@ -35,7 +35,7 @@ export const galleryGuestAr: GalleryGuestDict = {
     name: 'اسمكم',
     optional: 'اختياري',
     namePlaceholder: 'مثلًا: ليلى وكريم',
-    nameHelp: 'يظهر بجانب ما ترفعونه',
+    nameHelp: 'سيظهر اسمكم على قصتكم بجانب ما ترفعونه',
     resilient: 'تُحفظ الملفات على الهاتف وتُرفع في الخلفية — حتى عندما يضعف الاتصال.',
     limits: 'صور حتى {image} · فيديوهات حتى {video} وبطول {minutes} دقائق كحدّ أقصى',
   },
@@ -115,7 +115,7 @@ export const galleryGuestAr: GalleryGuestDict = {
     failed: 'تعذّر الحذف. حاولوا مرة أخرى.',
   },
   feed: {
-    title: 'من المناسبة',
+    title: 'كل الصور والفيديوهات',
     count: {
       zero: 'لا توجد عناصر',
       one: 'عنصر واحد',
@@ -147,6 +147,45 @@ export const galleryGuestAr: GalleryGuestDict = {
     previous: 'السابقة',
     position: '{i} من {n}',
     video: 'فيديو',
+  },
+  /** the feed as stories: one per person, a ring to watch what they shot */
+  stories: {
+    title: 'قصص المناسبة',
+    hint: 'اضغطوا على دائرة لمشاهدة ما صوّره كل ضيف.',
+    add: 'إضافة',
+    addLabel: 'إضافة صور وفيديوهات',
+    open: {
+      zero: 'مشاهدة قصة {name}: لا عناصر',
+      one: 'مشاهدة قصة {name}: عنصر واحد',
+      two: 'مشاهدة قصة {name}: عنصران',
+      few: 'مشاهدة قصة {name}: {n} عناصر',
+      many: 'مشاهدة قصة {name}: {n} عنصرًا',
+      other: 'مشاهدة قصة {name}: {n} عنصر',
+    },
+    newLabel: 'جديد',
+    host: 'أصحاب المناسبة',
+    anonymous: 'ضيف {n}',
+    viewerLabel: 'قصة {name}',
+    position: '{i} من {n}',
+    next: 'التالي',
+    previous: 'السابق',
+    pause: 'إيقاف مؤقت',
+    play: 'متابعة',
+    sound: 'تشغيل الصوت',
+    mute: 'كتم الصوت',
+    close: 'إغلاق',
+    tapHint: 'اضغطوا على الجانبين للتنقل بين الصور. اضغطوا مطولًا للإيقاف.',
+  },
+  /** under the title: how much has been shared */
+  hero: {
+    people: {
+      zero: 'لم يشارك أحد بعد',
+      one: 'شارك ضيف واحد',
+      two: 'شارك ضيفان',
+      few: 'شارك {n} ضيوف',
+      many: 'شارك {n} ضيفًا',
+      other: 'شارك {n} ضيف',
+    },
   },
   footer: {
     consent: 'برفعكم الملفات تؤكدون أنه يحق لكم مشاركتها، وأن أصحاب الدعوة وكل من لديه الرابط سيرونها.',

@@ -37,7 +37,7 @@ export const galleryGuestEs: GalleryGuestDict = {
     name: 'Tu nombre',
     optional: 'opcional',
     namePlaceholder: 'p. ej.: Lucía y Mateo',
-    nameHelp: 'Aparecerá junto a lo que subas',
+    nameHelp: 'Tu nombre aparecerá en tu historia, junto a lo que subas',
     resilient:
       'Tus archivos se guardan en el móvil y se suben en segundo plano, aunque se caiga la conexión.',
     limits: 'Fotos de hasta {image} · vídeos de hasta {video} y {minutes} minutos',
@@ -114,7 +114,7 @@ export const galleryGuestEs: GalleryGuestDict = {
     failed: 'No se pudo eliminar. Inténtalo de nuevo.',
   },
   feed: {
-    title: 'De la celebración',
+    title: 'Todas las fotos y vídeos',
     count: { one: '{n} elemento', many: '{n} de fotos y vídeos', other: '{n} fotos y vídeos' },
     live: 'Se actualiza en directo',
     empty: 'Todavía no hay fotos. ¡Sé el primero en compartir!',
@@ -132,6 +132,39 @@ export const galleryGuestEs: GalleryGuestDict = {
     previous: 'Anterior',
     position: '{i} de {n}',
     video: 'Vídeo',
+  },
+  /** the feed as stories: one per person, a ring to watch what they shot */
+  stories: {
+    title: 'Historias del evento',
+    hint: 'Toca un círculo para ver lo que grabó cada invitado.',
+    add: 'Añadir',
+    addLabel: 'Añadir fotos y vídeos',
+    open: {
+      one: 'Ver la historia de {name}: 1 elemento',
+      many: 'Ver la historia de {name}: {n} de elementos',
+      other: 'Ver la historia de {name}: {n} elementos',
+    },
+    newLabel: 'nuevo',
+    host: 'Los anfitriones',
+    anonymous: 'Invitado {n}',
+    viewerLabel: 'Historia de {name}',
+    position: 'Elemento {i} de {n}',
+    next: 'Siguiente',
+    previous: 'Anterior',
+    pause: 'Pausar',
+    play: 'Reanudar',
+    sound: 'Activar sonido',
+    mute: 'Silenciar',
+    close: 'Cerrar',
+    tapHint: 'Toca los lados para pasar de una foto a otra. Mantén pulsado para pausar.',
+  },
+  /** under the title: how much has been shared */
+  hero: {
+    people: {
+      one: '{n} invitado ha compartido',
+      many: '{n} de invitados han compartido',
+      other: '{n} invitados han compartido',
+    },
   },
   footer: {
     consent:

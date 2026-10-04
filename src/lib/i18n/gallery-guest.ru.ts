@@ -36,7 +36,7 @@ export const galleryGuestRu: GalleryGuestDict = {
     name: 'Ваше имя',
     optional: 'необязательно',
     namePlaceholder: 'например: Даша и Иван',
-    nameHelp: 'Появится рядом с вашими фото',
+    nameHelp: 'Имя появится на вашей истории рядом с вашими файлами',
     resilient: 'Файлы сохраняются на телефоне и загружаются в фоне — даже когда пропадает связь.',
     limits: 'Фото до {image} · видео до {video} и не длиннее {minutes} мин',
   },
@@ -113,7 +113,7 @@ export const galleryGuestRu: GalleryGuestDict = {
     failed: 'Не удалось удалить. Попробуйте ещё раз.',
   },
   feed: {
-    title: 'С праздника',
+    title: 'Все фото и видео',
     count: { one: '{n} файл', few: '{n} файла', many: '{n} файлов', other: '{n} файла' },
     live: 'Обновляется в реальном времени',
     empty: 'Здесь пока нет фотографий. Поделитесь первыми!',
@@ -131,6 +131,41 @@ export const galleryGuestRu: GalleryGuestDict = {
     previous: 'Предыдущее',
     position: '{i} из {n}',
     video: 'Видео',
+  },
+  /** the feed as stories: one per person, a ring to watch what they shot */
+  stories: {
+    title: 'Истории праздника',
+    hint: 'Нажмите на круг, чтобы посмотреть, что снял каждый гость.',
+    add: 'Добавить',
+    addLabel: 'Добавить фото и видео',
+    open: {
+      one: 'Смотреть историю {name}: {n} файл',
+      few: 'Смотреть историю {name}: {n} файла',
+      many: 'Смотреть историю {name}: {n} файлов',
+      other: 'Смотреть историю {name}: {n} файла',
+    },
+    newLabel: 'новое',
+    host: 'Хозяева',
+    anonymous: 'Гость {n}',
+    viewerLabel: 'История: {name}',
+    position: '{i} из {n}',
+    next: 'Дальше',
+    previous: 'Назад',
+    pause: 'Пауза',
+    play: 'Продолжить',
+    sound: 'Включить звук',
+    mute: 'Выключить звук',
+    close: 'Закрыть',
+    tapHint: 'Нажимайте по краям, чтобы листать. Удерживайте, чтобы остановить.',
+  },
+  /** under the title: how much has been shared */
+  hero: {
+    people: {
+      one: '{n} гость поделился',
+      few: '{n} гостя поделились',
+      many: '{n} гостей поделились',
+      other: '{n} гостя поделились',
+    },
   },
   footer: {
     consent:

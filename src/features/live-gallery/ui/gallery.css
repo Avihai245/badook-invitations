@@ -39,3 +39,13 @@
     transform: scale(1.04);
   }
 }
+
+/* a story's progress bar fills over the time its photo is shown (paused while someone holds the screen) */
+@keyframes story-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

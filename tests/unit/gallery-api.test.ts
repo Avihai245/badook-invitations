@@ -763,6 +763,19 @@ describe('the feed and the screen', () => {
       ...over,
     });
 
+  it('says who an item is from by an opaque key, and nothing else about the uploader', async () => {
+    const w = guestWorld();
+    w.db.feed.mockResolvedValueOnce([
+      published({ by: 'f3a9c0d1e2b47865', name: 'דנה' }),
+      published({ by: 'host', name: null }),
+      published(),
+    ]);
+    const res = await guest.guestFeed({ t: w.token }, IP, w.deps);
+    const items = res.body.items as Record<string, unknown>[];
+    expect(items.map((i) => i.by)).toEqual(['f3a9c0d1e2b47865', 'host', null]);
+    expect(JSON.stringify(res.body)).not.toMatch(/uploader/i);
+  });
+
   it('a page of published items with signed URLs only (no paths, no scores), and the next cursor', async () => {
     const w = guestWorld();
     const rows = Array.from({ length: GALLERY.feed.pageSize }, () => published());
@@ -781,6 +794,7 @@ describe('the feed and the screen', () => {
     expect(Object.keys(items[1]!).sort()).toEqual(
       [
         'at',
+        'by',
         'display',
         'durationMs',
         'height',

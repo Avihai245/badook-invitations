@@ -36,7 +36,7 @@ export const galleryGuestEn: GalleryGuestDict = {
     name: 'Your name',
     optional: 'optional',
     namePlaceholder: 'e.g. Dana & Yoav',
-    nameHelp: 'Shown next to what you upload',
+    nameHelp: 'Your name shows on your story, next to what you upload',
     resilient:
       'Your files are saved on your phone and upload in the background — even when the signal drops.',
     limits: 'Photos up to {image} · videos up to {video} and {minutes} minutes',
@@ -103,7 +103,7 @@ export const galleryGuestEn: GalleryGuestDict = {
     failed: 'Couldn’t delete it. Try again.',
   },
   feed: {
-    title: 'From the event',
+    title: 'All photos & videos',
     count: { one: '1 item', other: '{n} photos & videos' },
     live: 'Updating live',
     empty: 'No photos yet. Be the first to share!',
@@ -121,6 +121,31 @@ export const galleryGuestEn: GalleryGuestDict = {
     previous: 'Previous',
     position: '{i} of {n}',
     video: 'Video',
+  },
+  /** the feed as stories: one per person, a ring to watch what they shot */
+  stories: {
+    title: 'Event stories',
+    hint: 'Tap a circle to watch what each guest shot.',
+    add: 'Add',
+    addLabel: 'Add photos and videos',
+    open: { one: 'Watch {name}’s story: 1 item', other: 'Watch {name}’s story: {n} items' },
+    newLabel: 'new',
+    host: 'The hosts',
+    anonymous: 'Guest {n}',
+    viewerLabel: '{name}’s story',
+    position: 'Item {i} of {n}',
+    next: 'Next',
+    previous: 'Previous',
+    pause: 'Pause',
+    play: 'Play',
+    sound: 'Turn sound on',
+    mute: 'Mute',
+    close: 'Close',
+    tapHint: 'Tap the sides to move between photos. Hold to pause.',
+  },
+  /** under the title: how much has been shared */
+  hero: {
+    people: { one: '1 guest shared', other: '{n} guests shared' },
   },
   footer: {
     consent:

@@ -404,6 +404,9 @@ describe('items', () => {
     const since = (await c.query(`select now() - interval '1 minute' as t`)).rows[0].t.toISOString();
     const feed = await call<Record<string, unknown>[]>('gallery_feed', [inv, null, null, 30]);
     expect(feed.map((i) => i.id)).toEqual([a.id]);
+    // each item says who it is from by the start of the uploader's hash — never the hash itself
+    expect(feed[0]!.by).toBe(UPLOADER.slice(0, 16));
+    expect(JSON.stringify(feed)).not.toContain(UPLOADER);
     expect(await call('gallery_changes', [inv, since, 50])).toMatchObject({
       added: [{ id: a.id }],
       removed: [],

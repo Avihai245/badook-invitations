@@ -27,6 +27,8 @@ export interface FeedItem {
   /** when it entered the feed */
   at: string;
   name: string | null;
+  /** who it is from, as an opaque key (the stories group by it); 'host' for the hosts' own items */
+  by?: string | null;
 }
 
 /** One of this device's own uploads and where it stands. */

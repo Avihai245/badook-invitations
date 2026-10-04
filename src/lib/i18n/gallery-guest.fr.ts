@@ -37,7 +37,7 @@ export const galleryGuestFr: GalleryGuestDict = {
     name: 'Votre nom',
     optional: 'facultatif',
     namePlaceholder: 'ex. : Camille et Julien',
-    nameHelp: 'Affiché à côté de vos envois',
+    nameHelp: 'Votre nom s’affiche sur votre story, à côté de vos envois',
     resilient:
       'Vos fichiers sont gardés sur le téléphone et envoyés en arrière-plan — même quand le réseau décroche.',
     limits: 'Photos jusqu’à {image} · vidéos jusqu’à {video} et {minutes} minutes',
@@ -113,7 +113,7 @@ export const galleryGuestFr: GalleryGuestDict = {
     failed: 'La suppression a échoué. Réessayez.',
   },
   feed: {
-    title: 'L’événement en images',
+    title: 'Toutes les photos et vidéos',
     count: { one: '{n} élément', many: '{n} de photos et vidéos', other: '{n} photos et vidéos' },
     live: 'Mis à jour en direct',
     empty: 'Pas encore de photos. Soyez le premier à partager !',
@@ -135,6 +135,39 @@ export const galleryGuestFr: GalleryGuestDict = {
     previous: 'Précédente',
     position: '{i} sur {n}',
     video: 'Vidéo',
+  },
+  /** the feed as stories: one per person, a ring to watch what they shot */
+  stories: {
+    title: 'Les stories de l’événement',
+    hint: 'Touchez un cercle pour voir ce qu’a filmé chaque invité.',
+    add: 'Ajouter',
+    addLabel: 'Ajouter des photos et des vidéos',
+    open: {
+      one: 'Voir la story de {name} : 1 élément',
+      many: 'Voir la story de {name} : {n} d’éléments',
+      other: 'Voir la story de {name} : {n} éléments',
+    },
+    newLabel: 'nouveau',
+    host: 'Les hôtes',
+    anonymous: 'Invité {n}',
+    viewerLabel: 'Story de {name}',
+    position: 'Élément {i} sur {n}',
+    next: 'Suivant',
+    previous: 'Précédent',
+    pause: 'Pause',
+    play: 'Lecture',
+    sound: 'Activer le son',
+    mute: 'Couper le son',
+    close: 'Fermer',
+    tapHint: 'Touchez les côtés pour passer d’une photo à l’autre. Maintenez pour mettre en pause.',
+  },
+  /** under the title: how much has been shared */
+  hero: {
+    people: {
+      one: '{n} invité a partagé',
+      many: '{n} d’invités ont partagé',
+      other: '{n} invités ont partagé',
+    },
   },
   footer: {
     consent:

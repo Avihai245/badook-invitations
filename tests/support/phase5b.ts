@@ -185,6 +185,10 @@ export interface SeedPhoto {
   width?: number;
   height?: number;
   status?: 'published' | 'pending';
+  /** another guest's phone (the default is one phone for all) */
+  who?: string;
+  /** the name the guest gave: omitted is "אורחת", null is no name */
+  name?: string | null;
 }
 
 /**
@@ -192,9 +196,11 @@ export interface SeedPhoto {
  * through the gallery's own database functions (published, with the phone's checks' numbers).
  */
 export async function seedPhotos(invitationId: string, photos: SeedPhoto[]): Promise<string[]> {
-  const uploader = createHash('sha256').update(`e2e-phone-${invitationId}`).digest('hex');
   const ids: string[] = [];
   for (const [i, p] of photos.entries()) {
+    const uploader = createHash('sha256')
+      .update(`e2e-phone-${invitationId}${p.who ? `-${p.who}` : ''}`)
+      .digest('hex');
     const id = randomUUID();
     const folder = `${invitationId}/${id}`;
     const width = p.width ?? 1200;
@@ -221,8 +227,8 @@ export async function seedPhotos(invitationId: string, photos: SeedPhoto[]): Pro
       takenAt: taken,
     };
     const [reserved] = await sql<{ r: { ok: boolean } }>(
-      `select public.gallery_reserve($1, $2, null, 'אורחת', $3, 3000) as r`,
-      [invitationId, uploader, JSON.stringify([item])],
+      `select public.gallery_reserve($1, $2, null, $4, $3, 3000) as r`,
+      [invitationId, uploader, JSON.stringify([item]), p.name === undefined ? 'אורחת' : p.name],
     );
     expect(reserved!.r.ok).toBe(true);
     const phash = createHash('sha256').update(id).digest('hex').slice(0, 16);
