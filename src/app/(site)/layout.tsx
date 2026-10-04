@@ -5,6 +5,7 @@ import { UiProvider } from '@/lib/i18n/provider-lazy';
 import { getUiLocale } from '@/lib/i18n/server';
 import { A11Y_BOOT } from '@/features/site/a11y';
 import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';
+import { StaleBuildGuard } from '@/features/site/StaleBuildGuard.client';
 import { ThemeSync } from '@/features/site/Theme.client';
 import { THEME_BOOT } from '@/features/site/theme';
 import '@/styles/app.css';
@@ -33,6 +34,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           {children}
           <AccessibilityMenu />
           <ThemeSync />
+          <StaleBuildGuard />
         </UiProvider>
       </body>
     </html>

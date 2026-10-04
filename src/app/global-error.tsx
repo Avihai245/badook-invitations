@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, type CSSProperties } from 'react';
+import { isStaleBuildError, reloadForNewBuild } from '@/lib/stale-build';
 
 /**
  * The last resort, when a root layout itself fails (the site's or an invitation's): it replaces the
@@ -16,6 +17,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error(error);
+    if (isStaleBuildError(error)) reloadForNewBuild();
   }, [error]);
   return (
     <html lang="he" dir="rtl">

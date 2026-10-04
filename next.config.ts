@@ -81,6 +81,11 @@ const buildCommit = (() => {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Amplify builds: Next's own version-skew protection (a tab on an older deployment loads pages in
+  // full instead of mixing builds) — features/site/StaleBuildGuard.client.tsx covers the rest
+  ...(process.env.AWS_COMMIT_ID?.trim()
+    ? { deploymentId: process.env.AWS_COMMIT_ID.trim().slice(0, 32) }
+    : {}),
   images: imageSources
     ? {
         formats: ['image/avif', 'image/webp'],
