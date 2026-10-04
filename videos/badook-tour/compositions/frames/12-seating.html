@@ -562,8 +562,9 @@
       // zoom-to-target on the floor plan (nested wrappers: T = −offset)
       var WIN_CX = 1150 / 2, WIN_CY = 856 / 2;
       var ZX = -(PLAN.x + PLAN.w / 2 - WIN_CX);
-      var ZY = -(PLAN.y + PLAN.h / 2 - WIN_CY);
       var ZS = 1.3;
+      // clamp so the screenshot's bottom edge (917.55 − 61.17 = 856.38 local) never rises into the window at 1.3×
+      var ZY = Math.max(-(PLAN.y + PLAN.h / 2 - WIN_CY), WIN_CY / ZS + WIN_CY - 856.38 + 0.5);
 
       var tl = gsap.timeline({ paused: true });
 

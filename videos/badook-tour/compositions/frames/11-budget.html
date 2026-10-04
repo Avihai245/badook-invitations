@@ -93,7 +93,7 @@
     [id="11-budget-pct"] {
       position: absolute;
       left: 783px;
-      top: 434px;
+      top: 435.7px;
       width: 300px;
       height: 44px;
       direction: ltr;
@@ -219,6 +219,13 @@
       white-space: nowrap;
       box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.04);
       transform-origin: 0% 50%;
+    }
+    [class~="11-budget-veil"] {
+      position: absolute;
+      inset: -1px;
+      border-radius: 9999px;
+      background: rgba(251, 247, 241, 0.62);
+      pointer-events: none;
     }
     [class~="11-budget-callout"] svg {
       width: 28px;
@@ -473,10 +480,12 @@
         <div id="11-budget-c-add" class="11-budget-callout" dir="rtl" lang="he" style="left: 350px; top: 81px;">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 8v8" /><path d="M8 12h8" /></svg>
           <span>הוצאה חדשה</span>
+          <div id="11-budget-v-add" class="11-budget-veil"></div>
         </div>
         <div id="11-budget-c-pay" class="11-budget-callout" dir="rtl" lang="he" style="left: 468px; top: 752.5px;">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h18" /></svg>
           <span>תשלומים</span>
+          <div id="11-budget-v-pay" class="11-budget-veil"></div>
         </div>
       </div>
     </div>
@@ -513,16 +522,14 @@
       function off(pct) { return 130 - pct; }            // fill dash offset (pathLength 130)
       var needle = el("needle");
       var fills = scope.querySelectorAll('[class~="11-budget-fill"]');
-      var pctNum = el("pct-num");
-      var pct = { v: 0 };
-      function paintPct() { pctNum.textContent = String(Math.max(0, Math.round(pct.v))); }
+      var pctNum = el("pct-num");   // the percent counts with the needle (snapped textContent tween: seek-safe, no callbacks)
 
       // one needle move = rotation + fill + percent on the SAME window and ease
       function swing(from, to, at, dur, ease, first) {
         var ir = !!first;
         tl.fromTo(needle, { rotation: deg(from), svgOrigin: "180 180" }, { rotation: deg(to), svgOrigin: "180 180", duration: dur, ease: ease, immediateRender: ir }, at);
         tl.fromTo(fills, { attr: { "stroke-dashoffset": off(from) } }, { attr: { "stroke-dashoffset": off(to) }, duration: dur, ease: ease, immediateRender: ir }, at);
-        tl.fromTo(pct, { v: from }, { v: to, duration: dur, ease: ease, immediateRender: ir, onUpdate: paintPct }, at);
+        tl.fromTo(pctNum, { textContent: from }, { textContent: to, snap: { textContent: 1 }, duration: dur, ease: ease, immediateRender: ir }, at);
       }
       function fade(name, a, b, at, dur, ease, first) {
         tl.fromTo(el(name), { opacity: a }, { opacity: b, duration: dur, ease: ease || "power2.out", immediateRender: !!first }, at);
@@ -533,7 +540,6 @@
 
       // initial gauge state: 0%
       tl.set(needle, { rotation: 0, svgOrigin: "180 180" }, 0);
-      paintPct();
       tl.set(el("zp-safe"), { opacity: 0 }, 0);
       tl.set(el("zp-close"), { opacity: 0 }, 0);
       tl.set(el("zp-over"), { opacity: 0 }, 0);
@@ -545,7 +551,7 @@
 
       // ── Scene 2 (2.5–3.5s): needle sweeps to 44%, percent counts with it ──
       tl.fromTo(el("fills"), { opacity: 0 }, { opacity: 1, duration: 0.06, ease: "none" }, 2.5);
-      swing(0, 44, 2.5, 0.9, "power3.out", true);
+      swing(0, 44.1, 2.5, 0.9, "power3.out", true);
 
       // ── Scene 3 (3.5–5.4s): "ירוק, בטוחים" — green zone glows, pill pops ──
       fade("glow-safe", 0, 1, 3.6, 0.6, "power2.out", true);
@@ -554,7 +560,7 @@
       // ── Scene 4 (5.4–7.7s): "צהוב, מתקרבים לגבול" — swing into the amber zone ──
       fade("glow-safe", 1, 0, 5.4, 0.5, "power2.inOut");
       fade("lineplate", 0, 1, 5.4, 0.3, "power2.out", true);
-      swing(44, 92, 5.4, 0.6, "power3.inOut");
+      swing(44.1, 92, 5.4, 0.6, "power3.inOut");
       fade("fill-close", 0, 1, 5.76, 0.12, "none", true);
       fade("fill-safe", 1, 0, 5.8, 0.1, "none", true);
       fade("glow-close", 0, 1, 5.85, 0.55, "power2.out", true);
@@ -570,7 +576,7 @@
       fade("zp-close", 1, 0, 8.4, 0.2, "power2.out");
       pop("zp-over", 8.4, true);
       // HOLD 8.6–9.35: nothing moves — the red needle sits past the line
-      swing(104, 44, 9.35, 0.5, "power2.inOut");
+      swing(104, 44.1, 9.35, 0.5, "power2.inOut");
       fade("glow-over", 1, 0, 9.35, 0.35, "power2.inOut");
       fade("fill-close", 0, 1, 9.42, 0.06, "none");
       fade("fill-over", 1, 0, 9.44, 0.06, "none");
@@ -606,7 +612,8 @@
       function settle(name, at) {
         // the previous subject steps back as the spotlight moves on
         tl.fromTo(el("hole-" + name), { opacity: 1 }, { opacity: 0, duration: 0.35, ease: "power2.inOut", immediateRender: false }, at);
-        tl.fromTo([el("r-" + name), el("rg-" + name), el("l-" + name), el("c-" + name)], { opacity: 1 }, { opacity: 0.4, duration: 0.35, ease: "power2.inOut", immediateRender: false }, at);
+        tl.fromTo([el("r-" + name), el("rg-" + name), el("l-" + name)], { opacity: 1 }, { opacity: 0.4, duration: 0.35, ease: "power2.inOut", immediateRender: false }, at);
+        tl.fromTo(el("v-" + name), { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.inOut" }, at);   // opaque callout, veiled
       }
 
       // 10.3s "הוצאות" — add expense
@@ -622,9 +629,7 @@
       tl.fromTo(el("l-basis-dot"), { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, svgOrigin: "999.8 597.7", duration: 0.3, ease: "power3.out" }, 12.3);
       tl.fromTo(el("chip"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 12.45);
       // 13.2s the what-if number ticks 240 → 260
-      var chipNum = el("chip-num");
-      var guests = { v: 240 };
-      tl.fromTo(guests, { v: 240 }, { v: 260, duration: 0.7, ease: "power2.out", onUpdate: function () { chipNum.textContent = String(Math.round(guests.v)); } }, 13.2);
+      tl.fromTo(el("chip-num"), { textContent: 240 }, { textContent: 260, snap: { textContent: 1 }, duration: 0.7, ease: "power2.out" }, 13.2);
 
       // hold to the last frame
       tl.set({}, {}, 14.5);
