@@ -108,7 +108,7 @@
     }
 
     /* screen card: phone-studio.png (390 CSS wide) at 900 px → s = 2.3077;
-       crop from CSS y 113 (dialog [16,127,358,590] top lands at y 472), card 900×1120 at (90, 440) */
+       crop from CSS y 119 (dialog [16,127,358,590] top lands at y 458), card 900×1120 at (90, 440) */
     [id="05-ai-window"] {
       position: absolute;
       left: 90px;
@@ -127,7 +127,7 @@
     [id="05-ai-world"] {
       position: absolute;
       left: 0;
-      top: -260.8px;   /* -113 · 2.3077 */
+      top: -274.6px;   /* -119 · 2.3077 */
       width: 900px;
       height: 1947.7px;
     }
@@ -147,12 +147,12 @@
       opacity: 0;
     }
 
-    /* working-state status pill, centered where the design card lands (540, 985) */
+    /* working-state status pill, beside the stack at (600, 1150) — inside the design card's landing box */
     [id="05-ai-status-wrap"] {
       position: absolute;
-      left: 90px;
-      top: 947px;
-      width: 900px;
+      left: 300px;
+      top: 1112px;
+      width: 600px;
       height: 76px;
       z-index: 2;
       display: flex;

@@ -1,0 +1,639 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="08-guests-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 700px at 92% 4%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── screen card: x 90–990, y 450–1570 (390-CSS-wide phone capture → 900 px, K0 = 2.3077) ── */
+    [id="08-guests-card-layer"] { position: absolute; inset: 0; }
+    [id="08-guests-card"] {
+      position: absolute;
+      left: 90px;
+      top: 450px;
+      width: 900px;
+      height: 1120px;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+    }
+    [id="08-guests-hairline"] {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      border-radius: 28px;
+      pointer-events: none;
+      z-index: 20;
+    }
+    /* lens = zoom-through layer (card-sized, centered origin); world = camera (CSS-px page, origin 0 0) */
+    [class~="08-guests-lens"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1120px;
+      overflow: hidden;
+      transform-origin: 450px 560px;
+    }
+    [id="08-guests-glens"] { z-index: 1; }
+    [id="08-guests-wlens"] { z-index: 2; opacity: 0; }
+    [class~="08-guests-world"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 390px;
+      transform-origin: 0 0;
+    }
+    [id="08-guests-gworld"] { height: 7053px; }
+    [id="08-guests-wworld"] { height: 844px; }
+    [id="08-guests-gimg"] { position: absolute; left: 0; top: 0; width: 390px; height: 7053px; display: block; }
+    [id="08-guests-wimg"] { position: absolute; left: 0; top: 0; width: 390px; height: 844px; display: block; }
+
+    /* patches cut from the same screenshots (CSS px of the 390-wide page) */
+    [class~="08-guests-hole"] { position: absolute; background: #FFFFFF; }
+    [class~="08-guests-btn"] { position: absolute; transform-origin: 50% 50%; background-repeat: no-repeat; }
+    /* excel [37, 316, 316, 48] */
+    [id="08-guests-excel-hole"] { left: 35px; top: 314px; width: 320px; height: 52px; }
+    [id="08-guests-excel-btn"] {
+      left: 37px; top: 316px; width: 316px; height: 48px;
+      border-radius: 10px;
+      background-image: url("assets/phone-guests.png");
+      background-size: 390px 7053px;
+      background-position: -37px -316px;
+    }
+    /* the capture baked the fixed bottom nav over the st-list / st-sent cards (y 779–845): rebuild that strip */
+    [class~="08-guests-navshade"] {
+      position: absolute;
+      top: 758px;
+      width: 169.66px;
+      height: 21px;
+      background: linear-gradient(to bottom, rgb(0, 0, 0) 0%, rgb(13, 13, 13) 100%);
+      mix-blend-mode: color-dodge;
+    }
+    [id="08-guests-navshade1"] { left: 17.67px; }
+    [id="08-guests-navshade2"] { left: 202.67px; }
+    [class~="08-guests-navgap"] { position: absolute; top: 758px; height: 21px; background: linear-gradient(to bottom, rgba(250, 250, 249, 0) 0%, #FAFAF9 100%); }
+    [id="08-guests-navgap1"] { left: 0; width: 16.67px; }
+    [id="08-guests-navgap2"] { left: 188.33px; width: 13.34px; }
+    [id="08-guests-navgap3"] { left: 373.33px; width: 16.67px; }
+    [id="08-guests-navband"] { position: absolute; left: 0; top: 778.5px; width: 390px; height: 67px; background: #FAFAF9; }
+    [class~="08-guests-cardfix"] {
+      position: absolute;
+      top: 778px;
+      width: 171.67px;
+      height: 68px;
+      box-sizing: border-box;
+      background: #FFFFFF;
+      border: 1px solid #E7E5E4;
+      border-top: none;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 1px 2px rgba(28, 25, 23, 0.05);
+    }
+    [id="08-guests-fix-sent"] { left: 16.67px; }
+    [id="08-guests-fix-list"] { left: 201.67px; }
+    /* rebuilt stat figures (Heebo 700, matched to the capture's "27" / "24") */
+    [class~="08-guests-num"] {
+      position: absolute;
+      top: 785px;
+      width: 120px;
+      height: 32px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      line-height: 32px;
+      color: #1C1917;
+      text-align: right;
+      direction: ltr;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    [id="08-guests-list-num"] { left: 234.6px; }
+    [id="08-guests-sent-num"] { left: 50.2px; }
+
+    /* WhatsApp dialog patches: open-wa [193, 522, 161, 40]; the dialog's own "1 מתוך 6" digit */
+    [id="08-guests-wa-hole"] { left: 191px; top: 520px; width: 165px; height: 44px; }
+    [id="08-guests-wa-btn"] {
+      left: 193px; top: 522px; width: 161px; height: 40px;
+      border-radius: 10px;
+      background-image: url("assets/phone-whatsapp.png");
+      background-size: 390px 844px;
+      background-position: -193px -522px;
+    }
+    [id="08-guests-dg-hole"] { left: 345.4px; top: 396.8px; width: 8.6px; height: 11.6px; }
+    [class~="08-guests-dg"] {
+      position: absolute;
+      left: 343.7px;
+      top: 395.6px;
+      width: 12px;
+      height: 14px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 14px;
+      color: #6D6660;
+      text-align: center;
+      direction: ltr;
+    }
+    [id="08-guests-dg2"], [id="08-guests-dg3"] { opacity: 0; }
+
+    /* spotlight + rings + leaders + pills (card coords, inside the guests lens, outside the camera) */
+    [class~="08-guests-spot"] {
+      position: absolute;
+      border-radius: 16px;
+      box-shadow: 0 0 0 2400px rgba(28, 25, 23, 0.42);
+      pointer-events: none;
+    }
+    [class~="08-guests-glow"] {
+      position: absolute;
+      border-radius: 16px;
+      box-shadow: 0 0 0 8px rgba(160, 112, 63, 0.18), 0 0 26px 4px rgba(160, 112, 63, 0.22);
+      pointer-events: none;
+    }
+    [id="08-guests-rings"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1120px;
+      overflow: visible;
+      pointer-events: none;
+    }
+    [class~="08-guests-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 4;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    [class~="08-guests-leader"] { position: absolute; width: 2px; background: #A0703F; }
+    [id="08-guests-leader1"] { transform-origin: 50% 0%; }
+    [id="08-guests-leader2"] { transform-origin: 50% 100%; }
+    [class~="08-guests-pillwrap"] {
+      position: absolute;
+      width: 600px;
+      height: 76px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    [class~="08-guests-pill"] {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      direction: rtl;
+      height: 76px;
+      box-sizing: border-box;
+      padding: 0 30px;
+      border-radius: 9999px;
+      border: 1px solid #A0703F;
+      background: #FBF7F1;
+      color: #7A5230;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.08);
+    }
+    [id="08-guests-pill1"] { transform-origin: 50% 0%; }
+    [id="08-guests-pill2"] { transform-origin: 50% 100%; }
+    [class~="08-guests-pill"] svg { width: 32px; height: 32px; flex: none; }
+
+    /* counter pill under the dialog (card coords, outside the lenses so it never scales) */
+    [id="08-guests-counter"] {
+      position: absolute;
+      left: 360px;
+      top: 975px;
+      width: 180px;
+      height: 76px;
+      z-index: 10;
+      box-sizing: border-box;
+      border-radius: 9999px;
+      border: 1px solid #A0703F;
+      background: #FBF7F1;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.12);
+      overflow: hidden;
+      transform-origin: 50% 0%;
+    }
+    [class~="08-guests-cnt"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 74px;
+      line-height: 74px;
+      text-align: center;
+      direction: ltr;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 36px;
+      color: #7A5230;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* ── top block (y 96–420): kicker + headline + chip row (RTL, right edge x 990) ── */
+    [id="08-guests-top"] { position: absolute; inset: 0; }
+    [id="08-guests-kicker"] {
+      position: absolute;
+      right: 90px;
+      top: 104px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+      direction: rtl;
+    }
+    [id="08-guests-head"] {
+      position: absolute;
+      right: 90px;
+      top: 162px;
+      width: 900px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 120px;
+      line-height: 1.06;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+      text-align: right;
+      direction: rtl;
+      white-space: nowrap;
+    }
+    [class~="08-guests-hw"] { display: inline-block; }
+    [id="08-guests-feature"] {
+      position: absolute;
+      right: 90px;
+      top: 336px;
+      height: 84px;
+      box-sizing: border-box;
+      padding: 0 34px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+      direction: rtl;
+      border-radius: 9999px;
+      background: #0F7D41;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 36px;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 10px 28px -12px rgba(15, 125, 65, 0.55);
+      transform-origin: 100% 50%;
+    }
+    [id="08-guests-feature"] svg { width: 40px; height: 40px; flex: none; }
+
+    /* ── fx layer (screen coords): file chip, ripples, touch point ── */
+    [id="08-guests-fx"] { position: absolute; inset: 0; pointer-events: none; }
+    /* file chip rests at x 620–990, y 336–420 (center 805, 378) */
+    [id="08-guests-chip"] {
+      position: absolute;
+      left: 620px;
+      top: 336px;
+      width: 370px;
+      height: 84px;
+      box-sizing: border-box;
+      padding: 0 26px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 18px;
+      direction: rtl;
+      border-radius: 12px;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      background: #FBF7F1;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 14px 32px -14px rgba(60, 35, 15, 0.38);
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 36px;
+      line-height: 1;
+      color: #1C1917;
+      white-space: nowrap;
+      transform-origin: 50% 50%;
+    }
+    [id="08-guests-chip"] svg { width: 40px; height: 46px; flex: none; }
+    [class~="08-guests-ripple"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px solid #A0703F;
+      box-sizing: border-box;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+    [id="08-guests-touch"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 60px;
+      height: 60px;
+      margin-left: -30px;
+      margin-top: -30px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      background: rgba(28, 25, 23, 0.26);
+      border: 3px solid rgba(251, 247, 241, 0.95);
+      box-shadow: 0 2px 10px rgba(28, 25, 23, 0.28);
+      transform-origin: 50% 50%;
+      z-index: 30;
+    }
+  </style>
+
+  <div id="root" data-composition-id="08-guests" data-width="1080" data-height="1920" data-duration="9.495">
+    <!-- full-bleed cream ground -->
+    <div id="08-guests-bg" class="clip" data-start="0" data-duration="9.495" data-track-index="0"></div>
+
+    <!-- the real phone screens in one screen card -->
+    <div id="08-guests-card-layer" class="clip" data-start="0" data-duration="9.495" data-track-index="1">
+      <div id="08-guests-card">
+        <!-- lens A: the guests page -->
+        <div id="08-guests-glens" class="08-guests-lens">
+          <div id="08-guests-gworld" class="08-guests-world">
+            <img id="08-guests-gimg" src="assets/phone-guests.png" alt="" />
+            <div id="08-guests-excel-hole" class="08-guests-hole"></div>
+            <div id="08-guests-excel-btn" class="08-guests-btn"></div>
+            <div id="08-guests-navshade1" class="08-guests-navshade"></div>
+            <div id="08-guests-navshade2" class="08-guests-navshade"></div>
+            <div id="08-guests-navgap1" class="08-guests-navgap"></div>
+            <div id="08-guests-navgap2" class="08-guests-navgap"></div>
+            <div id="08-guests-navgap3" class="08-guests-navgap"></div>
+            <div id="08-guests-navband"></div>
+            <div id="08-guests-fix-sent" class="08-guests-cardfix"></div>
+            <div id="08-guests-fix-list" class="08-guests-cardfix"></div>
+            <div id="08-guests-list-num" class="08-guests-num">0</div>
+            <div id="08-guests-sent-num" class="08-guests-num">0</div>
+          </div>
+          <div id="08-guests-spot1" class="08-guests-spot"></div>
+          <div id="08-guests-spot2" class="08-guests-spot"></div>
+          <div id="08-guests-glow1" class="08-guests-glow"></div>
+          <div id="08-guests-glow2" class="08-guests-glow"></div>
+          <svg id="08-guests-rings" viewBox="0 0 900 1120" aria-hidden="true">
+            <path id="08-guests-ring1" class="08-guests-ring" pathLength="1" d="M0 0" />
+            <path id="08-guests-ring2" class="08-guests-ring" pathLength="1" d="M0 0" />
+          </svg>
+          <div id="08-guests-leader1" class="08-guests-leader"></div>
+          <div id="08-guests-leader2" class="08-guests-leader"></div>
+          <div id="08-guests-pillwrap1" class="08-guests-pillwrap">
+            <div id="08-guests-pill1" class="08-guests-pill" dir="rtl" lang="he">
+              <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 6.5 h18 a2 2 0 0 1 2 2 v9.5 a2 2 0 0 1 -2 2 h-10.5 l-5.5 4.5 v-4.5 h-2 a2 2 0 0 1 -2 -2 v-9.5 a2 2 0 0 1 2 -2 z" fill="none" stroke="#A0703F" stroke-width="2" stroke-linejoin="round" /><path d="M10 13.5 l2.6 2.6 l5.4 -5.4" fill="none" stroke="#A0703F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <span>מהמספר של באדוק</span>
+            </div>
+          </div>
+          <div id="08-guests-pillwrap2" class="08-guests-pillwrap">
+            <div id="08-guests-pill2" class="08-guests-pill" dir="rtl" lang="he">
+              <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="8" y="3" width="12" height="22" rx="2.6" fill="none" stroke="#A0703F" stroke-width="2" /><path d="M12.5 21 h3" stroke="#A0703F" stroke-width="2" stroke-linecap="round" /></svg>
+              <span>מהוואטסאפ שלכם</span>
+            </div>
+          </div>
+        </div>
+        <!-- lens B: the "send from my WhatsApp" dialog -->
+        <div id="08-guests-wlens" class="08-guests-lens">
+          <div id="08-guests-wworld" class="08-guests-world">
+            <img id="08-guests-wimg" src="assets/phone-whatsapp.png" alt="" />
+            <div id="08-guests-dg-hole" class="08-guests-hole"></div>
+            <div id="08-guests-dg1" class="08-guests-dg">1</div>
+            <div id="08-guests-dg2" class="08-guests-dg">2</div>
+            <div id="08-guests-dg3" class="08-guests-dg">3</div>
+            <div id="08-guests-wa-hole" class="08-guests-hole"></div>
+            <div id="08-guests-wa-btn" class="08-guests-btn"></div>
+          </div>
+        </div>
+        <!-- counter pill under the dialog -->
+        <div id="08-guests-counter" dir="ltr">
+          <div id="08-guests-cnt1" class="08-guests-cnt">1 / 6</div>
+          <div id="08-guests-cnt2" class="08-guests-cnt">2 / 6</div>
+          <div id="08-guests-cnt3" class="08-guests-cnt">3 / 6</div>
+        </div>
+        <div id="08-guests-hairline"></div>
+      </div>
+    </div>
+
+    <!-- top block: kicker + headline + feature chip -->
+    <div id="08-guests-top" class="clip" data-start="0" data-duration="9.495" data-track-index="2">
+      <div id="08-guests-kicker" dir="rtl" lang="he">07 · מזמינים</div>
+      <h1 id="08-guests-head" dir="rtl" lang="he"><span id="08-guests-hw1" class="08-guests-hw">וואטסאפ</span> <span id="08-guests-hw2" class="08-guests-hw">לכולם</span></h1>
+      <div id="08-guests-feature" dir="rtl" lang="he">
+        <svg viewBox="0 0 38 38" aria-hidden="true"><path d="M19 4.5 a14.5 14.5 0 1 1 -7.6 26.85 l-6.4 2.15 l2.15 -6.2 A14.5 14.5 0 0 1 19 4.5 z" fill="none" stroke="#FBF7F1" stroke-width="2.6" stroke-linejoin="round" /><path d="M14.2 12.6 c-1.2 1.1 -1.3 3.3 0.6 5.9 c2 2.7 4.6 4.6 7 5.3 c1.7 0.5 3.1 -0.3 3.6 -1.5 l-2.6 -1.9 l-1.7 1.1 c-1.6 -0.7 -3.4 -2.4 -4.2 -4 l1 -1.7 l-1.8 -2.7 z" fill="#FBF7F1" /></svg>
+        <span>וואטסאפ</span>
+      </div>
+    </div>
+
+    <!-- fx layer: file chip, press ripples, touch point -->
+    <div id="08-guests-fx" class="clip" data-start="0" data-duration="9.495" data-track-index="3">
+      <div id="08-guests-chip" dir="rtl" lang="he">
+        <svg viewBox="0 0 38 44" aria-hidden="true"><rect x="1" y="1" width="36" height="42" rx="6" fill="#1D7A45" /><path d="M8 13 h22 M8 21 h22 M8 29 h22 M8 37 h22 M16 9 v31" stroke="#FBF7F1" stroke-width="1.8" stroke-opacity="0.85" /><rect x="8" y="9" width="22" height="31" rx="1.5" fill="none" stroke="#FBF7F1" stroke-width="1.8" /></svg>
+        <span dir="ltr">מוזמנים.xlsx</span>
+      </div>
+      <div id="08-guests-rip1" class="08-guests-ripple"></div>
+      <div id="08-guests-rip2" class="08-guests-ripple"></div>
+      <div id="08-guests-rip3" class="08-guests-ripple"></div>
+      <div id="08-guests-touch"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="08-guests"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="08-guests-' + name + '"]') || document.getElementById("08-guests-" + name);
+      }
+      function r2(v) { return Math.round(v * 100) / 100; }
+
+      // ── camera geometry (CSS px of the 390-wide phone page → card px) ──
+      var K0 = 900 / 390;               // 2.3077 px per CSS px
+      var CARD_X = 90, CARD_Y = 450;    // card origin on the canvas
+      var A = { cx: 0, cy: 150, z: 1 };        // page head: title + step 1 (excel) + step 2
+      var B = { cx: 0, cy: 400, z: 1 };        // step 2 send buttons + stat cards
+      var C = { cx: 195 - 195 / 1.1, cy: 420, z: 1.1 }; // gentle push-in on the two send options
+      var D = { cx: 0, cy: 179.4, z: 1 };      // WhatsApp dialog centered
+      function cam(s) { var k = K0 * s.z; return { x: r2(-s.cx * k), y: r2(-s.cy * k), scale: r2(k * 10000) / 10000 }; }
+      function cardPt(s, x, y) { var k = K0 * s.z; return [(x - s.cx) * k, (y - s.cy) * k]; }
+      function scr(s, x, y) { var p = cardPt(s, x, y); return [r2(p[0] + CARD_X), r2(p[1] + CARD_Y)]; }
+      function cardBox(s, b, pad) {
+        var p = cardPt(s, b[0], b[1]), k = K0 * s.z;
+        return { l: p[0] - pad, t: p[1] - pad, w: b[2] * k + pad * 2, h: b[3] * k + pad * 2 };
+      }
+      function place(node, bx) {
+        node.style.left = r2(bx.l) + "px"; node.style.top = r2(bx.t) + "px";
+        node.style.width = r2(bx.w) + "px"; node.style.height = r2(bx.h) + "px";
+      }
+      function ringPath(bx, rad) {
+        var l = bx.l, t = bx.t, r = bx.l + bx.w, b = bx.t + bx.h, cx = l + bx.w / 2;
+        return "M " + r2(cx) + " " + r2(t) + " H " + r2(l + rad) + " A " + rad + " " + rad + " 0 0 0 " + r2(l) + " " + r2(t + rad) +
+          " V " + r2(b - rad) + " A " + rad + " " + rad + " 0 0 0 " + r2(l + rad) + " " + r2(b) +
+          " H " + r2(r - rad) + " A " + rad + " " + rad + " 0 0 0 " + r2(r) + " " + r2(b - rad) +
+          " V " + r2(t + rad) + " A " + rad + " " + rad + " 0 0 0 " + r2(r - rad) + " " + r2(t) + " Z";
+      }
+
+      // measured boxes (packet, CSS px)
+      var EXCEL = [37, 316, 316, 48];
+      var SEND_MINE = [37, 554, 316, 48];
+      var SEND_AUTO = [193, 610, 160, 28];
+      var OPEN_WA = [193, 522, 161, 40];
+
+      // ring / spotlight / pill geometry in the push-in state C
+      var r1 = cardBox(C, SEND_AUTO, 10);
+      var r2b = cardBox(C, SEND_MINE, 10);
+      var uni = { l: r2b.l, t: r2b.t, w: r2b.w, h: (r1.t + r1.h) - r2b.t };
+      place(el("spot1"), r1); place(el("glow1"), r1);
+      place(el("spot2"), uni); place(el("glow2"), r2b);
+      el("ring1").setAttribute("d", ringPath(r1, 16));
+      el("ring2").setAttribute("d", ringPath(r2b, 16));
+      // pill 1 hangs under ring 1; pill 2 sits above ring 2
+      var p1cx = r1.l + r1.w / 2, p1top = r1.t + r1.h + 52;
+      var p2cx = r2b.l + r2b.w / 2, p2bot = r2b.t - 46;
+      place(el("leader1"), { l: p1cx - 1, t: r1.t + r1.h, w: 2, h: 52 });
+      place(el("leader2"), { l: p2cx - 1, t: p2bot, w: 2, h: 46 });
+      place(el("pillwrap1"), { l: p1cx - 300, t: p1top, w: 600, h: 76 });
+      place(el("pillwrap2"), { l: p2cx - 300, t: p2bot - 76, w: 600, h: 76 });
+
+      // screen-space targets for the touch point + ripples
+      var excelPt = scr(A, EXCEL[0] + EXCEL[2] / 2, EXCEL[1] + EXCEL[3] / 2);
+      // point at the empty left end of each option so its label stays readable
+      var autoPt = scr(C, SEND_AUTO[0] + 14, SEND_AUTO[1] + SEND_AUTO[3] / 2);
+      var minePt = scr(C, SEND_MINE[0] + 42, SEND_MINE[1] + SEND_MINE[3] / 2);
+      var waPt = scr(D, OPEN_WA[0] + OPEN_WA[2] / 2, OPEN_WA[1] + OPEN_WA[3] / 2);
+      function ripAt(name, p) { var n = el(name); n.style.left = r2(p[0] - 36) + "px"; n.style.top = r2(p[1] - 36) + "px"; }
+      ripAt("rip1", excelPt); ripAt("rip2", waPt); ripAt("rip3", waPt);
+      var chipC = [805, 378]; // file chip rest center
+
+      var tl = gsap.timeline({ paused: true });
+      tl.set(el("gworld"), cam(A), 0);
+      tl.set(el("wworld"), cam(D), 0);
+
+      // ── Scene 1 (0.0–2.2s): the screen card enters; headline reveal ──
+      tl.fromTo(el("card"), { opacity: 0, y: 60, scale: 0.985 }, { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.25);
+      tl.fromTo(el("hw1"), { opacity: 0, y: 56 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.45);
+      tl.fromTo(el("hw2"), { opacity: 0, y: 56 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.68);
+      // the Excel file chip lands in the chip row ("מקובץ אקסל")
+      tl.fromTo(el("chip"), { opacity: 0, y: 22, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, 1.55);
+      // the touch point arrives on the chip
+      tl.fromTo(el("touch"), { x: 930, y: 560, opacity: 0, scale: 1.3 }, { x: chipC[0], y: chipC[1], opacity: 1, scale: 1, duration: 0.42, ease: "power3.out" }, 1.78);
+
+      // ── Scene 2 (2.2–3.0s): grab → fly the chip into `excel` → press at 2.6s; st-list counts 0→40 ──
+      tl.to(el("touch"), { scale: 0.82, duration: 0.08, ease: "power2.in" }, 2.12);
+      tl.to(el("chip"), { scale: 0.86, rotation: -3, duration: 0.12, ease: "power2.out" }, 2.14);
+      tl.to(el("chip"), { x: excelPt[0] - chipC[0], y: excelPt[1] - chipC[1], duration: 0.38, ease: "power2.inOut" }, 2.2);
+      tl.to(el("touch"), { x: excelPt[0], y: excelPt[1], duration: 0.38, ease: "power2.inOut" }, 2.2);
+      // press on the real button (press-release spring on a live patch of it + click ripple)
+      tl.to(el("touch"), { scale: 0.72, duration: 0.07, ease: "power2.in" }, 2.6);
+      tl.to(el("touch"), { scale: 1, duration: 0.2, ease: "power2.out" }, 2.67);
+      tl.to(el("excel-btn"), { scale: 0.94, duration: 0.07, ease: "power2.in" }, 2.6);
+      tl.to(el("excel-btn"), { scale: 1, duration: 0.22, ease: "power2.out" }, 2.67);
+      tl.to(el("chip"), { scale: 0.18, rotation: 0, opacity: 0, duration: 0.22, ease: "power3.in" }, 2.6);
+      tl.fromTo(el("rip1"), { scale: 0.3, opacity: 0.95 }, { scale: 2.8, opacity: 0, duration: 0.7, ease: "power2.out", immediateRender: false }, 2.62);
+      // camera scrolls down to step 2 + the stat cards, the touch point lifts away
+      tl.fromTo(el("gworld"), cam(A), Object.assign({ duration: 0.55, ease: "power3.inOut", immediateRender: false }, cam(B)), 2.7);
+      tl.to(el("touch"), { opacity: 0, scale: 1.25, duration: 0.3, ease: "power2.out" }, 2.8);
+      var listState = { v: 0 };
+      tl.fromTo(listState, { v: 0 }, {
+        v: 40, duration: 0.8, ease: "power2.out",
+        onUpdate: function () { el("list-num").textContent = String(Math.round(listState.v)); }
+      }, 2.8);
+
+      // ── Scene 3 (3.0–5.0s): st-sent counts 0→34; WhatsApp-green feature chip pops at 3.5s ──
+      var sentState = { v: 0 };
+      tl.fromTo(sentState, { v: 0 }, {
+        v: 34, duration: 0.9, ease: "power2.out",
+        onUpdate: function () { el("sent-num").textContent = String(Math.round(sentState.v)); }
+      }, 3.05);
+      tl.fromTo(el("feature"), { opacity: 0, scale: 0.6, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.5);
+
+      // ── Scene 4 (5.0–7.9s): rings on their words ──
+      // gentle push-in onto the two send options
+      tl.fromTo(el("gworld"), cam(B), Object.assign({ duration: 0.6, ease: "power3.inOut", immediateRender: false }, cam(C)), 4.3);
+      tl.fromTo(el("touch"), { x: autoPt[0] + 120, y: autoPt[1] + 150, opacity: 0, scale: 1.25 }, { x: autoPt[0], y: autoPt[1], opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", immediateRender: false }, 4.5);
+      tl.fromTo(el("spot1"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 4.85);
+      // 5.0s — ring 1 on `send-auto` + pill "מהמספר של באדוק"
+      tl.fromTo(el("ring1"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.inOut" }, 5.0);
+      tl.fromTo(el("glow1"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 5.3);
+      tl.fromTo(el("leader1"), { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power2.out" }, 5.3);
+      tl.fromTo(el("pill1"), { opacity: 0, scale: 0.72, y: -6 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 5.48);
+      // 6.6s — ring moves to `send-mine` + pill "מהוואטסאפ שלכם"; the spotlight opens to hold both options
+      tl.to(el("touch"), { x: minePt[0], y: minePt[1], duration: 0.5, ease: "power3.inOut" }, 6.12);
+      tl.to(el("ring1"), { opacity: 0, duration: 0.3, ease: "power2.out" }, 6.5);
+      tl.to(el("glow1"), { opacity: 0, duration: 0.3, ease: "power2.out" }, 6.5);
+      tl.to(el("spot1"), { opacity: 0, duration: 0.45, ease: "power2.inOut" }, 6.5);
+      tl.fromTo(el("spot2"), { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.inOut" }, 6.5);
+      tl.fromTo(el("ring2"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.inOut" }, 6.6);
+      tl.fromTo(el("glow2"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 6.9);
+      tl.fromTo(el("leader2"), { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power2.out" }, 6.9);
+      tl.fromTo(el("pill2"), { opacity: 0, scale: 0.72, y: 6 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 7.12);
+
+      // ── Scene 5 (7.9–9.495s): inverse zoom-through to the WhatsApp dialog; presses on `open-wa`; 1/6 → 2/6 → 3/6 ──
+      tl.to(el("touch"), { x: waPt[0], y: waPt[1], duration: 0.6, ease: "power3.inOut" }, 7.45);
+      // Phase 1 — exit: the guests page recedes (scale/blur power3.in, opacity linear)
+      tl.fromTo(el("glens"), { scale: 1, filter: "blur(0px)" }, { scale: 0.8, filter: "blur(18px)", duration: 0.2, ease: "power3.in" }, 7.62);
+      tl.fromTo(el("glens"), { opacity: 1 }, { opacity: 0.15, duration: 0.2, ease: "none" }, 7.62);
+      // Phase 2 — hard cut
+      tl.set(el("glens"), { opacity: 0 }, 7.82);
+      tl.set(el("wlens"), { opacity: 0.15, scale: 1.25, filter: "blur(18px)" }, 7.82);
+      // Phase 3 — the dialog arrives oversized and retracts into focus
+      tl.to(el("wlens"), { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 7.82);
+      // counter pill springs in under the dialog
+      tl.fromTo(el("counter"), { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, 7.92);
+      // press 1 on open-wa → 2 / 6
+      tl.to(el("touch"), { scale: 0.72, duration: 0.07, ease: "power2.in" }, 8.1);
+      tl.to(el("touch"), { scale: 1, duration: 0.2, ease: "power2.out" }, 8.17);
+      tl.to(el("wa-btn"), { scale: 0.94, duration: 0.07, ease: "power2.in" }, 8.1);
+      tl.to(el("wa-btn"), { scale: 1, duration: 0.22, ease: "power2.out" }, 8.17);
+      tl.fromTo(el("rip2"), { scale: 0.3, opacity: 0.95 }, { scale: 2.8, opacity: 0, duration: 0.6, ease: "power2.out", immediateRender: false }, 8.12);
+      tl.to(el("cnt1"), { y: -20, opacity: 0, duration: 0.16, ease: "power3.in" }, 8.2);
+      tl.fromTo(el("cnt2"), { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 8.36);
+      tl.set(el("dg1"), { opacity: 0 }, 8.28);
+      tl.set(el("dg2"), { opacity: 1 }, 8.28);
+      // press 2 on open-wa → 3 / 6
+      tl.to(el("touch"), { scale: 0.72, duration: 0.07, ease: "power2.in" }, 8.72);
+      tl.to(el("touch"), { scale: 1, duration: 0.2, ease: "power2.out" }, 8.79);
+      tl.to(el("wa-btn"), { scale: 0.94, duration: 0.07, ease: "power2.in" }, 8.72);
+      tl.to(el("wa-btn"), { scale: 1, duration: 0.22, ease: "power2.out" }, 8.79);
+      tl.fromTo(el("rip3"), { scale: 0.3, opacity: 0.95 }, { scale: 2.8, opacity: 0, duration: 0.6, ease: "power2.out", immediateRender: false }, 8.74);
+      tl.to(el("cnt2"), { y: -20, opacity: 0, duration: 0.16, ease: "power3.in" }, 8.82);
+      tl.fromTo(el("cnt3"), { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 8.98);
+      tl.set(el("dg2"), { opacity: 0 }, 8.9);
+      tl.set(el("dg3"), { opacity: 1 }, 8.9);
+
+      // hold to the last frame
+      tl.set({}, {}, 9.49);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-guests"] = tl;
+    })();
+  </script>
+</template>
