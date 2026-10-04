@@ -15,8 +15,8 @@ import {
   SLUG_RE,
   TimezoneSchema,
 } from '../contracts/schemas';
-import { LOCALES, type InvitationDocument, type L10n, type Locale } from '../contracts/types';
-import { validateDocument } from '../contracts/validate';
+import { LOCALES, type InvitationDocument, type L10n, type Locale, type Venue } from '../contracts/types';
+import { CAPS, validateDocument } from '../contracts/validate';
 import type { Feature } from '@/features/flags/features';
 import { findFontPair } from '../fonts/library';
 import { paidLocales } from '../lib/locales';
@@ -150,6 +150,9 @@ export const CreateInvitationSchema = z.strictObject({
   startTime: HHmmSchema,
   endTime: HHmmSchema.nullable().optional(),
   timezone: TimezoneSchema,
+  /** the AI questionnaire: the place (the first venue) and a personal line (the design's story) */
+  venue: z.strictObject({ name: L10nSchema, address: L10nSchema }).nullable().optional(),
+  story: L10nSchema.nullable().optional(),
 });
 export type CreateInvitationInput = z.infer<typeof CreateInvitationSchema>;
 
@@ -161,6 +164,50 @@ const trimmed = (value: L10n | null | undefined): L10n | null => {
   for (const [k, v] of Object.entries(value)) if (v?.trim()) out[k as Locale] = v.trim().slice(0, 40);
   return Object.keys(out).length ? out : null;
 };
+
+/** Up to `max` characters of each of the invitation's languages; null when none is left. */
+const within = (value: L10n | null | undefined, locales: readonly Locale[], max: number): L10n | null => {
+  const out: L10n = {};
+  for (const l of locales) {
+    const v = value?.[l]?.trim();
+    if (v) out[l] = [...v].slice(0, max).join('').trim();
+  }
+  return Object.keys(out).length ? out : null;
+};
+
+/**
+ * The AI questionnaire's extra details on the seeded draft: the place on the first venue (of a venues
+ * section, or a "where" section's) and the personal line in the design's story section.
+ */
+function applyDetails(
+  doc: InvitationDocument,
+  locales: readonly Locale[],
+  input: Pick<CreateInvitationInput, 'venue' | 'story'>,
+) {
+  const name = within(input.venue?.name, locales, 80);
+  const address = within(input.venue?.address, locales, 80);
+  if (name || address) {
+    const query = [name, address]
+      .map((v) => (v ? locales.map((l) => v[l]).find(Boolean) : null))
+      .filter(Boolean)
+      .join(', ');
+    const place = <V extends Venue>(v: V): V => ({
+      ...v,
+      name: name ?? v.name,
+      address: address ?? v.address,
+      mapsQuery: query || v.mapsQuery,
+    });
+    for (const s of doc.sections) {
+      if (s.type === 'venues' && s.data.items[0]) s.data.items[0] = place(s.data.items[0]);
+      else if (s.type === 'where') s.data.venue = place(s.data.venue);
+    }
+  }
+  const story = within(input.story, locales, CAPS.body);
+  if (story) {
+    const section = doc.sections.find((s) => s.type === 'text' && s.id === 'story');
+    if (section?.type === 'text') section.data.body = story;
+  }
+}
 
 export async function createInvitation(userId: string, raw: unknown, deps: HostDeps): Promise<ApiResult> {
   const parsed = CreateInvitationSchema.safeParse(raw);
@@ -208,6 +255,7 @@ export async function createInvitation(userId: string, raw: unknown, deps: HostD
     doc.theme.palette = Object.fromEntries(Object.entries(preset.palette).filter(([k]) => editable.has(k)));
   }
   if (input.fontPairId) doc.theme.fontPairId = input.fontPairId;
+  applyDetails(doc, locales, input);
   // Birthday age on the cover: a seal that fits it shows "30"; a ticket shows "DANA 30" / "דנה 30".
   const age = input.eventType === 'birthday' && input.age ? String(input.age) : null;
   if (

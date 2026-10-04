@@ -55,6 +55,7 @@ export type MoreKey =
   | 'status'
   | 'list'
   | 'gallery'
+  | 'assistant'
   | 'wizard'
   | 'responses'
   | 'email'
