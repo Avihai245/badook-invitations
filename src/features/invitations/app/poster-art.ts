@@ -16,6 +16,12 @@ export function lazyPosterUrl(templateId: string, locale: UiLocale): string | nu
   return v ? `/poster-art/${v}/${locale}/${templateId}.html` : null;
 }
 
+/** The home page's other designs — their cards, rendered at build time (home/DesignCard.tsx). */
+export function designsMoreUrl(locale: UiLocale): string | null {
+  const v = version();
+  return v ? `/poster-art/${v}/${locale}/designs-more.html` : null;
+}
+
 /**
  * The posters' display and heading faces — { family: its @font-face rules } — fetched with the first
  * poster that nears the screen; each poster's own families are added as it does (`data-poster-fonts`),

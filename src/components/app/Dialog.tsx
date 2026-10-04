@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { Dialog as RadixDialog } from 'radix-ui';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import type { ReactElement, ReactNode } from 'react';
 import { useDir, type Dir } from './direction';
 import { IconButton } from './IconButton';

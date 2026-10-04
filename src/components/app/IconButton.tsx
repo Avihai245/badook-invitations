@@ -1,6 +1,6 @@
 'use client';
 
-import { Tooltip } from 'radix-ui';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import type { ComponentProps, ReactNode } from 'react';
 import { useDir } from './direction';
 import { DisabledTrigger } from './Hint';

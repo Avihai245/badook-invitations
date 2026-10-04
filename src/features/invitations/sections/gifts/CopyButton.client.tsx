@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Icon } from '../../ui/Icon';
+import { CoreIcon } from '../../ui/core-icons';
 
 /**
  * The Clipboard API, or — where an in-app browser (WhatsApp, Instagram) withholds it — a selected
@@ -43,7 +43,7 @@ export function CopyButton({ text, label, done }: { text: string; label: string;
       className="copy-btn"
       onClick={() => void copyText(text).then((ok) => ok && setCopied(true))}
     >
-      <Icon name={copied ? 'check' : 'copy'} size={15} />
+      <CoreIcon name={copied ? 'check' : 'copy'} size={15} />
       <span aria-live="polite">{copied ? done : label}</span>
     </button>
   );

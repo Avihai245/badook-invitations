@@ -1,7 +1,8 @@
 'use client';
 
 import { CircleHelp } from 'lucide-react';
-import { Popover, Tooltip } from 'radix-ui';
+import * as Popover from '@radix-ui/react-popover';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import {
   createContext,
   isValidElement,

@@ -12,7 +12,6 @@ import type { GalleryCounts } from '@/features/live-gallery/server/db';
 import { INSIGHTS } from '../config';
 import {
   BOT_UA,
-  BeaconSchema,
   breakdownOf,
   dayIn,
   funnelOf,
@@ -25,6 +24,7 @@ import {
   type SeriesPoint,
   type Totals,
 } from '../model';
+import { BeaconSchema } from '../schema';
 import type { InsightsDb, RawReport } from './db';
 
 /**

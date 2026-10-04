@@ -15,10 +15,12 @@ import { facesEn } from './faces.en';
 import { filmEn } from './film.en';
 import { planningEn } from './planning.en';
 import { enCore } from './app-core.en';
+import { enMore } from './app-more.en';
 
-/** Host-app UI strings, English: the site's (app-core.en.ts) and the app's screens. Same shape as app.he.ts. */
+/** Host-app UI strings, English: the site's (app-core.en.ts) and the app's screens (app-more.en.ts…). Same shape as app.he.ts. */
 export const en: AppDict = {
   ...enCore,
+  ...enMore,
   guests: guestsEn,
   help: { ...helpEn, ...studioHelpEn },
   support: supportEn,

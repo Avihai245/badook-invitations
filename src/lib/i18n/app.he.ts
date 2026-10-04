@@ -14,13 +14,15 @@ import { facesHe } from './faces.he';
 import { filmHe } from './film.he';
 import { planningHe } from './planning.he';
 import { heCore } from './app-core.he';
+import { heMore } from './app-more.he';
 
 /**
  * The host app's whole dictionary, Hebrew: the site's (app-core.he.ts — what the public pages need)
- * and the app's own screens (the editor, guests, planning…), which only the app's pages load.
+ * and the app's own screens (app-more.he.ts, the editor, guests, planning…), which only the app's pages load.
  */
 export const he = {
   ...heCore,
+  ...heMore,
   guests: guestsHe,
   help: { ...helpHe, ...studioHelpHe },
   support: supportHe,
@@ -39,8 +41,27 @@ export const he = {
 };
 
 export type AppDict = typeof he;
+/** The keys of app-more.<locale>.ts: screens of the host app (the event home, settings, overview…). */
+export type MoreKey =
+  | 'tickets'
+  | 'workspace'
+  | 'helpCenter'
+  | 'start'
+  | 'tour'
+  | 'eventHome'
+  | 'eventSettings'
+  | 'overview'
+  | 'eventTypes'
+  | 'status'
+  | 'list'
+  | 'gallery'
+  | 'wizard'
+  | 'responses'
+  | 'email'
+  | 'share';
 /** The keys only the app's screens use (not in the public pages' dictionary). */
 export type AppOnlyKey =
+  | MoreKey
   | 'guests'
   | 'help'
   | 'support'

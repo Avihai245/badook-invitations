@@ -12,9 +12,13 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { posterSample } from '../src/features/invitations/app/poster';
 import { posterArtVersion } from '../src/features/invitations/app/poster-art-version';
 import { TemplatePosterContent } from '../src/features/invitations/app/TemplatePoster';
+import { DesignCard } from '../src/features/site/home/DesignCard';
+import { INITIAL_DESIGNS, listedDesigns } from '../src/features/site/home/designs';
 import { fontFaceCss } from '../src/features/invitations/fonts';
 import { TEMPLATES } from '../src/features/invitations/templates/registry';
 import { UI_LOCALES } from '../src/lib/i18n/app';
+import { en } from '../src/lib/i18n/app.en';
+import { he } from '../src/lib/i18n/app.he';
 
 const root = process.cwd();
 const version = posterArtVersion(root);
@@ -23,6 +27,9 @@ const out = join(base, version);
 
 mkdirSync(base, { recursive: true });
 for (const old of readdirSync(base)) if (old !== version) rmSync(join(base, old), { recursive: true });
+
+// the cards render their posters' addresses (LazyTemplatePoster) with this build's version
+process.env.INVITES_POSTER_ART_VERSION = version;
 
 const manifests = [...TEMPLATES.values()].map(({ manifest }) => manifest);
 let bytes = 0;
@@ -39,6 +46,32 @@ for (const locale of UI_LOCALES) {
   }
 }
 
+// the home page's designs after the first few: their cards (the page carries only the first ones)
+const DICTIONARIES = { he, en };
+let cards = 0;
+for (const locale of UI_LOCALES) {
+  const t = DICTIONARIES[locale];
+  const labels = { sample: t.home.sample, liveDemo: t.gallery.preview.liveDemo, eventTypes: t.eventTypes };
+  const rest = listedDesigns().slice(INITIAL_DESIGNS);
+  const html = renderToStaticMarkup(
+    <>
+      {rest.map((manifest, i) => (
+        <DesignCard
+          key={manifest.id}
+          manifest={manifest}
+          locale={locale}
+          index={INITIAL_DESIGNS + i}
+          labels={labels}
+        />
+      ))}
+    </>,
+    { identifierPrefix: `pd-${locale}-` },
+  );
+  writeFileSync(join(out, locale, 'designs-more.html'), html);
+  cards = rest.length;
+  bytes += html.length;
+}
+
 // each family the posters write in (a pair's display and heading faces), regular weight
 const families = new Set(
   manifests.flatMap((m) => {
@@ -52,6 +85,6 @@ writeFileSync(
 );
 
 console.log(
-  `✓ poster art ${version}: ${manifests.length} posters × ${UI_LOCALES.length} languages ` +
+  `✓ poster art ${version}: ${manifests.length} posters + ${cards} more designs × ${UI_LOCALES.length} languages ` +
     `(${Math.round(bytes / 1024)} KB) → public/poster-art/`,
 );

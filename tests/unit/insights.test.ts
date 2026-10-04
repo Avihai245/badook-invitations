@@ -4,7 +4,6 @@ import { FEATURES, NO_OVERRIDES, type FeatureInput } from '@/features/flags/feat
 import { INSIGHTS } from '@/features/insights/config';
 import {
   BOT_UA,
-  BeaconSchema,
   breakdownOf,
   dayIn,
   daysBetween,
@@ -20,6 +19,7 @@ import {
   type BeaconState,
   type DayRow,
 } from '@/features/insights/model';
+import { BeaconSchema } from '@/features/insights/schema';
 import type { BeaconDeps, ReportDeps } from '@/features/insights/server/api';
 import type { RawReport } from '@/features/insights/server/db';
 import {

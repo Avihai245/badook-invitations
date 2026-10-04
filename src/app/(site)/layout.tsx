@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { preload } from 'react-dom';
 import { faceUrl } from '@/features/invitations/fonts';
+import { appFaceUrl } from '@/lib/app-fonts';
 import { uiDir } from '@/lib/i18n/app';
 import { UiProvider } from '@/lib/i18n/provider-lazy';
 import { getUiLocale } from '@/lib/i18n/server';
@@ -9,7 +10,7 @@ import { A11Y_BOOT } from '@/features/site/a11y';
 import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';
 import { ThemeSync } from '@/features/site/Theme.client';
 import { THEME_BOOT } from '@/features/site/theme';
-import '@/styles/app.css';
+import '@/styles/public.css';
 
 export const metadata: Metadata = {
   title: { default: 'Badook — הזמנות דיגיטליות', template: '%s · Badook' },
@@ -28,8 +29,13 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
   // headlines in the UI language's script (app.css --font-sans / --font-display)
   const faces =
     locale === 'he'
-      ? [faceUrl('Heebo', 'hebrew', 400), faceUrl('Frank Ruhl Libre', 'hebrew', 700)]
-      : [faceUrl('Inter', 'latin', 400)];
+      ? [
+          appFaceUrl('Heebo Variable', 'hebrew'),
+          // the letters, digits and punctuation of the text (the whole Latin face only for accents and the rest)
+          appFaceUrl('Heebo Variable', 'latin-basic'),
+          faceUrl('Frank Ruhl Libre', 'hebrew', 700),
+        ]
+      : [appFaceUrl('Inter Variable', 'latin-basic')];
   for (const href of faces) if (href) preload(href, { as: 'font', type: 'font/woff2', crossOrigin: '' });
   return (
     <html lang={locale} dir={uiDir(locale)} suppressHydrationWarning>

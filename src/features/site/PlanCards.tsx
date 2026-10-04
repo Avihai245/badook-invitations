@@ -1,7 +1,8 @@
 import { Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Button, cn } from '@/components/app';
+import { Button } from '@/components/app/Button';
+import { cn } from '@/components/app/utils';
 import { PLAN_IDS, PLAN_LIMITS, type PlanId } from '@/features/billing/plans';
 import { fmt, plural, type AppDict, type UiLocale } from '@/lib/i18n/app';
 

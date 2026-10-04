@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Dialog as RadixDialog } from 'radix-ui';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import { useState, type ReactNode } from 'react';
 import { Badge, BrandLogo, Button, cn, useDir } from '@/components/app';
 import { openHelp } from '@/features/support/open';

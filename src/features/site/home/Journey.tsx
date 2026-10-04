@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Reveal } from '../Reveal.client';
+import { Reveal } from '../Reveal';
 import { Play } from './Play.client';
 import { MomentScene, type MomentKey, type SceneText } from './scenes';
 

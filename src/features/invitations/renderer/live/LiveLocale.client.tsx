@@ -16,9 +16,9 @@ import { nativeName } from '../../lib/locales';
 import { FloatingControls, type MusicProps } from '../FloatingControls.client';
 import type { MotionLabels } from '../MotionPause.client';
 import { rememberChoice, storedChoice } from './detect';
-import type { LivePayload } from './payload';
+import type { LiveBody, LivePayload } from './payload';
 
-type Sections = ComponentType<{ payload: LivePayload; locale: Locale }>;
+type Sections = ComponentType<{ body: LiveBody; locale: Locale; hebrewDate: string | null }>;
 
 let chunk: Promise<Sections> | null = null;
 
@@ -32,6 +32,37 @@ function loadSections(): Promise<Sections> {
     },
   );
   return chunk;
+}
+
+/** How long after the opening the renderer is fetched for a guest who only reads (ms). */
+const PREFETCH_MS = 8000;
+
+const bodies = new Map<string, Promise<LiveBody>>();
+
+/**
+ * What renders the other languages: inline on the dev pages, else fetched — once — from the cached file
+ * the page names (server/live-body.ts), so it doesn't ride in every guest's page.
+ */
+function loadBody(body: LivePayload['body']): Promise<LiveBody> {
+  if (!('url' in body)) return Promise.resolve(body);
+  let pending = bodies.get(body.url);
+  if (!pending) {
+    pending = fetch(body.url).then((res) => {
+      if (!res.ok) throw new Error(`live body: HTTP ${res.status}`);
+      return res.json() as Promise<LiveBody>;
+    });
+    bodies.set(body.url, pending);
+    pending.catch(() => bodies.delete(body.url)); // offline: the next attempt retries
+  }
+  return pending;
+}
+
+/** The renderer and what it renders with. */
+function loadAll(payload: LivePayload): Promise<{ Sections: Sections; body: LiveBody }> {
+  return Promise.all([loadSections(), loadBody(payload.body)]).then(([Sections, body]) => ({
+    Sections,
+    body,
+  }));
 }
 
 /** A few letters of each script: `document.fonts.load` fetches the unicode-range faces they fall in. */
@@ -168,44 +199,59 @@ export function LiveLocale({
   /** the sections in `initial`, rendered on the server */
   children: ReactNode;
 }) {
-  const [view, setView] = useState<{ locale: Locale; Sections: Sections | null; how: How }>({
-    locale: initial,
-    Sections: null,
-    how: 'auto',
-  });
-  const { locale, Sections } = view;
+  const [view, setView] = useState<{
+    locale: Locale;
+    render: { Sections: Sections; body: LiveBody } | null;
+    how: How;
+  }>({ locale: initial, render: null, how: 'auto' });
+  const { locale, render } = view;
   const applied = useRef(initial);
   const busy = useRef<Locale | null>(null);
   const anchor = useRef<Anchor | null>(null);
   const fonts = useRef(new Map<Locale, Promise<unknown>>());
-  const { locales } = payload.doc;
-  const slug = payload.doc.share.slug;
+  const locales = payload.languages;
+  const slug = payload.slug;
   const entry = payload.locales[locale]!;
 
   /** Hover / press / focus on the pill or a language: fetch what the switch needs. */
   const prepare = useCallback(
     (l: Locale) => {
-      if (l !== initial) void loadSections().catch(() => undefined);
+      if (l !== initial) void loadAll(payload).catch(() => undefined);
       const e = payload.locales[l];
       if (e && !fonts.current.has(l)) fonts.current.set(l, loadFonts(e.vars, l));
     },
     [initial, payload],
   );
 
-  // Fetch the renderer ahead of time, once the guest is in and the opening has played.
+  // Fetch the renderer (and the document it renders) ahead of time — not while the page is still
+  // loading (its hundred kilobytes of script would compete with what the guest is waiting for, and with
+  // the page's own measurements): once the guest has moved a finger after the opening, and at the latest
+  // PREFETCH_MS after it. The pill's own hover / press / focus (`prepare`) fetches it on demand anyway.
   useEffect(() => {
     let timer = 0;
-    const later = (ms: number) => () => {
-      timer = window.setTimeout(() => void loadSections().catch(() => undefined), ms);
-    };
-    const afterOpening = later(3000);
-    if (document.documentElement.dataset.opened) later(1500)();
-    else window.addEventListener('invitation:open', afterOpening, { once: true });
-    return () => {
-      window.removeEventListener('invitation:open', afterOpening);
+    const moves = ['pointerdown', 'keydown', 'wheel', 'touchmove', 'scroll'] as const;
+    const stop = () => {
+      for (const type of moves) window.removeEventListener(type, moved);
+      window.removeEventListener('invitation:open', arm);
       window.clearTimeout(timer);
     };
-  }, []);
+    const go = () => {
+      stop();
+      void loadAll(payload).catch(() => undefined);
+    };
+    function moved() {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(go, 400);
+    }
+    function arm() {
+      window.removeEventListener('invitation:open', arm);
+      for (const type of moves) window.addEventListener(type, moved, { passive: true, once: true });
+      timer = window.setTimeout(go, PREFETCH_MS);
+    }
+    if (document.documentElement.dataset.opened) arm();
+    else window.addEventListener('invitation:open', arm, { once: true });
+    return stop;
+  }, [payload]);
 
   const switchTo = useCallback(
     async (next: Locale, how: How) => {
@@ -213,13 +259,13 @@ export function LiveLocale({
       busy.current = next;
       try {
         prepare(next);
-        const NextSections = next === initial ? null : await loadSections();
+        const loaded = next === initial ? null : await loadAll(payload);
         if (busy.current !== next) return; // another language was asked for meanwhile
         // the target script's fonts usually arrived on hover/press already — never wait long for them
         await Promise.race([fonts.current.get(next), new Promise((r) => window.setTimeout(r, 250))]);
         anchor.current = captureAnchor();
         // render + restore the position before the browser paints
-        flushSync(() => setView((v) => ({ locale: next, Sections: NextSections ?? v.Sections, how })));
+        flushSync(() => setView((v) => ({ locale: next, render: loaded ?? v.render, how })));
       } catch {
         // the renderer couldn't be fetched (offline): the guest's choice becomes the plain link;
         // a language picked for them stays as the page is
@@ -306,7 +352,11 @@ export function LiveLocale({
         listen={listen[locale] ?? null}
         motion={motion[locale] ?? null}
       />
-      {locale === initial || !Sections ? children : <Sections payload={payload} locale={locale} />}
+      {locale === initial || !render ? (
+        children
+      ) : (
+        <render.Sections body={render.body} locale={locale} hebrewDate={entry.hebrewDate} />
+      )}
     </>
   );
 }

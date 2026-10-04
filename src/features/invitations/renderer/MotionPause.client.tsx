@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Icon } from '../ui/Icon';
+import { CoreIcon } from '../ui/core-icons';
 import { motionAllowed } from './fx/motion';
 
 export interface MotionLabels {
@@ -91,7 +91,7 @@ export function MotionPause({ labels, className }: { labels: MotionLabels; class
       data-testid="motion-pause"
       onClick={() => setPaused((p) => !p)}
     >
-      <Icon name={paused ? 'play' : 'pause'} size={18} />
+      <CoreIcon name={paused ? 'play' : 'pause'} size={18} />
     </button>
   );
 }

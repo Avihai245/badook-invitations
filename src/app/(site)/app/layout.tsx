@@ -1,5 +1,6 @@
 import { after } from 'next/server';
 import type { ReactNode } from 'react';
+import '@/styles/app.css';
 import { tick } from '@/features/jobs/jobs';
 import { assertInvitationsEnabled } from '@/lib/feature';
 import { UiProvider } from '@/lib/i18n/provider-lazy';

@@ -31,11 +31,14 @@ export function BrandLogo({
   className,
   tone = 'auto',
   suffix,
+  lazy = false,
 }: {
   label: string;
   className?: string;
   tone?: 'auto' | 'onDark';
   suffix?: ReactNode;
+  /** A logo below the first screen (the footer's): fetched when it nears the screen — the hidden look's never. */
+  lazy?: boolean;
 }) {
   const img = (file: (typeof FILES)[keyof typeof FILES], extra?: string) => (
     <picture className={cn('contents', extra)}>
@@ -48,6 +51,7 @@ export function BrandLogo({
         width={LOGO.width}
         height={LOGO.height}
         decoding="async"
+        loading={lazy ? 'lazy' : undefined}
         className={cn('h-[2.1em] w-auto max-w-none shrink-0', extra)}
       />
     </picture>

@@ -12,6 +12,8 @@ import { LOCALES } from '../contracts/types';
 export function revalidateInvitationPage(slug: string) {
   revalidatePath(`/i/${slug}`);
   for (const lang of [...LOCALES, 'default']) revalidatePath(`/i/${slug}/${lang}`);
+  // what the live language switch fetches (live-body.ts)
+  revalidatePath(`/i/${slug}/live.json`);
 }
 
 /** The same for an invitation known by its id (a feature toggle): looks its address up first. */

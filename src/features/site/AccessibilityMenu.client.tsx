@@ -3,7 +3,8 @@
 import { Accessibility, Minus, Plus, RotateCcw, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { cn, Switch } from '@/components/app';
+import { Switch } from '@/components/app/Switch';
+import { cn } from '@/components/app/utils';
 import { useUi } from '@/lib/i18n/client';
 import {
   A11Y_EMPTY as EMPTY,

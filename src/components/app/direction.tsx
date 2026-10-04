@@ -1,6 +1,6 @@
 'use client';
 
-import { Direction } from 'radix-ui';
+import * as Direction from '@radix-ui/react-direction';
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react';
 
 export type Dir = 'ltr' | 'rtl';

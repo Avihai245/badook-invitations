@@ -1,7 +1,7 @@
 'use client';
 
 import { CircleAlert, CircleCheck, X } from 'lucide-react';
-import { Toast as RadixToast } from 'radix-ui';
+import * as RadixToast from '@radix-ui/react-toast';
 import {
   createContext,
   useCallback,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
-import { Segmented } from '@/components/app';
+import { Segmented } from '@/components/app/Segmented';
 import type { UiLocale } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { setUiLocale } from './ui-locale';

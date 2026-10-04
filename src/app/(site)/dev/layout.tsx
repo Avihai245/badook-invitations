@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import '@/styles/app.css';
 import { UiProvider } from '@/lib/i18n/provider-lazy';
 import { getUiLocale } from '@/lib/i18n/server';
 

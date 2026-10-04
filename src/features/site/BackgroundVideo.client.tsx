@@ -1,10 +1,11 @@
 'use client';
 
 import { Pause, Play } from 'lucide-react';
-import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { cn } from '@/components/app';
+import { preload } from 'react-dom';
+import { cn } from '@/components/app/utils';
 import { videoEmbedUrl, type VideoLink } from '@/features/invitations/lib/video-links';
+import { imageSet } from '@/features/invitations/renderer/images';
 import { mediaAllowed, useConsent } from './CookieConsent.client';
 import { useFirstInteraction } from './first-interaction';
 
@@ -62,6 +63,11 @@ export function BackgroundVideo({
   // null: nobody chose yet — plays unless external content is off; true/false: the button's choice
   const [wanted, setWanted] = useState<boolean | null>(null);
   const engaged = useFirstInteraction();
+  // the still, a plain <img> over the optimizer's widths (renderer/images.ts — next/image would add its
+  // runtime); preloaded with its priority, which an image preloaded without it lacks (it waits behind CSS)
+  const set = still ? imageSet(still, '100vw', 70) : null;
+  if (set?.srcSet)
+    preload(set.src, { as: 'image', imageSrcSet: set.srcSet, imageSizes: set.sizes, fetchPriority: 'high' });
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -129,8 +135,16 @@ export function BackgroundVideo({
   return (
     <>
       <div ref={box} aria-hidden className={cn('site-video', playing && !paused && 'playing', className)}>
-        {still ? (
-          <Image className="site-video-still" src={still} alt="" fill priority sizes="100vw" quality={70} />
+        {set ? (
+          <img
+            className="site-video-still"
+            src={set.src}
+            srcSet={set.srcSet}
+            sizes={set.sizes}
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+          />
         ) : null}
         {live && origin ? (
           <iframe

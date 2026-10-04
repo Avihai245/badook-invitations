@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Icon } from '../ui/Icon';
+import { CoreIcon } from '../ui/core-icons';
 
 /** Less than this left to scroll: the end of the invitation, no arrow. */
 const END_PX = 48;
@@ -65,7 +65,7 @@ export function FrameScrollCue() {
       aria-label={he ? 'גללו למטה' : 'Scroll down'}
       onClick={() => window.scrollBy({ top: Math.round(window.innerHeight * 0.8), behavior: 'smooth' })}
     >
-      <Icon name="chevron-down" size={22} />
+      <CoreIcon name="chevron-down" size={22} />
     </button>
   );
 }

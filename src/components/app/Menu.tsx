@@ -2,7 +2,7 @@
 
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { DropdownMenu } from 'radix-ui';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import type { ReactElement, ReactNode } from 'react';
 import { useDir, type Dir } from './direction';
 import { cn, iconSlot } from './utils';

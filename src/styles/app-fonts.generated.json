@@ -1,0 +1,18 @@
+{
+  "generatedBy": "scripts/build-fonts.mjs",
+  "variable": {
+    "Heebo Variable": {
+      "hebrew": "/fonts/heebo-variable/5.3.0/heebo-hebrew-w400-800-normal.woff2",
+      "latin": "/fonts/heebo-variable/5.3.0/heebo-latin-wght-normal.woff2",
+      "latin-basic": "/fonts/heebo-variable/5.3.0/heebo-latin-basic1-w400-800-normal.woff2",
+      "latin-ext": "/fonts/heebo-variable/5.3.0/heebo-latin-ext-wght-normal.woff2"
+    },
+    "Inter Variable": {
+      "cyrillic": "/fonts/inter-variable/5.3.0/inter-cyrillic-wght-normal.woff2",
+      "cyrillic-ext": "/fonts/inter-variable/5.3.0/inter-cyrillic-ext-wght-normal.woff2",
+      "latin": "/fonts/inter-variable/5.3.0/inter-latin-wght-normal.woff2",
+      "latin-basic": "/fonts/inter-variable/5.3.0/inter-latin-basic1-w400-800-normal.woff2",
+      "latin-ext": "/fonts/inter-variable/5.3.0/inter-latin-ext-wght-normal.woff2"
+    }
+  }
+}

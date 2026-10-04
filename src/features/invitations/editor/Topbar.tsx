@@ -20,7 +20,7 @@ import {
   Undo2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { Popover } from 'radix-ui';
+import * as Popover from '@radix-ui/react-popover';
 import { Badge, Button, Hint, IconButton, Menu, Segmented, cn, useDir } from '@/components/app';
 import { HelpFor } from '@/features/invitations/app/HelpFor';
 import { useReview } from '@/features/review/ui/host/ReviewProvider';

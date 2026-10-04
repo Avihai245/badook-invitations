@@ -4,7 +4,8 @@ import { LayoutGrid, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useTransition } from 'react';
-import { Button, StatusPage } from '@/components/app';
+import { Button } from '@/components/app/Button';
+import { StatusPage } from '@/components/app/StatusPage';
 import { BrokenSealArt } from '@/features/invitations/app/status-art';
 import { useUi } from '@/lib/i18n/client';
 

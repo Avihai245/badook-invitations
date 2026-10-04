@@ -2,7 +2,9 @@
 
 import { Check, ExternalLink, Play, RotateCcw } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Button, PHONE_VIEWPORT, PhoneFrame, Segmented } from '@/components/app';
+import { Button } from '@/components/app/Button';
+import { PHONE_VIEWPORT, PhoneFrame } from '@/components/app/PhoneFrame';
+import { Segmented } from '@/components/app/Segmented';
 import { mediaAllowed, saveConsent, useConsent } from './CookieConsent.client';
 import { useFirstInteraction } from './first-interaction';
 
@@ -53,9 +55,11 @@ export function SampleShowcase({
   useEffect(() => {
     const el = column.current;
     if (!el) return;
-    const fit = () => setScale(Math.min(0.86, el.clientWidth / PHONE_OUTER));
-    fit();
-    const ro = new ResizeObserver(fit);
+    // the column's width from the observer's own measurement (its first answer comes with the first
+    // layout) — reading `clientWidth` here forced a layout in the middle of hydration
+    const ro = new ResizeObserver(([entry]) => {
+      if (entry) setScale(Math.min(0.86, entry.contentRect.width / PHONE_OUTER));
+    });
     ro.observe(el);
     const io = new IntersectionObserver(
       (entries) => {

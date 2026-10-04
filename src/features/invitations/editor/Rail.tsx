@@ -58,7 +58,7 @@ import {
   WandSparkles,
   type LucideIcon,
 } from 'lucide-react';
-import { Popover } from 'radix-ui';
+import * as Popover from '@radix-ui/react-popover';
 import { useDeferredValue, useId, useMemo, useState } from 'react';
 import { Switch, cn, rovingKeyDown, useDir } from '@/components/app';
 import { useReview } from '@/features/review/ui/host/ReviewProvider';

@@ -1,6 +1,7 @@
 import { Home, LayoutGrid, LogIn, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Button, StatusPage } from '@/components/app';
+import { Button } from '@/components/app/Button';
+import { StatusPage } from '@/components/app/StatusPage';
 import { LostLetterArt } from '@/features/invitations/app/status-art';
 import { getUi } from '@/lib/i18n/server';
 import { getSessionUser } from '@/lib/supabase/session';

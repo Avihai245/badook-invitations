@@ -43,7 +43,10 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
           </div>
         </div>
         <div className="mx-auto grid max-w-[1100px] gap-10 px-5 py-10 sm:px-6 lg:grid-cols-[1fr_320px]">
-          <ContactForm defaultTopic={TOPICS.find((x) => x === topic) ?? 'support'} />
+          <ContactForm
+            defaultTopic={TOPICS.find((x) => x === topic) ?? 'support'}
+            sent={t.tickets.contactSent}
+          />
           <aside className="flex flex-col gap-4">
             <div className="flex items-start gap-3 rounded-[18px] border border-brand-line bg-brand-soft/60 p-5 text-[14px]">
               <Bot aria-hidden className="mt-0.5 size-5 shrink-0 text-brand" />

@@ -6,13 +6,16 @@ import type { LivePayload } from './payload';
 
 /**
  * The live language switch's payload (null for a single-locale invitation). `links(locale)` gives the
- * address of the page in that locale and the pill's plain link to it.
+ * address of the page in that locale and the pill's plain link to it. `bodyUrl`: where the browser
+ * fetches the document, the template and the options when it needs them (the public page); without it
+ * they go inline (the dev pages).
  */
 export function buildLivePayload(
   doc: InvitationDocument,
   template: TemplateManifest,
   options: Omit<RenderOptions, 'mode'>,
   links: (locale: Locale) => { url: string; href: string },
+  bodyUrl?: string,
 ): LivePayload | null {
   if (doc.locales.length < 2) return null;
   const locales: LivePayload['locales'] = {};
@@ -26,5 +29,10 @@ export function buildLivePayload(
       labels: { menu: ctx.t('locale.menu'), play: ctx.t('music.play'), pause: ctx.t('music.pause') },
     };
   }
-  return { doc, template, options, locales };
+  return {
+    languages: [...doc.locales],
+    slug: doc.share.slug,
+    locales,
+    body: bodyUrl ? { url: bodyUrl } : { doc, template, options },
+  };
 }

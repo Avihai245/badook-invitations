@@ -171,6 +171,14 @@ export function templateFontFamilies(template: TemplateManifest, pairId?: string
   return [...set];
 }
 
+/**
+ * A Latin face's ASCII part — letters, digits, punctuation, the typographic marks — as a file of its own
+ * (scripts/build-fonts.mjs "latin-basic": about two thirds of the whole Latin file). It belongs to the
+ * `latin` subset: a page that declares the Latin face declares this one after it, so it wins for those
+ * characters and the whole Latin face downloads only for what is left (accents, ligatures…).
+ */
+const BASIC = 'latin-basic';
+
 /** A family and the subsets (and weights) of it a page declares. */
 export interface FaceRequest {
   family: string;
@@ -245,7 +253,9 @@ export function fontFaceCss(families: Iterable<string | FaceRequest>, weights?: 
     const only = request.weights ?? weights;
     for (const f of entry.faces) {
       if (only && !only.includes(f.weight)) continue;
-      if (request.subsets && !request.subsets.includes(f.subset)) continue;
+      // the ASCII part goes with the Latin face
+      const subset = f.subset === BASIC ? 'latin' : f.subset;
+      if (request.subsets && !request.subsets.includes(subset)) continue;
       rules.push(
         `@font-face{font-family:'${request.family}';font-style:${f.style};font-weight:${f.weight};font-display:swap;` +
           `src:url(${f.url}) format('woff2');` +
@@ -290,16 +300,22 @@ const PRELOAD_SUBSET: Record<Script, string> = {
   ethiopic: 'ethiopic',
 };
 
-/** Only the active locale's display font is preloaded (§5 Fonts) — in its script's subset. */
+/**
+ * Only the active locale's display font is preloaded (§5 Fonts) — in its script's subset; a Latin face as
+ * its ASCII part (what the text is set in), and on a Hebrew page the display font's ASCII part too: the
+ * names' "&" and spaces are in it.
+ */
 export function displayFontPreloads(pair: FontPair, locale: Locale): string[] {
   const script = LOCALE_INFO[locale].script;
   const entry = FAMILIES[fontFor(pair, 'display', locale)];
   if (!entry) return [];
   const subset = entry.subsets.includes(PRELOAD_SUBSET[script]) ? PRELOAD_SUBSET[script] : 'latin';
-  const face =
-    entry.faces.find((f) => f.subset === subset && f.weight === 400 && f.style === 'normal') ??
-    entry.faces.find((f) => f.subset === subset);
-  return face ? [face.url] : [];
+  const face = (of: string) =>
+    entry.faces.find((f) => f.subset === of && f.weight === 400 && f.style === 'normal') ??
+    entry.faces.find((f) => f.subset === of);
+  const main = subset === 'latin' ? (face(BASIC) ?? face('latin')) : face(subset);
+  const ascii = subset !== 'latin' && script === 'hebrew' ? face(BASIC) : undefined;
+  return [main?.url, ascii?.url].filter((url): url is string => !!url);
 }
 
 /** A family's font files (woff2 URLs under /fonts, as served to browsers). */

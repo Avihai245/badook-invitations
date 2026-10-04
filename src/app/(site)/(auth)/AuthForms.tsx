@@ -4,7 +4,9 @@ import { CircleCheck } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment, useActionState, type ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Button, Field, Input } from '@/components/app';
+import { Button } from '@/components/app/Button';
+import { Field } from '@/components/app/Field';
+import { Input } from '@/components/app/Input';
 import type { AppDict } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import {

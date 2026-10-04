@@ -2,7 +2,7 @@
 
 import { CloudOff, Eye, Palette, PenLine, Send, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Dialog as RadixDialog } from 'radix-ui';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Dialog, IconButton, cn, useDir, useToast } from '@/components/app';
 import { ReviewDrawer } from '@/features/review/ui/host/ReviewDrawer';

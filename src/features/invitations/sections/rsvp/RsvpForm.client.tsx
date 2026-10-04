@@ -7,7 +7,7 @@ import { burstFrom } from '../../renderer/fx/burst';
 import { motionAllowed } from '../../renderer/fx/motion';
 import type { BurstKind } from '../../renderer/fx/theme';
 import { formatEntry } from '../../i18n/format';
-import { Icon } from '../../ui/Icon';
+import { CoreIcon } from '../../ui/core-icons';
 import { CalendarMenu, type CalendarLinks } from '../venues/CalendarMenu.client';
 import type { RsvpNotes } from './notes';
 import type { RsvpKey, RsvpStrings } from './strings';
@@ -557,7 +557,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
               data-diet={who}
             />
             <span>
-              {on ? <Icon name="check" size={14} strokeWidth={2} /> : null}
+              {on ? <CoreIcon name="check" size={14} strokeWidth={2} /> : null}
               {t(L, `diet.${k}`)}
             </span>
           </label>
@@ -608,7 +608,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
         disabled={value <= min}
         aria-label={t(L, 'rsvp.decrease')}
       >
-        <Icon name="minus" size={18} />
+        <CoreIcon name="minus" size={18} />
       </button>
       <output aria-live="polite">
         {/* a new number bumps in (invitation.css) — the live region itself stays */}
@@ -622,7 +622,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
         disabled={value >= max}
         aria-label={t(L, 'rsvp.increase')}
       >
-        <Icon name="plus" size={18} />
+        <CoreIcon name="plus" size={18} />
       </button>
     </div>
   );
@@ -634,7 +634,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     <div ref={formRef} data-insight-area="rsvp">
       {reply && status !== 'sending' ? (
         <p className="replied" role="status">
-          <Icon name="check" size={16} strokeWidth={2} />
+          <CoreIcon name="check" size={16} strokeWidth={2} />
           {reply.draft ? (
             <button type="button" className="linkbtn" onClick={editStoredReply}>
               {t(L, 'rsvp.alreadyReplied')}
@@ -660,7 +660,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
               }}
             />
             <span className="radio" aria-hidden="true">
-              {attending === v ? <Icon name="check" size={12} strokeWidth={3} /> : null}
+              {attending === v ? <CoreIcon name="check" size={12} strokeWidth={3} /> : null}
             </span>
             {t(L, v ? 'rsvp.yes' : 'rsvp.no')}
           </label>
@@ -672,7 +672,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
           <div className="grp steppers">
             <div className="srow">
               <p className="q" id={fid('adults-q')}>
-                <Icon name="users" size={18} />
+                <CoreIcon name="users" size={18} />
                 {t(L, 'rsvp.adults')}
               </p>
               {stepper('adults', adults.length, 1, config.maxAdults)}
@@ -680,7 +680,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
             {config.askChildren ? (
               <div className="srow">
                 <p className="q" id={fid('children-q')}>
-                  <Icon name="baby" size={18} />
+                  <CoreIcon name="baby" size={18} />
                   {t(L, 'rsvp.children')}
                 </p>
                 {stepper('children', children.length, 0, config.maxChildren)}
@@ -854,7 +854,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                     onChange={(ev) => setAnswers((a) => ({ ...a, [q.id]: ev.target.checked }))}
                   />
                   <span>
-                    {answers[q.id] === true ? <Icon name="check" size={14} strokeWidth={2} /> : null}
+                    {answers[q.id] === true ? <CoreIcon name="check" size={14} strokeWidth={2} /> : null}
                     {q.label}
                   </span>
                 </label>
@@ -964,7 +964,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                 t(L, 'rsvp.sending')
               ) : (
                 <>
-                  <Icon name="send" size={18} />
+                  <CoreIcon name="send" size={18} />
                   {t(L, 'rsvp.submit')}
                 </>
               )}

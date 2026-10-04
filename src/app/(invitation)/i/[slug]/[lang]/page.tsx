@@ -3,25 +3,21 @@ import { notFound } from 'next/navigation';
 import type { Locale } from '@/features/invitations/contracts/types';
 import { t } from '@/features/invitations/i18n/dictionary';
 import { LOCALE_INFO, isLocale } from '@/features/invitations/lib/locales';
-import { assetBasesFromEnv } from '@/features/invitations/renderer/assets';
 import { pageDescription, pageTitle } from '@/features/invitations/renderer/calendar-event';
-import {
-  buildRenderContext,
-  type RenderContext,
-  type RenderOptions,
-} from '@/features/invitations/renderer/context';
+import { buildRenderContext, type RenderContext } from '@/features/invitations/renderer/context';
 import { InvitationBody } from '@/features/invitations/renderer/InvitationBody';
 import { buildLivePayload } from '@/features/invitations/renderer/live/build';
 import { cinematicForPage } from '@/features/invitations/server/cinematic';
 import { OG_SIZE, ogVersion } from '@/features/invitations/server/og-image';
+import { liveBodyPath } from '@/features/invitations/server/live-body';
 import { pageExtras, type PageExtras } from '@/features/invitations/server/page-extras';
+import { renderOptions } from '@/features/invitations/server/render-options';
 import {
   getPublishedInvitation,
   resolveLocale,
   type PublishedInvitation,
 } from '@/features/invitations/server/published';
 import { voiceForPage } from '@/features/voice/server/page';
-import { serverEnv } from '@/lib/env';
 
 type Params = Promise<{ slug: string; lang: string }>;
 
@@ -33,28 +29,6 @@ export const revalidate = 600;
 export const dynamicParams = true;
 export async function generateStaticParams(): Promise<{ slug: string; lang: string }[]> {
   return [];
-}
-
-function renderOptions(
-  invitation: PublishedInvitation,
-  cinematic: boolean,
-  extras?: PageExtras,
-): Omit<RenderOptions, 'mode'> {
-  const env = serverEnv();
-  return {
-    cinematic,
-    // the event's live gallery (the gallery section's link) and its insights beacon
-    liveGallery: extras?.liveGallery ?? null,
-    insights: extras?.insights ?? false,
-    followUp: invitation.followUp,
-    brand: env.INVITES_BRAND_NAME,
-    publicBaseUrl: env.INVITES_PUBLIC_BASE_URL,
-    icsViaRoute: true,
-    bases: assetBasesFromEnv({
-      supabaseUrl: env.NEXT_PUBLIC_SUPABASE_URL,
-      templateMediaBaseUrl: env.NEXT_PUBLIC_TEMPLATE_MEDIA_BASE_URL,
-    }),
-  };
 }
 
 function context(
@@ -152,6 +126,8 @@ export default async function PublicInvitationPage({ params }: { params: Params 
       url: `/i/${slug}?lang=${l}`,
       href: link(l),
     }),
+    // the document and template for the other languages come as a cached file, not in this page
+    liveBodyPath(slug),
   );
   return (
     <InvitationBody

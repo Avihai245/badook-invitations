@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { BrandLogo } from '@/components/app';
+import { BrandLogo } from '@/components/app/BrandLogo';
 import { posterFontsUrl } from '@/features/invitations/app/poster-art';
 import { PosterArtLoader } from '@/features/invitations/app/PosterArtLoader.client';
 import { LazyTemplatePoster } from '@/features/invitations/app/LazyTemplatePoster';

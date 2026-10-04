@@ -127,7 +127,7 @@ export function FeatureSpotlight({
               {item.icon}
             </span>
             <span className="min-w-0">
-              <span className="block text-[16.5px] font-bold">{item.title}</span>
+              <span className="hx-feat-title block text-[16.5px] font-bold">{item.title}</span>
               <span
                 className={`mt-1 block text-[14.5px] text-pretty text-muted ${i === active ? '' : 'max-lg:hidden'}`}
               >

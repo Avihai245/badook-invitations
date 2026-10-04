@@ -1,6 +1,6 @@
 import { Play } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
-import { cn } from '@/components/app';
+import { cn } from '@/components/app/utils';
 import { dirOf, type Locale, type TemplateManifest } from '../contracts/types';
 import { longestWordLength } from '../lib/text';
 import { placeholderArt, placeholderScrim, type PlaceholderArt } from '../renderer/placeholders';

@@ -3,7 +3,7 @@ import { uiDir } from '@/lib/i18n/app';
 import { UiProvider } from '@/lib/i18n/provider-lazy';
 import { getUi } from '@/lib/i18n/server';
 import SiteNotFound from './(site)/not-found';
-import '@/styles/app.css';
+import '@/styles/public.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getUi();

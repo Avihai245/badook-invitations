@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type ReactNode } from 'react';
-import { cn } from '@/components/app';
+import { cn } from '@/components/app/utils';
 
 /**
  * A scene whose animations run only while it is on screen (site-home.css `.hs:not([data-play])`

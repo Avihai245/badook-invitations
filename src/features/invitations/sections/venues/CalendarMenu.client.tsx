@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import { Icon } from '../../ui/Icon';
+import { CoreIcon } from '../../ui/core-icons';
 
 export interface CalendarLinks {
   google: string;
@@ -51,7 +51,7 @@ export function CalendarMenu({
         aria-controls={menuId}
         onClick={() => setOpen((o) => !o)}
       >
-        <Icon name="calendar-plus" size={18} />
+        <CoreIcon name="calendar-plus" size={18} />
         {label}
       </button>
       <div className="dd-menu" role="menu" id={menuId}>
@@ -62,11 +62,11 @@ export function CalendarMenu({
           role="menuitem"
           data-insight="calendar"
         >
-          <Icon name="calendar-plus" size={18} />
+          <CoreIcon name="calendar-plus" size={18} />
           {labels.google}
         </a>
         <a href={links.ics} download={links.icsFileName} role="menuitem" data-insight="calendar">
-          <Icon name="calendar-plus" size={18} />
+          <CoreIcon name="calendar-plus" size={18} />
           {labels.apple}
         </a>
         <a
@@ -76,7 +76,7 @@ export function CalendarMenu({
           role="menuitem"
           data-insight="calendar"
         >
-          <Icon name="calendar-plus" size={18} />
+          <CoreIcon name="calendar-plus" size={18} />
           {labels.outlook}
         </a>
       </div>

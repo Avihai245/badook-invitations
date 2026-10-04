@@ -11,12 +11,20 @@
  * Ethiopic families, only in their own script's subset — then writes:
  *   - src/features/invitations/fonts/font-faces.generated.json  (faces + unicode-range + size-adjust)
  *   - src/styles/app-fonts.generated.css                         (the host app's Heebo, Inter + display fonts)
+ *   - src/styles/app-fonts.generated.json                        (the app's variable files, for the layout's preloads)
  * Font binaries are gitignored and regenerated on every build; the JSON/CSS are committed.
  * No request ever goes to Google Fonts (build or runtime).
+ *
+ * "latin-basic": a Hebrew page's spaces, digits and punctuation — and every English page's letters — live
+ * in each font's Latin file (12–39 KB a weight) with the accented letters, ligatures and symbols a page in
+ * ASCII never shows. Each Latin face also gets its ASCII part (letters, digits, punctuation, the
+ * typographic marks) cut out as a file of its own, about two thirds of the size; declared after the Latin
+ * face, it wins for those characters and the whole Latin face downloads only for the rest.
  */
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import subsetFont from 'subset-font';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const packDir = join(root, 'invitation-templates-pack');
@@ -26,6 +34,8 @@ const jsonOut = join(root, 'src', 'features', 'invitations', 'fonts', 'font-face
 const libraryFile = join(root, 'src', 'features', 'invitations', 'fonts', 'library.json');
 const scriptsFile = join(root, 'src', 'features', 'invitations', 'fonts', 'scripts.json');
 const appCssOut = join(root, 'src', 'styles', 'app-fonts.generated.css');
+const appJsonOut = join(root, 'src', 'styles', 'app-fonts.generated.json');
+const fontsourceVariableDir = join(root, 'node_modules', '@fontsource-variable');
 
 /** The subsets a pair's own families are copied in (when they have them). */
 const PAIR_SUBSETS = ['hebrew', 'latin', 'latin-ext', 'cyrillic', 'cyrillic-ext'];
@@ -92,11 +102,17 @@ const ROLE_VARIANTS = {
 
 /** Host app (§9B.1): Heebo (HE) / Inter (EN); display headlines in Frank Ruhl Libre (HE) / Fraunces (EN). */
 const APP_FAMILIES = {
-  Heebo: [400, 500, 600, 700, 800].map((w) => [w, 'normal']),
-  Inter: [400, 500, 600, 700, 800].map((w) => [w, 'normal']),
   'Frank Ruhl Libre': [500, 700].map((w) => [w, 'normal']),
   Fraunces: [500, 600].map((w) => [w, 'normal']),
 };
+/**
+ * The app's text faces, Heebo and Inter, as variable fonts (@fontsource-variable): one file per script
+ * covers every weight, where a file per weight — the home page uses four — made eight font requests
+ * (68 KB) for Hebrew text with its digits and Latin letters, and ten for English. They are declared
+ * as "<Family> Variable" (the stacks in theme.css name them), so the static faces the invitations
+ * declare under the plain name never compete with them inside one document.
+ */
+const APP_VARIABLE_FAMILIES = ['Heebo', 'Inter'];
 /**
  * The scripts neither has, which the live gallery's guest pages (and guest names) show: after them in
  * app.css's stacks, each downloaded only for its own letters (unicode-range).
@@ -107,6 +123,145 @@ const APP_SCRIPT_FAMILIES = {
 };
 
 const familyId = (family) => family.toLowerCase().replace(/\s+/g, '-');
+
+/** Bumped when the basic set changes (the file names carry it: nothing stale is reused). */
+const BASIC_REV = 1;
+/**
+ * What a page in ASCII shows from the Latin file: the letters, digits and punctuation, NBSP, the
+ * typographic marks (dashes, quotes, bullet, ellipsis, primes) and the signs beside numbers (€, ™, ©, ×, −).
+ * Accented letters, ligatures and the rest stay in the full Latin face, fetched when a page has some.
+ */
+const BASIC_RANGES = [
+  [0x20, 0x7e],
+  [0xa0, 0xa0],
+  [0xa9, 0xa9],
+  [0xb7, 0xb7],
+  [0xd7, 0xd7],
+  [0x2011, 0x2015],
+  [0x2018, 0x201a],
+  [0x201c, 0x201e],
+  [0x2022, 0x2022],
+  [0x2026, 0x2026],
+  [0x2032, 0x2033],
+  [0x20ac, 0x20ac],
+  [0x2122, 0x2122],
+  [0x2212, 0x2212],
+];
+/** The host app's variable text fonts are used from 400 to 800 (the static faces they replace were): a narrower axis, a lighter file. */
+const WEIGHT_AXIS = { min: 400, max: 800 };
+
+const expand = (ranges) => ranges.flatMap(([a, b]) => Array.from({ length: b - a + 1 }, (_, i) => a + i));
+
+/** The code points a font (TrueType / OpenType bytes) maps to a glyph — its cmap, formats 4 and 12. */
+function cmapPoints(sfnt) {
+  const view = new DataView(sfnt.buffer, sfnt.byteOffset, sfnt.byteLength);
+  const tables = view.getUint16(4);
+  let cmap = -1;
+  for (let i = 0; i < tables; i++) {
+    const at = 12 + i * 16;
+    const tag = String.fromCharCode(...[0, 1, 2, 3].map((k) => view.getUint8(at + k)));
+    if (tag === 'cmap') cmap = view.getUint32(at + 8);
+  }
+  const points = new Set();
+  if (cmap < 0) return points;
+  for (let i = 0, n = view.getUint16(cmap + 2); i < n; i++) {
+    const sub = cmap + view.getUint32(cmap + 4 + i * 8 + 4);
+    const format = view.getUint16(sub);
+    if (format === 4) {
+      const segments = view.getUint16(sub + 6) / 2;
+      const ends = sub + 14;
+      const starts = ends + segments * 2 + 2;
+      const deltas = starts + segments * 2;
+      const offsets = deltas + segments * 2;
+      for (let s = 0; s < segments; s++) {
+        const end = view.getUint16(ends + s * 2);
+        const start = view.getUint16(starts + s * 2);
+        const delta = view.getInt16(deltas + s * 2);
+        const offset = view.getUint16(offsets + s * 2);
+        for (let c = start; c <= end && c < 0xffff; c++) {
+          const glyph =
+            offset === 0 ? (c + delta) & 0xffff : view.getUint16(offsets + s * 2 + offset + (c - start) * 2);
+          if (glyph) points.add(c);
+        }
+      }
+    } else if (format === 12) {
+      for (let g = 0, n = view.getUint32(sub + 12); g < n; g++) {
+        const at = sub + 16 + g * 12;
+        const start = view.getUint32(at);
+        const end = view.getUint32(at + 4);
+        const glyph = view.getUint32(at + 8);
+        for (let c = start; c <= end; c++) if (glyph + (c - start)) points.add(c);
+      }
+    }
+  }
+  return points;
+}
+
+/** "U+0020-0040,U+0041-005A,…" for a set of code points. */
+function unicodeRangeOf(points) {
+  const sorted = [...points].sort((a, b) => a - b);
+  const hex = (n) => `U+${n.toString(16).toUpperCase().padStart(4, '0')}`;
+  const out = [];
+  for (let i = 0; i < sorted.length;) {
+    let j = i;
+    while (j + 1 < sorted.length && sorted[j + 1] === sorted[j] + 1) j++;
+    out.push(i === j ? hex(sorted[i]) : `${hex(sorted[i])}-${hex(sorted[j]).slice(2)}`);
+    i = j + 1;
+  }
+  return out.join(',');
+}
+
+/**
+ * The ASCII part of a Latin woff2 (written to `target`, next to it a `.range` file with what it holds, so a
+ * later run reuses both): { unicodeRange } — null when the font has none of it. `axes` limits a variable
+ * font's weight axis.
+ */
+async function writeBasic(source, target, { axes } = {}) {
+  const rangeFile = `${target}.range`;
+  if (existsSync(target) && existsSync(rangeFile)) return { unicodeRange: readFileSync(rangeFile, 'utf8') };
+  const wanted = expand(BASIC_RANGES);
+  const options = axes ? { variationAxes: { wght: axes } } : {};
+  const input = readFileSync(source);
+  const present = cmapPoints(
+    await subsetFont(input, String.fromCodePoint(...wanted), { targetFormat: 'sfnt', ...options }),
+  );
+  const kept = wanted.filter((c) => present.has(c));
+  if (!kept.length) return null;
+  writeFileSync(
+    target,
+    await subsetFont(input, String.fromCodePoint(...kept), { targetFormat: 'woff2', ...options }),
+  );
+  const unicodeRange = unicodeRangeOf(kept);
+  writeFileSync(rangeFile, unicodeRange);
+  return { unicodeRange };
+}
+
+/** The code points of a `unicode-range` value. */
+function pointsOfRange(range) {
+  const out = [];
+  for (const part of range.split(',')) {
+    const m = /^U\+([0-9A-F]+)(?:-([0-9A-F]+))?$/i.exec(part.trim());
+    if (!m) continue;
+    const from = parseInt(m[1], 16);
+    const to = m[2] ? parseInt(m[2], 16) : from;
+    for (let c = from; c <= to; c++) out.push(c);
+  }
+  return out;
+}
+
+/**
+ * A face's file with a narrower weight axis (for the host app's variable fonts): written to `target`
+ * with the code points of its `unicode-range` that it has — the same face, lighter.
+ */
+async function writeNarrowed(source, target, unicodeRange, axes) {
+  if (existsSync(target)) return;
+  const input = readFileSync(source);
+  const text = String.fromCodePoint(...pointsOfRange(unicodeRange));
+  writeFileSync(
+    target,
+    await subsetFont(input, text, { targetFormat: 'woff2', variationAxes: { wght: axes } }),
+  );
+}
 
 function collectInvitationNeeds() {
   const scripts = JSON.parse(readFileSync(scriptsFile, 'utf8'));
@@ -183,7 +338,7 @@ function parseFaces(cssFile, id) {
   return faces;
 }
 
-function buildFamily(family, variants, wanted = PAIR_SUBSETS) {
+async function buildFamily(family, variants, wanted = PAIR_SUBSETS) {
   const { dir, meta, version } = readMeta(family);
   const subsets = SUBSETS.filter((s) => wanted.includes(s) && meta.subsets.includes(s));
   const weights = meta.weights;
@@ -212,6 +367,19 @@ function buildFamily(family, variants, wanted = PAIR_SUBSETS) {
         unicodeRange: face.unicodeRange,
         url: `/fonts/${meta.id}/${version}/${face.file}`,
       });
+      // the Latin face's ASCII part, as a file of its own (declared after it)
+      if (subset === 'latin') {
+        const name = face.file.replace(/-latin-/, `-latin-basic${BASIC_REV}-`);
+        const cut = await writeBasic(join(dir, 'files', face.file), join(outDir, name));
+        if (cut)
+          faces.push({
+            weight,
+            style,
+            subset: 'latin-basic',
+            unicodeRange: cut.unicodeRange,
+            url: `/fonts/${meta.id}/${version}/${name}`,
+          });
+      }
     }
   }
   faces.sort(
@@ -224,6 +392,67 @@ function buildFamily(family, variants, wanted = PAIR_SUBSETS) {
     sizeAdjust: SIZE_ADJUST[family] ?? null,
     faces,
   };
+}
+
+/**
+ * A @fontsource-variable family (one weight-axis file per script) — its faces copied to /fonts, in the same
+ * shape as buildFamily's. They are declared for the weights the app uses (WEIGHT_AXIS: 400–800, as the static
+ * faces they replace were — a request for 300 or 900 lands on the nearest, as before), the Hebrew and the
+ * ASCII Latin ones are cut to that axis, and the ASCII part is a face of its own after the whole Latin one.
+ */
+async function buildVariableFamily(family, wanted = PAIR_SUBSETS) {
+  const id = familyId(family);
+  const dir = join(fontsourceVariableDir, id);
+  const cssFile = join(dir, 'wght.css');
+  if (!existsSync(cssFile)) {
+    throw new Error(`Missing @fontsource-variable/${id} for "${family}" — add it to devDependencies.`);
+  }
+  const { version } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+  const css = readFileSync(cssFile, 'utf8');
+  const weight = `${WEIGHT_AXIS.min} ${WEIGHT_AXIS.max}`;
+  const outDir = join(publicDir, `${id}-variable`, version);
+  mkdirSync(outDir, { recursive: true });
+  const faces = [];
+  for (const block of css.matchAll(/@font-face\s*{([^}]*)}/g)) {
+    const body = block[1];
+    const file = /url\(\.\/files\/([^)]+\.woff2)\)/.exec(body)?.[1];
+    const range = /unicode-range:\s*([^;]+);/.exec(body)?.[1]?.trim() ?? null;
+    const subset = file?.startsWith(`${id}-`)
+      ? file.slice(id.length + 1).replace(/-wght-normal\.woff2$/, '')
+      : null;
+    if (!file || !subset || !wanted.includes(subset)) continue;
+    const source = join(dir, 'files', file);
+    // Hebrew is cut to the app's weights; the other scripts' files are rarely fetched: as they are
+    let name = file;
+    if (subset === 'hebrew' && range) {
+      name = file.replace(/-wght-/, `-w${WEIGHT_AXIS.min}-${WEIGHT_AXIS.max}-`);
+      await writeNarrowed(source, join(outDir, name), range, WEIGHT_AXIS);
+    } else if (!existsSync(join(outDir, file))) copyFileSync(source, join(outDir, file));
+    faces.push({
+      weight,
+      style: 'normal',
+      subset,
+      unicodeRange: range,
+      url: `/fonts/${id}-variable/${version}/${name}`,
+    });
+    // the Latin file's ASCII part (letters, digits, punctuation) as a file of its own, after the whole one
+    if (subset === 'latin') {
+      const basic = file
+        .replace(/-latin-/, `-latin-basic${BASIC_REV}-`)
+        .replace(/-wght-/, `-w${WEIGHT_AXIS.min}-${WEIGHT_AXIS.max}-`);
+      const cut = await writeBasic(source, join(outDir, basic), { axes: WEIGHT_AXIS });
+      if (cut)
+        faces.push({
+          weight,
+          style: 'normal',
+          subset: 'latin-basic',
+          unicodeRange: cut.unicodeRange,
+          url: `/fonts/${id}-variable/${version}/${basic}`,
+        });
+    }
+  }
+  faces.sort((a, b) => a.subset.localeCompare(b.subset));
+  return { id: `${id}-variable`, subsets: faces.map((f) => f.subset), sizeAdjust: null, faces };
 }
 
 function faceCss(family, entry) {
@@ -250,19 +479,20 @@ const needs = collectInvitationNeeds();
 const families = {};
 for (const family of [...needs.keys()].sort()) {
   const { variants, subsets } = needs.get(family);
-  families[family] = buildFamily(family, variants, [...subsets]);
+  families[family] = await buildFamily(family, variants, [...subsets]);
 }
 
 const app = {};
 for (const [family, variants] of Object.entries(APP_FAMILIES)) {
-  app[family] = buildFamily(
+  app[family] = await buildFamily(
     family,
     variants.map(([w, s]) => `${w}:${s}`),
   );
 }
 for (const [family, subsets] of Object.entries(APP_SCRIPT_FAMILIES)) {
-  app[family] = buildFamily(family, ['400:normal', '500:normal', '600:normal', '700:normal'], subsets);
+  app[family] = await buildFamily(family, ['400:normal', '500:normal', '600:normal', '700:normal'], subsets);
 }
+for (const family of APP_VARIABLE_FAMILIES) app[`${family} Variable`] = await buildVariableFamily(family);
 
 const json = `${JSON.stringify({ generatedBy: 'scripts/build-fonts.mjs', families }, null, 2)}\n`;
 const css =
@@ -272,9 +502,25 @@ const css =
     .join('\n') +
   '\n';
 
+// the variable files by family and subset, for the layout's font preloads
+const appJson = `${JSON.stringify(
+  {
+    generatedBy: 'scripts/build-fonts.mjs',
+    variable: Object.fromEntries(
+      APP_VARIABLE_FAMILIES.map((family) => [
+        `${family} Variable`,
+        Object.fromEntries(app[`${family} Variable`].faces.map((f) => [f.subset, f.url])),
+      ]),
+    ),
+  },
+  null,
+  2,
+)}\n`;
+
 const changed = [
   writeIfChanged(jsonOut, json) && jsonOut,
   writeIfChanged(appCssOut, css) && appCssOut,
+  writeIfChanged(appJsonOut, appJson) && appJsonOut,
 ].filter(Boolean);
 const fileCount = Object.values({ ...families, ...app }).reduce((n, f) => n + f.faces.length, 0);
 console.log(

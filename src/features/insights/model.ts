@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import { INSIGHTS, type Milestone } from './config';
 
 /**
@@ -31,23 +30,6 @@ export interface BeaconState {
   gallery: boolean;
   langSwitch: boolean;
 }
-
-export const BeaconSchema = z.strictObject({
-  slug: z.string().regex(/^[a-z0-9-]{3,60}$/),
-  visit: z.uuid(),
-  lang: z.string().regex(/^[a-z]{2}$/),
-  device: z.enum(DEVICES),
-  source: z.enum(SOURCES),
-  opened: z.boolean(),
-  depth: z.union([z.literal(0), z.literal(25), z.literal(50), z.literal(75), z.literal(100)]),
-  visibleMs: z.number().int().min(0).max(INSIGHTS.beacon.maxVisibleMs),
-  rsvpStarted: z.boolean(),
-  rsvpSent: z.boolean(),
-  calendar: z.boolean(),
-  map: z.boolean(),
-  gallery: z.boolean(),
-  langSwitch: z.boolean(),
-});
 
 /** The events the page reports as they happen (data-insight attributes, the RSVP form's success). */
 export const INSIGHT_EVENTS = ['calendar', 'map', 'gallery', 'lang', 'rsvp_start', 'rsvp_sent'] as const;

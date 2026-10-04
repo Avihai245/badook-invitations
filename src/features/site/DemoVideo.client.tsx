@@ -2,9 +2,10 @@
 
 import { Maximize2, Play } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { preload } from 'react-dom';
 import { cn } from '@/components/app/utils';
+import { imageSet } from '@/features/invitations/renderer/images';
 import { useUi } from '@/lib/i18n/client';
 import { useFirstInteraction } from './first-interaction';
 import files from './site-video.generated.json';
@@ -30,6 +31,9 @@ export const TOUR_VIDEO = {
   poster: files.tour.poster,
   minutes: 3,
 } as const;
+
+/** The first screen's poster: shown at 600px from 1024px up, else the width of the screen. */
+const POSTER_SIZES = '(min-width: 1024px) 600px, 100vw';
 
 /** True from the first time `open` is: the dialog stays mounted after (its closing animation plays). */
 function useOpened(open: boolean): boolean {
@@ -72,6 +76,7 @@ export function TourVideo({ className, compact = false }: { className?: string; 
   const T = t.demoVideo.tour;
   const [open, setOpen] = useState(false);
   const opened = useOpened(open);
+  const tourPoster = imageSet(TOUR_VIDEO.poster, compact ? '112px' : '(min-width: 640px) 220px, 168px', 75);
   return (
     <>
       <button
@@ -89,12 +94,16 @@ export function TourVideo({ className, compact = false }: { className?: string; 
             compact ? 'w-[112px]' : 'w-[168px] sm:w-[220px]',
           )}
         >
-          <Image
-            src={TOUR_VIDEO.poster}
+          {/* a plain <img> over the optimizer's widths (renderer/images.ts): next/image would add its runtime */}
+          <img
+            src={tourPoster.src}
+            srcSet={tourPoster.srcSet}
+            sizes={tourPoster.sizes}
             alt=""
             width={1280}
             height={720}
-            sizes={compact ? '112px' : '(min-width: 640px) 220px, 168px'}
+            loading="lazy"
+            decoding="async"
             className="block aspect-video w-full object-cover"
           />
           <span className="absolute inset-0 grid place-items-center bg-black/15 transition-colors group-hover:bg-black/25">
@@ -160,6 +169,16 @@ export function DemoVideo({ className, label }: { className?: string; label?: st
     return () => io.disconnect();
   }, []);
   const load = seen && engaged && !still;
+  // the poster is the page's LCP: preloaded in the page's head with its priority (an image preloaded
+  // without it waits behind the stylesheet), the same one the <img> below asks for
+  const poster = imageSet(DEMO_VIDEO.poster, POSTER_SIZES, 70);
+  if (poster.srcSet)
+    preload(poster.src, {
+      as: 'image',
+      imageSrcSet: poster.srcSet,
+      imageSizes: poster.sizes,
+      fetchPriority: 'high',
+    });
   useEffect(() => {
     const el = video.current;
     if (!load || !el) return;
@@ -194,15 +213,16 @@ export function DemoVideo({ className, label }: { className?: string; label?: st
         ) : null}
       </video>
       {/* the poster, over the video until its first frame plays */}
-      <Image
-        src={DEMO_VIDEO.poster}
+      <img
+        src={poster.src}
+        srcSet={poster.srcSet}
+        sizes={poster.sizes}
         alt=""
-        fill
-        priority
-        quality={70}
-        sizes="(min-width: 1024px) 600px, 100vw"
+        // the largest picture of a phone's first screen: fetched at once, with the highest priority
+        fetchPriority="high"
+        decoding="async"
         className={cn(
-          'pointer-events-none object-cover transition-opacity duration-500',
+          'pointer-events-none absolute inset-0 size-full object-cover transition-opacity duration-500',
           playing && 'opacity-0',
         )}
       />

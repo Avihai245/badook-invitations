@@ -3,18 +3,30 @@
 import { CheckCircle2, Send } from 'lucide-react';
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
-import { Button, Field, Input, Select, Textarea } from '@/components/app';
+import { Button } from '@/components/app/Button';
+import { Field } from '@/components/app/Field';
+import { Input, Select, Textarea } from '@/components/app/Input';
+import type { AppDict } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 
 const TOPICS = ['support', 'billing', 'privacy', 'accessibility', 'business', 'other'] as const;
 type Topic = (typeof TOPICS)[number];
 type Errors = Partial<Record<'name' | 'email' | 'phone' | 'message' | 'form', string>>;
 
-/** The contact form: name, email, optional phone, topic and message; errors in words, focus on the first. */
-export function ContactForm({ defaultTopic = 'support' }: { defaultTopic?: Topic }) {
+/**
+ * The contact form: name, email, optional phone, topic and message; errors in words, focus on the first.
+ * `sent` — the strings of its "message received" card — comes from the page (the server has the whole
+ * dictionary; the browser's public one leaves the ticket screens' out).
+ */
+export function ContactForm({
+  defaultTopic = 'support',
+  sent: k,
+}: {
+  defaultTopic?: Topic;
+  sent: AppDict['tickets']['contactSent'];
+}) {
   const { t, locale, fmt } = useUi();
   const c = t.site.contact;
-  const k = t.tickets.contactSent;
   const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [errors, setErrors] = useState<Errors>({});
   // the support ticket the message opened (the team answers it; a signed-in visitor follows it in the app)

@@ -19,24 +19,28 @@ import {
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-import { Button } from '@/components/app';
+import { Button } from '@/components/app/Button';
 import { planPrices } from '@/features/billing/server/account';
-import { posterFontsUrl } from '@/features/invitations/app/poster-art';
+import { designsMoreUrl, posterFontsUrl } from '@/features/invitations/app/poster-art';
 import { PosterArtLoader } from '@/features/invitations/app/PosterArtLoader.client';
 import { LazyTemplatePoster } from '@/features/invitations/app/LazyTemplatePoster';
 import type { EventType } from '@/features/invitations/contracts/types';
 import { parseVideoLink } from '@/features/invitations/lib/video-links';
 import { SAMPLES } from '@/features/invitations/templates/demo';
-import { requireTemplate, TEMPLATES } from '@/features/invitations/templates/registry';
+import { requireTemplate } from '@/features/invitations/templates/registry';
 import { BackgroundVideo } from '@/features/site/BackgroundVideo.client';
 import { heroStill } from '@/features/site/hero-still';
 import { FeatureSpotlight } from '@/features/site/home/FeatureSpotlight.client';
+import { DesignCard } from '@/features/site/home/DesignCard';
+import { DesignsMore } from '@/features/site/home/DesignsMore.client';
+import { INITIAL_DESIGNS, listedDesigns } from '@/features/site/home/designs';
 import { HowItWorks } from '@/features/site/home/HowItWorks';
 import { Journey } from '@/features/site/home/Journey';
 import type { FeatureKey, MomentKey } from '@/features/site/home/scenes';
 import { Petals } from '@/features/site/Petals';
 import { PlanCards } from '@/features/site/PlanCards';
-import { Reveal } from '@/features/site/Reveal.client';
+import { Reveal } from '@/features/site/Reveal';
+import { RevealWatcher } from '@/features/site/RevealWatcher.client';
 import { SampleShowcase } from '@/features/site/SampleShowcase.client';
 import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { SiteFooter } from '@/features/site/SiteFooter';
@@ -141,7 +145,12 @@ export default async function HomePage() {
     { key: 'help', icon: <CircleHelp />, ...s.more.items.help },
   ];
   // the public designs (an unlisted one — manifest `listed: false` — isn't offered here)
-  const designs = [...TEMPLATES.values()].map(({ manifest }) => manifest).filter((m) => m.listed);
+  const designs = listedDesigns();
+  // the first designs are in the page; the rest come as a pre-rendered fragment as the section nears
+  // the screen (DesignsMore) — without a build's fragment (no `npm run poster-art`), all of them are here
+  const moreUrl = designsMoreUrl(locale);
+  const inline = moreUrl ? designs.slice(0, INITIAL_DESIGNS) : designs;
+  const cardLabels = { sample: h.sample, liveDemo: t.gallery.preview.liveDemo, eventTypes: t.eventTypes };
   const number = (v: number) => new Intl.NumberFormat(locale === 'he' ? 'he-IL' : 'en-GB').format(v);
   // the video sample skips the envelope: its first screen is the point
   const sample = (slug: string) => `/i/${slug}?lang=${locale}`;
@@ -150,6 +159,7 @@ export default async function HomePage() {
     <div className="flex min-h-dvh flex-col">
       {/* the posters' contents and fonts, fetched as each nears the screen (LazyTemplatePoster) */}
       <PosterArtLoader fontsUrl={posterFontsUrl()} />
+      <RevealWatcher />
       <SiteHeader overHero />
 
       <main id="main" className="flex-1">
@@ -342,46 +352,25 @@ export default async function HomePage() {
               <ArrowRight aria-hidden className="icon-dir size-4" />
             </Link>
           </div>
-          <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
-            {designs.map((manifest, i) => (
-              <Reveal as="li" key={manifest.id} delay={(i % 4) * 90}>
-                {/* each design opens its live demo, as guests would get it */}
-                <a
-                  href={`/i/demo-${manifest.id}?lang=${locale}`}
-                  target="_blank"
-                  rel="noopener"
-                  aria-label={`${manifest.name[locale] ?? manifest.name.en} · ${t.gallery.preview.liveDemo}`}
-                  className="group relative block rounded-[var(--radius-poster)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
-                >
-                  <span className="site-lift block rounded-[var(--radius-poster)]">
-                    <LazyTemplatePoster
-                      template={manifest}
-                      locale={locale}
-                      className="shadow-[0_18px_36px_-18px_rgba(60,35,15,0.45)]"
-                    />
-                  </span>
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-0 bottom-3 mx-auto flex w-fit items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-[12.5px] font-semibold text-white opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 [&_svg]:size-3.5"
-                  >
-                    <Play fill="currentColor" />
-                    {h.sample}
-                  </span>
-                </a>
-                <p className="mt-3 text-[15px] font-semibold">{manifest.name[locale] ?? manifest.name.en}</p>
-                <p className="text-[13px] text-muted">
-                  {manifest.categories
-                    .filter((c) => c !== 'save_the_date')
-                    .map((c) => t.eventTypes[c])
-                    .join(' · ')}
-                </p>
-              </Reveal>
+          <ul
+            id="designs-grid"
+            className="mt-10 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6"
+          >
+            {inline.map((manifest, i) => (
+              <DesignCard
+                key={manifest.id}
+                manifest={manifest}
+                locale={locale}
+                index={i}
+                labels={cardLabels}
+              />
             ))}
           </ul>
+          {moreUrl && designs.length > INITIAL_DESIGNS ? <DesignsMore url={moreUrl} /> : null}
         </section>
 
         {/* ── everything an invitation needs: a phone that shows each feature live ──────────── */}
-        <section className="relative isolate overflow-hidden bg-blush/70">
+        <section className="site-deferred relative isolate overflow-hidden bg-blush/70 [--cv-size:760px]">
           <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-24">
             <SectionTitle title={h.features.title} className="text-center" />
             <Reveal className="mt-12" delay={100}>

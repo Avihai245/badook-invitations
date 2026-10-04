@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Icon } from '../../ui/Icon';
+import { CoreIcon } from '../../ui/core-icons';
 
 /**
  * A venue's map (§2.2 Venues, §7 performance): the static placeholder until it comes near the
@@ -54,7 +54,7 @@ export function MapEmbed({
       data-loaded={loaded ? '' : undefined}
     >
       <span className="pin" aria-hidden="true">
-        <Icon name="map-pin" size={40} strokeWidth={1.6} />
+        <CoreIcon name="map-pin" size={40} strokeWidth={1.6} />
       </span>
       <span className="chip" aria-hidden="true">
         Google Maps

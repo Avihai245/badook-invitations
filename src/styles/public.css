@@ -1,0 +1,10 @@
+/* The public pages' styles (the home page, sign in / up, the policies, contact, the accessibility page, the
+   not-found page): the same tokens and base as app.css, but only the utilities these pages can use — the
+   files scripts/build-public-css.mjs found by following their imports (public-sources.generated.css).
+   Tailwind's scan of the whole repository put every screen of the app into the render-blocking CSS of
+   the first paint. `npm run check:public-css` proves no class they render is missing. */
+@import 'tailwindcss' source(none);
+@import './public-sources.generated.css';
+@import './app-fonts.generated.css';
+@import './site.css';
+@import './theme.css';

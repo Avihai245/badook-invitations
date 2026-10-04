@@ -3,7 +3,9 @@
 import { Cookie } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { Button, cn, Switch } from '@/components/app';
+import { Button } from '@/components/app/Button';
+import { Switch } from '@/components/app/Switch';
+import { cn } from '@/components/app/utils';
 import { useUi } from '@/lib/i18n/client';
 
 /**

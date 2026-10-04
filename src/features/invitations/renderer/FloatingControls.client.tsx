@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
 import { LISTEN_EVENT, ListenButton, MUSIC_EVENT, type ListenProps } from '@/features/voice/ui/Listen.client';
 import { dirOf, type Locale } from '../contracts/types';
-import { Icon } from '../ui/Icon';
+import { CoreIcon } from '../ui/core-icons';
 import { withStartAt } from './assets';
 import { MotionPause, type MotionLabels } from './MotionPause.client';
 
@@ -99,7 +99,7 @@ function LanguagePill({ current, options, onSwitch, onIntent }: LanguageControl)
         onSwitch(target.locale);
       }}
     >
-      <Icon name="languages" size={16} />
+      <CoreIcon name="languages" size={16} />
       <span lang={target.locale} dir={dirOf(target.locale)}>
         {target.label}
       </span>
@@ -146,11 +146,11 @@ function LanguageMenu({ current, options, menuLabel, onSwitch, onIntent }: Langu
       }}
     >
       <summary className="fab fab-lang" aria-label={`${menuLabel}: ${shown.label}`}>
-        <Icon name="languages" size={16} />
+        <CoreIcon name="languages" size={16} />
         <span lang={shown.locale} dir={dirOf(shown.locale)}>
           {shown.label}
         </span>
-        <Icon name="chevron-down" size={14} className="lang-chev" />
+        <CoreIcon name="chevron-down" size={14} className="lang-chev" />
       </summary>
       <ul className="lang-list" aria-label={menuLabel}>
         {options.map((o) => (
@@ -172,7 +172,7 @@ function LanguageMenu({ current, options, menuLabel, onSwitch, onIntent }: Langu
               }}
             >
               <span>{o.label}</span>
-              {o.locale === current ? <Icon name="check" size={16} /> : null}
+              {o.locale === current ? <CoreIcon name="check" size={16} /> : null}
             </a>
           </li>
         ))}
@@ -401,7 +401,7 @@ function MusicButton({ src, volume, startAtSec, playLabel, pauseLabel }: MusicPr
           aria-label={playing ? pauseLabel : playLabel}
           onClick={() => (playing ? pause() : play(false))}
         >
-          <Icon name={playing ? 'volume-2' : 'volume-x'} size={20} />
+          <CoreIcon name={playing ? 'volume-2' : 'volume-x'} size={20} />
         </button>
       )}
     </>

@@ -85,6 +85,9 @@ const buildCommit = (() => {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // `ANALYZE_SOURCEMAPS=1 npm run build`: the browser bundles with source maps, to see which modules weigh
+  // what in each chunk (scripts/analyze-bundles.mjs). Off in the real build.
+  productionBrowserSourceMaps: process.env.ANALYZE_SOURCEMAPS === '1',
   images: imageSources
     ? {
         formats: ['image/avif', 'image/webp'],

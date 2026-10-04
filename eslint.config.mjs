@@ -34,6 +34,13 @@ const config = [
     },
   },
   {
+    // The home page's video posters: a plain <img> over the optimizer's own addresses
+    // (features/invitations/renderer/images.ts) — next/image as a component would add its runtime
+    // (6 KB of JavaScript, hydrated per picture) to the first load.
+    files: ['src/features/site/DemoVideo.client.tsx', 'src/features/site/BackgroundVideo.client.tsx'],
+    rules: { '@next/next/no-img-element': 'off' },
+  },
+  {
     // The guest invitation renderer: media is served straight from Supabase Storage (long cache
     // headers, §1.1 rule 6) with explicit loading/decoding/fetchpriority — no Next image optimizer on
     // the guest path; and its App Router root layout writes <head> itself (fonts, preloads).

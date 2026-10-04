@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { BrandLogo } from '@/components/app';
+import { BrandLogo } from '@/components/app/BrandLogo';
 import { fmt, type AppDict } from '@/lib/i18n/app';
 import { CookieConsent, CookieSettingsButton } from './CookieConsent.client';
 
@@ -16,7 +16,7 @@ export function SiteFooter({ t, onHome = false }: { t: AppDict; onHome?: boolean
       <CookieConsent />
       <div className="mx-auto grid max-w-[1200px] gap-10 px-5 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
-          <BrandLogo label={t.brand} className="text-[18px]" />
+          <BrandLogo label={t.brand} className="text-[18px]" lazy />
           <p className="mt-3 max-w-[32ch] text-[14px] text-muted">{f.tagline}</p>
         </div>
         <nav aria-label={f.product}>

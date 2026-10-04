@@ -3,7 +3,7 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { Segmented } from '@/components/app';
+import { Segmented } from '@/components/app/Segmented';
 import { useUi } from '@/lib/i18n/client';
 import {
   applyTheme,

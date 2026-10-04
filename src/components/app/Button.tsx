@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react';
-import { Slot } from 'radix-ui';
+import * as Slot from '@radix-ui/react-slot';
 import type { ComponentProps, ReactNode } from 'react';
 import { cn, iconSlot } from './utils';
 

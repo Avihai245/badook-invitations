@@ -1189,6 +1189,9 @@
 }
 
 /* the feature list next to the phone */
+/* A feature that isn't the chosen one is dimmed — its icon and its title, not the whole button: faded
+   text over the section's pale ground is under the 4.5:1 contrast text needs (the description's
+   2.5:1, the title's 4.4:1 at the old 0.62), so the description keeps its full color. */
 .hx-feat {
   position: relative;
   display: flex;
@@ -1199,17 +1202,27 @@
   text-align: start;
   transition:
     background-color 0.35s,
-    box-shadow 0.35s,
-    opacity 0.35s;
+    box-shadow 0.35s;
+}
+.hx-feat-icon,
+.hx-feat-title {
+  transition: opacity 0.35s;
+}
+.hx-feat-icon {
   opacity: 0.62;
 }
-.hx-feat:hover {
+.hx-feat-title {
+  opacity: 0.7;
+}
+.hx-feat:hover :is(.hx-feat-icon, .hx-feat-title) {
   opacity: 0.9;
 }
 .hx-feat[aria-selected='true'] {
-  opacity: 1;
   background: rgba(255, 255, 255, 0.75);
   box-shadow: 0 18px 40px -24px rgba(60, 35, 15, 0.45);
+}
+.hx-feat[aria-selected='true'] :is(.hx-feat-icon, .hx-feat-title) {
+  opacity: 1;
 }
 .hx-feat-icon {
   flex: none;
