@@ -3,19 +3,19 @@ import type { ReactNode } from 'react';
 import { cn } from './utils';
 
 /**
- * The logo's files (public/brand, from badook-logo[-light].png): AVIF and WebP at 240 and 360 px wide
+ * The logo's files (public/brand, from badook-logo[-light].png by scripts/build-brand.mjs): AVIF and WebP at 240 and 360 px wide
  * (2x and 3x of the ~115 px it is shown at), content-hashed — cached for good (next.config.ts).
  */
 const FILES = {
   dark: {
-    avif: '/brand/badook-logo-240.5c37863668.avif 240w, /brand/badook-logo-360.d54b67750a.avif 360w',
-    webp: '/brand/badook-logo-240.f138f56276.webp 240w, /brand/badook-logo-360.46f13ad321.webp 360w',
-    src: '/brand/badook-logo-240.f138f56276.webp',
+    avif: '/brand/badook-logo-240.5c9562d1f2.avif 240w, /brand/badook-logo-360.da7142e247.avif 360w',
+    webp: '/brand/badook-logo-240.5103cb1b94.webp 240w, /brand/badook-logo-360.450706d652.webp 360w',
+    src: '/brand/badook-logo-240.5103cb1b94.webp',
   },
   light: {
-    avif: '/brand/badook-logo-light-240.f65a36dc71.avif 240w, /brand/badook-logo-light-360.4f922f5751.avif 360w',
-    webp: '/brand/badook-logo-light-240.6759b05e6a.webp 240w, /brand/badook-logo-light-360.ec6c7761fb.webp 360w',
-    src: '/brand/badook-logo-light-240.6759b05e6a.webp',
+    avif: '/brand/badook-logo-light-240.1a2c1a44b4.avif 240w, /brand/badook-logo-light-360.a20cbdb75c.avif 360w',
+    webp: '/brand/badook-logo-light-240.6ba0115df2.webp 240w, /brand/badook-logo-light-360.284fbd0370.webp 360w',
+    src: '/brand/badook-logo-light-240.6ba0115df2.webp',
   },
 } as const;
 const LOGO = { width: 480, height: 161, sizes: '120px' };

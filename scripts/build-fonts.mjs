@@ -122,6 +122,13 @@ const APP_SCRIPT_FAMILIES = {
   'Noto Sans Ethiopic': SCRIPT_SUBSETS.ethiopic,
 };
 
+/** The full fonts the combined Hebrew + ASCII files are cut from (see writeCombined). */
+const FONT_SOURCES = join(root, 'scripts', 'font-sources');
+const COMBINED = {
+  Heebo: join(FONT_SOURCES, 'Heebo[wght].ttf'),
+  'Frank Ruhl Libre': join(FONT_SOURCES, 'FrankRuhlLibre[wght].ttf'),
+};
+
 const familyId = (family) => family.toLowerCase().replace(/\s+/g, '-');
 
 /** Bumped when the basic set changes (the file names carry it: nothing stale is reused). */
@@ -261,6 +268,31 @@ async function writeNarrowed(source, target, unicodeRange, axes) {
     target,
     await subsetFont(input, text, { targetFormat: 'woff2', variationAxes: { wght: axes } }),
   );
+}
+
+/**
+ * The home page's text needs Hebrew and the ASCII letters and digits in the same font, which the font
+ * sources ship as two files per family (a script each): the full font (scripts/font-sources, the OFL files of
+ * Google Fonts), cut to both at once, is one file and one request. `pin`: a number picks one weight of a
+ * variable font, {min,max} narrows its axis. Returns { unicodeRange } of what the file holds.
+ */
+async function writeCombined(source, target, hebrewRange, pin) {
+  const rangeFile = `${target}.range`;
+  if (existsSync(target) && existsSync(rangeFile)) return { unicodeRange: readFileSync(rangeFile, 'utf8') };
+  const input = readFileSync(source);
+  const options = { variationAxes: { wght: pin } };
+  const wanted = [...new Set([...pointsOfRange(hebrewRange), ...expand(BASIC_RANGES)])].sort((a, b) => a - b);
+  const present = cmapPoints(
+    await subsetFont(input, String.fromCodePoint(...wanted), { targetFormat: 'sfnt', ...options }),
+  );
+  const kept = wanted.filter((c) => present.has(c));
+  writeFileSync(
+    target,
+    await subsetFont(input, String.fromCodePoint(...kept), { targetFormat: 'woff2', ...options }),
+  );
+  const unicodeRange = unicodeRangeOf(kept);
+  writeFileSync(rangeFile, unicodeRange);
+  return { unicodeRange };
 }
 
 function collectInvitationNeeds() {
@@ -452,6 +484,24 @@ async function buildVariableFamily(family, wanted = PAIR_SUBSETS) {
     }
   }
   faces.sort((a, b) => a.subset.localeCompare(b.subset));
+  const hebrew = faces.find((f) => f.subset === 'hebrew');
+  if (COMBINED[family] && hebrew?.unicodeRange) {
+    // Hebrew and the ASCII part in one file, declared last: the page's text is one request, not two
+    const name = `${id}-hebrew-basic${BASIC_REV}-w${WEIGHT_AXIS.min}-${WEIGHT_AXIS.max}-normal.woff2`;
+    const cut = await writeCombined(COMBINED[family], join(outDir, name), hebrew.unicodeRange, WEIGHT_AXIS);
+    faces.splice(
+      0,
+      faces.length,
+      ...faces.filter((f) => f.subset !== 'hebrew' && f.subset !== 'latin-basic'),
+      {
+        weight,
+        style: 'normal',
+        subset: 'hebrew-basic',
+        unicodeRange: cut.unicodeRange,
+        url: `/fonts/${id}-variable/${version}/${name}`,
+      },
+    );
+  }
   return { id: `${id}-variable`, subsets: faces.map((f) => f.subset), sizeAdjust: null, faces };
 }
 
@@ -488,6 +538,41 @@ for (const [family, variants] of Object.entries(APP_FAMILIES)) {
     family,
     variants.map(([w, s]) => `${w}:${s}`),
   );
+  // the display font's Hebrew and ASCII parts as one file per weight (the headline is both)
+  if (COMBINED[family]) {
+    const entry = app[family];
+    for (const weight of [...new Set(entry.faces.map((f) => f.weight))]) {
+      const hebrew = entry.faces.find((f) => f.weight === weight && f.subset === 'hebrew');
+      if (!hebrew?.unicodeRange) continue;
+      const [, , , version] = hebrew.url.split('/');
+      const name = `${entry.id}-hebrew-basic${BASIC_REV}-${weight}-normal.woff2`;
+      const cut = await writeCombined(
+        COMBINED[family],
+        join(publicDir, entry.id, version, name),
+        hebrew.unicodeRange,
+        weight,
+      );
+      entry.faces = [
+        ...entry.faces.filter(
+          (f) => f.weight !== weight || (f.subset !== 'hebrew' && f.subset !== 'latin-basic'),
+        ),
+        {
+          weight,
+          style: 'normal',
+          subset: 'hebrew-basic',
+          unicodeRange: cut.unicodeRange,
+          url: `/fonts/${entry.id}/${version}/${name}`,
+        },
+      ];
+    }
+    // per weight: the combined face after the rest of its weight
+    entry.faces.sort(
+      (a, b) =>
+        a.weight - b.weight ||
+        (a.subset === 'hebrew-basic') - (b.subset === 'hebrew-basic') ||
+        a.subset.localeCompare(b.subset),
+    );
+  }
 }
 for (const [family, subsets] of Object.entries(APP_SCRIPT_FAMILIES)) {
   app[family] = await buildFamily(family, ['400:normal', '500:normal', '600:normal', '700:normal'], subsets);
@@ -506,6 +591,18 @@ const css =
 const appJson = `${JSON.stringify(
   {
     generatedBy: 'scripts/build-fonts.mjs',
+    static: Object.fromEntries(
+      Object.keys(COMBINED)
+        .filter((family) => app[family])
+        .map((family) => [
+          family,
+          Object.fromEntries(
+            app[family].faces
+              .filter((f) => f.subset === 'hebrew-basic')
+              .map((f) => [String(f.weight), f.url]),
+          ),
+        ]),
+    ),
     variable: Object.fromEntries(
       APP_VARIABLE_FAMILIES.map((family) => [
         `${family} Variable`,

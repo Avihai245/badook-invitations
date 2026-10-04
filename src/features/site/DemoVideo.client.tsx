@@ -33,7 +33,8 @@ export const TOUR_VIDEO = {
 } as const;
 
 /** The first screen's poster: shown at 600px from 1024px up, else the width of the screen. */
-const POSTER_SIZES = '(min-width: 1024px) 600px, 100vw';
+// (on a phone it fills the page between the 20 px margins)
+const POSTER_SIZES = '(min-width: 1024px) 600px, calc(100vw - 40px)';
 
 /** True from the first time `open` is: the dialog stays mounted after (its closing animation plays). */
 function useOpened(open: boolean): boolean {
@@ -171,7 +172,7 @@ export function DemoVideo({ className, label }: { className?: string; label?: st
   const load = seen && engaged && !still;
   // the poster is the page's LCP: preloaded in the page's head with its priority (an image preloaded
   // without it waits behind the stylesheet), the same one the <img> below asks for
-  const poster = imageSet(DEMO_VIDEO.poster, POSTER_SIZES, 70);
+  const poster = imageSet(DEMO_VIDEO.poster, POSTER_SIZES, 60);
   if (poster.srcSet)
     preload(poster.src, {
       as: 'image',

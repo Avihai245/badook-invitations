@@ -2,8 +2,8 @@
  * The files the public site's pages can reach (scripts/build-public-css.mjs writes them as Tailwind
  * `@source` lines for src/styles/public.css; tests/unit/public-css-sources.test.ts keeps the host app
  * out of them). Walks the imports — static, re-exports, side-effect and dynamic `import('…')` — from
- * every route file of the public site: `src/app/(site)` except its `app/` and `dev/` subtrees, and the
- * not-found page. Packages are not followed; `@/…` is `src/…`.
+ * every route file of the public site: `src/app/(site)` except its `app/` and `dev/` subtrees, the home
+ * page's two route groups and the not-found page. Packages are not followed; `@/…` is `src/…`.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -30,6 +30,8 @@ export function publicSourceFiles(root) {
     }
   };
   collect(site);
+  // the home page: one static route group per language
+  for (const group of ['(home-he)', '(home-en)']) collect(join(src, 'app', group));
   // the page for an address that matches nothing (app/global-not-found.tsx)
   const notFound = join(src, 'app', 'global-not-found.tsx');
   if (existsSync(notFound)) entries.push(notFound);

@@ -16,7 +16,8 @@ const reaches = (prefix: string) => files.filter((f) => f.startsWith(prefix));
 describe('the files the public pages reach (public CSS sources)', () => {
   it('has the public site and what it shares', () => {
     for (const path of [
-      'src/app/(site)/page.tsx',
+      'src/app/(home-he)/page.tsx',
+      'src/features/site/home/HomePage.tsx',
       'src/app/(site)/layout.tsx',
       'src/app/(site)/(auth)/layout.tsx',
       'src/app/(site)/contact/page.tsx',

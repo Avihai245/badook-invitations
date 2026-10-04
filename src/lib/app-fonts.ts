@@ -8,3 +8,11 @@ import fonts from '@/styles/app-fonts.generated.json';
 export function appFaceUrl(family: 'Heebo Variable' | 'Inter Variable', subset: string): string | null {
   return (fonts.variable as Record<string, Record<string, string>>)[family]?.[subset] ?? null;
 }
+
+/**
+ * A display face with Hebrew and the ASCII letters and digits in one file ("Frank Ruhl Libre" at a weight the
+ * app uses): its woff2 under /fonts, for the layout's preload. null when the build has none.
+ */
+export function appStaticFaceUrl(family: 'Frank Ruhl Libre', weight: number): string | null {
+  return (fonts.static as Record<string, Record<string, string>>)[family]?.[String(weight)] ?? null;
+}

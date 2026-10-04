@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import type { CSSProperties, ReactNode } from 'react';
+import { Suspense, type CSSProperties, type ReactNode } from 'react';
 import { Button } from '@/components/app/Button';
 import { planPrices } from '@/features/billing/server/account';
 import { designsMoreUrl, posterFontsUrl } from '@/features/invitations/app/poster-art';
@@ -46,8 +46,9 @@ import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { SiteFooter } from '@/features/site/SiteFooter';
 import { SiteHeader } from '@/features/site/SiteHeader.client';
 import { invitationsEnabled } from '@/lib/feature';
-import { fmt } from '@/lib/i18n/app';
-import { getUi } from '@/lib/i18n/server';
+import { serverEnv } from '@/lib/env';
+import { fmt, type UiLocale } from '@/lib/i18n/app';
+import { dictFor } from '@/lib/i18n/dict';
 import '@/styles/site-home.css';
 
 /** The designs fanned out in "how it works" (the last one is in front). */
@@ -68,8 +69,9 @@ const EVENTS: EventType[] = [
 /** The first screen's background: this video, from 3:27. */
 const HERO_VIDEO = parseVideoLink('https://youtu.be/5GvcO2lufGU?t=207')!;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getUi();
+export function homeMetadata(locale: UiLocale): Metadata {
+  const t = dictFor(locale);
+  const base = serverEnv().INVITES_PUBLIC_BASE_URL?.replace(/\/+$/, '');
   const title = `${t.brand} — ${t.home.title} ${t.home.titleAccent}`;
   return {
     title: { absolute: title },
@@ -77,6 +79,13 @@ export async function generateMetadata(): Promise<Metadata> {
     // the public site is meant to be found (the app and the invitations stay hidden)
     robots: { index: true, follow: true },
     openGraph: { title, description: t.home.subtitle, type: 'website' },
+    // the two languages are two addresses: each names itself and the other
+    alternates: base
+      ? {
+          canonical: locale === 'en' ? `${base}/en` : `${base}/`,
+          languages: { he: `${base}/`, en: `${base}/en` },
+        }
+      : undefined,
   };
 }
 
@@ -114,10 +123,11 @@ function SectionTitle({
 /**
  * The home page: a first screen over a looping video, a live sample invitation in a phone (with and
  * without a background video), how it works, the designs, what else it does, pricing and questions.
- * Signed-in hosts never see it — the middleware sends them to their invitations.
+ * Signed-in hosts never see it — a script in <head> (HOME_BOOT) sends them to their invitations. It is
+ * static: one page per language ((home-he) at /, (home-en) at /en), so the CDN holds it.
  */
-export default async function HomePage() {
-  const { locale, t } = await getUi();
+export async function HomePage({ locale }: { locale: UiLocale }) {
+  const t = dictFor(locale);
   const h = t.home;
   const s = t.site;
   if (!invitationsEnabled()) {
@@ -308,166 +318,182 @@ export default async function HomePage() {
         </section>
 
         {/* ── how it works: three live scenes along a path ──────────────────────────────────── */}
-        <section
-          id="how"
-          className="site-deferred relative isolate scroll-mt-16 overflow-hidden border-y border-line bg-surface"
-        >
-          <div
-            aria-hidden
-            className="absolute inset-0 -z-10"
-            style={{
-              background:
-                'radial-gradient(40% 55% at 12% 20%, #FBF3EA 0%, transparent 70%), radial-gradient(38% 50% at 90% 85%, #F8EBE4 0%, transparent 70%)',
-            }}
-          />
-          <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-24">
-            <SectionTitle title={h.how.title} className="text-center" />
-            <HowItWorks
-              steps={h.how.steps}
-              s={s.scenes}
-              posters={FAN.map((id) => (
-                <LazyTemplatePoster
-                  key={id}
-                  template={requireTemplate(id).manifest}
-                  locale={locale}
-                  frameless
-                />
-              ))}
-            />
-          </div>
-        </section>
-
-        {/* ── the designs ───────────────────────────────────────────────────────────────────── */}
-        <section
-          id="designs"
-          className="site-deferred mx-auto max-w-[1200px] scroll-mt-16 px-5 py-20 [--cv-size:9000px] sm:px-6 sm:[--cv-size:5000px] lg:py-24 lg:[--cv-size:3400px]"
-        >
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionTitle title={h.designs.title} subtitle={h.designs.subtitle} />
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-1.5 rounded-btn text-[15px] font-semibold text-brand-deep hover:underline"
-            >
-              {h.designs.cta}
-              <ArrowRight aria-hidden className="icon-dir size-4" />
-            </Link>
-          </div>
-          <ul
-            id="designs-grid"
-            className="mt-10 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6"
+        <Suspense fallback={null}>
+          <section
+            id="how"
+            className="site-deferred relative isolate scroll-mt-16 overflow-hidden border-y border-line bg-surface"
           >
-            {inline.map((manifest, i) => (
-              <DesignCard
-                key={manifest.id}
-                manifest={manifest}
-                locale={locale}
-                index={i}
-                labels={cardLabels}
-              />
-            ))}
-          </ul>
-          {moreUrl && designs.length > INITIAL_DESIGNS ? <DesignsMore url={moreUrl} /> : null}
-        </section>
-
-        {/* ── everything an invitation needs: a phone that shows each feature live ──────────── */}
-        <section className="site-deferred relative isolate overflow-hidden bg-blush/70 [--cv-size:760px]">
-          <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-24">
-            <SectionTitle title={h.features.title} className="text-center" />
-            <Reveal className="mt-12" delay={100}>
-              <FeatureSpotlight items={features} s={s.scenes} label={h.features.title} />
-            </Reveal>
-          </div>
-        </section>
-
-        {/* ── from the invitation to the big day: a lit path through six moments (dark band) ── */}
-        <section className="site-deferred relative isolate overflow-hidden bg-[#1c1510] text-white [--cv-size:1800px]">
-          <div
-            aria-hidden
-            className="absolute inset-0 -z-10"
-            style={{
-              background:
-                'radial-gradient(50% 40% at 15% 0%, rgba(160,112,63,.45), transparent 70%), radial-gradient(45% 35% at 100% 100%, rgba(181,82,59,.35), transparent 70%)',
-            }}
-          />
-          <div className="mx-auto max-w-[1100px] px-5 py-20 sm:px-6 lg:py-24">
-            <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="font-display text-[32px] leading-tight font-bold text-balance sm:text-[42px]">
-                {s.more.title}
-              </h2>
-              <p className="mt-3 text-[17px] text-pretty text-white/75">{s.more.subtitle}</p>
-            </Reveal>
-            <Journey items={more} s={s.scenes} />
-          </div>
-        </section>
-
-        {/* ── pricing ───────────────────────────────────────────────────────────────────────── */}
-        <section
-          id="pricing"
-          className="site-deferred mx-auto max-w-[1200px] scroll-mt-16 px-5 py-20 [--cv-size:2400px] sm:px-6 lg:py-24 lg:[--cv-size:1100px]"
-        >
-          <SectionTitle
-            title={s.plans.title}
-            subtitle={s.plans.subtitle}
-            className="mx-auto max-w-2xl text-center"
-          />
-          <Reveal className="mt-12" delay={100}>
-            <PlanCards t={t} locale={locale} prices={planPrices()} />
-          </Reveal>
-          <p className="mx-auto mt-6 max-w-2xl text-center text-[13px] text-muted">
-            {s.plans.extra} {s.plans.vat}
-          </p>
-        </section>
-
-        {/* ── questions ─────────────────────────────────────────────────────────────────────── */}
-        <section id="faq" className="site-deferred scroll-mt-16 border-t border-line bg-surface">
-          <div className="mx-auto max-w-[860px] px-5 py-20 sm:px-6 lg:py-24">
-            <SectionTitle title={s.faq.title} className="text-center" />
-            <div className="mt-10 flex flex-col gap-3">
-              {s.faq.items.map((item, i) => (
-                <Reveal key={item.q} delay={Math.min(i, 4) * 70}>
-                  <details className="site-faq group rounded-[16px] border border-line bg-canvas px-5 open:bg-surface open:shadow-sm">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[16px] font-semibold">
-                      {item.q}
-                      <Plus
-                        aria-hidden
-                        className="site-faq-icon size-5 shrink-0 text-brand transition-transform duration-300"
-                      />
-                    </summary>
-                    <p className="pb-5 text-[15px] text-pretty text-muted">{item.a}</p>
-                  </details>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── last call ─────────────────────────────────────────────────────────────────────── */}
-        <section className="site-deferred px-5 py-20 [--cv-size:520px] sm:px-6">
-          <Reveal className="relative isolate mx-auto max-w-[1100px] overflow-hidden rounded-[28px] bg-inverse px-6 py-16 text-center text-white sm:py-20">
             <div
               aria-hidden
-              className="site-glow absolute inset-0 -z-10"
+              className="absolute inset-0 -z-10"
               style={{
                 background:
-                  'radial-gradient(50% 90% at 50% 0%, rgba(160,112,63,0.6), transparent 70%),' +
-                  'radial-gradient(40% 60% at 100% 100%, rgba(181,82,59,0.4), transparent 70%)',
+                  'radial-gradient(40% 55% at 12% 20%, #FBF3EA 0%, transparent 70%), radial-gradient(38% 50% at 90% 85%, #F8EBE4 0%, transparent 70%)',
               }}
             />
-            <h2 className="font-display text-[32px] leading-tight font-bold text-balance sm:text-[46px]">
-              {h.final.title}
-            </h2>
-            <p className="mt-3 text-[17px] text-white/75">{h.final.body}</p>
-            <Button asChild size="lg" variant="secondary" className="mt-8">
-              <Link href="/signup">
-                {h.start}
-                <ArrowRight className="icon-dir" aria-hidden />
+            <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-24">
+              <SectionTitle title={h.how.title} className="text-center" />
+              <HowItWorks
+                steps={h.how.steps}
+                s={s.scenes}
+                posters={FAN.map((id) => (
+                  <LazyTemplatePoster
+                    key={id}
+                    template={requireTemplate(id).manifest}
+                    locale={locale}
+                    frameless
+                  />
+                ))}
+              />
+            </div>
+          </section>
+        </Suspense>
+
+        {/* ── the designs ───────────────────────────────────────────────────────────────────── */}
+        <Suspense fallback={null}>
+          <section
+            id="designs"
+            className="site-deferred mx-auto max-w-[1200px] scroll-mt-16 px-5 py-20 [--cv-size:9000px] sm:px-6 sm:[--cv-size:5000px] lg:py-24 lg:[--cv-size:3400px]"
+          >
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <SectionTitle title={h.designs.title} subtitle={h.designs.subtitle} />
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-1.5 rounded-btn text-[15px] font-semibold text-brand-deep hover:underline"
+              >
+                {h.designs.cta}
+                <ArrowRight aria-hidden className="icon-dir size-4" />
               </Link>
-            </Button>
-          </Reveal>
-        </section>
+            </div>
+            <ul
+              id="designs-grid"
+              className="mt-10 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6"
+            >
+              {inline.map((manifest, i) => (
+                <DesignCard
+                  key={manifest.id}
+                  manifest={manifest}
+                  locale={locale}
+                  index={i}
+                  labels={cardLabels}
+                />
+              ))}
+            </ul>
+            {moreUrl && designs.length > INITIAL_DESIGNS ? <DesignsMore url={moreUrl} /> : null}
+          </section>
+        </Suspense>
+
+        {/* ── everything an invitation needs: a phone that shows each feature live ──────────── */}
+        <Suspense fallback={null}>
+          <section className="site-deferred relative isolate overflow-hidden bg-blush/70 [--cv-size:760px]">
+            <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-6 lg:py-24">
+              <SectionTitle title={h.features.title} className="text-center" />
+              <Reveal className="mt-12" delay={100}>
+                <FeatureSpotlight items={features} s={s.scenes} label={h.features.title} />
+              </Reveal>
+            </div>
+          </section>
+        </Suspense>
+
+        {/* ── from the invitation to the big day: a lit path through six moments (dark band) ── */}
+        <Suspense fallback={null}>
+          <section className="site-deferred relative isolate overflow-hidden bg-[#1c1510] text-white [--cv-size:1800px]">
+            <div
+              aria-hidden
+              className="absolute inset-0 -z-10"
+              style={{
+                background:
+                  'radial-gradient(50% 40% at 15% 0%, rgba(160,112,63,.45), transparent 70%), radial-gradient(45% 35% at 100% 100%, rgba(181,82,59,.35), transparent 70%)',
+              }}
+            />
+            <div className="mx-auto max-w-[1100px] px-5 py-20 sm:px-6 lg:py-24">
+              <Reveal className="mx-auto max-w-2xl text-center">
+                <h2 className="font-display text-[32px] leading-tight font-bold text-balance sm:text-[42px]">
+                  {s.more.title}
+                </h2>
+                <p className="mt-3 text-[17px] text-pretty text-white/75">{s.more.subtitle}</p>
+              </Reveal>
+              <Journey items={more} s={s.scenes} />
+            </div>
+          </section>
+        </Suspense>
+
+        {/* ── pricing ───────────────────────────────────────────────────────────────────────── */}
+        <Suspense fallback={null}>
+          <section
+            id="pricing"
+            className="site-deferred mx-auto max-w-[1200px] scroll-mt-16 px-5 py-20 [--cv-size:2400px] sm:px-6 lg:py-24 lg:[--cv-size:1100px]"
+          >
+            <SectionTitle
+              title={s.plans.title}
+              subtitle={s.plans.subtitle}
+              className="mx-auto max-w-2xl text-center"
+            />
+            <Reveal className="mt-12" delay={100}>
+              <PlanCards t={t} locale={locale} prices={planPrices()} />
+            </Reveal>
+            <p className="mx-auto mt-6 max-w-2xl text-center text-[13px] text-muted">
+              {s.plans.extra} {s.plans.vat}
+            </p>
+          </section>
+        </Suspense>
+
+        {/* ── questions ─────────────────────────────────────────────────────────────────────── */}
+        <Suspense fallback={null}>
+          <section id="faq" className="site-deferred scroll-mt-16 border-t border-line bg-surface">
+            <div className="mx-auto max-w-[860px] px-5 py-20 sm:px-6 lg:py-24">
+              <SectionTitle title={s.faq.title} className="text-center" />
+              <div className="mt-10 flex flex-col gap-3">
+                {s.faq.items.map((item, i) => (
+                  <Reveal key={item.q} delay={Math.min(i, 4) * 70}>
+                    <details className="site-faq group rounded-[16px] border border-line bg-canvas px-5 open:bg-surface open:shadow-sm">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[16px] font-semibold">
+                        {item.q}
+                        <Plus
+                          aria-hidden
+                          className="site-faq-icon size-5 shrink-0 text-brand transition-transform duration-300"
+                        />
+                      </summary>
+                      <p className="pb-5 text-[15px] text-pretty text-muted">{item.a}</p>
+                    </details>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </section>
+        </Suspense>
+
+        {/* ── last call ─────────────────────────────────────────────────────────────────────── */}
+        <Suspense fallback={null}>
+          <section className="site-deferred px-5 py-20 [--cv-size:520px] sm:px-6">
+            <Reveal className="relative isolate mx-auto max-w-[1100px] overflow-hidden rounded-[28px] bg-inverse px-6 py-16 text-center text-white sm:py-20">
+              <div
+                aria-hidden
+                className="site-glow absolute inset-0 -z-10"
+                style={{
+                  background:
+                    'radial-gradient(50% 90% at 50% 0%, rgba(160,112,63,0.6), transparent 70%),' +
+                    'radial-gradient(40% 60% at 100% 100%, rgba(181,82,59,0.4), transparent 70%)',
+                }}
+              />
+              <h2 className="font-display text-[32px] leading-tight font-bold text-balance sm:text-[46px]">
+                {h.final.title}
+              </h2>
+              <p className="mt-3 text-[17px] text-white/75">{h.final.body}</p>
+              <Button asChild size="lg" variant="secondary" className="mt-8">
+                <Link href="/signup">
+                  {h.start}
+                  <ArrowRight className="icon-dir" aria-hidden />
+                </Link>
+              </Button>
+            </Reveal>
+          </section>
+        </Suspense>
       </main>
 
-      <SiteFooter t={t} onHome />
+      <Suspense fallback={null}>
+        <SiteFooter t={t} onHome />
+      </Suspense>
     </div>
   );
 }

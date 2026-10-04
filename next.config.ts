@@ -153,6 +153,20 @@ const nextConfig: NextConfig = {
         uiSiteHe: dictionary('he', 'site'),
         uiSiteEn: dictionary('en', 'site'),
       };
+      // Next splits the code that every pair of routes shares into a chunk of its own once it is 20 KB of
+      // source: a first load of 18 small files, a request apiece on a phone. Code shared below 200 KB stays
+      // in the chunks that use it (the framework's and the big libraries' chunks are unaffected).
+      // Next splits the code that every pair of routes shares into a chunk of its own once it is 20 KB of
+      // source: a first load of 18 small files, a request apiece on a phone. Code shared below 200 KB stays
+      // in the chunks that use it (the framework's and the big libraries' chunks are unaffected).
+      for (const group of ['default', 'defaultVendors'])
+        (split.cacheGroups as Record<string, unknown>)[group] = {
+          minChunks: 2,
+          priority: group === 'default' ? -20 : -10,
+          reuseExistingChunk: true,
+          ...(group === 'defaultVendors' ? { test: /[\\/]node_modules[\\/]/ } : {}),
+          minSize: 200_000,
+        };
     }
     return config;
   },
@@ -164,6 +178,8 @@ const nextConfig: NextConfig = {
     // an address that matches no page at all gets the site's own 404 (app/global-not-found.tsx), not
     // Next's plain English one — the app has several root layouts, so there is no single not-found
     globalNotFound: true,
+    // the page's CSS goes into its HTML (the pages are cached whole): no stylesheet to wait for before the first paint
+    inlineCss: true,
     ...(publicHost ? { serverActions: { allowedOrigins: [publicHost] } } : {}),
   },
   // Metadata (title, Open Graph) goes into <head> for every user agent instead of being streamed after
@@ -201,6 +217,11 @@ const nextConfig: NextConfig = {
         source,
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       })),
+      {
+        // for crawlers and assistants: a static file, cached at the CDN
+        source: '/llms.txt',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=3600, s-maxage=86400' }],
+      },
       {
         // the templates' own pictures (not versioned by name): a day, then refreshed in the background
         source: '/templates/:path*',

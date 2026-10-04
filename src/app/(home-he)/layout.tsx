@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { homeBoot } from '@/features/site/home/home-boot';
 import { SiteRoot } from '@/features/site/SiteRoot';
-import { getUiLocale } from '@/lib/i18n/server';
 
 export const metadata: Metadata = {
   title: { default: 'Badook — הזמנות דיגיטליות', template: '%s · Badook' },
@@ -10,7 +10,11 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
 
-/** Root layout for the host app and the public pages that follow the `ui_lang` cookie. */
-export default async function SiteLayout({ children }: { children: ReactNode }) {
-  return <SiteRoot locale={await getUiLocale()}>{children}</SiteRoot>;
+/** The home page in Hebrew — static, so the language is fixed here instead of read from a cookie. */
+export default function HomeHeLayout({ children }: { children: ReactNode }) {
+  return (
+    <SiteRoot locale="he" boot={homeBoot('he')}>
+      {children}
+    </SiteRoot>
+  );
 }

@@ -25,7 +25,10 @@ export function UiLanguageToggle({ className }: { className?: string }) {
           await setUiLocale(value);
           // a full load: the other language's dictionary is its own chunk (lib/i18n/provider-lazy),
           // and the page turns around (rtl ↔ ltr) — a soft refresh would blank it while that loads
-          window.location.reload();
+          // (the home page is one static page per language: the other language is its other address)
+          const path = window.location.pathname;
+          if (path === '/' || path === '/en') window.location.assign(value === 'en' ? '/en' : '/');
+          else window.location.reload();
         })
       }
     />
