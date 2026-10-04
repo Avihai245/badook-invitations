@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { Segmented } from '@/components/app';
 import type { UiLocale } from '@/lib/i18n/app';
@@ -10,7 +9,6 @@ import { setUiLocale } from './ui-locale';
 /** עב | EN — switches the host-app UI language (not an invitation's languages). */
 export function UiLanguageToggle({ className }: { className?: string }) {
   const { locale, t } = useUi();
-  const router = useRouter();
   const [pending, start] = useTransition();
   return (
     <Segmented<UiLocale>
@@ -25,7 +23,9 @@ export function UiLanguageToggle({ className }: { className?: string }) {
       onValueChange={(value) =>
         start(async () => {
           await setUiLocale(value);
-          router.refresh();
+          // a full load: the other language's dictionary is its own chunk (lib/i18n/provider-lazy),
+          // and the page turns around (rtl ↔ ltr) — a soft refresh would blank it while that loads
+          window.location.reload();
         })
       }
     />

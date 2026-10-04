@@ -1,3 +1,4 @@
+import { sectionHelpHe } from './section-help.he';
 import { editorHe } from './editor.he';
 import { accountHe } from './account.he';
 import { billingHe } from './billing.he';
@@ -14,6 +15,7 @@ import { galleryNotifyHe } from './gallery-notify.he';
 import { facesHe } from './faces.he';
 import { filmHe } from './film.he';
 import { ticketsHe } from './tickets.he';
+import { planningHe } from './planning.he';
 
 /**
  * Host-app UI strings (§8: zero hard-coded UI strings in components), Hebrew — the default UI language.
@@ -33,11 +35,13 @@ export const he = {
   liveGallery: liveGalleryHe,
   eventDay: eventDayHe,
   studio: studioHe,
+  sectionHelp: sectionHelpHe,
   insights: insightsHe,
   galleryNotify: galleryNotifyHe,
   faces: facesHe,
   film: filmHe,
   tickets: ticketsHe,
+  planning: planningHe,
   common: {
     close: 'סגירה',
     cancel: 'ביטול',
@@ -91,14 +95,14 @@ export const he = {
   shell: {
     nav: {
       label: 'ניווט ראשי',
-      invitations: 'ההזמנות שלי',
-      newInvitation: 'הזמנה חדשה',
+      invitations: 'האירועים שלי',
+      newInvitation: 'אירוע חדש',
       billing: 'חבילה וחיובים',
       account: 'החשבון שלי',
       assistant: 'שאלו את העוזר',
       contact: 'יצירת קשר',
       /** the sidebar's help entry: opens the assistant */
-      help: 'עזרה והעוזר',
+      help: 'מדריך ועזרה',
       /** the admin console (staff only) */
       admin: 'ניהול המערכת',
       /** Badook Events, where hosts find a venue (opens in a new tab) */
@@ -109,8 +113,8 @@ export const he = {
     /** the phones' bottom bar (short labels) */
     tabs: {
       label: 'ניווט',
-      invitations: 'ההזמנות',
-      newInvitation: 'חדשה',
+      invitations: 'אירועים',
+      newInvitation: 'חדש',
       billing: 'חבילה',
       help: 'עזרה',
     },
@@ -121,6 +125,7 @@ export const he = {
     uiLanguage: 'שפת הממשק',
     /** the system's look (light / dark / as the device is set) */
     theme: { label: 'מראה', light: 'בהיר', dark: 'כהה', system: 'לפי המכשיר' },
+    supportUnread: 'יש תשובה חדשה מהצוות',
     account: 'החשבון שלי',
     signOut: 'יציאה',
     skipToContent: 'דילוג לתוכן',
@@ -152,6 +157,315 @@ export const he = {
     editDesign: 'עריכת העיצוב',
     guestsCount: { one: 'מוזמן אחד', other: '{n} מוזמנים' },
     responsesCount: { one: 'תשובה אחת', other: '{n} תשובות' },
+    nav: {
+      label: 'ניווט באירוע',
+      allEvents: 'כל האירועים',
+      home: 'בית האירוע',
+      stages: { plan: 'מתכננים', invite: 'מזמינים', arrange: 'מסדרים', celebrate: 'חוגגים' },
+      stageHint: {
+        plan: 'משימות, תקציב וספקים',
+        invite: 'עיצוב, מוזמנים, שליחה ואישורים',
+        arrange: 'סידור שולחנות',
+        celebrate: 'יום האירוע, גלריה וסרט',
+      },
+      items: {
+        home: 'בית האירוע',
+        tasks: 'משימות',
+        budget: 'תקציב',
+        vendors: 'ספקים',
+        ideas: 'פתקים ורעיונות',
+        design: 'עיצוב ההזמנה',
+        guests: 'מוזמנים',
+        share: 'שליחה ושיתוף',
+        responses: 'אישורי הגעה',
+        seating: 'סידור שולחנות',
+        live: 'יום האירוע',
+        gallery: 'גלריה חיה ומסך באולם',
+        film: 'סרט הרגעים',
+        insights: 'תובנות',
+        settings: 'הגדרות האירוע',
+      },
+      status: {
+        done: 'הושלם',
+        open: { one: 'פתוח אחד', other: '{n} פתוחים' },
+        notStarted: 'עוד לא התחלתם',
+        draft: 'טיוטה',
+        toSend: { one: 'אחד לשליחה', other: '{n} לשליחה' },
+        startsIn: { one: 'מחר', other: 'בעוד {n} ימים' },
+        today: 'היום!',
+      },
+      upgrade: 'בחבילה מתקדמת',
+      fullScreen: 'נפתח במסך מלא',
+      menu: 'האפשרויות של "{stage}"',
+      more: 'עוד',
+    },
+  },
+  demoVideo: {
+    label: 'Badook בארבעים וחמש שניות',
+    watch: 'צפו עם קול',
+    /** the full narrated tour (video/: TourLandscape) */
+    tour: {
+      title: 'סיור מלא במערכת',
+      body: 'כל היכולות של Badook, צעד אחר צעד — מהאירוע החדש ועד הסרט שאחרי.',
+      length: 'כ־{n} דקות',
+      play: 'צפייה בסיור',
+      captions: 'עברית',
+    },
+  },
+  /** the one help panel (the chat's panel, three tabs) and the guide's pages */
+  helpCenter: {
+    title: 'עזרה',
+    tabs: { guide: 'מדריך', assistant: 'שאלו את העוזר', contact: 'פנייה לצוות' },
+    tabsLabel: 'סוגי העזרה',
+    search: 'חיפוש במדריך',
+    searchPlaceholder: 'למשל: ייבוא מאקסל, תקציב, שולחנות',
+    noResults: 'לא מצאנו מאמר כזה. נסו מילה אחרת — או שאלו את העוזר.',
+    askInstead: 'לשאול את העוזר',
+    results: { one: 'תוצאה אחת', other: '{n} תוצאות' },
+    forThisScreen: 'למסך הזה',
+    sections: {
+      start: 'התחלה מהירה',
+      plan: 'מתכננים',
+      invite: 'מזמינים',
+      arrange: 'מסדרים',
+      celebrate: 'חוגגים',
+      account: 'החשבון והאירוע',
+      faq: 'שאלות נפוצות',
+    },
+    what: 'מה זה',
+    why: 'למה זה טוב',
+    steps: 'איך עושים את זה',
+    tips: 'כדאי לדעת',
+    next: 'המשך לקרוא',
+    openFull: 'פתיחה בעמוד מלא',
+    back: 'לכל המדריך',
+    readGuide: 'במדריך',
+    pageTitle: 'המדריך',
+    pageSubtitle: 'כל מה שהמערכת יודעת לעשות — לפי השלבים של האירוע. קצר, בצעדים.',
+    contact: {
+      title: 'מדברים עם הצוות',
+      body: 'שאלה שהמדריך והעוזר לא פתרו? הצוות עונה בדרך כלל באותו יום, כאן ובמייל.',
+      newTicket: 'פנייה חדשה',
+      myTickets: 'הפניות שלי',
+      contactPage: 'יצירת קשר',
+      fromChat: 'שוחחתם עם העוזר? אפשר להעביר את השיחה לצוות מהלשונית שלו — "לדבר עם נציג".',
+    },
+  },
+  /** "New event": the three-screen start (features/invitations/app/onboarding) */
+  start: {
+    metaTitle: 'אירוע חדש',
+    skip: 'דילוג לגלריית העיצובים',
+    back: 'חזרה',
+    next: 'המשך',
+    progress: 'שלב {n} מתוך 3',
+    type: {
+      title: 'איזה אירוע חוגגים?',
+      body: 'נתאים את העיצובים, המשימות והתקציב לסוג האירוע.',
+    },
+    details: {
+      title: 'ספרו לנו קצת',
+      body: 'מתי, כמה בערך ומה התקציב — אפשר לשנות הכול אחר כך.',
+      date: 'תאריך האירוע',
+      dateRequired: 'בחרו תאריך',
+      guests: 'כמה אורחים בערך?',
+      guestsHint: 'לא חייבים מדויק. התקציב מחושב לפיו עד שתהיה רשימה.',
+      budget: 'תקציב משוער (₪)',
+      budgetHint: 'רשות. נחלק אותו לקטגוריות לבד, בשקלים שלמים.',
+      invalidNumber: 'כתבו מספר שלם',
+    },
+    where: {
+      title: 'מאיפה מתחילים?',
+      body: 'כל הדרכים מובילות לאותו מקום — אפשר לעבור ביניהן בכל רגע.',
+      plan: { title: 'מתכננים', body: 'משימות לפי לוח זמנים, תקציב וספקים. בוחרים עיצוב הזמנה אחר כך.' },
+      design: { title: 'מעצבים את ההזמנה', body: 'בוחרים מתוך העיצובים המונפשים, ממלאים פרטים ומפרסמים.' },
+      all: { title: 'הכול', body: 'עיצוב הזמנה ותכנון יחד — ההמלצה שלנו.', badge: 'מומלץ' },
+      cta: 'יוצאים לדרך',
+      creating: 'מכינים את האירוע…',
+      error: 'משהו השתבש. נסו שוב.',
+    },
+    video: { title: 'רוצים לראות איך זה עובד?', cta: 'צפו בסרטון של 45 שניות' },
+  },
+  /** the event home's first visit: five short stops */
+  tour: {
+    label: 'סיור קצר',
+    step: '{n} מתוך {total}',
+    next: 'הבא',
+    done: 'סיימתי',
+    skip: 'דילוג',
+    steps: {
+      next: { title: 'הצעד הבא', body: 'תמיד דבר אחד — הכי חשוב עכשיו. מסיימים אותו, ומגיע הבא.' },
+      nav: {
+        title: 'ארבעה שלבים',
+        body: 'מתכננים, מזמינים, מסדרים, חוגגים. כל מה שהאירוע צריך — מסודר לפי הסדר.',
+      },
+      budget: {
+        title: 'מד התקציב',
+        body: 'ירוק — בטוחים, צהוב — מתקרבים לגבול, אדום — חריגה. מתעדכן עם כל הוצאה.',
+      },
+      rsvp: { title: 'אישורי הגעה', body: 'מי מגיע, מי לא ומי עוד לא ענה — מספר אחד, בכל מקום במערכת.' },
+      help: { title: 'עזרה בכל רגע', body: 'מדריך כתוב, העוזר החכם ופנייה לצוות — כפתור אחד.' },
+    },
+  },
+  /** /app/invitations/[id] — the event's home: countdown, the one next step, three widgets, the road */
+  eventHome: {
+    metaTitle: 'בית האירוע · {name}',
+    hero: {
+      label: 'ספירה לאחור לאירוע',
+      days: { one: 'יום', other: 'ימים' },
+      hours: { one: 'שעה', other: 'שעות' },
+      minutes: 'דקות',
+      left: 'עד {event}',
+      today: 'היום זה קורה! 🎉',
+      past: { one: 'האירוע היה אתמול', other: 'האירוע היה לפני {n} ימים' },
+      copy: 'העתקת הקישור',
+      copied: 'הקישור הועתק',
+      notLive: 'ההזמנה עוד לא פורסמה',
+      share: 'שליחה ושיתוף',
+    },
+    next: 'הצעד הבא',
+    also: 'גם כדאי',
+    actions: {
+      budget: {
+        title: 'קובעים תקציב',
+        body: 'כמה רוצים להשקיע ואיך זה מתחלק — ככה כל הצעת מחיר נמדדת מול משהו.',
+        cta: 'לקביעת התקציב',
+      },
+      planSetup: {
+        title: 'מתחילים לתכנן',
+        body: 'משימות לפי לוח זמנים, תקציב וספקים — מוכן בדקה, לפי סוג האירוע.',
+        cta: 'לפתיחת התכנון',
+      },
+      publish: {
+        title: 'מפרסמים את ההזמנה',
+        body: 'הקישור נפתח לאורחים, ואפשר להתחיל לשלוח ולשתף.',
+        cta: 'לפרסום',
+      },
+      publishChanges: {
+        title: 'יש שינויים שלא פורסמו',
+        body: 'האורחים עדיין רואים את הגרסה הקודמת של ההזמנה.',
+        cta: 'לפרסום השינויים',
+      },
+      guests: {
+        title: 'מעלים את רשימת המוזמנים',
+        body: 'קובץ אקסל עם שם וטלפון — כל מוזמן מקבל קישור אישי עם השם שלו.',
+        cta: 'להעלאת הרשימה',
+      },
+      send: {
+        title: { one: 'שולחים את ההזמנה למוזמן אחד', other: 'שולחים את ההזמנה ל־{n} מוזמנים' },
+        body: 'כל אחד מקבל בוואטסאפ את הקישור האישי שלו — ורואים מי פתח ומי אישר.',
+        cta: 'לשליחה',
+      },
+      matchReplies: {
+        title: { one: 'תשובה מהקישור הכללי מחכה לשיוך', other: '{n} תשובות מהקישור הכללי מחכות לשיוך' },
+        body: 'הן כבר נספרות. שיוך למוזמנים ברשימה מעדכן את הסטטוס שלהם.',
+        cta: 'לשיוך',
+      },
+      remind: {
+        title: { one: 'מוזמן אחד עוד לא ענה', other: '{n} מוזמנים עוד לא ענו' },
+        body: 'תזכורת קצרה בוואטסאפ עושה פלאים — רואים ברשימה מי.',
+        cta: 'לרשימת המוזמנים',
+      },
+      seating: {
+        title: 'מסדרים את השולחנות',
+        body: 'הסידור האוטומטי מושיב את כולם בלחיצה, ואז רק מזיזים מה שצריך.',
+        cta: 'לסידור השולחנות',
+      },
+      gallery: {
+        title: 'מכינים את הגלריה החיה',
+        body: 'קוד QR על השולחנות, והאורחים מעלים תמונות ישר למסך באולם.',
+        cta: 'לגלריה',
+      },
+      eventDay: {
+        title: 'היום הגדול! פותחים את עמדת הכניסה',
+        body: 'צ׳ק־אין בסריקת QR, ורואים את האולם מתמלא בזמן אמת.',
+        cta: 'ליום האירוע',
+      },
+      film: {
+        title: 'סרט הרגעים מחכה לכם',
+        body: 'כל התמונות של האורחים בסרט אחד עם מוזיקה — לשתף עם כולם.',
+        cta: 'לסרט הרגעים',
+      },
+      insights: {
+        title: 'איך היה? כל המספרים',
+        body: 'כמה פתחו, מתי ענו, מי הגיע — במקום אחד.',
+        cta: 'לתובנות',
+      },
+      tasks: {
+        title: { one: 'משימה אחת לשבוע הזה', other: '{n} משימות לשבוע הזה' },
+        body: 'מה שכדאי לסגור עכשיו כדי שהכול יגיע בזמן.',
+        cta: 'למשימות',
+      },
+      allSet: {
+        title: 'הכול מתקדם יפה',
+        body: 'אין כרגע משהו דחוף. אפשר להציץ במי שאישר הגעה.',
+        cta: 'לאישורי ההגעה',
+      },
+    },
+    widgets: {
+      budget: {
+        title: 'תקציב',
+        none: 'עוד לא הגדרתם תקציב כולל.',
+        set: 'לקביעת תקציב',
+        open: 'לתקציב המלא',
+      },
+      rsvp: {
+        title: 'אישורי הגעה',
+        coming: 'מגיעים',
+        declined: 'לא מגיעים',
+        waiting: 'עוד לא ענו',
+        people: { one: 'אדם אחד', other: '{n} אנשים' },
+        fromLink: { one: 'אחת מהקישור הכללי', other: '{n} מהקישור הכללי' },
+        aria: 'אישורי הגעה: {coming} מגיעים, {declined} לא מגיעים, {waiting} עוד לא ענו',
+        open: 'לכל התשובות',
+        empty: 'עוד אין רשימת מוזמנים ותשובות.',
+      },
+      tasks: {
+        title: 'משימות',
+        progress: '{done} מתוך {total} בוצעו',
+        week: { one: 'משימה אחת השבוע', other: '{n} משימות השבוע' },
+        open: 'לכל המשימות',
+        none: 'עוד אין תוכנית — משימות ותזכורות לפי סוג האירוע.',
+        setup: 'לפתיחת התכנון',
+      },
+    },
+    road: {
+      title: 'מפת הדרך',
+      label: 'ארבעת השלבים של האירוע',
+    },
+  },
+  /** /app/invitations/[id]/settings — the event's settings */
+  eventSettings: {
+    metaTitle: 'הגדרות האירוע · {name}',
+    title: 'הגדרות האירוע',
+    subtitle: 'הפרטים, התכנון, החבילה — ושכפול או העברה לארכיון.',
+    details: {
+      title: 'פרטי האירוע',
+      body: '{name} · {type} · {date}. שמות, תאריך, מקום ושפות משנים בעורך.',
+      cta: 'עריכה בעורך',
+    },
+    planning: {
+      title: 'הגדרות התכנון',
+      body: 'כמה התכנון מחובר להזמנה (מוזמנים, הושבה, יום האירוע), תזכורות במייל ותבניות משלכם.',
+      cta: 'פתיחת הגדרות התכנון',
+    },
+    plan: {
+      title: 'החבילה',
+      body: 'אילו יכולות פתוחות לאירוע: הושבה, יום האירוע, גלריה, סרט ועוד.',
+      cta: 'חבילה וחיובים',
+    },
+    duplicate: {
+      title: 'שכפול האירוע',
+      body: 'אירוע חדש עם אותו עיצוב וטקסטים — בלי המוזמנים והתשובות.',
+      cta: 'שכפול',
+    },
+    archive: {
+      title: 'העברה לארכיון',
+      body: 'ההזמנה מפסיקה להיות זמינה לאורחים. אפשר להחזיר אותה בכל רגע.',
+      cta: 'העברה לארכיון',
+      restoreTitle: 'האירוע בארכיון',
+      restoreBody: 'ההזמנה לא זמינה לאורחים. אפשר להחזיר אותה לפעילות.',
+      restore: 'החזרה מהארכיון',
+    },
   },
   /** /app/invitations/[id] — the invitation's overview */
   overview: {
@@ -290,7 +604,7 @@ export const he = {
     unpublishedChanges: 'יש שינויים שלא פורסמו',
   },
   list: {
-    title: 'ההזמנות שלי',
+    title: 'האירועים שלי',
     newInvitation: 'הזמנה חדשה',
     stats: { one: 'תשובה אחת · {attending} מגיעים', other: '{responses} תשובות · {attending} מגיעים' },
     noResponses: 'עוד אין תשובות',
@@ -311,6 +625,7 @@ export const he = {
     hideArchived: 'חזרה להזמנות',
     emptyTitle: 'עוד אין הזמנות',
     emptyBody: 'בחרו עיצוב ותוך דקות תהיה לכם הזמנה מרגשת',
+    emptyStart: 'אירוע חדש',
     emptyCta: 'בחירת עיצוב',
     archivedEmpty: 'אין הזמנות בארכיון',
     greeting: 'שלום, {name}',
@@ -356,6 +671,8 @@ export const he = {
       edit: 'עריכה',
     },
     progress: {
+      replied: '{pct}% ענו',
+      budget: 'תקציב',
       sent: 'נשלח ל־{sent} מתוך {guests}',
       attending: '{attending} מגיעים',
       noGuests: 'עוד אין רשימת מוזמנים',
@@ -514,7 +831,17 @@ export const he = {
       today: 'היום',
       closed: 'הסתיים',
       none: 'אין דדליין',
+      people: { one: 'אדם אחד', other: '{n} אנשים' },
+      fromLink: { one: 'מתוכם אחד מהקישור הכללי', other: 'מתוכם {n} מהקישור הכללי' },
+      pending: 'עוד לא ענו',
+      pendingSub: 'מתוך {n} ברשימת המוזמנים',
+      noList: 'אין עדיין רשימת מוזמנים',
     },
+    unmatched: {
+      one: 'תשובה אחת הגיעה מהקישור הכללי ועוד לא שויכה למוזמן ברשימה.',
+      other: '{n} תשובות הגיעו מהקישור הכללי ועוד לא שויכו למוזמנים ברשימה.',
+    },
+    matchLink: 'לשיוך ברשימת המוזמנים',
     dietary: 'העדפות תזונה',
     search: 'חיפוש לפי שם, טלפון או אימייל',
     statusFilter: 'סינון לפי תשובה',

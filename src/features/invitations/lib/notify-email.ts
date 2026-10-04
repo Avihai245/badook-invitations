@@ -1,4 +1,5 @@
-import { dictFor, fmt, plural, type UiLocale } from '@/lib/i18n/app';
+import { fmt, plural, type UiLocale } from '@/lib/i18n/app';
+import { dictFor } from '@/lib/i18n/dict';
 
 /**
  * The host's RSVP emails (§4 "sends host notification; daily digest option"): subject, HTML and text,

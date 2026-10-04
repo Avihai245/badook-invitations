@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { uiDir } from '@/lib/i18n/app';
-import { UiProvider } from '@/lib/i18n/client';
+import { UiProvider } from '@/lib/i18n/provider-lazy';
 import { getUi } from '@/lib/i18n/server';
 import SiteNotFound from './(site)/not-found';
 import '@/styles/app.css';

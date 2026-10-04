@@ -15,6 +15,7 @@ import {
   useToast,
 } from '@/components/app';
 import { StudioPanel } from '@/features/art-direction/ui/StudioPanel';
+import { TemplatePanel } from './TemplatePanel';
 import { VoiceCard } from '@/features/voice/ui/VoiceCard';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
@@ -64,6 +65,8 @@ export function trackLicense(license: string): string | null {
 
 export function GlobalPanel({ panel }: { panel: PanelId }) {
   switch (panel) {
+    case 'template':
+      return <TemplatePanel />;
     case 'studio':
       return <StudioPanel />;
     case 'cover':

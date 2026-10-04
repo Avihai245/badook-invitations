@@ -4,7 +4,7 @@ import { HintProvider, ToastProvider } from '@/components/app';
 import { BillingScreen } from '@/features/billing/BillingScreen.client';
 import { PLAN_LIMITS, effectivePlan, type PlanId } from '@/features/billing/plans';
 import type { BillingPageData } from '@/features/billing/server/billing';
-import { UiProvider } from '@/lib/i18n/client';
+import { UiProvider } from '@/lib/i18n/provider';
 
 // The customer's billing screen (/app/billing) and what the Badook team gave them from the admin
 // console: a plan as a gift (it shows as one, has nothing to cancel, and ends by itself), credits

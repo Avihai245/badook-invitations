@@ -565,6 +565,24 @@ export async function deleteResponse(
   return ok({ ok: true });
 }
 
+const LinkSchema = z.strictObject({ guestId: z.uuid().nullable() });
+
+/** PATCH { guestId } — a reply from the general link matched to a guest on the list (null: unmatched). */
+export async function linkResponse(
+  userId: string,
+  id: string,
+  responseId: string,
+  raw: unknown,
+  deps: HostDeps,
+): Promise<ApiResult> {
+  const parsed = LinkSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const done = await deps.db.linkResponse(id, userId, responseId, parsed.data.guestId);
+  if (done === 'taken') return fail(409, 'taken');
+  if (done !== 'ok') return fail(404, 'not_found');
+  return ok({ ok: true });
+}
+
 const NotifySchema = z.strictObject({ mode: z.enum(NOTIFY_MODES) });
 
 /** How the host hears about replies: every reply, a daily digest, or not at all. */

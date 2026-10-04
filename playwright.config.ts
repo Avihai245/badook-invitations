@@ -114,6 +114,8 @@ export default defineConfig({
             INVITES_WHATSAPP_GALLERY_TEMPLATE: 'badook_gallery',
             // face search offered (it still waits for each host to turn it on: tests/e2e/faces.spec.ts)
             INVITES_FACE_ALBUMS: 'on',
+            // event planning offered (tests/e2e/planning.spec.ts)
+            INVITES_PLANNING: 'on',
             // billing through our own test payment page instead of PayPlus (tests/e2e/billing.spec.ts)
             INVITES_BILLING_TEST_MODE: 'true',
             // the support assistant: the Anthropic API stand-in above (tests/e2e/support.spec.ts)

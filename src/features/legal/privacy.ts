@@ -243,6 +243,22 @@ export function privacyDoc(c: LegalContext): LegalDoc {
           ],
         },
         {
+          id: 'planning',
+          heading: '7F. Event planning: tasks, budget, vendors and ideas',
+          body: [
+            'A host can plan an event in the app: a task list, a budget, a list of vendors and a board of notes and ideas. This information is collected for the host, like a guest list (section 1), and only the host sees it.',
+            {
+              list: [
+                'What is kept: the tasks (their names, notes, dates and who is on them), the budget (the total, categories, amounts, payment dates and who pays), the vendors the host adds (the business’s name, and the phone number, email address, website, notes, rating and quote the host types about it), the cards on the ideas board (text, links, pictures, checklists), files the host attaches to a vendor or a cost (quotes, contracts, receipts) or to a card, and the host’s own templates. The vendors are the host’s business contacts, entered by the host; we use them only to show them back to the host.',
+                'Files are kept in private storage and opened only through links that expire after an hour. A link the host adds to the ideas board is read once by our server — the page’s title, description and picture — so that the card can show a preview; nothing from the host’s device or account is sent to that page.',
+                'Weekly email: unless the host turns it off, once a week we email the host’s own address (through Resend, section 5) the tasks and payments of the coming week. It stops when the event is over.',
+                'AI drafts (only where the plan includes it): the description of an event the host types, or the text of one card the host asks to summarize, is sent to Anthropic to draft a plan or suggest steps — together with the event’s date and nothing else about the host, the guests or the invitation. We keep nothing from that request except a count, to apply the daily limit.',
+                'How long: with the invitation, until the host deletes it or the account; deleting an account also erases its files and templates. A guest’s details are not part of it: the plan reads the guest list and replies only to show the host numbers (how many are coming), never names, and a vendor or a task is never shown to guests.',
+              ],
+            },
+          ],
+        },
+        {
           id: 'rights',
           heading: '8. Your rights',
           body: [
@@ -522,6 +538,22 @@ export function privacyDoc(c: LegalContext): LegalDoc {
               'מי רואה אותה: הלקוח, באפליקציה (מבקר בלי חשבון מקבל את תשובות הצוות במייל); וחברי הצוות שלנו שהתפקיד שלהם כולל תמיכה, במערכת הניהול שלנו, יחד עם פרטי החשבון של הלקוח (החבילה, קרדיטים להודעות, מספר ההזמנות). הערות פנימיות של הצוות על פנייה לא מוצגות ללקוח. מה שהצוות עושה בפנייה נרשם (מי, מה ומתי).',
               'מיילים: תשובת הצוות נשלחת לכתובת המייל של הלקוח (דרך Resend, סעיף 5); הצוות שלנו מקבל על פנייה חדשה, או על תשובה של לקוח, מייל עם נושא הפנייה בלבד, בלי השיחה.',
               'כמה זמן: פנייה שנענתה והלקוח לא חזר אליה נסגרת מעצמה אחרי 14 יום (כתיבה בה פותחת אותה מחדש); פנייה סגורה וכל ההודעות שבה נמחקות שנתיים אחרי שנסגרה; פנייה שהצוות מוחק כספאם נמחקת תוך 30 יום.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'planning',
+        heading: '7ו. תכנון האירוע: משימות, תקציב, ספקים ורעיונות',
+        body: [
+          'מארח יכול לתכנן אירוע במערכת: רשימת משימות, תקציב, רשימת ספקים ולוח של פתקים ורעיונות. המידע הזה נאסף עבור המארח, כמו רשימת המוזמנים (סעיף 1), ורק המארח רואה אותו.',
+          {
+            list: [
+              'מה נשמר: המשימות (שמותיהן, הערות, תאריכים ומי אחראי), התקציב (הסכום הכולל, קטגוריות, סכומים, מועדי תשלום ומי משלם), הספקים שהמארח מוסיף (שם העסק, ומספר הטלפון, כתובת המייל, האתר, ההערות, הדירוג וההצעה שהמארח מקליד עליו), הכרטיסים בלוח הרעיונות (טקסט, קישורים, תמונות, רשימות), קבצים שהמארח מצרף לספק, להוצאה או לכרטיס (הצעות מחיר, חוזים, קבלות), והתבניות של המארח עצמו. הספקים הם אנשי קשר עסקיים של המארח, שהוא מזין; אנחנו משתמשים בהם רק כדי להציג אותם בחזרה למארח.',
+              'הקבצים נשמרים באחסון פרטי ונפתחים רק בקישורים שפגים אחרי שעה. קישור שהמארח מוסיף ללוח הרעיונות נקרא פעם אחת בשרת שלנו — הכותרת, התיאור והתמונה של העמוד — כדי שהכרטיס יציג תצוגה מקדימה; שום דבר מהמכשיר או מהחשבון של המארח לא נשלח לעמוד הזה.',
+              'מייל שבועי: אלא אם המארח כיבה אותו, פעם בשבוע נשלחים לכתובת המייל של המארח עצמו (דרך Resend, סעיף 5) המשימות והתשלומים של השבוע הקרוב. הוא נפסק כשהאירוע עבר.',
+              'טיוטות AI (רק היכן שהחבילה כוללת את זה): תיאור האירוע שהמארח מקליד, או הטקסט של כרטיס אחד שהמארח מבקש לסכם, נשלחים ל־Anthropic כדי לנסח תוכנית או להציע צעדים — יחד עם תאריך האירוע ושום דבר אחר על המארח, על האורחים או על ההזמנה. אנחנו לא שומרים דבר מהבקשה, חוץ ממונה שמאפשר להחיל את המגבלה היומית.',
+              'כמה זמן: עם ההזמנה, עד שהמארח מוחק אותה או את החשבון; מחיקת חשבון מוחקת גם את הקבצים והתבניות שלו. פרטי האורחים אינם חלק מזה: התכנון קורא את רשימת המוזמנים והתשובות רק כדי להציג למארח מספרים (כמה מגיעים), אף פעם לא שמות, ואורחים אף פעם לא רואים ספק או משימה.',
             ],
           },
         ],

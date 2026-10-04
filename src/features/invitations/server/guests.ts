@@ -309,6 +309,17 @@ export interface MessageValues {
   date: string;
 }
 
+export interface GuestsPageReply {
+  id: string;
+  name: string;
+  phone: string | null;
+  attending: boolean;
+  adults: number;
+  children: number;
+  guestId: string | null;
+  createdAt: string;
+}
+
 export interface GuestsPageData {
   id: string;
   slug: string;
@@ -323,6 +334,8 @@ export interface GuestsPageData {
   locales: Locale[];
   publicBaseUrl: string;
   guests: GuestRecord[];
+  /** every reply, lightly (the counts, and matching the general link's replies to guests: lib/rsvp-summary) */
+  replies: GuestsPageReply[];
   /** the greeting line with {guest} as the guest will see it, or null when there is none */
   greeting: string | null;
   plan: PlanId;
@@ -356,10 +369,11 @@ export async function loadGuestsPage(
   publicBaseUrl?: string,
 ): Promise<GuestsPageData | null> {
   if (!isUuid(id)) return null;
-  const [inv, guests, account] = await Promise.all([
+  const [inv, guests, account, replies] = await Promise.all([
     hostDb.get(id, user.id),
     guestsDb.list(id, user.id),
     loadAccount({ id: user.id, email: user.email ?? undefined }),
+    hostDb.responses(id, user.id),
   ]);
   if (!inv || !guests) return null;
   const doc = inv.published ?? inv.draft;
@@ -380,6 +394,16 @@ export async function loadGuestsPage(
     locales: [...doc.locales],
     publicBaseUrl: publicBaseUrl ?? env.INVITES_PUBLIC_BASE_URL,
     guests,
+    replies: (replies?.responses ?? []).map((r) => ({
+      id: r.id,
+      name: r.name,
+      phone: r.phone,
+      attending: r.attending,
+      adults: r.adults,
+      children: r.children,
+      guestId: r.guestId ?? null,
+      createdAt: r.createdAt,
+    })),
     greeting: greeting || null,
     plan: account.effective,
     maxGuests: account.limits.guestsPerInvitation,

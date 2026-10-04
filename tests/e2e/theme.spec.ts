@@ -184,19 +184,8 @@ test.describe('the system’s look', () => {
     const icon = await page.locator('link[rel="icon"]').first().getAttribute('href');
     expect(icon).toBeTruthy();
     expect((await page.request.get(icon!)).headers()['content-type']).toContain('image/png');
-    // Badook Events, in a new tab: the sidebar's, or on phones the account menu's
-    if (phone(page)) {
-      await page.getByTestId('user-menu').click();
-      const item = page.getByRole('menuitem', { name: 'מחפשים מקום לאירוע?' });
-      await expect(item).toHaveAttribute('href', 'https://event.badooks.com/');
-      await expect(item).toHaveAttribute('target', '_blank');
-      await page.keyboard.press('Escape');
-    } else {
-      const link = page.getByTestId('nav-venues');
-      await expect(link).toHaveAttribute('href', 'https://event.badooks.com/');
-      await expect(link).toHaveAttribute('target', '_blank');
-      await expect(link).toHaveAccessibleName('מחפשים מקום לאירוע? (נפתח בלשונית חדשה)');
-    }
+    // Badook Events moved from the app's sidebar and menu to the Vendors screen's card (a venue to find)
+    await expect(page.getByTestId('nav-venues')).toHaveCount(0);
   });
 
   for (const theme of THEMES) {

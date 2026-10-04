@@ -63,6 +63,7 @@ function deps(db: Partial<Record<keyof HostDb, unknown>> = {}) {
     signedUpload: vi.fn(async (path: string) => ({ path, token: 'tok', url: `https://s/${path}?token=tok` })),
     responses: vi.fn(async () => ({ notify: 'each', responses: [] })),
     deleteResponse: vi.fn(async () => true),
+    linkResponse: vi.fn(async () => 'ok'),
     setNotify: vi.fn(async () => true),
     ...db,
   } as unknown as MockDb;

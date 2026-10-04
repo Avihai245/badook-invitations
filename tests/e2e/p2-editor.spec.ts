@@ -50,8 +50,9 @@ test.describe('host: create → edit → publish', () => {
 
     // empty list → gallery
     await expect(page.getByRole('heading', { name: 'עוד אין הזמנות' })).toBeVisible();
+    // "choose a design" goes straight to the gallery ("new event" opens the three-screen start)
     await page.getByRole('link', { name: 'בחירת עיצוב' }).click();
-    await page.waitForURL(/\/app\/invitations\/new$/);
+    await page.waitForURL(/\/app\/invitations\/new\?gallery=1$/);
     await expect(page.getByRole('heading', { name: 'בחרו עיצוב' })).toBeVisible();
 
     // filter chips narrow the gallery

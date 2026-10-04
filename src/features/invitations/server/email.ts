@@ -9,7 +9,14 @@ import { serviceDb } from '@/lib/supabase/server';
  * answer, anything else.
  */
 export type EmailKind =
-  'rsvp_reply' | 'rsvp_digest' | 'review' | 'billing_alert' | 'contact' | 'support' | 'other';
+  | 'rsvp_reply'
+  | 'rsvp_digest'
+  | 'plan_reminder'
+  | 'review'
+  | 'billing_alert'
+  | 'contact'
+  | 'support'
+  | 'other';
 
 export interface OutgoingEmail {
   to: string;

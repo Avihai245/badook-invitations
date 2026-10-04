@@ -61,6 +61,17 @@ const createInvitation = (page: Page) =>
     return (await res.json()) as { id: string };
   });
 
+/**
+ * The assistant from the one help panel: the floating button on a phone, "Guide & help" in the sidebar
+ * on a computer — both open the panel on its guide; the assistant is its second tab.
+ */
+async function openAssistant(page: Page) {
+  const launcher = page.getByTestId('support-launcher');
+  if (await launcher.isVisible()) await launcher.click();
+  else await page.locator('[data-tour="help"]:visible').first().click();
+  await page.getByTestId('support-chat').getByRole('tab', { name: 'שאלו את העוזר' }).click();
+}
+
 test.describe('the support assistant', () => {
   test.skip(!LOCAL, 'the answers come from the local API stand-in');
 
@@ -84,7 +95,7 @@ test.describe('the support assistant', () => {
   }) => {
     await signUp(page);
     const launcher = page.getByTestId('support-launcher');
-    await launcher.click();
+    await openAssistant(page);
     const chat = page.getByRole('dialog', { name: 'העוזר של Badook' });
     await expect(chat).toBeVisible();
     await expect(launcher).toBeHidden();
@@ -97,7 +108,7 @@ test.describe('the support assistant', () => {
     const steps = log.locator('ol > li');
     await expect(steps).toHaveCount(3);
     await expect(steps.first().locator('strong')).toHaveText('מוזמנים');
-    await expect(log.getByRole('link', { name: '/contact' })).toHaveAttribute('href', '/contact');
+    await expect(log.getByRole('link', { name: 'טופס יצירת קשר' })).toHaveAttribute('href', '/contact');
     // an address outside the site stays plain text
     await expect(log.getByText(/https:\/\/evil\.example\/login/)).toBeVisible();
     await expect(log.locator('a[href*="evil.example"]')).toHaveCount(0);
@@ -122,14 +133,14 @@ test.describe('the support assistant', () => {
       'user',
     ]);
 
-    // Escape closes it and the floating button is back
+    // Escape closes it (and on a phone the floating button is back; a computer has the sidebar's)
     await input.press('Escape');
     await expect(chat).toBeHidden();
-    await expect(launcher).toBeVisible();
+    if ((page.viewportSize()?.width ?? 1440) < 1024) await expect(launcher).toBeVisible();
 
     // on another page the conversation is still there (this tab only), until starting over
     await open(page, '/app/account');
-    await page.getByTestId('support-launcher').click();
+    await openAssistant(page);
     await expect(chat.getByRole('log').getByText(question, { exact: true })).toBeVisible();
     await chat.getByRole('button', { name: 'שיחה חדשה' }).click();
     await expect(chat.getByRole('log').getByText('אתם:')).toHaveCount(0);
@@ -138,7 +149,7 @@ test.describe('the support assistant', () => {
 
   test('a long answer can be stopped; when the API fails, a kind message', async ({ page }) => {
     await signUp(page);
-    await page.getByTestId('support-launcher').click();
+    await openAssistant(page);
     const chat = page.getByTestId('support-chat');
     const input = chat.getByRole('textbox', { name: 'כתבו שאלה…' });
     await input.fill('אפשר תשובה ארוכה?');
@@ -160,7 +171,7 @@ test.describe('the support assistant', () => {
     const email = await signUp(page);
     const { id } = await createInvitation(page);
     await open(page, `/app/invitations/${id}/guests`);
-    await page.getByTestId('support-launcher').click();
+    await openAssistant(page);
     const chat = page.getByRole('dialog', { name: 'העוזר של Badook' });
     const question = 'איך שולחים לכולם בוואטסאפ?';
     await chat.getByRole('button', { name: question }).click();
@@ -189,10 +200,10 @@ test.describe('the support assistant', () => {
     await expect(chat).toBeVisible();
     await chat.getByRole('button', { name: 'סגירת הצ׳אט' }).click();
 
-    // the editor's bar (phones: its ⋯ menu) instead of a floating button that would cover the editor;
-    // a new conversation there suggests editor questions
+    // the editor: a small round button in the preview's corner (and its bar — phones: the ⋯ menu); a
+    // new conversation there suggests editor questions
     await open(page, `/app/invitations/${id}/edit`);
-    await expect(page.getByTestId('support-launcher')).toHaveCount(0);
+    await expect(page.getByTestId('support-launcher')).toHaveAttribute('data-compact', '');
     if (testInfo.project.name === 'mobile') {
       await page.getByRole('button', { name: 'פעולות נוספות' }).click();
       await page.getByRole('menuitem', { name: 'עזרה: שאלו את העוזר' }).click();
@@ -207,7 +218,7 @@ test.describe('the support assistant', () => {
   }) => {
     await signUp(page);
     await open(page, '/app/invitations/new');
-    await page.getByTestId('support-launcher').click();
+    await openAssistant(page);
     const chat = page.getByRole('dialog', { name: 'העוזר של Badook' });
     const input = chat.getByRole('textbox', { name: 'כתבו שאלה…' });
     await input.fill('איזה עיצוב מתאים לחתונה?');
@@ -228,7 +239,7 @@ test.describe('the support assistant', () => {
     await signUp(page);
     const { id } = await createInvitation(page);
     await open(page, `/app/invitations/${id}/guests`);
-    await page.getByTestId('support-launcher').click();
+    await openAssistant(page);
     const chat = page.getByRole('dialog', { name: 'העוזר של Badook' });
     const input = chat.getByRole('textbox', { name: 'כתבו שאלה…' });
     await input.fill('איך עובד סידור שולחנות');

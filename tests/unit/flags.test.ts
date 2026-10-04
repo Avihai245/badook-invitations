@@ -18,6 +18,7 @@ vi.mock('server-only', () => ({}));
 const env = {
   INVITES_FEATURES_OFF: [] as string[],
   INVITES_FACE_ALBUMS: false,
+  INVITES_PLANNING: false,
   ANTHROPIC_API_KEY: '',
   INVITES_AI_MODEL: '',
 };
@@ -45,6 +46,11 @@ describe('the packages', () => {
     expect(packageFor('seating')).toBe('basic');
     expect(packageFor('live_gallery')).toBe('premium');
     expect(packageFor('checkin')).toBe('vip');
+    // planning: the section for everyone; AI and export in Pro; private templates in Business
+    expect(packageFor('planning')).toBe('basic');
+    expect(packageFor('planning_ai')).toBe('premium');
+    expect(packageFor('planning_export')).toBe('premium');
+    expect(packageFor('planning_templates')).toBe('vip');
   });
 });
 
@@ -125,14 +131,20 @@ describe('what this deployment offers', () => {
     expect(on.has('gallery_ai')).toBe(false);
     expect(on.has('translate_ai')).toBe(false);
     expect(on.has('face_albums')).toBe(false);
+    // planning waits for its own switch
+    expect(on.has('planning')).toBe(false);
+    expect(on.has('planning_templates')).toBe(false);
     on = deploymentFeatures({
       ...env,
       ANTHROPIC_API_KEY: 'k',
       INVITES_AI_MODEL: 'm',
       INVITES_FACE_ALBUMS: true,
+      INVITES_PLANNING: true,
       INVITES_FEATURES_OFF: ['projector'],
     } as never);
     expect(on.has('gallery_ai')).toBe(true);
+    expect(on.has('planning')).toBe(true);
+    expect(on.has('planning_ai')).toBe(true);
     expect(on.has('face_albums')).toBe(true);
     expect(on.has('projector')).toBe(false);
   });

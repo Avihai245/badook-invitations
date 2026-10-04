@@ -172,8 +172,13 @@ test.describe('responses dashboard', () => {
 
     await open(page, `/app/invitations/${id}/responses`);
     await expect(page.getByRole('heading', { level: 1, name: 'אישורי הגעה' })).toBeVisible();
-    await expect(kpi(page, 'מגיעים').locator('dd').first()).toHaveText('4');
+    // the one count of every screen: two "yes" replies, four people in them
+    await expect(kpi(page, 'מגיעים').locator('dd').first()).toHaveText('2');
+    await expect(kpi(page, 'מגיעים')).toContainText('4 אנשים');
     await expect(kpi(page, 'מגיעים')).toContainText('3 מבוגרים · ילד אחד');
+    // no guest list yet: no one is "not answered", and no reply waits to be matched
+    await expect(kpi(page, 'עוד לא ענו')).toContainText('אין עדיין רשימת מוזמנים');
+    await expect(page.getByTestId('responses-unmatched')).toHaveCount(0);
     await expect(kpi(page, 'תשובות').locator('dd').first()).toHaveText('3');
     await expect(kpi(page, 'לא מגיעים').locator('dd').first()).toHaveText('1');
     await expect(kpi(page, 'לא מגיעים')).toContainText('33% מהתשובות');
@@ -305,6 +310,8 @@ test.describe('responses dashboard', () => {
       erased: expect.any(Number),
       deleted: expect.any(Number),
     };
+    // …and the weekly planning email: tasks and payments of the coming week (features/planning)
+    const planning = { sent: expect.any(Number), failed: expect.any(Number), skipped: expect.any(Number) };
     expect(await first.json()).toEqual({
       sent: 1,
       failed: 0,
@@ -320,6 +327,7 @@ test.describe('responses dashboard', () => {
       logs,
       admin,
       support,
+      planning,
     });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
@@ -337,6 +345,7 @@ test.describe('responses dashboard', () => {
       logs,
       admin,
       support,
+      planning,
     });
   });
 });

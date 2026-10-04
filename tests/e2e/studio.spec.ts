@@ -274,7 +274,7 @@ test.describe('design it for me', () => {
     test.setTimeout(180_000);
     const errors = collectErrors(page);
     await host(page, 'studio-wizard', 'business');
-    await open(page, '/app/invitations/new');
+    await open(page, '/app/invitations/new?gallery=1');
     await page.getByTestId('studio-start').click();
     const wizard = page.getByRole('dialog');
     await wizard.getByRole('radio', { name: 'חתונה' }).click();

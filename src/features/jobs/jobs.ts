@@ -7,6 +7,7 @@ import { eventDayHousekeeping } from '@/features/event-day/server/housekeeping';
 import { processNoticeQueue } from '@/features/event-day/server/notify';
 import { facesHousekeeping } from '@/features/faces/server/deps';
 import { insightsHousekeeping } from '@/features/insights/server/deps';
+import { sendPlanReminders } from '@/features/planning/server/reminders';
 import { sendDigests } from '@/features/invitations/server/notify';
 import { syncSeedOnce } from '@/features/invitations/server/seed-sync';
 import { translationHousekeeping } from '@/features/invitations/translate/deps';
@@ -79,8 +80,13 @@ export async function runDaily(now: Date) {
   const support = await supportHousekeeping().catch(
     (err) => (console.error('support tickets housekeeping failed', err), null),
   );
+  // the weekly planning email: the week's tasks and payments (a no-op while planning is not offered)
+  const planning = await sendPlanReminders(now).catch(
+    (err) => (console.error('planning reminders failed', err), null),
+  );
   return {
     ...digests,
+    planning,
     purged: (purged as number | null) ?? null,
     overdue,
     seed,

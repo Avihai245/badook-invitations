@@ -100,7 +100,7 @@ for (const ui of ['he', 'en'] as const)
     });
 
     // the gallery's card
-    await page.goto('/app/invitations/new');
+    await page.goto('/app/invitations/new?gallery=1');
     await hydrated(page);
     await expect(page.getByTestId('studio-entry')).toBeVisible();
     await shot(page, `${ui}-gallery-studio`);

@@ -8,9 +8,9 @@ import {
   FileSpreadsheet,
   ListChecks,
   MailPlus,
-  MessageCircle,
   MoreHorizontal,
   Palette,
+  Plus,
   PencilLine,
   Send,
   Share2,
@@ -20,7 +20,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UpgradeDialog, upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
-import { useState, useTransition, type CSSProperties } from 'react';
+import { useState, useTransition, type CSSProperties, type ReactNode } from 'react';
 import {
   Badge,
   Button,
@@ -32,19 +32,18 @@ import {
   useToast,
   type BadgeVariant,
 } from '@/components/app';
+import { BudgetGauge } from '@/features/planning/ui/BudgetGauge';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
-import { getTemplate, TEMPLATES } from '../../templates/registry';
 import { hostApi, loginUrl } from '../api';
 import { CountdownChip, daysUntilEvent, useToday } from '../countdown';
 import { HelpFor } from '../HelpFor';
-import { TemplatePoster } from '../TemplatePoster';
 import { publishHref } from '../workspace/paths';
+import { STAGE_ICONS } from '../workspace/EventSpace';
+import { STAGES } from '../workspace/stages';
+import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { FollowUpDialog, followUpTypes } from './FollowUpDialog';
-
-/** How many designs the gallery offers (an unlisted one isn't counted). */
-const LISTED_DESIGNS = [...TEMPLATES.values()].filter(({ manifest }) => manifest.listed).length;
 
 const BADGE: Record<InvitationSummary['status'], BadgeVariant> = {
   draft: 'draft',
@@ -78,7 +77,21 @@ export function nextStep(
  * invitation (its poster, where it stands, the next step and its main places one tap away); the
  * archive; and an empty state that teaches the whole flow.
  */
-export function InvitationsList({ items, name }: { items: InvitationSummary[]; name: string | null }) {
+/** An event's budget as its card shows it (a tiny gauge): only for events with a plan and a total. */
+export type CardBudget = { total: number; committed: number; paid: number; planned: number };
+
+export function InvitationsList({
+  items,
+  name,
+  budgets = {},
+  posters = {},
+}: {
+  items: InvitationSummary[];
+  name: string | null;
+  budgets?: Record<string, CardBudget>;
+  /** each invitation's poster, drawn on the server (app/ItemPoster) */
+  posters?: Record<string, ReactNode>;
+}) {
   const { t, fmt, plural, number } = useUi();
   const router = useRouter();
   const { toast } = useToast();
@@ -133,7 +146,16 @@ export function InvitationsList({ items, name }: { items: InvitationSummary[]; n
         <div className="relative flex flex-wrap items-end justify-between gap-5">
           <div className="min-w-0">
             <p className="text-[14px] font-semibold text-brand-deep">
-              {name ? fmt(t.list.greeting, { name }) : t.list.greetingNoName}
+              {name ? (
+                // the name isolated: a Latin name keeps the comma on the Hebrew side ("שלום, Avihai")
+                <>
+                  {t.list.greeting.split('{name}')[0]}
+                  <bdi>{name}</bdi>
+                  {t.list.greeting.split('{name}')[1]}
+                </>
+              ) : (
+                t.list.greetingNoName
+              )}
             </p>
             <div className="mt-1 flex items-center gap-1">
               <PageTitle>
@@ -183,6 +205,8 @@ export function InvitationsList({ items, name }: { items: InvitationSummary[]; n
               style={{ '--rise-delay': `${Math.min(i, 6) * 60}ms` } as CSSProperties}
             >
               <InvitationCard
+                budget={budgets[item.id] ?? null}
+                poster={posters[item.id] ?? null}
                 item={item}
                 busy={busy === item.id}
                 past={today ? daysUntilEvent(item.date, today) < 0 : false}
@@ -204,44 +228,53 @@ export function InvitationsList({ items, name }: { items: InvitationSummary[]; n
   );
 }
 
-/** No invitations yet: an inviting first step, then the four steps of the whole flow. */
+/**
+ * No events yet: what Badook is (the demo video), one inviting first step, then the event's four stages —
+ * planning, inviting, arranging, celebrating — so the whole product is in view before the first click.
+ */
 function EmptyList() {
-  const { t, fmt, number } = useUi();
-  const steps: [keyof typeof t.list.steps, LucideIcon][] = [
-    ['design', Palette],
-    ['details', PencilLine],
-    ['guests', FileSpreadsheet],
-    ['send', MessageCircle],
-  ];
+  const { t, number } = useUi();
+  const N = t.workspace.nav;
   return (
-    <section className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface shadow-sm">
-      <div className="grid items-center gap-6 px-6 py-8 sm:px-10 sm:py-10 md:grid-cols-[minmax(0,1fr)_200px]">
-        <div className="max-w-[48ch]">
-          <h2 className="font-display text-[26px] leading-tight font-bold text-balance sm:text-[30px]">
+    <section
+      className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface shadow-sm"
+      data-testid="list-empty"
+    >
+      <div className="grid items-center gap-8 px-6 py-8 sm:px-10 sm:py-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+        <div className="max-w-[52ch]">
+          <h2 className="font-display text-[28px] leading-tight font-bold text-balance sm:text-[34px]">
             {t.list.emptyTitle}
           </h2>
-          <p className="mt-2 text-[15px] text-pretty text-muted">{t.list.emptyBody}</p>
-          <Button asChild size="lg" icon={<Palette />} className="mt-6">
-            <Link href="/app/invitations/new">{t.list.emptyCta}</Link>
-          </Button>
+          <p className="mt-2 text-[15.5px] text-pretty text-muted">{t.list.emptyBody}</p>
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+            {/* the three-screen start (onboarding/StartWizard); or straight to the designs */}
+            <Button asChild size="lg" icon={<Plus />}>
+              <Link href="/app/invitations/new">{t.list.emptyStart}</Link>
+            </Button>
+            <Link
+              href="/app/invitations/new?gallery=1"
+              className="inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-brand-deep underline-offset-4 hover:underline"
+            >
+              <Palette aria-hidden className="size-4" />
+              {t.list.emptyCta}
+            </Link>
+          </div>
         </div>
-        <div aria-hidden className="list-hero-art mx-auto w-[150px] max-md:order-first md:w-[200px]">
-          <EnvelopeArt />
-        </div>
+        <DemoVideo />
       </div>
       <div className="border-t border-line bg-canvas/70 px-6 py-7 sm:px-10">
         <h3 className="text-[12.5px] font-bold tracking-[.06em] text-muted">{t.list.steps.title}</h3>
         <ol className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
-          {steps.map(([key, Icon], i) => {
-            const step = t.list.steps[key] as { title: string; body: string };
+          {STAGES.map((stage, i) => {
+            const Icon = STAGE_ICONS[stage];
             return (
               <li
-                key={key}
+                key={stage}
                 className="site-rise relative"
                 style={{ '--rise-delay': `${i * 90}ms` } as CSSProperties}
               >
-                {i < steps.length - 1 ? (
-                  // the path to the next step (wide screens)
+                {i < STAGES.length - 1 ? (
+                  // the path to the next stage (wide screens)
                   <span
                     aria-hidden
                     className="absolute top-[21px] start-14 -end-2 hidden border-t-2 border-dashed border-brand-line lg:block"
@@ -258,11 +291,9 @@ function EmptyList() {
                 </span>
                 <p className="mt-3 text-[14.5px] font-bold">
                   <span className="sr-only">{number(i + 1)}. </span>
-                  {step.title}
+                  {N.stages[stage]}
                 </p>
-                <p className="mt-1 text-[13px] text-pretty text-muted">
-                  {fmt(step.body, { n: number(LISTED_DESIGNS) })}
-                </p>
+                <p className="mt-1 text-[13px] text-pretty text-muted">{N.stageHint[stage]}</p>
               </li>
             );
           })}
@@ -274,6 +305,8 @@ function EmptyList() {
 
 function InvitationCard({
   item,
+  budget = null,
+  poster = null,
   busy,
   past,
   onDuplicate,
@@ -281,6 +314,8 @@ function InvitationCard({
   onFollowUp,
 }: {
   item: InvitationSummary;
+  budget?: CardBudget | null;
+  poster?: ReactNode;
   busy: boolean;
   /** the event's day has passed (the visitor's own day) */
   past: boolean;
@@ -290,11 +325,8 @@ function InvitationCard({
   onFollowUp: () => void;
 }) {
   const { t, locale, date, number, plural, fmt } = useUi();
-  const template = getTemplate(item.templateId)?.manifest;
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
-  const primary = item.hosts.primary[loc] ?? item.hosts.primary[item.defaultLocale] ?? '';
-  const secondary = item.hosts.secondary?.[loc] ?? item.hosts.secondary?.[item.defaultLocale] ?? null;
   const base = `/app/invitations/${item.id}`;
   const archived = item.status === 'archived';
   const next = nextStep(item, { past });
@@ -315,23 +347,7 @@ function InvitationCard({
     >
       <div className="flex gap-4 p-3 sm:p-4">
         <Link href={base} tabIndex={-1} aria-hidden className="relative block w-[88px] shrink-0 sm:w-[112px]">
-          {template ? (
-            // the invitation's own names and date on its design (the event type as the opening line)
-            <TemplatePoster
-              template={template}
-              locale={loc}
-              text={{
-                eyebrow: t.eventTypes[item.eventType],
-                primary: primary || name,
-                secondary,
-                date: shortDate,
-              }}
-              joiner={item.hosts.joiner?.[loc] || '&'}
-              className="rounded-[14px]! transition-transform duration-300 group-hover/card:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover/card:translate-y-0 sm:rounded-[16px]!"
-            />
-          ) : (
-            <div className="aspect-[9/16] rounded-[14px] bg-subtle" />
-          )}
+          {poster ?? <div className="aspect-[9/16] rounded-[14px] bg-subtle" />}
         </Link>
 
         <div className="flex min-w-0 flex-1 flex-col">
@@ -371,7 +387,7 @@ function InvitationCard({
                 ...(item.status !== 'draft' || item.responses > 0
                   ? [{ label: t.list.menu.responses, icon: <ListChecks />, href: `${base}/responses` }]
                   : []),
-                ...(item.eventType === 'save_the_date' && !archived && followUpTypes(item.templateId).length
+                ...(item.eventType === 'save_the_date' && !archived && followUpTypes(item).length
                   ? [{ label: t.list.menu.followUp, icon: <MailPlus />, onSelect: onFollowUp }]
                   : []),
                 { label: t.list.menu.duplicate, icon: <Copy />, onSelect: onDuplicate },
@@ -420,6 +436,32 @@ function InvitationCard({
               )}
             </div>
           )}
+
+          {/* at a glance: how many replied, and the budget's tiny gauge */}
+          {!archived && (item.guests || budget) ? (
+            <div className="mt-3 flex items-center gap-3" data-testid="card-glance">
+              {item.guests ? (
+                <span className="inline-flex items-center rounded-full bg-success-bg px-2.5 py-1 text-[12px] font-bold text-success">
+                  {fmt(t.list.progress.replied, {
+                    pct: number(Math.min(100, Math.round((item.responses / item.guests) * 100))),
+                  })}
+                </span>
+              ) : null}
+              {budget ? (
+                <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-muted">
+                  <BudgetGauge
+                    size="xs"
+                    total={budget.total}
+                    committed={budget.committed}
+                    paid={budget.paid}
+                    planned={budget.planned}
+                    className="mx-0! w-[64px]!"
+                  />
+                  {t.list.progress.budget}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
 
           {next ? (
             <Hint text={t.list.nextHint}>
@@ -514,18 +556,6 @@ function EnvelopeDecor() {
         fill="#a0703f"
         className="list-hero-spark [animation-delay:1.2s]"
       />
-    </svg>
-  );
-}
-
-/** Empty-state illustration: an envelope with a seal (decorative, 120×120). */
-function EnvelopeArt() {
-  return (
-    <svg viewBox="0 0 120 120" fill="none">
-      <rect x="14" y="30" width="92" height="64" rx="8" fill="#F5F0E8" stroke="#D6CFC4" strokeWidth="2" />
-      <path d="M16 34 60 66l44-32" stroke="#D6CFC4" strokeWidth="2" strokeLinejoin="round" />
-      <circle cx="60" cy="66" r="13" fill="#731F2E" />
-      <circle cx="60" cy="66" r="9" stroke="#fff" strokeOpacity=".35" strokeWidth="1.5" />
     </svg>
   );
 }
