@@ -592,7 +592,8 @@ describe('responsive images', () => {
     const preloads = html.match(/<link rel="preload" as="image"[^>]*>/g) ?? [];
     expect(preloads).toHaveLength(1);
     expect(preloads[0]).toMatch(/imageSrcSet="[^"]*cine-sunset\.jpg[^"]*640w/);
-    expect(preloads[0]).toContain('fetchPriority="high"');
+    // first in line — unless the page opens on its cover, whose own picture is what the guest sees
+    expect(preloads[0]).toContain(doc.cover.enabled ? 'fetchPriority="auto"' : 'fetchPriority="high"');
     const pictures = html.match(/<img class="cine-img"[^>]*>/g) ?? [];
     expect(pictures.length).toBeGreaterThan(5);
     for (const img of pictures) expect(img).toContain('loading="lazy"');

@@ -20,6 +20,14 @@ const NONE: PageExtras = { insights: false, liveGallery: null };
  */
 export const pageExtras = cache(
   async (invitationId: string, doc: InvitationDocument): Promise<PageExtras> => {
+    const wantsGallery = doc.sections.some((s) => s.type === 'live_gallery' && s.enabled);
+    // the gallery's link is asked beside the features (not after them): one round trip, not two
+    const gallery = wantsGallery
+      ? invitationGalleryUrl(invitationId, doc.share.slug).catch((err) => {
+          console.error('page extras: the gallery’s link is unavailable', err);
+          return null;
+        })
+      : Promise.resolve(null);
     let features: Awaited<ReturnType<typeof featuresFor>>;
     try {
       features = await featuresFor(invitationId);
@@ -27,14 +35,10 @@ export const pageExtras = cache(
       console.error('page extras: the event’s features are unavailable', err);
       return NONE;
     }
-    const wantsGallery = doc.sections.some((s) => s.type === 'live_gallery' && s.enabled);
-    let liveGallery: PageExtras['liveGallery'] = null;
-    if (wantsGallery && features.has('live_gallery')) {
-      liveGallery = await invitationGalleryUrl(invitationId, doc.share.slug).catch((err) => {
-        console.error('page extras: the gallery’s link is unavailable', err);
-        return null;
-      });
-    }
-    return { insights: features.has('analytics'), liveGallery };
+    const link = await gallery;
+    return {
+      insights: features.has('analytics'),
+      liveGallery: features.has('live_gallery') ? link : null,
+    };
   },
 );

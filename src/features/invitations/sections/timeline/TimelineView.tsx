@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import type { SectionOf } from '../../contracts/types';
 import { Icon, TIMELINE_ICON } from '../../ui/Icon';
 import { Decoration, SecHead, editPath, iv, type SectionViewProps } from '../shared';
-import { FlipCards } from './FlipCards.client';
+import { FlipCards } from '../../renderer/lazy.client';
 
 export type TimelineVariant = 'horizontal-icons' | 'vertical' | 'flip-cards';
 

@@ -23,7 +23,7 @@ export default async function GlobalNotFound() {
   return (
     <html lang={locale} dir={uiDir(locale)}>
       <body>
-        <UiProvider locale={locale}>
+        <UiProvider locale={locale} scope="site">
           <SiteNotFound />
         </UiProvider>
       </body>

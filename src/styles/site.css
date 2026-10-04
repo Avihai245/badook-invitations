@@ -47,6 +47,14 @@
   opacity: 1;
 }
 
+/* ── below the first screen: not styled, laid out, painted or animated until it nears the screen ───
+   (the home page's sections — their scenes loop dozens of animations). `auto` keeps a section's real
+   size once it has been shown; --cv-size is the estimate before that. */
+.site-deferred {
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--cv-size, 900px);
+}
+
 /* ── scroll reveal (Reveal.client.tsx) ──────────────────────────────────────────────────────── */
 .reveal {
   transition:
@@ -87,9 +95,12 @@
   animation: site-rise 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   animation-delay: var(--rise-delay, 0ms);
 }
+/* from 1% rather than 0: invisible all the same, but the first screen's words count as painted with
+   the first frame (a browser leaves a fully transparent element out of the Largest Contentful Paint
+   until it shows, which made the page's main heading its last paint) */
 @keyframes site-rise {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: translateY(26px);
     filter: blur(6px);
   }

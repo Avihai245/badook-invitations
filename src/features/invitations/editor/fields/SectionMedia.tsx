@@ -13,7 +13,15 @@ import { patchSectionMedia, setSectionMedia } from '../presentation';
 import { useEditor } from '../state/EditorProvider';
 import { CaptionsField } from './captions';
 import { FieldFrame } from './fields';
-import { IMAGE_TYPES, UploadTile, VIDEO_TYPES, captureVideoStill, useUpload, useUploader } from './media';
+import {
+  IMAGE_TYPES,
+  UploadTile,
+  VIDEO_TYPES,
+  captureVideoStill,
+  size,
+  useUpload,
+  useUploader,
+} from './media';
 
 /** A picture (or a video, by its still) the invitation already has — the media picker's library. */
 export interface InvitationPicture {
@@ -269,7 +277,12 @@ export function SectionMediaField({ index }: { index: number }) {
           () => null,
         );
     }
-    set(withScrim({ kind: res.kind, src: res.ref, poster, focalPoint: { x: 0.5, y: 0.5 } }, await needed));
+    set(
+      withScrim(
+        { kind: res.kind, src: res.ref, poster, focalPoint: { x: 0.5, y: 0.5 }, ...size(res) },
+        await needed,
+      ),
+    );
     setLibrary(false);
   };
 

@@ -25,9 +25,11 @@ import { serverEnv } from '@/lib/env';
 
 type Params = Promise<{ slug: string; lang: string }>;
 
-// ISR (§1.1 rule 5): cached per slug + locale, refreshed at most a minute after a change even where
-// on-demand revalidation (revalidatePath on publish) is unavailable. Unknown slugs render on demand.
-export const revalidate = 60;
+// ISR (§1.1 rule 5): cached per slug + locale, on the server and the CDN. Every change a guest would
+// see refreshes it on demand (server/revalidate.ts: publishing, edits, features, the account's end);
+// the time limit only catches what changes with the clock — the RSVP deadline passing, a plan ending —
+// within ten minutes. Unknown slugs render on demand.
+export const revalidate = 600;
 export const dynamicParams = true;
 export async function generateStaticParams(): Promise<{ slug: string; lang: string }[]> {
   return [];

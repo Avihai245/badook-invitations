@@ -12,13 +12,16 @@ next-env.d.ts
 public/fonts/
 # the face search's model, copied from node_modules at build time (scripts/copy-face-models.mjs)
 public/face-models/
+# the posters' pre-rendered scenery (scripts/build-poster-art.tsx)
+public/poster-art/
 
 # env — only .env.example is committed; .env.production is written by amplify.yml during the build
 .env
 .env.*
 !.env.example
 
-# tests
+# tests (and Lighthouse CI's working folder)
+.lighthouseci/
 test-results/
 playwright-report/
 coverage/

@@ -280,12 +280,12 @@
       flex: none;
     }
   </style>
-  <div id="root" data-composition-id="07-share" data-width="1080" data-height="1920" data-duration="10.27">
+  <div id="root" data-composition-id="07-share" data-width="1080" data-height="1920" data-duration="10.77">
     <!-- full-bleed cream ground -->
-    <div id="07-share-bg" class="clip" data-start="0" data-duration="10.27" data-track-index="0"></div>
+    <div id="07-share-bg" class="clip" data-start="0" data-duration="10.77" data-track-index="0"></div>
 
     <!-- stage: share screen card + phone (enters in Scene 3) -->
-    <div id="07-share-stage" class="clip" data-start="0" data-duration="10.27" data-track-index="1">
+    <div id="07-share-stage" class="clip" data-start="0" data-duration="10.77" data-track-index="1">
       <div id="07-share-cardwrap">
         <div id="07-share-card">
           <div id="07-share-world">
@@ -323,11 +323,11 @@
           <!-- page B: prefilled RSVP -->
           <div class="07-share-pg" id="07-share-pg-rsvp">
             <img src="assets/phone-personal-rsvp.png" alt="" />
-            <!-- fields CSS [62,380,266,150] (+12 CSS pad) → screen-local [63.85,469.91,370.31,222.18] -->
-            <div class="07-share-spot" id="07-share-ph-spot" style="left: 63.85px; top: 469.91px; width: 370.31px; height: 222.18px;"></div>
-            <div class="07-share-ring" id="07-share-ring3" style="left: 63.85px; top: 469.91px; width: 370.31px; height: 222.18px;">
+            <!-- fields CSS [62,380,266,150] (pad → [50,368,290,182]) → screen-local [63.85,469.91,370.31,232.4] -->
+            <div class="07-share-spot" id="07-share-ph-spot" style="left: 63.85px; top: 469.91px; width: 370.31px; height: 232.4px;"></div>
+            <div class="07-share-ring" id="07-share-ring3" style="left: 63.85px; top: 469.91px; width: 370.31px; height: 232.4px;">
               <div class="07-share-ring-glow" id="07-share-ring3-glow"></div>
-              <svg width="370.31" height="222.18" aria-hidden="true"><path id="07-share-ring3-path" pathLength="1" data-w="370.31" data-h="222.18" /></svg>
+              <svg width="370.31" height="232.4" aria-hidden="true"><path id="07-share-ring3-path" pathLength="1" data-w="370.31" data-h="232.4" /></svg>
             </div>
           </div>
         </div>
@@ -335,7 +335,7 @@
     </div>
 
     <!-- top block: kicker + headline + chip row -->
-    <div id="07-share-top" class="clip" data-start="0" data-duration="10.27" data-track-index="2" dir="rtl" lang="he">
+    <div id="07-share-top" class="clip" data-start="0" data-duration="10.77" data-track-index="2" dir="rtl" lang="he">
       <div id="07-share-kicker" dir="rtl" lang="he">06 · משתפים</div>
       <h1 id="07-share-head" dir="rtl" lang="he"><span class="07-share-word" id="07-share-w1">קישור</span> <span class="07-share-word" id="07-share-w2">משלה</span></h1>
       <div id="07-share-rule"></div>
@@ -412,8 +412,8 @@
       tl.fromTo(el("ring2-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.out" }, 4.45);
       tl.fromTo(el("ring2-glow"), { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 4.85);
 
-      // ── Scene 3 (4.9–8.1s): pivot — the card slides aside (≈70%, dims to 60%), the phone takes the weight ──
-      tl.fromTo(el("cardwrap"), { x: 0, scale: 1, opacity: 1 }, { x: -50, scale: 0.7, opacity: 0.6, duration: 1.0, ease: "power3.inOut" }, 4.9);
+      // ── Scene 3 (4.9–8.1s): pivot — the card slides aside (≈65–70% so the QR stays clear of the phone, dims to 60%), the phone takes the weight ──
+      tl.fromTo(el("cardwrap"), { x: 0, scale: 1, opacity: 1 }, { x: -50, scale: 0.65, opacity: 0.6, duration: 1.0, ease: "power3.inOut" }, 4.9);
       tl.fromTo(el("spot2"), { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "power1.out", immediateRender: false }, 4.95);
       tl.fromTo(el("phone"), { opacity: 0, x: 160, y: 40, scale: 0.94 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 1.0, ease: "power3.out" }, 5.1);
       // headline steps back as the new idea arrives

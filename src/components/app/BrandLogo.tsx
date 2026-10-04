@@ -1,13 +1,24 @@
-/* eslint-disable @next/next/no-img-element -- the logo is a small static PNG already sized for 2x, in two versions the look switches between by CSS: nothing for the image optimizer to add */
+/* The logo is a small static image already sized for 2x and 3x (AVIF / WebP), in two versions the look switches between by CSS: nothing for the image optimizer to add. */
 import type { ReactNode } from 'react';
 import { cn } from './utils';
 
-const LOGO = {
-  src: '/brand/badook-logo.png',
-  light: '/brand/badook-logo-light.png',
-  width: 480,
-  height: 161,
-};
+/**
+ * The logo's files (public/brand, from badook-logo[-light].png): AVIF and WebP at 240 and 360 px wide
+ * (2x and 3x of the ~115 px it is shown at), content-hashed — cached for good (next.config.ts).
+ */
+const FILES = {
+  dark: {
+    avif: '/brand/badook-logo-240.5c37863668.avif 240w, /brand/badook-logo-360.d54b67750a.avif 360w',
+    webp: '/brand/badook-logo-240.f138f56276.webp 240w, /brand/badook-logo-360.46f13ad321.webp 360w',
+    src: '/brand/badook-logo-240.f138f56276.webp',
+  },
+  light: {
+    avif: '/brand/badook-logo-light-240.f65a36dc71.avif 240w, /brand/badook-logo-light-360.4f922f5751.avif 360w',
+    webp: '/brand/badook-logo-light-240.6759b05e6a.webp 240w, /brand/badook-logo-light-360.ec6c7761fb.webp 360w',
+    src: '/brand/badook-logo-light-240.6759b05e6a.webp',
+  },
+} as const;
+const LOGO = { width: 480, height: 161, sizes: '120px' };
 
 /**
  * The Badook logo (public/brand): the orange wordmark and its line "בדוק וסגרתם אירוע". Its height
@@ -26,24 +37,29 @@ export function BrandLogo({
   tone?: 'auto' | 'onDark';
   suffix?: ReactNode;
 }) {
-  const img = (src: string, extra?: string) => (
-    <img
-      src={src}
-      alt={label}
-      width={LOGO.width}
-      height={LOGO.height}
-      decoding="async"
-      className={cn('h-[2.1em] w-auto max-w-none shrink-0', extra)}
-    />
+  const img = (file: (typeof FILES)[keyof typeof FILES], extra?: string) => (
+    <picture className={cn('contents', extra)}>
+      <source type="image/avif" srcSet={file.avif} sizes={LOGO.sizes} />
+      <img
+        src={file.src}
+        srcSet={file.webp}
+        sizes={LOGO.sizes}
+        alt={label}
+        width={LOGO.width}
+        height={LOGO.height}
+        decoding="async"
+        className={cn('h-[2.1em] w-auto max-w-none shrink-0', extra)}
+      />
+    </picture>
   );
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
       {tone === 'onDark' ? (
-        img(LOGO.light)
+        img(FILES.light)
       ) : (
         <>
-          {img(LOGO.src, 'dark:hidden')}
-          {img(LOGO.light, 'hidden dark:block')}
+          {img(FILES.dark, 'dark:hidden')}
+          {img(FILES.light, 'hidden dark:block')}
         </>
       )}
       {suffix ? <span className="text-[0.8em] font-bold tracking-tight">{suffix}</span> : null}

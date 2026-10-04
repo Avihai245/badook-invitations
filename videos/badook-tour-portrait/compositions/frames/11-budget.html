@@ -335,13 +335,13 @@
     }
   </style>
 
-  <div id="root" data-composition-id="11-budget" data-width="1080" data-height="1920" data-duration="14.516">
+  <div id="root" data-composition-id="11-budget" data-width="1080" data-height="1920" data-duration="14.916">
 
     <!-- full-bleed cream ground -->
-    <div id="11-budget-bg" class="clip" data-start="0" data-duration="14.516" data-track-index="0"></div>
+    <div id="11-budget-bg" class="clip" data-start="0" data-duration="14.916" data-track-index="0"></div>
 
     <!-- WINDOW: the phone page in the house screen card; it scrolls (cut-the-curve) to each subject -->
-    <div id="11-budget-window" class="clip" data-start="0" data-duration="14.516" data-track-index="1">
+    <div id="11-budget-window" class="clip" data-start="0" data-duration="14.916" data-track-index="1">
       <div id="11-budget-win">
         <div id="11-budget-wscroll">
           <div id="11-budget-wworld" class="11-budget-world">
@@ -394,7 +394,7 @@
     </div>
 
     <!-- HERO: the gauge card zoomed; the gauge itself is rebuilt exactly over the screenshot's gauge -->
-    <div id="11-budget-hero" class="clip" data-start="0" data-duration="14.516" data-track-index="2">
+    <div id="11-budget-hero" class="clip" data-start="0" data-duration="14.916" data-track-index="2">
       <div id="11-budget-hero-cam">
         <div id="11-budget-hero-in">
           <div id="11-budget-hero-card">
@@ -504,7 +504,7 @@
     </div>
 
     <!-- TOP BLOCK: kicker + headline, on their words -->
-    <div id="11-budget-top" class="clip" data-start="0" data-duration="14.516" data-track-index="3" dir="rtl" lang="he">
+    <div id="11-budget-top" class="clip" data-start="0" data-duration="14.916" data-track-index="3" dir="rtl" lang="he">
       <div id="11-budget-kicker">10 · תקציב</div>
       <h1 id="11-budget-head">
         <span class="11-budget-hl" id="11-budget-hl1">איפה אתם</span>
@@ -596,16 +596,16 @@
       pop("zp-safe2", 9.6, true);
       fade("lineplate", 1, 0, 9.6, 0.25, "power2.out");
 
-      // ── Scene 6a (9.8–10.5s): zoom out — the hero card shrinks exactly onto the gauge card inside the
+      // ── Scene 6a (9.72–10.3s): zoom out — the hero card shrinks exactly onto the gauge card inside the
       // screen card while the rest of the page fades in around it (hero card 30,476 · 1020 wide ↔ page CSS
       // (17,323) in the card at crop y 200: 129.2,733.8 · 821.5 wide) ──
       var S = 900 / 390;
       var HX = 30, HY = 476, HW = 1020;
       var WX = 90 + 17 * S, WY = 450 + (323 - 200) * S, WW = 356 * S;
       var k1 = WW / HW;
-      tl.fromTo(el("hero-cam"), { x: 0, y: 0, scale: 1 }, { x: WX - k1 * HX, y: WY - k1 * HY, scale: k1, duration: 0.7, ease: "power3.inOut" }, 9.8);
-      fade("window", 0, 1, 9.85, 0.4, "power1.out", true);
-      fade("hero", 1, 0, 10.42, 0.12, "none", true);
+      tl.fromTo(el("hero-cam"), { x: 0, y: 0, scale: 1 }, { x: WX - k1 * HX, y: WY - k1 * HY, scale: k1, duration: 0.55, ease: "power3.inOut" }, 9.72);
+      fade("window", 0, 1, 9.75, 0.35, "power1.out", true);
+      fade("hero", 1, 0, 10.2, 0.1, "none", true);
 
       // spotlight rings: ring draws on, glow + dim cut-out follow
       function ring(name, at) {
@@ -619,8 +619,8 @@
       var Y0 = -200 * S, YPAY = -2759.3 * S, YBASIS = -935 * S, D = 240;
 
       // 10.3s "הוצאות" — add expense
-      ring("add", 10.3);
-      tl.fromTo(el("c-add"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 10.42);
+      ring("add", 10.32);
+      tl.fromTo(el("c-add"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 10.4);
 
       // ── Scene 6b (10.75s): cut-the-curve scroll down to payments (accelerate out → jump → decelerate in) ──
       tl.fromTo(el("hole-add"), { opacity: 1 }, { opacity: 0, duration: 0.18, ease: "power2.in", immediateRender: false }, 10.75);

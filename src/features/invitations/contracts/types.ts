@@ -120,6 +120,13 @@ export interface Media {
   captions?: L10n | null;
   /** the host says the video has speech (it then needs captions: a publish warning); absent: not said */
   speech?: boolean | null;
+  /**
+   * Its pixel size — an uploaded photo's, read in the browser as it was uploaded (editor
+   * prepare-image.ts): the page gives the picture its width / height so its box is kept before it loads.
+   * Absent for older documents and links.
+   */
+  width?: number | null;
+  height?: number | null;
 }
 
 // ---------- v2: cinematic presentation (feature `cinematic`) ----------
@@ -460,7 +467,12 @@ export type Section =
   | Base<'faq', { title: L10n; items: { id: string; q: L10n; a: L10n }[] }>
   | Base<
       'gallery',
-      { title: L10n | null; layout: 'carousel' | 'grid'; images: { id: string; src: AssetRef; alt: L10n }[] }
+      {
+        title: L10n | null;
+        layout: 'carousel' | 'grid';
+        /** width / height: an uploaded photo's pixel size (as Media's) */
+        images: { id: string; src: AssetRef; alt: L10n; width?: number; height?: number }[];
+      }
     >
   | Base<
       'gifts',

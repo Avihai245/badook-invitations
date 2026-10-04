@@ -1,0 +1,443 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="07-share-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 980px 820px at 92% 4%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    [id="07-share-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ── screen card: phone-share.png (390 CSS wide) at k = 900/390 = 2.307692 px per CSS px.
+       Card 900×1120 at (90,450). World = the page image; card-local X = wx + x·k·z, Y = wy + y·k·z ── */
+    [id="07-share-cardwrap"] {
+      position: absolute;
+      left: 90px;
+      top: 450px;
+      width: 900px;
+      height: 1120px;
+      transform-origin: 0% 50%;
+      z-index: 1;
+    }
+    [id="07-share-card"] {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border-radius: 28px;
+      background: #FFFFFF;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+    }
+    [id="07-share-world"] {
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 900px;
+      height: 3955.385px;
+      transform-origin: 0 0;
+    }
+    [id="07-share-world"] img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 3955.385px;
+      display: block;
+    }
+    [id="07-share-ov"] {
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 900px;
+      height: 1120px;
+    }
+
+    [class~="07-share-spot"] {
+      position: absolute;
+      border-radius: 16px;
+      box-shadow: 0 0 0 3000px rgba(28, 25, 23, 0.36);
+      opacity: 0;
+    }
+    [class~="07-share-ring"] {
+      position: absolute;
+      border-radius: 16px;
+    }
+    [class~="07-share-ring-glow"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      box-shadow: 0 0 0 8px rgba(160, 112, 63, 0.18), 0 0 26px rgba(160, 112, 63, 0.28);
+      opacity: 0;
+    }
+    [class~="07-share-ring"] svg {
+      position: absolute;
+      inset: 0;
+      overflow: visible;
+    }
+    [class~="07-share-ring"] path {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    /* callout pill + hairline leader under the link field (card-local) */
+    [id="07-share-leader"] {
+      position: absolute;
+      left: 744px;
+      top: 902px;
+      width: 1.5px;
+      height: 30px;
+      background: #A0703F;
+      transform-origin: 50% 0%;
+    }
+    [id="07-share-pill"] {
+      position: absolute;
+      right: 75.4px;
+      top: 932px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 30px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      color: #A0703F;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1;
+      white-space: nowrap;
+      direction: rtl;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.06);
+      transform-origin: 85% 0%;
+    }
+    [id="07-share-pill"] svg {
+      width: 34px;
+      height: 34px;
+      flex: none;
+    }
+
+    /* ── phone device (personal link): screen 498×1077.7 (p = 498/390 = 1.276923), 16px bezel ── */
+    [id="07-share-phone"] {
+      position: absolute;
+      left: 500px;
+      top: 455px;
+      width: 530px;
+      height: 1109.7px;
+      box-sizing: border-box;
+      padding: 16px;
+      border-radius: 64px;
+      background: #1C1917;
+      box-shadow:
+        inset 0 0 0 1px rgba(251, 247, 241, 0.10),
+        0 1px 3px rgba(28, 25, 23, 0.08),
+        0 30px 60px -20px rgba(60, 35, 15, 0.45),
+        0 6px 18px rgba(28, 25, 23, 0.06);
+      z-index: 3;
+      transform-origin: 50% 50%;
+    }
+    [id="07-share-screen"] {
+      position: relative;
+      width: 498px;
+      height: 1077.7px;
+      overflow: hidden;
+      border-radius: 50px;
+      background: #F8F1EE;
+    }
+    [class~="07-share-pg"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 498px;
+      height: 1077.7px;
+    }
+    [class~="07-share-pg"] img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 498px;
+      height: 1077.7px;
+      display: block;
+    }
+    /* marker highlight under the greeting: CSS ≈ [108,226,175,24] → screen-local ×p */
+    [id="07-share-marker"] {
+      position: absolute;
+      left: 137.9px;
+      top: 288.6px;
+      width: 223.5px;
+      height: 30.6px;
+      border-radius: 5px;
+      background: rgba(160, 112, 63, 0.78);
+      mix-blend-mode: screen;
+      transform-origin: 100% 50%;
+    }
+    [id="07-share-ph-spot"] {
+      border-radius: 16px;
+      box-shadow: 0 0 0 1600px rgba(28, 25, 23, 0.30);
+    }
+
+    /* ── top block (RTL, x 90–990) ── */
+    [id="07-share-top"] {
+      position: absolute;
+      left: 90px;
+      top: 0;
+      width: 900px;
+      height: 450px;
+      direction: rtl;
+      text-align: right;
+      z-index: 4;
+    }
+    [id="07-share-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 104px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="07-share-head"] {
+      position: absolute;
+      right: 0;
+      top: 162px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 120px;
+      line-height: 1.04;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [class~="07-share-word"] {
+      display: inline-block;
+    }
+    [id="07-share-rule"] {
+      position: absolute;
+      right: 0;
+      top: 336px;
+      width: 900px;
+      height: 1px;
+      background: rgba(28, 25, 23, 0.12);
+      transform-origin: 100% 50%;
+    }
+    [id="07-share-chip"] {
+      position: absolute;
+      right: 0;
+      top: 360px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 30px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1;
+      white-space: nowrap;
+      direction: rtl;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 10px 28px -12px rgba(122, 82, 48, 0.55);
+      transform-origin: 100% 50%;
+    }
+    [id="07-share-chip"] svg {
+      width: 32px;
+      height: 32px;
+      flex: none;
+    }
+  </style>
+  <div id="root" data-composition-id="07-share" data-width="1080" data-height="1920" data-duration="10.27">
+    <!-- full-bleed cream ground -->
+    <div id="07-share-bg" class="clip" data-start="0" data-duration="10.27" data-track-index="0"></div>
+
+    <!-- stage: share screen card + phone (enters in Scene 3) -->
+    <div id="07-share-stage" class="clip" data-start="0" data-duration="10.27" data-track-index="1">
+      <div id="07-share-cardwrap">
+        <div id="07-share-card">
+          <div id="07-share-world">
+            <img src="assets/phone-share.png" alt="" />
+          </div>
+          <div id="07-share-ov">
+            <!-- link-field [146,483,207,40] at crop cy=140 → card-local [336.92,791.54,477.69,92.31]; +10 pad -->
+            <div class="07-share-spot" id="07-share-spot1" style="left: 326.92px; top: 781.54px; width: 497.69px; height: 112.31px;"></div>
+            <!-- qr box [193,1325,160,160] after zoom (x −450, y −4303.46, ×1.5 → 3.4615 px/CSS) → [218.08,283.08,553.85,553.85]; +12 pad -->
+            <div class="07-share-spot" id="07-share-spot2" style="left: 206.08px; top: 271.08px; width: 577.85px; height: 577.85px;"></div>
+            <div class="07-share-ring" id="07-share-ring1" style="left: 326.92px; top: 781.54px; width: 497.69px; height: 112.31px;">
+              <div class="07-share-ring-glow" id="07-share-ring1-glow"></div>
+              <svg width="497.69" height="112.31" aria-hidden="true"><path id="07-share-ring1-path" pathLength="1" data-w="497.69" data-h="112.31" /></svg>
+            </div>
+            <div class="07-share-ring" id="07-share-ring2" style="left: 206.08px; top: 271.08px; width: 577.85px; height: 577.85px;">
+              <div class="07-share-ring-glow" id="07-share-ring2-glow"></div>
+              <svg width="577.85" height="577.85" aria-hidden="true"><path id="07-share-ring2-path" pathLength="1" data-w="577.85" data-h="577.85" /></svg>
+            </div>
+            <div id="07-share-leader"></div>
+            <div id="07-share-pill" dir="rtl" lang="he">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2" fill="none" stroke="#A0703F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <span>קישור משלה</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="07-share-phone">
+        <div id="07-share-screen">
+          <!-- page A: personal hero -->
+          <div class="07-share-pg" id="07-share-pg-hero">
+            <img src="assets/phone-personal-hero.png" alt="" />
+            <div id="07-share-marker"></div>
+          </div>
+          <!-- page B: prefilled RSVP -->
+          <div class="07-share-pg" id="07-share-pg-rsvp">
+            <img src="assets/phone-personal-rsvp.png" alt="" />
+            <!-- fields CSS [62,380,266,150] (pad → [50,368,290,182]) → screen-local [63.85,469.91,370.31,232.4] -->
+            <div class="07-share-spot" id="07-share-ph-spot" style="left: 63.85px; top: 469.91px; width: 370.31px; height: 232.4px;"></div>
+            <div class="07-share-ring" id="07-share-ring3" style="left: 63.85px; top: 469.91px; width: 370.31px; height: 232.4px;">
+              <div class="07-share-ring-glow" id="07-share-ring3-glow"></div>
+              <svg width="370.31" height="232.4" aria-hidden="true"><path id="07-share-ring3-path" pathLength="1" data-w="370.31" data-h="232.4" /></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- top block: kicker + headline + chip row -->
+    <div id="07-share-top" class="clip" data-start="0" data-duration="10.27" data-track-index="2" dir="rtl" lang="he">
+      <div id="07-share-kicker" dir="rtl" lang="he">06 · משתפים</div>
+      <h1 id="07-share-head" dir="rtl" lang="he"><span class="07-share-word" id="07-share-w1">קישור</span> <span class="07-share-word" id="07-share-w2">משלה</span></h1>
+      <div id="07-share-rule"></div>
+      <div id="07-share-chip" dir="rtl" lang="he">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 4.6 2.9 6.9 7.5 7.5-4.6.6-6.9 2.9-7.5 7.5-.6-4.6-2.9-6.9-7.5-7.5 4.6-.6 6.9-2.9 7.5-7.5z" fill="#FBF7F1" /><path d="M19 15.5c.25 1.9 1.1 2.75 3 3-1.9.25-2.75 1.1-3 3-.25-1.9-1.1-2.75-3-3 1.9-.25 2.75-1.1 3-3z" fill="#FBF7F1" /></svg>
+        <span>קישור אישי לכל מוזמן</span>
+      </div>
+    </div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="07-share"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="07-share-' + name + '"]') || document.getElementById("07-share-" + name);
+      }
+
+      // rounded-rect ring path (r = 16, 4px stroke), drawn from the top-right going left (RTL reading edge)
+      function ringD(w, h) {
+        var r = 16, p = 2;
+        var L = p, T = p, R = w - p, B = h - p;
+        return "M" + (R - r) + " " + T + " H" + (L + r) +
+          " A" + r + " " + r + " 0 0 0 " + L + " " + (T + r) +
+          " V" + (B - r) +
+          " A" + r + " " + r + " 0 0 0 " + (L + r) + " " + B +
+          " H" + (R - r) +
+          " A" + r + " " + r + " 0 0 0 " + R + " " + (B - r) +
+          " V" + (T + r) +
+          " A" + r + " " + r + " 0 0 0 " + (R - r) + " " + T + " Z";
+      }
+      ["ring1-path", "ring2-path", "ring3-path"].forEach(function (n) {
+        var p = el(n);
+        if (p) p.setAttribute("d", ringD(parseFloat(p.getAttribute("data-w")), parseFloat(p.getAttribute("data-h"))));
+      });
+
+      // camera states of the share page (k = 2.307692 px per CSS px)
+      var K = 900 / 390;
+      var Y_TOP = -50 * K;    // crop from CSS y 50: event header ("פורסם") + headline + link card
+      var Y_LINK = -140 * K;  // crop from CSS y 140: link field sits mid-card
+      var Z = 1.5;            // QR zoom (3.46 px per CSS px; capture is 3×)
+      var X_QR = -450;        // 450 − 273·K·Z = −495, clamped to 900 − 390·K·Z = −450 so the page keeps covering the card
+      var Y_QR = 560 - 1405 * K * Z; // QR box center (273,1405) → card center y
+
+      var tl = gsap.timeline({ paused: true });
+
+      gsap.set(el("world"), { x: 0, y: Y_TOP, scale: 1 });
+      gsap.set(el("pg-rsvp"), { y: 300, opacity: 0 });
+      gsap.set(el("phone"), { opacity: 0 });
+      gsap.set(el("chip"), { opacity: 0 });
+      gsap.set(el("pill"), { opacity: 0 });
+      gsap.set(el("leader"), { scaleY: 0 });
+
+      // ── Scene 1 (0.0–2.5s): the share screen enters (published header → link card); kicker + headline ──
+      tl.fromTo(el("card"), { opacity: 0, scale: 0.96, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.9, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.2);
+      tl.fromTo(el("w1"), { opacity: 0, y: 56 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.45);
+      tl.fromTo(el("w2"), { opacity: 0, y: 56 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.67);
+      tl.fromTo(el("rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 1.2);
+      // settle the page so the link field sits mid-card before its cue
+      tl.fromTo(el("world"), { x: 0, y: Y_TOP, scale: 1 }, { x: 0, y: Y_LINK, scale: 1, duration: 1.2, ease: "power3.inOut" }, 1.1);
+
+      // ── Scene 2 (2.5–4.9s): ring on link-field + pill; zoom-to-target on QR + ring ──
+      tl.fromTo(el("spot1"), { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power1.out" }, 2.5);
+      tl.fromTo(el("ring1-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 2.5);
+      tl.fromTo(el("ring1-glow"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 2.95);
+      tl.fromTo(el("leader"), { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power2.out" }, 2.85);
+      // spring-pop-entrance (smooth settle, no bounce)
+      tl.fromTo(el("pill"), { opacity: 0, scale: 0.82, y: -8 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 2.95);
+      // link callout clears before the camera commits to the QR
+      tl.fromTo([el("spot1"), el("ring1"), el("leader"), el("pill")], { opacity: 1 }, { opacity: 0, duration: 0.25, ease: "power1.in", immediateRender: false }, 3.4);
+      // coordinate-target-zoom: world scales 1.5× about its origin while translating the QR box to card center
+      tl.fromTo(el("world"), { x: 0, y: Y_LINK, scale: 1 }, { x: X_QR, y: Y_QR, scale: Z, duration: 1.0, ease: "power3.inOut", immediateRender: false }, 3.6);
+      tl.fromTo(el("spot2"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 4.4);
+      tl.fromTo(el("ring2-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.out" }, 4.45);
+      tl.fromTo(el("ring2-glow"), { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 4.85);
+
+      // ── Scene 3 (4.9–8.1s): pivot — the card slides aside (≈65–70% so the QR stays clear of the phone, dims to 60%), the phone takes the weight ──
+      tl.fromTo(el("cardwrap"), { x: 0, scale: 1, opacity: 1 }, { x: -50, scale: 0.65, opacity: 0.6, duration: 1.0, ease: "power3.inOut" }, 4.9);
+      tl.fromTo(el("spot2"), { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "power1.out", immediateRender: false }, 4.95);
+      tl.fromTo(el("phone"), { opacity: 0, x: 160, y: 40, scale: 0.94 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 1.0, ease: "power3.out" }, 5.1);
+      // headline steps back as the new idea arrives
+      tl.fromTo(el("head"), { opacity: 1 }, { opacity: 0.45, duration: 0.6, ease: "power2.out" }, 5.95);
+      // feature chip (spring-pop, smooth settle)
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.8, x: 30 }, { opacity: 1, scale: 1, x: 0, duration: 0.6, ease: "power3.out" }, 6.1);
+      // brown marker sweeps under the greeting (RTL: from the right edge)
+      tl.fromTo(el("marker"), { scaleX: 0, skewX: -4 }, { scaleX: 1, skewX: -4, duration: 0.5, ease: "power2.out" }, 7.4);
+
+      // ── Scene 4 (8.1–10.27s): cut-the-curve (upward) inside the phone → prefilled RSVP; fields ring ──
+      // exit: y 0 → −300 on power4.in, fade completes ~30% in; entry: y +300 → 0 on power4.out (mirrored distance + duration)
+      tl.fromTo(el("pg-hero"), { y: 0 }, { y: -300, duration: 0.3, ease: "power4.in" }, 7.95);
+      tl.fromTo(el("pg-hero"), { opacity: 1 }, { opacity: 0, duration: 0.2, ease: "power1.in", immediateRender: false }, 8.05);
+      tl.fromTo(el("pg-rsvp"), { y: 300 }, { y: 0, duration: 0.3, ease: "power4.out" }, 8.25);
+      tl.fromTo(el("pg-rsvp"), { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "power1.out" }, 8.25);
+      tl.fromTo(el("ph-spot"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 8.5);
+      tl.fromTo(el("ring3-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 8.5);
+      tl.fromTo(el("ring3-glow"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 9.0);
+
+      // hold to the last frame
+      tl.set({}, {}, 10.27);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["07-share"] = tl;
+    })();
+  </script>
+</template>

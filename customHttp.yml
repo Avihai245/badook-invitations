@@ -1,0 +1,40 @@
+# Amplify Hosting's headers for the files it serves itself (public/ and the build's static assets) —
+# these take precedence over next.config.ts, which the CDN does not apply to static files. Every path
+# marked immutable is versioned by name or folder (a content hash, a package version, the build's
+# poster-art hash), so a change gets a new address. Never a global rule: the app's private, no-store
+# responses must keep their own headers.
+customHeaders:
+  - pattern: '/_next/static/**'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=31536000, immutable
+  # self-hosted fonts: /fonts/<family>/<version>/… (scripts/build-fonts.mjs)
+  - pattern: '/fonts/**'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=31536000, immutable
+  # the site's videos, posters and captions: <name>.<hash>.<ext> (scripts/encode-site-video.mjs)
+  - pattern: '/video/**'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=31536000, immutable
+  # the logo: <name>-<width>.<hash>.<ext>
+  - pattern: '/brand/**'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=31536000, immutable
+  # the posters' pre-rendered scenery: /poster-art/<hash>/… (scripts/build-poster-art.tsx)
+  - pattern: '/poster-art/**'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=31536000, immutable
+  # the face search's model: /face-models/<version>/… (scripts/copy-face-models.mjs)
+  - pattern: '/face-models/**'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=31536000, immutable
+  # the templates' own pictures (not versioned by name): a day, then refreshed in the background
+  - pattern: '/templates/**'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=86400, stale-while-revalidate=2592000

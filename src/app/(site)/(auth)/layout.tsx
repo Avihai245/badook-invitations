@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BrandLogo } from '@/components/app';
-import { posterSample } from '@/features/invitations/app/poster';
-import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
-import { TemplatePoster } from '@/features/invitations/app/TemplatePoster';
+import { posterFontsUrl } from '@/features/invitations/app/poster-art';
+import { PosterArtLoader } from '@/features/invitations/app/PosterArtLoader.client';
+import { LazyTemplatePoster } from '@/features/invitations/app/LazyTemplatePoster';
 import { requireTemplate } from '@/features/invitations/templates/registry';
 import { assertInvitationsEnabled } from '@/lib/feature';
 import { getUi } from '@/lib/i18n/server';
@@ -65,7 +65,8 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
         aria-hidden
         className="relative isolate hidden overflow-hidden bg-[#2A1D1A] text-white lg:flex lg:flex-col lg:items-center lg:justify-center lg:gap-10 lg:px-10"
       >
-        <style dangerouslySetInnerHTML={{ __html: POSTER_FONT_CSS }} />
+        {/* the posters' contents and fonts, fetched only where the panel shows (wide screens) */}
+        <PosterArtLoader fontsUrl={posterFontsUrl()} />
         <div
           className="absolute inset-0 -z-10"
           style={{
@@ -86,12 +87,7 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
             >
               <div className="rounded-[1.9rem] bg-[#141210] p-[7px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)] ring-1 ring-white/10">
                 <div className="overflow-hidden rounded-[1.55rem]">
-                  <TemplatePoster
-                    template={requireTemplate(id).manifest}
-                    locale={locale}
-                    text={posterSample(id, locale)}
-                    frameless
-                  />
+                  <LazyTemplatePoster template={requireTemplate(id).manifest} locale={locale} frameless />
                 </div>
               </div>
             </div>

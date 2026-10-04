@@ -1,0 +1,613 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="09-rsvp-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 760px at 92% 4%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── stage: the phone capture as a screen card, big (house layout) ──
+       390-CSS-wide capture shown 900 px wide → k = 900/390 = 2.3076923 px per CSS px.
+       Card x 90–990, y 440–1543 (1103 px = 478 CSS px of page).
+       View A (Scenes 1–3): page y 300–778 (the four stat cards).
+       View B (Scene 4):    page y 765–1243 (the general-link banner) — reached by a cut-the-curve.
+       Screen (card-local) X = x·k ; Y = (y − cy)·k                                               */
+    [id="09-rsvp-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="09-rsvp-cam"] {
+      position: absolute;
+      inset: 0;
+      transform-origin: 540px 991px;
+    }
+    [id="09-rsvp-card"] {
+      position: absolute;
+      left: 90px;
+      top: 440px;
+      width: 900px;
+      height: 1103px;
+      overflow: hidden;
+      background: #FAFAF9;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-sizing: border-box;
+      border-radius: 28px;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 24px 60px -24px rgba(60, 35, 15, 0.35);
+    }
+    [class~="09-rsvp-pane"] {
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 900px;
+      height: 1103px;
+      overflow: hidden; /* bounds the cut's blur layer to the visible crop */
+    }
+    [class~="09-rsvp-world"] {
+      position: absolute;
+      left: 0;
+      width: 390px;
+      height: 3519px;
+      transform-origin: 0 0;
+      transform: scale(2.3076923);
+    }
+    [id="09-rsvp-world-a"] { top: -692.308px; } /* −300·k */
+    [id="09-rsvp-world-b"] { top: -1765.385px; } /* −765·k */
+    [class~="09-rsvp-shot"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 390px;
+      height: 3519px;
+      display: block;
+    }
+    [id="09-rsvp-nums"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 390px;
+      height: 3519px;
+      overflow: visible;
+    }
+    [class~="09-rsvp-num"] {
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      fill: #1C1917;
+      font-variant-numeric: tabular-nums;
+    }
+    /* spotlight cut-outs (page CSS px): the box stays clear, the rest of the page recedes */
+    [class~="09-rsvp-spot"] {
+      position: absolute;
+      border-radius: 24px;
+      box-shadow: 0 0 0 3000px rgba(251, 247, 241, 0.55);
+      opacity: 0;
+      pointer-events: none;
+    }
+    [id="09-rsvp-spot-a"] { left: 198px; top: 312px; width: 181px; height: 185px; }
+    [id="09-rsvp-spot-b"] { left: 11px; top: 831px; width: 368px; height: 134px; border-radius: 22px; }
+
+    /* view B: the full-page capture baked the phone's fixed bottom nav into page y 779–844 —
+       paint it out (page ground + the banner's own top edge, which the nav covered) */
+    [id="09-rsvp-patch"] {
+      position: absolute;
+      left: 0;
+      top: 740px;
+      width: 390px;
+      height: 104.333px;
+      overflow: hidden;
+      background: #FAFAF9;
+    }
+    [id="09-rsvp-patch-edge"] {
+      position: absolute;
+      left: 16px;
+      top: 96px;
+      width: 358px;
+      height: 60px;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid rgb(231, 229, 228);
+      border-radius: 18px;
+    }
+    /* pixel-exact copy of the real "assign" button so it can depress on click */
+    [id="09-rsvp-btn-plate"] {
+      position: absolute;
+      left: 189px;
+      top: 905px;
+      width: 172px;
+      height: 42px;
+      background: #fff;
+    }
+    [id="09-rsvp-btn"] {
+      position: absolute;
+      left: 192px;
+      top: 908px;
+      width: 164px;
+      height: 34px;
+      overflow: hidden;
+      border-radius: 10px;
+      transform-origin: 50% 50%;
+    }
+    [id="09-rsvp-btn-img"] {
+      position: absolute;
+      left: -192px;
+      top: -908px;
+      width: 390px;
+      height: 3519px;
+      display: block;
+    }
+
+    /* annotation layers: card-local screen px, NOT clipped by the card */
+    [class~="09-rsvp-annot"] {
+      position: absolute;
+      left: 90px;
+      top: 440px;
+      width: 900px;
+      height: 1103px;
+      pointer-events: none;
+    }
+    [class~="09-rsvp-rings"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 1103px;
+      overflow: visible;
+    }
+    [class~="09-rsvp-ring"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 4;
+      stroke-linecap: butt;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    [class~="09-rsvp-halo"] {
+      fill: none;
+      stroke: rgba(160, 112, 63, 0.18);
+      stroke-width: 16;
+      opacity: 0;
+    }
+    [class~="09-rsvp-leader"] {
+      fill: none;
+      stroke: #A0703F;
+      stroke-width: 2;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    [class~="09-rsvp-pill"] {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      direction: rtl;
+      padding: 16px 30px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      border-radius: 9999px;
+      color: #A0703F;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1.1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 12px 28px -14px rgba(60, 35, 15, 0.35);
+    }
+    [class~="09-rsvp-pill"] svg {
+      width: 36px;
+      height: 36px;
+      flex: none;
+    }
+    [id="09-rsvp-pill-ppl"] {
+      right: 25px; /* aligned to the r-yes ring's right edge */
+      top: -110px;
+      transform-origin: 100% 100%;
+    }
+    [id="09-rsvp-pill-gen"] {
+      left: 25px; /* under the banner's left end, clear of the cursor path */
+      top: 500px;
+      transform-origin: 50% 0%;
+    }
+
+    [id="09-rsvp-toast-anchor"] {
+      position: absolute;
+      left: 382px; /* centred on the assign button (x 632) */
+      top: 56px;
+      width: 500px;
+      display: flex;
+      justify-content: center;
+    }
+    [id="09-rsvp-toast"] {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      direction: rtl;
+      padding: 16px 32px 16px 28px;
+      background: #7A5230;
+      border-radius: 9999px;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1.1;
+      white-space: nowrap;
+      transform-origin: 50% 100%;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.10), 0 14px 30px -14px rgba(60, 35, 15, 0.55);
+    }
+    [id="09-rsvp-toast-check"] {
+      width: 40px;
+      height: 40px;
+      flex: none;
+    }
+    [id="09-rsvp-check-path"] {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    /* cursor click (tip of the arrow = element origin, parked on the assign centre 632.3, 369.2) */
+    [id="09-rsvp-cursor"] {
+      position: absolute;
+      left: 632.3px;
+      top: 369.2px;
+      width: 46px;
+      height: 56px;
+      transform-origin: 0 0;
+      z-index: 5;
+    }
+    [id="09-rsvp-cursor"] svg {
+      display: block;
+      width: 46px;
+      height: 56px;
+      overflow: visible;
+    }
+    [class~="09-rsvp-ripple"] {
+      position: absolute;
+      left: 590.3px; /* centre 632.3, 369.2 − 42 */
+      top: 327.2px;
+      width: 84px;
+      height: 84px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      border: 3px solid #A0703F;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    /* ── top block (RTL, right-aligned to the card's right edge x 990) ── */
+    [id="09-rsvp-top"] {
+      position: absolute;
+      left: 90px;
+      top: 0;
+      width: 900px;
+      height: 440px;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="09-rsvp-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 96px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="09-rsvp-headrow"] {
+      position: absolute;
+      right: 0;
+      top: 148px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 28px;
+      direction: rtl;
+    }
+    [id="09-rsvp-head"] {
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 120px;
+      line-height: 1.06;
+      letter-spacing: -0.018em;
+      white-space: nowrap;
+      color: #1C1917;
+    }
+    [class~="09-rsvp-word"] {
+      display: inline-block;
+    }
+    [id="09-rsvp-chip"] {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      height: 76px;
+      padding: 0 28px;
+      margin-top: 16px;
+      border-radius: 9999px;
+      background: #A0703F;
+      transform-origin: 100% 50%;
+      flex: none;
+    }
+    [id="09-rsvp-chip"] svg {
+      width: 25px;
+      height: 39px;
+      display: block;
+      flex: none;
+    }
+    [id="09-rsvp-dot-wrap"] {
+      position: relative;
+      width: 21px;
+      height: 21px;
+      flex: none;
+    }
+    [id="09-rsvp-dot"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: #FBF7F1;
+    }
+    [id="09-rsvp-dot-pulse"] {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid #FBF7F1;
+      box-sizing: border-box;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+  </style>
+
+  <div id="root" data-composition-id="09-rsvp" data-width="1080" data-height="1920" data-duration="12.076">
+    <!-- ground -->
+    <div id="09-rsvp-bg" class="clip" data-start="0" data-duration="12.076" data-track-index="0"></div>
+
+    <!-- screen card + overlays -->
+    <div id="09-rsvp-stage" class="clip" data-start="0" data-duration="12.076" data-track-index="1">
+      <div id="09-rsvp-cam">
+        <div id="09-rsvp-card">
+          <!-- view A: the four stat cards -->
+          <div id="09-rsvp-pane-a" class="09-rsvp-pane">
+            <div id="09-rsvp-world-a" class="09-rsvp-world">
+              <img class="09-rsvp-shot" src="assets/phone-responses.png" alt="" />
+              <!-- count-up overlays: white plates cover the printed numbers; numbers re-set at the exact baseline / right edge -->
+              <svg id="09-rsvp-nums" viewBox="0 0 390 3519" xmlns="http://www.w3.org/2000/svg">
+                <rect x="318" y="377" width="40" height="30" fill="#fff" />
+                <rect x="132" y="377" width="40" height="30" fill="#fff" />
+                <rect x="334" y="568" width="24" height="30" fill="#fff" />
+                <rect x="132" y="568" width="40" height="30" fill="#fff" />
+                <text id="09-rsvp-n-yes" class="09-rsvp-num" x="355.67" y="403" text-anchor="end">0</text>
+                <text id="09-rsvp-n-total" class="09-rsvp-num" x="169" y="403" text-anchor="end">0</text>
+                <text id="09-rsvp-n-no" class="09-rsvp-num" x="355.67" y="594.33" text-anchor="end">0</text>
+                <text id="09-rsvp-n-pend" class="09-rsvp-num" x="169.33" y="594" text-anchor="end">0</text>
+              </svg>
+              <div id="09-rsvp-spot-a" class="09-rsvp-spot"></div>
+            </div>
+          </div>
+          <!-- view B: the general-link banner -->
+          <div id="09-rsvp-pane-b" class="09-rsvp-pane">
+            <div id="09-rsvp-world-b" class="09-rsvp-world">
+              <img class="09-rsvp-shot" src="assets/phone-responses.png" alt="" />
+              <div id="09-rsvp-patch"><div id="09-rsvp-patch-edge"></div></div>
+              <div id="09-rsvp-btn-plate"></div>
+              <div id="09-rsvp-btn"><img id="09-rsvp-btn-img" src="assets/phone-responses.png" alt="" /></div>
+              <div id="09-rsvp-spot-b" class="09-rsvp-spot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- annotations for view A -->
+        <div id="09-rsvp-annot-a" class="09-rsvp-annot">
+          <svg class="09-rsvp-rings" viewBox="0 0 900 1103" xmlns="http://www.w3.org/2000/svg">
+            <path id="09-rsvp-halo-yes" class="09-rsvp-halo" />
+            <path id="09-rsvp-ring-yes" class="09-rsvp-ring" pathLength="1" />
+            <path id="09-rsvp-halo-no" class="09-rsvp-halo" />
+            <path id="09-rsvp-ring-no" class="09-rsvp-ring" pathLength="1" />
+            <path id="09-rsvp-halo-pend" class="09-rsvp-halo" />
+            <path id="09-rsvp-ring-pend" class="09-rsvp-ring" pathLength="1" />
+            <path id="09-rsvp-lead-ppl" class="09-rsvp-leader" pathLength="1" d="M 815 -36 L 815 27" />
+          </svg>
+          <div id="09-rsvp-pill-ppl" class="09-rsvp-pill" dir="rtl" lang="he">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#A0703F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2" /><circle cx="17" cy="9" r="2.8" /><path d="M16.5 14c2.9.2 5 2.4 5 5.4" /></svg>
+            <span>54 אנשים</span>
+          </div>
+        </div>
+
+        <!-- annotations for view B -->
+        <div id="09-rsvp-annot-b" class="09-rsvp-annot">
+          <svg class="09-rsvp-rings" viewBox="0 0 900 1103" xmlns="http://www.w3.org/2000/svg">
+            <path id="09-rsvp-halo-gen" class="09-rsvp-halo" />
+            <path id="09-rsvp-ring-gen" class="09-rsvp-ring" pathLength="1" />
+            <path id="09-rsvp-lead-gen" class="09-rsvp-leader" pathLength="1" d="M 195 462 L 195 500" />
+          </svg>
+          <div id="09-rsvp-pill-gen" class="09-rsvp-pill" dir="rtl" lang="he">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#A0703F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4l-1.1 1.1" /><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.1-1.1" /></svg>
+            <span>מהקישור הכללי</span>
+          </div>
+          <div id="09-rsvp-toast-anchor">
+            <div id="09-rsvp-toast" dir="rtl" lang="he">
+              <svg id="09-rsvp-toast-check" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.5" fill="#FBF7F1" /><path id="09-rsvp-check-path" d="M10 17.5 L15 22.5 L24.5 12" stroke="#7A5230" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" pathLength="1" /></svg>
+              <span>שויך למוזמן</span>
+            </div>
+          </div>
+          <div id="09-rsvp-ripple-1" class="09-rsvp-ripple"></div>
+          <div id="09-rsvp-ripple-2" class="09-rsvp-ripple"></div>
+          <div id="09-rsvp-cursor">
+            <svg viewBox="0 0 19 23" xmlns="http://www.w3.org/2000/svg"><path d="M0.5 0.5 L0.5 18.2 L5.1 14.1 L8.1 21.2 L11.2 19.9 L8.3 12.9 L14.4 12.6 Z" fill="#FFFFFF" stroke="#1C1917" stroke-width="1.3" stroke-linejoin="round" /></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- top block: kicker + headline + live chip -->
+    <div id="09-rsvp-top" class="clip" data-start="0" data-duration="12.076" data-track-index="2" dir="rtl" lang="he">
+      <div id="09-rsvp-kicker">08 · אישורי הגעה</div>
+      <div id="09-rsvp-headrow">
+        <h1 id="09-rsvp-head"><span id="09-rsvp-w1" class="09-rsvp-word">בזמן</span> <span id="09-rsvp-w2" class="09-rsvp-word">אמת</span></h1>
+        <div id="09-rsvp-chip">
+          <svg viewBox="0 0 11 17" fill="none" stroke="#FBF7F1" stroke-width="1.8" stroke-linecap="round"><path d="M4 2.5 Q 1 8.5 4 14.5" /><path d="M8.5 5 Q 7 8.5 8.5 12" /></svg>
+          <div id="09-rsvp-dot-wrap"><div id="09-rsvp-dot-pulse"></div><div id="09-rsvp-dot"></div></div>
+          <svg viewBox="0 0 11 17" fill="none" stroke="#FBF7F1" stroke-width="1.8" stroke-linecap="round"><path d="M7 2.5 Q 10 8.5 7 14.5" /><path d="M2.5 5 Q 4 8.5 2.5 12" /></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="09-rsvp"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="09-rsvp-' + name + '"]') || document.getElementById("09-rsvp-" + name);
+      }
+
+      var K = 900 / 390; // px per CSS px of the 390-wide phone page
+      var CY_A = 300;    // view A crop top (page CSS y)
+      var CY_B = 765;    // view B crop top (page CSS y)
+
+      // rounded-rect ring path (card-local screen px), drawn from the top-right corner leftwards (RTL reading)
+      function rr(b, pad, r) {
+        var x = b[0] - pad, y = b[1] - pad, w = b[2] + pad * 2, h = b[3] + pad * 2;
+        return "M " + (x + w - r) + " " + y +
+          " L " + (x + r) + " " + y +
+          " A " + r + " " + r + " 0 0 0 " + x + " " + (y + r) +
+          " L " + x + " " + (y + h - r) +
+          " A " + r + " " + r + " 0 0 0 " + (x + r) + " " + (y + h) +
+          " L " + (x + w - r) + " " + (y + h) +
+          " A " + r + " " + r + " 0 0 0 " + (x + w) + " " + (y + h - r) +
+          " L " + (x + w) + " " + (y + r) +
+          " A " + r + " " + r + " 0 0 0 " + (x + w - r) + " " + y;
+      }
+      // measured boxes (CSS px, phone page 390×3519)
+      var BOX = {
+        yes: [203, 317, 171, 175],
+        no: [203, 508, 171, 157],
+        pend: [16, 508, 171, 157],
+        gen: [16, 836, 358, 124]
+      };
+      function scr(b, cy) {
+        return [b[0] * K, (b[1] - cy) * K, b[2] * K, b[3] * K];
+      }
+      ["yes", "no", "pend"].forEach(function (k) {
+        var d = rr(scr(BOX[k], CY_A), 12, 56);
+        el("ring-" + k).setAttribute("d", d);
+        el("halo-" + k).setAttribute("d", d);
+      });
+      (function () {
+        var d = rr(scr(BOX.gen, CY_B), 12, 54);
+        el("ring-gen").setAttribute("d", d);
+        el("halo-gen").setAttribute("d", d);
+      })();
+      function spotBox(k) {
+        var b = BOX[k];
+        return { left: b[0] - 5, top: b[1] - 5, width: b[2] + 10, height: b[3] + 10 };
+      }
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–2.0s): screen card enters; kicker + headline per-word reveal ──
+      tl.fromTo(el("card"), { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 0);
+      tl.fromTo(el("kicker"), { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.15);
+      tl.fromTo(el("w1"), { opacity: 0, y: 64 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.4);
+      tl.fromTo(el("w2"), { opacity: 0, y: 64 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.66);
+
+      // ── Scene 2 (2.0–3.1s): feature chip pops; live dot does ONE finite pulse 2.0–3.1 ──
+      tl.fromTo(el("chip"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 2.0);
+      tl.fromTo(el("dot-pulse"), { opacity: 0.9, scale: 1 }, { opacity: 0, scale: 3, duration: 1.0, ease: "power2.out", immediateRender: false }, 2.1);
+      tl.fromTo(el("dot"), { scale: 1 }, { scale: 1.25, duration: 0.18, ease: "power2.out", immediateRender: false }, 2.1);
+      tl.to(el("dot"), { scale: 1, duration: 0.5, ease: "power2.inOut" }, 2.28);
+
+      // ── Scene 3 (3.1–7.5s): rings + count-ups on their words; slow camera push underneath ──
+      tl.fromTo(el("cam"), { scale: 1 }, { scale: 1.03, duration: 4.4, ease: "power1.inOut" }, 3.1);
+      function ring(k, at) {
+        tl.fromTo(el("ring-" + k), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, at);
+        tl.fromTo(el("halo-" + k), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, at + 0.4);
+      }
+      function count(target, from, to, at, dur, immediate) {
+        tl.fromTo(target, { textContent: from }, { textContent: to, snap: { textContent: 1 }, duration: dur, ease: "power3.out", immediateRender: immediate }, at);
+      }
+
+      // 3.1s — r-yes: spotlight + ring, card number counts 0→24 (responses card ticks with it)
+      tl.fromTo(el("spot-a"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 3.1);
+      ring("yes", 3.1);
+      count(el("n-yes"), 0, 24, 3.1, 1.3, true);
+      count(el("n-total"), 0, 24, 3.1, 1.3, true);
+
+      // 4.0s — pill "54 אנשים" on the same card
+      tl.fromTo(el("lead-ppl"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" }, 4.0);
+      tl.fromTo(el("pill-ppl"), { opacity: 0, scale: 0.82, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 4.05);
+
+      // 5.0s — r-no 0→3 (responses card 24→27)
+      tl.to(el("spot-a"), Object.assign({ duration: 0.6, ease: "power3.inOut" }, spotBox("no")), 5.0);
+      tl.to([el("ring-yes"), el("halo-yes"), el("lead-ppl")], { opacity: 0.3, duration: 0.5, ease: "power2.out" }, 5.0);
+      tl.to(el("pill-ppl"), { opacity: 0.45, duration: 0.5, ease: "power2.out" }, 5.0);
+      ring("no", 5.0);
+      count(el("n-no"), 0, 3, 5.05, 0.7, true);
+      count(el("n-total"), 24, 27, 5.05, 0.7, false);
+
+      // 5.9s — r-pending 0→14
+      tl.to(el("spot-a"), Object.assign({ duration: 0.6, ease: "power3.inOut" }, spotBox("pend")), 5.9);
+      tl.to([el("ring-no"), el("halo-no")], { opacity: 0.3, duration: 0.5, ease: "power2.out" }, 5.9);
+      ring("pend", 5.9);
+      count(el("n-pend"), 0, 14, 5.95, 1.0, true);
+
+      // ── Scene 4 (7.5–12.076s): cut-the-curve (upward, a scroll down the page) to the general-link banner ──
+      // exit: view A + its annotations rip upward (power4.in), fade dies right at the hard cut
+      tl.fromTo([el("pane-a"), el("annot-a")], { y: 0, filter: "blur(0px)" }, { y: -230, filter: "blur(18px)", duration: 0.3, ease: "power4.in" }, 7.5);
+      tl.fromTo([el("pane-a"), el("annot-a")], { opacity: 1 }, { opacity: 0, duration: 0.22, ease: "power1.in" }, 7.58);
+      // entry: view B continues the same upward path (power4.out), matched blur at the cut
+      tl.set(el("pane-b"), { y: 230, opacity: 0, filter: "blur(18px)" }, 0);
+      tl.fromTo(el("pane-b"), { y: 230, opacity: 0.35, filter: "blur(18px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.5, ease: "power4.out", immediateRender: false }, 7.8);
+
+      // banner ring + spotlight + pill
+      tl.fromTo(el("spot-b"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 7.95);
+      ring("gen", 7.95);
+      tl.fromTo(el("lead-gen"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.3, ease: "power2.out" }, 8.35);
+      tl.fromTo(el("pill-gen"), { opacity: 0, scale: 0.82, y: -10 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 8.4);
+
+      // 9.6s — cursor-click-ripple: move → click (cursor + button depress together) → ripple
+      tl.fromTo(el("cursor"), { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 9.45);
+      tl.fromTo(el("cursor"), { x: 330, y: 260 }, { x: 0, y: 0, duration: 0.8, ease: "power2.inOut" }, 9.6);
+      tl.to(el("cursor"), { scale: 0.85, duration: 0.08, ease: "power2.in" }, 10.55);
+      tl.to(el("cursor"), { scale: 1, duration: 0.08, ease: "power2.out" }, 10.63);
+      tl.to(el("btn"), { scale: 0.95, duration: 0.08, ease: "power2.in" }, 10.55);
+      tl.to(el("btn"), { scale: 1, duration: 0.08, ease: "power2.out" }, 10.63);
+      tl.fromTo([el("ripple-1"), el("ripple-2")], { scale: 0, opacity: 0.9 }, { scale: 3.4, opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.09, immediateRender: false }, 10.58);
+
+      // 10.8s — brown check toast pops above the banner
+      tl.fromTo(el("toast"), { opacity: 0, scale: 0.7, y: 18 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 10.8);
+      tl.fromTo(el("check-path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, 11.0);
+
+      // hold to the last frame
+      tl.set({}, {}, 12.076);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["09-rsvp"] = tl;
+    })();
+  </script>
+</template>

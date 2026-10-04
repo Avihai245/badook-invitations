@@ -21,6 +21,29 @@ function watch(el: Element) {
   return () => observer?.unobserve(el);
 }
 
+let pending: HTMLElement[] = [];
+
+/**
+ * The blocks mounted in one commit, placed together: every position is read first and only then are
+ * the off-screen ones hidden — one layout for the whole page instead of one per block (a read after
+ * each write forces the browser to lay the page out again).
+ */
+function place(el: HTMLElement) {
+  pending.push(el);
+  if (pending.length > 1) return;
+  queueMicrotask(() => {
+    const batch = pending;
+    pending = [];
+    const fold = window.innerHeight * 0.92;
+    // already on screen when the page loads: shown as is (no flash of hidden content)
+    const below = batch.filter((block) => block.isConnected && block.getBoundingClientRect().top >= fold);
+    for (const block of below) {
+      block.dataset.reveal = '';
+      watch(block);
+    }
+  });
+}
+
 /**
  * Fades and lifts its content in as it scrolls into view (site.css `.reveal`), after `delay` ms —
  * staggered lists pass increasing delays. Without JavaScript, or with reduced motion, it is simply there.
@@ -41,10 +64,11 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // already on screen when the page loads: shown as is (no flash of hidden content)
-    if (el.getBoundingClientRect().top < window.innerHeight * 0.92) return;
-    el.dataset.reveal = '';
-    return watch(el);
+    place(el);
+    return () => {
+      pending = pending.filter((block) => block !== el);
+      observer?.unobserve(el);
+    };
   }, []);
   return (
     <Tag

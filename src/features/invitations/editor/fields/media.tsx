@@ -19,6 +19,7 @@ import { getAt } from '../paths';
 import { useEditor } from '../state/EditorProvider';
 import { CaptionsField } from './captions';
 import { FieldFrame } from './fields';
+import { prepareImage } from './prepare-image';
 
 export const IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/avif';
 export const VIDEO_TYPES = 'video/mp4';
@@ -67,9 +68,12 @@ function put(url: string, file: Blob, onProgress?: (percent: number) => void): P
  */
 export async function uploadFile(
   invitationId: string,
-  file: Blob,
+  original: Blob,
   onProgress?: (percent: number) => void,
-): Promise<{ ref: AssetRef; kind: UploadKind }> {
+): Promise<{ ref: AssetRef; kind: UploadKind; width?: number; height?: number }> {
+  // a photo goes up ready for phones: upright, ≤ 2560px, WebP (prepare-image.ts), with its size
+  const prepared = await prepareImage(original);
+  const file = prepared?.file ?? original;
   const res = await hostApi<UploadTicket>(`/api/invitations/${invitationId}/uploads`, {
     method: 'POST',
     body: { contentType: file.type, size: file.size },
@@ -81,7 +85,14 @@ export async function uploadFile(
       body && !body.ok ? body.max : undefined,
     );
   await put(body.url, file, onProgress);
-  return { ref: body.ref, kind: body.kind };
+  return prepared
+    ? { ref: body.ref, kind: body.kind, width: prepared.width, height: prepared.height }
+    : { ref: body.ref, kind: body.kind };
+}
+
+/** An upload's pixel size, for the document (Media.width / height), when it was read. */
+export function size(res: { width?: number; height?: number }): { width?: number; height?: number } {
+  return res.width && res.height ? { width: res.width, height: res.height } : {};
 }
 
 /** uploadFile for the invitation being edited. */
@@ -166,6 +177,24 @@ export async function captureVideoStill(file: File): Promise<File | null> {
     v.load();
     URL.revokeObjectURL(url);
   }
+}
+
+/**
+ * YouTube's still for a link: the full-size 16:9 frame when the video has one (HD uploads), else the
+ * smaller one every video has — found out here, once, so the invitation asks for one picture that
+ * exists instead of trying one that may be missing (a 404 in every guest's console).
+ */
+async function youtubeStill(link: VideoLink): Promise<string | null> {
+  const maxres = link.provider === 'youtube' ? videoStillUrl(link, 'maxres') : null;
+  if (!maxres) return null;
+  const full = await new Promise<boolean>((resolve) => {
+    const img = new Image();
+    // a missing still comes back as a 120×90 grey placeholder (or an error)
+    img.onload = () => resolve(img.naturalWidth > 120);
+    img.onerror = () => resolve(false);
+    img.src = maxres;
+  });
+  return full ? maxres : videoStillUrl(link, 'hq');
 }
 
 /** Vimeo's still for a link (its oEmbed answers browsers directly); null when it can't be had. */
@@ -345,12 +374,16 @@ export function HeroMediaField({ path, label }: { path: string; label: string })
           () => null,
         );
     }
-    update(path, { kind: res.kind, src: res.ref, poster, focalPoint: { x: 0.5, y: 0.5 } }, null);
+    update(
+      path,
+      { kind: res.kind, src: res.ref, poster, focalPoint: { x: 0.5, y: 0.5 }, ...size(res) },
+      null,
+    );
     setFocal(true);
   };
 
   const onLink = async (v: VideoLink) => {
-    const poster = videoStillUrl(v) ?? (await vimeoStill(v));
+    const poster = (await youtubeStill(v)) ?? (await vimeoStill(v));
     update(path, { kind: 'video', src: canonicalVideoLink(v), poster, focalPoint: { x: 0.5, y: 0.5 } }, null);
     setLinking(false);
   };

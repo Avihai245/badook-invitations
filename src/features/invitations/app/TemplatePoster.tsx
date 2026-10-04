@@ -24,18 +24,16 @@ const CLOUDS: [number, number, number, number][] = [
  * the same poster works from a 96px list thumbnail to the home page's phones. The page loads the
  * display fonts (POSTER_FONT_CSS).
  */
-export function TemplatePoster({
-  template,
-  locale,
-  text,
-  joiner = '&',
-  image,
-  play = false,
-  frameless = false,
-  className,
-  children,
-  badge = null,
-}: {
+export function TemplatePoster(props: TemplatePosterProps) {
+  const { template, locale, frameless = false, className } = props;
+  return (
+    <PosterBox template={template} locale={locale} frameless={frameless} className={className}>
+      <TemplatePosterContent {...props} />
+    </PosterBox>
+  );
+}
+
+export interface TemplatePosterProps {
   template: PosterTemplate;
   locale: Locale;
   text: PosterText;
@@ -48,7 +46,54 @@ export function TemplatePoster({
   children?: ReactNode;
   /** a tag in the top corner (the gallery's "Premium") */
   badge?: ReactNode;
-}) {
+}
+
+/**
+ * A poster's frame: 9:16, the template's sky, the size its contents scale with (container units).
+ * `rest` carries attributes for the lazy posters (LazyTemplatePoster: the address of their contents).
+ */
+export function PosterBox({
+  template,
+  locale,
+  frameless = false,
+  className,
+  children,
+  ...rest
+}: {
+  template: PosterTemplate;
+  locale: Locale;
+  frameless?: boolean;
+  className?: string;
+  children?: ReactNode;
+} & Record<`data-${string}`, string | undefined>) {
+  return (
+    <div
+      dir={dirOf(locale)}
+      lang={locale}
+      className={cn(
+        'relative isolate aspect-[9/16] overflow-hidden',
+        !frameless && 'rounded-poster shadow-md',
+        className,
+      )}
+      style={{ background: placeholderArt(template.id).sky, containerType: 'inline-size' }}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** What a poster shows inside its frame (PosterBox): the scenery, the words, a picture or video. */
+export function TemplatePosterContent({
+  template,
+  locale,
+  text,
+  joiner = '&',
+  image,
+  play = false,
+  children,
+  badge = null,
+}: TemplatePosterProps) {
   const art = placeholderArt(template.id);
   const pair = template.fontPairs[0];
   const script = locale === 'he' ? 'hebrew' : 'latin';
@@ -63,16 +108,7 @@ export function TemplatePoster({
   const tint = (share: number) =>
     `color-mix(in srgb, ${overlayColor} ${Math.round(Math.min(1, ov * share) * 100)}%, transparent)`;
   return (
-    <div
-      dir={dirOf(locale)}
-      lang={locale}
-      className={cn(
-        'relative isolate aspect-[9/16] overflow-hidden',
-        !frameless && 'rounded-poster shadow-md',
-        className,
-      )}
-      style={{ background: art.sky, containerType: 'inline-size' }}
-    >
+    <>
       <div aria-hidden className="absolute inset-0">
         {art.scene ? (
           <Scene id={art.scene} place="poster" date={isoDate(text.date)} />
@@ -140,7 +176,7 @@ export function TemplatePoster({
         </span>
       ) : null}
       {badge ? <span className="absolute start-[4cqw] top-[4cqw]">{badge}</span> : null}
-    </div>
+    </>
   );
 }
 

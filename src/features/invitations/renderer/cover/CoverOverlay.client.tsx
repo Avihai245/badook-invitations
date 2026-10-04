@@ -12,6 +12,7 @@ import {
 } from 'react';
 import type { CoverStyle, TemplateManifest } from '../../contracts/types';
 import { burstFrom } from '../fx/burst';
+import { imageAt, imageSet } from '../images';
 import type { BurstKind } from '../fx/theme';
 import type { CoverMedia } from './media';
 import { Localized, coverName, type Variant } from './localized';
@@ -329,10 +330,26 @@ function VideoCover({
     <div className={cls} data-style={style} data-exit={overlay.exit} data-desktop={desktop ? '1' : undefined}>
       <div className="cv-media" aria-hidden="true">
         {/* wide screens without desktop art: the 9:16 media over a blurred copy of itself */}
-        {!desktop ? <img className="cv-backdrop" src={media.poster!} alt="" /> : null}
+        {/* through the image optimizer: the poster in the screen's width; the blurred copy small */}
+        {!desktop ? (
+          <img
+            className="cv-backdrop"
+            src={imageAt(media.poster!, 640)}
+            data-fallback={media.poster!}
+            alt=""
+            suppressHydrationWarning
+          />
+        ) : null}
         <picture>
           {desktop ? <source media={WIDE} srcSet={media.posterDesktop!} /> : null}
-          <img className="cv-poster" src={media.poster!} alt="" fetchPriority="high" decoding="async" />
+          <img
+            className="cv-poster"
+            {...posterSet(media.poster!)}
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+            suppressHydrationWarning
+          />
         </picture>
         <video ref={video} className="cv-video" muted playsInline preload="auto" disablePictureInPicture />
       </div>
@@ -471,4 +488,10 @@ function CssCover({
       ) : null}
     </div>
   );
+}
+
+/** The cover's poster, full-bleed, through the image optimizer (the original as its fallback). */
+function posterSet(url: string) {
+  const set = imageSet(url, '100vw');
+  return { src: set.src, srcSet: set.srcSet, sizes: set.sizes, 'data-fallback': set.fallback };
 }

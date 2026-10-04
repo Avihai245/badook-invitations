@@ -1,5 +1,4 @@
 import 'server-only';
-import { revalidatePath } from 'next/cache';
 import { after, NextResponse } from 'next/server';
 import { entitlementsFor, isAdminEmail } from '@/features/billing/server/account';
 import type { Feature } from '@/features/flags/features';
@@ -9,12 +8,12 @@ import { broadcastRefresh } from '@/lib/live/broadcast';
 import { getSessionUser } from '@/lib/supabase/session';
 import { voiceDeps } from '@/features/voice/server/deps';
 import { processVoice, queueVoice } from '@/features/voice/server/voice';
-import { LOCALES } from '../contracts/types';
 import { getTemplate } from '../templates/registry';
 import { translationRows } from '../translate/deps';
 import { cinematicFor } from './cinematic';
 import type { ApiResult, HostDeps } from './host-api';
 import { hostDb } from './host-db';
+import { revalidateInvitationPage } from './revalidate';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 /** Drafts are a few KB; this only stops abuse. */
@@ -22,20 +21,10 @@ export const MAX_JSON_BYTES = 512 * 1024;
 
 const json = (status: number, body: unknown) => NextResponse.json(body, { status, headers: NO_STORE });
 
-/**
- * Refreshes the cached public page of an invitation in every language. A page is cached under the
- * path the guest asked for: /i/<slug> (?lang= is a rewrite to /i/<slug>/<lang>), or /i/<slug>/<lang>
- * when that was requested directly.
- */
-function revalidate(slug: string) {
-  revalidatePath(`/i/${slug}`);
-  for (const lang of [...LOCALES, 'default']) revalidatePath(`/i/${slug}/${lang}`);
-}
-
 export const hostDeps: HostDeps = {
   db: hostDb,
   template: getTemplate,
-  revalidate,
+  revalidate: revalidateInvitationPage,
   now: () => Date.now(),
   translations: translationRows,
   broadcast: (channel, kind) => broadcastRefresh(channel, kind, fetch, 'invitations'),

@@ -228,6 +228,14 @@ export function libraryDisplayFamilies(): string[] {
  * name for all its faces, or a FaceRequest for some subsets / weights; `weights` keeps only those
  * weights for every family (e.g. [400] for text that is never bold).
  */
+/** A face's file (its woff2 under /fonts), or null when the build has no such face. */
+export function faceUrl(family: string, subset: string, weight: number): string | null {
+  return (
+    FAMILIES[family]?.faces.find((f) => f.subset === subset && f.weight === weight && f.style === 'normal')
+      ?.url ?? null
+  );
+}
+
 export function fontFaceCss(families: Iterable<string | FaceRequest>, weights?: readonly number[]): string {
   const rules: string[] = [];
   for (const item of families) {

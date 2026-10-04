@@ -1,0 +1,407 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Frank Ruhl Libre"; src: url("assets/fonts/frank-ruhl-libre-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+    }
+
+    /* ── full-bleed ground (own clip, lowest track) ── */
+    [id="04-design-bg"] {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 760px at 92% 6%, #F3E8DB 0%, rgba(243, 232, 219, 0.55) 42%, rgba(243, 232, 219, 0) 72%),
+        #FBF7F1;
+    }
+
+    /* ── the design gallery: tilted 3D screen card that scrolls (3d-page-scroll) ──
+       phone capture: 390 CSS px wide at 3× (1170 × 14658 px), shown 900 px wide → k = 900/1170 px per image px
+       (= 2.3077 px per CSS px). Card x 90–990, y 545–1545. Static tilt set by GSAP (no CSS transform here). */
+    [id="04-design-stage"] {
+      position: absolute;
+      inset: 0;
+    }
+    [id="04-design-window"] {
+      position: absolute;
+      left: 90px;
+      top: 545px;
+      width: 900px;
+      height: 1000px;
+      overflow: hidden;
+      border-radius: 28px;
+      background: #fff;
+      /* hairline as a 1px ring (keeps the inner width at exactly 900) + one soft warm shadow;
+         tiltY negative ⇒ shadow X offset positive */
+      box-shadow:
+        0 0 0 1px rgba(28, 25, 23, 0.12),
+        0 1px 3px rgba(28, 25, 23, 0.08),
+        16px 24px 60px -24px rgba(60, 35, 15, 0.38);
+    }
+    /* the scrolling page (.world). The capture's baked-in bottom nav (image rows 2286–2531) is cut out of the
+       page and re-mounted as a FIXED bar at the card bottom, like the real phone viewport. */
+    [id="04-design-page"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 11104px;
+    }
+    [class~="04-design-seg"] {
+      position: absolute;
+      left: 0;
+      width: 900px;
+      overflow: hidden;
+    }
+    [class~="04-design-seg"] img {
+      position: absolute;
+      left: 0;
+      display: block;
+      width: 900px;
+      height: 11275.38px;
+      max-width: none;
+    }
+    /* segment A: image rows 0–2286 */
+    [id="04-design-segA"] { top: 0; height: 1758.46px; }
+    [id="04-design-segA"] img { top: 0; }
+    /* filler between the first card row and its labels (24 image px) */
+    [id="04-design-fill"] {
+      position: absolute;
+      left: 0;
+      top: 1758.46px;
+      width: 900px;
+      height: 18.46px;
+      background: linear-gradient(to bottom, #F3F2F1 0%, #F8F8F7 100%);
+    }
+    /* segment B: image rows 2531–14658, placed at composite row 2310 */
+    [id="04-design-segB"] { top: 1776.92px; height: 9328.46px; }
+    [id="04-design-segB"] img { top: -1946.92px; }
+    /* rounded bottoms for the first card row where the nav strip was cut (card radius 63 image px) */
+    [class~="04-design-corner"] {
+      position: absolute;
+      top: 1710px;
+      width: 48.46px;
+      height: 48.46px;
+    }
+    [class~="04-design-cbl"] { background: radial-gradient(circle 48.46px at 100% 0%, rgba(242, 241, 240, 0) 47.6px, #F2F1F0 48.46px); }
+    [class~="04-design-cbr"] { background: radial-gradient(circle 48.46px at 0% 0%, rgba(242, 241, 240, 0) 47.6px, #F2F1F0 48.46px); }
+
+    /* the fixed bottom nav (image rows 2326–2531), clipped to the bar + the raised "+" button */
+    [id="04-design-nav"] {
+      position: absolute;
+      left: 0;
+      top: 842.31px;
+      width: 900px;
+      height: 157.69px;
+      overflow: hidden;
+      clip-path: path("M0 7.69 H900 V157.69 H0 Z M609.23 1.54 H636.92 A50.77 50.77 0 0 1 687.69 52.31 V53.85 A50.77 50.77 0 0 1 636.92 104.62 H609.23 A50.77 50.77 0 0 1 558.46 53.85 V52.31 A50.77 50.77 0 0 1 609.23 1.54 Z");
+    }
+    [id="04-design-nav"] img {
+      position: absolute;
+      left: 0;
+      top: -1789.23px;
+      display: block;
+      width: 900px;
+      height: 11275.38px;
+      max-width: none;
+    }
+    [id="04-design-navshade"] {
+      position: absolute;
+      left: 0;
+      top: 826px;
+      width: 900px;
+      height: 24px;
+      background: linear-gradient(to top, rgba(28, 25, 23, 0.07), rgba(28, 25, 23, 0));
+    }
+
+    /* ── top block (RTL, x 90–990) ── */
+    [id="04-design-top"] {
+      position: absolute;
+      left: 90px;
+      top: 0;
+      width: 900px;
+      height: 520px;
+      direction: rtl;
+      text-align: right;
+    }
+    [id="04-design-kicker"] {
+      position: absolute;
+      right: 0;
+      top: 92px;
+      font-family: "Heebo", sans-serif;
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="04-design-rule"] {
+      position: absolute;
+      right: 0;
+      top: 152px;
+      width: 900px;
+      height: 1px;
+      background: rgba(28, 25, 23, 0.12);
+      transform-origin: 100% 50%;
+    }
+
+    /* number-lockup "60+" — the headline of the top block (LTR run at the reading edge) */
+    [id="04-design-num"] {
+      position: absolute;
+      right: 0;
+      top: 176px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      color: #A0703F;
+      white-space: nowrap;
+    }
+    [id="04-design-digits"] {
+      display: block;
+      width: 250px;
+      text-align: right;
+      font-size: 220px;
+      line-height: 0.92;
+      letter-spacing: -0.025em;
+      font-variant-numeric: tabular-nums lining-nums;
+    }
+    [id="04-design-plus"] {
+      display: block;
+      margin-top: 22px;
+      margin-left: 6px;
+      font-size: 130px;
+      line-height: 1;
+      transform-origin: 50% 55%;
+    }
+
+    [id="04-design-line"] {
+      position: absolute;
+      right: 446px;
+      top: 182px;
+      margin: 0;
+      font-family: "Frank Ruhl Libre", serif;
+      font-weight: 500;
+      font-size: 100px;
+      line-height: 1.0;
+      letter-spacing: -0.018em;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+    [class~="04-design-word"] {
+      display: block;
+    }
+
+    /* feature chips — solid brown pills, cream text + line glyph */
+    [id="04-design-chips"] {
+      position: absolute;
+      right: 0;
+      top: 414px;
+      display: flex;
+      flex-direction: row;
+      gap: 18px;
+      direction: rtl;
+    }
+    [class~="04-design-chip"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      direction: rtl;
+      padding: 16px 30px;
+      border-radius: 9999px;
+      background: #A0703F;
+      color: #FBF7F1;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1.1;
+      white-space: nowrap;
+      transform-origin: 50% 50%;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 4px 16px rgba(28, 25, 23, 0.04);
+    }
+    [class~="04-design-glyph"] {
+      display: block;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      overflow: visible;
+    }
+
+    /* lead line as a callout pill sitting on the screen card's top edge (centered over the card gutter) */
+    [id="04-design-leadrow"] {
+      position: absolute;
+      left: 0;
+      top: 505px;
+      width: 1080px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+    [id="04-design-lead"] {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+      direction: rtl;
+      padding: 16px 34px;
+      border-radius: 9999px;
+      background: #FBF7F1;
+      border: 1px solid #A0703F;
+      color: #1C1917;
+      font-family: "Heebo", sans-serif;
+      font-weight: 500;
+      font-size: 42px;
+      line-height: 1.15;
+      white-space: nowrap;
+      transform-origin: 50% 50%;
+      box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08), 0 10px 28px -10px rgba(60, 35, 15, 0.30);
+    }
+    [id="04-design-leadglyph"] {
+      display: block;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      overflow: visible;
+    }
+  </style>
+
+  <div id="root" data-composition-id="04-design" data-width="1080" data-height="1920" data-duration="7.506">
+
+    <!-- full-bleed cream ground -->
+    <div id="04-design-bg" class="clip" data-start="0" data-duration="7.506" data-track-index="0"></div>
+
+    <!-- the design gallery (phone capture) as a tilted screen card that scrolls -->
+    <div id="04-design-stage" class="clip" data-start="0" data-duration="7.506" data-track-index="1">
+      <div id="04-design-window">
+        <div id="04-design-page">
+          <div class="04-design-seg" id="04-design-segA"><img src="assets/phone-designs.png" alt="" /></div>
+          <div id="04-design-fill"></div>
+          <div class="04-design-corner 04-design-cbl" style="left: 36.92px;"></div>
+          <div class="04-design-corner 04-design-cbr" style="left: 389.23px;"></div>
+          <div class="04-design-corner 04-design-cbl" style="left: 462.31px;"></div>
+          <div class="04-design-corner 04-design-cbr" style="left: 814.62px;"></div>
+          <div class="04-design-seg" id="04-design-segB"><img src="assets/phone-designs.png" alt="" /></div>
+        </div>
+        <div id="04-design-navshade"></div>
+        <div id="04-design-nav"><img src="assets/phone-designs.png" alt="" /></div>
+      </div>
+    </div>
+
+    <!-- top block: kicker, 60+ count-up, line, feature chips -->
+    <div id="04-design-top" class="clip" data-start="0" data-duration="7.506" data-track-index="2" dir="rtl" lang="he">
+      <div id="04-design-kicker" dir="rtl" lang="he">03 · עיצוב</div>
+      <div id="04-design-rule"></div>
+
+      <div id="04-design-num" dir="ltr"><span id="04-design-digits">0</span><span id="04-design-plus">+</span></div>
+
+      <h2 id="04-design-line" dir="rtl" lang="he"><span class="04-design-word" id="04-design-w1">עיצובים</span><span class="04-design-word" id="04-design-w2">מונפשים</span></h2>
+
+      <div id="04-design-chips" dir="rtl" lang="he">
+        <div class="04-design-chip" id="04-design-chip1">
+          <svg class="04-design-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5.5l11-2V16" fill="none" stroke="#FBF7F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><circle cx="6.2" cy="18" r="2.8" fill="none" stroke="#FBF7F1" stroke-width="2" /><circle cx="17.2" cy="16" r="2.8" fill="none" stroke="#FBF7F1" stroke-width="2" /></svg>
+          <span>מוזיקה</span>
+        </div>
+        <div class="04-design-chip" id="04-design-chip2">
+          <svg class="04-design-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 3.5 L12.2 9.8 L18.5 11.5 L12.2 13.2 L10.5 19.5 L8.8 13.2 L2.5 11.5 L8.8 9.8 Z" fill="none" stroke="#FBF7F1" stroke-width="1.8" stroke-linejoin="round" /><path d="M19 2.5 L19.8 4.7 L22 5.5 L19.8 6.3 L19 8.5 L18.2 6.3 L16 5.5 L18.2 4.7 Z" fill="#FBF7F1" /></svg>
+          <span>אנימציה</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- lead callout pill on the card's bottom edge -->
+    <div id="04-design-leadrow" class="clip" data-start="0" data-duration="7.506" data-track-index="3" dir="rtl" lang="he">
+      <div id="04-design-lead" dir="rtl" lang="he">
+        <svg id="04-design-leadglyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" fill="none" stroke="#A0703F" stroke-width="1.8" stroke-linecap="round" /><circle cx="16" cy="7" r="2.2" fill="none" stroke="#A0703F" stroke-width="1.8" /><circle cx="10" cy="17" r="2.2" fill="none" stroke="#A0703F" stroke-width="1.8" /></svg>
+        <span>מותאם לסוג האירוע</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var scope = document.querySelector('[data-composition-id="04-design"]') || document;
+      function el(name) {
+        return scope.querySelector('[id="04-design-' + name + '"]') || document.getElementById("04-design-" + name);
+      }
+
+      // display px per image px (capture is 1170 px wide at 3×, shown 900 px wide)
+      var K = 900 / 1170;
+      var SCROLL_FROM = -1140 * K; // page CSS y ≈ 380 at the card top
+      var SCROLL_TO = -4741 * K;   // composite row 4741 ≈ CSS y 1650 (second full card row framed above the nav)
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–2.1s): tilted screen card enters from below; kicker reveal ──
+      // static 3D tilt (rotateX 6 / rotateY −4, perspective 2200) carried in both states — only y/opacity move
+      tl.fromTo(
+        el("window"),
+        { transformPerspective: 2200, rotationX: 6, rotationY: -4, transformOrigin: "50% 50%", y: 320, opacity: 0 },
+        { transformPerspective: 2200, rotationX: 6, rotationY: -4, transformOrigin: "50% 50%", y: 0, opacity: 1, duration: 1.15, ease: "power3.out" },
+        0
+      );
+      tl.fromTo(
+        el("kicker"),
+        { opacity: 0, clipPath: "inset(0% 0% 0% 100%)" },
+        { opacity: 1, clipPath: "inset(0% 0% 0% 0%)", duration: 0.7, ease: "power3.out" },
+        0.45
+      );
+      tl.fromTo(el("rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 0.6);
+
+      // ── Scene 2 (2.1–4.0s): on "משישים" the number counts 0→60, "+" pops at 2.6s; the page scrolls ──
+      var digits = el("digits");
+      var counter = { v: 0 };
+      tl.fromTo(el("num"), { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 2.1);
+      tl.fromTo(
+        counter,
+        { v: 0 },
+        {
+          v: 60,
+          duration: 0.5,
+          ease: "power2.out",
+          onUpdate: function () {
+            digits.textContent = String(Math.round(counter.v));
+          }
+        },
+        2.1
+      );
+      tl.fromTo(el("plus"), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, 2.6);
+
+      // 3d-page-scroll: one finite power3 travel CSS y ≈ 380 → ≈ 1650, rows of invitation cards pass (2.1–6.6s);
+      // fromTo renders the from-state immediately, so the page is parked at CSS y ≈ 380 before 2.1s
+      tl.fromTo(el("page"), { y: SCROLL_FROM }, { y: SCROLL_TO, duration: 4.5, ease: "power3.inOut" }, 2.1);
+
+      // "עיצובים מונפשים" — per-word rise
+      tl.fromTo(el("w1"), { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 2.85);
+      tl.fromTo(el("w2"), { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 3.08);
+
+      // ── Scene 3 (4.0–7.506s): feature chips pop on their words, lead line, scroll settles, hold ──
+      tl.fromTo(el("chip1"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 4.3);
+      tl.fromTo(el("chip2"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 4.8);
+
+      tl.fromTo(el("lead"), { opacity: 0, scale: 0.86, y: 18 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "power3.out" }, 5.5);
+
+      // hold to the last frame
+      tl.set({}, {}, 7.5);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["04-design"] = tl;
+    })();
+  </script>
+</template>

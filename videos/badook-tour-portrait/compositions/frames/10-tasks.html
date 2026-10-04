@@ -112,10 +112,10 @@
     }
     /* phone-tasks 390×1912 CSS → 520×2549.33; crop CSS y 150 (heading) → scrolls to 412 (the list) */
     [id="10-tasks-img-tasks"] { height: 2549.33px; top: -200px; }
-    /* phone-vendors 390×1830 CSS → 520×2440; crop CSS y 925 (the "quote" column of the status board) */
-    [id="10-tasks-img-vendors"] { height: 2440px; top: -1233.33px; }
-    /* phone-ideas 390×1715 CSS → 520×2286.67; crop CSS y 470 (the pinned note) */
-    [id="10-tasks-img-ideas"] { height: 2286.67px; top: -626.67px; }
+    /* phone-vendors 390×1830 CSS → 520×2440; crop CSS y 918 (the "quote" column of the status board) */
+    [id="10-tasks-img-vendors"] { height: 2440px; top: -1224px; }
+    /* phone-ideas 390×1715 CSS → 520×2286.67; crop CSS y 484 (the pinned note) */
+    [id="10-tasks-img-ideas"] { height: 2286.67px; top: -645.33px; }
 
     /* ── title column (right side of each card, RTL first) ── */
     [class~="10-tasks-idx"] {
@@ -143,11 +143,11 @@
       text-align: right;
     }
 
-    /* ── vendors: spotlight on the quote card "קייטרינג שפע" (CSS [16,960,358,108] → win [21.33,46.67,477.33,144], padded 6) ── */
+    /* ── vendors: spotlight on the quote card "קייטרינג שפע" (CSS [16,960,358,108] → win [21.33,56,477.33,144], padded 6) ── */
     [id="10-tasks-vspot"] {
       position: absolute;
       left: 15.33px;
-      top: 40.67px;
+      top: 50px;
       width: 489.33px;
       height: 156px;
       border-radius: 16px;
@@ -158,7 +158,7 @@
     [id="10-tasks-dot"] {
       position: absolute;
       left: 373px;
-      top: 203.67px;
+      top: 213px;
       width: 10px;
       height: 10px;
       border-radius: 50%;
@@ -168,7 +168,7 @@
     [id="10-tasks-leader"] {
       position: absolute;
       left: 377.25px;
-      top: 213.67px;
+      top: 223px;
       width: 1.5px;
       height: 38px;
       background: #A0703F;
@@ -177,7 +177,7 @@
     [id="10-tasks-pill-row"] {
       position: absolute;
       left: 18px;
-      top: 251.67px;
+      top: 261px;
       width: 520px;
       display: flex;
       justify-content: center;
@@ -201,11 +201,11 @@
     }
     [id="10-tasks-pill"] svg { width: 30px; height: 30px; flex: none; }
 
-    /* ── ideas: ring + spotlight on the pinned note (CSS [16,582,358,162] → win [21.33,149.33,477.33,216], padded 6) ── */
+    /* ── ideas: ring + spotlight on the pinned note (CSS [16,582,358,162] → win [21.33,130.67,477.33,216], padded 6) ── */
     [id="10-tasks-spot"] {
       position: absolute;
       left: 15.33px;
-      top: 143.33px;
+      top: 124.67px;
       width: 489.33px;
       height: 228px;
       border-radius: 16px;
@@ -215,7 +215,7 @@
     [id="10-tasks-ring-glow"] {
       position: absolute;
       left: 33.33px;
-      top: 161.33px;
+      top: 142.67px;
       width: 489.33px;
       height: 228px;
       border-radius: 16px;
@@ -225,7 +225,7 @@
     [id="10-tasks-ring"] {
       position: absolute;
       left: 33.33px;
-      top: 161.33px;
+      top: 142.67px;
       width: 489.33px;
       height: 228px;
       overflow: visible;
@@ -241,13 +241,13 @@
     }
   </style>
 
-  <div id="root" data-composition-id="10-tasks" data-width="1080" data-height="1920" data-duration="7.882">
+  <div id="root" data-composition-id="10-tasks" data-width="1080" data-height="1920" data-duration="8.382">
 
     <!-- full-bleed cream ground -->
-    <div id="10-tasks-bg" class="clip" data-start="0" data-duration="7.882" data-track-index="0"></div>
+    <div id="10-tasks-bg" class="clip" data-start="0" data-duration="8.382" data-track-index="0"></div>
 
     <!-- stacked-card stage -->
-    <div id="10-tasks-stage" class="clip" data-start="0" data-duration="7.882" data-track-index="1">
+    <div id="10-tasks-stage" class="clip" data-start="0" data-duration="8.382" data-track-index="1">
 
       <div id="10-tasks-kicker" dir="rtl" lang="he">09 · מתכננים</div>
       <div id="10-tasks-rule"></div>
@@ -288,7 +288,7 @@
           </div>
         </div>
         <div class="10-tasks-idx" id="10-tasks-idx2">02</div>
-        <div class="10-tasks-title" id="10-tasks-title2" dir="rtl" lang="he">ספקים והצעות מחיר</div>
+        <div class="10-tasks-title" id="10-tasks-title2" dir="rtl" lang="he">ספקים<br />והצעות מחיר</div>
       </div>
 
       <!-- card 3 (bottom): ideas board -->

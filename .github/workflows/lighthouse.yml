@@ -1,0 +1,101 @@
+# The performance budget (perf-budget.json) on Lighthouse's mobile preset — Moto G Power, Slow 4G, 4x
+# CPU: Performance ≥ 90, LCP ≤ 2.5 s, TBT ≤ 200 ms, CLS ≤ 0.1, ≤ 170 KB of JavaScript and ≤ 1.5 MB in
+# all (compressed) with the first load, Accessibility and Best Practices 100 (and SEO on the home page).
+#
+# - pages: on pull requests that change what the pages load, and by hand — the home page and a sample
+#   invitation of every template (lighthouserc.cjs); a page over the budget fails the run.
+# - new-invitations: every day, and by hand — the invitations published in the last day, on the live
+#   site (scripts/lighthouse-budget.mjs --recent). Needs the repository secrets INVITES_CRON_URL and
+#   INVITES_CRON_SECRET (as the other scheduled jobs); INVITES_PERF_ALERT_WEBHOOK (a Slack-compatible
+#   incoming webhook) gets the pages that miss the budget. Without the secrets it does nothing.
+name: Lighthouse budget
+
+on:
+  workflow_dispatch:
+    inputs:
+      templates:
+        description: Template ids, comma-separated (empty = all)
+        required: false
+        default: ''
+      urls:
+        description: Live pages to check instead (space-separated URLs, e.g. a new invitation)
+        required: false
+        default: ''
+  pull_request:
+    paths:
+      - src/**
+      - public/**
+      - invitation-templates-pack/**
+      - next.config.ts
+      - package.json
+      - package-lock.json
+      - lighthouserc.cjs
+      - perf-budget.json
+      - .github/workflows/lighthouse.yml
+  schedule:
+    - cron: '41 4 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    if: github.event_name != 'schedule' && (github.event_name != 'workflow_dispatch' || inputs.urls == '')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      INVITES_FEATURE_ENABLED: 'true'
+      INVITES_DEV_ROUTES: 'true'
+      INVITES_PUBLIC_BASE_URL: http://localhost:3000
+      LHCI_TEMPLATES: ${{ inputs.templates }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Lighthouse CI
+        run: npx --yes @lhci/cli@0.15 autorun
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-pages
+          path: test-results/lhci/
+
+  new-invitations:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.urls != '')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Check the new invitations
+        env:
+          INVITES_CRON_URL: ${{ secrets.INVITES_CRON_URL }}
+          INVITES_CRON_SECRET: ${{ secrets.INVITES_CRON_SECRET }}
+          INVITES_PERF_ALERT_WEBHOOK: ${{ secrets.INVITES_PERF_ALERT_WEBHOOK }}
+          URLS: ${{ inputs.urls }}
+        run: |
+          if [ -n "$URLS" ]; then
+            node scripts/lighthouse-budget.mjs --runs 3 $(for u in $URLS; do printf -- '--url %s ' "$u"; done)
+          elif [ -z "$INVITES_CRON_URL" ] || [ -z "$INVITES_CRON_SECRET" ]; then
+            echo "INVITES_CRON_URL / INVITES_CRON_SECRET are not set — nothing to do."
+          else
+            node scripts/lighthouse-budget.mjs --recent --hours 24 --runs 3
+          fi
+      - name: Summary
+        if: always()
+        run: cat test-results/lighthouse/budget.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-new-invitations
+          path: test-results/lighthouse/
