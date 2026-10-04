@@ -77,5 +77,9 @@ export const eventDayGuideRu: EventDayGuideDict = {
     privacy: 'Политика конфиденциальности',
     accessibility: 'Доступность',
     made: 'Сделано в {brand}',
+    site: 'Цифровые приглашения и организация праздников',
+    visit: 'Перейти на сайт {brand}',
+    events: 'Badook Events',
+    eventsHint: 'Найти площадку для праздника',
   },
 };

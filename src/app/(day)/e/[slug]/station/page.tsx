@@ -5,6 +5,7 @@ import { stationPage } from '@/features/event-day/server/pages';
 import { DayUnavailable } from '@/features/event-day/ui/DayUnavailable';
 import { Station } from '@/features/event-day/ui/station/Station';
 import { ipFromHeaders } from '@/lib/client-ip';
+import { serverEnv } from '@/lib/env';
 import { eventDayGuestEn } from '@/lib/i18n/event-day-guest.en';
 import { eventDayGuestHe } from '@/lib/i18n/event-day-guest.he';
 import { fill } from '@/lib/i18n/guest';
@@ -48,5 +49,12 @@ export default async function StationPage({ searchParams }: { params: Params; se
     return (
       <DayUnavailable locale={lang === 'en' ? 'en' : 'he'} kind={data === 'rate' ? 'rate' : 'station'} />
     );
-  return <Station data={data} token={token} lang={lang === 'en' || lang === 'he' ? lang : null} />;
+  return (
+    <Station
+      data={data}
+      token={token}
+      lang={lang === 'en' || lang === 'he' ? lang : null}
+      brand={serverEnv().INVITES_BRAND_NAME}
+    />
+  );
 }

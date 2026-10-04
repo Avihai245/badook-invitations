@@ -1,8 +1,24 @@
 'use client';
 
-import { Camera, CircleCheck, Globe, Minus, PencilLine, Plus, Search, Undo2, WifiOff, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Camera,
+  CircleCheck,
+  Globe,
+  MapPin,
+  Minus,
+  PencilLine,
+  Plus,
+  Search,
+  Undo2,
+  WifiOff,
+  X,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Button, Dialog } from '@/components/app';
+import { BrandLogo } from '@/components/app/BrandLogo';
+import { BADOOK_EVENTS_URL } from '@/features/site/links';
 import { useLiveRefresh } from '@/lib/live/client';
 import type { RealtimeInfo } from '@/lib/live/types';
 import { codeFromScan } from '../../codes';
@@ -25,10 +41,12 @@ export function Station({
   data,
   token,
   lang,
+  brand,
 }: {
   data: StationPageData;
   token: string;
   lang: StaffLocale | null;
+  brand: string;
 }) {
   // the event staff's page: Hebrew or English — the one asked for, else the invitation's when it is
   // one of them, else Hebrew; the other one to switch to when the invitation has more languages
@@ -41,7 +59,7 @@ export function Station({
     : null;
   return (
     <DayTextProvider locale={locale}>
-      <StationBody data={data} token={token} other={other} onLocale={setLocale} />
+      <StationBody data={data} token={token} other={other} onLocale={setLocale} brand={brand} />
     </DayTextProvider>
   );
 }
@@ -53,11 +71,13 @@ function StationBody({
   token,
   other,
   onLocale,
+  brand,
 }: {
   data: StationPageData;
   token: string;
   other: StaffLocale | null;
   onLocale(l: StaffLocale): void;
+  brand: string;
 }) {
   const { t, locale, plural, number, date } = useDayText();
   const s = t.station;
@@ -475,6 +495,57 @@ function StationBody({
           <p className="mt-1 text-[12px] text-muted">{s.nameHelp}</p>
         </section>
       </div>
+
+      {/* whose system this is: Badook, with the way to its site and to Badook Events */}
+      <footer className="mx-auto mt-8 w-full max-w-[640px] px-4 text-center" data-testid="station-brand-card">
+        <div className="rounded-[22px] border border-line bg-surface px-5 pt-5 pb-4">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener"
+            data-testid="station-brand"
+            className="inline-flex flex-col items-center gap-1.5 rounded-[14px] px-3 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            <BrandLogo label={brand} className="text-[20px]" />
+            <span className="text-[13.5px] font-bold">{fill(t.footer.made, { brand })}</span>
+          </a>
+          <p className="mt-0.5 text-[12.5px] text-muted">{t.footer.site}</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener"
+              data-testid="station-brand-site"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-[14px] font-bold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              {fill(t.footer.visit, { brand })}
+              {locale === 'he' ? (
+                <ArrowLeft aria-hidden className="size-4" />
+              ) : (
+                <ArrowRight aria-hidden className="size-4" />
+              )}
+            </a>
+            <a
+              href={BADOOK_EVENTS_URL}
+              target="_blank"
+              rel="noopener"
+              data-testid="station-brand-events"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-line bg-canvas px-5 text-[14px] font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <MapPin aria-hidden className="size-4 text-[#e0532b]" />
+              {t.footer.events}
+            </a>
+          </div>
+          <p className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-muted">
+            <a href="/privacy" target="_blank" rel="noopener" className="underline">
+              {t.footer.privacy}
+            </a>
+            <a href="/accessibility" target="_blank" rel="noopener" className="underline">
+              {t.footer.accessibility}
+            </a>
+          </p>
+        </div>
+      </footer>
 
       {party ? (
         <Dialog

@@ -352,6 +352,22 @@ test('the entrance checks families in by search and by the code on their phone; 
   const station = await door.newPage();
   await station.goto(stationUrl);
   await expect(station.getByTestId('station')).toBeVisible();
+  // Badook is plain to see at the bottom, with its site and Badook Events (new tabs)
+  const brand = station.getByTestId('station-brand-card');
+  await brand.scrollIntoViewIfNeeded();
+  await expect(brand.getByRole('img', { name: 'Badook' }).first()).toBeVisible();
+  await expect(station.getByTestId('station-brand')).toHaveAttribute('href', '/');
+  await expect(station.getByTestId('station-brand-site')).toHaveAttribute('href', '/');
+  await expect(station.getByTestId('station-brand-site')).toHaveAttribute('target', '_blank');
+  await expect(station.getByTestId('station-brand-events')).toHaveAttribute(
+    'href',
+    'https://event.badooks.com/',
+  );
+  await expect(station.getByTestId('station-brand-events')).toHaveAttribute('target', '_blank');
+  mkdirSync(SCREENS, { recursive: true });
+  await settle(station);
+  await station.screenshot({ path: `${SCREENS}/station-brand-he-390.png`, fullPage: true });
+  await station.evaluate(() => window.scrollTo(0, 0));
   await station.getByTestId('station-search').fill('לוי');
   await station.locator('[data-party="משפחת לוי"]').click();
   await expect(station.getByTestId('party-table')).toContainText('12');

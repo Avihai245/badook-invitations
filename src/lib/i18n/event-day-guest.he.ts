@@ -127,6 +127,10 @@ export const eventDayGuestHe = {
     privacy: 'מדיניות פרטיות',
     accessibility: 'הצהרת נגישות',
     made: 'נוצר ב־{brand}',
+    site: 'הזמנות דיגיטליות וארגון אירועים',
+    visit: 'לאתר {brand}',
+    events: 'Badook אירועים',
+    eventsHint: 'למצוא מקום לאירוע',
   },
 };
 

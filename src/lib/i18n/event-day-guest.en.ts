@@ -128,5 +128,9 @@ export const eventDayGuestEn: EventDayGuestDict = {
     privacy: 'Privacy policy',
     accessibility: 'Accessibility statement',
     made: 'Made with {brand}',
+    site: 'Digital invitations & event planning',
+    visit: 'Visit {brand}',
+    events: 'Badook Events',
+    eventsHint: 'Find a venue for your event',
   },
 };
