@@ -273,13 +273,13 @@
     }
   </style>
 
-  <div id="root" data-composition-id="01-intro" data-width="1080" data-height="1920" data-duration="10.906">
+  <div id="root" data-composition-id="01-intro" data-width="1080" data-height="1920" data-duration="10.306">
 
     <!-- full-bleed cream ground -->
-    <div id="01-intro-bg" class="clip" data-start="0" data-duration="10.906" data-track-index="0"></div>
+    <div id="01-intro-bg" class="clip" data-start="0" data-duration="10.306" data-track-index="0"></div>
 
     <!-- phone: glow + shadow + bezel around the hoisted invitation video (never moves) -->
-    <div id="01-intro-phone-layer" class="clip" data-start="0" data-duration="10.906" data-track-index="1">
+    <div id="01-intro-phone-layer" class="clip" data-start="0" data-duration="10.306" data-track-index="1">
       <div id="01-intro-glow"></div>
       <div id="01-intro-shadow"></div>
       <div id="01-intro-bezel">
@@ -291,7 +291,7 @@
     </div>
 
     <!-- text layer: welcome + logo, the promise, the onward pill -->
-    <div id="01-intro-col" class="clip" data-start="0" data-duration="10.906" data-track-index="2" dir="rtl" lang="he">
+    <div id="01-intro-col" class="clip" data-start="0" data-duration="10.306" data-track-index="2" dir="rtl" lang="he">
       <div id="01-intro-head" dir="rtl" lang="he">
         <div id="01-intro-welcome">ברוכים הבאים ל־</div>
         <img id="01-intro-logo" src="assets/badook-logo.png" alt="Badook" />
@@ -328,7 +328,9 @@
     </div>
 
     <!-- approved frame video: the real invitation, hoisted by the assembler to fixed host geometry -->
-    <!-- approved frame video hoisted by assemble-index -->
+    <video id="01-intro-invite" class="clip" data-frame-video="approved" src="assets/invite-open.mp4" muted playsinline
+      data-start="0" data-duration="10.306" data-track-index="3"
+      data-frame-video-x="270" data-frame-video-y="470" data-frame-video-width="540" data-frame-video-height="1100" data-frame-video-fit="cover"></video>
   </div>
 
   <script src="assets/vendor/gsap.min.js"></script>
