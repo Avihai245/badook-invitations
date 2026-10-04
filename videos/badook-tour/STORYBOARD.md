@@ -82,7 +82,7 @@ subtitle of the voice — the headline/kicker are titles, not captions.
 - voiceover: "ברוכים הבאים לבאדוק — מקום אחד שבו מתכננים את האירוע, מזמינים את האורחים ומנהלים הכול עד הרגע האחרון. בואו נראה איך זה עובד."
 - duration: 10.306s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/01-intro.html
 - type: hook
 - persuasion: Show-don't-tell proof (the product's own output, the invitation, is the opening image)
@@ -125,7 +125,7 @@ phone (`ambient-glow-bloom`, finite). Hold.
 - voiceover: "מתחילים באירוע חדש: בוחרים את סוג האירוע, מוסיפים תאריך, מספר אורחים משוער ותקציב, ובוחרים מאיפה להתחיל. פחות מדקה, והאירוע מוכן."
 - duration: 11.636s
 - transition_in: blur-crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/02-start.html
 - type: product_intro
 - persuasion: Friction reduction
@@ -165,7 +165,7 @@ Scene 5 (9.2–11.636s): a brown stopwatch chip (circle ring + "00:45") pops bes
 - voiceover: "בית האירוע מראה הכול במבט אחד: ספירה לאחור, הצעד הבא שכדאי לעשות עכשיו, מד התקציב, אישורי ההגעה והמשימות. והכול מסודר בארבעה שלבים: מתכננים, מזמינים, מסדרים וחוגגים."
 - duration: 16.932s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/03-home.html
 - type: feature_showcase
 - persuasion: Value stacking
@@ -209,7 +209,7 @@ Held read from 15.9s.
 - voiceover: "בוחרים הזמנה מתוך יותר משישים עיצובים מונפשים, עם מוזיקה ואנימציה, שמותאמים לסוג האירוע."
 - duration: 7.506s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/04-design.html
 - type: feature_showcase
 - persuasion: Statistical proof (breadth)
@@ -243,7 +243,7 @@ Scene 3 (4.0–7.506s): two feature chips pop under the number on their words �
 - voiceover: "רוצים משהו אישי? מעלים כמה תמונות, ועצבו לי בונה עיצוב בהשראתן: צבעים, אווירה וסגנון."
 - duration: 8.214s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/05-ai.html
 - type: feature_showcase
 - persuasion: Feature-to-benefit translation
@@ -279,7 +279,7 @@ Scene 4 (5.8–8.214s): three swatch chips land beside the card on their words �
 - voiceover: "עורכים את הטקסטים, התאריך והמקום, ורואים כל שינוי מיד. אפשר לשלוח טיוטה למשפחה, לקבל הערות, ורק אז לפרסם."
 - duration: 10.247s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/06-edit.html
 - type: feature_showcase
 - persuasion: Risk reversal (review before you publish)
@@ -318,7 +318,7 @@ Scene 5 (8.6–10.247s): review card tucks away; 9.3s press on `publish` (`press
 - voiceover: "אחרי הפרסום, להזמנה יש קישור משלה וקוד QR. וכל מוזמן מקבל קישור אישי, שפונה אליו בשם וממלא את הפרטים בשבילו."
 - duration: 10.27s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/07-share.html
 - type: feature_showcase
 - persuasion: Show-don't-tell proof
@@ -356,7 +356,7 @@ name/phone fields ring ("וממלא את הפרטים בשבילו"). Hold.
 - voiceover: "מעלים את רשימת המוזמנים מקובץ אקסל, ושולחים לכולם בוואטסאפ: מהמספר של באדוק, או מהוואטסאפ שלכם, אחד אחרי השני."
 - duration: 9.495s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/08-guests.html
 - type: feature_showcase
 - persuasion: Friction reduction
@@ -395,7 +395,7 @@ at 7.9s and 8.7s, a small counter pill beside the dialog steps "1 / 6" → "2 / 
 - voiceover: "אישורי ההגעה מתעדכנים בזמן אמת: מי מגיע, כמה אנשים, מי לא, ומי עוד לא ענה. תשובה שהגיעה מהקישור הכללי משייכים למוזמן בלחיצה אחת."
 - duration: 12.076s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/09-rsvp.html
 - type: feature_showcase
 - persuasion: Statistical proof (live counts)
@@ -430,7 +430,7 @@ clicks (`cursor-click-ripple`), at 10.8s a brown check toast "שויך למוז�
 - voiceover: "בתכנון מחכה לכם רשימת משימות לפי לוח זמנים, ספקים עם הצעות מחיר, ולוח רעיונות להשראה."
 - duration: 7.882s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/10-tasks.html
 - type: feature_showcase
 - persuasion: Rule of three
@@ -465,7 +465,7 @@ Scene 4 (5.9–7.882s): 5.9s the left card (ideas) assembles, title "לוח רע
 - voiceover: "מד התקציב מראה מיד איפה אתם עומדים: ירוק, בטוחים. צהוב, מתקרבים לגבול. אדום, חריגה. מוסיפים הוצאות ותשלומים, ובודקים מה יקרה אם ישתנה מספר האורחים."
 - duration: 14.516s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/11-budget.html
 - type: feature_showcase
 - persuasion: Future pacing (see the risk before it happens)
@@ -510,7 +510,7 @@ ticks 240→260 at 13.2s. Hold.
 - voiceover: "את סידור השולחנות עושים בגרירה: מושיבים משפחות שלמות, מסדרים על תוכנית האולם, ושולחים לכל אורח את מספר השולחן שלו."
 - duration: 9.243s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/12-seating.html
 - type: feature_showcase
 - persuasion: Show-don't-tell proof
@@ -549,7 +549,7 @@ the right over the text column at 6.7s; at 7.6s ring on its "2 · השולחן �
 - voiceover: "ביום האירוע, עמדת הכניסה מאשרת הגעה בחיפוש או בסריקת קוד, ואתם רואים מי הגיע בזמן אמת."
 - duration: 7.969s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/13-eventday.html
 - type: feature_showcase
 - persuasion: Show-don't-tell proof
@@ -584,7 +584,7 @@ and a "בזמן אמת" chip with live dot. Hold.
 - voiceover: "האורחים מעלים תמונות לגלריה חיה שמוצגת על המסך באולם, וכל אחד יכול למצוא את התמונות שהוא מופיע בהן."
 - duration: 7.915s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/14-gallery.html
 - type: feature_showcase
 - persuasion: Belonging (everyone's photos, together)
@@ -620,7 +620,7 @@ pops at 6.4s under the screen. Hold.
 - voiceover: "ואחרי האירוע: סרט רגעים שנוצר מהתמונות, ותובנות על הצפיות וההגעה."
 - duration: 6.444s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/15-film.html
 - type: feature_showcase
 - persuasion: Future pacing (the memory lasts)
@@ -654,7 +654,7 @@ the "פתחו" card 0→188 (5.5s "וההגעה"). Hold.
 - voiceover: "ובכל שלב, כפתור העזרה פותח מדריך כתוב, עוזר חכם שעונה על כל שאלה, ופנייה ישירה לצוות."
 - duration: 8.599s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/16-help.html
 - type: benefit_highlight
 - persuasion: Risk reversal (never stuck)
@@ -691,7 +691,7 @@ Scene 5 (6.5–8.599s): row 3 "פנייה ישירה לצוות" (person glyph) 
 - voiceover: "באדוק. מהרעיון הראשון ועד הרגע האחרון. יוצאים לדרך."
 - duration: 8.895s
 - transition_in: blur-crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/17-end.html
 - type: cta
 - persuasion: Risk reversal (free to start)

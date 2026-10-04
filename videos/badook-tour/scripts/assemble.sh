@@ -5,7 +5,9 @@ set -e
 cd "$(dirname "$0")/.."
 mkdir -p .hyperframes/frame-src
 for f in compositions/frames/*.html; do
-  b=$(basename "$f"); [ -f ".hyperframes/frame-src/$b" ] || cp "$f" ".hyperframes/frame-src/$b"
+  b=$(basename "$f")
+  # a worker's (re)write is the source of truth; a file the assembler already hoisted is not
+  grep -q "approved frame video hoisted by assemble-index" "$f" || cp "$f" ".hyperframes/frame-src/$b"
 done
 cp .hyperframes/frame-src/*.html compositions/frames/
 node ../../.agents/skills/product-launch-video/scripts/assemble-index.mjs --storyboard ./STORYBOARD.md --hyperframes . | sed -n 1,9p
