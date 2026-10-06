@@ -73,7 +73,7 @@ test('the list, the gallery with its preview and wizard, and the account', async
   await explains(page, main.getByTestId('area-help'), 'האירועים שלי: מה כל כפתור עושה', [
     'אירוע חדש',
     'הצעד הבא',
-    'הכפתורים בכרטיס',
+    'כניסה לאירוע',
     'ארכיון',
   ]);
 
@@ -94,7 +94,8 @@ test('the list, the gallery with its preview and wizard, and the account', async
   await expect(preview).toBeVisible();
 
   // …and so has the wizard
-  await preview.getByRole('button', { name: 'מילוי ידני' }).click();
+  // with the AI set up the preview offers "manual" and "quick with AI"; without it, one "use this design"
+  await preview.getByRole('button', { name: /^(מילוי ידני|שימוש בעיצוב הזה)$/ }).click();
   const wizard = page.getByRole('dialog', { name: /הזמנה חדשה/ });
   await explains(
     page,
@@ -128,8 +129,8 @@ test('an event: its home and navigation, the RSVPs and sharing; the app’s own 
   }, id);
   expect(published).toBe(200);
 
-  // the list: the card opens the event's home
-  await open(page, '/app/invitations');
+  // the list (one event sends the host straight in; "all events" shows it): the card opens the event's home
+  await open(page, '/app/invitations?all=1');
   await main.getByRole('link', { name: 'נועה & איתי', exact: true }).click();
   await page.waitForURL(new RegExp(`/app/invitations/${id}$`));
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
@@ -138,13 +139,13 @@ test('an event: its home and navigation, the RSVPs and sharing; the app’s own 
   const tour = page.getByTestId('tour');
   if (await tour.isVisible().catch(() => false)) await tour.getByRole('button', { name: 'דילוג' }).click();
   await explains(page, main.getByTestId('area-help'), 'בית האירוע: מה כל דבר עושה', [
-    'הצעד הבא',
+    'המסלול שלכם',
     'מד התקציב',
-    'מפת הדרך',
+    'צריכים עוד משהו?',
   ]);
   // one next step: a published save-the-date (no planning) with no guests yet → the guest list
-  await expect(page.getByTestId('home-next')).toHaveAttribute('data-action', 'guests');
-  await expect(page.getByTestId('home-next').getByRole('link')).toHaveAttribute(
+  await expect(page.getByTestId('home-next')).toHaveAttribute('data-action', 'guests:add');
+  await expect(page.getByTestId('home-next').getByRole('link', { name: 'להוספת מוזמנים' })).toHaveAttribute(
     'href',
     `/app/invitations/${id}/guests?import=1`,
   );
@@ -156,7 +157,7 @@ test('an event: its home and navigation, the RSVPs and sharing; the app’s own 
       await page.getByRole('dialog', { name: stage }).getByRole('link', { name: item }).click();
     } else await page.getByTestId('event-sidebar').getByRole('link', { name: item, exact: true }).click();
   };
-  await go('מזמינים', 'אישורי הגעה');
+  await go('ההזמנה והמוזמנים', 'אישורי הגעה');
   await page.waitForURL(/\/responses$/);
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   if (!isPhone(page))
@@ -168,7 +169,7 @@ test('an event: its home and navigation, the RSVPs and sharing; the app’s own 
     'סינונים פעילים',
   ]);
 
-  await go('מזמינים', 'שליחה ושיתוף');
+  await go('ההזמנה והמוזמנים', 'שליחה ושיתוף');
   await page.waitForURL(/\/share$/);
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await explains(page, main.getByTestId('area-help'), 'שיתוף: מה כל כפתור עושה', ['העתקת ההודעה', 'קוד QR']);
@@ -177,8 +178,8 @@ test('an event: its home and navigation, the RSVPs and sharing; the app’s own 
   if (isPhone(page))
     await page.getByTestId('event-bottom-bar').getByRole('link', { name: 'בית האירוע' }).click();
   else await page.getByTestId('event-sidebar').getByRole('link', { name: 'כל האירועים' }).click();
-  if (isPhone(page)) await page.goto('/app/invitations');
-  await page.waitForURL(/\/app\/invitations$/);
+  if (isPhone(page)) await page.goto('/app/invitations?all=1');
+  await page.waitForURL(/\/app\/invitations\?all=1$/);
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await page.getByTestId('user-menu').filter({ visible: true }).first().click();
   await page.getByRole('menuitem', { name: 'חבילה וחיובים' }).click();

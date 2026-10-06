@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { packageFor, whyOff, type Feature, type FeatureInput } from '../flags/features';
 import { LIMITS, readState, SaveSchema, toDbPlan, type SeatingState } from './model';
+import type { SeatingAi } from './server-ai';
+import { tidyWords, wordsUnits } from './words';
 
 /**
  * The seating screen's API (GET / POST /api/invitations/:id/seating, POST …/seating/upload) as plain
@@ -33,6 +35,12 @@ export interface SeatingDeps {
   /** a signed upload URL for this path in the venue-plans bucket */
   signedUpload(path: string): Promise<{ path: string; url: string; token: string }>;
   newId(): string;
+  /** the AI that reads rules in words (null/absent: none is set up — the screen doesn't offer it) */
+  ai?: SeatingAi | null;
+  /** a daily cap on the AI (per account, and for the whole site) */
+  rateHit?(key: string, limit: number, windowSeconds: number): Promise<boolean>;
+  rateKey?(scope: 'account' | 'site', value: string): string;
+  aiLimits?: { perAccount: number; site: number };
 }
 
 const isUuid = (v: string) => z.uuid().safeParse(v).success;
@@ -124,4 +132,45 @@ export async function createPlanUpload(
   if (parsed.data.size > LIMITS.planBytes) return fail(413, 'too_large', { max: LIMITS.planBytes });
   const signed = await deps.signedUpload(`${userId}/${id}/${deps.newId()}.${ext}`);
   return ok({ path: signed.path, url: signed.url, token: signed.token });
+}
+
+const WordsSchema = z.strictObject({
+  text: z.string().trim().min(3).max(800),
+  locale: z.enum(['he', 'en']).default('he'),
+});
+
+const DAY = 86_400;
+
+/**
+ * POST …/seating/words { text } — the host's wishes in words read into rules (words.ts, feature
+ * `seating_auto`): `{ answer }` with unit ids, for the host to approve in the screen — nothing is
+ * saved here. 503 `ai_unavailable` without a model, 429 `rate_limited` past the daily cap, 422
+ * `refused` / `not_understood`, 502 `ai_failed`.
+ */
+export async function readWords(
+  userId: string,
+  id: string,
+  raw: unknown,
+  deps: SeatingDeps,
+): Promise<ApiResult> {
+  const refused = await gate(userId, id, deps, 'seating_auto');
+  if (refused) return refused;
+  const parsed = WordsSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  if (!deps.ai) return fail(503, 'ai_unavailable');
+  if (deps.rateHit && deps.rateKey && deps.aiLimits) {
+    const account = await deps.rateHit(deps.rateKey('account', userId), deps.aiLimits.perAccount, DAY);
+    const site = await deps.rateHit(deps.rateKey('site', 'all'), deps.aiLimits.site, DAY);
+    if (!account || !site) return fail(429, 'rate_limited');
+  }
+  const state = await deps.state(id, userId);
+  if (!state) return notFound;
+  const { plan, units } = readState(state);
+  const { list, ids } = wordsUnits(plan, units);
+  if (!list.length) return fail(422, 'no_guests');
+  const res = await deps.ai.readWords({ text: parsed.data.text, units: list, locale: parsed.data.locale });
+  if (res.status === 'refused') return fail(422, 'refused');
+  if (res.status === 'error') return fail(502, 'ai_failed');
+  const answer = tidyWords(res.json, ids);
+  return answer ? ok({ answer }) : fail(422, 'not_understood');
 }

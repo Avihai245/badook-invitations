@@ -24,9 +24,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 /**
- * /app/invitations/[id] — the event's home: the countdown, the one next step, the budget's gauge, the
- * RSVPs' ring, the tasks, the road through the four stages and what else is worth doing (the event's
- * navigation and strip come from the layout).
+ * /app/invitations/[id] — the event's home: the event at a glance, its path by the tools the host chose
+ * (the current step open with one button), the widgets that have something to show, and the tools not
+ * chosen yet a tap away (the event's navigation and strip come from the layout).
  */
 export default async function EventHomePage({ params }: { params: Params }) {
   const { id } = await params;
@@ -46,7 +46,7 @@ export default async function EventHomePage({ params }: { params: Params }) {
           item={item}
           uiLocale={locale}
           fallbackName={hostsLine(item.hosts, item.defaultLocale) || t.eventTypes[item.eventType]}
-          className="w-[96px] shrink-0 rotate-[-3deg] rounded-[16px]! shadow-[0_24px_40px_-20px_rgba(60,35,15,0.75)]! ring-4 ring-white/85 sm:w-[124px] dark:ring-line-strong"
+          className="w-[72px] shrink-0 rotate-[-3deg] rounded-[12px]! shadow-[0_18px_32px_-18px_rgba(60,35,15,0.75)]! ring-4 ring-white/85 sm:w-[96px] dark:ring-line-strong"
         />
       }
     />

@@ -55,6 +55,7 @@ export default async function SeatingPage({ params }: { params: Params }) {
       autoPackage={names('seating_auto')}
       planBase={planBaseUrl()}
       day={day}
+      wordsAi={autoWhy === null && seatingDeps.ai !== null}
     />
   );
 }

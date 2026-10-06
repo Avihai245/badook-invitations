@@ -4,6 +4,7 @@ import { cache } from 'react';
 import { revalidateInvitationPageById } from '@/features/invitations/server/revalidate';
 import { isAdminEmail, loadAccount } from '@/features/billing/server/account';
 import { effectivePlan, isPlanId, type AccountPlanState, type PlanId } from '@/features/billing/plans';
+import { readTools, type ToolKey } from '@/features/invitations/lib/tools';
 import { serverEnv, type ServerEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import type { FlagDeps } from './api';
@@ -48,10 +49,13 @@ type Row = {
   planRenewsAt: string | null;
 };
 
-/** An event's inputs: its owner's plan in force, the event's overrides, this deployment (null: no event). */
+/**
+ * An event's inputs: its owner's plan in force, the event's overrides, this deployment (null: no event) —
+ * and, beside them, the tools the host chose for the event (invitations/lib/tools; null: never chose).
+ */
 export async function featureInput(
   invitationId: string,
-): Promise<(FeatureInput & { ownerId: string }) | null> {
+): Promise<(FeatureInput & { ownerId: string; tools: ToolKey[] | null }) | null> {
   const { data, error } = await serviceDb().rpc('invitation_features', { p_id: invitationId });
   if (error) throw new Error(`invitation_features: ${error.message}`);
   if (!data) return null;
@@ -68,6 +72,9 @@ export async function featureInput(
     admin,
     overrides: readOverrides(r.overrides),
     available: deploymentFeatures(),
+    tools: readTools(
+      r.overrides && typeof r.overrides === 'object' ? (r.overrides as Record<string, unknown>).tools : null,
+    ),
   };
 }
 

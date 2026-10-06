@@ -8,5 +8,10 @@
     "poster": "/video/tour-poster.960b0ea314.jpg",
     "landscape": "/video/badook-tour.e0fe1a4806.mp4",
     "portrait": "/video/badook-tour-portrait.81aa0fbae1.mp4"
+  },
+  "seating": {
+    "landscape": "/video/badook-seating.f044a9ac6d.mp4",
+    "portrait": "/video/badook-seating-portrait.9bd00103b0.mp4",
+    "poster": "/video/seating-poster.a5c8b608db.jpg"
   }
 }

@@ -46,6 +46,7 @@
     "perf:lighthouse": "node scripts/lighthouse-budget.mjs",
     "perf:lhci": "INVITES_DEV_ROUTES=true npx --yes @lhci/cli@0.15 autorun",
     "video:render": "npm --prefix video ci && npm --prefix video run render",
+    "video:seating": "npm --prefix video ci && npm --prefix video run render:seating",
     "video:tour": "npm --prefix video ci && npm --prefix video run narrate && npm --prefix video run render:tour",
     "video:tour:recorded": "npm --prefix video ci && npm --prefix video run narrate:files && npm --prefix video run render:tour"
   },

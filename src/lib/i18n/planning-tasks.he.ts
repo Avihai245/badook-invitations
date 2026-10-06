@@ -3,8 +3,16 @@ export const planningTasksHe = {
   title: 'משימות',
   subtitle: 'מה לעשות ומתי, לפי התאריך של האירוע.',
   metaTitle: 'משימות · {name}',
+  /** the screen's "how it works", for a first visit (closed: remembered for this event) */
+  intro: {
+    title: 'איך עובדים עם המשימות',
+    order: 'הרשימה מסודרת לפי מתי צריך לטפל בכל דבר: באיחור, השבוע, החודש ובהמשך.',
+    tick: 'מסמנים ✓ כשסיימתם. לחיצה על משימה פותחת אותה: תאריך, הערה, ספק או עלות.',
+    own: 'חסרה משימה? כותבים אותה בשורה למעלה ולוחצים Enter.',
+  },
   views: {
     label: 'תצוגה',
+    show: 'סידור:',
     timeline: 'ציר זמן',
     category: 'לפי קטגוריה',
     list: 'רשימה',
@@ -15,6 +23,13 @@ export const planningTasksHe = {
     mine: 'שלי',
     cost: 'עם עלות',
     hidden: 'הוסתרו',
+    /** each filter, in a word (hover and keyboard) */
+    hints: {
+      now: 'מה שצריך לסגור ב־14 הימים הקרובים',
+      mine: 'משימות שאתם אחראים עליהן',
+      cost: 'משימות שמחוברות לתקציב',
+      hidden: 'משימות שהסתרתם — אפשר להחזיר אותן',
+    },
   },
   groups: {
     overdue: 'באיחור',
@@ -25,6 +40,14 @@ export const planningTasksHe = {
     done: 'בוצעו',
     hidden: 'הוסתרו',
     noCategory: 'כללי',
+    /** a line under a timeline group's title */
+    hints: {
+      overdue: 'התאריך עבר — כדאי לטפל או לעדכן תאריך',
+      week: 'כדאי לסגור בימים הקרובים',
+      month: 'על הפרק בשבועות הקרובים',
+      later: 'עוד יש זמן — נזכיר כשיתקרב',
+      noDate: 'משימות בלי תאריך. אפשר לתת להן תאריך בלחיצה',
+    },
   },
   add: {
     placeholder: 'משימה חדשה, ו-Enter להוספה',
@@ -54,8 +77,10 @@ export const planningTasksHe = {
     assignedTo: 'אחראי: {name}',
   },
   suggest: {
-    chip: 'הצעה להסתרה',
-    body: 'נשאר מעט זמן, ואולי המשימה הזאת כבר לא רלוונטית.',
+    chip: 'משימות שכנראה כבר לא רלוונטיות',
+    body: 'נשאר מעט זמן עד האירוע, אז אולי כבר אין צורך בהן.',
+    banner: { one: 'משימה אחת כנראה כבר לא רלוונטית.', other: '{n} משימות כנראה כבר לא רלוונטיות.' },
+    review: 'לעבור עליהן',
     hide: 'להסתיר',
     keep: 'להשאיר',
     hideAll: 'להסתיר את כל ההצעות ({n})',
