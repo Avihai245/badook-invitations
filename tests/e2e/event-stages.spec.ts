@@ -38,9 +38,9 @@ test.describe('the event’s stages', () => {
     const side = page.getByTestId('event-sidebar');
 
     // the stages, named as steps, in their order
-    await expect(side.getByRole('heading', { name: 'שלבי האירוע' })).toBeVisible();
-    await expect(toggle(page, 'plan')).toHaveAccessibleName(/^שלב 1 מתוך 4: מתכננים/);
-    await expect(toggle(page, 'celebrate')).toHaveAccessibleName(/^שלב 4 מתוך 4: חוגגים/);
+    await expect(side.getByRole('heading', { name: 'הכלים של האירוע' })).toBeVisible();
+    await expect(toggle(page, 'plan')).toHaveAccessibleName(/^שלב 1 מתוך 4: תכנון האירוע/);
+    await expect(toggle(page, 'celebrate')).toHaveAccessibleName(/^שלב 4 מתוך 4: ביום האירוע/);
 
     // open: the plan's open tasks, the stage being looked at, the seating not begun; the day is 57 days away
     await expect(toggle(page, 'plan')).toHaveAttribute('aria-expanded', 'true');
@@ -84,6 +84,31 @@ test.describe('the event’s stages', () => {
     await expect(toggle(page, 'plan')).toHaveAttribute('aria-expanded', 'true');
   });
 
+  test('only the tools the host chose: the others are not there, a tap away with "add tools"', async ({
+    page,
+  }) => {
+    const host = await plannedHost(page, 57);
+    expect((await api(page, `/api/invitations/${host.id}/tools`, 'PUT', { tools: ['invite'] })).status).toBe(
+      200,
+    );
+    await open(page, `/app/invitations/${host.id}`);
+    // the sidebar and the phone's bar: only the invitation's screens
+    await expect(navItem(page, 'guests')).toHaveCount(1);
+    await expect(navItem(page, 'budget')).toHaveCount(0);
+    await expect(navItem(page, 'seating')).toHaveCount(0);
+    await expect(page.getByTestId('home-journey').locator('[data-step="plan"]')).toHaveCount(0);
+    await expect(page.getByTestId('home-budget')).toHaveCount(0);
+    // the plan isn't gone: only hidden — taking the planning back shows it as it was
+    await expect(page.getByTestId('home-more-tools')).toContainText('תכנון האירוע');
+    await page.goto(`/app/invitations/${host.id}?tools=1`);
+    const dialog = page.getByRole('dialog', { name: 'הכלים של האירוע' });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('checkbox', { name: /תכנון האירוע/ }).click();
+    await dialog.getByTestId('tools-save').click();
+    await expect(page.getByTestId('home-budget')).toBeVisible();
+    await expect(navItem(page, 'budget')).toHaveCount(1);
+  });
+
   test('a month before the event, "celebrate" is open by itself', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'mobile', 'the sidebar is a computer’s');
     const host = await plannedHost(page, 20);
@@ -97,7 +122,7 @@ test.describe('the event’s stages', () => {
     const host = await plannedHost(page, 57);
     await open(page, `/app/invitations/${host.id}`);
     await page.getByTestId('event-bottom-bar').locator('[data-stage-button="invite"]').click();
-    const sheet = page.getByRole('dialog', { name: 'מזמינים' });
+    const sheet = page.getByRole('dialog', { name: 'ההזמנה והמוזמנים' });
     await expect(sheet.getByText('שלב 2 מתוך 4', { exact: true })).toBeVisible();
     await expect(sheet.locator('[data-nav="guests"]')).toBeVisible();
   });

@@ -177,10 +177,10 @@ test.describe('host: create → edit → publish', () => {
     await expect(page.locator('meta[name="robots"], meta[name="googlebot"]')).toHaveCount(0);
 
     // back in the list: the card is published
-    await open(page, '/app/invitations');
+    await open(page, '/app/invitations?all=1');
     const main = page.locator('#main');
     await expect(main.getByRole('link', { name: 'נועה & איתי' })).toBeVisible();
-    await expect(main.getByText('פורסם', { exact: true })).toBeVisible();
+    await expect(main.getByText('פורסמה', { exact: true })).toBeVisible();
     expect(errors).toEqual([]);
   });
 });
@@ -400,9 +400,9 @@ test.describe('from the list to publishing, a premium design, a wrong address', 
     });
 
     // the list's next step: straight to the editor with its publish window open
-    await open(page, '/app/invitations');
+    await open(page, '/app/invitations?all=1');
     const main = page.locator('#main');
-    await main.getByRole('link', { name: 'הצעד הבא: לפרסם' }).click();
+    await main.getByRole('link', { name: 'הצעד הבא: מסיימים את העיצוב ומפרסמים' }).click();
     await page.waitForURL(new RegExp(`/app/invitations/${created.id}/edit$`));
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
     const dialog = page.getByRole('dialog', { name: 'פרסום ההזמנה' });

@@ -86,14 +86,15 @@ test.describe('sign in with Google', () => {
 
     await open(page, '/signup');
     await chooseGoogleAccount(page, email);
-    await page.waitForURL(/\/app\/invitations$/);
+    // their one invitation: straight into it
+    await page.waitForURL(/\/app\/invitations\/[0-9a-f-]{36}/);
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
-    await expect(page.getByText('רוני').first()).toBeVisible();
+    await expect(page.getByText('רוני').filter({ visible: true }).first()).toBeVisible();
     // the password still works too
     await signOut(page);
     await page.fill('input[name=email]', email);
     await page.fill('input[name=password]', 'a-good-password');
     await page.getByRole('button', { name: 'כניסה', exact: true }).click();
-    await page.waitForURL(/\/app\/invitations$/);
+    await page.waitForURL(/\/app\/invitations\/[0-9a-f-]{36}/);
   });
 });

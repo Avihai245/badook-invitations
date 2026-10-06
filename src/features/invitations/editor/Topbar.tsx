@@ -67,7 +67,7 @@ export function Topbar({
   return (
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-line bg-surface px-3">
       <Link
-        href="/app/invitations"
+        href={`/app/invitations/${meta.id}`}
         aria-label={e.back}
         title={e.back}
         className="grid size-9 shrink-0 place-items-center rounded-btn text-muted hover:bg-subtle hover:text-ink"

@@ -19,6 +19,7 @@ import {
   MessageCircleQuestion,
   Palette,
   PartyPopper,
+  Plus,
   Send,
   Settings,
   Share2,
@@ -83,8 +84,8 @@ export const STAGE_ICONS: Record<StageKey, LucideIcon> = {
 export interface EventSpaceData {
   item: InvitationSummary;
   caps: WorkspaceCaps;
-  /** the plan's open tasks (null: no plan yet, or no planning) and the seating's numbers */
-  plan: { open: number } | null;
+  /** the plan's open tasks and this week's (null: no plan yet, or no planning) and the seating's numbers */
+  plan: { open: number; week: number } | null;
   seating: { tables: number; unseated: number } | null;
   /** the invitation's poster, drawn on the server (app/ItemPoster) */
   thumb?: ReactNode;
@@ -115,6 +116,10 @@ function useStatusLabel() {
         return S.done;
       case 'open':
         return plural(S.open, s.n, { n: number(s.n) });
+      case 'week':
+        return plural(S.week, s.n, { n: number(s.n) });
+      case 'inProgress':
+        return S.inProgress;
       case 'notStarted':
         return S.notStarted;
       case 'draft':
@@ -142,7 +147,7 @@ function StatusPill({ status }: { status: StageStatus }) {
         'ms-auto inline-flex h-5 shrink-0 items-center gap-1 rounded-full px-2 text-[11px] font-semibold whitespace-nowrap tabular-nums',
         done
           ? 'bg-success-bg text-success'
-          : status.kind === 'startsIn' || status.kind === 'notStarted'
+          : status.kind === 'startsIn' || status.kind === 'notStarted' || status.kind === 'inProgress'
             ? 'bg-subtle text-muted'
             : status.kind === 'today'
               ? 'bg-brand-deep text-white dark:text-[#1c1917]'
@@ -177,6 +182,9 @@ function StageMark({ n, progress }: { n: number; progress: StageProgress }) {
     </span>
   );
 }
+
+/** The list of every event — even for a host with one (the list sends them straight into it otherwise). */
+export const ALL_EVENTS = '/app/invitations?all=1';
 
 function itemHref(id: string, key: NavKey) {
   return `/app/invitations/${id}${NAV_PATHS[key]}`;
@@ -297,7 +305,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
   const { item, caps } = data;
   const path = usePathname();
   const current = navKeyOf(path, item.id);
-  const currentStage = stageOf(current);
+  const currentStage = stageOf(current, caps);
   const facts = useStageFacts(data);
   const { isOpen, toggle } = useOpenStages(item.id, facts, currentStage);
   // the stages' folding moves only once the host folds one (not while the page settles)
@@ -313,11 +321,11 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
       data-testid="event-sidebar"
     >
       <div className="px-5 pt-5">
-        <Link href="/app/invitations" className="inline-block rounded-btn text-[18px]">
+        <Link href={ALL_EVENTS} className="inline-block rounded-btn text-[18px]">
           <BrandLogo label={t.brand} />
         </Link>
         <Link
-          href="/app/invitations"
+          href={ALL_EVENTS}
           className="mt-3 flex items-center gap-1 rounded-btn text-[12.5px] font-semibold text-muted hover:text-ink"
         >
           <ChevronLeft aria-hidden className="icon-dir size-4" />
@@ -435,6 +443,14 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
             );
           })}
         </ol>
+        <Link
+          href={`${itemHref(item.id, 'home')}?tools=1`}
+          data-add-tools=""
+          className="mt-2 flex h-8 items-center gap-2.5 rounded-[10px] border border-dashed border-line-strong px-2.5 text-[13px] font-semibold text-muted transition-colors hover:border-brand hover:bg-brand-soft/50 hover:text-brand-deep"
+        >
+          <Plus aria-hidden className="size-4 shrink-0" strokeWidth={2} />
+          {N.addTools}
+        </Link>
       </nav>
 
       <div className="flex flex-col gap-0.5 border-t border-line px-3 pt-2 pb-3">
@@ -464,8 +480,19 @@ function EventThumb({ thumb, className }: { thumb?: ReactNode; className?: strin
  * The top of every screen in an event: a strip no taller than 72px — the poster, names, date and
  * countdown, whether it's live, and the main action (publish, or open the invitation).
  */
-export function EventBar({ item, thumb }: { item: InvitationSummary; thumb?: ReactNode }) {
+export function EventBar({
+  item,
+  thumb,
+  tools,
+}: {
+  item: InvitationSummary;
+  thumb?: ReactNode;
+  /** the event's tools (lib/tools): no invitation, no publish button */
+  tools: WorkspaceCaps['tools'];
+}) {
   const { t, locale, date } = useUi();
+  // the event's home has publishing as a step of its path: one publish button per screen, not two
+  const onHome = navKeyOf(usePathname(), item.id) === 'home';
   const w = t.workspace;
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
@@ -519,7 +546,7 @@ export function EventBar({ item, thumb }: { item: InvitationSummary; thumb?: Rea
               </a>
             </Button>
           ) : null}
-          {!live || item.unpublishedChanges ? (
+          {tools.includes('invite') && !onHome && (!live || item.unpublishedChanges) ? (
             <Button size="sm" icon={<Send className="icon-dir" />} asChild>
               <Link href={publishHref(item.id)}>{live ? t.editor.publishChanges : w.publish}</Link>
             </Button>
@@ -541,7 +568,7 @@ export function EventBottomBar({ data }: { data: EventSpaceData }) {
   const { item, caps } = data;
   const path = usePathname();
   const current = navKeyOf(path, item.id);
-  const currentStage = stageOf(current);
+  const currentStage = stageOf(current, caps);
   const facts = useStageFacts(data);
   const [sheet, setSheet] = useState<StageKey | 'more' | null>(null);
   const stages = STAGES.filter((s) => stageItems(s, caps).length);

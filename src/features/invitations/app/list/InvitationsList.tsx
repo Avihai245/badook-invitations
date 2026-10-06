@@ -4,23 +4,21 @@ import {
   Archive,
   ArchiveRestore,
   ArrowRight,
+  Check,
   Copy,
-  FileSpreadsheet,
   ListChecks,
   MailPlus,
   MoreHorizontal,
   Palette,
   Plus,
   PencilLine,
-  Send,
   Share2,
   Users,
-  type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UpgradeDialog, upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
-import { useState, useTransition, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useState, useTransition, type CSSProperties, type ReactNode } from 'react';
 import {
   Badge,
   Button,
@@ -39,9 +37,10 @@ import type { InvitationSummary } from '../../server/host-db';
 import { hostApi, loginUrl } from '../api';
 import { CountdownChip, daysUntilEvent, useToday } from '../countdown';
 import { HelpFor } from '../HelpFor';
-import { publishHref } from '../workspace/paths';
-import { STAGE_ICONS } from '../workspace/EventSpace';
-import { STAGES } from '../workspace/stages';
+import { track } from '@/features/analytics/track';
+import { TOOLS, type ToolKey } from '../../lib/tools';
+import { journey, type HomeFacts, type JourneyStep } from '../home/journey';
+import { TOOL_ICONS } from '../tools/ToolsPicker';
 import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { FollowUpDialog, followUpTypes } from './FollowUpDialog';
 
@@ -51,27 +50,6 @@ const BADGE: Record<InvitationSummary['status'], BadgeVariant> = {
   archived: 'neutral',
 };
 
-type NextStep = { key: 'publish' | 'republish' | 'import' | 'send' | 'track'; href: string; n?: number };
-
-/**
- * What the host would do next with this invitation: publish, upload the guest list, send it on
- * WhatsApp, then follow the replies. After the event only the replies are left to look at.
- */
-export function nextStep(
-  item: InvitationSummary,
-  { past = false }: { past?: boolean } = {},
-): NextStep | null {
-  const base = `/app/invitations/${item.id}`;
-  if (item.status === 'archived') return null;
-  if (past) return item.responses ? { key: 'track', href: `${base}/responses` } : null;
-  if (item.status === 'draft') return { key: 'publish', href: publishHref(item.id) };
-  if (item.unpublishedChanges) return { key: 'republish', href: publishHref(item.id) };
-  if (item.guests > item.sent)
-    return { key: 'send', href: `${base}/guests?send=1`, n: item.guests - item.sent };
-  if (item.guests === 0 && item.responses === 0) return { key: 'import', href: `${base}/guests?import=1` };
-  return { key: 'track', href: `${base}/responses` };
-}
-
 /**
  * §9B.3-A: the host's home base — a greeting with their invitations at a glance, then one card per
  * invitation (its poster, where it stands, the next step and its main places one tap away); the
@@ -79,16 +57,29 @@ export function nextStep(
  */
 /** An event's budget as its card shows it (a tiny gauge): only for events with a plan and a total. */
 export type CardBudget = { total: number; committed: number; paid: number; planned: number };
+/** The plan's numbers the card's path reads (null: no planning for the event). */
+export type CardPlanning = HomeFacts['planning'];
+
+/** The list with every event (a host with one event is otherwise sent straight into it). */
+const LIST_ALL = '/app/invitations?all=1';
 
 export function InvitationsList({
   items,
   name,
   budgets = {},
+  tools = {},
+  planning = {},
+  days = {},
   posters = {},
 }: {
   items: InvitationSummary[];
   name: string | null;
   budgets?: Record<string, CardBudget>;
+  /** each event's tools (invitations/lib/tools) */
+  tools?: Record<string, ToolKey[]>;
+  planning?: Record<string, CardPlanning>;
+  /** the days to each event as the server saw them (until the visitor's own day is known) */
+  days?: Record<string, number>;
   /** each invitation's poster, drawn on the server (app/ItemPoster) */
   posters?: Record<string, ReactNode>;
 }) {
@@ -105,6 +96,7 @@ export function InvitationsList({
   const active = items.filter((i) => i.status !== 'archived');
   const archived = items.filter((i) => i.status === 'archived');
   const visible = showArchived ? archived : active;
+  useEffect(() => track('list_view', { props: { events: active.length } }), [active.length]);
 
   async function act(id: string, url: string, body: unknown, done: (res: Record<string, unknown>) => string) {
     setBusy(id);
@@ -115,7 +107,8 @@ export function InvitationsList({
     if (limit) return setUpgrade(limit);
     if (!res.ok || !res.body) return void toast({ title: t.common.error, variant: 'danger' });
     toast({ title: done(res.body), variant: 'success' });
-    startTransition(() => router.refresh());
+    // the full list stays in view (with one event left, the bare list would go straight into it)
+    startTransition(() => router.replace(LIST_ALL));
   }
   const duplicate = (id: string) =>
     act(id, `/api/invitations/${id}/duplicate`, {}, (b) => fmt(t.list.duplicated, { slug: String(b.slug) }));
@@ -197,7 +190,12 @@ export function InvitationsList({
       </section>
 
       {visible.length ? (
-        <ul className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5 min-[1900px]:grid-cols-3">
+        <ul
+          className={cn(
+            'mt-6 grid grid-cols-1 gap-4 lg:gap-5',
+            visible.length > 2 ? 'lg:grid-cols-2 min-[1900px]:grid-cols-3' : 'max-w-[900px]',
+          )}
+        >
           {visible.map((item, i) => (
             <li
               key={item.id}
@@ -209,13 +207,20 @@ export function InvitationsList({
                 poster={posters[item.id] ?? null}
                 item={item}
                 busy={busy === item.id}
-                past={today ? daysUntilEvent(item.date, today) < 0 : false}
+                tools={tools[item.id] ?? ['invite']}
+                planning={planning[item.id] ?? null}
+                daysLeft={today ? daysUntilEvent(item.date, today) : (days[item.id] ?? 30)}
                 onDuplicate={() => void duplicate(item.id)}
                 onArchive={(on) => void archive(item.id, on)}
                 onFollowUp={() => setFollowUp(item)}
               />
             </li>
           ))}
+          {showArchived ? null : (
+            <li>
+              <NewEventCard />
+            </li>
+          )}
         </ul>
       ) : showArchived ? (
         <p className="mt-10 text-center text-muted">{t.list.archivedEmpty}</p>
@@ -233,8 +238,8 @@ export function InvitationsList({
  * planning, inviting, arranging, celebrating — so the whole product is in view before the first click.
  */
 function EmptyList() {
-  const { t, number } = useUi();
-  const N = t.workspace.nav;
+  const { t } = useUi();
+  const T = t.eventHome.tools;
   return (
     <section
       className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface shadow-sm"
@@ -263,41 +268,26 @@ function EmptyList() {
         <DemoVideo />
       </div>
       <div className="border-t border-line bg-canvas/70 px-6 py-7 sm:px-10">
-        <h3 className="text-[12.5px] font-bold tracking-[.06em] text-muted">{t.list.steps.title}</h3>
-        <ol className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
-          {STAGES.map((stage, i) => {
-            const Icon = STAGE_ICONS[stage];
+        <h3 className="text-[14px] font-bold">{T.title}</h3>
+        <p className="mt-1 text-[13px] text-muted">{T.body}</p>
+        <ul className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+          {TOOLS.map((tool, i) => {
+            const Icon = TOOL_ICONS[tool];
             return (
               <li
-                key={stage}
+                key={tool}
                 className="site-rise relative"
                 style={{ '--rise-delay': `${i * 90}ms` } as CSSProperties}
               >
-                {i < STAGES.length - 1 ? (
-                  // the path to the next stage (wide screens)
-                  <span
-                    aria-hidden
-                    className="absolute top-[21px] start-14 -end-2 hidden border-t-2 border-dashed border-brand-line lg:block"
-                  />
-                ) : null}
                 <span className="relative flex size-11 items-center justify-center rounded-full bg-brand-soft text-brand-deep ring-4 ring-canvas">
                   <Icon aria-hidden className="size-5" />
-                  <span
-                    aria-hidden
-                    className="absolute -end-1 -top-1 grid size-5 place-items-center rounded-full bg-brand text-[11px] font-bold text-white"
-                  >
-                    {number(i + 1)}
-                  </span>
                 </span>
-                <p className="mt-3 text-[14.5px] font-bold">
-                  <span className="sr-only">{number(i + 1)}. </span>
-                  {N.stages[stage]}
-                </p>
-                <p className="mt-1 text-[13px] text-pretty text-muted">{N.stageHint[stage]}</p>
+                <p className="mt-3 text-[14.5px] font-bold">{T.items[tool].title}</p>
+                <p className="mt-1 text-[13px] text-pretty text-muted">{T.items[tool].body}</p>
               </li>
             );
           })}
-        </ol>
+        </ul>
       </div>
     </section>
   );
@@ -308,7 +298,9 @@ function InvitationCard({
   budget = null,
   poster = null,
   busy,
-  past,
+  tools,
+  planning,
+  daysLeft,
   onDuplicate,
   onArchive,
   onFollowUp,
@@ -317,8 +309,10 @@ function InvitationCard({
   budget?: CardBudget | null;
   poster?: ReactNode;
   busy: boolean;
-  /** the event's day has passed (the visitor's own day) */
-  past: boolean;
+  tools: ToolKey[];
+  planning: CardPlanning;
+  /** the days to the event (the visitor's own day once known) */
+  daysLeft: number;
   onDuplicate: () => void;
   onArchive: (archived: boolean) => void;
   /** a save-the-date → its full invitation */
@@ -329,24 +323,20 @@ function InvitationCard({
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
   const base = `/app/invitations/${item.id}`;
   const archived = item.status === 'archived';
-  const next = nextStep(item, { past });
+  const invite = tools.includes('invite');
+  const path = archived ? null : journey(item.id, cardFacts(item, daysLeft, planning), new Set(tools));
+  const next = path?.current ?? null;
   const shortDate = date(item.date, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
-  const sentShare = item.guests ? Math.min(1, item.sent / item.guests) : 0;
-
-  const actions: { key: string; href: string; icon: LucideIcon; label: string }[] = [
-    { key: 'guests', href: `${base}/guests`, icon: Users, label: t.list.actions.guests },
-    { key: 'responses', href: `${base}/responses`, icon: ListChecks, label: t.list.actions.responses },
-    { key: 'share', href: `${base}/share`, icon: Share2, label: t.list.actions.share },
-    { key: 'edit', href: `${base}/edit`, icon: PencilLine, label: t.list.actions.edit },
-  ];
+  const enter = (via: 'card' | 'button') => track('event_enter', { invitationId: item.id, props: { via } });
 
   return (
     <article
       aria-busy={busy || undefined}
-      className="group/card flex h-full flex-col overflow-hidden rounded-[20px] border border-line bg-surface shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-brand-line hover:shadow-[0_18px_40px_-24px_rgba(60,35,15,0.45)] motion-reduce:transition-none"
+      data-testid="event-card"
+      className="group/card relative flex h-full flex-col overflow-hidden rounded-[20px] border border-line bg-surface shadow-sm transition-[box-shadow,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-brand-line hover:shadow-[0_18px_40px_-24px_rgba(60,35,15,0.45)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       <div className="flex gap-4 p-3 sm:p-4">
-        <Link href={base} tabIndex={-1} aria-hidden className="relative block w-[88px] shrink-0 sm:w-[112px]">
+        <Link href={base} tabIndex={-1} aria-hidden className="relative block w-[80px] shrink-0 sm:w-[104px]">
           {poster ?? <div className="aspect-[9/16] rounded-[14px] bg-subtle" />}
         </Link>
 
@@ -357,8 +347,15 @@ function InvitationCard({
                 {t.eventTypes[item.eventType]}
                 {archived ? null : <CountdownChip date={item.date} />}
               </p>
-              <h2 className="mt-1 truncate text-[17px] leading-snug font-bold sm:text-[18px]">
-                <Link href={base} lang={loc} className="rounded-[4px] hover:underline">
+              <h2 className="mt-1 truncate text-[18px] leading-snug font-bold sm:text-[19px]">
+                {/* the whole card opens the event: this link stretches over it */}
+                <Link
+                  href={base}
+                  lang={loc}
+                  onClick={() => enter('card')}
+                  className="rounded-[4px] after:absolute after:inset-0 after:content-[''] hover:underline"
+                  data-testid="event-card-link"
+                >
                   {name}
                 </Link>
               </h2>
@@ -366,133 +363,133 @@ function InvitationCard({
                 <span dir="ltr" className="tabular-nums">
                   {shortDate}
                 </span>
-                <Badge variant={BADGE[item.status]}>{t.status[item.status]}</Badge>
-                {item.status === 'published' && item.unpublishedChanges ? (
+                {invite || archived ? (
+                  <Badge variant={BADGE[item.status]}>{t.status[item.status]}</Badge>
+                ) : null}
+                {invite && item.status === 'published' && item.unpublishedChanges ? (
                   <Badge variant="warning">{t.status.unpublishedChanges}</Badge>
                 ) : null}
               </p>
             </div>
-            <Menu
-              trigger={
-                <IconButton label={t.common.more} size="sm" disabled={busy} className="-me-1 mt-px">
-                  <MoreHorizontal />
-                </IconButton>
-              }
-              items={[
-                { label: t.list.menu.edit, icon: <PencilLine />, href: `${base}/edit` },
-                { label: t.list.menu.guests, icon: <Users />, href: `${base}/guests` },
-                ...(item.status === 'published'
-                  ? [{ label: t.list.menu.share, icon: <Share2 />, href: `${base}/share` }]
-                  : []),
-                ...(item.status !== 'draft' || item.responses > 0
-                  ? [{ label: t.list.menu.responses, icon: <ListChecks />, href: `${base}/responses` }]
-                  : []),
-                ...(item.eventType === 'save_the_date' && !archived && followUpTypes(item).length
-                  ? [{ label: t.list.menu.followUp, icon: <MailPlus />, onSelect: onFollowUp }]
-                  : []),
-                { label: t.list.menu.duplicate, icon: <Copy />, onSelect: onDuplicate },
-                { type: 'separator' },
-                archived
-                  ? {
-                      label: t.list.menu.unarchive,
-                      icon: <ArchiveRestore />,
-                      onSelect: () => onArchive(false),
-                    }
-                  : { label: t.list.menu.archive, icon: <Archive />, onSelect: () => onArchive(true) },
-              ]}
-            />
+            <div className="relative z-10">
+              <Menu
+                trigger={
+                  <IconButton label={t.common.more} size="sm" disabled={busy} className="-me-1 mt-px">
+                    <MoreHorizontal />
+                  </IconButton>
+                }
+                items={[
+                  { label: t.list.menu.open, icon: <ArrowRight className="icon-dir" />, href: base },
+                  ...(invite
+                    ? [
+                        { label: t.list.menu.edit, icon: <PencilLine />, href: `${base}/edit` },
+                        { label: t.list.menu.guests, icon: <Users />, href: `${base}/guests` },
+                      ]
+                    : []),
+                  ...(invite && item.status === 'published'
+                    ? [{ label: t.list.menu.share, icon: <Share2 />, href: `${base}/share` }]
+                    : []),
+                  ...(invite && (item.status !== 'draft' || item.responses > 0)
+                    ? [{ label: t.list.menu.responses, icon: <ListChecks />, href: `${base}/responses` }]
+                    : []),
+                  ...(item.eventType === 'save_the_date' && !archived && followUpTypes(item).length
+                    ? [{ label: t.list.menu.followUp, icon: <MailPlus />, onSelect: onFollowUp }]
+                    : []),
+                  { label: t.list.menu.duplicate, icon: <Copy />, onSelect: onDuplicate },
+                  { type: 'separator' },
+                  archived
+                    ? {
+                        label: t.list.menu.unarchive,
+                        icon: <ArchiveRestore />,
+                        onSelect: () => onArchive(false),
+                      }
+                    : { label: t.list.menu.archive, icon: <Archive />, onSelect: () => onArchive(true) },
+                ]}
+              />
+            </div>
           </div>
 
-          {archived ? null : (
-            <div className="mt-3">
-              {item.guests ? (
-                <>
-                  <div className="flex items-center justify-between gap-2 text-[12.5px]">
-                    <span className="font-medium">
-                      {fmt(t.list.progress.sent, { sent: number(item.sent), guests: number(item.guests) })}
-                    </span>
-                    {item.attending ? (
-                      <span className="font-semibold text-success">
-                        {fmt(t.list.progress.attending, { attending: number(item.attending) })}
-                      </span>
-                    ) : null}
-                  </div>
-                  <span aria-hidden className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-subtle">
-                    <span
-                      className="block h-full rounded-full bg-linear-to-l from-[#25d366] to-[#128c4a]"
-                      style={{ width: `${sentShare * 100}%` }}
-                    />
+          {path && path.total ? (
+            <div className="mt-3" data-testid="card-path">
+              <div className="flex items-center justify-between gap-2 text-[12.5px]">
+                <span className="font-semibold text-ink/80">
+                  {fmt(t.list.pathProgress, { done: number(path.done), total: number(path.total) })}
+                </span>
+                {invite && item.guests ? (
+                  <span className="font-semibold text-success">
+                    {fmt(t.list.progress.replied, {
+                      pct: number(Math.min(100, Math.round((item.responses / item.guests) * 100))),
+                    })}
                   </span>
-                </>
-              ) : (
-                <p className="text-[12.5px] text-muted">
-                  {item.responses
-                    ? plural(t.list.stats, item.responses, {
-                        responses: number(item.responses),
-                        attending: number(item.attending),
-                      })
-                    : t.list.progress.noGuests}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* at a glance: how many replied, and the budget's tiny gauge */}
-          {!archived && (item.guests || budget) ? (
-            <div className="mt-3 flex items-center gap-3" data-testid="card-glance">
-              {item.guests ? (
-                <span className="inline-flex items-center rounded-full bg-success-bg px-2.5 py-1 text-[12px] font-bold text-success">
-                  {fmt(t.list.progress.replied, {
-                    pct: number(Math.min(100, Math.round((item.responses / item.guests) * 100))),
-                  })}
-                </span>
-              ) : null}
-              {budget ? (
-                <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-muted">
-                  <BudgetGauge
-                    size="xs"
-                    total={budget.total}
-                    committed={budget.committed}
-                    paid={budget.paid}
-                    planned={budget.planned}
-                    className="mx-0! w-[64px]!"
+                ) : null}
+              </div>
+              <span aria-hidden className="mt-1.5 flex gap-1">
+                {path.steps.map((s) => (
+                  <span
+                    key={s.key}
+                    className={cn(
+                      'h-1.5 flex-1 rounded-full',
+                      s.state === 'done' ? 'bg-success' : s.state === 'current' ? 'bg-brand' : 'bg-subtle',
+                    )}
                   />
-                  {t.list.progress.budget}
-                </span>
-              ) : null}
+                ))}
+              </span>
             </div>
           ) : null}
 
-          {next ? (
-            <Hint text={t.list.nextHint}>
-              <Link
-                href={next.href}
-                data-next-step={next.key}
-                className={cn(
-                  'mt-3 inline-flex max-w-full items-center gap-1.5 self-start rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors',
-                  next.key === 'republish'
-                    ? 'bg-warning-bg text-warning hover:bg-[#fef3c7] dark:hover:bg-warning-line'
-                    : 'bg-brand-soft text-brand-deep hover:bg-brand hover:text-white',
-                )}
-              >
-                {next.key === 'send' ? (
-                  <Send aria-hidden className="icon-dir size-3.5 shrink-0" />
-                ) : next.key === 'import' ? (
-                  <FileSpreadsheet aria-hidden className="size-3.5 shrink-0" />
-                ) : null}
-                <span className="truncate">
-                  {next.key === 'send'
-                    ? plural(t.list.next.send, next.n ?? 0, { n: number(next.n ?? 0) })
-                    : t.list.next[next.key]}
-                </span>
-                <ArrowRight aria-hidden className="icon-dir size-3.5 shrink-0" />
-              </Link>
-            </Hint>
+          {budget ? (
+            <div
+              className="mt-3 flex items-center gap-1.5 text-[12px] font-semibold text-muted"
+              data-testid="card-glance"
+            >
+              <BudgetGauge
+                size="xs"
+                total={budget.total}
+                committed={budget.committed}
+                paid={budget.paid}
+                planned={budget.planned}
+                className="mx-0! w-[64px]!"
+              />
+              {t.list.progress.budget}
+            </div>
+          ) : null}
+
+          {path ? (
+            next ? (
+              <Hint text={t.list.nextHint}>
+                <Link
+                  href={next.href}
+                  data-next-step={next.key}
+                  onClick={() =>
+                    track('step_click', {
+                      invitationId: item.id,
+                      props: { step: next.key, variant: next.variant, source: 'list' },
+                    })
+                  }
+                  className={cn(
+                    'relative z-10 mt-3 inline-flex max-w-full items-center gap-1.5 self-start rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors',
+                    next.variant === 'changes'
+                      ? 'bg-warning-bg text-warning hover:bg-[#fef3c7] dark:hover:bg-warning-line'
+                      : 'bg-brand-soft text-brand-deep hover:bg-brand hover:text-white',
+                  )}
+                >
+                  <span className="truncate">
+                    {t.list.nextLabel}: {stepTitle(next)}
+                  </span>
+                  <ArrowRight aria-hidden className="icon-dir size-3.5 shrink-0" />
+                </Link>
+              </Hint>
+            ) : (
+              <p className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-success">
+                <Check aria-hidden className="size-3.5" strokeWidth={3} />
+                {t.list.nothingNext}
+              </p>
+            )
           ) : null}
         </div>
       </div>
 
-      <div className="mt-auto border-t border-line bg-canvas/60 px-2 py-2 sm:px-3">
+      <div className="relative z-10 mt-auto border-t border-line bg-canvas/60 p-2 sm:p-3">
         {archived ? (
           <Button
             variant="ghost"
@@ -504,31 +501,68 @@ function InvitationCard({
             {t.list.menu.unarchive}
           </Button>
         ) : (
-          <div
-            role="group"
-            aria-label={fmt(t.list.actions.label, { name })}
-            className="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-1"
-          >
-            {actions.map(({ key, href, icon: Icon, label }) => (
-              <Link
-                key={key}
-                href={href}
-                data-quick={key}
-                className={cn(
-                  'flex min-h-11 flex-col items-center justify-center gap-1 rounded-[10px] px-1 py-1.5 text-center text-[11.5px] leading-tight font-semibold transition-colors sm:flex-row sm:gap-1.5 sm:text-[12.5px]',
-                  key === 'guests'
-                    ? 'bg-wa-soft text-wa-ink hover:bg-wa-soft-strong'
-                    : 'text-ink/75 hover:bg-subtle hover:text-ink',
-                )}
-              >
-                <Icon aria-hidden className="size-4 shrink-0" strokeWidth={1.9} />
-                {label}
-              </Link>
-            ))}
-          </div>
+          <Hint text={t.list.enterHint}>
+            <Link
+              href={base}
+              onClick={() => enter('button')}
+              data-testid="event-enter"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-brand text-[15px] font-bold text-white shadow-sm transition-colors hover:bg-brand-deep dark:text-[#1c1917]"
+            >
+              {t.list.enter}
+              <ArrowRight aria-hidden className="icon-dir size-4" />
+            </Link>
+          </Hint>
         )}
       </div>
     </article>
+  );
+
+  function stepTitle(s: JourneyStep): string {
+    const words = (
+      t.eventHome.journey.steps[s.key] as Record<string, { title: string | { one: string; other: string } }>
+    )[s.variant]!;
+    return typeof words.title === 'string'
+      ? words.title
+      : plural(words.title, s.n ?? 0, { n: number(s.n ?? 0) });
+  }
+}
+
+/** What the list knows of an event, as the path's facts (the replies counted on the list; no seating). */
+function cardFacts(item: InvitationSummary, daysLeft: number, planning: CardPlanning): HomeFacts {
+  return {
+    daysLeft,
+    status: item.status,
+    unpublishedChanges: item.unpublishedChanges,
+    guests: item.guests,
+    sent: item.sent,
+    notAnswered: Math.max(0, item.guests - item.responses),
+    unmatched: 0,
+    responses: item.responses,
+    planning,
+    seating: null,
+    eventDay: false,
+    gallery: false,
+  };
+}
+
+/** The last card: a new event — an invitation, a plan or the seating, whatever the host needs. */
+function NewEventCard() {
+  const { t } = useUi();
+  return (
+    <Link
+      href="/app/invitations/new"
+      data-testid="new-event-card"
+      className="flex h-full min-h-[148px] flex-col items-center justify-center gap-2 rounded-[20px] border-2 border-dashed border-line-strong p-5 text-center transition-colors hover:border-brand hover:bg-brand-soft/40"
+    >
+      <span
+        aria-hidden
+        className="grid size-11 place-items-center rounded-full bg-brand-soft text-brand-deep"
+      >
+        <Plus className="size-5" />
+      </span>
+      <span className="text-[15.5px] font-bold">{t.list.newCard.title}</span>
+      <span className="text-[13px] text-muted">{t.list.newCard.body}</span>
+    </Link>
   );
 }
 

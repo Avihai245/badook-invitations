@@ -3,7 +3,7 @@
  * apply: `{name}` placeholders go through fmt(), plural entries through plural().
  */
 export const editorHe = {
-  back: 'חזרה להזמנות',
+  back: 'חזרה לאירוע',
   titleSeparator: ' · ',
   save: {
     saving: 'שומר…',

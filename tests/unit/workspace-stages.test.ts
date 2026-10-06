@@ -40,6 +40,7 @@ describe('navKeyOf / stageOf — the event space grouped by stages (UX report §
       eventDay: 'plan' as const,
       gallery: false,
       insights: false,
+      tools: ['invite', 'plan', 'seating', 'day'] as const,
     };
     expect(stageItems('plan', caps)).toEqual([]);
     expect(stageItems('arrange', caps)).toEqual([]);
@@ -54,11 +55,14 @@ describe('stageStatus', () => {
     guests: 40,
     sent: 0,
     daysLeft: 58,
-    plan: { open: 3 },
+    plan: { open: 3, week: 0 },
     seating: { tables: 0, unseated: 0 },
   };
   it('says what is open, what is done and when the day comes', () => {
-    expect(stageStatus('plan', facts)).toEqual({ kind: 'open', n: 3 });
+    // the plan by this week — never "73 open", which only frightens
+    expect(stageStatus('plan', facts)).toEqual({ kind: 'inProgress' });
+    expect(stageStatus('plan', { ...facts, plan: { open: 3, week: 2 } })).toEqual({ kind: 'week', n: 2 });
+    expect(stageStatus('plan', { ...facts, plan: { open: 0, week: 0 } })).toEqual({ kind: 'done' });
     expect(stageStatus('plan', { ...facts, plan: null })).toEqual({ kind: 'notStarted' });
     expect(stageStatus('invite', facts)).toEqual({ kind: 'toSend', n: 40 });
     expect(stageStatus('invite', { ...facts, sent: 40 })).toEqual({ kind: 'done' });
@@ -80,7 +84,7 @@ describe('the sidebar’s stages as steps that open and close', () => {
     guests: 120,
     sent: 80,
     daysLeft: 57,
-    plan: { open: 73 },
+    plan: { open: 73, week: 0 },
     seating: { tables: 12, unseated: 0 },
   };
 
@@ -96,7 +100,7 @@ describe('the sidebar’s stages as steps that open and close', () => {
 
   it('knows three stages before the visitor’s today does; "celebrate" waits for it', () => {
     const before = { ...facts, daysLeft: null };
-    expect(stageStatusSoFar('plan', before)).toEqual({ kind: 'open', n: 73 });
+    expect(stageStatusSoFar('plan', before)).toEqual({ kind: 'inProgress' });
     expect(stageStatusSoFar('invite', before)).toEqual({ kind: 'toSend', n: 40 });
     expect(stageStatusSoFar('arrange', before)).toEqual({ kind: 'done' });
     expect(stageStatusSoFar('celebrate', before)).toBeNull();

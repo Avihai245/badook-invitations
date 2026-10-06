@@ -41,7 +41,7 @@ export async function open(page: Page, url: string) {
 export function api<T = Record<string, unknown>>(
   page: Page,
   url: string,
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
   body?: unknown,
 ): Promise<{ status: number; body: T }> {
   return page.evaluate(

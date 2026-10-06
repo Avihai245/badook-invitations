@@ -45,8 +45,10 @@ test('a new host sets the plan up in three short steps and lands on the event ho
 }) => {
   const host = await newHost(page, 'plan-first', 'free', { date: day(150) });
   await open(page, `/app/invitations/${host.id}`);
-  // the planning stage is in the event's navigation before any plan exists
-  await expect(navItem(page, 'tasks')).toHaveCount(1);
+  // planning is a tool the host adds when they want it: not in the way before there is a plan, offered
+  // under "need something else?" — and the plan's own page still opens straight away
+  await expect(navItem(page, 'tasks')).toHaveCount(0);
+  await expect(page.getByTestId('home-more-tools')).toContainText('תכנון האירוע');
   await open(page, plan(host));
   await expect(page.getByRole('heading', { name: 'נסתכל' }).or(page.getByText('נתחיל לתכנן'))).toBeVisible();
   await page
@@ -74,9 +76,11 @@ test('a new host sets the plan up in three short steps and lands on the event ho
   expect(state.body.view.tasks.some((t) => t.systemKey === 'invitation_published')).toBe(true);
   expect(state.body.view.categories.length).toBeGreaterThan(10);
 
-  // the stage says how many tasks are open; the home's tasks widget, what is due this week
+  // the stage says what is due this week (never the whole plan's open tasks); so does the home's widget
   await open(page, `/app/invitations/${host.id}`);
-  await expect(page.getByTestId('event-sidebar').locator('[data-stage="plan"]')).toContainText('פתוחים');
+  await expect(page.getByTestId('event-sidebar').locator('[data-stage="plan"]')).toContainText(
+    /השבוע|בתהליך/,
+  );
   await expect(page.getByTestId('home-tasks')).toBeVisible();
 });
 
@@ -276,7 +280,7 @@ test('a past event’s plan is a summary: what was spent, paid, and no more task
   // after the day the home's next step is the film or the numbers, and nothing is "due this week"
   await open(page, plan(host));
   await page.waitForURL(new RegExp(`/app/invitations/${host.id}$`), { timeout: 30_000 });
-  await expect(page.getByTestId('home-next')).toHaveAttribute('data-action', /film|insights/);
+  await expect(page.getByTestId('home-next')).toHaveAttribute('data-action', 'day:after');
   await expect(page.getByTestId('home-tasks')).not.toContainText('השבוע');
   // the budget is a summary
   await open(page, plan(host, '/budget'));

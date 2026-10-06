@@ -7,27 +7,27 @@ export const helpEn: typeof helpHe = {
     items: {
       newInvitation: {
         label: 'New event',
-        text: 'Three short questions — the kind of event, details and where to start — then planning, the invitation’s design or both.',
+        text: 'Three short questions — the kind of event, what you need (an invitation, planning, seating, the event day — only what’s relevant) and details.',
       },
       card: {
         label: 'Clicking an event',
-        text: 'Opens the event home: countdown, the next step, the budget, RSVPs and the four stages in the sidebar.',
+        text: 'Anywhere on the card opens the event home: your path, with the step for now one button away.',
       },
-      quick: {
-        label: 'The buttons on a card',
-        text: 'Guests & WhatsApp (upload a list from Excel and send), RSVPs, sharing and editing the design — one tap each.',
+      enter: {
+        label: 'Open the event',
+        text: 'The big button at the bottom of the card. Everything is there: guests, sending, RSVPs and the design. With one event you go straight in.',
       },
       nextStep: {
         label: 'The next step',
-        text: 'The colored line under each invitation: what to do now — publish, send to your guests, share or see who’s coming. One tap takes you there.',
+        text: 'The colored line on the card: what to do now for the event — publish, add guests, send or set a budget. One tap takes you there.',
       },
       countdown: {
         label: 'Countdown',
         text: 'On the invitation: how many days are left. On the day itself it says “Today!”, and afterwards “The event has passed”.',
       },
       menu: {
-        label: 'The ⋯ menu on each invitation',
-        text: 'Edit, guests, share (once published), responses, duplicate and archive.',
+        label: 'The ⋯ menu on each event',
+        text: 'Open the event, edit the design, guests, share (once published), responses, duplicate and archive.',
       },
       guests: {
         label: 'Guests',
@@ -54,8 +54,8 @@ export const helpEn: typeof helpHe = {
         text: 'On a save-the-date: creates the full invitation with the same details and links the two once it’s published.',
       },
       status: {
-        label: 'Draft / Published',
-        text: 'A draft isn’t visible to guests yet. “Published”: the link works. “Unpublished changes”: press Publish again in the editor.',
+        label: 'Not published yet / Published',
+        text: '“Not published yet”: guests can’t see the invitation yet. “Published”: the link works. “Unpublished changes”: press Publish again in the editor.',
       },
     },
   },
@@ -63,32 +63,32 @@ export const helpEn: typeof helpHe = {
     title: 'The event home: what each thing does',
     items: {
       countdown: {
-        label: 'Countdown',
-        text: 'Days, hours and minutes to the event’s start. Beside it: copy the link and open the invitation.',
+        label: 'The event',
+        text: 'Its name, date and how many days are left. Once published: copy the link and open the invitation.',
       },
       next: {
-        label: 'The next step',
-        text: 'Always one action — the most important now, by where the event stands and the time left. Finish it and the next one comes.',
+        label: 'Your path',
+        text: 'The steps your event needs by the tools you chose. The highlighted one is what to do now — one button. ✓ — done; “Later” — waits for something before it.',
       },
-      budget: {
-        label: 'The budget gauge',
-        text: 'How much of the budget you’re committed to: green to 85%, amber to 100%, red — over. Tap for the full budget.',
+      howTo: {
+        label: 'How do I do this?',
+        text: 'On the highlighted step: opens the guide right on it, in short steps.',
       },
       rsvp: {
         label: 'RSVPs',
-        text: 'Coming, not coming and not answered — the same numbers as the guest list, general-link replies included.',
+        text: 'After sending: coming, not coming and not answered — the same numbers as the guest list, general-link replies included.',
+      },
+      budget: {
+        label: 'The budget gauge',
+        text: 'Once you set a budget: how much of it you’re committed to — green to 85%, amber to 100%, red — over.',
       },
       tasks: {
-        label: 'Tasks',
-        text: 'How many tasks are done, how many are due this week, and what’s next.',
+        label: 'This week’s tasks',
+        text: 'When planning: only what’s worth closing this week, and what’s next — not the whole plan.',
       },
-      road: {
-        label: 'The road',
-        text: 'The event’s four stages — plan, invite, arrange, celebrate — each with its status. Tap to go to it.',
-      },
-      also: {
-        label: 'Also worth doing',
-        text: 'Up to three smaller suggestions after the next step.',
+      tools: {
+        label: 'Need something else?',
+        text: 'The tools you haven’t chosen yet — planning, seating, the event day. “Change tools” adds or removes; nothing is deleted.',
       },
     },
   },

@@ -2,7 +2,7 @@ import type { EditorDict } from './editor.he';
 
 /** Editor strings, English. Same shape as editor.he.ts (checked by the type). */
 export const editorEn: EditorDict = {
-  back: 'Back to invitations',
+  back: 'Back to the event',
   titleSeparator: ' · ',
   save: {
     saving: 'Saving…',

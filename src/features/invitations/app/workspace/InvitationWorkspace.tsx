@@ -24,8 +24,8 @@ export function InvitationWorkspace({
 }: {
   item: InvitationSummary;
   caps: WorkspaceCaps;
-  /** the plan's open tasks (null: no plan yet, or no planning) */
-  plan?: { open: number } | null;
+  /** the plan's open tasks and this week's (null: no plan yet, or no planning) */
+  plan?: { open: number; week: number } | null;
   /** the seating's tables and confirmed guests not seated yet (null: not known) */
   seating?: { tables: number; unseated: number } | null;
   /** the account menu at the sidebar's foot */
@@ -40,7 +40,7 @@ export function InvitationWorkspace({
       <div data-event-space="" className="lg:grid lg:min-h-dvh lg:grid-cols-[264px_minmax(0,1fr)]">
         <EventSidebar data={data} account={account} />
         <div className="min-w-0">
-          <EventBar item={item} thumb={thumb} />
+          <EventBar item={item} thumb={thumb} tools={caps.tools} />
           {children}
         </div>
       </div>

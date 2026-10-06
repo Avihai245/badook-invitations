@@ -62,6 +62,26 @@ export const overviewHe = {
     bar: '{date}: {n}',
     table: '{title}, לפי יום',
   },
+  /** where new hosts stop: the hosts' path over 30 days (features/analytics) */
+  path: {
+    title: 'המסלול של המארחים — 30 יום',
+    intro: 'כמה מארחים הגיעו לכל צעד, ובכמה פעמים. בלי עוגיות ובלי צד שלישי; לא נמדד כשהדפדפן מבקש לא לעקוב.',
+    step: 'צעד',
+    hosts: 'מארחים',
+    times: 'פעמים',
+    bar: 'מארחים, ביחס לצעד הנפוץ',
+    steps: {
+      list_view: 'ראו את רשימת האירועים',
+      event_enter: 'נכנסו לאירוע',
+      home_view: 'ראו את בית האירוע',
+      step_click: 'לחצו על צעד במסלול',
+      tools_set: 'בחרו או שינו כלים',
+      publish_open: 'פתחו את חלון הפרסום',
+      help_open: 'פתחו עזרה מצעד',
+      tour_skip: 'דילגו על הסיור',
+      tour_done: 'סיימו את הסיור',
+    },
+  },
   feed: {
     title: 'מה קורה עכשיו',
     intro: 'האירועים האחרונים במערכת, החדשים למעלה.',

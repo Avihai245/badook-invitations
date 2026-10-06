@@ -17,7 +17,10 @@ export function PlanStart() {
   const plan = usePlan();
   const planned = !!plan.view.settings;
   useEffect(() => {
-    if (planned) router.replace(`/app/invitations/${plan.id}`);
+    if (!planned) return;
+    router.replace(`/app/invitations/${plan.id}`);
+    // the event's frame (kept across its screens) shows the planning once there is a plan: drawn anew
+    router.refresh();
   }, [planned, plan.id, router]);
   return (
     <PlanFrame tool="overview" title={t.planning.title} description={t.planning.subtitle}>
