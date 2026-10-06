@@ -109,6 +109,27 @@ test.describe('the event’s stages', () => {
     await expect(navItem(page, 'budget')).toHaveCount(1);
   });
 
+  test('"add or remove tools" opens on any of the event’s screens; a new screen starts at its top', async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'the sidebar is a computer’s');
+    const host = await plannedHost(page, 57);
+    // from the budget (not the event's home): the same dialog, right there
+    await open(page, `/app/invitations/${host.id}/plan/budget`);
+    await page.getByTestId('event-sidebar').locator('[data-add-tools]').click();
+    const dialog = page.getByRole('dialog', { name: 'הכלים של האירוע' });
+    await expect(dialog).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/app/invitations/${host.id}/plan/budget$`));
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+    // scrolled down the budget, then to the tasks: the tasks start at their top
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
+    await navTo(page, 'tasks');
+    await page.waitForURL(/\/tasks$/);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  });
+
   test('a month before the event, "celebrate" is open by itself', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'mobile', 'the sidebar is a computer’s');
     const host = await plannedHost(page, 20);

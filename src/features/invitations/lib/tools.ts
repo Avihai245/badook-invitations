@@ -58,3 +58,30 @@ export function shownTools(
   );
   return list.length ? list : ['invite'];
 }
+
+/** What an event offers, as its screens know it (workspace/stages WorkspaceCaps). */
+export interface ToolOffer {
+  planning: boolean;
+  seating: 'on' | 'plan' | null;
+  eventDay: 'on' | 'plan' | null;
+  gallery: boolean;
+}
+
+/** The tools this event can have: offered here, or with an upgrade. */
+export function offeredTools(c: ToolOffer): ToolKey[] {
+  return TOOLS.filter(
+    (k) =>
+      k === 'invite' ||
+      (k === 'plan' && c.planning) ||
+      (k === 'seating' && c.seating !== null) ||
+      (k === 'day' && (c.eventDay !== null || c.gallery)),
+  );
+}
+
+/** The tools only a higher package opens. */
+export function lockedTools(c: ToolOffer): ToolKey[] {
+  return [
+    ...(c.seating === 'plan' ? (['seating'] as const) : []),
+    ...(c.eventDay === 'plan' && !c.gallery ? (['day'] as const) : []),
+  ];
+}

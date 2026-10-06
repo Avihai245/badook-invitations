@@ -3,10 +3,12 @@ import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { featureInput } from '@/features/flags/server';
 import { serverEnv } from '@/lib/env';
+import { rateKey } from '@/lib/links/tokens';
 import { invitationsEnabled } from '@/lib/feature';
 import { serviceDb } from '@/lib/supabase/server';
 import { getSessionUser } from '@/lib/supabase/session';
 import type { ApiResult, SaveAnswer, SeatingDeps } from './api';
+import { seatingAi } from './server-ai';
 
 /** The floor plans' bucket (supabase/migrations/*_seating.sql). */
 export const PLAN_BUCKET = 'venue-plans';
@@ -36,6 +38,29 @@ export const seatingDeps: SeatingDeps = {
     return { path: data.path, url: data.signedUrl, token: data.token };
   },
   newId: randomUUID,
+  // the same model, key and daily cap as the plan's AI tools
+  get ai() {
+    const env = serverEnv();
+    return seatingAi(
+      env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL
+        ? { apiKey: env.ANTHROPIC_API_KEY, model: env.INVITES_AI_MODEL, apiBase: env.INVITES_AI_API_BASE }
+        : null,
+    );
+  },
+  async rateHit(key, limit, windowSeconds) {
+    const { data, error } = await serviceDb().rpc('gallery_rate_hit', {
+      p_key_hash: key,
+      p_limit: limit,
+      p_window_seconds: windowSeconds,
+    });
+    if (error) throw new Error(`gallery_rate_hit: ${error.message}`);
+    return data === true;
+  },
+  rateKey: (scope, value) => rateKey('seating-ai', scope, value),
+  get aiLimits() {
+    const env = serverEnv();
+    return { perAccount: env.INVITES_PLANNING_AI_DAILY_LIMIT, site: env.INVITES_AI_DAILY_LIMIT };
+  },
 };
 
 /** Where the browser reads floor plans from (public URLs). */

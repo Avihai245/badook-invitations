@@ -21,7 +21,7 @@ import { hostApi, loginUrl } from '../api';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
 import type { ToolKey } from '../../lib/tools';
-import { ToolsDialog } from '../tools/ToolsDialog';
+import { useOpenTools } from './context';
 
 /**
  * The event's settings (the navigation's foot): its details (in the editor), the planning's settings, its
@@ -43,7 +43,7 @@ export function EventSettingsScreen({
   const { toast } = useToast();
   const router = useRouter();
   const [planOpen, setPlanOpen] = useState(false);
-  const [toolsOpen, setToolsOpen] = useState(false);
+  const openTools = useOpenTools();
   const T = t.eventHome.tools;
   const [busy, setBusy] = useState(false);
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
@@ -85,7 +85,7 @@ export function EventSettingsScreen({
           title={T.title}
           body={tools.tools.map((k) => T.items[k].title).join(' · ')}
           action={
-            <Button variant="secondary" onClick={() => setToolsOpen(true)} aria-haspopup="dialog">
+            <Button variant="secondary" onClick={openTools} aria-haspopup="dialog">
               {T.manage}
             </Button>
           }
@@ -152,15 +152,6 @@ export function EventSettingsScreen({
         />
       </div>
       {planning ? <PlanSettings open={planOpen} onOpenChange={setPlanOpen} /> : null}
-      <ToolsDialog
-        id={item.id}
-        open={toolsOpen}
-        onOpenChange={setToolsOpen}
-        current={tools.tools}
-        offered={tools.offered}
-        locked={tools.locked}
-        source="settings"
-      />
     </div>
   );
 }

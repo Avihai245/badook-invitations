@@ -14,7 +14,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Button, Card, CountUp, cn, useToast } from '@/components/app';
 import { track } from '@/features/analytics/track';
 import { taskTitle } from '@/features/planning/model/task-text';
@@ -23,13 +23,13 @@ import { BudgetGauge } from '@/features/planning/ui/BudgetGauge';
 import { DemoVideo } from '@/features/site/DemoVideo.client';
 import { openHelp } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
-import { TOOLS, type ToolKey } from '../../lib/tools';
+import { offeredTools, type ToolKey } from '../../lib/tools';
 import { hostsLine } from '../../lib/text';
 import type { EventHomeData } from '../../server/event-home';
 import { HelpFor } from '../HelpFor';
 import { TOOL_ICONS } from '../tools/ToolsPicker';
-import { ToolsDialog } from '../tools/ToolsDialog';
 import { journey, type Journey, type JourneyStep, type StepKey } from './journey';
+import { useOpenTools } from '../workspace/context';
 import { Tour } from './Tour';
 
 /**
@@ -55,18 +55,15 @@ export function EventHome({
   const id = data.item.id;
   const tools = data.caps.tools;
   const path = journey(id, data.facts, new Set(tools));
-  const offered = offeredTools(data);
-  const missing = offered.filter((k) => !tools.includes(k));
-  const [toolsOpen, setToolsOpen] = useState(false);
+  const missing = offeredTools(data.caps).filter((k) => !tools.includes(k));
+  const openTools = useOpenTools();
   useEffect(() => {
     // the sidebar's "add tools" (?tools=1) opens the tools straight away
     const url = new URL(window.location.href);
     // straight in from the list (one event): counted as entering it
     if (url.searchParams.get('via') === 'single')
       track('event_enter', { invitationId: id, props: { via: 'redirect' } });
-    if (url.searchParams.has('tools')) setToolsOpen(true);
-    if (url.searchParams.has('tools') || url.searchParams.has('via')) {
-      url.searchParams.delete('tools');
+    if (url.searchParams.has('via')) {
       url.searchParams.delete('via');
       window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
     }
@@ -108,7 +105,7 @@ export function EventHome({
           </div>
         </section>
       ) : null}
-      {missing.length ? <MoreTools missing={missing} onOpen={() => setToolsOpen(true)} /> : null}
+      {missing.length ? <MoreTools missing={missing} onOpen={openTools} /> : null}
       {/* a brand-new event (a draft, nobody on the list yet): the 45-second tour of everything */}
       {data.item.status === 'draft' && !data.item.guests && tools.includes('invite') ? (
         <details className="group max-w-[720px]">
@@ -127,42 +124,12 @@ export function EventHome({
         <Button variant="secondary" icon={<Settings />} asChild>
           <Link href={`/app/invitations/${id}/settings`}>{t.workspace.nav.items.settings}</Link>
         </Button>
-        <Button variant="secondary" icon={<Plus />} onClick={() => setToolsOpen(true)}>
+        <Button variant="secondary" icon={<Plus />} onClick={openTools}>
           {t.eventHome.tools.manage}
         </Button>
       </nav>
-      <ToolsDialog
-        id={id}
-        open={toolsOpen}
-        onOpenChange={setToolsOpen}
-        current={tools}
-        offered={offered}
-        locked={lockedTools(data)}
-        source="home"
-      />
     </div>
   );
-}
-
-/** The tools this event can have (offered here, or with an upgrade). */
-function offeredTools(data: EventHomeData): ToolKey[] {
-  const c = data.caps;
-  return TOOLS.filter(
-    (k) =>
-      k === 'invite' ||
-      (k === 'plan' && c.planning) ||
-      (k === 'seating' && c.seating !== null) ||
-      (k === 'day' && (c.eventDay !== null || c.gallery)),
-  );
-}
-
-/** The tools only a higher package opens. */
-function lockedTools(data: EventHomeData): ToolKey[] {
-  const c = data.caps;
-  return [
-    ...(c.seating === 'plan' ? (['seating'] as const) : []),
-    ...(c.eventDay === 'plan' && !c.gallery ? (['day'] as const) : []),
-  ];
 }
 
 function Hero({ data, poster }: { data: EventHomeData; poster: ReactNode }) {

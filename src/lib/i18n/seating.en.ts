@@ -8,6 +8,37 @@ export const seatingEn: SeatingDict = {
   subtitle:
     'Upload the venue’s floor plan, add tables and give every family its place: by dragging, by tapping, or automatically.',
   tab: 'Seating',
+  templates: {
+    title: 'Start from a ready-made hall',
+    body: 'No picture of the hall? Pick a ready-made one — with a stage, a dance floor and tables for {n} guests. Move and change everything after.',
+    inDialog: 'No picture? A ready-made hall',
+    blank: 'Or start from an empty hall and add tables yourself',
+    applied: 'The “{name}” hall is ready — now move things and seat people',
+    items: {
+      classic: { title: 'Classic hall', body: 'A stage, the dance floor before it, {n} round tables around' },
+      wide: { title: 'Wide hall', body: 'A stage and dance floor across the hall, {n} tables in rows' },
+      garden: {
+        title: 'Garden',
+        body: 'The dance floor in the middle, {n} tables around it, bar and buffet aside',
+      },
+      banquet: { title: 'Banquet tables', body: 'A head table before the stage and {n} more long tables' },
+    },
+    upload: {
+      body: 'Have a plan of the hall? Ask the venue for a picture or PDF of the layout — and upload it as the background.',
+      button: 'Upload a picture of the hall',
+    },
+  },
+  learn: {
+    button: 'Learn it like the pros (30s)',
+    title: 'Seating like the pros',
+    body: 'Half a minute: from a ready-made hall or a picture of yours, through tables and families, to the event day live.',
+    tips: {
+      start: 'Start from a ready-made hall — or ask the venue for a picture of the layout and upload it.',
+      families: 'Drag families to tables, or let auto-seating seat everyone, then adjust.',
+      day: 'On the event day the hall map updates live: who arrived, by table and across the hall.',
+    },
+    guide: 'The full guide',
+  },
   actions: {
     auto: 'Auto-seat',
     autoHint: 'Seats everyone who is coming by your rules and wishes. Undo takes it back.',
@@ -58,10 +89,11 @@ export const seatingEn: SeatingDict = {
     addTableLabel: 'Add a table',
     addLandmark: 'Mark',
     addLandmarkLabel: 'Mark the stage, dance floor, bar or an exit',
-    shapes: { round: 'Round', rect: 'Square', knights: 'Banquet' },
+    shapes: { round: 'Round', square: 'Square', rect: 'Rectangle', knights: 'Banquet' },
     shapeHints: {
       round: 'A round table, 10 seats (you can change it)',
-      rect: 'A square or rectangular table, 8 seats',
+      square: 'A square table, 8 seats — two on each side',
+      rect: 'A rectangular table, 8 seats along its sides',
       knights: 'A long banquet table, 20 seats',
     },
     undo: 'Undo',
@@ -181,6 +213,7 @@ export const seatingEn: SeatingDict = {
     belowSeated: '{seated} people already sit here, so it can’t have fewer seats.',
     landmarkTitle: 'Mark: {label}',
     landmarkLabel: 'Text',
+    side: 'Side (m)',
     width: 'Width (m)',
     depth: 'Depth (m)',
     removeLandmark: 'Delete the mark',
@@ -335,6 +368,44 @@ export const seatingEn: SeatingDict = {
     nearlyPerfect:
       'All rules and wishes are kept. The score shows small compromises, like a table a bit far from the stage or not quite full.',
     issuesTitle: 'What didn’t work out',
+    summary: {
+      families: 'Every family sits together',
+      rulesKept: { one: 'The rule is kept', other: '{n} of {total} rules kept' },
+      allRulesKept: { one: 'The rule is kept', other: 'All {n} rules kept' },
+      unseated: { one: 'One person without a seat', other: '{n} people without a seat' },
+    },
+    words: {
+      title: 'Tell us in words who sits with whom',
+      hint: 'For example: "grandma near the stage, the army friends together, uncle Moshe not at aunt Rachel’s table". Your list is only used to understand whom you mean, and nothing is saved until you approve.',
+      placeholder: 'Who sits with whom, who near the stage, who not together…',
+      read: 'Understand the rules',
+      reading: 'Reading…',
+      found: {
+        one: 'We understood one thing. What to add?',
+        other: 'We understood {n} things. What to add?',
+      },
+      together: 'Together',
+      apart: 'Not at one table',
+      hard: 'Must',
+      soft: 'Wish',
+      near: 'Near {zone}',
+      far: 'Away from {zone}',
+      accessible: 'Accessible table',
+      unclear: 'We didn’t understand: {list}. Write it again with the name as on the guest list.',
+      add: { one: 'Add', other: 'Add {n}' },
+      added: {
+        one: 'A rule was added. Now click "Seat everyone".',
+        other: '{n} rules were added. Now click "Seat everyone".',
+      },
+      discard: 'Not now',
+      errors: {
+        not_understood: 'We couldn’t understand that. Try other words, with the names as on the guest list.',
+        rate_limited:
+          'That’s today’s limit. You can still add rules by hand, from "Rules" in the guest list.',
+        no_guests: 'No guests to seat yet.',
+        failed: 'Something went wrong. Try again in a moment.',
+      },
+    },
     lockTip: 'Like a table? Pick it on the map, tap “Lock table”, then “Rearrange” — it stays as it is.',
     issues: {
       room: '{name} ({seats}): not enough free seats. Add a table or seats.',
@@ -351,6 +422,7 @@ export const seatingEn: SeatingDict = {
       underfilled: 'Table {table}: only {seated} of {capacity} seats.',
       mixed: 'Table {table}: {categories} together.',
       unmixed: 'Table {table}: mostly {category}.',
+      lonely: 'Table {table}: {names} without anyone from their group.',
       near: 'Not near {zone}: {names}',
       far: 'Close to {zone}: {names}',
       zones: { stage: 'the stage', dance: 'the dance floor', exit: 'the exit' },

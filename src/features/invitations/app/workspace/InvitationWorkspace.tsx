@@ -1,8 +1,11 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useState, type ReactNode } from 'react';
+import { lockedTools, offeredTools } from '../../lib/tools';
 import type { InvitationSummary } from '../../server/host-db';
-import { InWorkspace } from './context';
+import { ToolsDialog } from '../tools/ToolsDialog';
+import { InWorkspace, OpenTools } from './context';
 import { EventBar, EventBottomBar, EventSidebar } from './EventSpace';
 import type { WorkspaceCaps } from './stages';
 
@@ -35,16 +38,47 @@ export function InvitationWorkspace({
   children: ReactNode;
 }) {
   const data = { item, caps, plan, seating, thumb };
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const openTools = useCallback(() => setToolsOpen(true), []);
   return (
     <InWorkspace.Provider value>
-      <div data-event-space="" className="lg:grid lg:min-h-dvh lg:grid-cols-[264px_minmax(0,1fr)]">
-        <EventSidebar data={data} account={account} />
-        <div className="min-w-0">
-          <EventBar item={item} thumb={thumb} tools={caps.tools} />
-          {children}
+      <OpenTools.Provider value={openTools}>
+        <div data-event-space="" className="lg:grid lg:min-h-dvh lg:grid-cols-[264px_minmax(0,1fr)]">
+          <EventSidebar data={data} account={account} />
+          <div className="min-w-0">
+            <EventBar item={item} thumb={thumb} tools={caps.tools} />
+            {children}
+          </div>
         </div>
-      </div>
-      <EventBottomBar data={data} />
+        <EventBottomBar data={data} />
+        {/* the event's tools: one dialog for every screen of the event (a ?tools=1 link opens it too) */}
+        <ToolsDialog
+          id={item.id}
+          open={toolsOpen}
+          onOpenChange={setToolsOpen}
+          current={caps.tools}
+          offered={offeredTools(caps)}
+          locked={lockedTools(caps)}
+          source="workspace"
+        />
+        <Suspense>
+          <ToolsFromLink onOpen={openTools} />
+        </Suspense>
+      </OpenTools.Provider>
     </InWorkspace.Provider>
   );
+}
+
+/** `?tools=1` (a link from outside the event's frame, or an older bookmark): opens the tools, once. */
+function ToolsFromLink({ onOpen }: { onOpen: () => void }) {
+  const params = useSearchParams();
+  const asked = params.has('tools');
+  useEffect(() => {
+    if (!asked) return;
+    onOpen();
+    const url = new URL(window.location.href);
+    url.searchParams.delete('tools');
+    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+  }, [asked, onOpen]);
+  return null;
 }

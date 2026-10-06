@@ -28,7 +28,7 @@ export function ToolsDialog({
   current: readonly ToolKey[];
   offered: readonly ToolKey[];
   locked?: readonly ToolKey[];
-  source: 'home' | 'settings';
+  source: 'home' | 'settings' | 'workspace';
 }) {
   const { t } = useUi();
   const T = t.eventHome.tools;

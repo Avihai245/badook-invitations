@@ -108,7 +108,7 @@ async function seedGuests(
   }
 }
 
-const setPlan = (email: string, plan: 'free' | 'pro') =>
+const setPlan = (email: string, plan: 'free' | 'pro' | 'business') =>
   sql(
     `insert into accounts (user_id, plan) select id, $2 from auth.users where email = $1
      on conflict (user_id) do update set plan = excluded.plan`,
@@ -461,6 +461,167 @@ test.describe('seating', () => {
     expect(cohen[2]).toBe(4);
     expect(typeof cohen[3]).toBe('number');
     expect(sheets[1]!.data.length).toBe(4);
+    expect(errors).toEqual([]);
+  });
+
+  test('end to end: a ready-made hall, a square table, a family dragged, rules in words, auto, print, live', async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'one run: dragging with a mouse');
+    test.setTimeout(180_000);
+    const errors = collectErrors(page);
+    const email = await signUp(page, 'seat-e2e');
+    await setPlan(email, 'business');
+    const { id, slug } = await createInvitation(page);
+    // 60 who are coming: families, two army friends, grandma
+    await seedGuests(id, [
+      { name: 'משפחת כהן', party: 4, coming: 4, group: 'משפחה' },
+      { name: 'סבתא רבקה', party: 2, coming: 2, group: 'משפחה' },
+      { name: 'יוסי מהצבא', party: 2, coming: 2, group: 'צבא' },
+      { name: 'דני מהצבא', party: 2, coming: 2, group: 'צבא' },
+      ...Array.from({ length: 10 }, (_, i) => ({
+        name: `משפחה ${i + 1}`,
+        party: 5,
+        coming: 5,
+        group: i < 5 ? 'צד הכלה' : 'צד החתן',
+      })),
+    ]);
+
+    // nothing on the map and no picture: the ready-made halls, and how the pros do it
+    await open(page, `/app/invitations/${id}/seating`);
+    const halls = page.getByTestId('hall-templates');
+    await expect(halls).toBeVisible();
+    await expect(halls).toContainText('60');
+    await shot(page, 'templates-he', testInfo.project.name);
+    await page.getByTestId('seating-learn').click();
+    const learn = page.getByRole('dialog', { name: 'סידור שולחנות כמו מקצוענים' });
+    await expect(learn.getByTestId('seating-tutorial-video')).toBeVisible();
+    await expect(learn.locator('source').last()).toHaveAttribute(
+      'src',
+      /\/video\/badook-seating\.[0-9a-f]{10}\.mp4$/,
+    );
+    await learn.getByRole('button', { name: 'סגירה' }).first().click();
+    await expect(learn).toHaveCount(0);
+
+    // the classic hall: a stage, a dance floor and 6 round tables of 10 for 60
+    await halls.locator('[data-template="classic"]').click();
+    await expect(toast(page, 'האולם "אולם קלאסי" מוכן')).toBeVisible();
+    await expect(tableOnMap(page, 6)).toBeVisible();
+    await expect(tableOnMap(page, 7)).toHaveCount(0);
+    await expect(halls).toHaveCount(0);
+
+    // a square table is a square: as wide as it is deep, two chairs a side
+    await page.getByRole('button', { name: 'הוספת שולחן' }).click();
+    await page.getByRole('menuitem', { name: /מרובע/ }).click();
+    await expect(tableOnMap(page, 7)).toBeVisible();
+    await expect(page.getByTestId('table-inspector').getByTestId('table-size')).toBeVisible();
+    await page.getByTestId('table-inspector').getByRole('button', { name: 'סגירת חלון השולחן' }).click();
+    await saved(page);
+    const tables = await sql<{ number: number; shape: string; w: string; h: string; capacity: number }>(
+      `select number, shape, w, h, capacity from seating_tables
+       where invitation_id = $1 and deleted_at is null order by number`,
+      [id],
+    );
+    expect(tables).toHaveLength(7);
+    expect(tables.slice(0, 6).every((t) => t.shape === 'round' && t.capacity === 10)).toBe(true);
+    expect(tables[6]).toMatchObject({ shape: 'square', capacity: 8 });
+    expect(Number(tables[6]!.w)).toBe(Number(tables[6]!.h));
+    const [hall] = await sql<{ landmarks: { kind: string }[] }>(
+      `select landmarks from venue_layouts where invitation_id = $1`,
+      [id],
+    );
+    expect(hall!.landmarks.map((m) => m.kind)).toEqual(expect.arrayContaining(['stage', 'dance']));
+
+    // Cohen dragged to table 1
+    const from = await center(unitRow(page, 'משפחת כהן').getByTestId('unit-drag'));
+    const to = await center(tableOnMap(page, 1));
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.down();
+    await page.mouse.move(from.x + 20, from.y + 5, { steps: 3 });
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+    await page.mouse.up();
+    await expect(toast(page, 'משפחת כהן יושבים בשולחן 1')).toBeVisible();
+
+    // the rules in words: read, approved, then everyone seated by them
+    await page.getByTestId('auto-seat').click();
+    const dialog = page.getByRole('dialog', { name: 'סידור אוטומטי' });
+    const words = dialog.getByTestId('seating-words');
+    await words.getByRole('textbox').fill('החברים מהצבא ביחד, סבתא רבקה ליד הבמה, הדודה מחו״ל');
+    await words.getByTestId('words-read').click();
+    const answer = words.getByTestId('words-answer');
+    await expect(answer).toContainText('הבנו 2 דברים');
+    await expect(answer).toContainText('ביחד');
+    await expect(answer).toContainText('יוסי מהצבא');
+    await expect(answer).toContainText('ליד הבמה');
+    await expect(answer).toContainText('לא הבנו: "הדודה מחו״ל"');
+    await shot(page, 'words-he', testInfo.project.name);
+    await answer.getByTestId('words-add').click();
+    await expect(words.getByRole('status')).toContainText('נוספו 2 כללים');
+    await dialog.getByTestId('run-auto').click();
+    const result = page.getByTestId('auto-result');
+    await expect(result).toHaveAttribute('data-run', '1', { timeout: 20_000 });
+    await expect(result.getByTestId('auto-summary')).toContainText('כל משפחה יושבת יחד');
+    await expect(result.getByTestId('auto-summary')).toContainText('הכלל נשמר');
+    await expect(page.getByTestId('seating-summary')).toContainText('כל מאשרי ההגעה יושבים');
+    await saved(page);
+    await shot(page, 'end-to-end-he', testInfo.project.name);
+    const [ai] = await (
+      await fetch('http://127.0.0.1:' + (process.env.MOCK_WHATSAPP_PORT || 54340) + '/__ai/seating')
+    ).json();
+    expect(ai.structured).toBe(true);
+    expect(ai.task.units.map((u: { name: string }) => u.name)).toContain('סבתא רבקה');
+    const rules = await sql<{ kind: string; hard: boolean }>(
+      `select kind, hard from seating_constraints where invitation_id = $1`,
+      [id],
+    );
+    expect(rules).toEqual([{ kind: 'together', hard: true }]);
+    const army = await sql<{ table_id: string }>(
+      `select a.table_id from seat_assignments a join seating_units u on u.id = a.unit_id
+       join rsvp_responses r on r.id = u.response_id
+       where r.invitation_id = $1 and r.primary_name in ('יוסי מהצבא', 'דני מהצבא')`,
+      [id],
+    );
+    expect(army).toHaveLength(2);
+    expect(army[0]!.table_id).toBe(army[1]!.table_id);
+
+    // the print view has the hall and everyone
+    const printPage = await page.context().newPage();
+    await open(printPage, `/app/invitations/${id}/seating/print`);
+    await expect(printPage.getByTestId('print-map').locator('svg')).toBeVisible();
+    await expect(printPage.getByTestId('print-list')).toContainText('סבתא רבקה');
+    await printPage.close();
+
+    // on the day: the hall live — a family checked in shows at its table
+    await sql(
+      `update invitations set status = 'published', published = draft, published_at = now() where id = $1`,
+      [id],
+    );
+    const [cohen] = await sql<{ unit_id: string; number: number }>(
+      `select a.unit_id, t.number from seat_assignments a join seating_tables t on t.id = a.table_id
+       join seating_units u on u.id = a.unit_id join rsvp_responses r on r.id = u.response_id
+       where r.invitation_id = $1 and r.primary_name = 'משפחת כהן'`,
+      [id],
+    );
+    const checkin = await page.evaluate(
+      async ({ id, unitId }) => {
+        const res = await fetch(`/api/invitations/${id}/event-day/checkin`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ id: crypto.randomUUID(), unitId, count: 4 }),
+        });
+        return res.status;
+      },
+      { id, unitId: cohen!.unit_id },
+    );
+    expect(checkin).toBe(200);
+    await open(page, `/app/invitations/${id}/live`);
+    await expect(page.locator('[data-testid="live-hall"]:visible')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(`[data-heat-table="${cohen!.number}"]`).first()).toHaveAttribute(
+      'data-arrived',
+      '4',
+    );
+    await shot(page, 'live-he', testInfo.project.name);
+    expect(slug).toBeTruthy();
     expect(errors).toEqual([]);
   });
 

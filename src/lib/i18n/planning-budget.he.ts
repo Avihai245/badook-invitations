@@ -69,8 +69,20 @@ export const planningBudgetHe = {
     editHint: 'בשקלים שלמים. התכנון של הקטגוריות נשאר כמו שהוא — אפשר לעדכן אותו בכל קטגוריה.',
     save: 'שמירה',
   },
+  /** the screen's "how it works", for a first visit (closed: remembered for this event) */
+  intro: {
+    title: 'איך עובד התקציב — בשלושה צעדים',
+    plan: 'מה תכננתם: כבר חילקנו את התקציב לקטגוריות. אפשר לשנות כל סכום.',
+    close: 'מה סגרתם: הצעת מחיר או ספק שסגרתם — מוסיפים כהוצאה בקטגוריה שלה.',
+    pay: 'מה שילמתם: מקדמות ותשלומים, וסימון כששולם. נזכיר לפני כל תשלום.',
+  },
   catGauges: {
     title: 'לפי קטגוריה',
+    emptyTitle: 'עוד לא סגרתם הוצאות',
+    emptyBody: 'מתחילים מהחשוב ביותר: הוסיפו את ההצעה או הספק הראשון שסגרתם.',
+    addTo: 'הוצאה ב{name}',
+    showAll: 'כל הקטגוריות ({n})',
+    showActive: 'רק קטגוריות עם הוצאות',
     body: 'מה שסגרתם מול מה שתכננתם. החורגות ביותר ראשונות; לחיצה פותחת את הקטגוריה.',
     of: '{committed} מתוך {planned}',
     over: 'חריגה של {amount}',
@@ -177,6 +189,7 @@ export const planningBudgetHe = {
     expand: 'פתיחת {name}',
     collapse: 'סגירת {name}',
     required: 'חיוני',
+    requiredHint: 'קטגוריה שכמעט כל אירוע צריך — כדאי לסגור אותה מוקדם',
     items: { one: 'סעיף אחד', other: '{n} סעיפים' },
     noItems: 'עוד אין סעיפים בקטגוריה הזאת.',
     of: '{committed} מתוך {planned}',

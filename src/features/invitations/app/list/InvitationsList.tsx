@@ -7,6 +7,7 @@ import {
   Check,
   Copy,
   ListChecks,
+  Loader2,
   MailPlus,
   MoreHorizontal,
   Palette,
@@ -15,7 +16,7 @@ import {
   Share2,
   Users,
 } from 'lucide-react';
-import Link from 'next/link';
+import Link, { useLinkStatus } from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UpgradeDialog, upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
 import { useEffect, useState, useTransition, type CSSProperties, type ReactNode } from 'react';
@@ -30,7 +31,6 @@ import {
   useToast,
   type BadgeVariant,
 } from '@/components/app';
-import { BudgetGauge } from '@/features/planning/ui/BudgetGauge';
 import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
@@ -190,12 +190,7 @@ export function InvitationsList({
       </section>
 
       {visible.length ? (
-        <ul
-          className={cn(
-            'mt-6 grid grid-cols-1 gap-4 lg:gap-5',
-            visible.length > 2 ? 'lg:grid-cols-2 min-[1900px]:grid-cols-3' : 'max-w-[900px]',
-          )}
-        >
+        <ul className={cn('mt-6 grid grid-cols-1 gap-4 lg:gap-5', 'lg:grid-cols-2 min-[1900px]:grid-cols-3')}>
           {visible.map((item, i) => (
             <li
               key={item.id}
@@ -328,38 +323,40 @@ function InvitationCard({
   const next = path?.current ?? null;
   const shortDate = date(item.date, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
   const enter = (via: 'card' | 'button') => track('event_enter', { invitationId: item.id, props: { via } });
+  const used = budget && budget.committed > 0 ? Math.round((budget.committed / budget.total) * 100) : null;
+  const NextIcon = next ? TOOL_ICONS[next.tool] : null;
 
   return (
     <article
       aria-busy={busy || undefined}
       data-testid="event-card"
-      className="group/card relative flex h-full flex-col overflow-hidden rounded-[20px] border border-line bg-surface shadow-sm transition-[box-shadow,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-brand-line hover:shadow-[0_18px_40px_-24px_rgba(60,35,15,0.45)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      className="group/card relative flex h-full flex-col overflow-hidden rounded-[22px] border border-line bg-surface shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-brand-line hover:shadow-[0_18px_40px_-24px_rgba(60,35,15,0.45)] motion-reduce:transition-none"
     >
-      <div className="flex gap-4 p-3 sm:p-4">
-        <Link href={base} tabIndex={-1} aria-hidden className="relative block w-[80px] shrink-0 sm:w-[104px]">
+      <div className="flex gap-4 p-4 sm:gap-5 sm:p-5">
+        <Link href={base} tabIndex={-1} aria-hidden className="relative block w-[84px] shrink-0 sm:w-[104px]">
           {poster ?? <div className="aspect-[9/16] rounded-[14px] bg-subtle" />}
         </Link>
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-start gap-2">
             <div className="min-w-0 flex-1">
-              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-semibold text-brand-deep">
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] font-semibold text-brand-deep">
                 {t.eventTypes[item.eventType]}
                 {archived ? null : <CountdownChip date={item.date} />}
               </p>
-              <h2 className="mt-1 truncate text-[18px] leading-snug font-bold sm:text-[19px]">
+              <h2 className="mt-1.5 text-[19px] leading-snug font-extrabold sm:text-[21px]">
                 {/* the whole card opens the event: this link stretches over it */}
                 <Link
                   href={base}
                   lang={loc}
                   onClick={() => enter('card')}
-                  className="rounded-[4px] after:absolute after:inset-0 after:content-[''] hover:underline"
+                  className="line-clamp-2 rounded-[4px] after:absolute after:inset-0 after:content-[''] hover:underline"
                   data-testid="event-card-link"
                 >
                   {name}
                 </Link>
               </h2>
-              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-muted">
+              <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-muted">
                 <span dir="ltr" className="tabular-nums">
                   {shortDate}
                 </span>
@@ -374,7 +371,7 @@ function InvitationCard({
             <div className="relative z-10">
               <Menu
                 trigger={
-                  <IconButton label={t.common.more} size="sm" disabled={busy} className="-me-1 mt-px">
+                  <IconButton label={t.common.more} size="sm" disabled={busy} className="-me-1 -mt-0.5">
                     <MoreHorizontal />
                   </IconButton>
                 }
@@ -410,86 +407,80 @@ function InvitationCard({
           </div>
 
           {path && path.total ? (
-            <div className="mt-3" data-testid="card-path">
-              <div className="flex items-center justify-between gap-2 text-[12.5px]">
+            <div className="mt-auto pt-4" data-testid="card-path">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[12.5px]">
                 <span className="font-semibold text-ink/80">
                   {fmt(t.list.pathProgress, { done: number(path.done), total: number(path.total) })}
                 </span>
                 {invite && item.guests ? (
                   <span className="font-semibold text-success">
-                    {fmt(t.list.progress.replied, {
-                      pct: number(Math.min(100, Math.round((item.responses / item.guests) * 100))),
-                    })}
+                    {fmt(t.list.repliedOf, { n: number(item.responses), total: number(item.guests) })}
+                  </span>
+                ) : used !== null ? (
+                  <span className="font-semibold text-muted" data-testid="card-glance">
+                    {fmt(t.list.budgetUsed, { pct: number(used) })}
                   </span>
                 ) : null}
               </div>
-              <span aria-hidden className="mt-1.5 flex gap-1">
-                {path.steps.map((s) => (
-                  <span
-                    key={s.key}
-                    className={cn(
-                      'h-1.5 flex-1 rounded-full',
-                      s.state === 'done' ? 'bg-success' : s.state === 'current' ? 'bg-brand' : 'bg-subtle',
-                    )}
-                  />
-                ))}
+              <span aria-hidden className="mt-2 block h-2 overflow-hidden rounded-full bg-subtle">
+                <span
+                  className="block h-full rounded-full bg-linear-to-l from-brand to-brand-deep"
+                  style={{ width: `${Math.max(4, (path.done / path.total) * 100)}%` }}
+                />
               </span>
             </div>
-          ) : null}
-
-          {budget ? (
-            <div
-              className="mt-3 flex items-center gap-1.5 text-[12px] font-semibold text-muted"
-              data-testid="card-glance"
-            >
-              <BudgetGauge
-                size="xs"
-                total={budget.total}
-                committed={budget.committed}
-                paid={budget.paid}
-                planned={budget.planned}
-                className="mx-0! w-[64px]!"
-              />
-              {t.list.progress.budget}
-            </div>
-          ) : null}
-
-          {path ? (
-            next ? (
-              <Hint text={t.list.nextHint}>
-                <Link
-                  href={next.href}
-                  data-next-step={next.key}
-                  onClick={() =>
-                    track('step_click', {
-                      invitationId: item.id,
-                      props: { step: next.key, variant: next.variant, source: 'list' },
-                    })
-                  }
-                  className={cn(
-                    'relative z-10 mt-3 inline-flex max-w-full items-center gap-1.5 self-start rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors',
-                    next.variant === 'changes'
-                      ? 'bg-warning-bg text-warning hover:bg-[#fef3c7] dark:hover:bg-warning-line'
-                      : 'bg-brand-soft text-brand-deep hover:bg-brand hover:text-white',
-                  )}
-                >
-                  <span className="truncate">
-                    {t.list.nextLabel}: {stepTitle(next)}
-                  </span>
-                  <ArrowRight aria-hidden className="icon-dir size-3.5 shrink-0" />
-                </Link>
-              </Hint>
-            ) : (
-              <p className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-success">
-                <Check aria-hidden className="size-3.5" strokeWidth={3} />
-                {t.list.nothingNext}
-              </p>
-            )
           ) : null}
         </div>
       </div>
 
-      <div className="relative z-10 mt-auto border-t border-line bg-canvas/60 p-2 sm:p-3">
+      {path ? (
+        <div className="relative z-10 px-4 pb-4 sm:px-5">
+          {next && NextIcon ? (
+            <Link
+              href={next.href}
+              data-next-step={next.key}
+              title={t.list.nextHint}
+              onClick={() =>
+                track('step_click', {
+                  invitationId: item.id,
+                  props: { step: next.key, variant: next.variant, source: 'list' },
+                })
+              }
+              className={cn(
+                'group/next flex items-center gap-3 rounded-[16px] border p-3 transition-colors',
+                next.variant === 'changes'
+                  ? 'border-warning-line bg-warning-bg hover:bg-[#fef3c7] dark:hover:bg-warning-line'
+                  : 'border-brand-line bg-brand-soft/50 hover:bg-brand-soft',
+              )}
+            >
+              <span
+                aria-hidden
+                className="grid size-9 shrink-0 place-items-center rounded-[12px] bg-surface text-brand-deep shadow-xs [&_svg]:size-[18px]"
+              >
+                <NextIcon strokeWidth={1.9} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[11.5px] font-bold text-brand-deep">
+                  {t.list.nextLabel}
+                  <span className="sr-only">: </span>
+                </span>
+                <span className="block truncate text-[14px] font-bold text-ink">{stepTitle(next)}</span>
+              </span>
+              <ArrowRight
+                aria-hidden
+                className="icon-dir size-4 shrink-0 text-brand-deep transition-transform group-hover/next:-translate-x-0.5 motion-reduce:transition-none"
+              />
+            </Link>
+          ) : (
+            <p className="flex items-center gap-2 rounded-[16px] bg-success-bg px-3 py-3 text-[13.5px] font-semibold text-success">
+              <Check aria-hidden className="size-4" strokeWidth={3} />
+              {t.list.nothingNext}
+            </p>
+          )}
+        </div>
+      ) : null}
+
+      <div className="relative z-10 mt-auto flex items-center justify-end gap-2 border-t border-line bg-canvas/50 px-4 py-3 sm:px-5">
         {archived ? (
           <Button
             variant="ghost"
@@ -501,17 +492,14 @@ function InvitationCard({
             {t.list.menu.unarchive}
           </Button>
         ) : (
-          <Hint text={t.list.enterHint}>
-            <Link
-              href={base}
-              onClick={() => enter('button')}
-              data-testid="event-enter"
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-primary text-[15px] font-bold text-primary-ink shadow-sm transition-colors hover:bg-primary-hover"
-            >
-              {t.list.enter}
-              <ArrowRight aria-hidden className="icon-dir size-4" />
-            </Link>
-          </Hint>
+          <Link
+            href={base}
+            onClick={() => enter('button')}
+            data-testid="event-enter"
+            className="inline-flex h-11 min-w-[160px] items-center justify-center gap-2 rounded-[12px] bg-brand-deep px-5 text-[15px] font-bold text-white shadow-sm transition-colors hover:bg-brand-strong dark:text-[#1c1917]"
+          >
+            <EnterLabel label={t.list.enter} pending={t.list.opening} />
+          </Link>
         )}
       </div>
     </article>
@@ -525,6 +513,22 @@ function InvitationCard({
       ? words.title
       : plural(words.title, s.n ?? 0, { n: number(s.n ?? 0) });
   }
+}
+
+/** Inside the "open the event" link: a spinner and "opening…" from the click until the event is there. */
+function EnterLabel({ label, pending }: { label: string; pending: string }) {
+  const { pending: loading } = useLinkStatus();
+  return loading ? (
+    <>
+      <Loader2 aria-hidden className="size-4 animate-spin motion-reduce:animate-none" />
+      <span role="status">{pending}</span>
+    </>
+  ) : (
+    <>
+      {label}
+      <ArrowRight aria-hidden className="icon-dir size-4" />
+    </>
+  );
 }
 
 /** What the list knows of an event, as the path's facts (the replies counted on the list; no seating). */

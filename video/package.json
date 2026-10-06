@@ -19,7 +19,11 @@
     "render:tour": "npm run vtt && npm run render:tour:mp4 && npm run render:tour:portrait && npm run render:tour:poster",
     "render:tour:mp4": "remotion render src/index.ts TourLandscape out/badook-tour.mp4 --codec=h264 --crf=18 --audio-bitrate=192k && node ../scripts/encode-site-video.mjs tour.landscape out/badook-tour.mp4",
     "render:tour:portrait": "remotion render src/index.ts TourPortrait out/badook-tour-portrait.mp4 --codec=h264 --crf=18 --audio-bitrate=192k && node ../scripts/encode-site-video.mjs tour.portrait out/badook-tour-portrait.mp4",
-    "render:tour:poster": "node scripts/tour-poster.mjs && node ../scripts/encode-site-video.mjs tour.poster out/tour-poster.jpg"
+    "render:tour:poster": "node scripts/tour-poster.mjs && node ../scripts/encode-site-video.mjs tour.poster out/tour-poster.jpg",
+    "render:seating": "npm run render:seating:mp4 && npm run render:seating:portrait && npm run render:seating:poster",
+    "render:seating:mp4": "remotion render src/index.ts SeatingLandscape out/badook-seating.mp4 --codec=h264 --crf=18 && node ../scripts/encode-site-video.mjs seating.landscape out/badook-seating.mp4",
+    "render:seating:portrait": "remotion render src/index.ts SeatingPortrait out/badook-seating-portrait.mp4 --codec=h264 --crf=18 && node ../scripts/encode-site-video.mjs seating.portrait out/badook-seating-portrait.mp4",
+    "render:seating:poster": "remotion still src/index.ts SeatingLandscape out/seating-poster.png --frame=560 --image-format=png && node ../scripts/encode-site-video.mjs seating.poster out/seating-poster.png"
   },
   "dependencies": {
     "@fontsource/heebo": "5.3.0",

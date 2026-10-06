@@ -75,7 +75,8 @@ export const heMore = {
       /** over the sidebar's numbered stages */
       stagesTitle: 'הכלים של האירוע',
       /** under the stages: the event's tools, changed from the event's home */
-      addTools: 'הוספת כלים',
+      addTools: 'הוספה או הסרה של כלים',
+      addToolsHint: 'תכנון, סידור שולחנות, יום האירוע',
       /** a stage's place in the order (the sidebar's buttons, the phone's sheet) */
       stepOf: 'שלב {n} מתוך {total}',
       menu: 'האפשרויות של "{stage}"',
@@ -167,7 +168,7 @@ export const heMore = {
       },
       nav: {
         title: 'הכלים שבחרתם',
-        body: 'כאן נמצא כל כלי שבחרתם לאירוע. צריכים עוד משהו? "הוספת כלים" — בכל רגע.',
+        body: 'כאן נמצא כל כלי שבחרתם לאירוע. צריכים עוד משהו? "הוספה או הסרה של כלים" — בכל רגע.',
       },
       help: { title: 'עזרה בכל רגע', body: 'מדריך כתוב, העוזר החכם ופנייה לצוות — כפתור אחד.' },
     },
@@ -567,6 +568,9 @@ export const heMore = {
     nextHint: 'הדבר הבא שכדאי לעשות באירוע הזה. לחיצה לוקחת אתכם ישר לשם.',
     /** the card's main button, and its path */
     enter: 'כניסה לאירוע',
+    opening: 'פותחים…',
+    repliedOf: '{n} מתוך {total} ענו',
+    budgetUsed: 'תקציב: נוצלו {pct}%',
     enterHint: 'הכול על האירוע במקום אחד: המסלול, המוזמנים, אישורי ההגעה.',
     nextLabel: 'הצעד הבא',
     nothingNext: 'הכול מתקדם יפה',
@@ -585,13 +589,6 @@ export const heMore = {
       send: { title: 'שולחים בוואטסאפ ועוקבים', body: 'בלחיצה אחת לכל הרשימה, ורואים מי מגיע בזמן אמת.' },
     },
     /** the quick actions on each card */
-    progress: {
-      replied: '{pct}% ענו',
-      budget: 'תקציב',
-      sent: 'נשלח ל־{sent} מתוך {guests}',
-      attending: '{attending} מגיעים',
-      noGuests: 'עוד אין רשימת מוזמנים',
-    },
     followUp: {
       title: 'ההזמנה המלאה',
       description:

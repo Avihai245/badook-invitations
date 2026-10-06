@@ -18,6 +18,7 @@ import {
   Square,
   Undo2,
   Flag,
+  GalleryHorizontal,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
@@ -27,8 +28,9 @@ import { LANDMARK_KINDS, TABLE_SHAPES, type LandmarkKind, type TableShape } from
 
 const SHAPE_ICON: Record<TableShape, typeof Circle> = {
   round: Circle,
-  rect: Square,
-  knights: RectangleHorizontal,
+  square: Square,
+  rect: RectangleHorizontal,
+  knights: GalleryHorizontal,
 };
 
 /** The buttons above the map. Every one explains itself (tooltip), and "?" explains them all. */

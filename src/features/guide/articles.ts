@@ -52,8 +52,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Want to skip? “Skip to the design gallery” at the top of the wizard goes straight to the designs.',
       },
       {
-        he: 'שיניתם את דעתכם? "הוספת כלים" בסרגל האירוע, או "צריכים עוד משהו?" בבית האירוע. הורדת כלי רק מסתירה אותו — שום דבר לא נמחק.',
-        en: 'Changed your mind? “Add tools” in the event’s sidebar, or “Need something else?” on the event home. Removing a tool only hides it — nothing is deleted.',
+        he: 'שיניתם את דעתכם? "הוספה או הסרה של כלים" בסרגל האירוע, או "צריכים עוד משהו?" בבית האירוע. הורדת כלי רק מסתירה אותו — שום דבר לא נמחק.',
+        en: 'Changed your mind? “Add or remove tools” in the event’s sidebar, or “Need something else?” on the event home. Removing a tool only hides it — nothing is deleted.',
       },
       {
         he: 'בביקור הראשון בבית האירוע מופיע "סיור קצר" של שלוש תחנות. אפשר לדלג עליו.',
@@ -151,8 +151,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: '“Seating”: tables and seats. “On the day”: Event day, Live gallery & hall screen, Moments film.',
       },
       {
-        he: '"הוספת כלים" מתחת לכלים פותח את הבחירה — מוסיפים או מורידים, ושום דבר לא נמחק.',
-        en: '“Add tools” under the tools opens the choice — add or remove, nothing is deleted.',
+        he: '"הוספה או הסרה של כלים" מתחת לכלים פותח את הבחירה — מוסיפים או מורידים, ושום דבר לא נמחק.',
+        en: '“Add or remove tools” under the tools opens the choice — add or remove, nothing is deleted.',
       },
       {
         he: 'בתחתית הסרגל: "תובנות", "הגדרות האירוע" ו"מדריך ועזרה". "כל האירועים" למעלה מציג את כל האירועים.',
@@ -833,12 +833,12 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "סידור שולחנות" ב"סידור שולחנות" בסרגל. רוצים את התוכנית האמיתית? "תוכנית האולם" מעלה תמונה או PDF, ומכיילים קנה מידה.',
-        en: 'Open “Seating plan” under “Seating”. Want the real layout? “Floor plan” uploads an image or PDF, then you calibrate the scale.',
+        he: 'פותחים "סידור שולחנות" בסרגל. אין תמונה של האולם? בוחרים אולם מוכן (קלאסי, רחב, גן אירועים או אבירים) עם במה, רחבה ושולחנות לפי מספר האורחים. יש? מבקשים מהאולם תמונה או PDF של המפה, מעלים ב"תוכנית האולם" ומכיילים קנה מידה.',
+        en: 'Open “Seating plan” in the sidebar. No picture of the hall? Pick a ready-made one (classic, wide, garden or banquet) with a stage, a dance floor and tables for your guests. Have one? Ask the venue for a picture or PDF of its floor plan, upload it in “Floor plan” and calibrate the scale.',
       },
       {
-        he: 'לוחצים "שולחן" ובוחרים עגול, מרובע או אבירים. "סימון" מוסיף במה, רחבת ריקודים, בר, כניסה ויציאה.',
-        en: 'Click “Table” and pick round, square or knights. “Mark” adds a stage, dance floor, bar, entrance and exit.',
+        he: 'לוחצים "שולחן" ובוחרים עגול, מרובע (ריבוע, כיסאות בכל צד), מלבני או אבירים. בחלון השולחן משנים מקומות, גודל וסיבוב. "סימון" מוסיף במה, רחבת ריקודים, בר, כניסה ויציאה.',
+        en: 'Click “Table” and pick round, square (chairs on every side), rectangular or knights. The table’s panel changes its seats, size and rotation. “Mark” adds a stage, dance floor, bar, entrance and exit.',
       },
       {
         he: 'גוררים משפחה מהרשימה לשולחן במפה, או לוחצים "הושבה" ובוחרים שולחן.',
@@ -849,8 +849,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'In a family’s “Settings and wishes”, set its category, how near the stage or exit, and who must or mustn’t sit with it.',
       },
       {
-        he: 'לוחצים "סידור אוטומטי" ואז "סידור". אהבתם שולחן? "נעילת שולחן", ו"סדר מחדש" מסדר רק את השאר.',
-        en: 'Click “Auto-seat”, then “Seat everyone”. Like a table? “Lock table”, and “Rearrange” redoes only the rest.',
+        he: 'לוחצים "סידור אוטומטי". אפשר לכתוב במילים מי עם מי ("סבתא ליד הבמה, החברים מהצבא ביחד, דוד משה לא עם דודה רחל"), לאשר את הכללים שהובנו, ואז "סידור". אהבתם שולחן? "נעילת שולחן", ו"סדר מחדש" מסדר רק את השאר.',
+        en: 'Click “Auto-seat”. You can write who sits with whom in words (“grandma near the stage, the army friends together, uncle Moshe not with aunt Rachel”), approve the rules it understood, then “Seat everyone”. Like a table? “Lock table”, and “Rearrange” redoes only the rest.',
       },
       {
         he: 'בסוף לוחצים "הדפסה" למפה ולרשימה לפי א״ב עם מספרי השולחנות, או "Excel" לקובץ.',
@@ -863,6 +863,18 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Seating by hand is on every plan. Auto-seating is included from Pro up.',
       },
       {
+        he: 'הסידור האוטומטי עובד כמו מארגן מקצועי: משפחה תמיד יחד, כל קבוצה יחד, אף אחד לא יושב לבד בלי מישהו מהקבוצה שלו, ושולחנות לא נשארים חצי ריקים.',
+        en: 'Auto-seating works like a professional planner: a family always together, each group together, nobody alone without someone from their group, and no half-empty tables.',
+      },
+      {
+        he: 'ביום האירוע מפת האולם מתעדכנת בלייב במסך "יום האירוע": מי הגיע, לפי שולחן ולפי האולם כולו.',
+        en: 'On the day, the hall map updates live on the “Event day” screen: who arrived, by table and for the whole hall.',
+      },
+      {
+        he: 'רוצים לראות איך עושים את זה? "ללמוד כמו מקצוענים" בראש המסך מציג סרטון של חצי דקה.',
+        en: 'Want to see how it’s done? “Learn it like the pros” at the top of the screen plays a 30-second video.',
+      },
+      {
         he: 'משפחה שהודיעה שלא תגיע אחרי שהושבה? מופיעה התראה, ו"לפנות את המקומות שלהן" מפנה אותם.',
         en: 'A seated family said they won’t come? A notice appears, and “Free their seats” clears them.',
       },
@@ -873,8 +885,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     next: ['send-table', 'event-day', 'rsvp-and-notifications'],
     keywords: {
-      he: 'סידור שולחנות, הושבה, שולחנות, מפת אולם, סידור אוטומטי, תוכנית אולם, הדפסה, אבירים, כרטיסי ישיבה, סידורי ישיבה',
-      en: 'seating, seating plan, tables, floor plan, auto-seat, hall map, print, seating chart, knights table',
+      he: 'סידור שולחנות, הושבה, שולחנות, מפת אולם, סידור אוטומטי, תוכנית אולם, הדפסה, אבירים, כרטיסי ישיבה, סידורי ישיבה, שולחן מרובע, אולם מוכן, תבנית אולם, כללים במילים, סרטון הדרכה',
+      en: 'seating, seating plan, tables, floor plan, auto-seat, hall map, print, seating chart, knights table, square table, hall template, rules in words, tutorial video',
     },
     screens: ['seating'],
   },
@@ -1397,8 +1409,8 @@ export const GUIDE_FAQ: GuideFaq[] = [
       en: 'Can I plan without choosing an invitation design?',
     },
     a: {
-      he: 'כן. ב"אירוע חדש", ב"מה אתם צריכים לאירוע?", מסמנים רק "תכנון האירוע" — האירוע נפתח ישר בבית האירוע עם משימות ותקציב. רוצים הזמנה אחר כך? "הוספת כלים" ← "הזמנה דיגיטלית ואישורי הגעה".',
-      en: 'Yes. In “New event”, under “What do you need for your event?”, tick only “Event planning” — the event opens straight on the event home with tasks and a budget. Want an invitation later? “Add tools” → “Digital invitation & RSVPs”.',
+      he: 'כן. ב"אירוע חדש", ב"מה אתם צריכים לאירוע?", מסמנים רק "תכנון האירוע" — האירוע נפתח ישר בבית האירוע עם משימות ותקציב. רוצים הזמנה אחר כך? "הוספה או הסרה של כלים" ← "הזמנה דיגיטלית ואישורי הגעה".',
+      en: 'Yes. In “New event”, under “What do you need for your event?”, tick only “Event planning” — the event opens straight on the event home with tasks and a budget. Want an invitation later? “Add or remove tools” → “Digital invitation & RSVPs”.',
     },
     more: 'quick-start',
   },

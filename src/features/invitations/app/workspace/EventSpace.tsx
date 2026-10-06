@@ -38,6 +38,7 @@ import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
 import { CountdownChip, daysUntilEvent, useToday } from '../countdown';
+import { useOpenTools } from './context';
 import { publishHref } from './paths';
 import {
   NAV_PATHS,
@@ -443,14 +444,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
             );
           })}
         </ol>
-        <Link
-          href={`${itemHref(item.id, 'home')}?tools=1`}
-          data-add-tools=""
-          className="mt-2 flex h-8 items-center gap-2.5 rounded-[10px] border border-dashed border-line-strong px-2.5 text-[13px] font-semibold text-muted transition-colors hover:border-brand hover:bg-brand-soft/50 hover:text-brand-deep"
-        >
-          <Plus aria-hidden className="size-4 shrink-0" strokeWidth={2} />
-          {N.addTools}
-        </Link>
+        <AddToolsButton />
       </nav>
 
       <div className="flex flex-col gap-0.5 border-t border-line px-3 pt-2 pb-3">
@@ -468,6 +462,41 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
         <div className="mt-2">{account}</div>
       </div>
     </aside>
+  );
+}
+
+/**
+ * Under the event's tools: add or remove one (lib/tools) — the dialog opens right here, on any screen
+ * of the event. Two lines: what it does, and which tools there are.
+ */
+function AddToolsButton({ size = 'md', onOpen }: { size?: 'md' | 'lg'; onOpen?: () => void }) {
+  const { t } = useUi();
+  const N = t.workspace.nav;
+  const open = useOpenTools();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        onOpen?.();
+        open();
+      }}
+      data-add-tools=""
+      className={cn(
+        'mt-2 flex w-full items-center gap-2.5 rounded-[12px] border border-dashed border-line-strong px-2.5 text-start transition-colors hover:border-brand hover:bg-brand-soft/50',
+        size === 'lg' ? 'py-3' : 'py-2',
+      )}
+    >
+      <span
+        aria-hidden
+        className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-deep"
+      >
+        <Plus className="size-4" strokeWidth={2.2} />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[13px] font-semibold text-ink">{N.addTools}</span>
+        <span className="block text-[11.5px] leading-snug text-muted">{N.addToolsHint}</span>
+      </span>
+    </button>
   );
 }
 
@@ -639,6 +668,7 @@ export function EventBottomBar({ data }: { data: EventSpaceData }) {
                 </li>
               ))}
             </ul>
+            <AddToolsButton size="lg" onOpen={() => setSheet(null)} />
           </>
         ) : null}
       </Sheet>

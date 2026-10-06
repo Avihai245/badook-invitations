@@ -70,7 +70,8 @@ export const enMore: Pick<AppDict, MoreKey> = {
       /** over the sidebar's numbered stages */
       stagesTitle: 'Your event’s tools',
       /** under the stages: the event's tools, changed from the event's home */
-      addTools: 'Add tools',
+      addTools: 'Add or remove tools',
+      addToolsHint: 'Planning, seating, the event day',
       /** a stage's place in the order (the sidebar's buttons, the phone's sheet) */
       stepOf: 'Step {n} of {total}',
       menu: '“{stage}” options',
@@ -160,7 +161,7 @@ export const enMore: Pick<AppDict, MoreKey> = {
       },
       nav: {
         title: 'The tools you chose',
-        body: 'Every tool you picked for the event lives here. Need something else? “Add tools”, any time.',
+        body: 'Every tool you picked for the event lives here. Need something else? “Add or remove tools”, any time.',
       },
       help: {
         title: 'Help any time',
@@ -577,6 +578,9 @@ export const enMore: Pick<AppDict, MoreKey> = {
     past: 'The event has passed',
     nextHint: 'The next thing worth doing for this event. One tap takes you straight there.',
     enter: 'Open the event',
+    opening: 'Opening…',
+    repliedOf: '{n} of {total} replied',
+    budgetUsed: 'Budget: {pct}% used',
     enterHint: 'Everything about the event in one place: your path, guests and RSVPs.',
     nextLabel: 'Next step',
     nothingNext: 'All going well',
@@ -603,13 +607,6 @@ export const enMore: Pick<AppDict, MoreKey> = {
         title: 'Send on WhatsApp and follow',
         body: 'To your whole list in one go, and see who’s coming as it happens.',
       },
-    },
-    progress: {
-      replied: '{pct}% replied',
-      budget: 'Budget',
-      sent: 'Sent to {sent} of {guests}',
-      attending: '{attending} coming',
-      noGuests: 'No guest list yet',
     },
     followUp: {
       title: 'The full invitation',
