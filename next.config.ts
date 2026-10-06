@@ -189,6 +189,7 @@ const nextConfig: NextConfig = {
   // so they must ship with those routes (the paths are computed at runtime, invisible to tracing).
   outputFileTracingIncludes: {
     '/i/[slug]/opengraph-image': FONT_FILES,
+    '/api/invitations/[id]/share-image': FONT_FILES,
     '/dev/invitations/og/[template]/[lang]/[doc]': FONT_FILES,
   },
   // /i/<slug>?lang=en → /i/<slug>/en (no ?lang → /i/<slug>/default): the public invitation is a

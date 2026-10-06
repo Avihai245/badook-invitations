@@ -49,10 +49,11 @@ import {
   usePreviewControls,
 } from '../fields/fields';
 import { LibraryFontPairs } from '../fields/font-library';
-import { AUDIO_TYPES, ImageField, UploadTile, useUploader } from '../fields/media';
+import { AUDIO_TYPES, UploadTile, useUploader } from '../fields/media';
 import { useEditor, type PanelId } from '../state/EditorProvider';
 import { FontSuggestions, OpeningPicker, PhotoPaletteCard, ScenePanel, StylePanel } from './DesignCinematic';
 import { HebrewDateLanguages, LanguagesPanel } from './LanguagesPanel';
+import { ShareCardPreview, useShareAuto } from './ShareCard';
 
 /**
  * A track's licence as the template pack gives it — unless it's still a placeholder ("TBD …"),
@@ -715,6 +716,7 @@ function SharePanel() {
   const e = t.editor;
   const s = e.f.share;
   const url = `${publicBaseUrl.replace(/\/+$/, '')}/i/${meta.slug}`;
+  const shareAuto = useShareAuto();
   return (
     <>
       <PanelCard title={e.cards.link}>
@@ -761,7 +763,17 @@ function SharePanel() {
         )}
       </PanelCard>
       <PanelCard title={e.cards.card}>
-        <L10nField path="share.ogTitle" label={s.ogTitle} help={s.ogTitleHelp} cap={60} nullable />
+        {/* never empty: what guests get is filled in from the invitation until the host changes it */}
+        <p className="-mt-1 text-[12px] text-muted">{s.intro}</p>
+        <ShareCardPreview />
+        <L10nField
+          path="share.ogTitle"
+          label={s.ogTitle}
+          help={s.ogTitleHelp}
+          cap={60}
+          nullable
+          auto={shareAuto.title}
+        />
         <L10nField
           path="share.ogDescription"
           label={s.ogDescription}
@@ -770,8 +782,8 @@ function SharePanel() {
           multiline
           rows={2}
           nullable
+          auto={shareAuto.description}
         />
-        <ImageField path="share.ogImage" label={s.ogImage} help={s.ogImageHelp} />
         <BoolField path="share.noindex" label={s.noindex} help={s.noindexHelp} />
       </PanelCard>
       {/* the invitation read aloud (features/voice) */}

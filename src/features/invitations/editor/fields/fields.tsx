@@ -1,6 +1,6 @@
 'use client';
 
-import { Copy } from 'lucide-react';
+import { Copy, RotateCcw, Sparkles } from 'lucide-react';
 import {
   createContext,
   useContext,
@@ -189,11 +189,18 @@ export function L10nField({
   required = false,
   maxLength,
   count = cappedLength,
+  auto,
   className,
 }: {
   path: string;
   label: string;
   cap?: number;
+  /**
+   * The text the invitation uses while the host wrote none (the share card's title from the hosts…):
+   * shown in the field itself, as real text, so it is never empty — editing it makes it the host's own,
+   * and "back to automatic" clears it again.
+   */
+  auto?: (locale: Locale) => string;
   /** how the counter measures the text (default: §3 caps with a 12-char budget per live token) */
   count?: (text: string) => number;
   multiline?: boolean;
@@ -217,17 +224,32 @@ export function L10nField({
   // in a hidden section nothing shows, so an empty language isn't flagged (as in validateDocument)
   const hidden = /^sections\.(\d+)\./.exec(path);
   const inHiddenSection = !!hidden && doc.sections[Number(hidden[1])]?.enabled === false;
+  const autoText = auto?.(locale) ?? '';
+  const isAuto = !!auto && !text.trim();
+  // the host emptied an automatic field to type their own: keep it empty until they leave it
+  const [cleared, setCleared] = useState(false);
+  const shown = isAuto && !cleared ? autoText : text;
 
   const change = (next: string) => {
+    if (isAuto && !cleared && next === autoText) return;
+    setCleared(!!auto && !next.trim());
     let v: L10n | null = { ...(value ?? {}), [locale]: next };
     if (nullable && locales.every((l) => !(v?.[l] ?? '').trim())) v = null;
     update(path, v, `${path}.${locale}`);
   };
+  const backToAuto = () => {
+    setCleared(false);
+    const v: L10n = { ...(value ?? {}) };
+    delete v[locale];
+    update(path, nullable && locales.every((l) => !(v[l] ?? '').trim()) ? null : v, `${path}.${locale}`);
+  };
   const dir = dirOf(locale);
+  const onBlur = () => setCleared(false);
   const control = multiline ? (
     <Textarea
-      value={text}
+      value={shown}
       rows={rows ?? 4}
+      onBlur={onBlur}
       onChange={(ev) => change(ev.target.value)}
       dir={dir}
       lang={locale}
@@ -236,7 +258,8 @@ export function L10nField({
     />
   ) : (
     <Input
-      value={text}
+      value={shown}
+      onBlur={onBlur}
       onChange={(ev) => change(ev.target.value)}
       dir={dir}
       lang={locale}
@@ -244,6 +267,26 @@ export function L10nField({
       maxLength={maxLength ?? (cap ? cap * 2 : 300)}
     />
   );
+  const autoHelp = auto ? (
+    isAuto ? (
+      <span className="inline-flex items-start gap-1.5" data-auto-text="">
+        <Sparkles aria-hidden size={12} strokeWidth={1.75} className="mt-[3px] shrink-0 text-brand-deep" />
+        <span>{help ?? e.autoText.filled}</span>
+      </span>
+    ) : (
+      <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-0.5">
+        <span>{e.autoText.own}</span>
+        <button
+          type="button"
+          onClick={backToAuto}
+          className="inline-flex items-center gap-1 font-semibold text-ink underline-offset-2 hover:underline"
+        >
+          <RotateCcw aria-hidden size={12} strokeWidth={1.75} />
+          {e.autoText.reset}
+        </button>
+      </span>
+    )
+  ) : null;
 
   return (
     <FieldFrame path={path} label={label} className={className}>
@@ -251,7 +294,7 @@ export function L10nField({
         label={label}
         required={required}
         help={
-          !text.trim() && other ? (
+          !text.trim() && other && !auto ? (
             <button
               type="button"
               onClick={() => change(value?.[other] ?? '')}
@@ -281,11 +324,11 @@ export function L10nField({
               </button>
             </span>
           ) : (
-            help
+            (autoHelp ?? help)
           )
         }
         error={error}
-        counter={cap ? { value: count(text), max: cap } : undefined}
+        counter={cap ? { value: count(shown), max: cap } : undefined}
         labelAside={
           locales.length > 1 ? (
             <L10nTabs<Locale>
@@ -298,7 +341,11 @@ export function L10nField({
                 label: e.languageShort[l],
                 ariaLabel: e.languageFull[l],
                 lang: l,
-                missing: !inHiddenSection && !(value?.[l] ?? '').trim() && (!nullable || !!value),
+                missing:
+                  !inHiddenSection &&
+                  !(value?.[l] ?? '').trim() &&
+                  !auto?.(l).trim() &&
+                  (!nullable || !!value),
               }))}
             />
           ) : undefined
