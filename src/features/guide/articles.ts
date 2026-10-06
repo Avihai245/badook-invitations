@@ -833,8 +833,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "סידור שולחנות" בסרגל. אין תמונה של האולם? בוחרים אולם מוכן (קלאסי, רחב, גן אירועים או אבירים) עם במה, רחבה ושולחנות לפי מספר האורחים. יש? מבקשים מהאולם תמונה או PDF של המפה, מעלים ב"תוכנית האולם" ומכיילים קנה מידה.',
-        en: 'Open “Seating plan” in the sidebar. No picture of the hall? Pick a ready-made one (classic, wide, garden or banquet) with a stage, a dance floor and tables for your guests. Have one? Ask the venue for a picture or PDF of its floor plan, upload it in “Floor plan” and calibrate the scale.',
+        he: 'פותחים "סידור שולחנות" בסרגל. אין תמונה של האולם? בוחרים אולם מוכן (קלאסי, רחב, גן אירועים או אבירים) עם במה, רחבה ושולחנות לפי מספר האורחים. יש? מבקשים מהאולם תמונה או PDF של המפה, מעלים ב"תמונת האולם" ומכיילים קנה מידה.',
+        en: 'Open “Seating plan” in the sidebar. No picture of the hall? Pick a ready-made one (classic, wide, garden or banquet) with a stage, a dance floor and tables for your guests. Have one? Ask the venue for a picture or PDF of its floor plan, upload it in “Hall picture” and calibrate the scale.',
       },
       {
         he: 'לוחצים "שולחן" ובוחרים עגול, מרובע (ריבוע, כיסאות בכל צד), מלבני או אבירים. בחלון השולחן משנים מקומות, גודל וסיבוב. "סימון" מוסיף במה, רחבת ריקודים, בר, כניסה ויציאה.',

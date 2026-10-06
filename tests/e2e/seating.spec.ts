@@ -164,7 +164,7 @@ async function openPlan(page: Page) {
   const button = page.getByTestId('plan-button');
   await button.focus();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('dialog', { name: 'תוכנית האולם' })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'תמונת האולם' })).toBeVisible();
 }
 const saved = (page: Page) =>
   expect(page.getByRole('status').filter({ hasText: 'כל השינויים נשמרו' })).toBeVisible({ timeout: 15_000 });
@@ -233,15 +233,15 @@ test.describe('seating', () => {
 
     // the floor plan: an image, then its width in meters
     await openPlan(page);
-    let dialog = page.getByRole('dialog', { name: 'תוכנית האולם' });
+    let dialog = page.getByRole('dialog', { name: 'תמונת האולם' });
     await dialog
       .getByTestId('plan-file')
       .setInputFiles({ name: 'hall.png', mimeType: 'image/png', buffer: planPng() });
-    await expect(toast(page, 'תוכנית האולם עודכנה')).toBeVisible({ timeout: 20_000 });
+    await expect(toast(page, 'תמונת האולם עודכנה')).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId('seating-plan-image')).toHaveCount(1);
     await expect(page.getByText('קנה המידה של התוכנית עוד לא כויל')).toBeVisible();
     await openPlan(page);
-    dialog = page.getByRole('dialog', { name: 'תוכנית האולם' });
+    dialog = page.getByRole('dialog', { name: 'תמונת האולם' });
     await expect(dialog.getByTestId('plan-scale')).toContainText('לא כויל');
     await dialog.getByTestId('plan-width').fill('40');
     await dialog.getByRole('button', { name: 'עדכון' }).click();
@@ -251,7 +251,7 @@ test.describe('seating', () => {
     // …or a line of known length drawn on the plan
     if (!mobile) {
       await page.getByTestId('plan-button').click();
-      await page.getByRole('dialog', { name: 'תוכנית האולם' }).getByTestId('draw-line').click();
+      await page.getByRole('dialog', { name: 'תמונת האולם' }).getByTestId('draw-line').click();
       await expect(page.getByText('ציירו קו על התוכנית')).toBeVisible();
       // the dialog's closing animation keeps the page from taking pointer events for a moment
       await expect(page.getByTestId('plan-dialog')).toHaveCount(0);
@@ -493,7 +493,10 @@ test.describe('seating', () => {
     await expect(halls).toBeVisible();
     await expect(halls).toContainText('60');
     await shot(page, 'templates-he', testInfo.project.name);
-    await page.getByTestId('seating-learn').click();
+    // the first visit: the video as a card above the map; watched, it doesn't come back
+    const card = page.getByTestId('seating-learn-card');
+    await expect(card).toContainText('פעם ראשונה בסידור שולחנות?');
+    await card.getByTestId('seating-learn-play').click();
     const learn = page.getByRole('dialog', { name: 'סידור שולחנות כמו מקצוענים' });
     await expect(learn.getByTestId('seating-tutorial-video')).toBeVisible();
     await expect(learn.locator('source').last()).toHaveAttribute(
@@ -502,6 +505,14 @@ test.describe('seating', () => {
     );
     await learn.getByRole('button', { name: 'סגירה' }).first().click();
     await expect(learn).toHaveCount(0);
+    await expect(card).toHaveCount(0);
+    // the header's "video guide" still opens it, any time
+    await page.getByTestId('seating-learn').click();
+    await expect(learn).toBeVisible();
+    await learn.getByRole('button', { name: 'סגירה' }).first().click();
+    await open(page, `/app/invitations/${id}/seating`);
+    await expect(page.getByTestId('hall-templates')).toBeVisible();
+    await expect(card).toHaveCount(0);
 
     // the classic hall: a stage, a dance floor and 6 round tables of 10 for 60
     await halls.locator('[data-template="classic"]').click();
@@ -739,7 +750,7 @@ test.describe('the partner’s venue', () => {
     await expect(page.getByText('קנה המידה של התוכנית עוד לא כויל')).toHaveCount(0);
     await saved(page);
     await page.getByTestId('plan-button').click();
-    const dialog = page.getByRole('dialog', { name: 'תוכנית האולם' });
+    const dialog = page.getByRole('dialog', { name: 'תמונת האולם' });
     await expect(dialog).toContainText('התוכנית של אולמי הגן');
     await expect(dialog).toContainText('בשימוש עכשיו');
     await expect(dialog.getByTestId('plan-scale')).toContainText('כויל: התוכנית ברוחב 36.5 מטר');

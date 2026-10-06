@@ -60,7 +60,7 @@ import { LandmarkInspector, TableInspector } from './Inspector';
 import { PlanFileError, preparePlanFile, renderStoredPdf, uploadTo } from './plan-file';
 import { LineLengthDialog, PlanDialog, type PlanBusy } from './PlanDialog';
 import { SeatingCanvas, type CanvasControls } from './SeatingCanvas';
-import { SeatingTutorial } from './SeatingTutorial';
+import { LearnCard, SeatingTutorial } from './SeatingTutorial';
 import { TemplatePicker } from './TemplatePicker';
 import { useSeatingSave, type SaveStatus } from './useSeatingSave';
 
@@ -660,8 +660,8 @@ export function SeatingScreen({
               </Button>
             </Hint>
             <Button
-              variant="ghost"
-              icon={<PlayCircle />}
+              variant="secondary"
+              icon={<PlayCircle className="text-brand-deep" />}
               onClick={() => setLearnOpen(true)}
               data-testid="seating-learn"
             >
@@ -671,6 +671,7 @@ export function SeatingScreen({
         }
       />
       <SeatingTutorial open={learnOpen} onOpenChange={setLearnOpen} />
+      <LearnCard onPlay={() => setLearnOpen(true)} />
 
       {/* where things stand */}
       <div

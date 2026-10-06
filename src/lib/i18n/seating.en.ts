@@ -29,8 +29,15 @@ export const seatingEn: SeatingDict = {
     },
   },
   learn: {
-    button: 'Learn it like the pros (30s)',
+    button: 'Video guide (30s)',
     title: 'Seating like the pros',
+    card: {
+      title: 'First time arranging the seats?',
+      body: 'A half-minute video shows the whole way: a picture of the hall or a ready-made one, tables, families, auto-seating, and the event day live.',
+      play: 'Watch the video',
+      dismiss: 'Not now',
+      length: '30s',
+    },
     body: 'Half a minute: from a ready-made hall or a picture of yours, through tables and families, to the event day live.',
     tips: {
       start: 'Start from a ready-made hall — or ask the venue for a picture of the layout and upload it.',
@@ -102,7 +109,9 @@ export const seatingEn: SeatingDict = {
     zoomOut: 'Zoom out',
     fit: 'Show everything',
     snap: 'Snap to grid',
-    plan: 'Floor plan',
+    plan: 'Hall picture',
+    planHint:
+      'Upload a picture or PDF of the hall’s floor plan (ask the venue for it), or pick a ready-made hall. The tables go on top of it.',
     help: 'About the tools',
   },
   landmarks: {
@@ -147,8 +156,8 @@ export const seatingEn: SeatingDict = {
         text: 'When on, tables snap to the grid (every half meter), so rows line up easily.',
       },
       plan: {
-        label: 'Floor plan',
-        text: 'Upload an image or a PDF of the plan and calibrate it: draw a line along something whose length you know and enter it in meters.',
+        label: 'Hall picture',
+        text: 'Upload a picture or PDF of the hall’s floor plan (ask the venue for it) or pick a ready-made hall, and calibrate it: draw a line along something whose length you know and enter it in meters.',
       },
       assign: {
         label: 'Seating guests',
@@ -308,8 +317,9 @@ export const seatingEn: SeatingDict = {
     remove: 'Remove',
   },
   plan: {
-    title: 'Floor plan',
-    subtitle: 'An image or a PDF of the venue’s floor plan, under the tables.',
+    title: 'Hall picture',
+    subtitle:
+      'A picture or PDF of the hall’s floor plan (ask the venue for it), under the tables — or a ready-made hall.',
     upload: 'Upload an image or a PDF',
     replace: 'Replace the plan',
     types: 'PNG, JPG, WebP or PDF (its first page), up to 15 MB',
@@ -489,6 +499,6 @@ export const seatingEn: SeatingDict = {
     removed: { one: 'Table {number} deleted', other: '{n} items deleted' },
     undo: 'Undo',
     declinedFreed: { one: '1 seat freed', other: '{n} seats freed' },
-    uploaded: 'The floor plan was updated',
+    uploaded: 'The hall picture was updated',
   },
 };

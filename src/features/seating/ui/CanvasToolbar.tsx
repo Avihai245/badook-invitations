@@ -4,8 +4,8 @@ import {
   Circle,
   Grid3x3,
   Hand,
+  ImageUp,
   Lock,
-  Map as MapIcon,
   Maximize,
   Minimize,
   Minus,
@@ -22,7 +22,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
-import { AreaHelp, IconButton, Menu } from '@/components/app';
+import { AreaHelp, Hint, IconButton, Menu } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { LANDMARK_KINDS, TABLE_SHAPES, type LandmarkKind, type TableShape } from '../model';
 
@@ -112,6 +112,13 @@ export function CanvasToolbar({
           onSelect: () => onAddLandmark(kind),
         }))}
       />
+      {/* the hall's own picture (or a ready-made hall): named, not an icon to guess */}
+      <Hint text={tb.planHint}>
+        <button type="button" className={soft} onClick={onPlan} data-testid="plan-button">
+          <ImageUp aria-hidden className="text-brand-deep" />
+          {tb.plan}
+        </button>
+      </Hint>
       <span aria-hidden className="mx-0.5 h-6 w-px bg-line" />
       <IconButton label={tb.undo} tooltip disabled={!canUndo} onClick={onUndo}>
         <Undo2 className="icon-dir" />
@@ -131,9 +138,6 @@ export function CanvasToolbar({
       </IconButton>
       <IconButton label={tb.snap} tooltip aria-pressed={snap} onClick={() => onSnap(!snap)}>
         <Grid3x3 />
-      </IconButton>
-      <IconButton label={tb.plan} tooltip onClick={onPlan} data-testid="plan-button">
-        <MapIcon />
       </IconButton>
       <div className="ms-auto flex items-center gap-0.5">
         {/* phones have it beside "map | guests" (and the bar on top in full screen) */}
@@ -170,7 +174,7 @@ export function SeatingHelp({ className }: { className?: string }) {
         { icon: <Minus />, ...h.zoom },
         { icon: <Maximize />, ...h.full },
         { icon: <Grid3x3 />, ...h.snap },
-        { icon: <MapIcon />, ...h.plan },
+        { icon: <ImageUp />, ...h.plan },
         { icon: <MousePointerClick />, ...h.assign },
         { icon: <Lock />, ...h.lock },
         { icon: <Sparkles />, ...h.auto },
