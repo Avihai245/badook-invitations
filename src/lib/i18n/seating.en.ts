@@ -29,16 +29,16 @@ export const seatingEn: SeatingDict = {
     },
   },
   learn: {
-    button: 'Video guide (30s)',
+    button: 'Video guide (45s)',
     title: 'Seating like the pros',
     card: {
       title: 'First time arranging the seats?',
-      body: 'A half-minute video shows the whole way: a picture of the hall or a ready-made one, tables, families, auto-seating, and the event day live.',
+      body: 'A short narrated video shows the whole way: a picture of the hall or a ready-made one, tables, families, auto-seating, and the event day live.',
       play: 'Watch the video',
       dismiss: 'Not now',
-      length: '30s',
+      length: '45s',
     },
-    body: 'Half a minute: from a ready-made hall or a picture of yours, through tables and families, to the event day live.',
+    body: 'Under a minute, narrated: from a ready-made hall or a picture of yours, through tables and families, to the event day live.',
     tips: {
       start: 'Start from a ready-made hall — or ask the venue for a picture of the layout and upload it.',
       families: 'Drag families to tables, or let auto-seating seat everyone, then adjust.',

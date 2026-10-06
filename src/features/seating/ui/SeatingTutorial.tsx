@@ -8,7 +8,7 @@ import files from '@/features/site/site-video.generated.json';
 import { openHelp } from '@/features/support/open';
 import { useUi } from '@/lib/i18n/client';
 
-/** The seating tutorial's files (video/src/seating, `npm run video:seating`): muted, captions in the picture. */
+/** The seating tutorial's files (video/src/seating, `npm run video:seating`): narrated, its sentences as subtitles in the picture. */
 export const SEATING_VIDEO = {
   landscape: files.seating.landscape,
   portrait: files.seating.portrait,
@@ -16,7 +16,7 @@ export const SEATING_VIDEO = {
 } as const;
 
 /**
- * "Seat like the pros": the 30-second film of the whole flow — the hall (a picture from the venue, or
+ * "Seat like the pros": the narrated film (45 s) of the whole flow — the hall (a picture from the venue, or
  * a ready-made one), tables, families, auto-seating with rules in words, printing and sending, and the
  * live map on the day — with three tips under it and the full guide a click away.
  */
@@ -60,7 +60,6 @@ export function SeatingTutorial({
           className="mt-1 max-h-[62dvh] w-full rounded-[14px] bg-subtle"
           poster={SEATING_VIDEO.poster}
           autoPlay
-          muted
           controls
           playsInline
           preload="metadata"

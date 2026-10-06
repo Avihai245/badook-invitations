@@ -871,8 +871,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'On the day, the hall map updates live on the “Event day” screen: who arrived, by table and for the whole hall.',
       },
       {
-        he: 'רוצים לראות איך עושים את זה? "ללמוד כמו מקצוענים" בראש המסך מציג סרטון של חצי דקה.',
-        en: 'Want to see how it’s done? “Learn it like the pros” at the top of the screen plays a 30-second video.',
+        he: 'רוצים לראות איך עושים את זה? "סרטון הדרכה" בראש המסך מציג סרטון קצר עם קריינות (45 שניות).',
+        en: 'Want to see how it’s done? “Video guide” at the top of the screen plays a short narrated video (45 seconds).',
       },
       {
         he: 'משפחה שהודיעה שלא תגיע אחרי שהושבה? מופיעה התראה, ו"לפנות את המקומות שלהן" מפנה אותם.',

@@ -11,8 +11,8 @@
  *   demo.landscape / demo.portrait   the muted 45-second loop: H.264 High, ≤720p, 24 fps, no audio,
  *                                    CRF 34 — under 800 KB each
  *   tour.landscape / tour.portrait   the narrated tour: H.264 ≤720p, 30 fps, CRF 30, AAC 96 kb/s mono
- *   seating.landscape / .portrait    the seating screen's muted 30-second tutorial: as the demo
- *                                    (≤720p, 24 fps, no audio), CRF 32
+ *   seating.landscape / .portrait    the seating screen's narrated tutorial: H.264 ≤720p, 30 fps,
+ *                                    CRF 32, AAC 96 kb/s mono
  *   demo.poster / tour.poster /
  *   seating.poster                   a still (an image) → 1280 px JPEG; the pages serve it through
  *                                    the image optimizer (AVIF / WebP, the width the screen needs)
@@ -86,12 +86,36 @@ const ENTRIES = {
   'seating.landscape': {
     name: 'badook-seating',
     ext: 'mp4',
-    args: ['-an', '-vf', 'scale=-2:min(720\\,ih):flags=lanczos,fps=24', ...H264, '-crf', '32'],
+    args: [
+      '-vf',
+      'scale=-2:min(720\\,ih):flags=lanczos',
+      ...H264,
+      '-crf',
+      '32',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '96k',
+      '-ac',
+      '1',
+    ],
   },
   'seating.portrait': {
     name: 'badook-seating-portrait',
     ext: 'mp4',
-    args: ['-an', '-vf', 'scale=min(720\\,iw):-2:flags=lanczos,fps=24', ...H264, '-crf', '32'],
+    args: [
+      '-vf',
+      'scale=min(720\\,iw):-2:flags=lanczos',
+      ...H264,
+      '-crf',
+      '32',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '96k',
+      '-ac',
+      '1',
+    ],
   },
   'seating.poster': {
     name: 'seating-poster',

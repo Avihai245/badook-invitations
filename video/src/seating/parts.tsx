@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { C, SHADOW } from '../theme';
 
 export const FAMILY_COLORS = ['#a0703f', '#2a78d6', '#15803d', '#b45309', '#9b3a3f', '#1f5a66', '#5a3a7a'];
@@ -351,3 +351,116 @@ export const PrintIcon = ({ size = 28, color = 'currentColor' }: { size?: number
     <path d="M7 14h10v7H7z" strokeLinejoin="round" />
   </svg>
 );
+
+/* ---------- the app's own buttons, as the seating screen draws them ---------- */
+
+/** A lucide icon's paths (the app's icon set), drawn at any size. */
+function Lucide({
+  size = 24,
+  color = 'currentColor',
+  paths,
+  circles = [],
+  fill = 'none',
+}: {
+  size?: number;
+  color?: string;
+  paths: string[];
+  circles?: [number, number, number][];
+  fill?: string;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={fill}
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {paths.map((d, i) => (
+        <path key={i} d={d} />
+      ))}
+      {circles.map(([cx, cy, r], i) => (
+        <circle key={`c${i}`} cx={cx} cy={cy} r={r} />
+      ))}
+    </svg>
+  );
+}
+
+export const ImageUpIcon = (p: { size?: number; color?: string }) => (
+  <Lucide
+    {...p}
+    paths={[
+      'M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21',
+      'm14 19.5 3-3 3 3',
+      'M17 22v-5.5',
+    ]}
+    circles={[[9, 9, 2]]}
+  />
+);
+export const FlagIcon = (p: { size?: number; color?: string }) => (
+  <Lucide {...p} paths={['M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z', 'M4 22v-7']} />
+);
+export const PlusIcon = (p: { size?: number; color?: string }) => (
+  <Lucide {...p} paths={['M5 12h14', 'M12 5v14']} />
+);
+export const SendIcon = (p: { size?: number; color?: string }) => (
+  <Lucide
+    {...p}
+    paths={[
+      'M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z',
+      'm21.854 2.147-10.94 10.939',
+    ]}
+  />
+);
+
+/**
+ * One of the screen's buttons: "dark" (the main action), "soft" (white, outlined). `pressed` 0→1
+ * squeezes it for a click; `glow` rings it while the voice names it.
+ */
+export function AppButton({
+  children,
+  icon,
+  variant = 'soft',
+  pressed = 0,
+  glow = 0,
+  style,
+}: {
+  children: ReactNode;
+  icon?: ReactNode;
+  variant?: 'dark' | 'soft';
+  pressed?: number;
+  glow?: number;
+  style?: CSSProperties;
+}) {
+  const dark = variant === 'dark';
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        height: 64,
+        padding: '0 22px',
+        borderRadius: 14,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        fontSize: 24,
+        fontWeight: 700,
+        whiteSpace: 'nowrap',
+        boxSizing: 'border-box',
+        background: dark ? C.ink : C.surface,
+        color: dark ? '#fff' : C.ink,
+        border: dark ? 'none' : `2px solid ${C.line}`,
+        boxShadow: `${SHADOW.sm}${glow > 0.01 ? `, 0 0 0 ${3 + glow * 5}px rgba(160,112,63,${0.25 + glow * 0.45})` : ''}`,
+        transform: `scale(${1 - 0.07 * Math.sin(Math.min(1, pressed) * Math.PI)})`,
+        ...style,
+      }}
+    >
+      {icon}
+      {children}
+    </div>
+  );
+}

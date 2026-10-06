@@ -14,7 +14,20 @@ import {
   useSpringAt,
   WhatsAppIcon,
 } from '../ui';
-import { FAMILY_COLORS, Floor, HallSketch, PrintIcon, Table, UploadIcon } from './parts';
+import {
+  AppButton,
+  FAMILY_COLORS,
+  FlagIcon,
+  Floor,
+  HallSketch,
+  ImageUpIcon,
+  PlusIcon,
+  PrintIcon,
+  SendIcon,
+  Table,
+  UploadIcon,
+} from './parts';
+import { beat } from './timing';
 
 const inOut = Easing.inOut(Easing.cubic);
 
@@ -37,44 +50,106 @@ const TEMPLATES = [
 const CARD_W = 215;
 const cardLeft = (i: number) => 40 + (3 - i) * (CARD_W + 20);
 
-/** Ask the venue for a picture of the hall and upload it — or pick a ready-made hall. */
+/** The map's toolbar, as the screen has it: "+ שולחן", "סימון", "תמונת האולם" (right to left). */
+const TB = {
+  table: { left: 806, width: 170 },
+  mark: { left: 642, width: 150 },
+  picture: { left: 398, width: 230 },
+} as const;
+const center = (b: { left: number; width: number }) => b.left + b.width / 2;
+
+function MapToolbar({
+  top,
+  opacity = 1,
+  press,
+}: {
+  top: number;
+  opacity?: number;
+  press?: { table?: number; picture?: number; pictureGlow?: number };
+}) {
+  return (
+    <>
+      <Card style={{ left: 0, right: 0, top, height: 92, opacity }} radius={22} />
+      <div style={{ opacity }}>
+        <AppButton
+          variant="dark"
+          icon={<PlusIcon size={26} color="#fff" />}
+          pressed={press?.table}
+          style={{ top: top + 14, left: TB.table.left, width: TB.table.width }}
+        >
+          שולחן
+        </AppButton>
+        <AppButton
+          icon={<FlagIcon size={24} />}
+          style={{ top: top + 14, left: TB.mark.left, width: TB.mark.width }}
+        >
+          סימון
+        </AppButton>
+        <AppButton
+          icon={<ImageUpIcon size={26} color={C.brandDeep} />}
+          pressed={press?.picture}
+          glow={press?.pictureGlow}
+          style={{ top: top + 14, left: TB.picture.left, width: TB.picture.width }}
+        >
+          תמונת האולם
+        </AppButton>
+      </div>
+    </>
+  );
+}
+
+/**
+ * "מבקשים מהאולם תמונה של המפה ומעלים אותה, או בוחרים באפשרות 'תמונת האולם' ותראו מספר טמפלטים
+ * מוכנים": the venue's picture asked for and uploaded — or the toolbar's "Hall picture", and the
+ * ready-made halls it offers.
+ */
 export function HallScene() {
   const frame = useCurrentFrame();
   const sp = useSpringAt();
-  const ask = sp(6);
-  const reply = sp(24, { damping: 14 });
-  const uploaded = sp(50, { damping: 14 });
-  const or = sp(62);
-  const picker = sp(66);
-  const chosen = sp(100, { damping: 12 });
+  const b1 = beat('hall', 2.88); // "מבקשים מהאולם…"
+  const b2 = beat('hall', 6.12); // "או בוחרים באפשרות…"
+  const ask = sp(b1);
+  const reply = sp(b1 + 22, { damping: 14 });
+  const uploaded = sp(b1 + 58, { damping: 14 });
+  const or = sp(b2 - 8);
+  const bar = sp(b2 - 4);
+  const click = b2 + 18;
+  const picker = sp(click + 8, { damping: 15 });
+  const pick = b2 + 96;
+  const chosen = sp(pick + 4, { damping: 12 });
   const cursorX = keyframes(
     frame,
     [
       [0, 760],
-      [70, 760],
-      [92, cardLeft(0) + CARD_W / 2],
+      [b2, 760],
+      [click - 2, center(TB.picture)],
+      [click + 30, center(TB.picture)],
+      [pick - 2, cardLeft(0) + CARD_W / 2],
     ],
     inOut,
   );
   const cursorY = keyframes(
     frame,
     [
-      [0, 980],
-      [70, 980],
-      [92, 700],
+      [0, 960],
+      [b2, 960],
+      [click - 2, 516],
+      [click + 30, 516],
+      [pick - 2, 790],
     ],
     inOut,
   );
+  const glow = interpolate(frame, [b2, b2 + 8, click, click + 10], [0, 1, 1, 0], clamp);
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <Card style={{ left: 0, right: 0, top: 0, height: 430, opacity: sp(0) }} radius={28}>
+      <Card style={{ left: 0, right: 0, top: 0, height: 390, opacity: sp(0) }} radius={28}>
         <div style={{ position: 'absolute', top: 26, right: 32, ...heading }}>
           מבקשים מהאולם תמונה של המפה
         </div>
         <div
           style={{
             position: 'absolute',
-            top: 92,
+            top: 88,
             right: 32,
             maxWidth: 440,
             padding: '16px 22px',
@@ -92,7 +167,7 @@ export function HallScene() {
         <div
           style={{
             position: 'absolute',
-            top: 90,
+            top: 80,
             left: 36,
             padding: 12,
             borderRadius: '22px 22px 22px 6px',
@@ -103,10 +178,10 @@ export function HallScene() {
           }}
         >
           <div style={{ filter: 'sepia(0.25) contrast(0.95)', borderRadius: 10, overflow: 'hidden' }}>
-            <HallSketch variant="classic" width={400} />
+            <HallSketch variant="classic" width={360} />
           </div>
         </div>
-        <div style={{ position: 'absolute', top: 250, right: 32, opacity: uploaded }}>
+        <div style={{ position: 'absolute', top: 236, right: 32, opacity: uploaded }}>
           <Pill
             bg={C.brand}
             color="#fff"
@@ -119,7 +194,7 @@ export function HallScene() {
         <div
           style={{
             position: 'absolute',
-            top: 330,
+            top: 314,
             right: 32,
             fontSize: 21,
             color: C.muted,
@@ -134,7 +209,7 @@ export function HallScene() {
       <div
         style={{
           position: 'absolute',
-          top: 446,
+          top: 400,
           left: '50%',
           marginLeft: -36,
           width: 72,
@@ -154,21 +229,28 @@ export function HallScene() {
         או
       </div>
 
+      <MapToolbar top={470} opacity={bar} press={{ picture: pressAt(frame, click), pictureGlow: glow }} />
+
       <Card
         style={{
           left: 0,
           right: 0,
-          top: 520,
-          height: 360,
+          top: 590,
+          height: 410,
           opacity: picker,
           transform: `translateY(${(1 - picker) * 40}px)`,
         }}
         radius={28}
       >
-        <div style={{ position: 'absolute', top: 24, right: 32, ...heading }}>בוחרים אולם מוכן</div>
+        <div style={{ position: 'absolute', top: 24, right: 32, ...heading }}>מתחילים מאולם מוכן</div>
+        <div
+          style={{ position: 'absolute', top: 66, right: 32, fontSize: 21, fontWeight: 600, color: C.muted }}
+        >
+          במה, רחבה ושולחנות לפי מספר האורחים
+        </div>
       </Card>
       {TEMPLATES.map((tpl, i) => {
-        const inn = sp(70 + i * 4);
+        const inn = sp(click + 12 + i * 4);
         const sel = i === 0 ? chosen : 0;
         return (
           <div
@@ -176,7 +258,7 @@ export function HallScene() {
             style={{
               position: 'absolute',
               left: cardLeft(i),
-              top: 600,
+              top: 712,
               width: CARD_W,
               padding: 10,
               boxSizing: 'border-box',
@@ -214,7 +296,7 @@ export function HallScene() {
       <div
         style={{
           position: 'absolute',
-          top: 900,
+          top: 940,
           left: 0,
           right: 0,
           textAlign: 'center',
@@ -226,7 +308,7 @@ export function HallScene() {
       >
         השולחנות כבר במקום, לפי מספר האורחים
       </div>
-      <Cursor x={cursorX} y={cursorY} pressed={pressAt(frame, 92)} />
+      <Cursor x={cursorX} y={cursorY} pressed={pressAt(frame, click, pick)} />
     </div>
   );
 }
@@ -234,115 +316,101 @@ export function HallScene() {
 /* ------------------------------------------------------------------ 2. tables */
 
 const SHAPES = [
-  { name: 'עגול', seats: 10, x: 830, w: 130, h: 130, shape: 'round' as const },
-  { name: 'מרובע', seats: 8, x: 550, w: 130, h: 130, shape: 'square' as const },
-  { name: 'אבירים', seats: 16, x: 220, w: 300, h: 70, shape: 'knights' as const },
+  { name: 'עגול', seats: 10, x: 830, w: 130, h: 130, shape: 'round' as const, menu: 0 },
+  { name: 'מרובע', seats: 8, x: 550, w: 130, h: 130, shape: 'square' as const, menu: 1 },
+  { name: 'אבירים', seats: 16, x: 220, w: 300, h: 70, shape: 'knights' as const, menu: 3 },
 ];
-const BTN_W = 190;
-const btnCenter = (i: number) => 1000 - 30 - BTN_W / 2 - i * (BTN_W + 16);
-const TABLE_Y = 720;
+/** "+ שולחן"'s menu, as the screen has it: each shape with what it seats. */
+const MENU = [
+  { name: 'עגול', hint: '10 מקומות (אפשר לשנות)' },
+  { name: 'מרובע', hint: '8 מקומות — שניים בכל צד' },
+  { name: 'מלבני', hint: '8 מקומות לאורך הצדדים' },
+  { name: 'אבירים', hint: 'שולחן ארוך, 20 מקומות' },
+];
+const MENU_BOX = { left: 556, top: 104, width: 420, item: 72 };
+const menuItemY = (i: number) => MENU_BOX.top + 12 + MENU_BOX.item / 2 + i * MENU_BOX.item;
+const MENU_X = MENU_BOX.left + MENU_BOX.width / 2;
+const TABLE_Y = 760;
+const GUEST_COLORS = [
+  FAMILY_COLORS[1],
+  FAMILY_COLORS[1],
+  FAMILY_COLORS[1],
+  FAMILY_COLORS[2],
+  FAMILY_COLORS[2],
+  FAMILY_COLORS[4],
+  FAMILY_COLORS[4],
+  FAMILY_COLORS[4],
+  FAMILY_COLORS[5],
+  FAMILY_COLORS[5],
+  FAMILY_COLORS[6],
+  FAMILY_COLORS[6],
+  FAMILY_COLORS[0],
+  FAMILY_COLORS[0],
+  FAMILY_COLORS[3],
+  FAMILY_COLORS[3],
+];
 
-function ShapeIcon({ shape, active }: { shape: 'round' | 'square' | 'knights'; active: boolean }) {
-  const color = active ? '#fff' : C.brandDeep;
-  const box = { round: [30, 30, 999], square: [28, 28, 5], knights: [44, 16, 4] }[shape];
+function ShapeGlyph({ shape }: { shape: 'round' | 'square' | 'rect' | 'knights' }) {
+  const box = { round: [24, 24, 999], square: [22, 22, 4], rect: [32, 18, 4], knights: [36, 12, 3] }[shape];
   return (
-    <div style={{ width: box[0], height: box[1], borderRadius: box[2], border: `3.5px solid ${color}` }} />
+    <div
+      style={{
+        width: box[0],
+        height: box[1],
+        borderRadius: box[2],
+        border: `3px solid ${C.brandDeep}`,
+        flexShrink: 0,
+      }}
+    />
   );
 }
 
-/** Round, square or knights — each table comes with its chairs. */
+/**
+ * "מוסיפים שולחנות: עגולים, מרובעים או אבירים, כל אורח עם הכיסא שלו": "+ שולחן" and its menu, a
+ * table of each shape placed, then every chair taken by a guest.
+ */
 export function TablesScene() {
   const frame = useCurrentFrame();
   const sp = useSpringAt();
-  const PICK = [14, 52, 90];
-  const DROP = [32, 70, 108];
-  const active = frame < PICK[1] ? 0 : frame < PICK[2] ? 1 : 2;
+  const add = beat('tables', 11.26); // "מוסיפים שולחנות"
+  const shapes = beat('tables', 12.73); // "עגולים, מרובעים או אבירים"
+  const guests = beat('tables', 15.47); // "כל אורח עם הכיסא שלו"
+  // three rounds of "+ שולחן" → a shape; the picks fall on the words
+  const OPEN = [add + 2, shapes + 14, shapes + 40];
+  const PICK = [shapes + 4, shapes + 30, shapes + 58];
+  const SHAPE_FOR = [0, 1, 3];
+  const menuOpen = OPEN.findIndex((o, i) => frame >= o + 2 && frame < PICK[i]! + 2);
+  const menuIn =
+    menuOpen >= 0 ? interpolate(frame, [OPEN[menuOpen]! + 2, OPEN[menuOpen]! + 8], [0, 1], clamp) : 0;
+  const tb = center(TB.table);
+  const pts: [number, number, number][] = [[0, 520, 520]];
+  OPEN.forEach((o, i) => {
+    pts.push(
+      [o - 8, tb, 46],
+      [o, tb, 46],
+      [PICK[i]! - 4, MENU_X, menuItemY(SHAPE_FOR[i]!)],
+      [PICK[i]!, MENU_X, menuItemY(SHAPE_FOR[i]!)],
+    );
+  });
+  pts.push([PICK[2]! + 16, 520, 600]);
   const cursorX = keyframes(
     frame,
-    [
-      [0, 520],
-      [12, btnCenter(0)],
-      [16, btnCenter(0)],
-      [30, SHAPES[0].x],
-      [36, SHAPES[0].x],
-      [50, btnCenter(1)],
-      [54, btnCenter(1)],
-      [68, SHAPES[1].x],
-      [74, SHAPES[1].x],
-      [88, btnCenter(2)],
-      [92, btnCenter(2)],
-      [106, SHAPES[2].x],
-    ],
+    pts.map(([t, x]) => [t, x]),
     inOut,
   );
   const cursorY = keyframes(
     frame,
-    [
-      [0, 500],
-      [12, 55],
-      [16, 55],
-      [30, TABLE_Y],
-      [36, TABLE_Y],
-      [50, 55],
-      [54, 55],
-      [68, TABLE_Y],
-      [74, TABLE_Y],
-      [88, 55],
-      [92, 55],
-      [106, TABLE_Y],
-    ],
+    pts.map(([t, , y]) => [t, y]),
     inOut,
   );
+  const cursorOut = interpolate(frame, [PICK[2]! + 18, PICK[2]! + 28], [1, 0], clamp);
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <Card style={{ left: 0, right: 0, top: 0, height: 110, opacity: sp(0) }} radius={24}>
-        <div
-          style={{
-            position: 'absolute',
-            left: 30,
-            top: 0,
-            bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: 22,
-            fontWeight: 600,
-            color: C.muted,
-          }}
-        >
-          בוחרים צורה ומניחים
-        </div>
-      </Card>
+      <Floor width={1000} height={880} style={{ top: 120, left: 0, opacity: sp(2) }} />
+      <MapToolbar top={0} opacity={sp(0)} press={{ table: pressAt(frame, ...OPEN) }} />
       {SHAPES.map((s, i) => {
-        const on = i === active && frame >= PICK[0];
-        return (
-          <div
-            key={s.name}
-            style={{
-              position: 'absolute',
-              top: 20,
-              left: btnCenter(i) - BTN_W / 2,
-              width: BTN_W,
-              height: 70,
-              borderRadius: 16,
-              background: on ? C.brandDeep : C.brandSoft,
-              color: on ? '#fff' : C.brandDeep,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 14,
-              fontSize: 27,
-              fontWeight: 800,
-              opacity: sp(4 + i * 3),
-            }}
-          >
-            <ShapeIcon shape={s.shape} active={on} />
-            {s.name}
-          </div>
-        );
-      })}
-      <Floor width={1000} height={860} style={{ top: 140, left: 0, opacity: sp(2) }} />
-      {SHAPES.map((s, i) => {
-        const pop = sp(DROP[i] + 2, { damping: 11, stiffness: 160 });
+        const pop = sp(PICK[i]! + 3, { damping: 11, stiffness: 160 });
+        const filled = Math.max(0, Math.min(s.seats, Math.floor((frame - guests - i * 4) * 0.6)));
         return (
           <div key={s.name}>
             <Table
@@ -353,26 +421,76 @@ export function TablesScene() {
               w={s.w}
               h={s.h}
               pop={pop}
-              highlight={interpolate(frame, [DROP[i] + 2, DROP[i] + 20], [1, 0], clamp) * (pop > 0.1 ? 1 : 0)}
+              filled={filled}
+              colors={GUEST_COLORS}
+              highlight={
+                interpolate(frame, [PICK[i]! + 3, PICK[i]! + 20], [1, 0], clamp) * (pop > 0.1 ? 1 : 0)
+              }
             />
             <div
               style={{
                 position: 'absolute',
                 top: TABLE_Y + 130,
-                left: s.x - 120,
-                width: 240,
+                left: s.x - 130,
+                width: 260,
                 textAlign: 'center',
                 opacity: pop,
               }}
             >
               <Pill style={{ fontSize: 22 }}>
-                {s.name} · {s.seats} מקומות
+                {s.name} · {filled > 0 ? `${filled}/${s.seats}` : `${s.seats} מקומות`}
               </Pill>
             </div>
           </div>
         );
       })}
-      <Cursor x={cursorX} y={cursorY} pressed={pressAt(frame, ...PICK, ...DROP)} />
+      {/* "+ שולחן"'s menu */}
+      {menuIn > 0 ? (
+        <Card
+          style={{
+            left: MENU_BOX.left,
+            top: MENU_BOX.top,
+            width: MENU_BOX.width,
+            height: 24 + MENU.length * MENU_BOX.item,
+            opacity: menuIn,
+            transform: `translateY(${(1 - menuIn) * -10}px)`,
+            boxShadow: SHADOW.lg,
+            zIndex: 20,
+          }}
+          radius={18}
+        >
+          {MENU.map((m, i) => {
+            const hot = SHAPE_FOR[menuOpen] === i && frame >= PICK[menuOpen]! - 6;
+            return (
+              <div
+                key={m.name}
+                style={{
+                  position: 'absolute',
+                  top: 12 + i * MENU_BOX.item,
+                  left: 10,
+                  right: 10,
+                  height: MENU_BOX.item - 6,
+                  borderRadius: 12,
+                  background: hot ? C.brandSoft : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  padding: '0 18px',
+                }}
+              >
+                <ShapeGlyph shape={(['round', 'square', 'rect', 'knights'] as const)[i]!} />
+                <div style={{ lineHeight: 1.15 }}>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: C.ink }}>{m.name}</div>
+                  <div style={{ fontSize: 18, fontWeight: 600, color: C.muted }}>{m.hint}</div>
+                </div>
+              </div>
+            );
+          })}
+        </Card>
+      ) : null}
+      <div style={{ opacity: cursorOut }}>
+        <Cursor x={cursorX} y={cursorY} pressed={pressAt(frame, ...OPEN, ...PICK)} />
+      </div>
     </div>
   );
 }
@@ -570,55 +688,143 @@ export function FamiliesScene() {
 
 /* ------------------------------------------------------------------ 4. auto */
 
-const RULE_TEXT = 'סבתא ליד הבמה, החברים מהצבא ביחד, ודוד משה לא באותו שולחן עם דודה רחל';
+const RULE_TEXT = 'סבתא ליד הבמה, החברים מהצבא ביחד, דוד משה לא עם דודה רחל';
 const RULES = [
   { kind: 'ליד הבמה', who: 'סבתא רבקה', bg: C.brandSoft, color: C.brandDeep },
-  { kind: 'ביחד', who: 'החברים מהצבא (6)', bg: C.successBg, color: C.success },
-  { kind: 'לא באותו שולחן', who: 'דוד משה · דודה רחל', bg: C.dangerBg, color: C.danger },
+  { kind: 'ביחד', who: 'יוסי מהצבא ודני מהצבא (חובה)', bg: C.successBg, color: C.success },
+  { kind: 'לא באותו שולחן', who: 'דוד משה ודודה רחל (חובה)', bg: C.dangerBg, color: C.danger },
 ];
 const MINI = [
-  { x: 150, y: 150 },
-  { x: 850, y: 150 },
-  { x: 150, y: 320 },
-  { x: 850, y: 320 },
-  { x: 390, y: 325 },
-  { x: 610, y: 325 },
+  { x: 150, y: 130 },
+  { x: 850, y: 130 },
+  { x: 150, y: 285 },
+  { x: 850, y: 285 },
+  { x: 390, y: 290 },
+  { x: 610, y: 290 },
 ];
+const FLOOR_TOP = 630;
+const AUTO_BTN = { left: 676, width: 300 };
+const READ_BTN = { left: 668, width: 300, top: 236 };
+const ADD_BTN = { left: 808, width: 160, top: 498 };
+const RUN_BTN = { left: 32, width: 180, top: 556 };
 
-/** Rules in words → rules to confirm → everyone seated. */
+/**
+ * "אופציה נוספת זה לתת למערכת שלנו לעזור: כותבים במילים מי יושב עם מי, מאשרים את הסידור, והמערכת
+ * מושיבה את כולם": "סידור אוטומטי", its "ספרו במילים מי עם מי", the rules it understood (approved with
+ * "להוסיף"), then "סידור" — and the tables fill.
+ */
 export function AutoScene() {
   const frame = useCurrentFrame();
   const sp = useSpringAt();
+  const help = beat('auto', 21.81); // "אופציה נוספת…"
+  const write = beat('auto', 25.06); // "כותבים במילים…"
+  const approve = beat('auto', 27.45); // "מאשרים את הסידור, והמערכת מושיבה את כולם"
+  const openAt = help + 46;
+  const dialog = sp(openAt + 4, { damping: 16 });
   const chars = Array.from(RULE_TEXT);
-  const typed = Math.max(0, Math.min(chars.length, Math.floor((frame - 8) * 1.4)));
-  const caret = Math.floor(frame / 8) % 2 === 0 && typed < chars.length;
-  const go = 94;
+  const typeFrom = write - 4;
+  const typed = Math.max(0, Math.min(chars.length, Math.floor((frame - typeFrom) * (chars.length / 54))));
+  const caret = Math.floor(frame / 8) % 2 === 0 && typed < chars.length && frame >= typeFrom;
+  const readAt = write + 56;
+  const addAt = approve + 8;
+  const runAt = approve + 34;
+  const understood = sp(readAt + 8, { damping: 15 });
+  const added = sp(addAt + 4);
+  const done = sp(runAt + 34, { damping: 13 });
+  const headerOut = interpolate(frame, [openAt, openAt + 10], [1, 0], clamp);
+  const cx = (b: { left: number; width: number }) => b.left + b.width / 2;
   const cursorX = keyframes(
     frame,
     [
-      [0, 700],
-      [80, 700],
-      [go, 830],
+      [0, 520],
+      [help + 10, 520],
+      [openAt - 2, cx(AUTO_BTN)],
+      [openAt + 12, cx(AUTO_BTN)],
+      [write, 760],
+      [readAt - 2, cx(READ_BTN)],
+      [readAt + 6, cx(READ_BTN)],
+      [addAt - 2, cx(ADD_BTN)],
+      [addAt + 6, cx(ADD_BTN)],
+      [runAt - 2, cx(RUN_BTN)],
     ],
     inOut,
   );
   const cursorY = keyframes(
     frame,
     [
-      [0, 260],
-      [80, 400],
-      [go, 505],
+      [0, 520],
+      [help + 10, 520],
+      [openAt - 2, 36],
+      [openAt + 12, 36],
+      [write, 420],
+      [readAt - 2, READ_BTN.top + 28],
+      [readAt + 6, READ_BTN.top + 28],
+      [addAt - 2, ADD_BTN.top + 26],
+      [addAt + 6, ADD_BTN.top + 26],
+      [runAt - 2, RUN_BTN.top + 28],
     ],
     inOut,
   );
-  const done = sp(130, { damping: 13 });
+  const cursorOut = interpolate(frame, [runAt + 12, runAt + 22], [1, 0], clamp);
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <Card style={{ left: 0, right: 0, top: 0, height: 560, opacity: sp(0) }} radius={28}>
+      <Floor width={1000} height={1000 - FLOOR_TOP} style={{ left: 0, top: FLOOR_TOP, opacity: sp(2) }} />
+      {MINI.map((m, i) => {
+        const filled = Math.max(0, Math.min(8, Math.floor((frame - runAt - 6 - i * 3) * 0.55)));
+        const colors = Array.from(
+          { length: 8 },
+          (_, k) => FAMILY_COLORS[(i + (k < 5 ? 0 : 3)) % FAMILY_COLORS.length],
+        );
+        return (
+          <Table
+            key={i}
+            x={m.x}
+            y={FLOOR_TOP + m.y}
+            shape="round"
+            seats={8}
+            w={74}
+            chairSize={20}
+            filled={filled}
+            colors={colors}
+            pop={sp(4 + i * 2)}
+          />
+        );
+      })}
+
+      {/* the screen's header actions, before the dialog opens */}
+      <div style={{ opacity: Math.min(sp(0), headerOut) }}>
+        <AppButton
+          variant="dark"
+          icon={<SparkleIcon size={26} color="#fff" />}
+          pressed={pressAt(frame, openAt)}
+          glow={interpolate(frame, [help, help + 10, openAt, openAt + 6], [0, 1, 1, 0], clamp)}
+          style={{ top: 4, left: AUTO_BTN.left, width: AUTO_BTN.width }}
+        >
+          סידור אוטומטי
+        </AppButton>
+        <AppButton icon={<PrintIcon size={24} />} style={{ top: 4, left: 492, width: 170 }}>
+          הדפסה
+        </AppButton>
+      </div>
+
+      {/* the dialog */}
+      <Card
+        style={{
+          left: 0,
+          right: 0,
+          top: 0,
+          height: 620,
+          opacity: dialog,
+          transform: `scale(${0.94 + 0.06 * dialog})`,
+          transformOrigin: '80% 0',
+          boxShadow: SHADOW.xl,
+        }}
+        radius={28}
+      >
         <div
           style={{
             position: 'absolute',
-            top: 26,
+            top: 22,
             right: 32,
             display: 'flex',
             alignItems: 'center',
@@ -630,22 +836,35 @@ export function AutoScene() {
           סידור אוטומטי
         </div>
         <div
-          style={{ position: 'absolute', top: 80, right: 32, fontSize: 22, fontWeight: 600, color: C.muted }}
+          style={{
+            position: 'absolute',
+            top: 74,
+            left: 24,
+            right: 24,
+            height: 230,
+            borderRadius: 18,
+            border: `2px solid ${C.brandLine}`,
+            background: 'rgba(246,237,225,0.45)',
+          }}
+        />
+        <div
+          style={{ position: 'absolute', top: 88, right: 44, fontSize: 23, fontWeight: 800, color: C.ink }}
         >
           ספרו במילים מי עם מי
         </div>
         <div
           style={{
             position: 'absolute',
-            top: 120,
-            left: 32,
-            right: 32,
-            height: 120,
-            padding: '16px 20px',
+            top: 128,
+            left: 44,
+            right: 44,
+            height: 96,
+            padding: '14px 18px',
             boxSizing: 'border-box',
-            borderRadius: 16,
-            border: `2.5px solid ${frame < 70 ? C.brand : C.line}`,
-            fontSize: 26,
+            borderRadius: 14,
+            background: '#fff',
+            border: `2.5px solid ${frame >= typeFrom && frame < readAt ? C.brand : C.line}`,
+            fontSize: 25,
             lineHeight: 1.45,
             fontWeight: 600,
             color: C.ink,
@@ -654,28 +873,36 @@ export function AutoScene() {
           {chars.slice(0, typed).join('')}
           {caret ? <span style={{ color: C.brand }}>|</span> : null}
         </div>
+        <AppButton
+          icon={<SparkleIcon size={22} />}
+          pressed={pressAt(frame, readAt)}
+          style={{ top: READ_BTN.top, left: READ_BTN.left, width: READ_BTN.width, height: 56, fontSize: 22 }}
+        >
+          להבין את הכללים
+        </AppButton>
         <div
           style={{
             position: 'absolute',
-            top: 262,
+            top: 318,
             right: 32,
             fontSize: 22,
-            fontWeight: 700,
+            fontWeight: 800,
             color: C.ink,
-            opacity: sp(64),
+            opacity: understood,
           }}
         >
-          הבנו 3 כללים — מאשרים?
+          הבנו 3 דברים. מה להוסיף?
         </div>
         {RULES.map((r, i) => {
-          const inn = sp(66 + i * 6, { damping: 14 });
+          const inn = sp(readAt + 10 + i * 5, { damping: 14 });
           return (
             <div
               key={r.kind}
               style={{
                 position: 'absolute',
-                top: 304 + i * 58,
+                top: 356 + i * 46,
                 right: 32,
+                left: 32,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
@@ -685,78 +912,63 @@ export function AutoScene() {
             >
               <div
                 style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 10,
-                  background: C.success,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
+                  background: C.ink,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
-                <CheckIcon
-                  size={22}
-                  color="#fff"
-                  progress={interpolate(frame, [72 + i * 6, 82 + i * 6], [0, 1], clamp)}
-                />
+                <CheckIcon size={20} color="#fff" />
               </div>
-              <Pill bg={r.bg} color={r.color} style={{ fontSize: 22 }}>
+              <Pill bg={r.bg} color={r.color} style={{ fontSize: 20, padding: '6px 14px' }}>
                 {r.kind}
               </Pill>
-              <div style={{ fontSize: 24, fontWeight: 700, color: C.ink }}>{r.who}</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: C.ink }}>{r.who}</div>
             </div>
           );
         })}
+        <div style={{ opacity: understood * (1 - added) }}>
+          <AppButton
+            variant="dark"
+            pressed={pressAt(frame, addAt)}
+            style={{ top: ADD_BTN.top, left: ADD_BTN.left, width: ADD_BTN.width, height: 52, fontSize: 22 }}
+          >
+            להוסיף 3
+          </AppButton>
+        </div>
         <div
           style={{
             position: 'absolute',
-            top: 470,
-            left: 32,
-            height: 66,
-            padding: '0 30px',
-            borderRadius: 16,
-            background: `linear-gradient(90deg, ${C.brandDeep}, ${C.brand})`,
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            fontSize: 26,
-            fontWeight: 800,
-            opacity: sp(84),
-            transform: `scale(${1 - 0.07 * Math.sin(pressAt(frame, go) * Math.PI)})`,
-            boxShadow: '0 12px 26px rgba(122,82,48,0.3)',
+            top: 510,
+            right: 32,
+            fontSize: 21,
+            fontWeight: 700,
+            color: C.success,
+            opacity: added,
           }}
         >
-          <SparkleIcon size={26} color="#fff" />
-          להושיב את כולם
+          נוספו 3 כללים. עכשיו לוחצים "סידור"
         </div>
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 540, height: 1.5, background: C.line }} />
+        <AppButton
+          variant="dark"
+          icon={<SparkleIcon size={24} color="#fff" />}
+          pressed={pressAt(frame, runAt)}
+          glow={interpolate(frame, [addAt + 8, addAt + 14, runAt, runAt + 6], [0, 1, 1, 0], clamp)}
+          style={{ top: RUN_BTN.top, left: RUN_BTN.left, width: RUN_BTN.width, height: 52, fontSize: 23 }}
+        >
+          סידור
+        </AppButton>
       </Card>
-      <Floor width={1000} height={410} style={{ left: 0, top: 590, opacity: sp(4) }} />
-      {MINI.map((m, i) => {
-        const filled = Math.max(0, Math.min(8, Math.floor((frame - go - 4 - i * 3) * 0.55)));
-        const colors = Array.from(
-          { length: 8 },
-          (_, k) => FAMILY_COLORS[(i + (k < 5 ? 0 : 3)) % FAMILY_COLORS.length],
-        );
-        return (
-          <Table
-            key={i}
-            x={m.x}
-            y={590 + m.y}
-            shape="round"
-            seats={8}
-            w={74}
-            chairSize={20}
-            filled={filled}
-            colors={colors}
-            pop={sp(8 + i * 2)}
-          />
-        );
-      })}
+
       <div
         style={{
           position: 'absolute',
-          top: 590 + 200,
+          top: FLOOR_TOP + 160,
           left: 0,
           right: 0,
           display: 'flex',
@@ -771,10 +983,12 @@ export function AutoScene() {
           style={{ fontSize: 24, padding: '14px 26px', boxShadow: SHADOW.lg }}
         >
           <CheckIcon size={26} color="#fff" />
-          כל המשפחות יחד · 3 כללים נשמרו
+          כל משפחה יושבת יחד · כל 3 הכללים נשמרו
         </Pill>
       </div>
-      <Cursor x={cursorX} y={cursorY} pressed={pressAt(frame, go)} />
+      <div style={{ opacity: cursorOut }}>
+        <Cursor x={cursorX} y={cursorY} pressed={pressAt(frame, openAt, readAt, addAt, runAt)} />
+      </div>
     </div>
   );
 }
@@ -788,46 +1002,66 @@ const SHEET = [
   ['שולחן 4', 'החברים מהעבודה'],
   ['שולחן 5', 'משפחת מזרחי'],
 ];
+const PRINT_BTN = { left: 30, width: 180 };
+const SEND_BTN = { left: 560, width: 410 };
 
-/** The printed map for the hall — and every guest gets their table number. */
+/**
+ * "מדפיסים לאולם, ושולחים לכל אורח את מספר השולחן שלו בוואטסאפ": "הדפסה" (the map and the lists for
+ * the hall), then "לשלוח לאורחים את השולחן" — and a guest's WhatsApp with their table.
+ */
 export function SendScene() {
   const frame = useCurrentFrame();
   const sp = useSpringAt();
-  const sheet = sp(6, { damping: 15 });
-  const send = 46;
-  const msg = sp(send + 10, { damping: 14 });
-  const link = sp(send + 26, { damping: 14 });
+  const say = beat('send', 31.21);
+  const printAt = say + 4;
+  const sendAt = say + 44;
+  const sheet = sp(printAt + 6, { damping: 15 });
+  const phone = sp(sendAt + 4, { damping: 16 });
+  const msg = sp(sendAt + 16, { damping: 14 });
+  const link = sp(sendAt + 40, { damping: 14 });
   const cursorX = keyframes(
     frame,
     [
-      [0, 300],
-      [send - 12, 300],
-      [send, 260],
+      [0, 420],
+      [printAt - 2, PRINT_BTN.left + PRINT_BTN.width / 2],
+      [printAt + 14, PRINT_BTN.left + PRINT_BTN.width / 2],
+      [sendAt - 2, SEND_BTN.left + SEND_BTN.width / 2],
     ],
     inOut,
   );
   const cursorY = keyframes(
     frame,
     [
-      [0, 500],
-      [send - 12, 800],
-      [send, 905],
+      [0, 420],
+      [printAt - 2, 36],
+      [printAt + 14, 36],
+      [sendAt - 2, 36],
     ],
     inOut,
   );
+  const cursorOut = interpolate(frame, [sendAt + 20, sendAt + 30], [1, 0], clamp);
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <div style={{ position: 'absolute', left: 30, top: 0, opacity: sp(0) }}>
-        <Pill bg={C.ink} color="#fff" style={{ fontSize: 24, padding: '12px 22px' }}>
-          <PrintIcon size={26} color="#fff" />
-          הדפסה לאולם
-        </Pill>
-      </div>
+      <AppButton
+        icon={<PrintIcon size={24} />}
+        pressed={pressAt(frame, printAt)}
+        style={{ top: 4, left: PRINT_BTN.left, width: PRINT_BTN.width, opacity: sp(0) }}
+      >
+        הדפסה
+      </AppButton>
+      <AppButton
+        icon={<SendIcon size={24} />}
+        pressed={pressAt(frame, sendAt)}
+        glow={interpolate(frame, [sendAt - 14, sendAt - 6, sendAt, sendAt + 6], [0, 1, 1, 0], clamp)}
+        style={{ top: 4, left: SEND_BTN.left, width: SEND_BTN.width, opacity: sp(2) }}
+      >
+        לשלוח לאורחים את השולחן
+      </AppButton>
       <div
         style={{
           position: 'absolute',
           left: 30,
-          top: 90,
+          top: 100,
           width: 470,
           height: 740,
           background: '#fff',
@@ -854,7 +1088,7 @@ export function SendScene() {
                 padding: '9px 0',
                 borderBottom: `1.5px solid ${C.line}`,
                 fontSize: 20,
-                opacity: sp(14 + i * 4),
+                opacity: sp(printAt + 14 + i * 4),
               }}
             >
               <span style={{ fontWeight: 800, color: C.ink, width: 86 }}>{table}</span>
@@ -863,50 +1097,32 @@ export function SendScene() {
           ))}
         </div>
       </div>
-      <div
-        style={{
-          position: 'absolute',
-          left: 30,
-          top: 870,
-          height: 72,
-          width: 470,
-          borderRadius: 18,
-          background: C.waStrong,
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 12,
-          fontSize: 25,
-          fontWeight: 800,
-          opacity: sp(30),
-          transform: `scale(${1 - 0.06 * Math.sin(pressAt(frame, send) * Math.PI)})`,
-        }}
+      <Phone
+        width={360}
+        style={{ left: 600, top: 100, opacity: phone, transform: `translateY(${(1 - phone) * 40}px)` }}
       >
-        <WhatsAppIcon size={30} />
-        שולחים לכל אורח את השולחן שלו
-      </div>
-      <Phone width={380} style={{ left: 580, top: 90, opacity: sp(2) }}>
         <div
           style={{
-            height: 120,
+            height: 116,
             background: C.waStrong,
             color: '#fff',
             display: 'flex',
             alignItems: 'flex-end',
+            gap: 10,
             padding: '0 22px 16px',
-            fontSize: 24,
+            fontSize: 23,
             fontWeight: 800,
           }}
         >
+          <WhatsAppIcon size={26} />
           נועה ואיתי
         </div>
         <div
           style={{
             position: 'absolute',
-            top: 150,
+            top: 146,
             right: 18,
-            left: 40,
+            left: 36,
             background: '#fff',
             borderRadius: '18px 4px 18px 18px',
             padding: '16px 18px',
@@ -924,13 +1140,15 @@ export function SendScene() {
             <DoubleCheck size={20} color="#34b7f1" />
           </div>
         </div>
-        <div style={{ position: 'absolute', top: 430, right: 18, opacity: link }}>
+        <div style={{ position: 'absolute', top: 424, right: 18, opacity: link }}>
           <Pill bg={C.brandSoft} color={C.brandDeep} style={{ fontSize: 20 }}>
             איפה השולחן באולם ›
           </Pill>
         </div>
       </Phone>
-      <Cursor x={cursorX} y={cursorY} pressed={pressAt(frame, send)} />
+      <div style={{ opacity: cursorOut }}>
+        <Cursor x={cursorX} y={cursorY} pressed={pressAt(frame, printAt, sendAt)} />
+      </div>
     </div>
   );
 }
@@ -962,9 +1180,9 @@ export function LiveScene() {
     <div style={{ position: 'absolute', inset: 0 }}>
       <Floor width={1000} height={620} style={{ left: 0, top: 0, opacity: sp(0) }} />
       <div style={{ position: 'absolute', left: 26, top: 22, opacity: sp(2) }}>
-        <Pill bg={C.dangerBg} color={C.danger} style={{ fontSize: 22 }}>
-          <span style={{ width: 14, height: 14, borderRadius: 99, background: C.danger, opacity: blink }} />
-          בלייב
+        <Pill bg={C.successBg} color={C.success} style={{ fontSize: 22 }}>
+          <span style={{ width: 14, height: 14, borderRadius: 99, background: C.success, opacity: blink }} />
+          בזמן אמת
         </Pill>
       </div>
       {LIVE.map((t, i) => {
@@ -1004,7 +1222,7 @@ export function LiveScene() {
       </div>
       <Card style={{ left: 0, top: 650, width: 360, height: 350, opacity: sp(8) }} radius={26}>
         <div style={{ position: 'absolute', top: 30, left: 0, right: 0, textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: C.muted }}>נכנסו לאולם</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: C.muted }}>אנשים הגיעו</div>
           <div style={{ fontSize: 96, fontWeight: 800, color: C.ink, lineHeight: 1.05, direction: 'ltr' }}>
             {total}
             <span style={{ fontSize: 40, color: C.faint }}> / {LIVE_TOTAL}</span>

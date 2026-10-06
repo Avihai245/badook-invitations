@@ -1,25 +1,27 @@
-import { AbsoluteFill, Easing, interpolate, Sequence, useCurrentFrame } from 'remotion';
-import { Background, LogoImg, SceneShell } from '../Shell';
+import { AbsoluteFill, Audio, Easing, interpolate, Sequence, staticFile, useCurrentFrame } from 'remotion';
+import { Background, LogoImg } from '../Shell';
 import { C, FONT } from '../theme';
 import { OVERLAP } from '../timing';
+import { NarratedShell, Subtitles } from '../tour/TourShell';
 import { clamp, useLayout, useSpringAt } from '../ui';
 import { AutoScene, FamiliesScene, HallScene, LiveScene, SendScene, TablesScene } from './scenes';
-import { SEATING_SCENES, seatingStart } from './timing';
+import { SEATING_CUES, SEATING_SCENES, SEATING_TOTAL, seatingStart } from './timing';
 
 /** The six steps, in order: kicker + burned-in caption + the visual. */
 const STEPS = [
-  { kicker: '01 · האולם', caption: 'תמונה מהאולם — או אולם מוכן', View: HallScene },
+  { kicker: '01 · האולם', caption: 'תמונה מהאולם, או אולם מוכן', View: HallScene },
   { kicker: '02 · שולחנות', caption: 'עגול, מרובע או אבירים', View: TablesScene },
   { kicker: '03 · משפחות', caption: 'גוררים משפחה שלמה לשולחן', View: FamiliesScene },
-  { kicker: '04 · אוטומטי', caption: 'כותבים במילים מי עם מי', View: AutoScene },
-  { kicker: '05 · שולחים', caption: 'מדפיסים ושולחים לכל אורח', View: SendScene },
-  { kicker: '06 · ביום האירוע', caption: 'רואים בלייב מי הגיע, לפי שולחן', View: LiveScene },
+  { kicker: '04 · סידור אוטומטי', caption: 'המערכת מושיבה את כולם', View: AutoScene },
+  { kicker: '05 · שולחים', caption: 'מדפיסים ושולחים בוואטסאפ', View: SendScene },
+  { kicker: '06 · ביום האירוע', caption: 'רואים בלייב מי הגיע', View: LiveScene },
 ];
 
 /**
- * "Seat like the pros" — the seating screen's 30-second tutorial (Hebrew captions in the picture,
- * no sound): the hall (a picture from the venue, or a ready-made hall), the tables, families dragged
- * in, auto-seating with rules in words, printing and sending, and the live map on the day.
+ * "Seat like the pros" — the seating screen's tutorial, narrated (public/seating/narration.mp3, the
+ * scenes timed to it in timing.ts) with its sentences as subtitles: the hall (a picture from the venue,
+ * or a ready-made hall from "Hall picture"), the tables, families dragged in, auto-seating with rules
+ * in words, printing and sending on WhatsApp, and the live map on the day — the app's own buttons.
  */
 export function SeatingTutorial() {
   return (
@@ -37,16 +39,18 @@ export function SeatingTutorial() {
             durationInFrames={SEATING_SCENES[idx].dur + OVERLAP}
             name={SEATING_SCENES[idx].id}
           >
-            <SceneShell kicker={kicker} caption={caption} dur={SEATING_SCENES[idx].dur}>
+            <NarratedShell kicker={kicker} title={caption} dur={SEATING_SCENES[idx].dur}>
               <View />
-            </SceneShell>
+            </NarratedShell>
           </Sequence>
         );
       })}
       <Sequence from={seatingStart(SEATING_SCENES.length - 1)} name="End">
         <EndScene />
       </Sequence>
+      <Audio src={staticFile('seating/narration.mp3')} name="narration" />
       <SeatingChrome />
+      <Subtitles cues={SEATING_CUES} total={SEATING_TOTAL} />
     </AbsoluteFill>
   );
 }
@@ -96,7 +100,7 @@ function OpenScene({ dur }: { dur: number }) {
           opacity: c,
         }}
       >
-        כל מה שצריך לדעת, בחצי דקה
+        כל הדרך, צעד אחר צעד
       </div>
     </AbsoluteFill>
   );
@@ -107,6 +111,8 @@ function EndScene() {
   const { portrait } = useLayout();
   const a = sp(0, { damping: 14 });
   const b = sp(8, { damping: 14 });
+  // with the voice: "סידור שולחנות" then "לא היה פשוט כל כך"
+  const c = sp(38, { damping: 14 });
   return (
     <AbsoluteFill
       style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'column', textAlign: 'center' }}
@@ -125,18 +131,21 @@ function EndScene() {
           transform: `translateY(${(1 - b) * 40}px)`,
         }}
       >
-        עכשיו תורכם
+        סידור שולחנות
       </div>
       <div
         style={{
-          marginTop: 30,
-          fontSize: portrait ? 42 : 46,
-          fontWeight: 700,
-          color: C.brandDeep,
-          opacity: b,
+          marginTop: 22,
+          fontSize: portrait ? 96 : 104,
+          fontWeight: 800,
+          letterSpacing: -2,
+          lineHeight: 1.05,
+          color: C.brand,
+          opacity: c,
+          transform: `translateY(${(1 - c) * 30}px)`,
         }}
       >
-        שמירה אוטומטית, ואפשר לבטל כל צעד
+        לא היה פשוט כל כך
       </div>
     </AbsoluteFill>
   );
@@ -187,19 +196,19 @@ function SeatingChrome() {
         <div
           style={{
             position: 'absolute',
-            top: 120,
+            top: 80,
             left: 0,
             right: 0,
             display: 'flex',
             justifyContent: 'center',
           }}
         >
-          <LogoImg width={230} />
+          <LogoImg width={200} />
         </div>
         <div
           style={{
             position: 'absolute',
-            top: 1640,
+            top: 1790,
             left: 0,
             right: 0,
             display: 'flex',
@@ -212,10 +221,10 @@ function SeatingChrome() {
     );
   return (
     <AbsoluteFill style={{ opacity }}>
-      <div style={{ position: 'absolute', top: 70, right: 120 }}>
-        <LogoImg width={220} />
+      <div style={{ position: 'absolute', top: 64, right: 120 }}>
+        <LogoImg width={200} />
       </div>
-      <div style={{ position: 'absolute', bottom: 80, right: 120 }}>{dots}</div>
+      <div style={{ position: 'absolute', top: 806, right: 120 }}>{dots}</div>
     </AbsoluteFill>
   );
 }
