@@ -506,7 +506,7 @@ function InvitationCard({
               href={base}
               onClick={() => enter('button')}
               data-testid="event-enter"
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-brand text-[15px] font-bold text-white shadow-sm transition-colors hover:bg-brand-deep dark:text-[#1c1917]"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-primary text-[15px] font-bold text-primary-ink shadow-sm transition-colors hover:bg-primary-hover"
             >
               {t.list.enter}
               <ArrowRight aria-hidden className="icon-dir size-4" />

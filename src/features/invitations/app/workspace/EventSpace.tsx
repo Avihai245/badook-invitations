@@ -352,7 +352,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
         className="mt-2 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain px-3 pb-2 [scrollbar-width:thin]"
       >
         <NavItem id={item.id} navKey="home" current={current === 'home'} />
-        <h2 className="px-2 pt-3 pb-1.5 text-[11.5px] font-semibold text-faint">{N.stagesTitle}</h2>
+        <h2 className="px-2 pt-3 pb-1.5 text-[11.5px] font-semibold text-muted">{N.stagesTitle}</h2>
         <ol className="flex flex-col">
           {stages.map((stage, i) => {
             const items = stageItems(stage, caps);
@@ -400,7 +400,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
                     <span className="sr-only">
                       {fmt(N.stepOf, { n: number(i + 1), total: number(stages.length) })}:
                     </span>
-                    <span className="min-w-0 truncate">{N.stages[stage]}</span>
+                    <span className="min-w-0 leading-tight">{N.stages[stage]}</span>
                     {status ? <StatusPill status={status} /> : <span className="ms-auto" />}
                     <ChevronDown
                       aria-hidden
@@ -491,13 +491,14 @@ export function EventBar({
   tools: WorkspaceCaps['tools'];
 }) {
   const { t, locale, date } = useUi();
-  // the event's home has publishing as a step of its path: one publish button per screen, not two
+  // the event's home shows all of this in its own hero (and publishing as a step of its path): no strip
   const onHome = navKeyOf(usePathname(), item.id) === 'home';
   const w = t.workspace;
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
   const live = item.status === 'published';
   const archived = item.status === 'archived';
+  if (onHome) return null;
   return (
     <header
       className="flex min-h-[64px] items-center gap-3 border-b border-line bg-surface/85 px-4 py-2 backdrop-blur sm:px-6 lg:sticky lg:top-0 lg:z-20 lg:max-h-[72px]"
@@ -546,7 +547,7 @@ export function EventBar({
               </a>
             </Button>
           ) : null}
-          {tools.includes('invite') && !onHome && (!live || item.unpublishedChanges) ? (
+          {tools.includes('invite') && (!live || item.unpublishedChanges) ? (
             <Button size="sm" icon={<Send className="icon-dir" />} asChild>
               <Link href={publishHref(item.id)}>{live ? t.editor.publishChanges : w.publish}</Link>
             </Button>

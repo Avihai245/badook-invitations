@@ -21,7 +21,8 @@ async function chooseGoogleAccount(page: Page, email: string, name?: string) {
 }
 
 async function signOut(page: Page) {
-  await page.getByTestId('user-menu').click();
+  // inside an event its sidebar has the account menu (the app's own is hidden there)
+  await page.getByTestId('user-menu').filter({ visible: true }).first().click();
   await page.getByRole('menuitem', { name: 'יציאה' }).click();
   await page.waitForURL(/\/login/);
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
