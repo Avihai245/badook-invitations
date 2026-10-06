@@ -24,7 +24,8 @@ export const ASSISTANT = {
   storyMax: 300,
   /** the AI's answer: how long we wait, how long it may be */
   timeoutMs: 25_000,
-  maxTokens: 1200,
+  /** the reply is short; the rest is room for the model's thinking (current models always think) */
+  maxTokens: 4096,
   /** turns a host may have a day / an hour */
   perDay: 120,
   perHour: 60,
