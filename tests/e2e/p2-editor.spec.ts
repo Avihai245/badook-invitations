@@ -70,7 +70,7 @@ test.describe('host: create → edit → publish', () => {
     const preview = page.getByRole('dialog');
     await expect(preview.getByRole('heading', { name: 'סהר בורדו' })).toBeVisible();
     await preview.getByRole('button', { name: /כחול לילה/ }).click();
-    await preview.getByRole('button', { name: 'שימוש בעיצוב הזה' }).click();
+    await preview.getByRole('button', { name: 'מילוי ידני' }).click();
 
     // wizard
     const wizard = page.getByRole('dialog');
@@ -123,6 +123,28 @@ test.describe('host: create → edit → publish', () => {
     // exactly: the row's "?" is named by its card ("קישור ושיתוף: מה כל דבר עושה"), which contains the name too
     await page.getByRole('button', { name: 'קישור ושיתוף', exact: true }).click();
     await expect(page.getByText('ההזמנה עוד לא פורסמה — הקישור יתחיל לעבוד אחרי הפרסום.')).toBeVisible();
+    // the share card is filled in from the invitation: the names, the date and the place, and the image
+    // made from it (the host can still write their own, and go back to the automatic text)
+    const shareTitle = page.getByRole('textbox', { name: 'כותרת בשיתוף' });
+    await expect(shareTitle).toHaveValue('נועה & איתי');
+    const shareDescription = page.getByRole('textbox', { name: 'תיאור בשיתוף' });
+    await expect(shareDescription).toHaveValue(/2027.*אחוזת הגפן/);
+    const card = page.getByTestId('share-card');
+    await expect(card).toContainText('נועה & איתי');
+    await expect(card.locator('img')).toHaveAttribute(
+      'src',
+      /\/api\/invitations\/[^/]+\/share-image\?lang=he/,
+      {
+        timeout: 20_000,
+      },
+    );
+    expect(
+      await card.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth),
+    ).toBe(1200);
+    await shareTitle.fill('בואו לחגוג איתנו');
+    await expect(card).toContainText('בואו לחגוג איתנו');
+    await page.getByRole('button', { name: 'חזרה למילוי האוטומטי' }).click();
+    await expect(shareTitle).toHaveValue('נועה & איתי');
     const draftPath = new URL(await page.getByRole('textbox', { name: 'כתובת ההזמנה' }).inputValue())
       .pathname;
     const guest = await page.context().newPage();

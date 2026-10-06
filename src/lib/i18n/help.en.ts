@@ -569,11 +569,11 @@ export const helpEn: typeof helpHe = {
       publishNow: { label: 'Publish now', text: 'Opens the publish window.' },
       card: {
         label: 'Share title and description',
-        text: 'What shows in the link preview on WhatsApp. Empty = the names, the date and the venue.',
+        text: 'What shows in the link preview on WhatsApp. Filled in from the names, the date and the venue and kept up to date; write your own and “Back to automatic” brings the original back.',
       },
       image: {
         label: 'Share image',
-        text: 'The picture in the link preview. Empty = an image made from the invitation for you.',
+        text: 'The picture in the link preview, as the preview shows it. Made from the invitation for you (its main photo, the names and the date); upload another picture and go back to the automatic one any time.',
       },
       noindex: {
         label: 'Hide from search engines',

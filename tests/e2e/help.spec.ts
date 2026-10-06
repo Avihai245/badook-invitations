@@ -94,7 +94,7 @@ test('the list, the gallery with its preview and wizard, and the account', async
   await expect(preview).toBeVisible();
 
   // …and so has the wizard
-  await preview.getByRole('button', { name: 'שימוש בעיצוב הזה' }).click();
+  await preview.getByRole('button', { name: 'מילוי ידני' }).click();
   const wizard = page.getByRole('dialog', { name: /הזמנה חדשה/ });
   await explains(
     page,

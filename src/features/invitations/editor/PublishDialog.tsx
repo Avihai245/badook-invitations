@@ -21,9 +21,9 @@ import { validateDocument, type Issue } from '../contracts/validate';
 import { hostApi } from '../app/api';
 import { HelpFor } from '../app/HelpFor';
 import { posterColors } from '../app/poster';
-import { formatEventDate } from '../lib/dates';
 import { nativeName } from '../lib/locales';
 import { hostsText, issueText, sectionName } from './fields/fields';
+import { useShareAuto } from './panels/ShareCard';
 import { issueTarget } from './issues';
 import { useEditor } from './state/EditorProvider';
 import { useTranslations } from './translations';
@@ -42,6 +42,7 @@ const LOCALE_SUFFIX = new RegExp(`\\.(${LOCALES.join('|')})$`);
 
 export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: () => Promise<boolean> }) {
   const { doc, template, meta, setMeta, publicBaseUrl, select, setShowIssues } = useEditor();
+  const shareAuto = useShareAuto();
   const { t, locale: ui, plural, date } = useUi();
   const { toast } = useToast();
   const e = t.editor;
@@ -214,9 +215,9 @@ export function PublishDialog({ onClose, flush }: { onClose: () => void; flush: 
   }
 
   const colors = posterColors(template, doc.cover.sealColor);
-  const cardTitle = doc.share.ogTitle?.[doc.defaultLocale]?.trim() || hostsText(doc, doc.defaultLocale);
+  const cardTitle = doc.share.ogTitle?.[doc.defaultLocale]?.trim() || shareAuto.title(doc.defaultLocale);
   const cardDescription =
-    doc.share.ogDescription?.[doc.defaultLocale]?.trim() || formatEventDate(doc, doc.defaultLocale);
+    doc.share.ogDescription?.[doc.defaultLocale]?.trim() || shareAuto.description(doc.defaultLocale);
 
   return (
     <Dialog
