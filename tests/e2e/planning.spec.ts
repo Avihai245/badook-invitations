@@ -8,7 +8,12 @@ import { LOCAL, api, hydrated, newHost, open, publish, setPlan, sql, type Host }
 
 test.skip(!LOCAL, 'reads and writes rows of the local database');
 
-const day = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+// the date in the event's time zone (the app counts days there: near midnight UTC it is already
+// tomorrow in Israel)
+const day = (offset: number) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem' }).format(
+    new Date(Date.now() + offset * 86_400_000),
+  );
 const plan = (host: Host, tool = '') => `/app/invitations/${host.id}/plan${tool}`;
 
 /** A host with a wedding `days` days away, signed in, with the plan set up through the API. */
@@ -100,6 +105,7 @@ test('tasks: add with Enter, tick with Undo, hide, and the details drawer keeps 
   await expect(page.getByText('כל השינויים נשמרו')).toBeVisible();
   await page.waitForTimeout(800);
   await page.reload();
+  await hydrated(page);
   await content(page);
   await expect(row).toBeVisible();
 
