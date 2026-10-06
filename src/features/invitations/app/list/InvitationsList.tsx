@@ -439,6 +439,7 @@ function InvitationCard({
             <Link
               href={next.href}
               data-next-step={next.key}
+              aria-label={`${t.list.nextLabel}: ${stepTitle(next)}`}
               title={t.list.nextHint}
               onClick={() =>
                 track('step_click', {
@@ -460,10 +461,7 @@ function InvitationCard({
                 <NextIcon strokeWidth={1.9} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[11.5px] font-bold text-brand-deep">
-                  {t.list.nextLabel}
-                  <span className="sr-only">: </span>
-                </span>
+                <span className="block text-[11.5px] font-bold text-brand-deep">{t.list.nextLabel}</span>
                 <span className="block truncate text-[14px] font-bold text-ink">{stepTitle(next)}</span>
               </span>
               <ArrowRight

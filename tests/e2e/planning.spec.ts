@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { navItem, navTo } from '../support/event-nav';
-import { LOCAL, api, newHost, open, publish, setPlan, sql, type Host } from '../support/phase5b';
+import { LOCAL, api, hydrated, newHost, open, publish, setPlan, sql, type Host } from '../support/phase5b';
 
 // Event planning (feature planning): the tab and its first-run, the tasks (add, tick with undo, hide,
 // the details), a system task that ticks itself, the event's date moving the tasks' dates, the plan's
@@ -64,6 +64,7 @@ test('a new host sets the plan up in three short steps and lands on the event ho
   await page.getByRole('button', { name: 'להתחיל לתכנן' }).click();
   // set up: the event's home takes over (one next step; the budget as a gauge)
   await page.waitForURL(new RegExp(`/app/invitations/${host.id}$`), { timeout: 30_000 });
+  await hydrated(page);
   await expect(page.getByTestId('home-next')).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId('home-budget')).toContainText('120,000');
 
@@ -280,6 +281,7 @@ test('a past event’s plan is a summary: what was spent, paid, and no more task
   // after the day the home's next step is the film or the numbers, and nothing is "due this week"
   await open(page, plan(host));
   await page.waitForURL(new RegExp(`/app/invitations/${host.id}$`), { timeout: 30_000 });
+  await hydrated(page);
   await expect(page.getByTestId('home-next')).toHaveAttribute('data-action', 'day:after');
   await expect(page.getByTestId('home-tasks')).not.toContainText('השבוע');
   // the budget is a summary
@@ -440,6 +442,8 @@ test.describe('in English', () => {
     await page.getByRole('button', { name: 'Next' }).click();
     await page.getByRole('button', { name: 'Next' }).click();
     await page.getByRole('button', { name: 'Start planning' }).click();
+    await page.waitForURL(new RegExp(`/app/invitations/${host.id}$`), { timeout: 30_000 });
+    await hydrated(page);
     await expect(page.getByTestId('home-next')).toBeVisible({ timeout: 30_000 });
     await expect(navItem(page, 'tasks')).toHaveText(/Tasks/);
     await navTo(page, 'tasks');

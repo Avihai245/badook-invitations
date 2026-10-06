@@ -30,7 +30,16 @@ export async function sql<T = Record<string, unknown>>(text: string, values: unk
   }
 }
 
-export const hydrated = (page: Page) => page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+/**
+ * The page is hydrated, and its streamed parts are in place: until React swaps one in, it waits in a
+ * hidden copy (div#S:…[hidden]) — the same test id twice for a moment.
+ */
+export async function hydrated(page: Page) {
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+  await page
+    .waitForFunction(() => !document.querySelector('div[hidden][id^="S:"]'), null, { timeout: 15_000 })
+    .catch(() => undefined);
+}
 
 export async function open(page: Page, url: string) {
   await page.goto(url);
