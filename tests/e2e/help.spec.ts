@@ -94,7 +94,8 @@ test('the list, the gallery with its preview and wizard, and the account', async
   await expect(preview).toBeVisible();
 
   // …and so has the wizard
-  await preview.getByRole('button', { name: 'שימוש בעיצוב הזה' }).click();
+  // with the AI set up the preview offers "manual" and "quick with AI"; without it, one "use this design"
+  await preview.getByRole('button', { name: /^(מילוי ידני|שימוש בעיצוב הזה)$/ }).click();
   const wizard = page.getByRole('dialog', { name: /הזמנה חדשה/ });
   await explains(
     page,

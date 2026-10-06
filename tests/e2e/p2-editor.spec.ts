@@ -70,7 +70,8 @@ test.describe('host: create → edit → publish', () => {
     const preview = page.getByRole('dialog');
     await expect(preview.getByRole('heading', { name: 'סהר בורדו' })).toBeVisible();
     await preview.getByRole('button', { name: /כחול לילה/ }).click();
-    await preview.getByRole('button', { name: 'שימוש בעיצוב הזה' }).click();
+    // with the AI set up the preview offers "manual" and "quick with AI"; without it, one "use this design"
+    await preview.getByRole('button', { name: /^(מילוי ידני|שימוש בעיצוב הזה)$/ }).click();
 
     // wizard
     const wizard = page.getByRole('dialog');
@@ -142,7 +143,7 @@ test.describe('host: create → edit → publish', () => {
     const url = await dialog.getByRole('textbox').inputValue();
     expect(url).toMatch(/\/i\/noa-and-[a-z0-9-]+$/); // transliterated from the Hebrew names
     await dialog.getByRole('button', { name: 'סגירה' }).click();
-    await expect(page.getByText('פורסם', { exact: true })).toBeVisible();
+    await expect(page.getByText('פורסמה', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'פתיחת ההזמנה' })).toHaveAttribute('href', url);
 
     // the public page shows the published invitation (the cached "not available" page is gone)
