@@ -159,12 +159,16 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
     {
       key: 'status',
       header: r.columns.status,
-      cell: (x) =>
-        x.attending ? (
-          <Badge variant="live">{r.attending}</Badge>
-        ) : (
-          <Badge variant="danger">{r.declined}</Badge>
-        ),
+      cell: (x) => (
+        <span className="flex flex-wrap items-center gap-1.5">
+          {x.attending ? (
+            <Badge variant="live">{r.attending}</Badge>
+          ) : (
+            <Badge variant="danger">{r.declined}</Badge>
+          )}
+          <ReplyTags reply={x} />
+        </span>
+      ),
     },
     { key: 'adults', header: r.columns.adults, numeric: true, cell: (x) => number(x.adults) },
     { key: 'children', header: r.columns.children, numeric: true, cell: (x) => number(x.children) },
@@ -229,8 +233,16 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
     setQuery('');
   };
 
-  const statusBadge = (x: DashboardResponse) =>
-    x.attending ? <Badge variant="live">{r.attending}</Badge> : <Badge variant="danger">{r.declined}</Badge>;
+  const statusBadge = (x: DashboardResponse) => (
+    <>
+      {x.attending ? (
+        <Badge variant="live">{r.attending}</Badge>
+      ) : (
+        <Badge variant="danger">{r.declined}</Badge>
+      )}
+      <ReplyTags reply={x} />
+    </>
+  );
 
   return (
     <>
@@ -612,6 +624,33 @@ export function ResponsesDashboard({ data }: { data: DashboardData }) {
   );
 }
 
+/** A reply the host set ("manual"), and a request to bring more people waiting for the host. */
+function ReplyTags({ reply: x }: { reply: DashboardResponse }) {
+  const { t, fmt, number } = useUi();
+  const A = t.guests.answer;
+  return (
+    <>
+      {x.source === 'host' ? (
+        <span
+          title={A.manualHint}
+          className="rounded-full bg-subtle px-2 py-0.5 text-[11.5px] font-semibold text-muted"
+          data-reply-manual=""
+        >
+          {A.manual}
+        </span>
+      ) : null}
+      {x.attending && x.extraRequested ? (
+        <span
+          className="rounded-full bg-warning-bg px-2 py-0.5 text-[11.5px] font-semibold text-warning"
+          data-reply-extra=""
+        >
+          {fmt(A.extraBadge, { n: number(x.extraRequested) })}
+        </span>
+      ) : null}
+    </>
+  );
+}
+
 function ResponseDrawer({
   response: x,
   data,
@@ -627,7 +666,7 @@ function ResponseDrawer({
   onClose: () => void;
   onDeleted: (id: string) => void;
 }) {
-  const { t, fmt, date } = useUi();
+  const { t, fmt, date, plural, number } = useUi();
   const r = t.responses;
   const d = r.drawer;
   const { toast } = useToast();
@@ -667,6 +706,7 @@ function ResponseDrawer({
             ) : (
               <Badge variant="danger">{r.declined}</Badge>
             )}
+            <ReplyTags reply={x} />
             <span>{fmt(d.received, { date: when(x.createdAt) })}</span>
             {x.updatedAt !== x.createdAt ? (
               <span>· {fmt(d.updated, { date: when(x.updatedAt) })}</span>
@@ -681,6 +721,25 @@ function ResponseDrawer({
         }
       >
         <div className="flex flex-col gap-6 text-[14px]">
+          {x.source === 'host' || (x.attending && x.extraRequested) ? (
+            <section
+              className={cn(
+                'flex flex-col items-start gap-1.5 rounded-[12px] px-3.5 py-3 text-[13px]',
+                x.attending && x.extraRequested ? 'bg-warning-bg text-warning' : 'bg-subtle text-ink/80',
+              )}
+              data-testid="reply-note"
+            >
+              {x.attending && x.extraRequested ? (
+                <p className="font-semibold">
+                  {plural(d.extra, x.extraRequested, { n: number(x.extraRequested) })}
+                </p>
+              ) : null}
+              {x.source === 'host' ? <p>{d.manual}</p> : null}
+              <Link href={`/app/invitations/${data.id}/guests`} className="font-semibold underline">
+                {d.toGuests}
+              </Link>
+            </section>
+          ) : null}
           {x.phoneDisplay || x.email ? (
             <section>
               <h3 className="mb-2 text-[13px] font-bold text-muted">{d.contact}</h3>

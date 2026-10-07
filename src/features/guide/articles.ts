@@ -700,8 +700,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     tips: [
       {
-        he: 'ב"אורחים ושיטת חישוב" רואים זה לצד זה: אורחים צפויים, לפי רשימת המוזמנים, ואנשים שאישרו הגעה. "סנכרון לרשימה" מעדכן את הצפוי.',
-        en: '“Guests and how costs are counted” shows side by side: expected guests, by the guest list, and people who said yes. “Sync to the list” updates the expected number.',
+        he: '"לפי הרשימה" סופר את מי שאישר לפי התשובה ואת מי שעוד לא ענה לפי מספר המוזמנים שלו — מי שענה שלא יגיע לא נספר. ב"אורחים ושיטת חישוב" רואים לידו כמה הוזמנו וכמה אישרו.',
+        en: '“By the list” counts those who said yes as they replied and those who haven’t answered by how many they were invited with — those who said no aren’t counted. “Guests and how costs are counted” shows it next to how many were invited and how many said yes.',
       },
       {
         he: 'התקציב מתחלק לקטגוריות בשקלים שלמים, ומה שנשאר מהעיגול נכנס ל"אחר" — כך שהסכום תמיד שווה לתקציב.',

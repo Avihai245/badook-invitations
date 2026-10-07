@@ -388,8 +388,29 @@ test.describe('guest list', () => {
     expect(csv.text).toContain(`/i/${slug}?g=${dana!.token}`);
     expect(csv.text).toContain('דנה לוי');
 
+    // an answer set by hand shows as such among the replies, with its note
+    const davidId = (await listGuests(page, id)).find((g) => g.name === 'דוד בלי טלפון')!.id;
+    expect(
+      await page.evaluate(
+        async ({ invitationId, guestId }) =>
+          (
+            await fetch(`/api/invitations/${invitationId}/guests/${guestId}/answer`, {
+              method: 'PUT',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ kind: 'answer', attending: false, count: null }),
+            })
+          ).status,
+        { invitationId: id, guestId: davidId },
+      ),
+    ).toBe(200);
     // the other invitation pages link here
     await open(page, `/app/invitations/${id}/responses`);
+    await expect(page.locator('[data-reply-manual]:visible')).toHaveCount(1);
+    await page.locator('[data-reply-manual]:visible').click();
+    await expect(page.getByTestId('reply-note')).toContainText(
+      'עדכנתם את התשובה הזו בעצמכם ברשימת המוזמנים.',
+    );
+    await page.keyboard.press('Escape');
     await navTo(page, 'guests');
     await page.waitForURL(/\/guests$/);
 

@@ -164,9 +164,10 @@ export const planningBudgetHe = {
     childrenN: { one: 'ילד אחד', other: '{n} ילדים' },
     tablesN: { one: 'שולחן אחד', other: '{n} שולחנות' },
     basisLabel: 'מאיפה לקחת את מספר האורחים',
-    basis: { invited: 'כל המוזמנים', confirmed: 'מי שאישר הגעה', manual: 'אורחים צפויים' },
+    basis: { invited: 'לפי הרשימה', confirmed: 'מי שאישר הגעה', manual: 'אורחים צפויים' },
     basisHelp: {
-      invited: 'כל מי שברשימת המוזמנים, כמבוגרים.',
+      invited:
+        'מי שאישר — לפי התשובה (מבוגרים וילדים), ומי שעוד לא ענה — לפי מספר המוזמנים שלו. מי שענה שלא יגיע לא נספר.',
       confirmed: 'מי שענה "מגיעים", מבוגרים וילדים לפי התשובות.',
       manual: 'כמה אורחים אתם מצפים — המספר שתכתבו כאן. כשהרשימה מוכנה אפשר לסנכרן אליה.',
     },
@@ -178,12 +179,12 @@ export const planningBudgetHe = {
     tablesFollow: 'לפי סידור השולחנות.',
     /** the three numbers side by side, so they never look like they disagree */
     expected: 'אורחים צפויים',
-    byList: 'לפי רשימת המוזמנים',
+    byList: 'הוזמנו ברשימה',
     confirmed: 'אנשים שאישרו הגעה',
     byListNote: { one: 'אורח אחד ברשימה', other: '{n} אורחים ברשימה' },
     sync: 'סנכרון לרשימה',
     synced: 'מספר האורחים הצפוי עודכן לפי הרשימה',
-    differ: 'התקציב מחושב לפי {expected}; ברשימת המוזמנים יש {list}.',
+    differ: 'התקציב מחושב לפי {expected}; לפי הרשימה צפויים {list}.',
   },
   categories: {
     expand: 'פתיחת {name}',

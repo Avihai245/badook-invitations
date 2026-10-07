@@ -322,3 +322,42 @@ describe('the list card counts guests who answered', () => {
     expect(item.extraRequests).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('the replies screen says who answered and what they asked for', () => {
+  it('an answer the host set is "host"; a request to bring more is on the reply', async () => {
+    const byHost = await guest('משפחת שושן', 2);
+    await commit('owner_set_response', [inv, OWNER, byHost, true, 2]);
+    const asking = await guest('משפחת גבאי', 2);
+    await reply({ guestId: asking, adults: 2, extra: 1 });
+    const { responses } = await call<{
+      responses: { guestId: string; source: string; extraRequested: number | null }[];
+    }>('owner_responses', [inv, OWNER]);
+    expect(responses.find((x) => x.guestId === byHost)).toMatchObject({
+      source: 'host',
+      extraRequested: null,
+    });
+    expect(responses.find((x) => x.guestId === asking)).toMatchObject({ source: 'guest', extraRequested: 1 });
+  });
+});
+
+describe('the budget counts the people expected by the list', () => {
+  it('answers as given, the rest by their invitation, not who said no', async () => {
+    const before = await call<{ invited: number; expectedAdults: number; expectedChildren: number }>(
+      'planning_headcount',
+      [inv],
+    );
+    const coming = await guest('משפחת פרץ', 4);
+    await reply({ guestId: coming, adults: 1, children: 1 });
+    await guest('משפחת דהן', 3);
+    const no = await guest('משפחת אוחיון', 5);
+    await reply({ guestId: no, attending: false });
+    const after = await call<{ invited: number; expectedAdults: number; expectedChildren: number }>(
+      'planning_headcount',
+      [inv],
+    );
+    expect(after.invited - before.invited).toBe(4 + 3 + 5);
+    // the Perez family: 1 adult and 1 child of 4; the Dahans: 3 still to answer; the Ohayons: none
+    expect(after.expectedAdults - before.expectedAdults).toBe(1 + 3);
+    expect(after.expectedChildren - before.expectedChildren).toBe(1);
+  });
+});

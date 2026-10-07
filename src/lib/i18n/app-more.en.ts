@@ -837,6 +837,12 @@ export const enMore: Pick<AppDict, MoreKey> = {
       deleteTitle: 'Delete the reply from {name}?',
       deleteBody: 'The reply and its guests will be deleted for good.',
       deleted: 'Reply deleted',
+      manual: 'You set this answer yourself on the guest list.',
+      extra: {
+        one: 'They asked to bring one more person. Approve it or not on the guest list.',
+        other: 'They asked to bring {n} more. Approve it or not on the guest list.',
+      },
+      toGuests: 'To the guest list',
     },
     yes: 'Yes',
     no: 'No',
