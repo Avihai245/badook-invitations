@@ -632,6 +632,11 @@ describe('the story and the feed', () => {
     expect(of(s2.id)).toMatchObject({ placement: 'story', post: s2.id });
     expect(of(p1.id)).toMatchObject({ placement: 'feed', post, instagram: 'dana.k_23' });
     expect(of(p2.id)).toMatchObject({ instagram: null });
+    // the hosts' list of who asked to be tagged: theirs only, in the gallery (or waiting), by username
+    expect(await commit('gallery_owner_tags', [likes, OTHER])).toBeNull();
+    const tags = await commit<{ id: string; instagram: string }[]>('gallery_owner_tags', [likes, OWNER]);
+    expect(tags.map((x) => [x.id, x.instagram])).toEqual([[p1.id, 'dana.k_23']]);
+    expect(await call('gallery_counts', [likes])).toMatchObject({ tagged: 1 });
     // "tag me" takes an Instagram username only
     await expect(
       commit('gallery_reserve', [

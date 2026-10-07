@@ -212,6 +212,18 @@ export const liveGalleryEn: LiveGalleryDict = {
     previous: 'Previous',
     position: '{i} of {n}',
   },
+  tags: {
+    button: 'Tag requests ({n})',
+    hint: 'A list for Excel of the guests who asked you to tag them on Instagram: username, profile link, name, how many photos and their file names as in the ZIP download.',
+    csv: {
+      handle: 'Instagram username',
+      link: 'Profile link',
+      name: 'Name they gave',
+      photos: 'Photos',
+      first: 'First shared',
+      files: 'Files in the download',
+    },
+  },
   download: {
     button: 'Download all (ZIP)',
     title: 'Download every file',

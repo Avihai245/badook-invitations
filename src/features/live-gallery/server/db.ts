@@ -36,6 +36,8 @@ export interface GalleryCounts {
   videos: number;
   uploaders: number;
   bytes: number;
+  /** Instagram usernames that asked to be tagged (in the gallery or waiting) */
+  tagged?: number;
 }
 
 export interface ItemRow {
@@ -212,6 +214,10 @@ export const galleryDb = {
       p_item_ids: itemIds,
       p_action: action,
     }),
+
+  /** the photos guests asked to be tagged in, by username (null: not the owner's) */
+  ownerTags: (id: string, ownerId: string) =>
+    rpc<ItemRow[] | null>('gallery_owner_tags', { p_id: id, p_owner_id: ownerId }),
 
   ownerOriginals: (
     id: string,

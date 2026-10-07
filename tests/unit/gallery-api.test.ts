@@ -1435,3 +1435,54 @@ describe('what a storage error means for the upload queue', () => {
     expect(classify(404, '')).toBe('server');
   });
 });
+
+describe('the list of tag requests', () => {
+  const cols = {
+    handle: 'Instagram username',
+    link: 'Profile link',
+    name: 'Name',
+    photos: 'Photos',
+    first: 'First shared',
+    files: 'Files',
+  };
+  it('one row per username: its profile, the names given, how many photos and their names in the ZIP', () => {
+    const a1 = row({
+      instagram: 'dana.k',
+      name: 'דנה',
+      takenAt: '2027-06-17T18:10:00.000Z',
+      originalDone: true,
+    });
+    const a2 = row({
+      instagram: 'dana.k',
+      name: 'דנה ויואב',
+      takenAt: '2027-06-17T18:05:00.000Z',
+      originalDone: true,
+    });
+    const b = row({ instagram: 'roni', name: null, takenAt: null, createdAt: '2027-06-17T19:00:00.000Z' });
+    const csv = host.tagsCsv([a1, a2, b, row({ instagram: null })], 'Asia/Jerusalem', cols);
+    expect(csv.startsWith('﻿')).toBe(true);
+    const lines = csv.slice(1).split('\r\n');
+    expect(lines[0]).toBe('Instagram username,Profile link,Name,Photos,First shared,Files');
+    expect(lines).toHaveLength(3);
+    // no @ in front (Excel would read it as a formula); the earliest photo is when they first shared
+    expect(lines[1]).toBe(
+      [
+        'dana.k',
+        'https://www.instagram.com/dana.k/',
+        'דנה / דנה ויואב',
+        '2',
+        '2027-06-17 21:05:00',
+        `${host.archiveName(a1, 'Asia/Jerusalem', false)} | ${host.archiveName(a2, 'Asia/Jerusalem', false)}`,
+      ].join(','),
+    );
+    // without the original yet: named as the ZIP names its preview
+    expect(lines[2]!).toContain(host.archiveName(b, 'Asia/Jerusalem', true));
+    expect(lines[2]!.startsWith('roni,https://www.instagram.com/roni/,,1,2027-06-17 22:00:00,')).toBe(true);
+  });
+
+  it('nobody asked: the header only', () => {
+    expect(host.tagsCsv([], 'Asia/Jerusalem', cols).slice(1)).toBe(
+      'Instagram username,Profile link,Name,Photos,First shared,Files',
+    );
+  });
+});

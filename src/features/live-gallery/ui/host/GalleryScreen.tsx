@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  AtSign,
   CalendarClock,
   Check,
   Copy,
@@ -306,7 +307,21 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
         title={L.title}
         help={help}
         description={L.subtitle}
-        actions={<DownloadDialog invitationId={id} slug={view.slug} counts={counts} />}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            {/* the guests who asked to be tagged on Instagram: a list to download (shown once one has) */}
+            {counts.tagged ? (
+              <Hint text={L.tags.hint}>
+                <Button variant="secondary" icon={<AtSign />} asChild>
+                  <a href={`/api/invitations/${id}/gallery/tags`} download data-testid="gallery-tags">
+                    {fmt(L.tags.button, { n: number(counts.tagged) })}
+                  </a>
+                </Button>
+              </Hint>
+            ) : null}
+            <DownloadDialog invitationId={id} slug={view.slug} counts={counts} />
+          </div>
+        }
       />
       <p className="mt-3 flex flex-wrap items-center gap-2 text-[13px]">
         <Badge

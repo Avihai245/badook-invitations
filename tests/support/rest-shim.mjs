@@ -103,6 +103,7 @@ const FUNCTIONS = new Set([
   // the live gallery (supabase/migrations/*_live_gallery.sql)
   'gallery_owner_get',
   'gallery_like',
+  'gallery_owner_tags',
   'gallery_likes_of',
   'gallery_owner_create',
   'gallery_owner_update',

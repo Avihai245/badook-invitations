@@ -372,5 +372,19 @@ test('the feed: photos shared together are one post to swipe; a heart (or a doub
   await sheet.getByRole('button', { name: 'שמירה' }).click();
   await expect(sheet).toBeHidden();
   expect(await guest.evaluate(() => localStorage.getItem('badook-gallery:instagram'))).toBeNull();
+  // the hosts: who asked to be tagged, as a list to download (Dana, with her two photos)
+  await page.goto(`/app/invitations/${host.id}/gallery`);
+  const tags = page.getByTestId('gallery-tags');
+  await expect(tags).toHaveText('בקשות תיוג (1)');
+  await expect(tags).toHaveAttribute('href', `/api/invitations/${host.id}/gallery/tags`);
+  const csv = await page.evaluate(async (href) => {
+    const res = await fetch(href);
+    return { type: res.headers.get('content-type'), text: await res.text() };
+  }, `/api/invitations/${host.id}/gallery/tags`);
+  expect(csv.type).toContain('text/csv');
+  const lines = csv.text.replace(/^\ufeff/, '').split('\r\n');
+  expect(lines[0]).toBe('שם משתמש באינסטגרם,קישור לפרופיל,השם שכתבו,תמונות,שיתפו לראשונה,הקבצים בהורדה');
+  expect(lines).toHaveLength(2);
+  expect(lines[1]).toMatch(/^dana\.k,https:\/\/www\.instagram\.com\/dana\.k\/,דנה,1,/);
   await context.close();
 });

@@ -207,6 +207,19 @@ export const liveGalleryHe = {
     previous: 'הקודם',
     position: '{i} מתוך {n}',
   },
+  /** the guests who asked to be tagged on Instagram, to download */
+  tags: {
+    button: 'בקשות תיוג ({n})',
+    hint: 'רשימה לאקסל של האורחים שביקשו שתתייגו אותם באינסטגרם: שם המשתמש, קישור לפרופיל, השם, כמה תמונות ושמות הקבצים כמו בהורדת ה־ZIP.',
+    csv: {
+      handle: 'שם משתמש באינסטגרם',
+      link: 'קישור לפרופיל',
+      name: 'השם שכתבו',
+      photos: 'תמונות',
+      first: 'שיתפו לראשונה',
+      files: 'הקבצים בהורדה',
+    },
+  },
   download: {
     button: 'הורדת הכל (ZIP)',
     title: 'הורדת כל הקבצים',

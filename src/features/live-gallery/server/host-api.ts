@@ -1,5 +1,6 @@
 import 'server-only';
 import { z } from 'zod';
+import { csvCell } from '@/features/invitations/lib/guest-import';
 import {
   packageFor,
   planForPackage,
@@ -481,3 +482,45 @@ export async function originalsPage(
 }
 
 export type { GallerySettings };
+
+/** The columns of the tag list, in the host's language. */
+export interface TagColumns {
+  handle: string;
+  link: string;
+  name: string;
+  photos: string;
+  first: string;
+  files: string;
+}
+
+/**
+ * The list of guests who asked to be tagged on Instagram, for Excel (UTF-8 with a BOM): one row per
+ * username — the username, their profile's link, the name they gave, how many photos, when they first
+ * shared, and the photos' file names as the ZIP download names them (to find them).
+ */
+export function tagsCsv(items: readonly ItemRow[], timeZone: string, c: TagColumns): string {
+  const byHandle = new Map<string, ItemRow[]>();
+  for (const item of items) {
+    if (!item.instagram) continue;
+    const list = byHandle.get(item.instagram);
+    if (list) list.push(item);
+    else byHandle.set(item.instagram, [item]);
+  }
+  const rows = [...byHandle.entries()].map(([handle, list]) => {
+    const names = [...new Set(list.map((r) => r.name?.trim()).filter((n): n is string => !!n))];
+    const first = list.map((r) => r.takenAt ?? r.createdAt).sort()[0]!;
+    return [
+      // the username without its @ (a cell starting with @ is a formula to Excel)
+      handle,
+      `https://www.instagram.com/${handle}/`,
+      names.join(' / '),
+      list.length,
+      stamp(first, timeZone)
+        .replace('_', ' ')
+        .replace(/-(\d\d)-(\d\d)$/, ':$1:$2'),
+      list.map((r) => archiveName(r, timeZone, !r.originalDone)).join(' | '),
+    ];
+  });
+  const header = [c.handle, c.link, c.name, c.photos, c.first, c.files];
+  return '\ufeff' + [header, ...rows].map((r) => r.map((v) => csvCell(v)).join(',')).join('\r\n');
+}
