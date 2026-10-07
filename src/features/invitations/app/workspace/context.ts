@@ -9,3 +9,11 @@ import { createContext, useContext } from 'react';
 export const InWorkspace = createContext(false);
 
 export const useInWorkspace = () => useContext(InWorkspace);
+
+/**
+ * Opens the event's tools (invitations/lib/tools) from any of its screens: the sidebar's "add or
+ * remove tools", the event home's "need something else?". A no-op outside an event's workspace.
+ */
+export const OpenTools = createContext<() => void>(() => undefined);
+
+export const useOpenTools = () => useContext(OpenTools);

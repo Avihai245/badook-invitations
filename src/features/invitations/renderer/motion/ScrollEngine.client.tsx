@@ -182,7 +182,7 @@ export function ScrollEngine() {
       { threshold: [0, 0.35, 0.7] },
     );
     const prepare = (el: HTMLElement) => {
-      if (el.dataset.trDone !== undefined || runs.has(el)) return;
+      if (el.dataset.trDone !== undefined || runs.has(el) || (inv && !inv.contains(el))) return;
       el.dataset.trDone = '';
       const section = el.closest<HTMLElement>('.cine[data-tr]');
       const text = el.textContent ?? '';
@@ -389,6 +389,10 @@ export function ScrollEngine() {
 
     // ── (re)scan: every node the page adds ──
     const scan = () => {
+      // a page replaced as a whole (the editor's preview playing a section, or going back to editing)
+      // is the new engine's: this one must not mark its texts as revealed before it runs (it may see
+      // the new nodes in the moment before its own cleanup)
+      if (inv && !inv.isConnected) return;
       if (ending) checkEnd();
       document.querySelectorAll(REVEALED).forEach((el) => reveal.observe(el));
       const instant = inv?.dataset.instant !== undefined;

@@ -215,6 +215,24 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     setDecline((d) => ({ ...d, fullName: d.fullName || guest.name, phone: d.phone || phone }));
   }, [guest, config.nameFormat]);
 
+  // a personal link counts as many as the guest was invited with — whatever the section's maximum —
+  // and no more: anyone beyond it is a request the hosts approve (submit_rsvp keeps it apart)
+  const party = guest?.partySize ?? null;
+  const maxAdults = party !== null ? Math.max(1, party - children.length) : config.maxAdults;
+  const maxChildren = !config.askChildren
+    ? 0
+    : party !== null
+      ? Math.max(0, party - adults.length)
+      : config.maxChildren;
+  const [extra, setExtra] = useState(0);
+  const full = party !== null && adults.length + children.length >= party;
+  useEffect(() => {
+    if (party === null) return;
+    // a draft from before the link was known: no more than the invitation
+    setAdults((list) => (list.length > party ? list.slice(0, Math.max(1, party)) : list));
+    setChildren((list) => list.slice(0, Math.max(0, party - 1)));
+  }, [party]);
+
   useEffect(() => {
     renderedAt.current = Date.now();
   }, []);
@@ -300,8 +318,8 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
   const step = (kind: 'adults' | 'children', delta: 1 | -1) => {
     const [list, set, min, max] =
       kind === 'adults'
-        ? ([adults, setAdults, 1, config.maxAdults] as const)
-        : ([children, setChildren, 0, config.maxChildren] as const);
+        ? ([adults, setAdults, 1, maxAdults] as const)
+        : ([children, setChildren, 0, maxChildren] as const);
     if (delta > 0 && list.length < max) {
       const restored = stash.current[kind][list.length] ?? {};
       (set as (v: (Adult | Child)[]) => void)([...list, restored]);
@@ -390,6 +408,8 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
       ...(reply ? { editToken: reply.editToken } : {}),
       ...(guest ? { guestToken: guest.token } : {}),
     };
+    // asked to bring more than the invitation (the personal link only): a request for the hosts
+    const more = attending && full && extra > 0 ? { extraRequested: extra } : {};
     const nullable = (v: string | undefined) => (v?.trim() ? v.trim() : null);
     if (!attending) {
       return {
@@ -405,6 +425,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
     return {
       ...base,
       attending: true,
+      ...more,
       adults: adults.map((p, i) => ({
         firstName: config.nameFormat === 'full' ? '' : (p.firstName?.trim() ?? ''),
         lastName: config.nameFormat === 'full' ? '' : (p.lastName?.trim() ?? ''),
@@ -675,7 +696,7 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                 <CoreIcon name="users" size={18} />
                 {t(L, 'rsvp.adults')}
               </p>
-              {stepper('adults', adults.length, 1, config.maxAdults)}
+              {stepper('adults', adults.length, 1, maxAdults)}
             </div>
             {config.askChildren ? (
               <div className="srow">
@@ -683,8 +704,47 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                   <CoreIcon name="baby" size={18} />
                   {t(L, 'rsvp.children')}
                 </p>
-                {stepper('children', children.length, 0, config.maxChildren)}
+                {stepper('children', children.length, 0, maxChildren)}
               </div>
+            ) : null}
+            {party !== null ? (
+              <p className="note" data-testid="rsvp-invited-for">
+                {t(L, 'rsvp.invitedFor', { n: party })}
+              </p>
+            ) : null}
+            {full ? (
+              <>
+                <div className="srow" data-testid="rsvp-bring-more">
+                  <p className="q" id={fid('extra-q')}>
+                    <CoreIcon name="plus" size={18} />
+                    {t(L, 'rsvp.bringMore')}
+                  </p>
+                  <div className="stepper" role="group" aria-labelledby={fid('extra-q')}>
+                    <button
+                      type="button"
+                      onClick={() => setExtra((n) => Math.max(0, n - 1))}
+                      disabled={extra <= 0}
+                      aria-label={t(L, 'rsvp.decrease')}
+                    >
+                      <CoreIcon name="minus" size={18} />
+                    </button>
+                    <output aria-live="polite">
+                      <span className="bump" key={extra}>
+                        {extra}
+                      </span>
+                    </output>
+                    <button
+                      type="button"
+                      onClick={() => setExtra((n) => Math.min(20, n + 1))}
+                      disabled={extra >= 20}
+                      aria-label={t(L, 'rsvp.increase')}
+                    >
+                      <CoreIcon name="plus" size={18} />
+                    </button>
+                  </div>
+                </div>
+                {extra > 0 ? <p className="note">{t(L, 'rsvp.bringMoreHint')}</p> : null}
+              </>
             ) : null}
           </div>
 

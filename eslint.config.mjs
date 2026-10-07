@@ -37,7 +37,12 @@ const config = [
     // The home page's video posters: a plain <img> over the optimizer's own addresses
     // (features/invitations/renderer/images.ts) — next/image as a component would add its runtime
     // (6 KB of JavaScript, hydrated per picture) to the first load.
-    files: ['src/features/site/DemoVideo.client.tsx', 'src/features/site/BackgroundVideo.client.tsx'],
+    // The seating tutorial's card poster is the same.
+    files: [
+      'src/features/site/DemoVideo.client.tsx',
+      'src/features/site/BackgroundVideo.client.tsx',
+      'src/features/seating/ui/SeatingTutorial.tsx',
+    ],
     rules: { '@next/next/no-img-element': 'off' },
   },
   {

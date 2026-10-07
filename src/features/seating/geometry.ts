@@ -35,18 +35,23 @@ export const CHAIR_OFFSET = 0.32;
 export const CHAIR_RADIUS = 0.22;
 
 /** The usual capacity of a new table of each shape. */
-export const DEFAULT_CAPACITY: Record<TableShape, number> = { round: 10, rect: 8, knights: 20 };
+export const DEFAULT_CAPACITY: Record<TableShape, number> = { round: 10, square: 8, rect: 8, knights: 20 };
 
 /**
  * A table's size for its shape and seats — what venues use: round tables whose edge gives each seat
- * ~0.56 m (10 seats → 1.8 m, 12 → 2.1 m); rectangular tables 0.9 m deep with 0.6 m per seat along both
- * long sides (a small one is square); knights (banquet) tables 1 m deep, seats along both long sides.
+ * ~0.56 m (10 seats → 1.8 m, 12 → 2.1 m); square tables with the seats on all four sides (8 → 1.5 m a
+ * side); rectangular tables 0.9 m deep with 0.6 m per seat along both long sides (a small one is
+ * square); knights (banquet) tables 1 m deep, seats along both long sides.
  */
 export function defaultTableSize(shape: TableShape, capacity: number): { w: number; h: number } {
   const n = Math.max(1, Math.round(capacity));
   if (shape === 'round') {
     const d = Math.max(0.8, round1((n * 0.56) / Math.PI));
     return { w: d, h: d };
+  }
+  if (shape === 'square') {
+    const side = Math.max(0.9, round1(Math.ceil(n / 4) * SEAT_PITCH + 0.3));
+    return { w: side, h: side };
   }
   if (shape === 'rect') {
     if (n <= 4) return { w: 0.9, h: 0.9 };
@@ -66,8 +71,9 @@ export function rotate(p: Point, deg: number): Point {
 
 /**
  * Where a table's chairs go, relative to its center before rotation: evenly around a round table;
- * along the two long sides of a rectangular one (a small square table: one per side; an odd seat goes
- * to an end); along the long sides only for a knights table.
+ * evenly on all four sides of a square one (top, then right, bottom, left take the extra seats); along
+ * the two long sides of a rectangular one (a small one: one per side); along the long sides only for a
+ * knights table.
  */
 export function chairPositions(t: Pick<SeatingTable, 'shape' | 'capacity' | 'w' | 'h'>): Point[] {
   const n = Math.max(0, Math.round(t.capacity));
@@ -83,6 +89,17 @@ export function chairPositions(t: Pick<SeatingTable, 'shape' | 'capacity' | 'w' 
   const hh = t.h / 2;
   const along = (count: number, y: number): Point[] =>
     Array.from({ length: count }, (_, i) => ({ x: round2(-hw + (t.w * (i + 0.5)) / count), y }));
+  if (t.shape === 'square') {
+    const per = [0, 1, 2, 3].map((side) => Math.floor(n / 4) + (side < n % 4 ? 1 : 0));
+    const down = (count: number, x: number): Point[] =>
+      Array.from({ length: count }, (_, i) => ({ x, y: round2(-hh + (t.h * (i + 0.5)) / count) }));
+    return [
+      ...along(per[0]!, round2(-hh - CHAIR_OFFSET)),
+      ...down(per[1]!, round2(hw + CHAIR_OFFSET)),
+      ...along(per[2]!, round2(hh + CHAIR_OFFSET)),
+      ...down(per[3]!, round2(-hw - CHAIR_OFFSET)),
+    ];
+  }
   if (t.shape === 'rect' && n <= 4) {
     const sides: Point[] = [
       { x: 0, y: -hh - CHAIR_OFFSET },

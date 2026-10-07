@@ -3,21 +3,20 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
+import { track } from '@/features/analytics/track';
 import { markTourDone } from './tour-done';
 
 const DONE_KEY = 'badook:tour-done';
 
-type StepKey = 'next' | 'nav' | 'budget' | 'rsvp' | 'help';
+type StepKey = 'path' | 'nav' | 'help';
 
 /** Where each stop points: the first of its selectors that is on the screen (the sidebar or the phone's bar). */
 const TARGETS: Record<StepKey, string[]> = {
-  next: ['[data-testid="home-next"]'],
+  path: ['[data-testid="home-journey"]'],
   nav: ['[data-testid="event-sidebar"]', '[data-testid="event-bottom-bar"]'],
-  budget: ['[data-testid="home-budget"]'],
-  rsvp: ['[data-testid="home-rsvp"]'],
   help: ['[data-tour="help"]', '.support-launcher'],
 };
-const ORDER: StepKey[] = ['next', 'nav', 'budget', 'rsvp', 'help'];
+const ORDER: StepKey[] = ['path', 'nav', 'help'];
 
 function visible(el: Element | null): el is HTMLElement {
   if (!(el instanceof HTMLElement)) return false;
@@ -42,8 +41,8 @@ function seen(): boolean {
 }
 
 /**
- * The event home's first visit (UX report §4.2): five short stops — the next step, the four stages, the
- * budget gauge, the RSVPs and help — each lit up on a dimmed screen with a short card. Opens by itself
+ * The event home's first visit (UX report §4.2): three short stops — the event's path (what to do now),
+ * the tools the host chose, and help — each lit up on a dimmed screen with a short card. Opens by itself
  * once (remembered on the account and in this browser), or with `?tour=1` (after the start wizard). Esc
  * or "skip" ends it.
  */
@@ -85,7 +84,8 @@ export function Tour({ seenOnAccount = false }: { seenOnAccount?: boolean }) {
     };
   }, [key]);
 
-  const close = () => {
+  const close = (finished = false) => {
+    track(finished ? 'tour_done' : 'tour_skip', { props: { at: at + 1 } });
     try {
       window.localStorage.setItem(DONE_KEY, '1');
     } catch {
@@ -154,10 +154,10 @@ export function Tour({ seenOnAccount = false }: { seenOnAccount?: boolean }) {
           {words.body}
         </p>
         <div className="mt-4 flex items-center justify-between gap-2">
-          <Button variant="ghost" size="sm" onClick={close}>
+          <Button variant="ghost" size="sm" onClick={() => close()}>
             {T.skip}
           </Button>
-          <Button size="sm" onClick={() => (last ? close() : setAt((i) => i + 1))}>
+          <Button size="sm" onClick={() => (last ? close(true) : setAt((i) => i + 1))}>
             {last ? T.done : T.next}
           </Button>
         </div>

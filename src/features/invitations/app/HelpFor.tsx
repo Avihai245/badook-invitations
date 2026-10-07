@@ -46,7 +46,6 @@ import {
   Image,
   KeyRound,
   Languages,
-  LayoutDashboard,
   Link2,
   ListChecks,
   ListFilter,
@@ -100,7 +99,7 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
   list: {
     newInvitation: Plus,
     card: MousePointerClick,
-    quick: Users,
+    enter: Send,
     nextStep: Sparkles,
     countdown: CalendarClock,
     menu: Ellipsis,
@@ -115,11 +114,11 @@ const ICONS: { [A in HelpArea]: Record<keyof Help[A]['items'], LucideIcon> } = {
   overview: {
     countdown: CalendarClock,
     next: Send,
-    budget: Gauge,
+    howTo: Sparkles,
     rsvp: ListChecks,
+    budget: Gauge,
     tasks: ListOrdered,
-    road: LayoutDashboard,
-    also: Check,
+    tools: Plus,
   },
   gallery: {
     filter: ListFilter,

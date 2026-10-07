@@ -328,6 +328,7 @@ test.describe('responses dashboard', () => {
       admin,
       support,
       planning,
+      hostEvents: expect.any(Number),
     });
     // nothing new since → nothing sent
     expect(await (await cron(`Bearer ${CRON_SECRET}`)).json()).toEqual({
@@ -346,6 +347,7 @@ test.describe('responses dashboard', () => {
       admin,
       support,
       planning,
+      hostEvents: expect.any(Number),
     });
   });
 });
@@ -377,8 +379,8 @@ test.describe('save-the-date', () => {
     expect(body).toContain('DTSTART:20270617T163000Z');
     expect(body).toContain('SUMMARY:נועה & איתי');
 
-    // the full invitation, from the list
-    await open(page, '/app/invitations');
+    // the full invitation, from the list (with one event, "all events" shows it)
+    await open(page, '/app/invitations?all=1');
     await page.getByRole('button', { name: 'אפשרויות נוספות' }).first().click();
     await page.getByRole('menuitem', { name: 'יצירת ההזמנה המלאה' }).click();
     const dialog = page.getByRole('dialog', { name: 'ההזמנה המלאה' });

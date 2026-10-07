@@ -24,12 +24,13 @@ test.describe('acting as a customer from the admin console', () => {
     await open(page, `/app/admin/users/${host.userId}`);
     await page.getByTestId('admin-action-act-as').click();
     await act(page, 'admin-act-as-dialog', 'הלקוחה ביקשה עזרה בעריכה');
-    await page.waitForURL(/\/app\/invitations$/);
+    // the customer's app: their one event opens straight away, as it does for them
+    await page.waitForURL(/\/app\/invitations(\/[0-9a-f-]{36})?(\?|$)/);
 
     // the customer's app, as they see it, with the banner
     const bar = page.getByTestId('acting-as-bar');
     await expect(bar).toContainText(host.email);
-    await expect(page.getByText(bride).first()).toBeVisible();
+    await expect(page.getByText(bride).filter({ visible: true }).first()).toBeVisible();
     await expect(page.getByText(staffEmail)).toHaveCount(0);
 
     // it works in their account: their invitation's guests screen opens
@@ -79,7 +80,7 @@ test.describe('acting as a customer from the admin console', () => {
     ).toBe(1);
 
     // the customer never noticed: still themself, their own invitation
-    await open(host.page, '/app/invitations');
+    await open(host.page, '/app/invitations?all=1');
     await expect(host.page.getByTestId('acting-as-bar')).toHaveCount(0);
     await expect(host.page.getByText(bride).first()).toBeVisible();
     await host.context.close();

@@ -15,8 +15,8 @@ export const enMore: Pick<AppDict, MoreKey> = {
       share: 'Share',
       edit: 'Edit the design',
     },
-    editHint: 'The editor opens full screen. “Back” returns to your invitations.',
-    publish: 'Publish',
+    editHint: 'The editor opens full screen. “Back” returns to the event.',
+    publish: 'Publish the invitation',
     openInvitation: 'Open the invitation',
     editDesign: 'Edit the design',
     guestsCount: { one: '1 guest', other: '{n} guests' },
@@ -25,12 +25,17 @@ export const enMore: Pick<AppDict, MoreKey> = {
       label: 'Event navigation',
       allEvents: 'All events',
       home: 'Event home',
-      stages: { plan: 'Plan', invite: 'Invite', arrange: 'Arrange', celebrate: 'Celebrate' },
+      stages: {
+        plan: 'Event planning',
+        invite: 'Invitation & guests',
+        arrange: 'Seating',
+        celebrate: 'On the day',
+      },
       stageHint: {
         plan: 'Tasks, budget and vendors',
         invite: 'Design, guests, sending and RSVPs',
-        arrange: 'Seating plan',
-        celebrate: 'Event day, gallery and film',
+        arrange: 'Tables and seats',
+        celebrate: 'Entrance, gallery and film',
       },
       items: {
         home: 'Event home',
@@ -52,8 +57,10 @@ export const enMore: Pick<AppDict, MoreKey> = {
       status: {
         done: 'Done',
         open: { one: '1 open', other: '{n} open' },
+        week: { one: '1 this week', other: '{n} this week' },
+        inProgress: 'In progress',
         notStarted: 'Not started',
-        draft: 'Draft',
+        draft: 'Not published yet',
         toSend: { one: '1 to send', other: '{n} to send' },
         startsIn: { one: 'Tomorrow', other: 'In {n} days' },
         today: 'Today!',
@@ -61,7 +68,10 @@ export const enMore: Pick<AppDict, MoreKey> = {
       upgrade: 'On a higher plan',
       fullScreen: 'Opens full screen',
       /** over the sidebar's numbered stages */
-      stagesTitle: 'Event stages',
+      stagesTitle: 'Your event’s tools',
+      /** under the stages: the event's tools, changed from the event's home */
+      addTools: 'Add or remove tools',
+      addToolsHint: 'Planning, seating, the event day',
       /** a stage's place in the order (the sidebar's buttons, the phone's sheet) */
       stepOf: 'Step {n} of {total}',
       menu: '“{stage}” options',
@@ -119,7 +129,7 @@ export const enMore: Pick<AppDict, MoreKey> = {
     },
     details: {
       title: 'Tell us a little',
-      body: 'When, roughly how many and the budget — you can change everything later.',
+      body: 'When and roughly how many — you can change everything later.',
       date: 'Event date',
       dateRequired: 'Choose a date',
       guests: 'About how many guests?',
@@ -128,22 +138,10 @@ export const enMore: Pick<AppDict, MoreKey> = {
       budgetHint: 'Optional. We’ll split it into categories, in whole shekels.',
       invalidNumber: 'Type a whole number',
     },
-    where: {
-      title: 'Where do you want to start?',
-      body: 'Every road leads to the same place — switch any time.',
-      plan: {
-        title: 'Planning',
-        body: 'Tasks on a timeline, a budget and vendors. Pick an invitation design later.',
-      },
-      design: {
-        title: 'Designing the invitation',
-        body: 'Pick an animated design, fill in the details and publish.',
-      },
-      all: {
-        title: 'Everything',
-        body: 'Invitation design and planning together — our recommendation.',
-        badge: 'Recommended',
-      },
+    needs: {
+      title: 'What do you need for your event?',
+      body: 'Pick only what’s relevant to you. Add or remove any time — nothing is deleted.',
+      popular: 'Most popular',
       cta: 'Let’s go',
       creating: 'Setting up your event…',
       error: 'Something went wrong. Try again.',
@@ -157,21 +155,13 @@ export const enMore: Pick<AppDict, MoreKey> = {
     done: 'Done',
     skip: 'Skip',
     steps: {
-      next: {
-        title: 'The next step',
-        body: 'Always one thing — the most important now. Finish it and the next one comes.',
+      path: {
+        title: 'Your path',
+        body: 'Everything your event needs, step by step. The highlighted step is what to do now — one tap.',
       },
       nav: {
-        title: 'Four stages',
-        body: 'Plan, invite, arrange, celebrate. Everything the event needs — in order.',
-      },
-      budget: {
-        title: 'The budget gauge',
-        body: 'Green — safe, amber — close to the limit, red — over. It moves with every expense.',
-      },
-      rsvp: {
-        title: 'RSVPs',
-        body: 'Who’s coming, who isn’t and who hasn’t answered — one number, everywhere.',
+        title: 'The tools you chose',
+        body: 'Every tool you picked for the event lives here. Need something else? “Add or remove tools”, any time.',
       },
       help: {
         title: 'Help any time',
@@ -192,88 +182,203 @@ export const enMore: Pick<AppDict, MoreKey> = {
       copy: 'Copy the link',
       copied: 'Link copied',
       notLive: 'The invitation isn’t published yet',
+      live: 'The invitation is published',
+      daysLeft: { one: 'Tomorrow!', other: 'In {n} days' },
       share: 'Send & share',
     },
-    next: 'Next step',
-    also: 'Also worth doing',
-    actions: {
-      budget: {
-        title: 'Set a budget',
-        body: 'How much you want to spend and how it splits — so every quote is measured against something.',
-        cta: 'Set the budget',
+    /** over the widgets — only the ones with something to show */
+    progressTitle: 'How it’s going',
+    journey: {
+      title: 'Your path',
+      label: 'The event’s steps',
+      progress: '{done} of {total} done',
+      now: 'Now',
+      done: 'Done',
+      later: 'Later',
+      howTo: 'How do I do this?',
+      allDone: {
+        title: 'All going well',
+        body: 'Nothing urgent right now. When there’s a new step, it shows up here.',
       },
-      planSetup: {
-        title: 'Start planning',
-        body: 'Tasks on a timeline, a budget and vendors — ready in a minute, for your kind of event.',
-        cta: 'Start planning',
+      past: {
+        title: 'The event is behind you',
+        body: 'Have a look at every reply and the numbers.',
+        cta: 'See RSVPs',
       },
-      publish: {
-        title: 'Publish the invitation',
-        body: 'The link opens for guests, and you can start sending and sharing.',
-        cta: 'Publish',
-      },
-      publishChanges: {
-        title: 'You have unpublished changes',
-        body: 'Guests still see the previous version of the invitation.',
-        cta: 'Publish the changes',
-      },
-      guests: {
-        title: 'Upload your guest list',
-        body: 'An Excel file with names and phones — every guest gets a personal link with their name.',
-        cta: 'Upload the list',
-      },
-      send: {
-        title: { one: 'Send the invitation to 1 guest', other: 'Send the invitation to {n} guests' },
-        body: 'Each gets their personal link on WhatsApp — and you see who opened it and who’s coming.',
-        cta: 'Send',
-      },
-      matchReplies: {
-        title: {
-          one: 'A general-link reply is waiting to be matched',
-          other: '{n} general-link replies are waiting to be matched',
+      alt: { shareLink: 'No list? Share a general link', editDesign: 'Change the design' },
+      steps: {
+        invitation: {
+          publish: {
+            title: 'Finish the design and publish',
+            body: 'Check the names, date and venue, then tap “Publish” — the link opens to your guests.',
+            cta: 'Design & publish',
+          },
+          changes: {
+            title: 'Your guests don’t see your changes yet',
+            body: 'Publishing again updates the invitation for everyone.',
+            cta: 'Publish the changes',
+          },
+          done: {
+            title: 'The invitation is published',
+            body: 'Change the design and details any time.',
+            cta: 'Change the design',
+          },
         },
-        body: 'They already count. Matching them to guests on the list updates their status.',
-        cta: 'Match',
+        guests: {
+          add: {
+            title: 'Add your guests',
+            body: 'Upload an Excel file or add them by hand — name and phone. Each guest gets a personal link with their name.',
+            cta: 'Add guests',
+          },
+          link: {
+            title: 'Share a general link',
+            body: 'Guests reply through the link. You can add a guest list any time.',
+            cta: 'Share',
+          },
+          done: {
+            title: { one: '1 guest on the list', other: '{n} guests on the list' },
+            body: 'Add and edit any time.',
+            cta: 'The guest list',
+          },
+        },
+        send: {
+          waiting: {
+            title: 'Send on WhatsApp',
+            body: 'After publishing: each guest gets their personal link.',
+            cta: 'Publish first',
+          },
+          send: {
+            title: { one: 'Send the invitation to 1 guest', other: 'Send the invitation to {n} guests' },
+            body: 'Each one gets their personal link on WhatsApp — and you see who opened and who said yes.',
+            cta: 'Send on WhatsApp',
+          },
+          share: {
+            title: 'Share the invitation',
+            body: 'Copy the link and send it on WhatsApp, to a group or anywhere else.',
+            cta: 'Share the link',
+          },
+          done: {
+            title: 'The invitation was sent',
+            body: 'Now just wait for the replies.',
+            cta: 'Send & share',
+          },
+        },
+        rsvp: {
+          waiting: {
+            title: 'Follow the RSVPs',
+            body: 'After sending: see who’s coming, who isn’t and who hasn’t answered.',
+            cta: 'See RSVPs',
+          },
+          follow: {
+            title: 'Follow the RSVPs',
+            body: 'Replies come in and update here as they happen.',
+            cta: 'See RSVPs',
+          },
+          remind: {
+            title: { one: '1 guest hasn’t answered', other: '{n} guests haven’t answered' },
+            body: 'A short WhatsApp reminder works wonders.',
+            cta: 'Send a reminder',
+          },
+          match: {
+            title: { one: '1 reply waits to be matched', other: '{n} replies wait to be matched' },
+            body: 'Replies through the general link. Matching one to a guest updates their status.',
+            cta: 'Match replies',
+          },
+          done: { title: 'Every guest answered', body: 'All the replies in one place.', cta: 'See RSVPs' },
+        },
+        plan: {
+          setup: {
+            title: 'Start a plan for the event',
+            body: 'Tasks on a timeline, a budget and vendors — ready in a minute, for your kind of event.',
+            cta: 'Start the plan',
+          },
+          budget: {
+            title: 'Set a budget',
+            body: 'How much you want to spend — so every quote is measured against something.',
+            cta: 'Set the budget',
+          },
+          tasks: {
+            title: { one: '1 task this week', other: '{n} tasks this week' },
+            body: 'Only what’s worth closing now. The rest waits for its time.',
+            cta: 'This week’s tasks',
+          },
+          onTrack: {
+            title: 'The plan is on track',
+            body: 'Nothing due this week. We’ll remind you when it’s time.',
+            cta: 'The plan',
+          },
+          done: { title: 'Every task is done', body: 'Well done! It’s all wrapped up.', cta: 'The plan' },
+        },
+        seating: {
+          waiting: {
+            title: 'Arrange the tables',
+            body: 'Once RSVPs come in, auto-seating seats everyone in one tap.',
+            cta: 'Seating',
+          },
+          start: {
+            title: 'Arrange the tables',
+            body: 'Add tables, and auto-seating seats everyone in one tap.',
+            cta: 'Seating',
+          },
+          open: {
+            title: { one: '1 guest without a table', other: '{n} guests without a table' },
+            body: 'Drag to a table, or let auto-seating finish the job.',
+            cta: 'Seating',
+          },
+          done: {
+            title: 'Everyone has a seat',
+            body: 'Print the seating plan when you’re ready.',
+            cta: 'Seating',
+          },
+        },
+        day: {
+          soon: {
+            title: 'The event day',
+            body: 'Opens two weeks before: an entrance station, a live gallery from your guests and a moments film.',
+            cta: 'Take a look',
+          },
+          prepare: {
+            title: 'Get the event day ready',
+            body: 'A gallery QR on the tables and an entrance station — all set in advance.',
+            cta: 'Get ready',
+          },
+          today: {
+            title: 'The big day! 🎉',
+            body: 'Check-in at the entrance, and guests upload photos straight to the hall screen.',
+            cta: 'Event day',
+          },
+          after: {
+            title: 'Your moments film is waiting',
+            body: 'Every guest photo in one film — share it with everyone.',
+            cta: 'The film',
+          },
+        },
       },
-      remind: {
-        title: { one: '1 guest hasn’t answered', other: '{n} guests haven’t answered' },
-        body: 'A short WhatsApp reminder works wonders — the list shows who.',
-        cta: 'The guest list',
-      },
-      seating: {
-        title: 'Arrange the tables',
-        body: 'Auto-seating seats everyone in one click; then just move what you want.',
-        cta: 'The seating plan',
-      },
-      gallery: {
-        title: 'Get the live gallery ready',
-        body: 'A QR code on the tables, and guests upload photos straight to the screen in the hall.',
-        cta: 'The gallery',
-      },
-      eventDay: {
-        title: 'The big day! Open the entrance station',
-        body: 'Check-in by scanning a QR, and watch the hall fill up live.',
-        cta: 'Event day',
-      },
-      film: {
-        title: 'Your moments film is waiting',
-        body: 'Every guest photo in one film with music — to share with everyone.',
-        cta: 'The moments film',
-      },
-      insights: {
-        title: 'How was it? All the numbers',
-        body: 'How many opened it, when they replied, who came — in one place.',
-        cta: 'Insights',
-      },
-      tasks: {
-        title: { one: '1 task this week', other: '{n} tasks this week' },
-        body: 'What’s worth closing now so everything arrives on time.',
-        cta: 'Tasks',
-      },
-      allSet: {
-        title: 'Everything’s moving along nicely',
-        body: 'Nothing urgent right now. Have a look at who’s coming.',
-        cta: 'RSVPs',
+    },
+    tools: {
+      title: 'Your event’s tools',
+      body: 'Pick only what you need. Add or remove any time — nothing is deleted.',
+      add: 'Need something else?',
+      addBody: 'Add a tool only when you need it — it shows up in your path and the menu.',
+      manage: 'Change tools',
+      save: 'Save',
+      cancel: 'Cancel',
+      saved: 'Your event’s tools were updated',
+      error: 'We couldn’t save. Try again.',
+      pickOne: 'Pick at least one tool',
+      upgrade: 'On a higher plan',
+      chosen: 'Chosen',
+      items: {
+        invite: {
+          title: 'Digital invitation & RSVPs',
+          body: 'An animated design, a guest list, sending on WhatsApp and seeing who’s coming.',
+        },
+        plan: { title: 'Event planning', body: 'Tasks on a timeline, a budget and vendors.' },
+        seating: { title: 'Seating', body: 'Tables, auto-seating and printing.' },
+        day: {
+          title: 'The event day',
+          body: 'An entrance station, a live guest gallery and a moments film.',
+        },
       },
     },
     widgets: {
@@ -298,20 +403,18 @@ export const enMore: Pick<AppDict, MoreKey> = {
         title: 'Tasks',
         progress: '{done} of {total} done',
         week: { one: '1 task this week', other: '{n} tasks this week' },
+        weekNone: 'Nothing due this week',
+        nextUp: 'Up next',
         open: 'All tasks',
         none: 'No plan yet — tasks and reminders for your kind of event.',
         setup: 'Start planning',
       },
     },
-    road: {
-      title: 'The road',
-      label: 'The event’s four stages',
-    },
   },
   eventSettings: {
     metaTitle: 'Event settings · {name}',
     title: 'Event settings',
-    subtitle: 'The details, the planning, the package — and duplicating or archiving.',
+    subtitle: 'The details, your event’s tools, the planning, the package — and duplicating or archiving.',
     details: {
       title: 'Event details',
       body: '{name} · {type} · {date}. Names, date, venue and languages are changed in the editor.',
@@ -427,8 +530,8 @@ export const enMore: Pick<AppDict, MoreKey> = {
     other: 'Other',
   },
   status: {
-    draft: 'Draft',
-    published: 'Live',
+    draft: 'Not published yet',
+    published: 'Published',
     archived: 'Archived',
     unpublishedChanges: 'Unpublished changes',
   },
@@ -441,7 +544,8 @@ export const enMore: Pick<AppDict, MoreKey> = {
     },
     noResponses: 'No responses yet',
     menu: {
-      edit: 'Edit',
+      open: 'Open the event',
+      edit: 'Edit the design',
       share: 'Share',
       guests: 'Guests',
       responses: 'Responses',
@@ -472,17 +576,19 @@ export const enMore: Pick<AppDict, MoreKey> = {
       days: { one: 'Tomorrow', two: 'In 2 days', other: 'In {n} days' },
     },
     past: 'The event has passed',
-    nextHint: 'The next thing worth doing with this invitation. One tap takes you straight there.',
+    nextHint: 'The next thing worth doing for this event. One tap takes you straight there.',
+    enter: 'Open the event',
+    opening: 'Opening…',
+    repliedOf: '{n} of {total} replied',
+    budgetUsed: 'Budget: {pct}% used',
+    enterHint: 'Everything about the event in one place: your path, guests and RSVPs.',
+    nextLabel: 'Next step',
+    nothingNext: 'All going well',
+    pathProgress: '{done} of {total} steps',
+    newCard: { title: 'New event', body: 'An invitation, a plan or seating — whatever you need.' },
     archiveHint:
       'Invitations you archived: off the list and not counted toward your plan. Bring one back from its ⋯ menu.',
     hideArchivedHint: 'Back to your active invitations.',
-    next: {
-      publish: 'Next step: publish',
-      republish: 'You have changes: publish again',
-      import: 'Next step: upload your guest list',
-      send: { one: 'Send on WhatsApp to 1 guest', other: 'Send on WhatsApp to {n} guests' },
-      track: 'See who’s coming',
-    },
     steps: {
       title: 'How it works',
       design: {
@@ -501,20 +607,6 @@ export const enMore: Pick<AppDict, MoreKey> = {
         title: 'Send on WhatsApp and follow',
         body: 'To your whole list in one go, and see who’s coming as it happens.',
       },
-    },
-    actions: {
-      label: 'Quick actions: {name}',
-      guests: 'Guests & WhatsApp',
-      responses: 'RSVPs',
-      share: 'Share',
-      edit: 'Edit',
-    },
-    progress: {
-      replied: '{pct}% replied',
-      budget: 'Budget',
-      sent: 'Sent to {sent} of {guests}',
-      attending: '{attending} coming',
-      noGuests: 'No guest list yet',
     },
     followUp: {
       title: 'The full invitation',
@@ -745,6 +837,12 @@ export const enMore: Pick<AppDict, MoreKey> = {
       deleteTitle: 'Delete the reply from {name}?',
       deleteBody: 'The reply and its guests will be deleted for good.',
       deleted: 'Reply deleted',
+      manual: 'You set this answer yourself on the guest list.',
+      extra: {
+        one: 'They asked to bring one more person. Approve it or not on the guest list.',
+        other: 'They asked to bring {n} more. Approve it or not on the guest list.',
+      },
+      toGuests: 'To the guest list',
     },
     yes: 'Yes',
     no: 'No',

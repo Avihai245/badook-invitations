@@ -17,7 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CalendarPlus, ChevronDown, EyeOff, ListChecks, Plus, Sparkles, Calendar, List } from 'lucide-react';
 import { useCallback, useId, useMemo, useRef, useState } from 'react';
-import { Button, cn, EmptyState, Input, Menu, Segmented } from '@/components/app';
+import { Button, cn, EmptyState, Hint, Input, Menu, Segmented } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { googleTaskUrl } from '../model/calendar';
 import type { TaskView } from '../model/plan';
@@ -35,6 +35,7 @@ import {
   type Chip,
 } from '../model/tasks-view';
 import { isDone } from '../model/week';
+import { Intro } from './Intro';
 import { PlanFrame, ToolHelp } from './PlanFrame';
 import { usePlan } from './PlanProvider';
 import { CostPrompt } from './tasks/CostPrompt';
@@ -210,6 +211,13 @@ export function TasksScreen() {
         </>
       }
     >
+      <Intro
+        storageKey={`planning:tasks-intro:${plan.id}`}
+        title={T.intro.title}
+        closeLabel={t.common.close}
+        testId="tasks-intro"
+        steps={[{ text: T.intro.order }, { text: T.intro.tick }, { text: T.intro.own }]}
+      />
       <form onSubmit={(e) => void submit(e)} className="flex gap-2">
         <Input
           ref={input}
@@ -225,7 +233,8 @@ export function TasksScreen() {
         </Button>
       </form>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span className="text-[12.5px] font-semibold text-muted">{T.views.show}</span>
         <Segmented
           label={T.views.label}
           value={mode}
@@ -236,22 +245,27 @@ export function TasksScreen() {
             { value: 'list', label: T.views.list },
           ]}
         />
-        <div role="group" aria-label={T.chips.label} className="flex flex-wrap gap-1.5">
+        <div role="group" aria-label={T.chips.label} className="flex flex-wrap items-center gap-1.5">
+          <span aria-hidden className="text-[12.5px] font-semibold text-muted">
+            {T.chips.label}:
+          </span>
           {CHIPS.map((chip) => (
-            <button
-              key={chip}
-              type="button"
-              aria-pressed={chips.has(chip)}
-              onClick={() => toggleChip(chip)}
-              className={cn(
-                'min-h-11 rounded-full px-3.5 text-[13.5px] font-semibold ring-1 transition-colors motion-reduce:transition-none',
-                chips.has(chip)
-                  ? 'bg-inverse text-white ring-inverse'
-                  : 'bg-surface text-ink/75 ring-line hover:bg-subtle hover:text-ink',
-              )}
-            >
-              {T.chips[chip]}
-            </button>
+            <Hint key={chip} text={T.chips.hints[chip]}>
+              <button
+                key={chip}
+                type="button"
+                aria-pressed={chips.has(chip)}
+                onClick={() => toggleChip(chip)}
+                className={cn(
+                  'min-h-11 rounded-full px-3.5 text-[13.5px] font-semibold ring-1 transition-colors motion-reduce:transition-none',
+                  chips.has(chip)
+                    ? 'bg-inverse text-white ring-inverse'
+                    : 'bg-surface text-ink/75 ring-line hover:bg-subtle hover:text-ink',
+                )}
+              >
+                {T.chips[chip]}
+              </button>
+            </Hint>
           ))}
         </div>
       </div>
@@ -325,12 +339,19 @@ export function TasksScreen() {
                       </button>
                     </h2>
                   ) : (
-                    <h2 className="mb-2 flex items-center gap-2 text-[14.5px] font-bold">
-                      <bdi>{group.label}</bdi>
-                      <span className="rounded-full bg-subtle px-2 text-[12px] leading-5 font-semibold text-muted tabular-nums">
-                        {number(group.tasks.length)}
-                      </span>
-                    </h2>
+                    <div className="mb-2">
+                      <h2 className="flex items-center gap-2 text-[14.5px] font-bold">
+                        <bdi>{group.label}</bdi>
+                        <span className="rounded-full bg-subtle px-2 text-[12px] leading-5 font-semibold text-muted tabular-nums">
+                          {number(group.tasks.length)}
+                        </span>
+                      </h2>
+                      {mode === 'timeline' && group.key in T.groups.hints ? (
+                        <p className="mt-0.5 text-[12.5px] text-muted">
+                          {T.groups.hints[group.key as keyof typeof T.groups.hints]}
+                        </p>
+                      ) : null}
+                    </div>
                   )
                 ) : null}
                 {collapsed ? null : (

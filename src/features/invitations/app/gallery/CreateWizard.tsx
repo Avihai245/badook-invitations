@@ -15,6 +15,8 @@ import { COUPLE_EVENTS } from '../../templates/seed-copy';
 import { EVENT_ICONS } from '../event-icons';
 import { HelpFor } from '../HelpFor';
 import { clearAnswers, planInit, readAnswers } from '../onboarding/answers';
+import { DEFAULT_TOOLS } from '../../lib/tools';
+import { saveEventTools } from '../tools/ToolsPicker';
 import { templateKeyFor } from '@/features/planning/templates';
 
 export interface WizardSeed {
@@ -200,12 +202,16 @@ export function CreateWizard({
         return;
       }
       if (res.ok && body?.ok && body.id) {
-        // a budget or a guest count from the start wizard: the plan is set up with them (a convenience)
-        if (answers && (answers.budget || answers.guests) && answers.eventType === eventType)
+        // what the host said they need (the start wizard; straight from the gallery: the invitation), and
+        // the plan when they asked for one — set up with the budget and guest count they gave (a convenience)
+        const fromStart = answers && answers.eventType === eventType ? answers : null;
+        const tools = fromStart?.tools ?? DEFAULT_TOOLS;
+        await saveEventTools(body.id, tools);
+        if (fromStart && tools.includes('plan'))
           await fetch(`/api/invitations/${body.id}/planning`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify(planInit(answers, templateKeyFor(eventType) ?? 'blank')),
+            body: JSON.stringify(planInit(fromStart, templateKeyFor(eventType) ?? 'blank')),
           }).catch(() => null);
         clearAnswers();
         // The skeleton stays up until the editor replaces this page.

@@ -37,10 +37,15 @@ export interface AskInput {
   messages: readonly AssistantMessage[];
 }
 
-/** Models that don't take the structured-output parameter are asked without it (remembered per server). */
+/**
+ * Models that don't take the structured-output parameter, or the effort setting, are asked without it
+ * (remembered per server).
+ */
 let structuredUnsupported = false;
+let effortUnsupported = false;
 export const resetAssistantAiState = () => {
   structuredUnsupported = false;
+  effortUnsupported = false;
 };
 
 export function parseAnswer(text: string): Answer | null {
@@ -90,6 +95,13 @@ export async function askAssistant(
     const left = deadline - Date.now();
     if (left < 3_000) break;
     const structured = !structuredUnsupported;
+    // current models always think, and the thinking counts against max_tokens: a short form-filling
+    // turn needs little of it (low effort keeps it quick; max_tokens leaves room for both)
+    const effort = !effortUnsupported;
+    const outputConfig = {
+      ...(effort ? { effort: 'low' } : {}),
+      ...(structured ? { format: { type: 'json_schema', schema: answerSchema(input.manifest) } } : {}),
+    };
     let res: Response;
     try {
       res = await fetchImpl(`${config.apiBase}/v1/messages`, {
@@ -110,9 +122,7 @@ export async function askAssistant(
             },
           ],
           messages,
-          ...(structured
-            ? { output_config: { format: { type: 'json_schema', schema: answerSchema(input.manifest) } } }
-            : {}),
+          ...(Object.keys(outputConfig).length ? { output_config: outputConfig } : {}),
         }),
         signal: AbortSignal.timeout(left),
       });
@@ -124,6 +134,13 @@ export async function askAssistant(
     if (!res.ok) {
       const message = body?.error?.message ?? '';
       lastError = `${res.status} ${body?.error?.type ?? ''}`.trim();
+      // an older model without the effort setting: ask again without it (before the format check —
+      // its error names output_config too)
+      if (res.status === 400 && effort && /effort/i.test(message)) {
+        effortUnsupported = true;
+        attempt--;
+        continue;
+      }
       if (res.status === 400 && structured && /output_config|format|json_schema|structured/i.test(message)) {
         structuredUnsupported = true;
         attempt--;

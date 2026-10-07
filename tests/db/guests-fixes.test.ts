@@ -204,7 +204,7 @@ describe('replies and guests', () => {
     expect(edit).toEqual({ id: first.id, replaced: true });
   });
 
-  it('a reply through the general link finds its guest by phone — only one who has not answered', async () => {
+  it('a reply through the general link finds its guest by phone — answering again replaces their reply', async () => {
     await commit('import_guests', [inv, OWNER, JSON.stringify([row('Yael', '+972501110003')]), 500]);
     const yael = await byName('Yael');
     const linked = await commit<{ id: string }>('submit_rsvp', [
@@ -220,14 +220,21 @@ describe('replies and guests', () => {
       },
     );
     expect((await byName('Yael')).response).toMatchObject({ id: linked.id, attending: true });
-    // Yael already answered: another reply with her phone stays on its own
-    const other = await commit<{ id: string }>('submit_rsvp', [
+    // Yael already answered: another reply with her phone is her family answering again — it replaces
+    // her reply (one reply a family: never counted twice, *_guest_answers.sql)
+    const again = await commit<{ id: string; replaced: boolean }>('submit_rsvp', [
       inv,
       reply('Her partner', '+972501110003'),
       '[]',
       null,
       'fix-hash-partner',
     ]);
+    expect(again).toEqual({ id: linked.id, replaced: true });
+    expect(
+      (await c.query(`select count(*)::int as n from rsvp_responses where guest_id = $1`, [yael.id])).rows[0]
+        .n,
+    ).toBe(1);
+    // a phone that isn't on the list stays a reply of its own
     const stray = await commit<{ id: string }>('submit_rsvp', [
       inv,
       reply('Not on the list', '+972501119999'),
@@ -235,10 +242,8 @@ describe('replies and guests', () => {
       null,
       'fix-hash-stray',
     ]);
-    const rows = (
-      await c.query(`select guest_id from rsvp_responses where id = any($1)`, [[other.id, stray.id]])
-    ).rows;
-    expect(rows).toEqual([{ guest_id: null }, { guest_id: null }]);
+    const rows = (await c.query(`select guest_id from rsvp_responses where id = $1`, [stray.id])).rows;
+    expect(rows).toEqual([{ guest_id: null }]);
   });
 
   it('knows the site’s sample invitations (the RSVP route stores nothing for them)', async () => {

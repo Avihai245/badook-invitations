@@ -19,11 +19,21 @@ export function pageTitle(ctx: RenderContext): string {
   return ctx.text(ctx.doc.share.ogTitle) || calendarTitle(ctx);
 }
 
-/** The link-preview description: the host's share description, else the date (+ the Hebrew date). */
+/**
+ * The link preview's description when the host wrote none — what the editor shows in the share
+ * description field: the date, the Hebrew date and the (first) place's name.
+ */
+export function autoShareDescription(ctx: RenderContext): string {
+  const venue = firstVenue(ctx);
+  return [ctx.eventDateLong, ctx.hebrewDate, venue ? ctx.text(venue.name) : '']
+    .map((s) => s?.trim())
+    .filter(Boolean)
+    .join(' · ');
+}
+
+/** The link-preview description: the host's share description, else autoShareDescription. */
 export function pageDescription(ctx: RenderContext): string {
-  return (
-    ctx.text(ctx.doc.share.ogDescription) || [ctx.eventDateLong, ctx.hebrewDate].filter(Boolean).join(' · ')
-  );
+  return ctx.text(ctx.doc.share.ogDescription) || autoShareDescription(ctx);
 }
 
 /** Calendar event of one venue — shared by the venue/RSVP calendar menus and /i/[slug]/event.ics. */

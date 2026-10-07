@@ -70,7 +70,8 @@ test.describe('host: create → edit → publish', () => {
     const preview = page.getByRole('dialog');
     await expect(preview.getByRole('heading', { name: 'סהר בורדו' })).toBeVisible();
     await preview.getByRole('button', { name: /כחול לילה/ }).click();
-    await preview.getByRole('button', { name: 'שימוש בעיצוב הזה' }).click();
+    // with the AI set up the preview offers "manual" and "quick with AI"; without it, one "use this design"
+    await preview.getByRole('button', { name: /^(מילוי ידני|שימוש בעיצוב הזה)$/ }).click();
 
     // wizard
     const wizard = page.getByRole('dialog');
@@ -123,6 +124,28 @@ test.describe('host: create → edit → publish', () => {
     // exactly: the row's "?" is named by its card ("קישור ושיתוף: מה כל דבר עושה"), which contains the name too
     await page.getByRole('button', { name: 'קישור ושיתוף', exact: true }).click();
     await expect(page.getByText('ההזמנה עוד לא פורסמה — הקישור יתחיל לעבוד אחרי הפרסום.')).toBeVisible();
+    // the share card is filled in from the invitation: the names, the date and the place, and the image
+    // made from it (the host can still write their own, and go back to the automatic text)
+    const shareTitle = page.getByRole('textbox', { name: 'כותרת בשיתוף' });
+    await expect(shareTitle).toHaveValue('נועה & איתי');
+    const shareDescription = page.getByRole('textbox', { name: 'תיאור בשיתוף' });
+    await expect(shareDescription).toHaveValue(/2027.*אחוזת הגפן/);
+    const card = page.getByTestId('share-card');
+    await expect(card).toContainText('נועה & איתי');
+    await expect(card.locator('img')).toHaveAttribute(
+      'src',
+      /\/api\/invitations\/[^/]+\/share-image\?lang=he/,
+      {
+        timeout: 20_000,
+      },
+    );
+    expect(
+      await card.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth),
+    ).toBe(1200);
+    await shareTitle.fill('בואו לחגוג איתנו');
+    await expect(card).toContainText('בואו לחגוג איתנו');
+    await page.getByRole('button', { name: 'חזרה למילוי האוטומטי' }).click();
+    await expect(shareTitle).toHaveValue('נועה & איתי');
     const draftPath = new URL(await page.getByRole('textbox', { name: 'כתובת ההזמנה' }).inputValue())
       .pathname;
     const guest = await page.context().newPage();
@@ -142,7 +165,7 @@ test.describe('host: create → edit → publish', () => {
     const url = await dialog.getByRole('textbox').inputValue();
     expect(url).toMatch(/\/i\/noa-and-[a-z0-9-]+$/); // transliterated from the Hebrew names
     await dialog.getByRole('button', { name: 'סגירה' }).click();
-    await expect(page.getByText('פורסם', { exact: true })).toBeVisible();
+    await expect(page.getByText('פורסמה', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'פתיחת ההזמנה' })).toHaveAttribute('href', url);
 
     // the public page shows the published invitation (the cached "not available" page is gone)
@@ -177,10 +200,10 @@ test.describe('host: create → edit → publish', () => {
     await expect(page.locator('meta[name="robots"], meta[name="googlebot"]')).toHaveCount(0);
 
     // back in the list: the card is published
-    await open(page, '/app/invitations');
+    await open(page, '/app/invitations?all=1');
     const main = page.locator('#main');
     await expect(main.getByRole('link', { name: 'נועה & איתי' })).toBeVisible();
-    await expect(main.getByText('פורסם', { exact: true })).toBeVisible();
+    await expect(main.getByText('פורסמה', { exact: true })).toBeVisible();
     expect(errors).toEqual([]);
   });
 });
@@ -400,9 +423,9 @@ test.describe('from the list to publishing, a premium design, a wrong address', 
     });
 
     // the list's next step: straight to the editor with its publish window open
-    await open(page, '/app/invitations');
+    await open(page, '/app/invitations?all=1');
     const main = page.locator('#main');
-    await main.getByRole('link', { name: 'הצעד הבא: לפרסם' }).click();
+    await main.getByRole('link', { name: 'הצעד הבא: מסיימים את העיצוב ומפרסמים' }).click();
     await page.waitForURL(new RegExp(`/app/invitations/${created.id}/edit$`));
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
     const dialog = page.getByRole('dialog', { name: 'פרסום ההזמנה' });

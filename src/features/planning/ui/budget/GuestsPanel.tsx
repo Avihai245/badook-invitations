@@ -43,6 +43,10 @@ export function GuestsPanel() {
 
   const basis: GuestBasis = integrations.guests ? settings.guestBasis : 'manual';
   const manual = h.basis === 'manual';
+  // what the list expects: each guest's answer, else their invitation (who said no isn't counted)
+  const listAdults = h.expectedAdults ?? h.invited;
+  const listChildren = h.expectedChildren ?? 0;
+  const listPeople = listAdults + listChildren;
 
   const commitCount = (
     key: 'manualAdults' | 'manualChildren' | 'manualTables',
@@ -111,17 +115,17 @@ export function GuestsPanel() {
           </div>
         ))}
       </div>
-      {manual && h.invited > 0 && h.invited !== h.guests ? (
+      {manual && listPeople > 0 && listPeople !== h.guests ? (
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-4 py-2.5 text-[12.5px] text-muted">
           <span>
             {fmt(G.differ, {
               expected: plural(G.guestsN, h.guests, { n: number(h.guests) }),
-              list: plural(G.guestsN, h.invited, { n: number(h.invited) }),
+              list: plural(G.guestsN, listPeople, { n: number(listPeople) }),
             })}
           </span>
           <button
             type="button"
-            onClick={() => void saveSettings({ manualAdults: h.invited, manualChildren: 0 })}
+            onClick={() => void saveSettings({ manualAdults: listAdults, manualChildren: listChildren })}
             className="rounded-btn px-2 py-1 text-[13px] font-semibold text-brand-deep hover:bg-brand-soft"
           >
             {G.sync}

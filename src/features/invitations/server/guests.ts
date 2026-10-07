@@ -42,7 +42,20 @@ export interface GuestRecord {
   optedOut: boolean;
   /** a WhatsApp message waiting for its next try (Meta asked us to slow down) */
   retryAt: string | null;
-  response: { id: string; attending: boolean; adults: number; children: number; updatedAt: string } | null;
+  response: GuestResponse | null;
+}
+
+/** A guest's reply as the guests page shows it (their latest). */
+export interface GuestResponse {
+  id: string;
+  attending: boolean;
+  adults: number;
+  children: number;
+  /** guest: they answered (the RSVP form); host: the host set it here */
+  source?: 'guest' | 'host';
+  /** people beyond their invitation they asked to bring: not counted until the host approves */
+  extraRequested?: number | null;
+  updatedAt: string;
 }
 
 async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
@@ -71,7 +84,12 @@ export const guestsDb = {
       | null
     >('add_guest', { p_id: id, p_owner_id: ownerId, p_guest: guest, p_max: max }),
   update: (id: string, ownerId: string, guestId: string, g: CleanGuest) =>
-    rpc<{ ok: true; guest: GuestRecord } | { ok: false; code: 'duplicate_phone' } | null>('update_guest', {
+    rpc<
+      | { ok: true; guest: GuestRecord }
+      | { ok: false; code: 'duplicate_phone' }
+      | { ok: false; code: 'below_confirmed'; confirmed: number }
+      | null
+    >('update_guest', {
       p_id: id,
       p_owner_id: ownerId,
       p_guest_id: guestId,
@@ -80,6 +98,26 @@ export const guestsDb = {
       p_email: g.email,
       p_party_size: g.partySize,
       p_group: g.group,
+    }),
+  /** the host sets a guest's answer (attending null: no answer — only one the host set) */
+  setAnswer: (
+    id: string,
+    ownerId: string,
+    guestId: string,
+    attending: boolean | null,
+    count: number | null,
+  ) =>
+    rpc<{ ok: true; guest: GuestRecord } | { ok: false; code: 'invalid' | 'guest_reply' } | null>(
+      'owner_set_response',
+      { p_id: id, p_owner_id: ownerId, p_guest_id: guestId, p_attending: attending, p_count: count },
+    ),
+  /** the host approves (or declines) a guest's request to bring more people */
+  decideExtra: (id: string, ownerId: string, guestId: string, approve: boolean) =>
+    rpc<{ ok: true; guest: GuestRecord } | { ok: false; code: 'nothing' } | null>('owner_extra_decision', {
+      p_id: id,
+      p_owner_id: ownerId,
+      p_guest_id: guestId,
+      p_approve: approve,
     }),
   remove: (id: string, ownerId: string, ids: string[]) =>
     rpc<number | null>('delete_guests', { p_id: id, p_owner_id: ownerId, p_guest_ids: ids }),
@@ -104,6 +142,12 @@ export const guestsDb = {
     }),
   byToken: (invitationId: string, token: string) =>
     rpc<string | null>('guest_by_token', { p_invitation_id: invitationId, p_token: token }),
+  /** a personal link's guest and the people they were invited with (the RSVP's limit) */
+  rsvpGuest: (invitationId: string, token: string) =>
+    rpc<{ id: string; partySize: number | null } | null>('guest_rsvp', {
+      p_invitation_id: invitationId,
+      p_token: token,
+    }),
 };
 
 /** A personal link's token: 16 url-safe characters (96 random bits). */
@@ -255,12 +299,50 @@ export async function updateGuest(
   if ('error' in c) return fail(422, c.error);
   const result = await guestsDb.update(id, userId, guestId, c);
   if (!result) return fail(404, 'not_found');
-  if (!result.ok) return fail(409, result.code);
+  if (!result.ok) return fail(409, result.code, 'confirmed' in result ? { confirmed: result.confirmed } : {});
   // the language is its own call (update_guest keeps its signature): only when the form sent one
   if (parsed.data.language !== undefined && result.guest.language !== c.language) {
     await guestsDb.setLanguage(id, userId, [guestId], c.language);
     return ok({ ...result, guest: { ...result.guest, language: c.language } });
   }
+  return ok(result);
+}
+
+const AnswerSchema = z.discriminatedUnion('kind', [
+  // coming / not coming / no answer (only an answer the host set can be taken back)
+  z.strictObject({
+    kind: z.literal('answer'),
+    attending: z.boolean().nullable(),
+    count: z.number().int().min(1).max(99).nullable().default(null),
+  }),
+  // the guest's request to bring more people
+  z.strictObject({ kind: z.literal('extra'), approve: z.boolean() }),
+]);
+
+/**
+ * PUT /api/invitations/:id/guests/:guestId/answer — the host sets whether a guest is coming and how
+ * many ({ kind: 'answer', attending, count }; coming with more than invited invites them with that
+ * many), or decides on their request to bring more ({ kind: 'extra', approve }). The reply is like any
+ * other: the counts, the seating and the event day follow it. 409 guest_reply: "no answer" over the
+ * guest's own reply.
+ */
+export async function setGuestAnswer(
+  userId: string,
+  id: string,
+  guestId: string,
+  raw: unknown,
+): Promise<ApiResult> {
+  if (!isUuid(id) || !isUuid(guestId)) return fail(404, 'not_found');
+  const parsed = AnswerSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const a = parsed.data;
+  if (a.kind === 'answer' && a.attending && a.count === null) return fail(400, 'invalid');
+  const result =
+    a.kind === 'answer'
+      ? await guestsDb.setAnswer(id, userId, guestId, a.attending, a.attending ? a.count : null)
+      : await guestsDb.decideExtra(id, userId, guestId, a.approve);
+  if (!result) return fail(404, 'not_found');
+  if (!result.ok) return fail(result.code === 'invalid' ? 400 : 409, result.code);
   return ok(result);
 }
 

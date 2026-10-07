@@ -19,6 +19,7 @@ import {
   MessageCircleQuestion,
   Palette,
   PartyPopper,
+  Plus,
   Send,
   Settings,
   Share2,
@@ -37,6 +38,7 @@ import { useUi } from '@/lib/i18n/client';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
 import { CountdownChip, daysUntilEvent, useToday } from '../countdown';
+import { useOpenTools } from './context';
 import { publishHref } from './paths';
 import {
   NAV_PATHS,
@@ -83,8 +85,8 @@ export const STAGE_ICONS: Record<StageKey, LucideIcon> = {
 export interface EventSpaceData {
   item: InvitationSummary;
   caps: WorkspaceCaps;
-  /** the plan's open tasks (null: no plan yet, or no planning) and the seating's numbers */
-  plan: { open: number } | null;
+  /** the plan's open tasks and this week's (null: no plan yet, or no planning) and the seating's numbers */
+  plan: { open: number; week: number } | null;
   seating: { tables: number; unseated: number } | null;
   /** the invitation's poster, drawn on the server (app/ItemPoster) */
   thumb?: ReactNode;
@@ -115,6 +117,10 @@ function useStatusLabel() {
         return S.done;
       case 'open':
         return plural(S.open, s.n, { n: number(s.n) });
+      case 'week':
+        return plural(S.week, s.n, { n: number(s.n) });
+      case 'inProgress':
+        return S.inProgress;
       case 'notStarted':
         return S.notStarted;
       case 'draft':
@@ -142,7 +148,7 @@ function StatusPill({ status }: { status: StageStatus }) {
         'ms-auto inline-flex h-5 shrink-0 items-center gap-1 rounded-full px-2 text-[11px] font-semibold whitespace-nowrap tabular-nums',
         done
           ? 'bg-success-bg text-success'
-          : status.kind === 'startsIn' || status.kind === 'notStarted'
+          : status.kind === 'startsIn' || status.kind === 'notStarted' || status.kind === 'inProgress'
             ? 'bg-subtle text-muted'
             : status.kind === 'today'
               ? 'bg-brand-deep text-white dark:text-[#1c1917]'
@@ -177,6 +183,9 @@ function StageMark({ n, progress }: { n: number; progress: StageProgress }) {
     </span>
   );
 }
+
+/** The list of every event — even for a host with one (the list sends them straight into it otherwise). */
+export const ALL_EVENTS = '/app/invitations?all=1';
 
 function itemHref(id: string, key: NavKey) {
   return `/app/invitations/${id}${NAV_PATHS[key]}`;
@@ -297,7 +306,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
   const { item, caps } = data;
   const path = usePathname();
   const current = navKeyOf(path, item.id);
-  const currentStage = stageOf(current);
+  const currentStage = stageOf(current, caps);
   const facts = useStageFacts(data);
   const { isOpen, toggle } = useOpenStages(item.id, facts, currentStage);
   // the stages' folding moves only once the host folds one (not while the page settles)
@@ -313,11 +322,11 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
       data-testid="event-sidebar"
     >
       <div className="px-5 pt-5">
-        <Link href="/app/invitations" className="inline-block rounded-btn text-[18px]">
+        <Link href={ALL_EVENTS} className="inline-block rounded-btn text-[18px]">
           <BrandLogo label={t.brand} />
         </Link>
         <Link
-          href="/app/invitations"
+          href={ALL_EVENTS}
           className="mt-3 flex items-center gap-1 rounded-btn text-[12.5px] font-semibold text-muted hover:text-ink"
         >
           <ChevronLeft aria-hidden className="icon-dir size-4" />
@@ -344,7 +353,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
         className="mt-2 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain px-3 pb-2 [scrollbar-width:thin]"
       >
         <NavItem id={item.id} navKey="home" current={current === 'home'} />
-        <h2 className="px-2 pt-3 pb-1.5 text-[11.5px] font-semibold text-faint">{N.stagesTitle}</h2>
+        <h2 className="px-2 pt-3 pb-1.5 text-[11.5px] font-semibold text-muted">{N.stagesTitle}</h2>
         <ol className="flex flex-col">
           {stages.map((stage, i) => {
             const items = stageItems(stage, caps);
@@ -392,7 +401,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
                     <span className="sr-only">
                       {fmt(N.stepOf, { n: number(i + 1), total: number(stages.length) })}:
                     </span>
-                    <span className="min-w-0 truncate">{N.stages[stage]}</span>
+                    <span className="min-w-0 leading-tight">{N.stages[stage]}</span>
                     {status ? <StatusPill status={status} /> : <span className="ms-auto" />}
                     <ChevronDown
                       aria-hidden
@@ -435,6 +444,7 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
             );
           })}
         </ol>
+        <AddToolsButton />
       </nav>
 
       <div className="flex flex-col gap-0.5 border-t border-line px-3 pt-2 pb-3">
@@ -455,6 +465,41 @@ export function EventSidebar({ data, account }: { data: EventSpaceData; account:
   );
 }
 
+/**
+ * Under the event's tools: add or remove one (lib/tools) — the dialog opens right here, on any screen
+ * of the event. Two lines: what it does, and which tools there are.
+ */
+function AddToolsButton({ size = 'md', onOpen }: { size?: 'md' | 'lg'; onOpen?: () => void }) {
+  const { t } = useUi();
+  const N = t.workspace.nav;
+  const open = useOpenTools();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        onOpen?.();
+        open();
+      }}
+      data-add-tools=""
+      className={cn(
+        'mt-2 flex w-full items-center gap-2.5 rounded-[12px] border border-dashed border-line-strong px-2.5 text-start transition-colors hover:border-brand hover:bg-brand-soft/50',
+        size === 'lg' ? 'py-3' : 'py-2',
+      )}
+    >
+      <span
+        aria-hidden
+        className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-deep"
+      >
+        <Plus className="size-4" strokeWidth={2.2} />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[13px] font-semibold text-ink">{N.addTools}</span>
+        <span className="block text-[11.5px] leading-snug text-muted">{N.addToolsHint}</span>
+      </span>
+    </button>
+  );
+}
+
 function EventThumb({ thumb, className }: { thumb?: ReactNode; className?: string }) {
   if (!thumb) return null;
   return <span className={cn('block shrink-0', className)}>{thumb}</span>;
@@ -464,13 +509,25 @@ function EventThumb({ thumb, className }: { thumb?: ReactNode; className?: strin
  * The top of every screen in an event: a strip no taller than 72px — the poster, names, date and
  * countdown, whether it's live, and the main action (publish, or open the invitation).
  */
-export function EventBar({ item, thumb }: { item: InvitationSummary; thumb?: ReactNode }) {
+export function EventBar({
+  item,
+  thumb,
+  tools,
+}: {
+  item: InvitationSummary;
+  thumb?: ReactNode;
+  /** the event's tools (lib/tools): no invitation, no publish button */
+  tools: WorkspaceCaps['tools'];
+}) {
   const { t, locale, date } = useUi();
+  // the event's home shows all of this in its own hero (and publishing as a step of its path): no strip
+  const onHome = navKeyOf(usePathname(), item.id) === 'home';
   const w = t.workspace;
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
   const live = item.status === 'published';
   const archived = item.status === 'archived';
+  if (onHome) return null;
   return (
     <header
       className="flex min-h-[64px] items-center gap-3 border-b border-line bg-surface/85 px-4 py-2 backdrop-blur sm:px-6 lg:sticky lg:top-0 lg:z-20 lg:max-h-[72px]"
@@ -519,7 +576,7 @@ export function EventBar({ item, thumb }: { item: InvitationSummary; thumb?: Rea
               </a>
             </Button>
           ) : null}
-          {!live || item.unpublishedChanges ? (
+          {tools.includes('invite') && (!live || item.unpublishedChanges) ? (
             <Button size="sm" icon={<Send className="icon-dir" />} asChild>
               <Link href={publishHref(item.id)}>{live ? t.editor.publishChanges : w.publish}</Link>
             </Button>
@@ -541,7 +598,7 @@ export function EventBottomBar({ data }: { data: EventSpaceData }) {
   const { item, caps } = data;
   const path = usePathname();
   const current = navKeyOf(path, item.id);
-  const currentStage = stageOf(current);
+  const currentStage = stageOf(current, caps);
   const facts = useStageFacts(data);
   const [sheet, setSheet] = useState<StageKey | 'more' | null>(null);
   const stages = STAGES.filter((s) => stageItems(s, caps).length);
@@ -611,6 +668,7 @@ export function EventBottomBar({ data }: { data: EventSpaceData }) {
                 </li>
               ))}
             </ul>
+            <AddToolsButton size="lg" onOpen={() => setSheet(null)} />
           </>
         ) : null}
       </Sheet>

@@ -2,7 +2,7 @@ import type { EditorDict } from './editor.he';
 
 /** Editor strings, English. Same shape as editor.he.ts (checked by the type). */
 export const editorEn: EditorDict = {
-  back: 'Back to invitations',
+  back: 'Back to the event',
   titleSeparator: ' · ',
   save: {
     saving: 'Saving…',
@@ -46,6 +46,11 @@ export const editorEn: EditorDict = {
     fr: 'French',
     es: 'Spanish',
     am: 'Amharic',
+  },
+  autoText: {
+    filled: 'Filled in from the invitation’s details and kept up to date',
+    own: 'Your own text',
+    reset: 'Back to automatic',
   },
   copyFrom: {
     he: 'Copy from Hebrew',
@@ -257,7 +262,8 @@ export const editorEn: EditorDict = {
       parallax: 'Full bleed, moving slower than the scroll',
       video_bg: 'A silent looping video behind the text',
     },
-    needsMedia: 'Add a picture or video first',
+    needsMedia:
+      'These layouts show a picture: add a picture or video above first (a tap on one takes you there)',
     needsVideo: 'Needs a video',
     motion: {
       play: 'Play',
@@ -278,7 +284,7 @@ export const editorEn: EditorDict = {
       },
       scroll: 'While scrolling',
       scrolls: { none: 'None', parallax: 'Parallax', ken_burns: 'Slow zoom' },
-      scrollNeedsMedia: 'For the section’s picture',
+      scrollNeedsMedia: 'Moves the section’s picture: available once you add a picture or video above',
       text: 'Text reveal',
       texts: { none: 'None', letters: 'Letters', words: 'Words', lines: 'Lines' },
       intensity: 'Intensity',
@@ -751,11 +757,21 @@ export const editorEn: EditorDict = {
       slug: 'Invitation address',
       slugHelp: 'You can change the address in the publish dialog.',
       ogTitle: 'Share title',
-      ogTitleHelp: 'Empty = the hosts’ names',
+      ogTitleHelp: 'Filled in from the hosts’ names and kept up to date — you can change it',
       ogDescription: 'Share description',
-      ogDescriptionHelp: 'Empty = the date and place',
+      ogDescriptionHelp: 'Filled in from the date and place and kept up to date — you can change it',
       ogImage: 'Share image',
-      ogImageHelp: 'Empty = an image generated from the invitation',
+      ogImageHelp: 'Made from the invitation: its main photo, the names and the date — and kept up to date.',
+      ogImageOwnHelp: 'Your own picture — cropped to a wide card, as in the preview.',
+      ogImageUpload: 'Upload another picture',
+      ogImageReplace: 'Replace',
+      ogImageReset: 'Back to the automatic image',
+      intro:
+        'Everything is already filled in from the invitation’s details. Nothing to change — unless you want to.',
+      preview: 'How the link looks when you send it',
+      previewLoading: 'Preparing the image…',
+      previewFailed: 'Couldn’t show the image right now.',
+      retry: 'Try again',
       noindex: 'Hide from search engines',
       noindexHelp: 'Recommended: only people with the link will find the invitation.',
       notLive: 'Not published yet — the link starts working once you publish.',

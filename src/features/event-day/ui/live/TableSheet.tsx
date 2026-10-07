@@ -25,6 +25,7 @@ export function PartyRow({
   const s = t.eventDay.sheet;
   const declined = party.status === 'declined';
   const done = party.seats > 0 && party.arrived >= party.seats;
+  const over = party.seats > 0 && party.arrived > party.seats;
   return (
     <li
       className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line py-3 last:border-b-0"
@@ -49,7 +50,7 @@ export function PartyRow({
           {declined && !party.arrived ? (
             <Badge variant="draft">{s.declined}</Badge>
           ) : party.arrived ? (
-            <Badge variant={done ? 'live' : 'warning'}>
+            <Badge variant={over ? 'danger' : done ? 'live' : 'warning'}>
               {fmt(s.arrived, { arrived: number(party.arrived), seats: number(party.seats) })}
             </Badge>
           ) : (
@@ -58,6 +59,11 @@ export function PartyRow({
               {party.seats ? ` · ${number(party.seats)}` : ''}
             </Badge>
           )}
+          {over ? (
+            <span className="font-semibold text-danger" data-party-over="">
+              {s.over}
+            </span>
+          ) : null}
           {told ? <span className="text-muted">{fmt(s.told, { number: told.number })}</span> : null}
           {party.phoneTail ? (
             <span className="text-muted" dir="ltr">

@@ -13,12 +13,12 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     section: 'start',
     title: { he: 'מתחילים אירוע חדש', en: 'Start a new event' },
     what: {
-      he: 'אשף קצר של שלושה מסכים: איזה אירוע חוגגים, כמה פרטים, ומאיפה מתחילים. בסוף מגיעים לבית האירוע או לגלריית העיצובים.',
-      en: 'A short three-screen wizard: what you’re celebrating, a few details, and where to start. At the end you land on the event home or in the design gallery.',
+      he: 'אשף קצר של שלושה מסכים: איזה אירוע חוגגים, מה אתם צריכים לאירוע, וכמה פרטים. בוחרים רק את מה שרלוונטי — הזמנה דיגיטלית, תכנון, סידור שולחנות או יום האירוע.',
+      en: 'A short three-screen wizard: what you’re celebrating, what you need for it, and a few details. Pick only what’s relevant — a digital invitation, planning, seating or the event day.',
     },
     why: {
-      he: 'התשובות מתאימות לכם עיצובים, משימות ותקציב לסוג האירוע, כך שלא מתחילים מדף ריק. אפשר לשנות הכול אחר כך.',
-      en: 'Your answers fit the designs, tasks and budget to your kind of event, so you never start from a blank page. You can change everything later.',
+      he: 'לא כל אירוע צריך הכול. מי שרוצה רק הזמנה דיגיטלית ואישורי הגעה רואה רק את זה — בלי משימות ותקציב. אפשר להוסיף כלי בכל רגע.',
+      en: 'Not every event needs everything. If you only want a digital invitation and RSVPs, that’s all you see — no tasks or budget. Add a tool any time.',
     },
     steps: [
       {
@@ -26,24 +26,24 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Click “New event” in the sidebar (on a phone: “New” in the bottom bar).',
       },
       {
-        he: 'ב"איזה אירוע חוגגים?" בוחרים את סוג האירוע — חתונה, בר מצווה, יום הולדת ועוד — ולוחצים "המשך".',
-        en: 'In “What are you celebrating?” pick the kind of event — a wedding, a bar mitzvah, a birthday and more — and click “Next”.',
+        he: 'ב"איזה אירוע חוגגים?" בוחרים את סוג האירוע — חתונה, בר מצווה, יום הולדת ועוד.',
+        en: 'In “What are you celebrating?” pick the kind of event — a wedding, a bar mitzvah, a birthday and more.',
       },
       {
-        he: 'ב"ספרו לנו קצת" ממלאים שמות, תאריך האירוע, כמה אורחים בערך ותקציב משוער (רשות), ולוחצים "המשך".',
-        en: 'In “Tell us a little” fill in the names, the event date, roughly how many guests and an estimated budget (optional), then click “Next”.',
+        he: 'ב"מה אתם צריכים לאירוע?" מסמנים את מה שצריך: "הזמנה דיגיטלית ואישורי הגעה", "תכנון האירוע", "סידור שולחנות", "יום האירוע" — אחד או כמה — ולוחצים "המשך".',
+        en: 'In “What do you need for your event?” tick what you need: “Digital invitation & RSVPs”, “Event planning”, “Seating”, “The event day” — one or more — and click “Next”.',
       },
       {
-        he: 'ב"מאיפה מתחילים?" בוחרים "מתכננים", "מעצבים את ההזמנה" או "הכול" (המומלץ).',
-        en: 'In “Where do you want to start?” choose “Planning”, “Designing the invitation” or “Everything” (recommended).',
+        he: 'ב"ספרו לנו קצת" ממלאים שמות, תאריך וכמה אורחים בערך (ותקציב משוער — רק אם בחרתם בתכנון), ולוחצים "יוצאים לדרך".',
+        en: 'In “Tell us a little” fill in the names, the date and roughly how many guests (and an estimated budget — only if you chose planning), then click “Let’s go”.',
       },
       {
-        he: 'לוחצים "יוצאים לדרך". "מתכננים" פותח ישר את בית האירוע; שתי האפשרויות האחרות פותחות את גלריית העיצובים.',
-        en: 'Click “Let’s go”. “Planning” opens the event home right away; the other two open the design gallery.',
+        he: 'עם הזמנה דיגיטלית — ממשיכים לבחור עיצוב בגלריה. בלי הזמנה — בית האירוע נפתח מיד.',
+        en: 'With a digital invitation you go on to pick a design in the gallery. Without one, the event home opens right away.',
       },
       {
-        he: 'בבית האירוע עושים את מה שכתוב בכרטיס "הצעד הבא" — תמיד דבר אחד, הכי חשוב עכשיו.',
-        en: 'On the event home, do what the “Next step” card says — always one thing, the most important one now.',
+        he: 'בבית האירוע, ב"המסלול שלכם", עושים את הצעד המודגש — תמיד דבר אחד, בכפתור אחד.',
+        en: 'On the event home, in “Your path”, do the highlighted step — always one thing, one button.',
       },
     ],
     tips: [
@@ -52,18 +52,18 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Want to skip? “Skip to the design gallery” at the top of the wizard goes straight to the designs.',
       },
       {
-        he: 'התקציב מתחלק לקטגוריות לבד, בשקלים שלמים, ומספר האורחים המשוער משמש את התקציב עד שיש רשימת מוזמנים.',
-        en: 'The budget is split into categories for you, in whole shekels, and the estimated guests drive the budget until there’s a guest list.',
+        he: 'שיניתם את דעתכם? "הוספה או הסרה של כלים" בסרגל האירוע, או "צריכים עוד משהו?" בבית האירוע. הורדת כלי רק מסתירה אותו — שום דבר לא נמחק.',
+        en: 'Changed your mind? “Add or remove tools” in the event’s sidebar, or “Need something else?” on the event home. Removing a tool only hides it — nothing is deleted.',
       },
       {
-        he: 'בביקור הראשון בבית האירוע מופיע "סיור קצר" של חמש תחנות. אפשר לדלג עליו.',
-        en: 'Your first visit to the event home shows “A quick tour” of five stops. You can skip it.',
+        he: 'בביקור הראשון בבית האירוע מופיע "סיור קצר" של שלוש תחנות. אפשר לדלג עליו.',
+        en: 'Your first visit to the event home shows “A quick tour” of three stops. You can skip it.',
       },
     ],
     next: ['event-home', 'create-invitation', 'tasks'],
     keywords: {
-      he: 'אירוע חדש, הזמנה חדשה, התחלה, אשף, פתיחת אירוע, מתחילים, צעד ראשון, איך מתחילים',
-      en: 'new event, new invitation, getting started, wizard, onboarding, create event, first steps, how to start',
+      he: 'אירוע חדש, הזמנה חדשה, התחלה, אשף, פתיחת אירוע, מתחילים, צעד ראשון, איך מתחילים, רק הזמנה, בלי תכנון, כלים',
+      en: 'new event, new invitation, getting started, wizard, onboarding, create event, first steps, how to start, only an invitation, no planning, tools',
     },
   },
   {
@@ -71,57 +71,57 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     section: 'start',
     title: { he: 'בית האירוע', en: 'The event home' },
     what: {
-      he: 'המסך הראשון של כל אירוע: ספירה לאחור, הצעד הבא, תקציב, אישורי הגעה ומשימות במבט אחד, ומפת הדרך של ארבעת השלבים.',
-      en: 'The first screen of every event: a countdown, the next step, the budget, RSVPs and tasks at a glance, and the road through the four stages.',
+      he: 'המסך הראשון של כל אירוע: האירוע במבט אחד, "המסלול שלכם" — הצעדים שהאירוע צריך לפי הכלים שבחרתם, עם הצעד של עכשיו מודגש — ומה מתקדם.',
+      en: 'The first screen of every event: the event at a glance, “Your path” — the steps your event needs by the tools you chose, with the step for now highlighted — and how it’s going.',
     },
     why: {
-      he: 'במקום לחפש מה לעשות, רואים דבר אחד שהכי חשוב עכשיו, ואת כל המספרים במקום אחד — אותם מספרים כמו בשאר המערכת.',
-      en: 'Instead of hunting for what to do, you see the one thing that matters most now, and every number in one place — the same numbers as everywhere else.',
+      he: 'לא צריך לחפש מה לעשות: הצעד המודגש הוא הדבר היחיד שחשוב עכשיו, בכפתור אחד. כשמסיימים — מגיע הבא.',
+      en: 'No hunting for what to do: the highlighted step is the one thing that matters now, one button. When it’s done, the next one comes.',
     },
     steps: [
       {
-        he: 'פותחים אירוע מ"האירועים שלי", או לוחצים "בית האירוע" בניווט של האירוע.',
-        en: 'Open an event from “My events”, or click “Event home” in the event’s navigation.',
+        he: 'פותחים אירוע מ"האירועים שלי" ("כניסה לאירוע", או לחיצה בכל מקום על הכרטיס). עם אירוע אחד — נכנסים אליו ישר.',
+        en: 'Open an event from “My events” (“Open the event”, or a click anywhere on its card). With one event you go straight into it.',
       },
       {
-        he: 'למעלה מופיעה הספירה לאחור. "העתקת הקישור" מעתיק את קישור ההזמנה, ו"שליחה ושיתוף" פותח את מסך השיתוף.',
-        en: 'The countdown is at the top. “Copy the link” copies the invitation’s link, and “Send & share” opens the sharing screen.',
+        he: 'למעלה: שם האירוע, התאריך, כמה ימים נשארו, והאם ההזמנה פורסמה ("העתקת הקישור" כשהיא פורסמה).',
+        en: 'At the top: the event’s name, the date, how many days are left, and whether the invitation is published (“Copy the link” once it is).',
       },
       {
-        he: 'בכרטיס "הצעד הבא" לוחצים על הכפתור, למשל "לפרסום", "להעלאת הרשימה" או "לשליחה". כשמסיימים, מגיע הצעד הבא.',
-        en: 'In the “Next step” card, click its button — for example “Publish”, “Upload the list” or “Send”. When it’s done, the next one comes.',
+        he: 'ב"המסלול שלכם" לוחצים על הכפתור של הצעד המודגש — למשל "לעיצוב ולפרסום", "להוספת מוזמנים" או "לשליחה בוואטסאפ".',
+        en: 'In “Your path”, click the highlighted step’s button — for example “Design & publish”, “Add guests” or “Send on WhatsApp”.',
       },
       {
-        he: 'מציצים בשלושת הכרטיסים: מד התקציב ("לתקציב המלא"), טבעת אישורי ההגעה ("לכל התשובות") והתקדמות המשימות ("לכל המשימות").',
-        en: 'Glance at the three cards: the budget gauge (“The full budget”), the RSVP ring (“All replies”) and the task progress (“All tasks”).',
+        he: 'לא בטוחים איך? "איך עושים את זה?" בצעד המודגש פותח את המדריך בדיוק על הנושא.',
+        en: 'Not sure how? “How do I do this?” on the highlighted step opens the guide right on it.',
       },
       {
-        he: 'ב"מפת הדרך" רואים את ארבעת השלבים — מתכננים, מזמינים, מסדרים, חוגגים — ואיפה אתם עומדים בכל אחד.',
-        en: 'In “The road” you see the four stages — Plan, Invite, Arrange, Celebrate — and where you stand in each.',
+        he: 'ב"איך זה מתקדם" מופיעים רק כרטיסים שיש בהם מה לראות: אישורי ההגעה אחרי השליחה, התקציב כשהוגדר, ומשימות השבוע בתכנון.',
+        en: 'Under “How it’s going” only cards with something to show appear: RSVPs after sending, the budget once set, and this week’s tasks when planning.',
       },
       {
-        he: 'ב"גם כדאי" מחכים עוד דברים שכדאי לעשות בקרוב, כל אחד עם כפתור שלוקח ישר לשם.',
-        en: 'Under “Also worth doing” are more things to do soon, each with a button that takes you straight there.',
+        he: 'צריכים עוד כלי? ב"צריכים עוד משהו?" לוחצים "שינוי הכלים" ומסמנים.',
+        en: 'Need another tool? Under “Need something else?” click “Change tools” and tick it.',
       },
     ],
     tips: [
       {
-        he: 'טבעת אישורי ההגעה מראה מגיעים, לא מגיעים ועוד לא ענו. תשובות מהקישור הכללי כבר נספרות, ומסומנות "מהקישור הכללי".',
-        en: 'The RSVP ring shows coming, not coming and not answered. Replies through the general link already count, marked “from the general link”.',
+        he: 'צעד שהושלם מסומן ב־✓ ונשאר לחיץ (למשל "לשינוי העיצוב"). צעד "בהמשך" מחכה למשהו לפניו — אפשר לפתוח אותו כבר עכשיו.',
+        en: 'A finished step shows a ✓ and stays clickable (e.g. “Change the design”). A “Later” step waits for something before it — you can still open it now.',
       },
       {
-        he: 'בלי תקציב כולל, כרטיס התקציב מציע "לקביעת תקציב". בלי תוכנית, כרטיס המשימות מציע "לפתיחת התכנון".',
-        en: 'With no total budget, the budget card offers “Set a budget”. With no plan, the tasks card offers “Start planning”.',
+        he: 'אין רשימת מוזמנים? בצעד "מוסיפים את המוזמנים" יש "אפשר לשתף קישור כללי" — והאורחים עונים דרכו.',
+        en: 'No guest list? The “Add your guests” step offers “Share a general link” — guests reply through it.',
       },
       {
-        he: 'בטלפון, "תובנות" ו"הגדרות האירוע" הם כפתורים בתחתית בית האירוע.',
-        en: 'On a phone, “Insights” and “Event settings” are buttons at the foot of the event home.',
+        he: 'בטלפון, "תובנות", "הגדרות האירוע" ו"שינוי הכלים" הם כפתורים בתחתית בית האירוע.',
+        en: 'On a phone, “Insights”, “Event settings” and “Change tools” are buttons at the foot of the event home.',
       },
     ],
-    next: ['navigation', 'budget-gauge', 'rsvp-and-notifications'],
+    next: ['navigation', 'publish-and-share', 'import-guests'],
     keywords: {
-      he: 'בית האירוע, דשבורד, לוח בקרה, סקירה, הצעד הבא, ספירה לאחור, מפת הדרך, גם כדאי, מסך ראשי',
-      en: 'event home, dashboard, overview, next step, countdown, the road, also worth doing, home screen',
+      he: 'בית האירוע, דשבורד, לוח בקרה, סקירה, הצעד הבא, המסלול שלכם, ספירה לאחור, מסך ראשי, כלים, צריכים עוד משהו',
+      en: 'event home, dashboard, overview, next step, your path, countdown, home screen, tools, need something else',
     },
     screens: ['home'],
   },
@@ -130,37 +130,37 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     section: 'start',
     title: { he: 'הניווט באירוע', en: 'Getting around an event' },
     what: {
-      he: 'בתוך אירוע, הניווט מסודר לפי החיים של האירוע: בית האירוע, ארבעה שלבים — מתכננים, מזמינים, מסדרים, חוגגים — ולמטה תובנות והגדרות האירוע.',
-      en: 'Inside an event, navigation follows the event’s life: the event home, four stages — Plan, Invite, Arrange, Celebrate — and, at the bottom, insights and the event settings.',
+      he: 'בתוך אירוע הסרגל מראה רק את הכלים שבחרתם לאירוע: "תכנון האירוע", "ההזמנה והמוזמנים", "סידור שולחנות", "ביום האירוע" — ולמטה תובנות והגדרות האירוע.',
+      en: 'Inside an event the sidebar shows only the tools you chose for it: “Event planning”, “Invitation & guests”, “Seating”, “On the day” — and, at the bottom, insights and the event settings.',
     },
     why: {
-      he: 'כל מסך נמצא בשלב שבו צריכים אותו, וליד כל שלב רואים את המצב שלו: הושלם, כמה פתוחים, או בעוד כמה ימים.',
-      en: 'Every screen sits in the stage where you need it, and each stage shows its status: done, how many are open, or in how many days.',
+      he: 'אין מסכים שלא צריך. ליד כל כלי רואים את המצב שלו: הושלם, כמה לשבוע הזה, או בעוד כמה ימים.',
+      en: 'No screens you don’t need. Each tool shows its status: done, how many this week, or in how many days.',
     },
     steps: [
       {
-        he: 'במחשב, בסרגל הצד של האירוע לוחצים "בית האירוע", או על מסך מתוך אחד מארבעת השלבים.',
-        en: 'On a computer, in the event’s sidebar, click “Event home” or a screen inside one of the four stages.',
+        he: 'במחשב, בסרגל הצד של האירוע לוחצים "בית האירוע", או על מסך מתוך אחד הכלים.',
+        en: 'On a computer, in the event’s sidebar, click “Event home” or a screen inside one of the tools.',
       },
       {
-        he: '"מתכננים": משימות, תקציב, ספקים, פתקים ורעיונות. "מזמינים": עיצוב ההזמנה, מוזמנים, שליחה ושיתוף, אישורי הגעה.',
-        en: '“Plan”: Tasks, Budget, Vendors, Notes & ideas. “Invite”: Invitation design, Guests, Send & share, RSVPs.',
+        he: '"תכנון האירוע": משימות, תקציב, ספקים, פתקים ורעיונות. "ההזמנה והמוזמנים": עיצוב ההזמנה, מוזמנים, שליחה ושיתוף, אישורי הגעה.',
+        en: '“Event planning”: Tasks, Budget, Vendors, Notes & ideas. “Invitation & guests”: Invitation design, Guests, Send & share, RSVPs.',
       },
       {
-        he: '"מסדרים": סידור שולחנות. "חוגגים": יום האירוע, גלריה חיה ומסך באולם, סרט הרגעים.',
-        en: '“Arrange”: Seating plan. “Celebrate”: Event day, Live gallery & hall screen, Moments film.',
+        he: '"סידור שולחנות": השולחנות וההושבה. "ביום האירוע": יום האירוע, גלריה חיה ומסך באולם, סרט הרגעים.',
+        en: '“Seating”: tables and seats. “On the day”: Event day, Live gallery & hall screen, Moments film.',
       },
       {
-        he: 'בתחתית הסרגל: "תובנות", "הגדרות האירוע" ו"מדריך ועזרה". "כל האירועים" למעלה מחזיר לרשימת האירועים.',
-        en: 'At the bottom of the sidebar: “Insights”, “Event settings” and “Guide & help”. “All events” at the top takes you back to your events.',
+        he: '"הוספה או הסרה של כלים" מתחת לכלים פותח את הבחירה — מוסיפים או מורידים, ושום דבר לא נמחק.',
+        en: '“Add or remove tools” under the tools opens the choice — add or remove, nothing is deleted.',
       },
       {
-        he: 'בטלפון, בסרגל התחתון לוחצים "בית האירוע" או אחד מארבעת השלבים — נפתח חלון עם המסכים של אותו שלב.',
-        en: 'On a phone, tap “Event home” or one of the four stages in the bottom bar — a sheet opens with that stage’s screens.',
+        he: 'בתחתית הסרגל: "תובנות", "הגדרות האירוע" ו"מדריך ועזרה". "כל האירועים" למעלה מציג את כל האירועים.',
+        en: 'At the bottom of the sidebar: “Insights”, “Event settings” and “Guide & help”. “All events” at the top shows all your events.',
       },
       {
-        he: 'בפס העליון של כל מסך: "פרסום" כשיש מה לפרסם, ו"פתיחת ההזמנה" כדי לראות אותה כמו האורחים.',
-        en: 'In the strip at the top of every screen: “Publish” when there’s something to publish, and “Open the invitation” to see it as guests do.',
+        he: 'בטלפון, בסרגל התחתון לוחצים "בית האירוע" או אחד הכלים — נפתח חלון עם המסכים שלו.',
+        en: 'On a phone, tap “Event home” or one of the tools in the bottom bar — a sheet opens with its screens.',
       },
     ],
     tips: [
@@ -169,8 +169,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'A screen marked as on a higher plan belongs to a bigger plan. Opening it shows what it includes and how to upgrade.',
       },
       {
-        he: 'מחוץ לאירוע, הסרגל כולל "האירועים שלי", "אירוע חדש" ו"מדריך ועזרה". החשבון, החבילה והפניות לצוות נמצאים בתפריט החשבון למטה.',
-        en: 'Outside an event, the sidebar has “My events”, “New event” and “Guide & help”. Your account, plan and support tickets are in the account menu at the bottom.',
+        he: '"פרסום ההזמנה" בפס העליון מופיע כשיש מה לפרסם (בבית האירוע הוא צעד במסלול). "חזרה" בעורך מחזירה לאירוע.',
+        en: '“Publish the invitation” in the top strip shows when there’s something to publish (on the event home it’s a step of your path). “Back” in the editor returns to the event.',
       },
       {
         he: '"מדריך ועזרה" פותח חלונית עם שלוש לשוניות: "מדריך", "שאלו את העוזר" ו"פנייה לצוות".',
@@ -179,8 +179,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     next: ['event-home', 'event-settings', 'quick-start'],
     keywords: {
-      he: 'ניווט, תפריט, סרגל צד, שלבים, מתכננים, מזמינים, מסדרים, חוגגים, איפה נמצא, סרגל תחתון, טלפון, נייד',
-      en: 'navigation, menu, sidebar, stages, plan, invite, arrange, celebrate, where is, bottom bar, phone, mobile',
+      he: 'ניווט, תפריט, סרגל צד, שלבים, כלים, הוספת כלים, תכנון האירוע, ההזמנה והמוזמנים, סידור שולחנות, ביום האירוע, איפה נמצא, סרגל תחתון, טלפון, נייד',
+      en: 'navigation, menu, sidebar, stages, tools, add tools, event planning, invitation and guests, seating, on the day, where is, bottom bar, phone, mobile',
     },
     screens: ['home'],
   },
@@ -230,8 +230,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Designs tagged “Premium” can be edited on any plan, and published on Pro and Business.',
       },
       {
-        he: 'את העורך פותחים שוב בכל רגע מ"עיצוב ההזמנה" בשלב "מזמינים".',
-        en: 'Open the editor again any time from “Invitation design” in the “Invite” stage.',
+        he: 'את העורך פותחים שוב בכל רגע מ"עיצוב ההזמנה" ב"ההזמנה והמוזמנים".',
+        en: 'Open the editor again any time from “Invitation design” under “Invitation & guests”.',
       },
       {
         he: 'מה שמילאתם באשף "אירוע חדש" (תאריך ושמות) כבר ממולא בחלון היצירה.',
@@ -330,8 +330,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Choose the invitation’s address (English letters, numbers and hyphens) and click “Publish”.',
       },
       {
-        he: 'פותחים "שליחה ושיתוף" בשלב "מזמינים", ולוחצים "העתקה" ליד הקישור.',
-        en: 'Open “Send & share” in the “Invite” stage, and click “Copy” next to the link.',
+        he: 'פותחים "שליחה ושיתוף" ב"ההזמנה והמוזמנים", ולוחצים "העתקה" ליד הקישור.',
+        en: 'Open “Send & share” under “Invitation & guests”, and click “Copy” next to the link.',
       },
       {
         he: 'בוחרים את שפת ההודעה, עורכים אותה אם רוצים, ולוחצים "שליחה בוואטסאפ" או "העתקת ההודעה".',
@@ -381,8 +381,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "מוזמנים" בשלב "מזמינים" ולוחצים "העלאת רשימה מאקסל".',
-        en: 'Open “Guests” in the “Invite” stage and click “Upload a list from Excel”.',
+        he: 'פותחים "מוזמנים" ב"ההזמנה והמוזמנים", לוחצים "הוספת מוזמנים" ובוחרים "העלאת רשימה מאקסל".',
+        en: 'Open “Guests” under “Invitation & guests”, click “Add guests” and choose “Upload a list from Excel”.',
       },
       {
         he: 'גוררים קובץ xlsx או CSV לחלון, או לוחצים לבחירה. אין קובץ? "קובץ לדוגמה" מוריד תבנית עם העמודות.',
@@ -397,8 +397,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Click “Import N guests”. A guest already on the list is updated, not duplicated.',
       },
       {
-        he: 'רוצים להוסיף מישהו אחד? "הוספה ידנית": שם וטלפון, ולא חובה — מייל, כמות, קבוצה ושפה.',
-        en: 'Adding just one person? “Add by hand”: a name and phone, and optionally an email, party size, group and language.',
+        he: 'רוצים להוסיף מישהו אחד? "הוספת מוזמנים" ← "הוספה ידנית": שם וטלפון, ולא חובה — מייל, כמות, קבוצה ושפה.',
+        en: 'Adding just one person? “Add guests” → “Add by hand”: a name and phone, and optionally an email, party size, group and language.',
       },
     ],
     tips: [
@@ -444,16 +444,16 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'In the list, next to a guest (or in their ⋯ menu), click “Copy the personal link” and send it any way you like.',
       },
       {
-        he: 'רוצים ברכה עם השם? בכרטיס "ברכה אישית עם שם המוזמן" לוחצים "עריכת הברכה" וכותבים אותה בסקשן הפתיחה.',
-        en: 'Want a greeting with their name? In the personal greeting card, click “Edit the greeting” and write it in the opening section.',
+        he: 'רוצים ברכה עם השם? בתפריט ⋯ שבראש העמוד לוחצים "עריכת הברכה האישית" וכותבים אותה בסקשן הפתיחה.',
+        en: 'Want a greeting with their name? In the ⋯ menu at the top of the page, click “Edit the personal greeting” and write it in the opening section.',
       },
       {
         he: 'בהזמנה בכמה שפות, בוחרים לכל מוזמן שפה בעמודת "שפה". הקישור שלו נפתח בה.',
         en: 'In a multi-language invitation, choose each guest’s language in the “Language” column. Their link opens in it.',
       },
       {
-        he: 'עוקבים בעמודת "סטטוס": נשלח, נמסר, נקרא, פתח/ה את ההזמנה, מגיע/ה או לא מגיע/ה.',
-        en: 'Follow the “Status” column: sent, delivered, read, opened the invitation, coming or not coming.',
+        he: 'עוקבים בעמודת "ההזמנה" (נשלח, נמסר, נקרא, פתח/ה את ההזמנה) ובעמודת "הגעה" (מגיעים וכמה, לא מגיעים, עוד לא ענו).',
+        en: 'Follow the “Invitation” column (sent, delivered, read, opened) and the “Attending” column (coming and how many, not coming, no reply yet).',
       },
     ],
     tips: [
@@ -464,6 +464,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       {
         he: 'כמה מוזמנים באותו מכשיר? כל אחד מקבל את התשובה שלו, לפי הקישור שממנו נכנס.',
         en: 'Several guests on one device? Each keeps their own reply, by the link they came in from.',
+      },
+      {
+        he: 'מקישור אישי אפשר לאשר עד מספר המוזמנים של אותו מוזמן. מי שרוצה להביא עוד מבקש בטופס, והבקשה מחכה לאישור שלכם ("+N ביקשו" ברשימה).',
+        en: 'A personal link can confirm up to that guest’s party size. Anyone wanting to bring more asks in the form, and the request waits for you (“+N asked” in the list).',
       },
       {
         he: 'מחיקת מוזמן מפסיקה את הקישור האישי שלו. תשובה שכבר שלח נשארת.',
@@ -562,12 +566,12 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Under “Email notifications” choose “For every reply”, “Daily summary” or “Off”. “Export to Excel” downloads every reply.',
       },
       {
-        he: 'ב"מוזמנים", כשמופיע כרטיס על תשובות מהקישור הכללי, לוחצים "שיוך למוזמנים".',
-        en: 'In “Guests”, when a card about replies from the general link appears, click “Match to guests”.',
+        he: 'ב"מוזמנים", כשמופיע כרטיס על תשובות מהקישור הכללי, לוחצים "שיוך למוזמנים" ובוחרים לכל תשובה את המוזמן שלה.',
+        en: 'In “Guests”, when a card about replies from the general link appears, click “Match to guests” and pick each reply’s guest.',
       },
       {
-        he: 'לכל תשובה בוחרים מוזמן מ"התאמות אפשריות" (לפי טלפון או שם) או מהרשימה, ולוחצים "שיוך".',
-        en: 'For each reply, pick a guest from “Possible matches” (by phone or name) or from the list, and click “Match”.',
+        he: 'מישהו אישר בטלפון? ב"מוזמנים" לוחצים על התא בעמודת "הגעה" ובוחרים מגיעים (וכמה), לא מגיעים או עוד לא ענו.',
+        en: 'Someone confirmed by phone? In “Guests”, click their cell in the “Attending” column and choose coming (and how many), not coming, or no reply yet.',
       },
       {
         he: 'כדי לתזכר, מסננים "בלי תשובה" ברשימת המוזמנים ושולחים מהתפריט ⋯ "שליחה מהוואטסאפ שלי".',
@@ -584,14 +588,14 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: '“Not answered” means guests on the list with no reply of their own — so matching general-link replies makes that number exact.',
       },
       {
-        he: 'אורח שכבר ענה יכול לערוך את התשובה מאותו מכשיר. היא מתעדכנת ולא נכפלת.',
-        en: 'A guest who already replied can edit the reply from the same device. It updates, not duplicates.',
+        he: 'אורח שעונה שוב (מאותו מכשיר, מהקישור האישי או עם הטלפון שלו) — התשובה מתעדכנת ולא נכפלת. תשובה שעדכנתם ידנית מסומנת "ידני" ונספרת בכל מקום, גם בסידור השולחנות.',
+        en: 'A guest who answers again (same device, personal link or their phone) updates the reply, never doubles it. An answer you set by hand is marked “manual” and counts everywhere, seating included.',
       },
     ],
     next: ['personal-links', 'whatsapp-sending', 'seating'],
     keywords: {
-      he: 'אישורי הגעה, RSVP, תשובות, מגיעים, לא מגיעים, עוד לא ענו, שיוך, קישור כללי, התראות, מייל, ייצוא, דדליין, תזכורת',
-      en: 'RSVP, replies, coming, not coming, not answered, match, general link, notifications, email, export, deadline, reminder',
+      he: 'אישורי הגעה, RSVP, תשובות, מגיעים, לא מגיעים, עוד לא ענו, שיוך, קישור כללי, התראות, מייל, ייצוא, דדליין, תזכורת, עדכון ידני, סטטוס הגעה, אישר בטלפון, ביקשו להוסיף',
+      en: 'RSVP, replies, coming, not coming, not answered, match, general link, notifications, email, export, deadline, reminder, set by hand, attendance status, confirmed by phone, asked for more',
     },
     screens: ['responses', 'guests'],
   },
@@ -611,8 +615,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "משימות" בשלב "מתכננים". בפעם הראשונה עוברים שלושה צעדים קצרים — האירוע, אורחים ותקציב, שילוב — ולוחצים "להתחיל לתכנן".',
-        en: 'Open “Tasks” in the “Plan” stage. The first time, go through three short steps — event, guests and budget, linking — then “Start planning”.',
+        he: 'פותחים "משימות" ב"תכנון האירוע". בפעם הראשונה עוברים שלושה צעדים קצרים — האירוע, אורחים ותקציב, שילוב — ולוחצים "להתחיל לתכנן".',
+        en: 'Open “Tasks” under “Event planning”. The first time, go through three short steps — event, guests and budget, linking — then “Start planning”.',
       },
       {
         he: 'בוחרים תצוגה: "ציר זמן" (באיחור, השבוע, החודש, בהמשך), "לפי קטגוריה" או "רשימה".',
@@ -670,8 +674,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "תקציב" בשלב "מתכננים". בפעם הראשונה ממלאים "התקציב הכולל" ו"כמה אורחים צפויים?" ולוחצים "לשמור ולהתחיל".',
-        en: 'Open “Budget” in the “Plan” stage. The first time, fill in “Total budget” and “How many guests do you expect?” and click “Save and start”.',
+        he: 'פותחים "תקציב" ב"תכנון האירוע". בפעם הראשונה ממלאים "התקציב הכולל" ו"כמה אורחים צפויים?" ולוחצים "לשמור ולהתחיל".',
+        en: 'Open “Budget” under “Event planning”. The first time, fill in “Total budget” and “How many guests do you expect?” and click “Save and start”.',
       },
       {
         he: 'קוראים את המד: ירוק עד 85%, צהוב בין 85% ל-100%, ואדום מעל 100%. הסקאלה מגיעה עד 130%.',
@@ -696,8 +700,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     tips: [
       {
-        he: 'ב"אורחים ושיטת חישוב" רואים זה לצד זה: אורחים צפויים, לפי רשימת המוזמנים, ואנשים שאישרו הגעה. "סנכרון לרשימה" מעדכן את הצפוי.',
-        en: '“Guests and how costs are counted” shows side by side: expected guests, by the guest list, and people who said yes. “Sync to the list” updates the expected number.',
+        he: '"לפי הרשימה" סופר את מי שאישר לפי התשובה ואת מי שעוד לא ענה לפי מספר המוזמנים שלו — מי שענה שלא יגיע לא נספר. ב"אורחים ושיטת חישוב" רואים לידו כמה הוזמנו וכמה אישרו.',
+        en: '“By the list” counts those who said yes as they replied and those who haven’t answered by how many they were invited with — those who said no aren’t counted. “Guests and how costs are counted” shows it next to how many were invited and how many said yes.',
       },
       {
         he: 'התקציב מתחלק לקטגוריות בשקלים שלמים, ומה שנשאר מהעיגול נכנס ל"אחר" — כך שהסכום תמיד שווה לתקציב.',
@@ -729,8 +733,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "ספקים" בשלב "מתכננים" ולוחצים "הוספת ספק". שם וקטגוריה מספיקים.',
-        en: 'Open “Vendors” in the “Plan” stage and click “Add vendor”. A name and a category are enough.',
+        he: 'פותחים "ספקים" ב"תכנון האירוע" ולוחצים "הוספת ספק". שם וקטגוריה מספיקים.',
+        en: 'Open “Vendors” under “Event planning” and click “Add vendor”. A name and a category are enough.',
       },
       {
         he: 'גוררים כרטיס לעמודה הבאה כשמשהו מתקדם, או בוחרים "העברה למצב" בתפריט הספק.',
@@ -784,8 +788,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "פתקים ורעיונות" בשלב "מתכננים".',
-        en: 'Open “Notes & ideas” in the “Plan” stage.',
+        he: 'פותחים "פתקים ורעיונות" ב"תכנון האירוע".',
+        en: 'Open “Notes & ideas” under “Event planning”.',
       },
       {
         he: 'כותבים פתק או מדביקים קישור בשורה שלמעלה, ולוחצים Enter. ב"עוד אפשרויות" בוחרים תמונה או רשימה.',
@@ -833,12 +837,12 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "סידור שולחנות" בשלב "מסדרים". רוצים את התוכנית האמיתית? "תוכנית האולם" מעלה תמונה או PDF, ומכיילים קנה מידה.',
-        en: 'Open “Seating plan” in the “Arrange” stage. Want the real layout? “Floor plan” uploads an image or PDF, then you calibrate the scale.',
+        he: 'פותחים "סידור שולחנות" בסרגל. אין תמונה של האולם? בוחרים אולם מוכן (קלאסי, רחב, גן אירועים או אבירים) עם במה, רחבה ושולחנות לפי מספר האורחים. יש? מבקשים מהאולם תמונה או PDF של המפה, מעלים ב"תמונת האולם" ומכיילים קנה מידה.',
+        en: 'Open “Seating plan” in the sidebar. No picture of the hall? Pick a ready-made one (classic, wide, garden or banquet) with a stage, a dance floor and tables for your guests. Have one? Ask the venue for a picture or PDF of its floor plan, upload it in “Hall picture” and calibrate the scale.',
       },
       {
-        he: 'לוחצים "שולחן" ובוחרים עגול, מרובע או אבירים. "סימון" מוסיף במה, רחבת ריקודים, בר, כניסה ויציאה.',
-        en: 'Click “Table” and pick round, square or knights. “Mark” adds a stage, dance floor, bar, entrance and exit.',
+        he: 'לוחצים "שולחן" ובוחרים עגול, מרובע (ריבוע, כיסאות בכל צד), מלבני או אבירים. בחלון השולחן משנים מקומות, גודל וסיבוב. "סימון" מוסיף במה, רחבת ריקודים, בר, כניסה ויציאה.',
+        en: 'Click “Table” and pick round, square (chairs on every side), rectangular or knights. The table’s panel changes its seats, size and rotation. “Mark” adds a stage, dance floor, bar, entrance and exit.',
       },
       {
         he: 'גוררים משפחה מהרשימה לשולחן במפה, או לוחצים "הושבה" ובוחרים שולחן.',
@@ -849,8 +853,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'In a family’s “Settings and wishes”, set its category, how near the stage or exit, and who must or mustn’t sit with it.',
       },
       {
-        he: 'לוחצים "סידור אוטומטי" ואז "סידור". אהבתם שולחן? "נעילת שולחן", ו"סדר מחדש" מסדר רק את השאר.',
-        en: 'Click “Auto-seat”, then “Seat everyone”. Like a table? “Lock table”, and “Rearrange” redoes only the rest.',
+        he: 'לוחצים "סידור אוטומטי". אפשר לכתוב במילים מי עם מי ("סבתא ליד הבמה, החברים מהצבא ביחד, דוד משה לא עם דודה רחל"), לאשר את הכללים שהובנו, ואז "סידור". אהבתם שולחן? "נעילת שולחן", ו"סדר מחדש" מסדר רק את השאר.',
+        en: 'Click “Auto-seat”. You can write who sits with whom in words (“grandma near the stage, the army friends together, uncle Moshe not with aunt Rachel”), approve the rules it understood, then “Seat everyone”. Like a table? “Lock table”, and “Rearrange” redoes only the rest.',
       },
       {
         he: 'בסוף לוחצים "הדפסה" למפה ולרשימה לפי א״ב עם מספרי השולחנות, או "Excel" לקובץ.',
@@ -863,6 +867,18 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Seating by hand is on every plan. Auto-seating is included from Pro up.',
       },
       {
+        he: 'הסידור האוטומטי עובד כמו מארגן מקצועי: משפחה תמיד יחד, כל קבוצה יחד, אף אחד לא יושב לבד בלי מישהו מהקבוצה שלו, ושולחנות לא נשארים חצי ריקים.',
+        en: 'Auto-seating works like a professional planner: a family always together, each group together, nobody alone without someone from their group, and no half-empty tables.',
+      },
+      {
+        he: 'ביום האירוע מפת האולם מתעדכנת בלייב במסך "יום האירוע": מי הגיע, לפי שולחן ולפי האולם כולו.',
+        en: 'On the day, the hall map updates live on the “Event day” screen: who arrived, by table and for the whole hall.',
+      },
+      {
+        he: 'רוצים לראות איך עושים את זה? "סרטון הדרכה" בראש המסך מציג סרטון קצר עם קריינות (45 שניות).',
+        en: 'Want to see how it’s done? “Video guide” at the top of the screen plays a short narrated video (45 seconds).',
+      },
+      {
         he: 'משפחה שהודיעה שלא תגיע אחרי שהושבה? מופיעה התראה, ו"לפנות את המקומות שלהן" מפנה אותם.',
         en: 'A seated family said they won’t come? A notice appears, and “Free their seats” clears them.',
       },
@@ -873,8 +889,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     next: ['send-table', 'event-day', 'rsvp-and-notifications'],
     keywords: {
-      he: 'סידור שולחנות, הושבה, שולחנות, מפת אולם, סידור אוטומטי, תוכנית אולם, הדפסה, אבירים, כרטיסי ישיבה, סידורי ישיבה',
-      en: 'seating, seating plan, tables, floor plan, auto-seat, hall map, print, seating chart, knights table',
+      he: 'סידור שולחנות, הושבה, שולחנות, מפת אולם, סידור אוטומטי, תוכנית אולם, הדפסה, אבירים, כרטיסי ישיבה, סידורי ישיבה, שולחן מרובע, אולם מוכן, תבנית אולם, כללים במילים, סרטון הדרכה',
+      en: 'seating, seating plan, tables, floor plan, auto-seat, hall map, print, seating chart, knights table, square table, hall template, rules in words, tutorial video',
     },
     screens: ['seating'],
   },
@@ -949,8 +965,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "יום האירוע" בשלב "חוגגים". בכרטיס "עמדת הכניסה" לוחצים "העתקת הקישור" או "הורדת QR" ושולחים לצוות.',
-        en: 'Open “Event day” in the “Celebrate” stage. In the “Entrance station” card, click “Copy link” or “Download QR” and send it to the staff.',
+        he: 'פותחים "יום האירוע" ב"ביום האירוע". בכרטיס "עמדת הכניסה" לוחצים "העתקת הקישור" או "הורדת QR" ושולחים לצוות.',
+        en: 'Open “Event day” under “On the day”. In the “Entrance station” card, click “Copy link” or “Download QR” and send it to the staff.',
       },
       {
         he: 'בטלפון או בטאבלט שבכניסה פותחים את הקישור. "סריקת קוד" סורקת את הקוד של האורח, או מחפשים לפי שם או טלפון.',
@@ -1008,8 +1024,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "גלריה חיה ומסך באולם" בשלב "חוגגים" ולוחצים "הפעלת הגלריה".',
-        en: 'Open “Live gallery & hall screen” in the “Celebrate” stage and click “Turn on the gallery”.',
+        he: 'פותחים "גלריה חיה ומסך באולם" ב"ביום האירוע" ולוחצים "הפעלת הגלריה".',
+        en: 'Open “Live gallery & hall screen” under “On the day” and click “Turn on the gallery”.',
       },
       {
         he: 'בכרטיס "הקישור לאורחים": "העתקה", "שליחה בוואטסאפ", או מורידים את קוד ה-QR להדפסה על השולחנות.',
@@ -1118,8 +1134,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "סרט הרגעים" בשלב "חוגגים", או "יצירת סרט" בכרטיס שבגלריה.',
-        en: 'Open “Moments film” in the “Celebrate” stage, or “Make a film” on the gallery’s card.',
+        he: 'פותחים "סרט הרגעים" ב"ביום האירוע", או "יצירת סרט" בכרטיס שבגלריה.',
+        en: 'Open “Moments film” under “On the day”, or “Make a film” on the gallery’s card.',
       },
       {
         he: 'בוחרים אורך (30, 60 או 90 שניות), "לאורך" או "לרוחב", איכות, ושפת הכרטיסים.',
@@ -1397,8 +1413,8 @@ export const GUIDE_FAQ: GuideFaq[] = [
       en: 'Can I plan without choosing an invitation design?',
     },
     a: {
-      he: 'כן. ב"אירוע חדש" בוחרים "מתכננים" — האירוע נפתח עם עיצוב שמתאים לסוג האירוע, וישר לבית האירוע עם משימות ותקציב. את ההזמנה מעצבים אחר כך ב"עיצוב ההזמנה".',
-      en: 'Yes. In “New event” choose “Planning” — the event opens with a design that suits its type and goes straight to the event home with tasks and a budget. Design the invitation later in “Invitation design”.',
+      he: 'כן. ב"אירוע חדש", ב"מה אתם צריכים לאירוע?", מסמנים רק "תכנון האירוע" — האירוע נפתח ישר בבית האירוע עם משימות ותקציב. רוצים הזמנה אחר כך? "הוספה או הסרה של כלים" ← "הזמנה דיגיטלית ואישורי הגעה".',
+      en: 'Yes. In “New event”, under “What do you need for your event?”, tick only “Event planning” — the event opens straight on the event home with tasks and a budget. Want an invitation later? “Add or remove tools” → “Digital invitation & RSVPs”.',
     },
     more: 'quick-start',
   },

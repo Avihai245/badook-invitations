@@ -32,7 +32,14 @@ import {
   usePreviewControls,
 } from '../fields/fields';
 import { invitationPictures } from '../fields/SectionMedia';
-import { applyDocPalette, seededHints, setOpening, setScene, setThemeTokens } from '../presentation';
+import {
+  applyDocPalette,
+  motionMs,
+  seededHints,
+  setOpening,
+  setScene,
+  setThemeTokens,
+} from '../presentation';
 import { useEditor } from '../state/EditorProvider';
 import { PaletteChoices } from './SectionCinematic';
 
@@ -190,7 +197,21 @@ export function ScenePanel() {
 export function StylePanel() {
   const { doc, apply } = useEditor();
   const { t } = useUi();
+  const { play } = usePreviewControls();
   const s = t.editor.cine.style;
+  // the motion's strength shows only as something comes in: a moment after the slider stops, the first
+  // section after the main screen plays in the preview
+  const playTimer = useRef(0);
+  useEffect(() => () => window.clearTimeout(playTimer.current), []);
+  const playFirst = () => {
+    const index = doc.sections.findIndex((x, i) => i > 0 && x.enabled);
+    if (!play || index < 0) return;
+    window.clearTimeout(playTimer.current);
+    playTimer.current = window.setTimeout(
+      () => play(`sections.${index}`, motionMs(doc.sections[index]!), { show: false }),
+      600,
+    );
+  };
   const scale = docScale(doc);
   const R = THEME_TOKEN_RANGES;
   const pct = (v: number) => Math.round(v * 100);
@@ -245,7 +266,10 @@ export function StylePanel() {
         max={pct(R.motion.max)}
         step={10}
         format={(v) => (v === 100 ? s.asDesigned : v === 0 ? s.still : `${v}%`)}
-        onChange={(v) => apply((d) => setThemeTokens(d, { motion: v / 100 }), 'theme.tokens.motion')}
+        onChange={(v) => {
+          apply((d) => setThemeTokens(d, { motion: v / 100 }), 'theme.tokens.motion');
+          playFirst();
+        }}
       />
       {ends(s.still, s.lively)}
       {scale.motion === 0 ? <p className="text-[12px] text-muted">{s.stillNote}</p> : null}

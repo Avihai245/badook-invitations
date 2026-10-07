@@ -83,8 +83,8 @@ export function EditorShell({
       highlight,
       replay,
       // a section's motion, played in the phone; on a phone the editor shows the preview for it
-      play: (path: string, ms: number) => {
-        setMobileView('preview');
+      play: (path: string, ms: number, options?: { show?: boolean }) => {
+        if (options?.show !== false) setMobileView('preview');
         playSection(path, ms);
       },
     }),

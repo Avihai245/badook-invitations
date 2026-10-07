@@ -5,8 +5,15 @@ export const planningTasksEn: PlanningTasksDict = {
   title: 'Tasks',
   subtitle: 'What to do and when, counted from the date of the event.',
   metaTitle: 'Tasks · {name}',
+  intro: {
+    title: 'How the tasks work',
+    order: 'The list is sorted by when each thing needs doing: overdue, this week, this month and later.',
+    tick: 'Tick ✓ when it’s done. Tap a task to open it: a date, a note, a vendor or a cost.',
+    own: 'Something missing? Type it in the line above and press Enter.',
+  },
   views: {
     label: 'View',
+    show: 'Sort:',
     timeline: 'Timeline',
     category: 'By category',
     list: 'List',
@@ -17,6 +24,12 @@ export const planningTasksEn: PlanningTasksDict = {
     mine: 'Mine',
     cost: 'With a cost',
     hidden: 'Hidden',
+    hints: {
+      now: 'What needs closing in the next 14 days',
+      mine: 'Tasks you’re responsible for',
+      cost: 'Tasks linked to the budget',
+      hidden: 'Tasks you hid — you can bring them back',
+    },
   },
   groups: {
     overdue: 'Overdue',
@@ -27,6 +40,13 @@ export const planningTasksEn: PlanningTasksDict = {
     done: 'Done',
     hidden: 'Hidden',
     noCategory: 'General',
+    hints: {
+      overdue: 'The date has passed — handle it or update the date',
+      week: 'Worth closing in the next few days',
+      month: 'Coming up in the next few weeks',
+      later: 'There’s time — we’ll remind you when it gets close',
+      noDate: 'Tasks without a date. Tap one to give it a date',
+    },
   },
   add: {
     placeholder: 'New task, then Enter to add',
@@ -56,8 +76,10 @@ export const planningTasksEn: PlanningTasksDict = {
     assignedTo: 'Owner: {name}',
   },
   suggest: {
-    chip: 'Suggested to hide',
-    body: 'There is little time left, so this may no longer apply.',
+    chip: 'Tasks that probably no longer apply',
+    body: 'Little time is left before the event, so they may not be needed.',
+    banner: { one: '1 task probably no longer applies.', other: '{n} tasks probably no longer apply.' },
+    review: 'Go over them',
     hide: 'Hide',
     keep: 'Keep',
     hideAll: 'Hide all suggestions ({n})',

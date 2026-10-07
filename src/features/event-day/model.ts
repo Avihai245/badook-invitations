@@ -148,7 +148,7 @@ const num = (v: unknown, fallback = 0) => {
   const n = typeof v === 'number' ? v : typeof v === 'string' ? Number(v) : NaN;
   return Number.isFinite(n) ? n : fallback;
 };
-const SHAPES: readonly TableShape[] = ['round', 'rect', 'knights'];
+const SHAPES: readonly TableShape[] = ['round', 'square', 'rect', 'knights'];
 
 /** A table from the database (numeric columns may come as strings). */
 export function readTable(raw: Record<string, unknown>): HallTable {

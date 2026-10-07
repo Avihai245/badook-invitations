@@ -24,6 +24,9 @@ import {
   type TurnResult,
 } from '../../assistant/model';
 import { EVENT_ICONS } from '../event-icons';
+import { DEFAULT_TOOLS } from '../../lib/tools';
+import { readAnswers } from '../onboarding/answers';
+import { saveEventTools } from '../tools/ToolsPicker';
 import type { WizardSeed } from './CreateWizard';
 
 /** The languages the questionnaire writes an invitation in (the others come from the editor). */
@@ -287,8 +290,15 @@ export function AssistantWizard({
       }
       const body = (await res.json().catch(() => null)) as (TurnResult & { ok?: boolean }) | null;
       if (!res.ok || !body?.ok) throw new Error(`assistant: ${res.status}`);
+      if (body.source === 'script' && body.reason === 'error') {
+        // a passing failure (a slow or busy model): the device reads this answer and asks on, and the
+        // next message goes to the AI again
+        scriptAnswer(said, content, 'ai');
+        return;
+      }
       if (body.source === 'script') {
-        // no AI from here on: say so once, then the device reads this answer and asks on
+        // no AI from here on (not set up, or past a limit): say so once, then the device reads this
+        // answer and asks on
         setMode('script');
         const note: AssistantMessage[] = [...said, { role: 'assistant', content: a.offline }];
         scriptAnswer(note, content, 'script');
@@ -350,6 +360,8 @@ export function AssistantWizard({
         return;
       }
       if (res.ok && body?.ok && body.id) {
+        // what the host said they need in the start wizard (lib/tools), else the invitation they came for
+        await saveEventTools(body.id, readAnswers()?.tools ?? DEFAULT_TOOLS);
         // The skeleton stays up until the editor replaces this page.
         router.push(`/app/invitations/${body.id}/edit`);
         return;

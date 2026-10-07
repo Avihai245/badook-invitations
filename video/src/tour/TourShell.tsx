@@ -26,8 +26,27 @@ export function TourShell({
   title: string;
   children: ReactNode;
 }) {
-  const frame = useCurrentFrame();
   const { dur } = useSegment();
+  return (
+    <NarratedShell kicker={kicker} title={title} dur={dur}>
+      {children}
+    </NarratedShell>
+  );
+}
+
+/** The same layout for any narrated video: its scene's length given (the seating tutorial's too). */
+export function NarratedShell({
+  kicker,
+  title,
+  dur,
+  children,
+}: {
+  kicker: string;
+  title: string;
+  dur: number;
+  children: ReactNode;
+}) {
+  const frame = useCurrentFrame();
   const { portrait } = useLayout();
   const exit = interpolate(frame, [dur - 5, dur + 4], [0, 1], { ...clamp, easing: Easing.in(Easing.cubic) });
   const enter = interpolate(frame, [3, 16], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });

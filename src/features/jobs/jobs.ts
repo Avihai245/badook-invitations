@@ -84,9 +84,13 @@ export async function runDaily(now: Date) {
   const planning = await sendPlanReminders(now).catch(
     (err) => (console.error('planning reminders failed', err), null),
   );
+  // the hosts' path through the app (features/analytics) is kept 400 days
+  const { data: hostEvents, error: hostEventsError } = await serviceDb().rpc('host_events_purge');
+  if (hostEventsError) console.error('host_events_purge failed', hostEventsError.message);
   return {
     ...digests,
     planning,
+    hostEvents: (hostEvents as number | null) ?? null,
     purged: (purged as number | null) ?? null,
     overdue,
     seed,

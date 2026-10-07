@@ -631,6 +631,11 @@ function StationBody({
                     ))}
                   </ul>
                 ) : null}
+                {party.seats > 0 && party.arrived >= party.seats ? (
+                  <p className="mt-2 text-[13px] font-semibold text-success" data-testid="party-all-here">
+                    {s.allHere}
+                  </p>
+                ) : null}
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <span className="text-[14px] font-semibold">{s.arrivingNow}</span>
                   <div className="flex items-center gap-2">
@@ -660,6 +665,15 @@ function StationBody({
                     </button>
                   </div>
                 </div>
+                {party.seats > 0 && party.arrived + count > party.seats ? (
+                  <p
+                    className="mt-3 rounded-[12px] bg-warning-bg px-3 py-2 text-[13px] font-semibold text-warning"
+                    role="status"
+                    data-testid="party-over"
+                  >
+                    {plural(s.over, party.seats)}
+                  </p>
+                ) : null}
                 <Button
                   size="lg"
                   className="mt-4 h-13 w-full text-[16px]"
