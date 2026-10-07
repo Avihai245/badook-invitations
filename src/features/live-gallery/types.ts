@@ -33,6 +33,8 @@ export interface FeedItem {
   placement?: Placement;
   /** the feed post it belongs to (photos shared together are one post); its own id when alone */
   post?: string;
+  /** the Instagram username the guest asked to be tagged with (no @) */
+  instagram?: string | null;
 }
 
 export type Placement = 'story' | 'feed';

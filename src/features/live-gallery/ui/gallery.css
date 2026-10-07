@@ -77,3 +77,15 @@
     transform: scale(1.25);
   }
 }
+
+/* a story's ring: the event's colour turning into a warm glow and back (a social app's ring, in the
+   event's own colours) */
+.gallery-ring {
+  background: conic-gradient(
+    from 210deg,
+    var(--gallery-accent),
+    color-mix(in oklab, var(--gallery-accent) 45%, #f6b351),
+    color-mix(in oklab, var(--gallery-accent) 65%, #ea4c7a),
+    var(--gallery-accent)
+  );
+}

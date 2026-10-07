@@ -378,7 +378,7 @@ describe('the tray', () => {
       'צפייה בסטורי של דנה: 3 פריטים, חדש',
       'צפייה בסטורי של המארחים: פריט אחד, חדש',
     ]);
-    expect(screen.getByText(H.stories.hint)).toBeTruthy();
+    expect(screen.getByTestId('gallery-stories').getAttribute('title')).toBe(H.stories.hint);
   });
 
   it('opens a person’s story, and shows the ones already watched as watched', () => {

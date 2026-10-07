@@ -53,7 +53,7 @@ test('without the package the film and face search are offered, not given; their
   const phone = await browser.newContext(PHONE);
   const guest = await phone.newPage();
   await guest.goto(link);
-  await expect(guest.getByRole('button', { name: 'בחירת תמונות וסרטונים' })).toBeEnabled();
+  await expect(guest.getByTestId('gallery-share')).toBeEnabled();
   await expect(guest.getByTestId('face-search')).toHaveCount(0);
   const t = new URL(link).searchParams.get('t');
   for (const path of ['search', 'leave'])
@@ -88,7 +88,7 @@ test('without the package the film and face search are offered, not given; their
   const phone2 = await browser.newContext(PHONE);
   const guest2 = await phone2.newPage();
   await guest2.goto(vipLink);
-  await expect(guest2.getByRole('button', { name: 'בחירת תמונות וסרטונים' })).toBeEnabled();
+  await expect(guest2.getByTestId('gallery-share')).toBeEnabled();
   await expect(guest2.getByTestId('face-search')).toHaveCount(0);
   expect(
     await api(guest2, '/api/gallery/faces/search', 'POST', {

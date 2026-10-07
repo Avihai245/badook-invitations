@@ -67,6 +67,8 @@ export interface ItemRow {
   placement?: 'story' | 'feed';
   /** the feed post (its key, or the item's id) */
   post?: string;
+  /** the Instagram username to tag (no @) */
+  instagram?: string | null;
   guestId: string | null;
   /** who added it: a guest, or the host (their highlights film) */
   source?: 'guest' | 'host';
@@ -120,6 +122,8 @@ export interface ReserveItem {
   placement?: 'story' | 'feed';
   /** feed items shared together: one post */
   post?: string | null;
+  /** "tag me": the guest's Instagram username */
+  instagram?: string | null;
 }
 
 export interface OwnerGallery {

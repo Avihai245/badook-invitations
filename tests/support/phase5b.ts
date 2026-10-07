@@ -202,6 +202,8 @@ export interface SeedPhoto {
   placement?: 'story' | 'feed';
   /** the feed post it joins (photos shared together) */
   post?: string;
+  /** "tag me": the guest's Instagram username */
+  instagram?: string;
 }
 
 /**
@@ -240,6 +242,7 @@ export async function seedPhotos(invitationId: string, photos: SeedPhoto[]): Pro
       takenAt: taken,
       ...(p.placement ? { placement: p.placement } : {}),
       ...(p.post ? { post: p.post } : {}),
+      ...(p.instagram ? { instagram: p.instagram } : {}),
     };
     const [reserved] = await sql<{ r: { ok: boolean } }>(
       `select public.gallery_reserve($1, $2, null, $4, $3, 3000) as r`,

@@ -70,21 +70,20 @@ export function StoryAvatar({
   return (
     <span
       aria-hidden
-      className={`block shrink-0 rounded-full p-[3px] ${
-        ring === 'new'
-          ? 'bg-[linear-gradient(135deg,var(--gallery-accent),color-mix(in_oklab,var(--gallery-accent)_35%,white))]'
-          : 'bg-line-strong'
+      className={`block shrink-0 rounded-full p-[2.5px] ${
+        ring === 'new' ? 'gallery-ring' : 'bg-line-strong'
       }`}
       style={{ width: size, height: size }}
     >
-      <span className="block size-full rounded-full border-[3px] border-canvas bg-canvas">{inner}</span>
+      <span className="block size-full rounded-full border-[2.5px] border-canvas bg-canvas">{inner}</span>
     </span>
   );
 }
 
 /**
- * The stories at the top of the guests' page: a "+" to add your own, then a circle for each person
- * who shared, newest first, scrolling sideways. A tap opens that person's story in the viewer.
+ * The stories at the top of the guests' page, as in a social app: "your story" first (the guest's own
+ * circle with a small "+", one tap to share to it), then a circle for each person who shared, newest
+ * first, scrolling sideways. A tap opens that person's story in the viewer.
  */
 export function StoriesTray({
   stories,
@@ -92,39 +91,56 @@ export function StoriesTray({
   nameOf,
   onOpen,
   onAdd,
+  me,
 }: {
   stories: readonly Story[];
   seen: Record<string, string>;
   nameOf(story: Story): string;
   onOpen(key: string): void;
-  /** the way to pick photos (when the gallery takes uploads) */
+  /** sharing to the story (when the gallery takes uploads) */
   onAdd?: () => void;
+  /** this guest's initial, for their own circle ('' without a name) */
+  me?: string;
 }) {
   const { t, plural } = useGuestText();
   if (!stories.length && !onAdd) return null;
+  const tile =
+    'group flex w-[74px] flex-col items-center gap-1.5 rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
   return (
-    <section className="mt-7" aria-labelledby="gallery-stories" data-testid="gallery-stories">
-      <h2 id="gallery-stories" className="text-[18px] font-bold">
+    <section
+      className="mt-4"
+      aria-labelledby="gallery-stories"
+      data-testid="gallery-stories"
+      title={t.stories.hint}
+    >
+      <h2 id="gallery-stories" className="sr-only">
         {t.stories.title}
       </h2>
-      <ul className="-mx-4 mt-3 flex snap-x gap-3.5 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-6 sm:px-6 [&::-webkit-scrollbar]:hidden">
+      <ul className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pt-1 pb-2 [scrollbar-width:none] sm:-mx-6 sm:px-6 [&::-webkit-scrollbar]:hidden">
         {onAdd ? (
           <li className="shrink-0 snap-start">
             <button
               type="button"
               onClick={onAdd}
               aria-label={`${t.stories.yours}: ${t.stories.addLabel}`}
-              className="group flex w-[76px] flex-col items-center gap-1.5 rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              data-testid="story-add"
+              className={tile}
             >
-              <span
-                aria-hidden
-                className="grid size-[72px] place-items-center rounded-full border-2 border-dashed border-[var(--gallery-accent)] text-[var(--gallery-accent)] transition-transform group-active:scale-95 motion-reduce:transition-none"
-              >
-                <Plus className="size-7" strokeWidth={2.25} />
+              <span className="relative block transition-transform group-active:scale-95 motion-reduce:transition-none">
+                <span
+                  aria-hidden
+                  className="grid size-[66px] place-items-center rounded-full border border-line bg-subtle font-display text-[24px] font-bold text-ink"
+                >
+                  {me || <User className="size-7 text-muted" />}
+                </span>
+                <span
+                  aria-hidden
+                  className="absolute -end-0.5 -bottom-0.5 grid size-[24px] place-items-center rounded-full border-[2.5px] border-canvas bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)]"
+                >
+                  <Plus className="size-3.5" strokeWidth={3} />
+                </span>
               </span>
-              <span className="w-full truncate text-center text-[12.5px] font-semibold text-muted">
-                {t.stories.yours}
-              </span>
+              <span className="w-full truncate text-center text-[12px] text-muted">{t.stories.yours}</span>
             </button>
           </li>
         ) : null}
@@ -140,14 +156,14 @@ export function StoriesTray({
                 aria-label={label}
                 data-story={story.key}
                 data-unseen={unseen ? '' : undefined}
-                className="group flex w-[76px] flex-col items-center gap-1.5 rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className={tile}
               >
                 <span className="block transition-transform group-active:scale-95 motion-reduce:transition-none">
-                  <StoryAvatar story={story} size={72} ring={unseen ? 'new' : 'seen'} />
+                  <StoryAvatar story={story} size={66} ring={unseen ? 'new' : 'seen'} />
                 </span>
                 <span
                   dir="auto"
-                  className={`w-full truncate text-center text-[12.5px] ${unseen ? 'font-bold text-ink' : 'font-medium text-muted'}`}
+                  className={`w-full truncate text-center text-[12px] ${unseen ? 'font-semibold text-ink' : 'text-muted'}`}
                 >
                   {name}
                 </span>
@@ -156,7 +172,6 @@ export function StoriesTray({
           );
         })}
       </ul>
-      {stories.length ? <p className="mt-1 text-[12.5px] text-muted">{t.stories.hint}</p> : null}
     </section>
   );
 }

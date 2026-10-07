@@ -362,6 +362,19 @@ export function ItemsSection({
                     .filter(Boolean)
                     .join(' · ')}
                 </p>
+                {item.instagram ? (
+                  <p className="mt-1">
+                    <a
+                      href={`https://www.instagram.com/${item.instagram}/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-white underline underline-offset-2"
+                      data-instagram={item.instagram}
+                    >
+                      {fmt(g.instagram, { handle: `@${item.instagram}` })}
+                    </a>
+                  </p>
+                ) : null}
               </div>
               <div className="flex flex-wrap gap-2">
                 {actionsFor(item).map((a) => (

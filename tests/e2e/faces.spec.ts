@@ -189,7 +189,7 @@ test('a guest finds the photos they are in, downloads them, and is left out; ano
   });
   expect(refused).toMatchObject({ status: 403, body: { code: 'feature_off' } });
   await guest.reload();
-  await expect(guest.getByRole('button', { name: 'בחירת תמונות וסרטונים' })).toBeEnabled();
+  await expect(guest.getByTestId('gallery-share')).toBeEnabled();
   await expect(guest.getByTestId('face-search')).toHaveCount(0);
   await phoneA.close();
   await phoneB.close();

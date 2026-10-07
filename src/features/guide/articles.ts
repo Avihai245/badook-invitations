@@ -1050,8 +1050,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     tips: [
       {
-        he: 'אצל האורחים הגלריה היא כמו אינסטגרם של האירוע: סטורי בעיגולים למעלה, פיד של פוסטים עם לייקים, ובשיתוף בוחרים לאן. כל מה ששותף מגיע אליכם, גם לסטורי וגם לפיד.',
-        en: 'For guests the gallery is the event’s own Instagram: stories in circles at the top, a feed of posts with likes, and they choose where to share. Everything shared reaches you, story or feed.',
+        he: 'אצל האורחים הגלריה היא רשת חברתית של האירוע: סטורי בעיגולים, פיד עם לייקים, ופס שיתוף בתחתית ("סטורי" או "פוסט"). אורח יכול לבקש שתתייגו אותו — תראו ליד התמונה שלו את שם המשתמש שלו באינסטגרם.',
+        en: 'For guests the gallery is the event’s own social network: stories in circles, a feed with likes, and a share bar at the bottom (“Story” or “Post”). A guest can ask to be tagged — you’ll see their Instagram username by their photos.',
       },
       {
         he: 'הגלריה החיה כלולה בתוכנית Pro ומעלה.',

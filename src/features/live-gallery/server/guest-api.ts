@@ -18,7 +18,16 @@ import type {
 import type { GalleryDb, ItemRow, TokenLookup } from './db';
 import type { HintKind } from './realtime';
 import { BUCKETS, type Bucket, type GalleryStorage } from './storage';
-import { POST_RE, TOKEN_RE, UPLOADER_RE, codeMatches, rateKey, sha256Hex, uploaderHash } from './tokens';
+import {
+  INSTAGRAM_RE,
+  POST_RE,
+  TOKEN_RE,
+  UPLOADER_RE,
+  codeMatches,
+  rateKey,
+  sha256Hex,
+  uploaderHash,
+} from './tokens';
 
 /**
  * The guests' and the screen's gallery API as plain functions over injected dependencies (the route
@@ -158,6 +167,7 @@ export function feedItem(
     by: r.by ?? null,
     placement: r.placement ?? 'feed',
     post: r.post ?? r.id,
+    instagram: r.instagram ?? null,
   };
 }
 
@@ -280,6 +290,13 @@ export const ReserveSchema = z.strictObject({
   code: z.string().max(64).optional(),
   uploader: z.string().regex(UPLOADER_RE),
   name: z.string().max(200).optional(),
+  /** "tag me": the guest's Instagram username (an @ in front is fine) */
+  instagram: z
+    .string()
+    .max(40)
+    .transform((v) => v.trim().replace(/^@+/, '').toLowerCase())
+    .pipe(z.string().regex(INSTAGRAM_RE))
+    .optional(),
   g: z
     .string()
     .regex(/^[A-Za-z0-9_-]{16,64}$/)
@@ -404,6 +421,7 @@ export async function guestReserve(raw: unknown, ip: string | null, deps: GuestD
       takenAt: plausibleTime(spec.takenAt, now),
       placement: spec.placement ?? 'feed',
       post: (spec.placement ?? 'feed') === 'feed' ? (spec.post ?? null) : null,
+      instagram: q.instagram ?? null,
     };
   });
   const guestId = q.g ? await deps.db.guestByToken(inv, q.g) : null;

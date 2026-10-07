@@ -197,6 +197,7 @@ export const liveGalleryEn: LiveGalleryDict = {
       host: 'Your decision',
     },
     by: 'Uploaded by {name}',
+    instagram: 'Asked to be tagged on Instagram: {handle}',
     video: 'Video',
     photo: 'Photo',
     noPreview: 'No preview',

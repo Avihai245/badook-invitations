@@ -146,17 +146,36 @@ export const galleryGuestHe = {
     close: 'סגירה',
     tapHint: 'הקישו בצד כדי לעבור בין התמונות. החזיקו כדי לעצור.',
   },
-  /** sharing: to the story (the circles) or to the feed (posts with likes) */
   share: {
     open: 'שיתוף',
-    composer: 'שתפו רגע מהאירוע…',
-    title: 'מה משתפים?',
-    where: 'לאן לשתף',
     story: 'סטורי',
-    storyHint: 'רגע מהאירוע — מופיע בעיגולים למעלה',
-    feed: 'פוסט בפיד',
-    feedHint: 'נשאר בפיד ואפשר לעשות לו לייק. כמה תמונות יחד = פוסט אחד',
+    post: 'פוסט',
+    storyLabel: 'שיתוף לסטורי',
+    postLabel: 'שיתוף פוסט לפיד',
+    dock: 'מה משתפים',
+  },
+  /** the name on what a guest shares: asked once, then a small button to change it */
+  name: {
+    title: 'איך לקרוא לכם?',
+    body: 'השם יופיע על הסטורי והפוסטים שלכם. אפשר לשנות אותו בכל רגע.',
+    continue: 'המשך',
+    skip: 'בלי שם',
+    save: 'שמירה',
+    edit: 'עריכת השם',
+    as: 'משתפים בתור {name}',
+    anonymous: 'משתפים בלי שם',
     close: 'סגירה',
+    tag: 'רוצים שנתייג אתכם?',
+    tagHint: 'כשהתמונות מהאירוע יעלו לאינסטגרם, נוכל לתייג אתכם בהן.',
+    instagram: 'שם המשתמש שלכם באינסטגרם',
+    instagramInvalid: 'רק אותיות באנגלית, ספרות, נקודה וקו תחתון',
+    profile: 'הפרופיל של {handle} באינסטגרם',
+  },
+  /** the gallery's numbers, under its name */
+  stats: {
+    posts: 'פוסטים',
+    media: 'תמונות',
+    people: 'שיתפו',
   },
   /** a post of the feed */
   post: {

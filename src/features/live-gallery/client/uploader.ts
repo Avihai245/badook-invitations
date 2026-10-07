@@ -55,6 +55,8 @@ export interface UploaderOptions {
   uploader: string;
   code(): string | null;
   name(): string | null;
+  /** "tag me": the guest's Instagram username (null: they didn't ask) */
+  instagram?(): string | null;
   /** the guest's personal invitation token, when they came through it */
   guest: string | null;
   onChange(snapshot: Snapshot): void;
@@ -446,6 +448,7 @@ export class Uploader {
       {
         ...this.common(),
         ...(this.o.name() ? { name: this.o.name()! } : {}),
+        ...(this.o.instagram?.() ? { instagram: this.o.instagram()! } : {}),
         ...(this.o.guest ? { g: this.o.guest } : {}),
         items: items.map((i) => ({
           key: i.localId,

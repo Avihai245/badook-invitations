@@ -192,6 +192,7 @@ export const liveGalleryHe = {
       host: 'החלטה שלכם',
     },
     by: 'הועלה על ידי {name}',
+    instagram: 'ביקשו תיוג באינסטגרם: {handle}',
     video: 'סרטון',
     photo: 'תמונה',
     noPreview: 'אין תצוגה מקדימה',

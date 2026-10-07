@@ -9,6 +9,7 @@ import {
   Globe,
   ImagePlus,
   LayoutGrid,
+  Plus,
   Rows3,
   Lock,
   LoaderCircle,
@@ -50,12 +51,12 @@ import type {
 } from '../../types';
 import type { GuestPageData } from '../../server/pages';
 import { MediaViewer } from '../MediaViewer';
-import { GuestTextProvider, fmt, formatBytes, useGuestText, type GuestLocale } from '../guest-text';
+import { GuestTextProvider, fmt, useGuestText, type GuestLocale } from '../guest-text';
 import { FeedGrid } from './FeedGrid';
 import { FeedPost } from './FeedPost';
 import { groupPosts, isStory, mergeLikes, toggled, type Post } from './posts';
 import { QueuePanel } from './QueuePanel';
-import { ShareSheet } from './ShareSheet';
+import { NameSheet } from './NameSheet';
 import { StoriesTray } from './StoriesTray';
 import { StoryViewer } from './StoryViewer';
 import { groupStories, isUnseen, readSeen, writeSeen, type Story } from './stories';
@@ -143,9 +144,13 @@ function GalleryBody({
   const [likes, setLikes] = useState<Record<string, Likes>>(data.initial?.likes ?? {});
   const [view, setView] = useState<'feed' | 'grid'>('feed');
   const postKeys = useRef<string[]>([]);
-  // sharing: the sheet, and where to (the story or the feed)
-  const [sheet, setSheet] = useState(false);
-  const [placement, setPlacement] = useState<Placement>('feed');
+  // sharing: where the files being picked go (the story or the feed), and the name sheet — asked once,
+  // before the first share, then opened from the top bar
+  const placement = useRef<Placement>('feed');
+  const [nameSheet, setNameSheet] = useState<{ mode: 'first' | 'edit'; to: Placement } | null>(null);
+  const [instagram, setInstagram] = useState('');
+  const instagramRef = useRef('');
+  const asked = useRef(false);
   const since = useRef<string | null>(data.initial?.now ?? null);
   const expires = useRef<number>(data.initial?.expiresAt ?? 0);
   // what the feed shows, for telling what a refresh brought that is new
@@ -192,6 +197,10 @@ function GalleryBody({
         const saved = localStorage.getItem('badook-gallery:name') ?? '';
         nameRef.current = saved;
         setName(saved);
+        const handle = localStorage.getItem('badook-gallery:instagram') ?? '';
+        instagramRef.current = handle;
+        setInstagram(handle);
+        asked.current = !!saved || localStorage.getItem('badook-gallery:asked') === '1';
       } catch {
         // private mode
       }
@@ -309,6 +318,7 @@ function GalleryBody({
       uploader: uploaderId,
       code: () => code.current,
       name: () => nameRef.current.trim() || null,
+      instagram: () => instagramRef.current || null,
       guest,
       onChange: setSnapshot,
       onResult: (item) => {
@@ -355,13 +365,12 @@ function GalleryBody({
   }, [state, snapshot?.blocked]);
 
   const fileInput = useRef<HTMLInputElement>(null);
-  const cameraInput = useRef<HTMLInputElement>(null);
   const onFiles = async (list: FileList | null) => {
     const files = list ? Array.from(list) : [];
     if (!files.length || !uploader.current) return;
     setSkipped([]);
     const before = new Set(uploader.current.snapshot().items.map((i) => i.localId));
-    const result = await uploader.current.add(files, placement);
+    const result = await uploader.current.add(files, placement.current);
     const added = uploader.current
       .snapshot()
       .items.filter((i) => !before.has(i.localId))
@@ -416,9 +425,31 @@ function GalleryBody({
     },
     [token, uploaderId],
   );
+  // one tap: the phone's own picker (it offers the camera too); the first time, the name first
+  const pick = (to: Placement) => {
+    placement.current = to;
+    fileInput.current?.click();
+  };
   const share = (to: Placement) => {
-    setPlacement(to);
-    setSheet(true);
+    if (asked.current) pick(to);
+    else setNameSheet({ mode: 'first', to });
+  };
+  const onNameDone = (value: { name: string; instagram: string }) => {
+    const sheet = nameSheet;
+    onName(value.name);
+    instagramRef.current = value.instagram;
+    setInstagram(value.instagram);
+    asked.current = true;
+    try {
+      localStorage.setItem('badook-gallery:asked', '1');
+      if (value.instagram) localStorage.setItem('badook-gallery:instagram', value.instagram);
+      else localStorage.removeItem('badook-gallery:instagram');
+    } catch {
+      // private mode: asked again next visit
+    }
+    setNameSheet(null);
+    // still the tap that opened the sheet's button: the picker may open
+    if (sheet?.mode === 'first') pick(sheet.to);
   };
   const storyName = (s: Story) =>
     s.host ? t.stories.host : (s.name ?? fmt(t.stories.anonymous, { n: number(s.anonymous ?? 1) }));
@@ -463,47 +494,69 @@ function GalleryBody({
   };
 
   const canUpload = phase === 'ready' && (state === 'open' || state === 'paused');
-  // the floating "add" shows once the upload card has scrolled away, and hides at the footer
-  const uploadRef = useRef<HTMLElement>(null);
-  const footerRef = useRef<HTMLElement>(null);
-  const [fab, setFab] = useState(false);
-  useEffect(() => {
-    if (!canUpload || typeof IntersectionObserver === 'undefined') return;
-    const seen = new Map<Element, boolean>();
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) seen.set(e.target, e.isIntersecting);
-      const card = uploadRef.current ? seen.get(uploadRef.current) : true;
-      const foot = footerRef.current ? seen.get(footerRef.current) : false;
-      setFab(card === false && !foot);
-    });
-    for (const el of [uploadRef.current, footerRef.current]) if (el) io.observe(el);
-    return () => io.disconnect();
-  }, [canUpload]);
   const showQueue = roundItems.length > 0 || (snapshot?.preparing ?? 0) > 0;
+  const initial = (Array.from(name.trim())[0] ?? '').toLocaleUpperCase();
+  // the event's picture: its newest photo, else the couple's initials ("נ&א")
+  const cover = items.find((i) => i.thumb)?.thumb ?? null;
+  const monogram = title
+    .split(/\s*&\s*/)
+    .map((w) => Array.from(w.trim())[0] ?? '')
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('&');
+  const eventDate = data.event.date
+    ? date(`${data.event.date}T12:00:00Z`, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC',
+      })
+    : null;
+  const more_ = next ? '+' : '';
+  const stat = (n: number, label: string, testId?: string) => (
+    <div className="text-center sm:text-start" data-testid={testId}>
+      <p className="text-[17px] leading-none font-bold tabular-nums">
+        {number(n)}
+        {more_}
+      </p>
+      <p className="mt-1 text-[12.5px] text-muted">{label}</p>
+    </div>
+  );
 
   return (
     <div style={accent} className="relative min-h-svh overflow-x-clip bg-canvas" dir={dir}>
-      {/* the event's colour, washed over the top of the page */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[440px] bg-[radial-gradient(110%_90%_at_50%_0%,color-mix(in_oklab,var(--gallery-accent)_26%,transparent),transparent_72%)]"
-      />
-      <div className="relative mx-auto w-full max-w-[720px] px-4 pt-5 pb-10 sm:px-6 sm:pt-8">
-        <header className={`relative text-center ${others.length ? 'pt-11 sm:pt-0' : ''}`}>
+      {/* the top bar: the event, live, the language and "you" (the name on what you share) */}
+      <div className="sticky top-0 z-30 border-b border-line/70 bg-canvas/85 backdrop-blur-xl backdrop-saturate-150">
+        <div className="mx-auto flex h-14 w-full max-w-[640px] items-center gap-2 px-4">
+          <p className="min-w-0 flex-1 truncate font-display text-[19px] font-bold" aria-hidden>
+            <bdi>{title}</bdi>
+          </p>
+          {live === 'live' ? (
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full bg-success-bg px-2.5 py-1 text-[11.5px] font-semibold text-success"
+              data-testid="gallery-live"
+            >
+              <span aria-hidden className="relative flex size-1.5">
+                <span className="absolute inline-flex size-full rounded-full bg-success opacity-60 motion-safe:animate-ping" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-success" />
+              </span>
+              {t.feed.live}
+            </span>
+          ) : null}
           {others.length === 1 ? (
             <button
               type="button"
               onClick={() => onLocale(others[0]!)}
               lang={others[0]}
-              className="absolute end-0 top-0 inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-[12.5px] font-semibold text-ink shadow-sm"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full px-2.5 text-[12.5px] font-semibold text-ink hover:bg-subtle"
             >
-              <Globe aria-hidden className="size-3.5" />
+              <Globe aria-hidden className="size-4" />
               {nativeName(others[0]!)}
             </button>
           ) : others.length > 1 ? (
             // more languages: a menu of them, each by its own name
-            <label className="absolute end-0 top-0 inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-surface ps-3 pe-2 text-[12.5px] font-semibold text-ink shadow-sm">
-              <Globe aria-hidden className="size-3.5" />
+            <label className="inline-flex h-9 items-center gap-1.5 rounded-full ps-2.5 pe-1.5 text-[12.5px] font-semibold text-ink hover:bg-subtle">
+              <Globe aria-hidden className="size-4" />
               <select
                 aria-label={t.language}
                 value={locale}
@@ -518,40 +571,51 @@ function GalleryBody({
               </select>
             </label>
           ) : null}
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_14%,transparent)] px-3.5 py-1.5 text-[12.5px] font-bold text-[var(--gallery-accent)]">
-            <Sparkles aria-hidden className="size-3.5" />
-            {t.eyebrow}
-          </p>
-          <h1 className="mt-3 font-display text-[34px] leading-[1.1] font-bold text-balance sm:text-[42px]">
-            <bdi>{title}</bdi>
-          </h1>
-          {data.event.date ? (
-            <p className="mt-2 text-[14.5px] text-muted">
-              {date(`${data.event.date}T12:00:00Z`, {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                timeZone: 'UTC',
-              })}
-            </p>
+          {canUpload && asked.current ? (
+            <button
+              type="button"
+              onClick={() => setNameSheet({ mode: 'edit', to: 'feed' })}
+              aria-label={`${name.trim() ? fmt(t.name.as, { name: name.trim() }) : t.name.anonymous}. ${t.name.edit}`}
+              title={t.name.edit}
+              data-testid="name-edit"
+              className="grid size-9 shrink-0 place-items-center rounded-full border border-line bg-surface font-display text-[15px] font-bold text-ink hover:border-line-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              {initial || <User aria-hidden className="size-4 text-muted" />}
+            </button>
           ) : null}
-          {phase === 'ready' && items.length ? (
-            <p className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[13px] font-semibold">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3.5 py-1.5 shadow-sm ring-1 ring-line">
-                <Camera aria-hidden className="size-4 text-[var(--gallery-accent)]" />
-                {plural(t.feed.count, items.length, { n: `${number(items.length)}${next ? '+' : ''}` })}
-              </span>
-              {guests ? (
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3.5 py-1.5 shadow-sm ring-1 ring-line"
-                  data-testid="gallery-people"
-                >
-                  <User aria-hidden className="size-4 text-[var(--gallery-accent)]" />
-                  {plural(t.hero.people, guests, { n: `${number(guests)}${next ? '+' : ''}` })}
-                </span>
-              ) : null}
+        </div>
+      </div>
+
+      <div className="relative mx-auto w-full max-w-[640px] px-4 pt-5 pb-32 sm:px-6">
+        {/* the event, like a profile: its picture in a ring, its name, its numbers */}
+        <header className="flex items-center gap-5 sm:gap-7">
+          <span
+            aria-hidden
+            className="gallery-ring grid size-[86px] shrink-0 place-items-center rounded-full p-[3px] sm:size-[104px]"
+          >
+            <span className="relative grid size-full place-items-center overflow-hidden rounded-full border-[3px] border-canvas bg-[color-mix(in_oklab,var(--gallery-accent)_14%,white)] font-display text-[26px] font-bold text-[var(--gallery-accent)]">
+              {cover ? (
+                <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
+              ) : (
+                monogram || <Sparkles className="size-8" />
+              )}
+            </span>
+          </span>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-[24px] leading-[1.1] font-bold text-balance sm:text-[30px]">
+              <bdi>{title}</bdi>
+            </h1>
+            <p className="mt-1 text-[13px] text-muted">
+              {[t.eyebrow, eventDate].filter(Boolean).join(' · ')}
             </p>
-          ) : null}
+            {phase === 'ready' ? (
+              <div className="mt-3.5 flex gap-6">
+                {stat(posts.length, t.stats.posts)}
+                {stat(items.length, t.stats.media)}
+                {stat(guests, t.stats.people, 'gallery-people')}
+              </div>
+            ) : null}
+          </div>
         </header>
 
         {phase === 'invalid' ? (
@@ -585,100 +649,30 @@ function GalleryBody({
                 nameOf={storyName}
                 onOpen={setStoryOpen}
                 onAdd={canUpload ? () => share('story') : undefined}
+                me={initial}
               />
             ) : null}
-
-            {canUpload ? (
-              // sharing, as a social app's composer: one tap opens the sheet (story or post, then the picker)
-              <section
-                ref={uploadRef}
-                aria-label={t.upload.title}
-                className="mt-5 flex items-center gap-2.5 rounded-[22px] border border-line bg-surface p-2.5 ps-3 shadow-[0_20px_44px_-32px_rgba(20,10,0,0.5)]"
-              >
-                <span
-                  aria-hidden
-                  className="grid size-11 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_16%,white)] font-display text-[18px] font-bold text-[var(--gallery-accent)]"
-                >
-                  {(Array.from(name.trim())[0] ?? '').toLocaleUpperCase() || <User className="size-5" />}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => share('feed')}
-                  disabled={!snapshot}
-                  data-testid="gallery-share"
-                  className="h-12 min-w-0 flex-1 truncate rounded-full bg-subtle px-4 text-start text-[15px] text-muted transition-colors hover:bg-line focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60"
-                >
-                  {t.share.composer}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => share('feed')}
-                  disabled={!snapshot}
-                  aria-label={t.upload.pick}
-                  className="grid size-12 shrink-0 place-items-center rounded-full bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] shadow-[0_10px_22px_-12px_rgba(0,0,0,0.55)] transition-transform active:scale-95 disabled:opacity-60 motion-reduce:transition-none"
-                >
-                  <ImagePlus aria-hidden className="size-5" />
-                </button>
-              </section>
-            ) : null}
             {canUpload && mode === 'approval' ? (
-              <p className="mt-2 px-1 text-[12.5px] text-muted">{t.upload.approvalBody}</p>
+              <p className="mt-1 text-[12.5px] text-muted">{t.upload.approvalBody}</p>
             ) : null}
             {canUpload ? (
-              <>
-                <input
-                  ref={fileInput}
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  hidden
-                  data-testid="gallery-files"
-                  onChange={(e) => {
-                    void onFiles(e.target.files);
-                    e.target.value = '';
-                  }}
-                />
-                <input
-                  ref={cameraInput}
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  hidden
-                  onChange={(e) => {
-                    void onFiles(e.target.files);
-                    e.target.value = '';
-                  }}
-                />
-                <ShareSheet
-                  open={sheet}
-                  onOpenChange={setSheet}
-                  placement={placement}
-                  onPlacement={setPlacement}
-                  name={name}
-                  onName={onName}
-                  approval={mode === 'approval'}
-                  note={`${t.upload.resilient} ${fmt(t.upload.limits, {
-                    image: formatBytes(data.limits.imageBytes, locale),
-                    video: formatBytes(data.limits.videoBytes, locale),
-                    minutes: number(data.limits.videoMinutes),
-                  })}`}
-                  disabled={!snapshot}
-                  style={accent}
-                  onPick={() => {
-                    fileInput.current?.click();
-                    setSheet(false);
-                  }}
-                  onCamera={() => {
-                    cameraInput.current?.click();
-                    setSheet(false);
-                  }}
-                />
-              </>
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                hidden
+                data-testid="gallery-files"
+                onChange={(e) => {
+                  void onFiles(e.target.files);
+                  e.target.value = '';
+                }}
+              />
             ) : null}
             {skipped.length ? (
               <p
                 role="alert"
-                className="mt-3 rounded-[10px] bg-warning-bg px-3 py-2 text-[13px] text-warning"
+                className="mt-3 rounded-[12px] bg-warning-bg px-3 py-2 text-[13px] text-warning"
               >
                 {plural(t.skipped, skipped.length, {
                   reasons: [...new Set(skipped.map((s) => t.item.errors[s.code] ?? s.code))].join(', '),
@@ -703,7 +697,7 @@ function GalleryBody({
 
             {waiting.length ? (
               <section className="mt-6" aria-labelledby="gallery-mine">
-                <h2 id="gallery-mine" className="text-[16px] font-bold">
+                <h2 id="gallery-mine" className="text-[15px] font-bold">
                   {t.mine.title}
                 </h2>
                 <p className="text-[13px] text-muted">{t.mine.help}</p>
@@ -711,9 +705,9 @@ function GalleryBody({
                   {waiting.map((m) => (
                     <li
                       key={m.id}
-                      className="flex items-center gap-3 rounded-[12px] border border-line bg-surface p-2 pe-3"
+                      className="flex items-center gap-3 rounded-[14px] border border-line bg-surface p-2 pe-3"
                     >
-                      <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[8px] bg-subtle">
+                      <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[10px] bg-subtle">
                         {m.thumb ? (
                           <img src={m.thumb} alt="" className="size-full object-cover" loading="lazy" />
                         ) : null}
@@ -753,164 +747,151 @@ function GalleryBody({
               </p>
             ) : null}
 
-            <section className="mt-8" aria-labelledby="gallery-feed">
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <h2 id="gallery-feed" className="text-[18px] font-bold">
-                  {t.feed.title}
-                </h2>
-                <div className="flex items-center gap-3">
-                  {live === 'live' ? (
-                    <span
-                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-success"
-                      data-testid="gallery-live"
-                    >
-                      <span aria-hidden className="relative flex size-2">
-                        <span className="absolute inline-flex size-full rounded-full bg-success opacity-60 motion-safe:animate-ping" />
-                        <span className="relative inline-flex size-2 rounded-full bg-success" />
-                      </span>
-                      {t.feed.live}
-                    </span>
-                  ) : null}
-                  {/* the feed's posts, or every photo and video (the stories' too) in a grid */}
-                  <div
-                    role="radiogroup"
-                    aria-label={t.view.label}
-                    className="flex rounded-full bg-subtle p-1"
+            <section className="mt-5" aria-labelledby="gallery-feed">
+              <h2 id="gallery-feed" className="sr-only">
+                {t.feed.title}
+              </h2>
+              {/* the feed's posts, or every photo and video (the stories' too) in a grid: a profile's tabs */}
+              <div
+                role="tablist"
+                aria-label={t.view.label}
+                className="-mx-4 grid grid-cols-2 border-b border-line sm:mx-0"
+              >
+                {(
+                  [
+                    ['feed', t.view.feed, Rows3],
+                    ['grid', t.view.grid, LayoutGrid],
+                  ] as const
+                ).map(([value, label, Icon]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    role="tab"
+                    aria-selected={view === value}
+                    aria-controls="gallery-view"
+                    onClick={() => setView(value)}
+                    data-view={value}
+                    className={`relative inline-flex h-12 items-center justify-center gap-2 text-[13.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus ${
+                      view === value ? 'text-ink' : 'text-muted hover:text-ink'
+                    }`}
                   >
-                    {(
-                      [
-                        ['feed', t.view.feed, Rows3],
-                        ['grid', t.view.grid, LayoutGrid],
-                      ] as const
-                    ).map(([value, label, Icon]) => (
-                      <button
-                        key={value}
-                        type="button"
-                        role="radio"
-                        aria-checked={view === value}
-                        onClick={() => setView(value)}
-                        data-view={value}
-                        className={`inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus ${
-                          view === value ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'
-                        }`}
-                      >
-                        <Icon aria-hidden className="size-4" />
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                    <Icon aria-hidden className="size-[18px]" />
+                    {label}
+                    {view === value ? (
+                      <span
+                        aria-hidden
+                        className="absolute inset-x-6 -bottom-px h-[2px] rounded-full bg-ink"
+                      />
+                    ) : null}
+                  </button>
+                ))}
               </div>
-              {view === 'grid' ? (
-                items.length ? (
-                  <FeedGrid
-                    items={items}
-                    fresh={fresh}
-                    onOpen={setOpen}
-                    hasMore={!!next}
-                    loadingMore={loadingMore}
-                    onMore={() => void more()}
-                  />
+              <div id="gallery-view" role="tabpanel" className="pt-4">
+                {view === 'grid' ? (
+                  items.length ? (
+                    <div className="-mx-4 sm:mx-0">
+                      <FeedGrid
+                        items={items}
+                        fresh={fresh}
+                        onOpen={setOpen}
+                        hasMore={!!next}
+                        loadingMore={loadingMore}
+                        onMore={() => void more()}
+                      />
+                    </div>
+                  ) : (
+                    <Empty
+                      text={t.feed.empty}
+                      action={canUpload ? t.share.postLabel : null}
+                      onAction={() => share('feed')}
+                    />
+                  )
+                ) : posts.length ? (
+                  <>
+                    <ol className="-mx-4 flex flex-col gap-3 sm:mx-0 sm:gap-6" data-testid="gallery-posts">
+                      {posts.map((post) => (
+                        <li key={post.key}>
+                          <FeedPost
+                            post={post}
+                            author={authorOf(post)}
+                            likes={likes[post.key]}
+                            fresh={post.items.some((i) => fresh.has(i.id))}
+                            onLike={(on) => void like(post.key, on)}
+                            onOpen={(item) => {
+                              const at = items.findIndex((i) => i.id === item.id);
+                              if (at >= 0) setOpen(at);
+                            }}
+                          />
+                        </li>
+                      ))}
+                    </ol>
+                    {next ? <MoreButton loading={loadingMore} onMore={() => void more()} /> : null}
+                  </>
                 ) : (
-                  <Empty
-                    text={t.feed.empty}
-                    action={canUpload ? t.share.open : null}
-                    onAction={() => share('feed')}
-                  />
-                )
-              ) : posts.length ? (
-                <>
-                  <p className="mb-3 text-[12.5px] text-muted">{t.post.doubleTap}</p>
-                  <ol className="mx-auto flex max-w-[560px] flex-col gap-5" data-testid="gallery-posts">
-                    {posts.map((post) => (
-                      <li key={post.key}>
-                        <FeedPost
-                          post={post}
-                          author={authorOf(post)}
-                          likes={likes[post.key]}
-                          fresh={post.items.some((i) => fresh.has(i.id))}
-                          onLike={(on) => void like(post.key, on)}
-                          onOpen={(item) => {
-                            const at = items.findIndex((i) => i.id === item.id);
-                            if (at >= 0) setOpen(at);
-                          }}
-                        />
-                      </li>
-                    ))}
-                  </ol>
-                  {next ? <MoreButton loading={loadingMore} onMore={() => void more()} /> : null}
-                </>
-              ) : (
-                <>
-                  <Empty
-                    text={t.view.empty}
-                    action={canUpload ? t.share.open : null}
-                    onAction={() => share('feed')}
-                  />
-                  {next ? <MoreButton loading={loadingMore} onMore={() => void more()} /> : null}
-                </>
-              )}
+                  <>
+                    <Empty
+                      text={t.view.empty}
+                      action={canUpload ? t.share.postLabel : null}
+                      onAction={() => share('feed')}
+                    />
+                    {next ? <MoreButton loading={loadingMore} onMore={() => void more()} /> : null}
+                  </>
+                )}
+              </div>
             </section>
           </>
         )}
 
-        <footer ref={footerRef} className="mt-14 text-center text-[12px] leading-relaxed text-muted">
+        <footer className="mt-16 text-center text-[12px] leading-relaxed text-muted">
           {/* whose system this is: Badook, with the way to its site and to Badook Events */}
           <section
             aria-label={data.brand}
             data-testid="gallery-brand-card"
-            className="mx-auto max-w-[460px] rounded-[24px] border border-line bg-surface px-5 pt-6 pb-5 shadow-[0_20px_50px_-30px_rgba(20,10,0,0.35)]"
+            className="mx-auto max-w-[420px] border-t border-line pt-8"
           >
             <a
               href="/"
               target="_blank"
               rel="noopener"
               data-testid="gallery-brand"
-              className="inline-flex flex-col items-center gap-2 rounded-[14px] px-3 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              className="inline-flex flex-col items-center gap-1.5 rounded-[14px] px-3 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
-              <BrandLogo label={data.brand} className="text-[22px]" />
-              <span className="text-[14px] font-bold text-ink">
+              <BrandLogo label={data.brand} className="text-[20px]" />
+              <span className="text-[13.5px] font-semibold text-ink">
                 {fmt(t.footer.made, { brand: data.brand })}
               </span>
             </a>
-            <p className="mt-0.5 text-[13px] text-muted">{t.footer.site}</p>
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener"
-              data-testid="gallery-brand-site"
-              className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-6 text-[14.5px] font-bold text-white shadow-sm transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none"
-            >
-              {fmt(t.footer.visit, { brand: data.brand })}
-              {dir === 'rtl' ? (
-                <ArrowLeft aria-hidden className="size-4" />
-              ) : (
-                <ArrowRight aria-hidden className="size-4" />
-              )}
-            </a>
-            <a
-              href={BADOOK_EVENTS_URL}
-              target="_blank"
-              rel="noopener"
-              data-testid="gallery-brand-events"
-              className="mt-3 flex items-center gap-3 rounded-[16px] border border-line bg-canvas px-4 py-3 text-start transition-colors hover:bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >
-              <span
-                aria-hidden
-                className="grid size-10 shrink-0 place-items-center rounded-full bg-[#fdebe4] text-[#e0532b]"
+            <p className="text-[12.5px] text-muted">{t.footer.site}</p>
+            <div className="mt-4 flex flex-col items-stretch gap-2 sm:flex-row sm:justify-center">
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener"
+                data-testid="gallery-brand-site"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-[13.5px] font-semibold text-white transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none dark:text-[#1c1917]"
               >
-                <MapPin className="size-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[14px] font-bold text-ink">{t.footer.events}</span>
-                <span className="block text-[12.5px] text-muted">{t.footer.eventsHint}</span>
-              </span>
-              {dir === 'rtl' ? (
-                <ArrowLeft aria-hidden className="size-4 shrink-0 text-muted" />
-              ) : (
-                <ArrowRight aria-hidden className="size-4 shrink-0 text-muted" />
-              )}
-            </a>
+                {fmt(t.footer.visit, { brand: data.brand })}
+                {dir === 'rtl' ? (
+                  <ArrowLeft aria-hidden className="size-4" />
+                ) : (
+                  <ArrowRight aria-hidden className="size-4" />
+                )}
+              </a>
+              <a
+                href={BADOOK_EVENTS_URL}
+                target="_blank"
+                rel="noopener"
+                data-testid="gallery-brand-events"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-line bg-surface px-5 text-[13.5px] font-semibold text-ink transition-colors hover:bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              >
+                <MapPin aria-hidden className="size-4 text-[#e0532b]" />
+                <span>
+                  {t.footer.events}
+                  <span className="sr-only"> · </span>
+                  <span className="ms-1.5 font-normal text-muted">{t.footer.eventsHint}</span>
+                </span>
+              </a>
+            </div>
           </section>
           {canUpload ? <p className="mx-auto mt-6 max-w-[52ch]">{t.footer.consent}</p> : null}
           <p className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
@@ -924,21 +905,56 @@ function GalleryBody({
         </footer>
       </div>
 
-      {/* past the upload card: a button to add photos stays at hand (not over the footer) */}
-      {canUpload && fab ? (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(16px,env(safe-area-inset-bottom))]">
-          <button
-            type="button"
-            onClick={() => share('feed')}
-            disabled={!snapshot}
-            data-testid="gallery-fab"
-            className="pointer-events-auto inline-flex h-13 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-6 text-[15.5px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.55)] transition-transform active:scale-[0.97] disabled:opacity-60 motion-reduce:transition-none"
+      {/* sharing, always at hand: the story, or a post (one tap to the phone's picker) */}
+      {canUpload ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(14px,env(safe-area-inset-bottom))]">
+          <nav
+            aria-label={t.share.dock}
+            data-testid="gallery-dock"
+            className="pointer-events-auto flex items-center gap-1 rounded-full bg-[#141210]/92 p-1.5 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] ring-1 ring-white/10 backdrop-blur-xl"
           >
-            <ImagePlus aria-hidden className="size-5" />
-            {t.share.open}
-          </button>
+            <button
+              type="button"
+              onClick={() => share('story')}
+              disabled={!snapshot}
+              aria-label={t.share.storyLabel}
+              data-testid="share-story"
+              className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-[14.5px] font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white disabled:opacity-50"
+            >
+              <span
+                aria-hidden
+                className="gallery-ring grid size-6 place-items-center rounded-full p-[1.5px]"
+              >
+                <span className="grid size-full place-items-center rounded-full bg-[#141210]">
+                  <Plus className="size-3" strokeWidth={3} />
+                </span>
+              </span>
+              {t.share.story}
+            </button>
+            <button
+              type="button"
+              onClick={() => share('feed')}
+              disabled={!snapshot}
+              aria-label={t.share.postLabel}
+              data-testid="gallery-share"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-5 text-[14.5px] font-bold text-[var(--gallery-accent-ink)] transition-transform active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white disabled:opacity-50 motion-reduce:transition-none"
+            >
+              <ImagePlus aria-hidden className="size-[18px]" />
+              {t.share.post}
+            </button>
+          </nav>
         </div>
       ) : null}
+
+      <NameSheet
+        open={!!nameSheet}
+        mode={nameSheet?.mode ?? 'edit'}
+        name={name}
+        instagram={instagram}
+        onClose={() => setNameSheet(null)}
+        onDone={onNameDone}
+        style={accent}
+      />
 
       {/* the accessibility menu, on the side of the page, in the page's language */}
       <AccessibilityPanel a={t.a11y} newTab place="corner" />
@@ -1002,19 +1018,19 @@ function GalleryBody({
 /** Nothing here yet: an invitation to be the first, with the way to share. */
 function Empty({ text, action, onAction }: { text: string; action: string | null; onAction(): void }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[22px] border border-dashed border-line-strong px-4 py-10 text-center">
+    <div className="flex flex-col items-center gap-3 px-4 py-12 text-center">
       <span
         aria-hidden
-        className="grid size-14 place-items-center rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_14%,transparent)] text-[var(--gallery-accent)]"
+        className="grid size-[72px] place-items-center rounded-full border-2 border-ink text-ink"
       >
-        <Camera className="size-7" />
+        <Camera className="size-8" strokeWidth={1.6} />
       </span>
-      <p className="max-w-[34ch] text-[14.5px] text-muted">{text}</p>
+      <p className="max-w-[30ch] text-[15px] text-muted">{text}</p>
       {action ? (
         <button
           type="button"
           onClick={onAction}
-          className="inline-flex h-11 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-5 text-[14.5px] font-bold text-[var(--gallery-accent-ink)] shadow-sm transition-transform active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none"
+          className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[14px] font-semibold text-[var(--gallery-accent)] transition-colors hover:bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           <ImagePlus aria-hidden className="size-4" />
           {action}

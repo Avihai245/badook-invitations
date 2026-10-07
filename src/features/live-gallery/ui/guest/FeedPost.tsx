@@ -9,18 +9,18 @@ import { hueOf } from './StoriesTray';
 import { frameRatio, type Post } from './posts';
 import { ago } from './stories';
 
-/** A person's circle in a post's header: their initial on a colour of their own, the hosts a heart. */
+/** A person's circle in a post's header: their initial on a colour of their own in the event's ring. */
 function Avatar({ name, seed, host }: { name: string | null; seed: string; host: boolean }) {
   const hue = hueOf(seed);
   const initial = name ? (Array.from(name.trim())[0] ?? '').toLocaleUpperCase() : '';
   return (
     <span
       aria-hidden
-      className="grid size-9 shrink-0 place-items-center rounded-full p-[2px] [background:linear-gradient(135deg,var(--gallery-accent),color-mix(in_oklab,var(--gallery-accent)_35%,white))]"
+      className="gallery-ring grid size-[38px] shrink-0 place-items-center rounded-full p-[2px]"
     >
       <span
         className="grid size-full place-items-center rounded-full border-2 border-surface text-[14px] font-bold"
-        style={{ background: `hsl(${hue} 55% 90%)`, color: `hsl(${hue} 45% 28%)` }}
+        style={{ background: `hsl(${hue} 45% 92%)`, color: `hsl(${hue} 40% 30%)` }}
       >
         {host ? (
           <Heart className="size-4 fill-current" />
@@ -107,20 +107,37 @@ export function FeedPost({
     'absolute top-1/2 z-10 hidden size-9 -translate-y-1/2 [@media(hover:hover)]:grid place-items-center rounded-full bg-white/85 text-ink shadow-md backdrop-blur transition-opacity hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:pointer-events-none disabled:opacity-0';
   const time = ago(post.at, now, locale);
   const current = post.items[index] ?? post.items[0]!;
+  // the username the guest asked to be tagged with (their newest)
+  const handle = [...post.items].reverse().find((i) => i.instagram)?.instagram ?? null;
 
   return (
     <article
       aria-label={fmt(P.label, { name: author })}
       data-post={post.key}
-      className={`overflow-hidden rounded-[22px] border border-line bg-surface shadow-[0_18px_40px_-30px_rgba(20,10,0,0.45)] ${
+      className={`overflow-hidden bg-surface sm:rounded-[18px] sm:border sm:border-line ${
         fresh ? 'motion-safe:animate-[gallery-in_600ms_cubic-bezier(0.22,1,0.36,1)_both]' : ''
       }`}
     >
-      <header className="flex items-center gap-2.5 px-3.5 py-3">
+      <header className="flex items-center gap-2.5 px-3 py-2.5">
         <Avatar name={post.name} seed={post.name ?? post.by ?? post.key} host={post.by === 'host'} />
-        <p className="min-w-0 flex-1 truncate text-[14.5px] font-bold" dir="auto">
-          {author}
-        </p>
+        <div className="min-w-0 flex-1 leading-tight">
+          <p className="truncate text-[14px] font-semibold" dir="auto">
+            {author}
+          </p>
+          {handle ? (
+            <a
+              href={`https://www.instagram.com/${handle}/`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={fmt(t.name.profile, { handle: `@${handle}` })}
+              dir="ltr"
+              data-instagram={handle}
+              className="block truncate text-[12.5px] text-muted hover:text-ink"
+            >
+              @{handle}
+            </a>
+          ) : null}
+        </div>
         {time ? (
           <time className="shrink-0 text-[12.5px] text-muted" dateTime={post.at}>
             {time}
@@ -155,6 +172,7 @@ export function FeedPost({
                   className="size-full touch-manipulation select-none"
                   onPointerUp={onTap}
                   data-item={item.id}
+                  title={P.doubleTap}
                 >
                   {item.display || item.thumb ? (
                     <img
@@ -214,7 +232,7 @@ export function FeedPost({
         ) : null}
       </div>
 
-      <div className="flex items-center gap-1 px-2 pt-1.5">
+      <div className="flex items-center gap-1 px-1.5 pt-1">
         <button
           type="button"
           onClick={() => onLike(!liked)}
@@ -226,7 +244,7 @@ export function FeedPost({
           <Heart
             aria-hidden
             key={liked ? 'on' : 'off'}
-            className={`size-[26px] ${
+            className={`size-[27px] ${
               liked
                 ? 'fill-[#e5364b] text-[#e5364b] motion-safe:animate-[like-pop_320ms_ease-out]'
                 : 'text-ink'
@@ -255,11 +273,11 @@ export function FeedPost({
           <Maximize2 aria-hidden className="size-5" />
         </button>
       </div>
-      <p className="px-4 pb-3.5 text-[14px]" aria-live="polite" data-likes={post.key}>
+      <p className="px-3.5 pb-3.5 text-[14px]" aria-live="polite" data-likes={post.key}>
         {n ? (
-          <span className="font-bold">{plural(P.likes, n, { n: number(n) })}</span>
+          <span className="font-semibold">{plural(P.likes, n, { n: number(n) })}</span>
         ) : (
-          <span className="text-muted">{P.noLikes}</span>
+          <span className="text-[13.5px] text-muted">{P.noLikes}</span>
         )}
       </p>
     </article>

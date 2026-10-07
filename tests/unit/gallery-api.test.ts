@@ -484,6 +484,31 @@ describe('reserving uploads', () => {
     expect(cap).toBe(GALLERY.limits.itemsPerEvent);
   });
 
+  it('"tag me": an Instagram username (an @ and capitals are fine) goes with every item; anything else is refused', async () => {
+    const w = guestWorld();
+    const ok = await guest.guestReserve(
+      { t: w.token, uploader: UPLOADER, instagram: ' @Dana.K_23 ', items: [photoSpec('a'), photoSpec('b')] },
+      IP,
+      w.deps,
+    );
+    expect(ok.status).toBe(200);
+    const rows = w.db.reserve.mock.calls[0]![4] as { instagram: string | null }[];
+    expect(rows.map((r) => r.instagram)).toEqual(['dana.k_23', 'dana.k_23']);
+    for (const bad of ['dana k', 'דנה', '@', 'x'.repeat(31)])
+      expect(
+        (
+          await guest.guestReserve(
+            { t: w.token, uploader: UPLOADER, instagram: bad, items: [photoSpec('c')] },
+            IP,
+            w.deps,
+          )
+        ).status,
+      ).toBe(400);
+    // without it: nothing
+    await guest.guestReserve({ t: w.token, uploader: UPLOADER, items: [photoSpec('d')] }, IP, w.deps);
+    expect((w.db.reserve.mock.calls.at(-1)![4] as { instagram: string | null }[])[0]!.instagram).toBeNull();
+  });
+
   it('rate-limited per link, per address and per device (hashed keys) — nothing signed when over', async () => {
     const w = guestWorld();
     const req = { t: w.token, uploader: UPLOADER, items: [photoSpec('a')] };
@@ -813,6 +838,7 @@ describe('the feed and the screen', () => {
         'durationMs',
         'height',
         'id',
+        'instagram',
         'kind',
         'name',
         'placement',

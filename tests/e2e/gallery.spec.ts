@@ -102,7 +102,7 @@ async function phone(browser: Browser): Promise<BrowserContext> {
 async function openGallery(page: Page, link: string) {
   await page.goto(link);
   // the queue is ready (IndexedDB opened, the uploader started)
-  await expect(page.getByRole('button', { name: 'בחירת תמונות וסרטונים' })).toBeEnabled();
+  await expect(page.getByTestId('gallery-share')).toBeEnabled();
 }
 
 type Photo = { name: string; mimeType: string; buffer: Buffer };
@@ -225,13 +225,15 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
     }
     return route.continue();
   });
-  // sharing: the sheet says where to (a post in the feed, chosen), and takes the name
+  // sharing a post: the first time, the name (and "want us to tag you?"), then the phone's picker
   await guest.getByTestId('gallery-share').click();
-  const sheet = guest.getByTestId('share-sheet');
-  await expect(sheet.getByRole('radio', { name: /פוסט בפיד/ })).toHaveAttribute('aria-checked', 'true');
-  await sheet.getByLabel('השם שלכם').fill('דנה ויואב');
-  await guest.keyboard.press('Escape');
-  await choose(guest, files);
+  const sheet = guest.getByTestId('name-sheet');
+  await sheet.getByTestId('name-input').fill('דנה ויואב');
+  await sheet.getByRole('switch', { name: 'רוצים שנתייג אתכם?' }).click();
+  await sheet.getByTestId('instagram-input').fill('@Dana.Yoav');
+  const chooser = guest.waitForEvent('filechooser');
+  await sheet.getByTestId('name-continue').click();
+  await (await chooser).setFiles(files);
   await expect.poll(() => dropped, { timeout: 30_000 }).toBe(true);
   await expect(guest.getByText('אין חיבור לאינטרנט. הכל שמור בטלפון')).toBeVisible();
   await expect(progressTitle(guest)).toHaveText('0 מתוך 3 הועלו');
@@ -260,6 +262,7 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
   await expect(posts.locator('[data-post]')).toHaveCount(1);
   await expect(posts.locator('[data-item]')).toHaveCount(3);
   await expect(posts.locator('[data-post]')).toHaveAttribute('aria-label', 'הפוסט של דנה ויואב');
+  await expect(posts.locator('[data-instagram="dana.yoav"]')).toHaveText('@dana.yoav');
   await expect(posts.getByText('היו הראשונים לעשות לייק')).toBeVisible();
   await posts.getByRole('button', { name: 'לייק', exact: true }).click();
   await expect(posts.getByText('לייק אחד')).toBeVisible();

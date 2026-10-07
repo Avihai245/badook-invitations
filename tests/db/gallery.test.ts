@@ -601,7 +601,7 @@ describe('the story and the feed', () => {
   it('the story or the feed: several photos shared together are one post, liked once per phone', async () => {
     const post = 'post-0123456789ab';
     const s1 = item(likes, { placement: 'story' });
-    const p1 = item(likes, { placement: 'feed', post });
+    const p1 = item(likes, { placement: 'feed', post, instagram: 'dana.k_23' });
     const p2 = item(likes, { placement: 'feed', post });
     // a story never takes a post key; an item without a placement goes to the feed, its own post
     const old = item(likes, { post: 'ignored-0123456789', placement: undefined });
@@ -630,7 +630,19 @@ describe('the story and the feed', () => {
     const of = (id: string) => feed.find((x) => x.id === id)!;
     expect(of(s1.id)).toMatchObject({ placement: 'story', post: s1.id });
     expect(of(s2.id)).toMatchObject({ placement: 'story', post: s2.id });
-    expect(of(p1.id)).toMatchObject({ placement: 'feed', post });
+    expect(of(p1.id)).toMatchObject({ placement: 'feed', post, instagram: 'dana.k_23' });
+    expect(of(p2.id)).toMatchObject({ instagram: null });
+    // "tag me" takes an Instagram username only
+    await expect(
+      commit('gallery_reserve', [
+        likes,
+        UPLOADER,
+        null,
+        null,
+        JSON.stringify([item(likes, { instagram: 'not a handle!' })]),
+        100,
+      ]),
+    ).rejects.toThrow(/gallery_items_instagram_check/);
     expect(of(p2.id)).toMatchObject({ placement: 'feed', post });
     expect(of(old.id)).toMatchObject({ placement: 'feed', post: 'ignored-0123456789' });
 
