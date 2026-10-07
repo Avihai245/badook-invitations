@@ -262,7 +262,8 @@ export const editorEn: EditorDict = {
       parallax: 'Full bleed, moving slower than the scroll',
       video_bg: 'A silent looping video behind the text',
     },
-    needsMedia: 'Add a picture or video first',
+    needsMedia:
+      'These layouts show a picture: add a picture or video above first (a tap on one takes you there)',
     needsVideo: 'Needs a video',
     motion: {
       play: 'Play',
@@ -283,7 +284,7 @@ export const editorEn: EditorDict = {
       },
       scroll: 'While scrolling',
       scrolls: { none: 'None', parallax: 'Parallax', ken_burns: 'Slow zoom' },
-      scrollNeedsMedia: 'For the section’s picture',
+      scrollNeedsMedia: 'Moves the section’s picture: available once you add a picture or video above',
       text: 'Text reveal',
       texts: { none: 'None', letters: 'Letters', words: 'Words', lines: 'Lines' },
       intensity: 'Intensity',

@@ -262,7 +262,7 @@ export const editorHe = {
       parallax: 'רקע מלא שזז לאט יותר מהגלילה',
       video_bg: 'סרטון שקט ברקע, בלולאה',
     },
-    needsMedia: 'קודם מוסיפים תמונה או וידאו',
+    needsMedia: 'הפריסות האלה מציגות תמונה — קודם מוסיפים תמונה או וידאו למעלה (לחיצה על פריסה מובילה לשם)',
     needsVideo: 'צריך סרטון',
     motion: {
       play: 'הצגה',
@@ -283,7 +283,7 @@ export const editorHe = {
       },
       scroll: 'בזמן הגלילה',
       scrolls: { none: 'בלי', parallax: 'פרלקסה', ken_burns: 'זום איטי' },
-      scrollNeedsMedia: 'לתמונה של הסקשן',
+      scrollNeedsMedia: 'מזיז את התמונה של הסקשן — זמין אחרי שמוסיפים תמונה או וידאו למעלה',
       text: 'חשיפת הטקסט',
       texts: { none: 'בלי', letters: 'אותיות', words: 'מילים', lines: 'שורות' },
       intensity: 'עוצמה',
