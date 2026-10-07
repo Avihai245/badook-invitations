@@ -134,6 +134,7 @@ export const galleryGuestRu: GalleryGuestDict = {
   },
   /** the feed as stories: one per person, a ring to watch what they shot */
   stories: {
+    yours: 'Ваша история',
     title: 'Истории праздника',
     hint: 'Нажмите на круг, чтобы посмотреть, что снял каждый гость.',
     add: 'Добавить',
@@ -159,6 +160,35 @@ export const galleryGuestRu: GalleryGuestDict = {
     tapHint: 'Нажимайте по краям, чтобы листать. Удерживайте, чтобы остановить.',
   },
   /** under the title: how much has been shared */
+  share: {
+    open: 'Поделиться',
+    composer: 'Поделитесь моментом праздника…',
+    title: 'Чем делитесь?',
+    where: 'Куда поделиться',
+    story: 'История',
+    storyHint: 'Момент праздника — появится в кружках сверху',
+    feed: 'Пост в ленте',
+    feedHint: 'Останется в ленте, его можно лайкнуть. Несколько фото вместе = один пост',
+    close: 'Закрыть',
+  },
+  post: {
+    label: 'Пост: {name}',
+    likes: { one: '{n} лайк', few: '{n} лайка', many: '{n} лайков', other: '{n} лайка' },
+    noLikes: 'Будьте первым, кто поставит лайк',
+    like: 'Нравится',
+    unlike: 'Убрать лайк',
+    open: 'Открыть на весь экран',
+    slide: '{i} из {n}',
+    next: 'Следующее фото',
+    previous: 'Предыдущее фото',
+    doubleTap: 'Двойное касание фото — лайк',
+  },
+  view: {
+    label: 'Вид',
+    feed: 'Лента',
+    grid: 'Все фото',
+    empty: 'В ленте пока нет постов. Поделитесь первым!',
+  },
   hero: {
     people: {
       one: '{n} гость поделился',
@@ -166,6 +196,22 @@ export const galleryGuestRu: GalleryGuestDict = {
       many: '{n} гостей поделились',
       other: '{n} гостя поделились',
     },
+  },
+  a11y: {
+    open: 'Меню доступности',
+    title: 'Доступность',
+    close: 'Закрыть меню доступности',
+    text: 'Размер текста',
+    smaller: 'Уменьшить текст',
+    larger: 'Увеличить текст',
+    contrast: 'Высокий контраст',
+    links: 'Выделить ссылки',
+    readable: 'Удобочитаемый шрифт',
+    spacing: 'Межстрочный интервал',
+    motion: 'Остановить анимацию',
+    cursor: 'Крупный курсор',
+    reset: 'Сбросить',
+    statement: 'Заявление о доступности',
   },
   footer: {
     consent:

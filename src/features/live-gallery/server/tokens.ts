@@ -24,6 +24,8 @@ export type LinkKind = 'upload' | 'projector';
 export const TOKEN_RE = /^[A-Za-z0-9_-]{24}$/;
 /** The browser's random uploader id. */
 export const UPLOADER_RE = /^[A-Za-z0-9_-]{16,64}$/;
+/** a feed post's key: made by the phone for the photos it shares together, or an item's id */
+export const POST_RE = /^[A-Za-z0-9_-]{8,40}$/;
 
 export { randomId, sha256Hex } from '@/lib/links/tokens';
 

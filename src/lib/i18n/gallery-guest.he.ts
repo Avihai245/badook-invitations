@@ -126,6 +126,7 @@ export const galleryGuestHe = {
   },
   /** the feed as stories: one per person, a ring to watch what they shot */
   stories: {
+    yours: 'הסטורי שלך',
     title: 'סטוריז מהאירוע',
     hint: 'לחצו על עיגול כדי לראות מה כל אורח צילם.',
     add: 'הוספה',
@@ -145,9 +146,58 @@ export const galleryGuestHe = {
     close: 'סגירה',
     tapHint: 'הקישו בצד כדי לעבור בין התמונות. החזיקו כדי לעצור.',
   },
+  /** sharing: to the story (the circles) or to the feed (posts with likes) */
+  share: {
+    open: 'שיתוף',
+    composer: 'שתפו רגע מהאירוע…',
+    title: 'מה משתפים?',
+    where: 'לאן לשתף',
+    story: 'סטורי',
+    storyHint: 'רגע מהאירוע — מופיע בעיגולים למעלה',
+    feed: 'פוסט בפיד',
+    feedHint: 'נשאר בפיד ואפשר לעשות לו לייק. כמה תמונות יחד = פוסט אחד',
+    close: 'סגירה',
+  },
+  /** a post of the feed */
+  post: {
+    label: 'הפוסט של {name}',
+    likes: { one: 'לייק אחד', other: '{n} לייקים' },
+    noLikes: 'היו הראשונים לעשות לייק',
+    like: 'לייק',
+    unlike: 'ביטול הלייק',
+    open: 'פתיחה במסך מלא',
+    slide: '{i} מתוך {n}',
+    next: 'התמונה הבאה',
+    previous: 'התמונה הקודמת',
+    doubleTap: 'הקשה כפולה על תמונה = לייק',
+  },
+  /** the feed, or every photo in a grid */
+  view: {
+    label: 'תצוגה',
+    feed: 'פיד',
+    grid: 'כל התמונות',
+    empty: 'עוד אין פוסטים בפיד. היו הראשונים לשתף!',
+  },
   /** under the title: how much has been shared */
   hero: {
     people: { one: 'אורח אחד שיתף', other: '{n} אורחים שיתפו' },
+  },
+  /** the accessibility menu (its button floats on the side of the page) */
+  a11y: {
+    open: 'תפריט נגישות',
+    title: 'נגישות',
+    close: 'סגירת תפריט הנגישות',
+    text: 'גודל טקסט',
+    smaller: 'הקטנת טקסט',
+    larger: 'הגדלת טקסט',
+    contrast: 'ניגודיות גבוהה',
+    links: 'הדגשת קישורים',
+    readable: 'גופן קריא',
+    spacing: 'ריווח שורות',
+    motion: 'עצירת אנימציות',
+    cursor: 'סמן גדול',
+    reset: 'איפוס',
+    statement: 'להצהרת הנגישות',
   },
   footer: {
     consent: 'בהעלאה אתם מאשרים שמותר לכם לשתף את התמונות, ושהמארחים ומי שיש לו את הקישור יראו אותן.',

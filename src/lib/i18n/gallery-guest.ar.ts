@@ -150,6 +150,7 @@ export const galleryGuestAr: GalleryGuestDict = {
   },
   /** the feed as stories: one per person, a ring to watch what they shot */
   stories: {
+    yours: 'قصتك',
     title: 'قصص المناسبة',
     hint: 'اضغطوا على دائرة لمشاهدة ما صوّره كل ضيف.',
     add: 'إضافة',
@@ -177,6 +178,42 @@ export const galleryGuestAr: GalleryGuestDict = {
     tapHint: 'اضغطوا على الجانبين للتنقل بين الصور. اضغطوا مطولًا للإيقاف.',
   },
   /** under the title: how much has been shared */
+  share: {
+    open: 'مشاركة',
+    composer: 'شاركوا لحظة من المناسبة…',
+    title: 'ماذا تشاركون؟',
+    where: 'أين تشاركون',
+    story: 'قصة',
+    storyHint: 'لحظة من المناسبة — تظهر في الدوائر في الأعلى',
+    feed: 'منشور في الصفحة',
+    feedHint: 'يبقى في الصفحة ويمكن الإعجاب به. عدة صور معًا = منشور واحد',
+    close: 'إغلاق',
+  },
+  post: {
+    label: 'منشور {name}',
+    likes: {
+      zero: 'لا إعجابات',
+      one: 'إعجاب واحد',
+      two: 'إعجابان',
+      few: '{n} إعجابات',
+      many: '{n} إعجابًا',
+      other: '{n} إعجاب',
+    },
+    noLikes: 'كونوا أول من يعجب بهذا',
+    like: 'إعجاب',
+    unlike: 'إلغاء الإعجاب',
+    open: 'فتح بملء الشاشة',
+    slide: '{i} من {n}',
+    next: 'الصورة التالية',
+    previous: 'الصورة السابقة',
+    doubleTap: 'انقر مرتين على الصورة للإعجاب بها',
+  },
+  view: {
+    label: 'العرض',
+    feed: 'المنشورات',
+    grid: 'كل الصور',
+    empty: 'لا توجد منشورات بعد. كونوا أول من يشارك!',
+  },
   hero: {
     people: {
       zero: 'لم يشارك أحد بعد',
@@ -186,6 +223,22 @@ export const galleryGuestAr: GalleryGuestDict = {
       many: 'شارك {n} ضيفًا',
       other: 'شارك {n} ضيف',
     },
+  },
+  a11y: {
+    open: 'قائمة إمكانية الوصول',
+    title: 'إمكانية الوصول',
+    close: 'إغلاق قائمة إمكانية الوصول',
+    text: 'حجم النص',
+    smaller: 'تصغير النص',
+    larger: 'تكبير النص',
+    contrast: 'تباين عالٍ',
+    links: 'إبراز الروابط',
+    readable: 'خط سهل القراءة',
+    spacing: 'تباعد الأسطر',
+    motion: 'إيقاف الحركة',
+    cursor: 'مؤشر كبير',
+    reset: 'إعادة الضبط',
+    statement: 'بيان إمكانية الوصول',
   },
   footer: {
     consent: 'برفعكم الملفات تؤكدون أنه يحق لكم مشاركتها، وأن أصحاب الدعوة وكل من لديه الرابط سيرونها.',

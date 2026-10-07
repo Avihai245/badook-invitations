@@ -393,15 +393,16 @@ describe('the tray', () => {
     expect(onOpen).toHaveBeenCalledWith('n:דנה');
   });
 
-  it('has a "+" to add your own when the gallery takes uploads', () => {
+  it('has "your story" with a "+" to add to it when the gallery takes uploads', () => {
     const onAdd = vi.fn();
     mountTray({}, onAdd);
-    fireEvent.click(screen.getByRole('button', { name: H.stories.addLabel }));
+    expect(screen.getByText(H.stories.yours)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: `${H.stories.yours}: ${H.stories.addLabel}` }));
     expect(onAdd).toHaveBeenCalledTimes(1);
   });
 
   it('has no "+" when it does not', () => {
     mountTray();
-    expect(screen.queryByRole('button', { name: H.stories.addLabel })).toBeNull();
+    expect(screen.queryByRole('button', { name: new RegExp(H.stories.addLabel) })).toBeNull();
   });
 });

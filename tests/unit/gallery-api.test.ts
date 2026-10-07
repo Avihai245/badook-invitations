@@ -210,6 +210,20 @@ function guestWorld(
     uploaderItems: vi.fn(async (): Promise<ItemRow[]> => []),
     guestDelete: vi.fn(async () => true),
     guestByToken: vi.fn(async (): Promise<string | null> => 'guest-row-id'),
+    like: vi.fn(
+      async (
+        ..._args: Parameters<GuestDeps['db']['like']>
+      ): Promise<{ ok: true; n: number; mine: boolean } | { ok: false; code: 'not_found' }> => ({
+        ok: true,
+        n: 3,
+        mine: true,
+      }),
+    ),
+    likesOf: vi.fn(
+      async (
+        ..._args: Parameters<GuestDeps['db']['likesOf']>
+      ): Promise<Record<string, { n: number; mine: boolean }>> => ({}),
+    ),
   };
   const { storage, put, signedUploads } = fakeStorage();
   const deps: GuestDeps = {
@@ -801,6 +815,8 @@ describe('the feed and the screen', () => {
         'id',
         'kind',
         'name',
+        'placement',
+        'post',
         'takenAt',
         'thumb',
         'video',
@@ -855,6 +871,77 @@ describe('the feed and the screen', () => {
     ]);
     w.rateAnswers.set(tokens.rateKey('feed', `${INV}:${UPLOADER}`), false);
     expect((await guest.guestFeed({ t: w.token, uploader: UPLOADER }, IP, w.deps)).status).toBe(429);
+  });
+
+  it('the story or the feed: each item says where it was shared and its post; the feed brings likes', async () => {
+    const w = guestWorld();
+    const story = published({ placement: 'story', post: 'ignored' });
+    const a = published({ placement: 'feed', post: 'post-0123456789ab' });
+    const b = published({ placement: 'feed', post: 'post-0123456789ab' });
+    const old = published();
+    w.db.feed.mockResolvedValueOnce([story, a, b, old]);
+    w.db.likesOf.mockResolvedValueOnce({ 'post-0123456789ab': { n: 4, mine: true } });
+    const res = await guest.guestFeed(
+      { t: w.token, uploader: UPLOADER, posts: ['seen-on-screen-01'] },
+      IP,
+      w.deps,
+    );
+    const items = res.body.items as { placement: string; post: string }[];
+    expect(items.map((i) => [i.placement, i.post])).toEqual([
+      ['story', 'ignored'],
+      ['feed', 'post-0123456789ab'],
+      ['feed', 'post-0123456789ab'],
+      ['feed', old.id],
+    ]);
+    // the posts on the screen, then the feed posts of this answer (once each; never a story)
+    expect(w.db.likesOf).toHaveBeenCalledWith(
+      INV,
+      ['seen-on-screen-01', 'post-0123456789ab', old.id],
+      tokens.uploaderHash(INV, UPLOADER),
+    );
+    expect(res.body.likes).toEqual({ 'post-0123456789ab': { n: 4, mine: true } });
+    // a malformed post key is refused before anything is read
+    expect((await guest.guestFeed({ t: w.token, posts: ['no spaces'] }, IP, w.deps)).status).toBe(400);
+  });
+
+  it('a like: once per phone (its hash), pages are told; rate-limited; an unknown post is not found', async () => {
+    const w = guestWorld();
+    const res = await guest.guestLike(
+      { t: w.token, uploader: UPLOADER, post: 'post-0123456789ab', on: true },
+      IP,
+      w.deps,
+    );
+    expect(res).toEqual({ status: 200, body: { ok: true, likes: { n: 3, mine: true } } });
+    expect(w.db.like).toHaveBeenCalledWith(
+      INV,
+      'post-0123456789ab',
+      tokens.uploaderHash(INV, UPLOADER),
+      true,
+    );
+    expect(w.deps.broadcast).toHaveBeenCalledWith('gallery-channel-unit', 'likes');
+    w.db.like.mockResolvedValueOnce({ ok: false, code: 'not_found' });
+    expect(
+      (
+        await guest.guestLike(
+          { t: w.token, uploader: UPLOADER, post: 'gone-0123456789', on: true },
+          IP,
+          w.deps,
+        )
+      ).status,
+    ).toBe(404);
+    expect(
+      (await guest.guestLike({ t: w.token, post: 'post-0123456789ab', on: true }, IP, w.deps)).status,
+    ).toBe(400);
+    w.rateAnswers.set(tokens.rateKey('like', `${INV}:${UPLOADER}`), false);
+    expect(
+      (
+        await guest.guestLike(
+          { t: w.token, uploader: UPLOADER, post: 'post-0123456789ab', on: false },
+          IP,
+          w.deps,
+        )
+      ).status,
+    ).toBe(429);
   });
 
   it('the screen: newest published items, then what changed', async () => {

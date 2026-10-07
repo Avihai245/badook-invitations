@@ -581,3 +581,105 @@ describe('privileges', () => {
     ]);
   });
 });
+
+describe('the story and the feed', () => {
+  let likes: string;
+  beforeAll(async () => {
+    const doc = (await c.query(`select draft from invitations where slug = 'noa-and-itay'`)).rows[0].draft;
+    likes = (
+      await commit<{ id: string }>('create_invitation', [
+        OWNER,
+        'sahar-bordeaux',
+        'wedding',
+        'gallery-likes',
+        doc,
+      ])
+    ).id;
+    await commit('gallery_owner_create', [likes, OWNER, ...links('9', '0', 'likes')]);
+  });
+
+  it('the story or the feed: several photos shared together are one post, liked once per phone', async () => {
+    const post = 'post-0123456789ab';
+    const s1 = item(likes, { placement: 'story' });
+    const p1 = item(likes, { placement: 'feed', post });
+    const p2 = item(likes, { placement: 'feed', post });
+    // a story never takes a post key; an item without a placement goes to the feed, its own post
+    const old = item(likes, { post: 'ignored-0123456789', placement: undefined });
+    delete (old as Record<string, unknown>).placement;
+    const s2 = item(likes, { placement: 'story', post: 'story-0123456789ab' });
+    expect(
+      (
+        await commit<{ ok: boolean }>('gallery_reserve', [
+          likes,
+          UPLOADER,
+          null,
+          'דנה',
+          JSON.stringify([s1, p1, p2, old, s2]),
+          100,
+        ])
+      ).ok,
+    ).toBe(true);
+    for (const x of [s1, p1, p2, old, s2])
+      await commit('gallery_complete', [likes, x.id, UPLOADER, 'published', 'ok', '{}', '[]', '{}', false]);
+    const feed = await call<{ id: string; placement: string; post: string }[]>('gallery_feed', [
+      likes,
+      null,
+      null,
+      30,
+    ]);
+    const of = (id: string) => feed.find((x) => x.id === id)!;
+    expect(of(s1.id)).toMatchObject({ placement: 'story', post: s1.id });
+    expect(of(s2.id)).toMatchObject({ placement: 'story', post: s2.id });
+    expect(of(p1.id)).toMatchObject({ placement: 'feed', post });
+    expect(of(p2.id)).toMatchObject({ placement: 'feed', post });
+    expect(of(old.id)).toMatchObject({ placement: 'feed', post: 'ignored-0123456789' });
+
+    // likes: once per phone, taken back, counted per post
+    expect(await commit('gallery_like', [likes, post, UPLOADER, true])).toEqual({
+      ok: true,
+      n: 1,
+      mine: true,
+    });
+    expect(await commit('gallery_like', [likes, post, UPLOADER, true])).toEqual({
+      ok: true,
+      n: 1,
+      mine: true,
+    });
+    expect(await commit('gallery_like', [likes, post, SOMEONE, true])).toEqual({
+      ok: true,
+      n: 2,
+      mine: true,
+    });
+    expect(await call('gallery_likes_of', [likes, [post, old.id], UPLOADER])).toEqual({
+      [post]: { n: 2, mine: true },
+    });
+    expect(await commit('gallery_like', [likes, post, UPLOADER, false])).toEqual({
+      ok: true,
+      n: 1,
+      mine: false,
+    });
+    expect(await call('gallery_likes_of', [likes, [post], UPLOADER])).toEqual({
+      [post]: { n: 1, mine: false },
+    });
+    // a story, an unknown post, a hidden one: nothing to like
+    expect(await commit('gallery_like', [likes, s1.id, UPLOADER, true])).toEqual({
+      ok: false,
+      code: 'not_found',
+    });
+    expect(await commit('gallery_like', [likes, 'nobody-0123456789', UPLOADER, true])).toEqual({
+      ok: false,
+      code: 'not_found',
+    });
+    await commit('gallery_owner_moderate', [likes, OWNER, [old.id], 'hide']);
+    expect(await commit('gallery_like', [likes, 'ignored-0123456789', UPLOADER, true])).toEqual({
+      ok: false,
+      code: 'not_found',
+    });
+    // nobody but the service role
+    await expect(
+      as(c, 'anon', null, () =>
+        c.query(`select public.gallery_like($1, $2, $3, true)`, [likes, post, UPLOADER]),
+      ),
+    ).rejects.toThrow(/permission denied/);
+  });
+});

@@ -215,7 +215,12 @@ export class Uploader {
 
   // ── adding and removing ──
 
-  async add(files: File[]): Promise<AddResult> {
+  /**
+   * Prepares and queues `files`, shared `to` the story or the feed: the files picked together for
+   * the feed are one post (a key of their own).
+   */
+  async add(files: File[], to: 'story' | 'feed' = 'feed'): Promise<AddResult> {
+    const post = to === 'feed' ? randomToken(15) : undefined;
     const result: AddResult = { added: 0, errors: [] };
     this.preparing += files.length;
     this.emit();
@@ -272,6 +277,8 @@ export class Uploader {
         nextAt: 0,
         error: null,
         sent: 0,
+        placement: to,
+        ...(post ? { post } : {}),
       };
       try {
         await this.o.store.putBlob(localId, 'original', prepared.original);
@@ -450,6 +457,8 @@ export class Uploader {
           height: i.meta.height,
           durationMs: i.meta.durationMs,
           takenAt: i.meta.takenAt,
+          ...(i.placement ? { placement: i.placement } : {}),
+          ...(i.post ? { post: i.post } : {}),
         })),
       },
     );

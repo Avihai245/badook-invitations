@@ -138,6 +138,7 @@ export const galleryGuestFr: GalleryGuestDict = {
   },
   /** the feed as stories: one per person, a ring to watch what they shot */
   stories: {
+    yours: 'Votre story',
     title: 'Les stories de l’événement',
     hint: 'Touchez un cercle pour voir ce qu’a filmé chaque invité.',
     add: 'Ajouter',
@@ -162,12 +163,57 @@ export const galleryGuestFr: GalleryGuestDict = {
     tapHint: 'Touchez les côtés pour passer d’une photo à l’autre. Maintenez pour mettre en pause.',
   },
   /** under the title: how much has been shared */
+  share: {
+    open: 'Partager',
+    composer: 'Partagez un moment de la fête…',
+    title: 'Que partagez-vous ?',
+    where: 'Où partager',
+    story: 'Story',
+    storyHint: 'Un moment de la fête — dans les cercles en haut',
+    feed: 'Publication',
+    feedHint: 'Reste dans le fil et peut être aimée. Plusieurs photos ensemble = une publication',
+    close: 'Fermer',
+  },
+  post: {
+    label: 'Publication de {name}',
+    likes: { one: '{n} j’aime', many: '{n} de j’aime', other: '{n} j’aime' },
+    noLikes: 'Soyez le premier à aimer',
+    like: 'J’aime',
+    unlike: 'Je n’aime plus',
+    open: 'Ouvrir en plein écran',
+    slide: '{i} sur {n}',
+    next: 'Photo suivante',
+    previous: 'Photo précédente',
+    doubleTap: 'Touchez deux fois une photo pour l’aimer',
+  },
+  view: {
+    label: 'Affichage',
+    feed: 'Fil',
+    grid: 'Toutes les photos',
+    empty: 'Aucune publication pour l’instant. Soyez le premier à partager !',
+  },
   hero: {
     people: {
       one: '{n} invité a partagé',
       many: '{n} d’invités ont partagé',
       other: '{n} invités ont partagé',
     },
+  },
+  a11y: {
+    open: 'Menu d’accessibilité',
+    title: 'Accessibilité',
+    close: 'Fermer le menu d’accessibilité',
+    text: 'Taille du texte',
+    smaller: 'Réduire le texte',
+    larger: 'Agrandir le texte',
+    contrast: 'Contraste élevé',
+    links: 'Surligner les liens',
+    readable: 'Police lisible',
+    spacing: 'Interligne',
+    motion: 'Arrêter les animations',
+    cursor: 'Grand curseur',
+    reset: 'Réinitialiser',
+    statement: 'Déclaration d’accessibilité',
   },
   footer: {
     consent:

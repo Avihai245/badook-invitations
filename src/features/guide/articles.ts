@@ -1050,6 +1050,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     tips: [
       {
+        he: 'אצל האורחים הגלריה היא כמו אינסטגרם של האירוע: סטורי בעיגולים למעלה, פיד של פוסטים עם לייקים, ובשיתוף בוחרים לאן. כל מה ששותף מגיע אליכם, גם לסטורי וגם לפיד.',
+        en: 'For guests the gallery is the event’s own Instagram: stories in circles at the top, a feed of posts with likes, and they choose where to share. Everything shared reaches you, story or feed.',
+      },
+      {
         he: 'הגלריה החיה כלולה בתוכנית Pro ומעלה.',
         en: 'The live gallery is included from Pro up.',
       },
@@ -1064,8 +1068,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
     next: ['hall-screen', 'moments-film', 'event-day'],
     keywords: {
-      he: 'גלריה, גלריה חיה, תמונות מהאורחים, העלאת תמונות, QR, אלבום, ZIP, הורדה, אישור תמונות, סרטונים',
-      en: 'gallery, live gallery, guest photos, upload photos, QR, album, ZIP, download, approve photos, videos, moderation',
+      he: 'גלריה, גלריה חיה, תמונות מהאורחים, העלאת תמונות, QR, אלבום, ZIP, הורדה, אישור תמונות, סרטונים, סטורי, פיד, לייק, אינסטגרם',
+      en: 'gallery, live gallery, guest photos, upload photos, QR, album, ZIP, download, approve photos, videos, moderation, story, feed, like, instagram',
     },
     screens: ['gallery'],
   },

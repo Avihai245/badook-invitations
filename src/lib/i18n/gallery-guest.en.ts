@@ -124,6 +124,7 @@ export const galleryGuestEn: GalleryGuestDict = {
   },
   /** the feed as stories: one per person, a ring to watch what they shot */
   stories: {
+    yours: 'Your story',
     title: 'Event stories',
     hint: 'Tap a circle to watch what each guest shot.',
     add: 'Add',
@@ -144,8 +145,53 @@ export const galleryGuestEn: GalleryGuestDict = {
     tapHint: 'Tap the sides to move between photos. Hold to pause.',
   },
   /** under the title: how much has been shared */
+  share: {
+    open: 'Share',
+    composer: 'Share a moment from the event…',
+    title: 'What are you sharing?',
+    where: 'Where to share',
+    story: 'Story',
+    storyHint: 'A moment from the event — shows in the circles at the top',
+    feed: 'Feed post',
+    feedHint: 'Stays in the feed and can be liked. Several photos together = one post',
+    close: 'Close',
+  },
+  post: {
+    label: '{name}’s post',
+    likes: { one: '1 like', other: '{n} likes' },
+    noLikes: 'Be the first to like this',
+    like: 'Like',
+    unlike: 'Unlike',
+    open: 'Open full screen',
+    slide: '{i} of {n}',
+    next: 'Next photo',
+    previous: 'Previous photo',
+    doubleTap: 'Double-tap a photo to like it',
+  },
+  view: {
+    label: 'View',
+    feed: 'Feed',
+    grid: 'All photos',
+    empty: 'No posts in the feed yet. Be the first to share!',
+  },
   hero: {
     people: { one: '1 guest shared', other: '{n} guests shared' },
+  },
+  a11y: {
+    open: 'Accessibility menu',
+    title: 'Accessibility',
+    close: 'Close the accessibility menu',
+    text: 'Text size',
+    smaller: 'Smaller text',
+    larger: 'Larger text',
+    contrast: 'High contrast',
+    links: 'Highlight links',
+    readable: 'Readable font',
+    spacing: 'Line spacing',
+    motion: 'Stop animations',
+    cursor: 'Large cursor',
+    reset: 'Reset',
+    statement: 'Accessibility statement',
   },
   footer: {
     consent:

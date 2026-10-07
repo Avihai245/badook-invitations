@@ -8,6 +8,8 @@ import {
   CircleAlert,
   Globe,
   ImagePlus,
+  LayoutGrid,
+  Rows3,
   Lock,
   LoaderCircle,
   MapPin,
@@ -26,6 +28,7 @@ import {
   type ReactNode,
 } from 'react';
 import { BrandLogo } from '@/components/app/BrandLogo';
+import { AccessibilityPanel } from '@/features/site/AccessibilityMenu.client';
 import { RTL_LOCALES } from '@/features/invitations/contracts/types';
 import { nativeName } from '@/features/invitations/lib/locales';
 import { BADOOK_EVENTS_URL } from '@/features/site/links';
@@ -36,12 +39,23 @@ import { galleryApi } from '../../client/api';
 import { openStore, type QueueStore } from '../../client/idb';
 import { useLiveRefresh } from '@/lib/live/client';
 import { Uploader, randomToken, type AddResult, type Snapshot } from '../../client/uploader';
-import type { FeedItem, FeedResponse, GalleryState, MineItem, RealtimeInfo } from '../../types';
+import type {
+  FeedItem,
+  FeedResponse,
+  GalleryState,
+  Likes,
+  MineItem,
+  Placement,
+  RealtimeInfo,
+} from '../../types';
 import type { GuestPageData } from '../../server/pages';
 import { MediaViewer } from '../MediaViewer';
 import { GuestTextProvider, fmt, formatBytes, useGuestText, type GuestLocale } from '../guest-text';
 import { FeedGrid } from './FeedGrid';
+import { FeedPost } from './FeedPost';
+import { groupPosts, isStory, mergeLikes, toggled, type Post } from './posts';
 import { QueuePanel } from './QueuePanel';
+import { ShareSheet } from './ShareSheet';
 import { StoriesTray } from './StoriesTray';
 import { StoryViewer } from './StoryViewer';
 import { groupStories, isUnseen, readSeen, writeSeen, type Story } from './stories';
@@ -125,6 +139,13 @@ function GalleryBody({
   const [seen, setSeen] = useState<Record<string, string>>({});
   useEffect(() => setSeen(readSeen(token)), [token]);
   const [loadingMore, setLoadingMore] = useState(false);
+  // the feed's posts and their likes; the feed as posts, or every photo in a grid
+  const [likes, setLikes] = useState<Record<string, Likes>>(data.initial?.likes ?? {});
+  const [view, setView] = useState<'feed' | 'grid'>('feed');
+  const postKeys = useRef<string[]>([]);
+  // sharing: the sheet, and where to (the story or the feed)
+  const [sheet, setSheet] = useState(false);
+  const [placement, setPlacement] = useState<Placement>('feed');
   const since = useRef<string | null>(data.initial?.now ?? null);
   const expires = useRef<number>(data.initial?.expiresAt ?? 0);
   // what the feed shows, for telling what a refresh brought that is new
@@ -212,15 +233,19 @@ function GalleryBody({
 
   const request = useCallback(
     async (extra: Record<string, unknown>) => {
+      // the posts on the screen: their likes come back with the answer
+      const asked = postKeys.current.slice(0, GALLERY.feed.likesPerAnswer);
       const res = await galleryApi<FeedResponse & { code?: string; state?: GalleryState }>(
         '/api/gallery/feed',
         {
           t: token,
           ...(code.current ? { code: code.current } : {}),
           ...(uploaderId ? { uploader: uploaderId } : {}),
+          ...(asked.length ? { posts: asked } : {}),
           ...extra,
         },
       );
+      if (res.ok && res.body?.likes) setLikes((cur) => mergeLikes(cur, asked, res.body!.likes));
       if (res.status === 404) setPhase('invalid');
       else if (res.status === 403 && res.body?.code === 'off') {
         setState('off');
@@ -336,7 +361,7 @@ function GalleryBody({
     if (!files.length || !uploader.current) return;
     setSkipped([]);
     const before = new Set(uploader.current.snapshot().items.map((i) => i.localId));
-    const result = await uploader.current.add(files);
+    const result = await uploader.current.add(files, placement);
     const added = uploader.current
       .snapshot()
       .items.filter((i) => !before.has(i.localId))
@@ -359,7 +384,42 @@ function GalleryBody({
 
   // ── this phone's own uploads that aren't in the feed ──
   const mineIds = useMemo(() => new Set(mine.map((m) => m.id)), [mine]);
-  const stories = useMemo(() => groupStories(items), [items]);
+  const stories = useMemo(() => groupStories(items.filter(isStory)), [items]);
+  const posts = useMemo(() => groupPosts(items), [items]);
+  useEffect(() => {
+    postKeys.current = posts.map((p) => p.key);
+  }, [posts]);
+  // an unnamed guest's number, the same in the stories and the feed
+  const people = useMemo(() => groupStories(items), [items]);
+  const authorOf = (post: Post) => {
+    if (post.by === 'host') return t.stories.host;
+    if (post.name) return post.name;
+    const person = people.find(
+      (s) => !s.name && s.items.some((i) => i.post === post.key || i.id === post.key),
+    );
+    return fmt(t.stories.anonymous, { n: number(person?.anonymous ?? 1) });
+  };
+  const like = useCallback(
+    async (post: string, on: boolean) => {
+      if (!uploaderId) return;
+      setLikes((cur) => ({ ...cur, [post]: toggled(cur[post], on) }));
+      const res = await galleryApi<{ likes?: Likes }>('/api/gallery/like', {
+        t: token,
+        uploader: uploaderId,
+        post,
+        on,
+        ...(code.current ? { code: code.current } : {}),
+      });
+      const answer = res.ok ? res.body?.likes : undefined;
+      // the server's count (others liked meanwhile), or back to how it was
+      setLikes((cur) => ({ ...cur, [post]: answer ?? toggled(cur[post], !on) }));
+    },
+    [token, uploaderId],
+  );
+  const share = (to: Placement) => {
+    setPlacement(to);
+    setSheet(true);
+  };
   const storyName = (s: Story) =>
     s.host ? t.stories.host : (s.name ?? fmt(t.stories.anonymous, { n: number(s.anonymous ?? 1) }));
   const watched = useCallback(
@@ -372,7 +432,7 @@ function GalleryBody({
       }),
     [token],
   );
-  const guests = stories.filter((s) => !s.host).length;
+  const guests = people.filter((s) => !s.host).length;
   const waiting = mine.filter((m) => m.status !== 'published');
   const [confirming, setConfirming] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -518,90 +578,54 @@ function GalleryBody({
               <Banner text={t.ended} />
             ) : null}
 
-            {stories.length ? (
+            {stories.length || canUpload ? (
               <StoriesTray
                 stories={stories}
                 seen={seen}
                 nameOf={storyName}
                 onOpen={setStoryOpen}
-                onAdd={canUpload ? () => fileInput.current?.click() : undefined}
+                onAdd={canUpload ? () => share('story') : undefined}
               />
             ) : null}
 
             {canUpload ? (
+              // sharing, as a social app's composer: one tap opens the sheet (story or post, then the picker)
               <section
                 ref={uploadRef}
-                className="mt-6 rounded-[28px] border border-line bg-surface p-5 shadow-[0_28px_60px_-34px_rgba(20,10,0,0.45)] sm:p-7"
-                aria-labelledby="gallery-upload"
+                aria-label={t.upload.title}
+                className="mt-5 flex items-center gap-2.5 rounded-[22px] border border-line bg-surface p-2.5 ps-3 shadow-[0_20px_44px_-32px_rgba(20,10,0,0.5)]"
               >
-                <div className="flex items-start gap-3.5">
-                  <span
-                    aria-hidden
-                    className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] shadow-[0_10px_24px_-12px_rgba(0,0,0,0.55)]"
-                  >
-                    <ImagePlus className="size-6" />
-                  </span>
-                  <div className="min-w-0">
-                    <h2 id="gallery-upload" className="text-[20px] leading-tight font-bold">
-                      {t.upload.title}
-                    </h2>
-                    <p className="mt-1 text-[14px] text-muted">
-                      {mode === 'approval' ? t.upload.approvalBody : t.upload.body}
-                    </p>
-                  </div>
-                </div>
-                {/* the name comes first: it is the name on this person's story */}
-                <div className="mt-5">
-                  <label
-                    htmlFor="gallery-name"
-                    className="flex items-baseline gap-1.5 text-[13px] font-semibold"
-                  >
-                    {t.upload.name}
-                    <span className="text-[12px] font-normal text-muted">({t.upload.optional})</span>
-                  </label>
-                  <div className="mt-1.5 flex items-center gap-2.5">
-                    <span
-                      aria-hidden
-                      className="grid size-11 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_16%,white)] font-display text-[18px] font-bold text-[var(--gallery-accent)]"
-                    >
-                      {(Array.from(name.trim())[0] ?? '').toLocaleUpperCase() || <User className="size-5" />}
-                    </span>
-                    <input
-                      id="gallery-name"
-                      value={name}
-                      maxLength={GALLERY.limits.nameLength}
-                      onChange={(e) => onName(e.target.value)}
-                      placeholder={t.upload.namePlaceholder}
-                      dir="auto"
-                      autoComplete="name"
-                      aria-describedby="gallery-name-help"
-                      className="h-11 min-w-0 flex-1 rounded-[12px] border border-line bg-surface px-3.5 text-[15px] focus:border-ink focus:shadow-ring focus:outline-hidden"
-                    />
-                  </div>
-                  <p id="gallery-name-help" className="mt-1.5 text-[12px] text-muted">
-                    {t.upload.nameHelp}
-                  </p>
-                </div>
-                <div className="mt-4 grid gap-2.5 sm:grid-cols-[1fr_auto]">
-                  <button
-                    type="button"
-                    onClick={() => fileInput.current?.click()}
-                    disabled={!snapshot}
-                    className="inline-flex h-14 items-center justify-center gap-2.5 rounded-[16px] bg-[linear-gradient(135deg,var(--gallery-accent),color-mix(in_oklab,var(--gallery-accent)_78%,black))] px-5 text-[17px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_14px_28px_-14px_rgba(0,0,0,0.65)] transition-transform active:scale-[0.98] disabled:opacity-60 motion-reduce:transition-none"
-                  >
-                    <ImagePlus aria-hidden className="size-5" />
-                    {t.upload.pick}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => cameraInput.current?.click()}
-                    disabled={!snapshot}
-                    className="inline-flex h-14 items-center justify-center gap-2 rounded-[16px] border border-line bg-surface px-5 text-[15px] font-semibold text-ink shadow-sm disabled:opacity-60"
-                  >
-                    <Camera aria-hidden className="size-5" />
-                    {t.upload.camera}
-                  </button>
-                </div>
+                <span
+                  aria-hidden
+                  className="grid size-11 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_16%,white)] font-display text-[18px] font-bold text-[var(--gallery-accent)]"
+                >
+                  {(Array.from(name.trim())[0] ?? '').toLocaleUpperCase() || <User className="size-5" />}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => share('feed')}
+                  disabled={!snapshot}
+                  data-testid="gallery-share"
+                  className="h-12 min-w-0 flex-1 truncate rounded-full bg-subtle px-4 text-start text-[15px] text-muted transition-colors hover:bg-line focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60"
+                >
+                  {t.share.composer}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => share('feed')}
+                  disabled={!snapshot}
+                  aria-label={t.upload.pick}
+                  className="grid size-12 shrink-0 place-items-center rounded-full bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] shadow-[0_10px_22px_-12px_rgba(0,0,0,0.55)] transition-transform active:scale-95 disabled:opacity-60 motion-reduce:transition-none"
+                >
+                  <ImagePlus aria-hidden className="size-5" />
+                </button>
+              </section>
+            ) : null}
+            {canUpload && mode === 'approval' ? (
+              <p className="mt-2 px-1 text-[12.5px] text-muted">{t.upload.approvalBody}</p>
+            ) : null}
+            {canUpload ? (
+              <>
                 <input
                   ref={fileInput}
                   type="file"
@@ -625,25 +649,41 @@ function GalleryBody({
                     e.target.value = '';
                   }}
                 />
-                <p className="mt-3 text-[12.5px] leading-relaxed text-muted">
-                  {t.upload.resilient}{' '}
-                  {fmt(t.upload.limits, {
+                <ShareSheet
+                  open={sheet}
+                  onOpenChange={setSheet}
+                  placement={placement}
+                  onPlacement={setPlacement}
+                  name={name}
+                  onName={onName}
+                  approval={mode === 'approval'}
+                  note={`${t.upload.resilient} ${fmt(t.upload.limits, {
                     image: formatBytes(data.limits.imageBytes, locale),
                     video: formatBytes(data.limits.videoBytes, locale),
                     minutes: number(data.limits.videoMinutes),
-                  })}
-                </p>
-                {skipped.length ? (
-                  <p
-                    role="alert"
-                    className="mt-3 rounded-[10px] bg-warning-bg px-3 py-2 text-[13px] text-warning"
-                  >
-                    {plural(t.skipped, skipped.length, {
-                      reasons: [...new Set(skipped.map((s) => t.item.errors[s.code] ?? s.code))].join(', '),
-                    })}
-                  </p>
-                ) : null}
-              </section>
+                  })}`}
+                  disabled={!snapshot}
+                  style={accent}
+                  onPick={() => {
+                    fileInput.current?.click();
+                    setSheet(false);
+                  }}
+                  onCamera={() => {
+                    cameraInput.current?.click();
+                    setSheet(false);
+                  }}
+                />
+              </>
+            ) : null}
+            {skipped.length ? (
+              <p
+                role="alert"
+                className="mt-3 rounded-[10px] bg-warning-bg px-3 py-2 text-[13px] text-warning"
+              >
+                {plural(t.skipped, skipped.length, {
+                  reasons: [...new Set(skipped.map((s) => t.item.errors[s.code] ?? s.code))].join(', '),
+                })}
+              </p>
             ) : null}
 
             {showQueue && snapshot ? (
@@ -714,41 +754,101 @@ function GalleryBody({
             ) : null}
 
             <section className="mt-8" aria-labelledby="gallery-feed">
-              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 id="gallery-feed" className="text-[18px] font-bold">
                   {t.feed.title}
-                  {items.length && !next ? (
-                    <span className="ms-2 text-[13px] font-normal text-muted">
-                      {plural(t.feed.count, items.length)}
+                </h2>
+                <div className="flex items-center gap-3">
+                  {live === 'live' ? (
+                    <span
+                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-success"
+                      data-testid="gallery-live"
+                    >
+                      <span aria-hidden className="relative flex size-2">
+                        <span className="absolute inline-flex size-full rounded-full bg-success opacity-60 motion-safe:animate-ping" />
+                        <span className="relative inline-flex size-2 rounded-full bg-success" />
+                      </span>
+                      {t.feed.live}
                     </span>
                   ) : null}
-                </h2>
-                {live === 'live' ? (
-                  <span
-                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-success"
-                    data-testid="gallery-live"
+                  {/* the feed's posts, or every photo and video (the stories' too) in a grid */}
+                  <div
+                    role="radiogroup"
+                    aria-label={t.view.label}
+                    className="flex rounded-full bg-subtle p-1"
                   >
-                    <span aria-hidden className="relative flex size-2">
-                      <span className="absolute inline-flex size-full rounded-full bg-success opacity-60 motion-safe:animate-ping" />
-                      <span className="relative inline-flex size-2 rounded-full bg-success" />
-                    </span>
-                    {t.feed.live}
-                  </span>
-                ) : null}
+                    {(
+                      [
+                        ['feed', t.view.feed, Rows3],
+                        ['grid', t.view.grid, LayoutGrid],
+                      ] as const
+                    ).map(([value, label, Icon]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        role="radio"
+                        aria-checked={view === value}
+                        onClick={() => setView(value)}
+                        data-view={value}
+                        className={`inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus ${
+                          view === value ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'
+                        }`}
+                      >
+                        <Icon aria-hidden className="size-4" />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-              {items.length ? (
-                <FeedGrid
-                  items={items}
-                  fresh={fresh}
-                  onOpen={setOpen}
-                  hasMore={!!next}
-                  loadingMore={loadingMore}
-                  onMore={() => void more()}
-                />
+              {view === 'grid' ? (
+                items.length ? (
+                  <FeedGrid
+                    items={items}
+                    fresh={fresh}
+                    onOpen={setOpen}
+                    hasMore={!!next}
+                    loadingMore={loadingMore}
+                    onMore={() => void more()}
+                  />
+                ) : (
+                  <Empty
+                    text={t.feed.empty}
+                    action={canUpload ? t.share.open : null}
+                    onAction={() => share('feed')}
+                  />
+                )
+              ) : posts.length ? (
+                <>
+                  <p className="mb-3 text-[12.5px] text-muted">{t.post.doubleTap}</p>
+                  <ol className="mx-auto flex max-w-[560px] flex-col gap-5" data-testid="gallery-posts">
+                    {posts.map((post) => (
+                      <li key={post.key}>
+                        <FeedPost
+                          post={post}
+                          author={authorOf(post)}
+                          likes={likes[post.key]}
+                          fresh={post.items.some((i) => fresh.has(i.id))}
+                          onLike={(on) => void like(post.key, on)}
+                          onOpen={(item) => {
+                            const at = items.findIndex((i) => i.id === item.id);
+                            if (at >= 0) setOpen(at);
+                          }}
+                        />
+                      </li>
+                    ))}
+                  </ol>
+                  {next ? <MoreButton loading={loadingMore} onMore={() => void more()} /> : null}
+                </>
               ) : (
-                <p className="rounded-[16px] border border-dashed border-line-strong px-4 py-10 text-center text-[14px] text-muted">
-                  {t.feed.empty}
-                </p>
+                <>
+                  <Empty
+                    text={t.view.empty}
+                    action={canUpload ? t.share.open : null}
+                    onAction={() => share('feed')}
+                  />
+                  {next ? <MoreButton loading={loadingMore} onMore={() => void more()} /> : null}
+                </>
               )}
             </section>
           </>
@@ -829,16 +929,19 @@ function GalleryBody({
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(16px,env(safe-area-inset-bottom))]">
           <button
             type="button"
-            onClick={() => fileInput.current?.click()}
+            onClick={() => share('feed')}
             disabled={!snapshot}
             data-testid="gallery-fab"
             className="pointer-events-auto inline-flex h-13 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-6 text-[15.5px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.55)] transition-transform active:scale-[0.97] disabled:opacity-60 motion-reduce:transition-none"
           >
             <ImagePlus aria-hidden className="size-5" />
-            {t.stories.addLabel}
+            {t.share.open}
           </button>
         </div>
       ) : null}
+
+      {/* the accessibility menu, on the side of the page, in the page's language */}
+      <AccessibilityPanel a={t.a11y} newTab place="corner" />
 
       {storyOpen ? (
         <StoryViewer
@@ -892,6 +995,65 @@ function GalleryBody({
           onCancel={() => setConfirming(null)}
         />
       ) : null}
+    </div>
+  );
+}
+
+/** Nothing here yet: an invitation to be the first, with the way to share. */
+function Empty({ text, action, onAction }: { text: string; action: string | null; onAction(): void }) {
+  return (
+    <div className="flex flex-col items-center gap-3 rounded-[22px] border border-dashed border-line-strong px-4 py-10 text-center">
+      <span
+        aria-hidden
+        className="grid size-14 place-items-center rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_14%,transparent)] text-[var(--gallery-accent)]"
+      >
+        <Camera className="size-7" />
+      </span>
+      <p className="max-w-[34ch] text-[14.5px] text-muted">{text}</p>
+      {action ? (
+        <button
+          type="button"
+          onClick={onAction}
+          className="inline-flex h-11 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-5 text-[14.5px] font-bold text-[var(--gallery-accent-ink)] shadow-sm transition-transform active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none"
+        >
+          <ImagePlus aria-hidden className="size-4" />
+          {action}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+/** Older posts: on their own near the bottom (and with the button, without IntersectionObserver). */
+function MoreButton({ loading, onMore }: { loading: boolean; onMore(): void }) {
+  const { t } = useGuestText();
+  const ref = useRef<HTMLDivElement>(null);
+  const onMoreRef = useRef(onMore);
+  useEffect(() => {
+    onMoreRef.current = onMore;
+  }, [onMore]);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      (entries) => entries.some((e) => e.isIntersecting) && onMoreRef.current(),
+      {
+        rootMargin: '800px 0px',
+      },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className="mt-5 flex justify-center">
+      <button
+        type="button"
+        onClick={onMore}
+        disabled={loading}
+        className="h-10 rounded-full border border-line bg-surface px-5 text-[14px] font-semibold text-ink shadow-sm disabled:opacity-60"
+      >
+        {loading ? t.feed.loading : t.feed.more}
+      </button>
     </div>
   );
 }

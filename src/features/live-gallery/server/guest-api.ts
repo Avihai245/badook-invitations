@@ -9,6 +9,7 @@ import type {
   FeedItem,
   FeedResponse,
   GalleryState,
+  Likes,
   MineItem,
   PartTicket,
   RealtimeInfo,
@@ -17,7 +18,7 @@ import type {
 import type { GalleryDb, ItemRow, TokenLookup } from './db';
 import type { HintKind } from './realtime';
 import { BUCKETS, type Bucket, type GalleryStorage } from './storage';
-import { TOKEN_RE, UPLOADER_RE, codeMatches, rateKey, sha256Hex, uploaderHash } from './tokens';
+import { POST_RE, TOKEN_RE, UPLOADER_RE, codeMatches, rateKey, sha256Hex, uploaderHash } from './tokens';
 
 /**
  * The guests' and the screen's gallery API as plain functions over injected dependencies (the route
@@ -47,6 +48,8 @@ export interface GuestDeps {
     | 'guestDelete'
     | 'rateHit'
     | 'guestByToken'
+    | 'like'
+    | 'likesOf'
   >;
   storage: GalleryStorage;
   /** what the event may use (feature flags) */
@@ -153,6 +156,8 @@ export function feedItem(
     at: r.publishedAt ?? r.createdAt,
     name: r.name,
     by: r.by ?? null,
+    placement: r.placement ?? 'feed',
+    post: r.post ?? r.id,
   };
 }
 
@@ -167,6 +172,8 @@ export const FeedSchema = z.strictObject({
   before: Cursor.optional(),
   since: z.iso.datetime({ offset: true }).optional(),
   mine: z.boolean().optional(),
+  /** the feed posts on the guest's screen: their likes come back */
+  posts: z.array(z.string().regex(POST_RE)).max(GALLERY.feed.likesPerAnswer).optional(),
 });
 
 /** POST /api/gallery/feed — the published items (a page, or what changed since), and this device's own. */
@@ -217,7 +224,22 @@ export async function guestFeed(raw: unknown, ip: string | null, deps: GuestDeps
     thumb: m.thumbPath ? (urls.media.get(m.thumbPath) ?? null) : null,
     createdAt: m.createdAt,
   }));
+  // the likes of the posts on the screen and of those in this answer
+  const posts = [
+    ...new Set([
+      ...(q.posts ?? []),
+      ...rows.filter((row) => (row.placement ?? 'feed') === 'feed').map((row) => row.post ?? row.id),
+    ]),
+  ].slice(0, GALLERY.feed.likesPerAnswer);
+  const likes: Record<string, Likes> = posts.length
+    ? await deps.db.likesOf(
+        r.invitationId,
+        posts,
+        q.uploader ? uploaderHash(r.invitationId, q.uploader) : null,
+      )
+    : {};
   const body: Omit<FeedResponse, 'ok'> = {
+    likes,
     state: r.state,
     mode: g.mode,
     opensAt: g.opensAt,
@@ -247,6 +269,10 @@ const ItemSpec = z.strictObject({
   height: z.number().int().min(1).max(100_000).nullable().optional(),
   durationMs: z.number().int().min(0).nullable().optional(),
   takenAt: z.iso.datetime({ offset: true }).nullable().optional(),
+  /** to the story or the feed (the feed when not said) */
+  placement: z.enum(['story', 'feed']).optional(),
+  /** the feed post it joins: the photos a guest shares together */
+  post: z.string().regex(POST_RE).optional(),
 });
 
 export const ReserveSchema = z.strictObject({
@@ -376,6 +402,8 @@ export async function guestReserve(raw: unknown, ip: string | null, deps: GuestD
       height: spec.height ?? null,
       durationMs: spec.kind === 'video' ? (spec.durationMs ?? null) : null,
       takenAt: plausibleTime(spec.takenAt, now),
+      placement: spec.placement ?? 'feed',
+      post: (spec.placement ?? 'feed') === 'feed' ? (spec.post ?? null) : null,
     };
   });
   const guestId = q.g ? await deps.db.guestByToken(inv, q.g) : null;
@@ -621,6 +649,37 @@ export async function guestRemove(raw: unknown, ip: string | null, deps: GuestDe
 }
 
 // ─── the screen ─────────────────────────────────────────────────────────────────────────────────
+
+// ─── likes ──────────────────────────────────────────────────────────────────────────────────────
+
+export const LikeSchema = z.strictObject({
+  t: z.string(),
+  code: z.string().max(64).optional(),
+  uploader: z.string().regex(UPLOADER_RE),
+  post: z.string().regex(POST_RE),
+  on: z.boolean(),
+});
+
+/**
+ * POST /api/gallery/like — this phone likes a feed post (or takes it back): one like per phone and
+ * post. The other guests' pages are told, so the count moves for everyone.
+ */
+export async function guestLike(raw: unknown, ip: string | null, deps: GuestDeps): Promise<ApiResult> {
+  const parsed = LikeSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const q = parsed.data;
+  const r = await resolve(q.t, 'upload', deps);
+  if (!r) return notFound;
+  if (r.state === 'off') return fail(403, 'off', { state: 'off' });
+  const denied = await checkCode(r, q.code, ip, deps);
+  if (denied) return denied;
+  if (!(await rateOk(deps, 'like', `${r.invitationId}:${q.uploader}`, GALLERY.rate.likePerDevice)))
+    return fail(429, 'rate');
+  const res = await deps.db.like(r.invitationId, q.post, uploaderHash(r.invitationId, q.uploader), q.on);
+  if (!res.ok) return notFound;
+  await deps.broadcast(r.lookup.gallery.channel, 'likes').catch(() => undefined);
+  return ok({ likes: { n: res.n, mine: res.mine } satisfies Likes });
+}
 
 export const ProjectorSchema = z.strictObject({
   p: z.string(),

@@ -49,3 +49,31 @@
     transform: scaleX(1);
   }
 }
+
+/* a like: the heart over the photo pops and fades (double tap), the small one bounces */
+@keyframes like-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  18% {
+    opacity: 0.95;
+    transform: scale(1.15);
+  }
+  30% {
+    transform: scale(0.95);
+  }
+  70% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+@keyframes like-pop {
+  40% {
+    transform: scale(1.25);
+  }
+}

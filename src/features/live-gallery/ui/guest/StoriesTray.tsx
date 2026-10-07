@@ -6,7 +6,7 @@ import { useGuestText } from '../guest-text';
 import { isUnseen, type Story } from './stories';
 
 /** A person's colour: soft, steady (the same name is always the same hue), readable initials on it. */
-function hueOf(key: string): number {
+export function hueOf(key: string): number {
   let h = 0;
   for (const ch of key) h = (h * 31 + ch.codePointAt(0)!) % 360;
   return h;
@@ -113,7 +113,7 @@ export function StoriesTray({
             <button
               type="button"
               onClick={onAdd}
-              aria-label={t.stories.addLabel}
+              aria-label={`${t.stories.yours}: ${t.stories.addLabel}`}
               className="group flex w-[76px] flex-col items-center gap-1.5 rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
               <span
@@ -123,7 +123,7 @@ export function StoriesTray({
                 <Plus className="size-7" strokeWidth={2.25} />
               </span>
               <span className="w-full truncate text-center text-[12.5px] font-semibold text-muted">
-                {t.stories.add}
+                {t.stories.yours}
               </span>
             </button>
           </li>

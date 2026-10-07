@@ -17,14 +17,31 @@ const day = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISO
 async function seeded(page: Page) {
   const host = await newHost(page, 'stories', 'pro', { date: day(30) });
   const link = await galleryOn(page, host.id);
+  const story = 'story' as const;
   await seedPhotos(host.id, [
-    { color: [70, 110, 170], who: 'dana', name: 'דנה', minute: 1 },
-    { color: [190, 120, 90], who: 'dana', name: 'דנה', minute: 4 },
-    { color: [90, 150, 110], who: 'dana', name: 'דנה', minute: 9 },
-    { color: [170, 90, 140], who: 'yoav', name: 'יואב', minute: 12, width: 1600, height: 1000 },
-    { color: [120, 120, 190], who: 'yoav', name: 'יואב', minute: 15, width: 1600, height: 1000 },
-    { color: [200, 170, 80], who: 'one', name: null, minute: 20 },
-    { color: [100, 170, 170], who: 'two', name: null, minute: 25 },
+    { color: [70, 110, 170], who: 'dana', name: 'דנה', minute: 1, placement: story },
+    { color: [190, 120, 90], who: 'dana', name: 'דנה', minute: 4, placement: story },
+    { color: [90, 150, 110], who: 'dana', name: 'דנה', minute: 9, placement: story },
+    {
+      color: [170, 90, 140],
+      who: 'yoav',
+      name: 'יואב',
+      minute: 12,
+      width: 1600,
+      height: 1000,
+      placement: story,
+    },
+    {
+      color: [120, 120, 190],
+      who: 'yoav',
+      name: 'יואב',
+      minute: 15,
+      width: 1600,
+      height: 1000,
+      placement: story,
+    },
+    { color: [200, 170, 80], who: 'one', name: null, minute: 20, placement: story },
+    { color: [100, 170, 170], who: 'two', name: null, minute: 25, placement: story },
   ]);
   return { host, link };
 }
@@ -81,8 +98,11 @@ test('each person who shared is a circle; a tap plays their story, then the next
   await expect(tray.getByRole('button', { name: /אורח\/ת 2: פריט אחד/ })).toBeVisible();
   // the numbers say how much was shared and by how many
   await expect(guest.getByTestId('gallery-people')).toContainText('4 אורחים שיתפו');
-  // the grid of everything is still there under the stories
+  // stories aren't feed posts; the grid of everything has them all
+  await expect(guest.getByTestId('gallery-posts')).toHaveCount(0);
+  await guest.locator('[data-view="grid"]').click();
   await expect(guest.getByTestId('gallery-feed').locator('[data-item]')).toHaveCount(7);
+  await guest.locator('[data-view="feed"]').click();
   await shot(guest, `he-${tag}-1-page`);
 
   // Yoav's story: his two photos, in the order he shared them
@@ -179,8 +199,10 @@ test('with no photos yet there are no stories, just the invitation to share', as
   const host = await newHost(page, 'stories-empty', 'pro', { date: day(30) });
   const link = await galleryOn(page, host.id);
   const { page: guest, context } = await guestPage(browser, testInfo.project, link);
-  await expect(guest.getByText('עוד אין כאן תמונות. היו הראשונים לשתף!')).toBeVisible();
-  await expect(guest.getByTestId('gallery-stories')).toHaveCount(0);
+  await expect(guest.getByText('עוד אין פוסטים בפיד. היו הראשונים לשתף!')).toBeVisible();
+  // the stories offer only "your story"
+  await expect(guest.getByTestId('gallery-stories').locator('[data-story]')).toHaveCount(0);
+  await expect(guest.getByTestId('gallery-stories').getByText('הסטורי שלך')).toBeVisible();
   await expect(guest.getByTestId('gallery-people')).toHaveCount(0);
   await expect(guest.getByTestId('gallery-brand')).toBeVisible();
   await shot(guest, `he-${testInfo.project.name}-0-empty`);
@@ -232,19 +254,96 @@ test('Badook is plain to see at the bottom, with its site and Badook Events; a b
 
   // at the footer the floating button steps aside; in the middle of the photos it is there
   await expect(guest.getByTestId('gallery-fab')).toHaveCount(0);
-  await guest.getByTestId('gallery-feed').scrollIntoViewIfNeeded();
+  await guest.getByTestId('gallery-posts').scrollIntoViewIfNeeded();
   await guest.evaluate(() => {
-    const feed = document.querySelector('[data-testid="gallery-feed"]')!;
+    const feed = document.querySelector('[data-testid="gallery-posts"]')!;
     window.scrollTo(0, feed.getBoundingClientRect().top + window.scrollY + 200);
   });
   await expect(guest.getByTestId('gallery-fab')).toBeVisible();
   await shot(guest, `he-${testInfo.project.name}-4-fab`, false);
-  // and it picks photos like the card's button
-  const chooser = guest.waitForEvent('filechooser');
+  // and it shares like the composer: the sheet, then the phone's photos
   await guest.getByTestId('gallery-fab').click();
+  const chooser = guest.waitForEvent('filechooser');
+  await guest.getByTestId('share-sheet').getByTestId('share-pick').click();
   await chooser;
   await guest.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await expect(guest.getByTestId('gallery-fab')).toHaveCount(0);
   await shot(guest, `he-${testInfo.project.name}-5-footer`, false);
+  await context.close();
+});
+
+test('the feed: photos shared together are one post to swipe; a heart (or a double tap) likes it, and every phone sees the count', async ({
+  page,
+  browser,
+}, testInfo) => {
+  const host = await newHost(page, 'feed-likes', 'pro', { date: day(30) });
+  const link = await galleryOn(page, host.id);
+  const post = 'dana-post-0123456789';
+  await seedPhotos(host.id, [
+    { color: [70, 110, 170], who: 'dana', name: 'דנה', minute: 1, placement: 'feed', post },
+    { color: [190, 120, 90], who: 'dana', name: 'דנה', minute: 2, placement: 'feed', post },
+    { color: [170, 90, 140], who: 'yoav', name: 'יואב', minute: 5, placement: 'feed' },
+    { color: [100, 170, 170], who: 'yoav', name: 'יואב', minute: 6, placement: 'story' },
+  ]);
+  const { page: guest, context } = await guestPage(browser, testInfo.project, link);
+  const tag = testInfo.project.name;
+
+  // two posts, newest first; Dana's has two photos and says so; Yoav's story is a circle, not a post
+  const posts = guest.getByTestId('gallery-posts');
+  await expect(posts.locator('[data-post]')).toHaveCount(2);
+  await expect(posts.locator('[data-post]').first()).toHaveAttribute('aria-label', 'הפוסט של יואב');
+  const dana = posts.locator(`[data-post="${post}"]`);
+  await expect(dana.locator('[data-item]')).toHaveCount(2);
+  await expect(guest.getByTestId('gallery-stories').locator('[data-story]')).toHaveCount(1);
+  // the accessibility menu is on the side
+  await expect(guest.getByTestId('a11y-button')).toBeVisible();
+  await shot(guest, `he-${tag}-6-feed`);
+
+  // a double tap on the photo likes it (once); the heart takes it back
+  await dana.locator('[data-item]').first().dblclick();
+  await expect(dana.getByText('לייק אחד')).toBeVisible();
+  await expect(dana.getByRole('button', { name: 'ביטול הלייק' })).toHaveAttribute('aria-pressed', 'true');
+  await dana.scrollIntoViewIfNeeded();
+  await shot(guest, `he-${tag}-6b-post`, false);
+  await dana.locator('[data-item]').first().dblclick();
+  await expect(dana.getByText('לייק אחד')).toBeVisible();
+
+  // another phone sees it, and adds its own
+  const other = await guestPage(browser, testInfo.project, link);
+  const theirs = other.page.getByTestId('gallery-posts').locator(`[data-post="${post}"]`);
+  await expect(theirs.getByText('לייק אחד')).toBeVisible();
+  await expect(theirs.getByRole('button', { name: 'לייק', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+  await theirs.getByRole('button', { name: 'לייק', exact: true }).click();
+  await expect(theirs.getByText('2 לייקים')).toBeVisible();
+  // the first phone follows (live, or at its next refresh)
+  await expect(dana.getByText('2 לייקים')).toBeVisible({ timeout: 20_000 });
+  await other.context.close();
+
+  // unliked: back to one, and it holds after a reload
+  await dana.getByRole('button', { name: 'ביטול הלייק' }).click();
+  await expect(dana.getByText('לייק אחד')).toBeVisible();
+  await guest.reload();
+  await guest.getByRole('heading', { level: 1 }).waitFor();
+  await expect(
+    guest.getByTestId('gallery-posts').locator(`[data-post="${post}"]`).getByText('לייק אחד'),
+  ).toBeVisible();
+
+  // the sheet: where to share, the story or a post
+  await guest.getByTestId('gallery-share').click();
+  const sheet = guest.getByTestId('share-sheet');
+  await sheet.getByRole('radio', { name: /סטורי/ }).click();
+  await expect(sheet.getByRole('radio', { name: /סטורי/ })).toHaveAttribute('aria-checked', 'true');
+  await shot(guest, `he-${tag}-7-sheet`, false);
+  await guest.keyboard.press('Escape');
+  await expect(sheet).toBeHidden();
+  // "your story" opens it with the story chosen
+  await guest
+    .getByTestId('gallery-stories')
+    .getByRole('button', { name: /הסטורי שלך/ })
+    .click();
+  await expect(sheet.getByRole('radio', { name: /סטורי/ })).toHaveAttribute('aria-checked', 'true');
   await context.close();
 });

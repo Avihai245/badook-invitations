@@ -57,6 +57,10 @@ export interface QueueItem {
   sent: number;
   /** times the server didn't find a file this phone had sent (bounded: GALLERY.queue.maxMismatches) */
   mismatches?: number;
+  /** shared to the story or the feed (an item queued before there was a choice: the feed) */
+  placement?: 'story' | 'feed';
+  /** the feed post it joins: the photos picked together */
+  post?: string;
 }
 
 export type Action =

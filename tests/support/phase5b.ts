@@ -198,6 +198,10 @@ export interface SeedPhoto {
   who?: string;
   /** the name the guest gave: omitted is "אורחת", null is no name */
   name?: string | null;
+  /** shared to the story or the feed (omitted: the feed, a post of its own) */
+  placement?: 'story' | 'feed';
+  /** the feed post it joins (photos shared together) */
+  post?: string;
 }
 
 /**
@@ -234,6 +238,8 @@ export async function seedPhotos(invitationId: string, photos: SeedPhoto[]): Pro
       height,
       durationMs: null,
       takenAt: taken,
+      ...(p.placement ? { placement: p.placement } : {}),
+      ...(p.post ? { post: p.post } : {}),
     };
     const [reserved] = await sql<{ r: { ok: boolean } }>(
       `select public.gallery_reserve($1, $2, null, $4, $3, 3000) as r`,
