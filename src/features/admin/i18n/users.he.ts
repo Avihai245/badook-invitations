@@ -89,10 +89,13 @@ export const usersHe = {
     endsAt: 'מסתיימת',
     price: 'מחיר חודשי',
     provider: 'גובה התשלום',
-    providers2: { payplus: 'PayPlus', test: 'תשלום בדיקה', gift: 'מתנה מהצוות', none: 'אין' } as Record<
-      string,
-      string
-    >,
+    providers2: {
+      tranzila: 'טרנזילה',
+      payplus: 'PayPlus',
+      test: 'תשלום בדיקה',
+      gift: 'מתנה מהצוות',
+      none: 'אין',
+    } as Record<string, string>,
     giftLine: 'מתנה מהצוות עד {date} (כולל)',
     subscription: 'מנוי בתשלום פעיל',
     noSubscription: 'אין מנוי בתשלום',

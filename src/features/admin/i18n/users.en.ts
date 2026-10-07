@@ -90,6 +90,7 @@ export const usersEn: typeof usersHe = {
     price: 'Monthly price',
     provider: 'Charged by',
     providers2: {
+      tranzila: 'Tranzila',
       payplus: 'PayPlus',
       test: 'Test payment',
       gift: 'A gift from the team',

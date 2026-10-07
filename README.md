@@ -14,11 +14,11 @@ and rendering, the editor, the experience (video-first cover, music, live langua
 link preview, share screen) and the dashboard & extras (responses dashboard, CSV export, email
 notifications, gallery, gifts, date reveal, the save-the-date flow, template preview videos). On top:
 the public site (home, policies, cookie consent, accessibility menu, contact), guest lists with
-personal links, WhatsApp sending from the official number, three plans with PayPlus, the AI support
+personal links, WhatsApp sending from the official number, three plans with Tranzila (or PayPlus), the AI support
 assistant, sign in with Google, and the partner API for Badook Events.
 
 Setting up the outside services (each guide says what goes where):
-[WhatsApp](docs/whatsapp-setup.md) · [payments (PayPlus)](docs/billing-setup.md) ·
+[WhatsApp](docs/whatsapp-setup.md) · [payments (Tranzila, PayPlus)](docs/billing-setup.md) ·
 [sign in with Google](docs/google-sign-in.md) · [Badook Events partner API](docs/partner-api.md).
 
 ## Stack

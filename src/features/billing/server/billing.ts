@@ -9,6 +9,7 @@ import { serviceDb } from '@/lib/supabase/server';
 import {
   CREDIT_PACKS,
   PLAN_LIMITS,
+  RENEWAL_GRACE_DAYS,
   discountActive,
   discountedPrice,
   isProduct,
@@ -30,12 +31,22 @@ import {
   validCallbackHash,
   type PayplusTransaction,
 } from './payplus';
+import {
+  cardKey,
+  chargeToken,
+  iframeUrl,
+  readNotice,
+  tranzilaConfigured,
+  type ChargeResult,
+} from './tranzila';
 
 /**
  * Plans and message packs: a purchase (billing_checkouts) → the provider's payment page → its callback,
  * confirmed with the provider → the plan or the credits (checkout_complete / billing_apply, once).
- * Monthly renewals come as callbacks for the subscription. INVITES_BILLING_TEST_MODE replaces PayPlus
- * with a test page of our own (local and end-to-end tests).
+ * Two providers: Tranzila (when its keys are set: new purchases go through it) — its card form in an
+ * iframe gives a token, which our server charges, now and each month (chargeRenewals); and PayPlus —
+ * its own payment page, and monthly renewals that come as callbacks for the subscription.
+ * INVITES_BILLING_TEST_MODE replaces both with a test page of our own (local and end-to-end tests).
  */
 
 const ok = <T>(body: T, status = 200): ApiResult<T> => ({ status, body });
@@ -113,12 +124,13 @@ export const checkoutDb = {
     }),
 };
 
-export type BillingMode = 'payplus' | 'test' | 'off';
+export type BillingMode = 'tranzila' | 'payplus' | 'test' | 'off';
 export function billingMode(): BillingMode {
   const env = serverEnv();
   // the test payment page never runs on a public address, even if the flag is left on by mistake
   const local = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(env.INVITES_PUBLIC_BASE_URL);
   if (env.INVITES_BILLING_TEST_MODE && local) return 'test';
+  if (tranzilaConfigured()) return 'tranzila';
   return payplusConfigured() ? 'payplus' : 'off';
 }
 
@@ -153,7 +165,10 @@ export function nextRenewal(from: number): string {
 
 const CheckoutSchema = z.strictObject({ product: z.string().refine(isProduct) });
 
-/** POST /api/billing/checkout — opens a purchase and returns the payment page to go to. */
+/**
+ * POST /api/billing/checkout — opens a purchase and returns the payment page: `url` to go to (PayPlus,
+ * the test page), or `iframe` to show on the billing screen (Tranzila's card form) with the amount.
+ */
 export async function startCheckout(
   user: Pick<User, 'id' | 'email' | 'user_metadata'>,
   raw: unknown,
@@ -178,20 +193,35 @@ export async function startCheckout(
   const base = await requestBaseUrl();
   if (mode === 'test') return ok({ ok: true, url: `${base}/app/billing/test-checkout?id=${id}` });
 
-  const t =
-    locale === 'en'
-      ? { plan: 'Badook plan', credits: 'WhatsApp messages' }
-      : { plan: 'חבילת Badook', credits: 'הודעות וואטסאפ' };
-  const pack = packOf(product);
+  const itemName = productName(product, locale);
+  const customer = {
+    name: account.fullName || String(user.user_metadata?.full_name ?? user.email ?? ''),
+    email: user.email ?? '',
+    phone: account.phone,
+  };
+  if (mode === 'tranzila') {
+    // the iframe goes on to our return page, which takes the whole billing screen back to the result
+    const back = (result: 'success' | 'failure') =>
+      `${base}/api/billing/tranzila/return?result=${result}&checkout=${id}`;
+    const iframe = iframeUrl({
+      ref: id,
+      amount,
+      itemName,
+      customer,
+      locale,
+      urls: {
+        success: back('success'),
+        failure: back('failure'),
+        notify: `${base}/api/billing/tranzila/notify`,
+      },
+    });
+    return ok({ ok: true, iframe, checkout: id, amount });
+  }
   const page = await generatePaymentLink({
     ref: id,
     amount,
-    itemName: pack ? `${t.credits} × ${pack}` : `${t.plan} ${product === 'pro' ? 'Pro' : 'Business'}`,
-    customer: {
-      name: account.fullName || String(user.user_metadata?.full_name ?? user.email ?? ''),
-      email: user.email ?? '',
-      phone: account.phone,
-    },
+    itemName,
+    customer,
     recurring: isPlan(product),
     locale,
     urls: {
@@ -203,6 +233,16 @@ export async function startCheckout(
   });
   await checkoutDb.attach(id, page.pageRequestUid);
   return ok({ ok: true, url: page.url });
+}
+
+/** What a purchase is called on the payment form and in the provider's records. */
+function productName(product: Product, locale: UiLocale): string {
+  const t =
+    locale === 'en'
+      ? { plan: 'Badook plan', credits: 'WhatsApp messages' }
+      : { plan: 'חבילת Badook', credits: 'הודעות וואטסאפ' };
+  const pack = packOf(product);
+  return pack ? `${t.credits} × ${pack}` : `${t.plan} ${product === 'pro' ? 'Pro' : 'Business'}`;
 }
 
 /** Gives the purchase: a plan (renewing monthly, with its credits) or a message pack. Once. */
@@ -428,6 +468,191 @@ export async function applyRenewal(
   });
 }
 
+// ─── Tranzila: the iframe's token, charged by us ─────────────────────────────────────────────────
+
+export const tranzilaDb = {
+  /** true once per id: this caller makes the charge */
+  claim: (id: string) => rpc<boolean>('billing_claim', { p_id: id }),
+  saveCard: (
+    userId: string,
+    card: { token: string; expMonth: number; expYear: number; last4: string | null },
+  ) =>
+    rpc<null>('billing_card_save', {
+      p_user_id: userId,
+      p_provider: 'tranzila',
+      p_token: card.token,
+      p_month: card.expMonth,
+      p_year: card.expYear,
+      p_last4: card.last4,
+    }),
+  due: (graceDays: number) =>
+    rpc<DueRenewal[]>('billing_renewals_due', { p_provider: 'tranzila', p_grace_days: graceDays }),
+};
+
+export type TranzilaOutcome = 'paid' | 'failed' | 'canceled' | 'pending' | 'unknown_checkout';
+
+/** What a charge's answer leaves in the records (never the token). */
+const chargePayload = (charge: ChargeResult, extra: Record<string, unknown> = {}) => ({
+  tranzila: charge,
+  ...extra,
+});
+
+/**
+ * POST /api/billing/tranzila/notify, and the page the iframe goes on to — what Tranzila sent back from
+ * its card form: the card's token for our purchase. Whichever comes first charges the token (once per
+ * purchase and card) for the purchase's own amount; Tranzila's answer to that charge settles it. A
+ * notice that says the form failed settles a pending purchase as failed; a card that went through
+ * after that (another try in the same form) still pays for it.
+ */
+export async function tranzilaNotice(fields: Record<string, string>): Promise<{
+  outcome: TranzilaOutcome;
+  checkoutId: string | null;
+}> {
+  const notice = readNotice(fields);
+  const checkout = notice.checkoutId ? await checkoutDb.get(notice.checkoutId, null) : null;
+  if (!checkout || checkout.provider !== 'tranzila') return { outcome: 'unknown_checkout', checkoutId: null };
+  const result = (outcome: TranzilaOutcome) => ({ outcome, checkoutId: checkout.id });
+  const card =
+    notice.ok && notice.token && notice.expMonth && notice.expYear
+      ? { token: notice.token, expMonth: notice.expMonth, expYear: notice.expYear, last4: notice.last4 }
+      : null;
+  if (checkout.status !== 'pending' && !(checkout.status === 'failed' && card))
+    return result(checkout.status);
+  const recorded = { response: notice.response, index: notice.index, last4: notice.last4 };
+  if (!card) {
+    await settle(checkout, 'failed', {
+      eventId: `tranzila:failed:${checkout.id}`,
+      subscriptionId: null,
+      customerId: null,
+      payload: { form: recorded },
+    });
+    return result('failed');
+  }
+  // one charge per purchase and card, whichever notice came first
+  if (!(await tranzilaDb.claim(`tranzila:checkout:${checkout.id}:${cardKey(card.token)}`)))
+    return result('pending');
+  const charge = await chargeToken({
+    ...card,
+    amount: Number(checkout.amount),
+    itemName: productName(checkout.product, 'he'),
+    customer:
+      notice.contact || notice.email ? { name: notice.contact ?? '', email: notice.email ?? '' } : null,
+    holderId: notice.holderId,
+    remarks: checkout.id,
+  });
+  const payload = chargePayload(charge, { form: recorded });
+  if (charge.status === 'unknown') {
+    // it may have been charged: a person checks in Tranzila's dashboard before anything else happens
+    await alertSupport('A Tranzila charge without a clear answer (kept pending)', {
+      checkout: checkout.id,
+      userId: checkout.userId,
+      product: checkout.product,
+      amount: checkout.amount,
+      error: charge.error,
+    });
+    return result('pending');
+  }
+  if (charge.status === 'declined') {
+    await settle(checkout, 'failed', {
+      eventId: `tranzila:declined:${checkout.id}:${cardKey(card.token)}`,
+      subscriptionId: null,
+      customerId: null,
+      payload,
+    });
+    return result('failed');
+  }
+  // a plan renews with this card: kept before the plan is given, so its first renewal finds it
+  if (isPlan(checkout.product))
+    await tranzilaDb.saveCard(checkout.userId, card).catch((err) =>
+      alertSupport('Could not keep the card for the monthly charge', {
+        checkout: checkout.id,
+        userId: checkout.userId,
+        error: err instanceof Error ? err.message : String(err),
+      }),
+    );
+  await settle(checkout, 'paid', {
+    eventId: `tranzila:${charge.transactionId ?? checkout.id}`,
+    // the purchase that started this monthly plan
+    subscriptionId: isPlan(checkout.product) ? `tranzila:${checkout.id}` : null,
+    customerId: null,
+    payload,
+  });
+  return result('paid');
+}
+
+/** A plan whose month is up, with the card to charge (billing_renewals_due). */
+export interface DueRenewal {
+  userId: string;
+  email: string | null;
+  fullName: string | null;
+  plan: 'pro' | 'business';
+  planStatus: 'active' | 'past_due';
+  planRenewsAt: string;
+  planPrice: number | null;
+  token: string;
+  expireMonth: number;
+  expireYear: number;
+}
+
+/** When a declined monthly charge is tried again: days after the renewal date (within the grace days). */
+export const RENEWAL_ATTEMPT_DAYS = [0, 2, 5, 9] as const;
+
+/**
+ * The daily run's monthly charges for Tranzila plans: each plan whose month is up is charged at its
+ * price (the price it was bought at), once per attempt — on the day, and again 2, 5 and 9 days later
+ * while it is declined (the plan is past due meanwhile, and lapses after the grace days). Paid: another
+ * month and its credits. Returns how many were charged.
+ */
+export async function chargeRenewals(now = Date.now()): Promise<{ paid: number; failed: number }> {
+  let paid = 0;
+  let failed = 0;
+  for (const due of await tranzilaDb.due(RENEWAL_GRACE_DAYS)) {
+    const dueAt = Date.parse(due.planRenewsAt);
+    const daysLate = Math.floor((now - dueAt) / 86_400_000);
+    const attempt = RENEWAL_ATTEMPT_DAYS.filter((d) => d <= daysLate).length - 1;
+    if (attempt < 0) continue;
+    const key = `tranzila:renewal:${due.userId}:${due.planRenewsAt}:${attempt}`;
+    if (!(await tranzilaDb.claim(key))) continue;
+    const amount = Number(due.planPrice ?? planPrices()[due.plan]);
+    const charge = await chargeToken({
+      token: due.token,
+      expMonth: due.expireMonth,
+      expYear: due.expireYear,
+      amount,
+      itemName: productName(due.plan, 'he'),
+      customer: due.fullName ? { name: due.fullName, email: due.email ?? '' } : null,
+      remarks: `renewal ${due.userId}`,
+    });
+    if (charge.status === 'unknown') {
+      await alertSupport('A Tranzila monthly charge without a clear answer', {
+        userId: due.userId,
+        email: due.email,
+        plan: due.plan,
+        amount,
+        renewsAt: due.planRenewsAt,
+        error: charge.error,
+      });
+      continue;
+    }
+    const ok = charge.status === 'approved';
+    await accountDb.billingApply({
+      id: ok ? `tranzila:${charge.transactionId ?? key}` : key,
+      provider: 'tranzila',
+      type: ok ? 'renewal.paid' : 'renewal.failed',
+      userId: due.userId,
+      // the next month counts from the renewal date, so the plan keeps its day of the month
+      patch: ok ? { planStatus: 'active', planRenewsAt: nextRenewal(dueAt) } : { planStatus: 'past_due' },
+      credits: ok ? PLAN_LIMITS[due.plan].monthlyCredits : 0,
+      payload: chargePayload(charge, { attempt }),
+      product: due.plan,
+      amount,
+    });
+    if (ok) paid += 1;
+    else failed += 1;
+  }
+  return { paid, failed };
+}
+
 // ─── canceling ───────────────────────────────────────────────────────────────────────────────────
 
 /** POST /api/billing/cancel — no more monthly charges; the plan stays until the paid period ends. */
@@ -584,13 +809,17 @@ async function reconcilePending(): Promise<number> {
 }
 
 /**
- * For the daily job: settles PayPlus purchases whose notice never came (reconcilePending), and tells
+ * For the daily job: settles PayPlus purchases whose notice never came (reconcilePending), charges the
+ * Tranzila plans whose month is up (chargeRenewals), and tells
  * support about paid plans whose renewal never arrived, to check in the provider's dashboard. Returns
  * how many plans are overdue.
  */
 export async function reportOverdue(): Promise<number> {
   if (billingMode() === 'payplus')
     await reconcilePending().catch((err) => console.error('[billing] pending checkouts', err));
+  // Tranzila's monthly charges are ours to make (also for plans bought before PayPlus took over again)
+  if (tranzilaConfigured())
+    await chargeRenewals().catch((err) => console.error('[billing] tranzila renewals', err));
   const overdue = await rpc<{ userId: string; email: string; plan: string; renewsAt: string }[]>(
     'billing_overdue',
     { p_days: 3 },
