@@ -242,6 +242,53 @@ describe('the model call', () => {
     expect(body.messages[0].role).toBe('user');
     expect(body.messages[0].content).toContain('חתונה\nשל דנה');
     expect(body.output_config.format.type).toBe('json_schema');
+    // current models always think: low effort, and room for the thinking besides the short reply
+    expect(body.output_config.effort).toBe('low');
+    expect(body.max_tokens).toBeGreaterThanOrEqual(4096);
+  });
+
+  it('a model without the effort setting is asked again without it (and still in JSON)', async () => {
+    resetAssistantAiState();
+    const answer = { draft: {}, skip: [], ask: 'date', reply: 'מתי?' };
+    const bodies: Record<string, unknown>[] = [];
+    const fetchImpl = vi.fn(async (_url: string, init: RequestInit) => {
+      const body = JSON.parse(init.body as string) as { output_config?: { effort?: string } };
+      bodies.push(body);
+      return body.output_config?.effort
+        ? new Response(
+            JSON.stringify({
+              type: 'error',
+              error: {
+                type: 'invalid_request_error',
+                message: 'output_config.effort: not supported by this model',
+              },
+            }),
+            { status: 400 },
+          )
+        : new Response(JSON.stringify({ content: [{ type: 'text', text: JSON.stringify(answer) }] }), {
+            status: 200,
+          });
+    });
+    const input = {
+      manifest: sahar,
+      locale: 'he' as const,
+      uiLocale: 'he' as const,
+      today: '2026-10-04',
+      draft: {},
+      skipped: [],
+      messages: [{ role: 'user' as const, content: 'חתונה' }],
+    };
+    const config = { apiKey: 'k', model: 'm', apiBase: 'https://ai.test', brand: 'Badook' };
+    expect(await askAssistant(input, config, fetchImpl as unknown as typeof fetch)).toMatchObject({
+      status: 'ok',
+    });
+    expect(bodies).toHaveLength(2);
+    expect(bodies[1]).toMatchObject({ output_config: { format: { type: 'json_schema' } } });
+    expect((bodies[1] as { output_config: object }).output_config).not.toHaveProperty('effort');
+    // remembered: the next turn asks without it at once
+    await askAssistant(input, config, fetchImpl as unknown as typeof fetch);
+    expect(bodies).toHaveLength(3);
+    expect((bodies[2] as { output_config: object }).output_config).not.toHaveProperty('effort');
   });
 
   it('parses a JSON answer wrapped in words', () => {

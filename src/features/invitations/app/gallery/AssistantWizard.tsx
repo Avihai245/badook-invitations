@@ -290,8 +290,15 @@ export function AssistantWizard({
       }
       const body = (await res.json().catch(() => null)) as (TurnResult & { ok?: boolean }) | null;
       if (!res.ok || !body?.ok) throw new Error(`assistant: ${res.status}`);
+      if (body.source === 'script' && body.reason === 'error') {
+        // a passing failure (a slow or busy model): the device reads this answer and asks on, and the
+        // next message goes to the AI again
+        scriptAnswer(said, content, 'ai');
+        return;
+      }
       if (body.source === 'script') {
-        // no AI from here on: say so once, then the device reads this answer and asks on
+        // no AI from here on (not set up, or past a limit): say so once, then the device reads this
+        // answer and asks on
         setMode('script');
         const note: AssistantMessage[] = [...said, { role: 'assistant', content: a.offline }];
         scriptAnswer(note, content, 'script');

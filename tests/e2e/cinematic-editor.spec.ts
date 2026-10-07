@@ -175,6 +175,11 @@ test.describe('the cinematic editor', () => {
     // the preview has it
     const previewed = frame.locator('.cine[data-layout="full_bleed"][data-enter="zoom"]');
     await expect(previewed).toHaveAttribute('data-tr', 'words', { timeout: 15_000 });
+    // and plays it by itself (an entrance only shows as the section comes in): the words come in one
+    // by one on the live page
+    await expect(frame.locator('.inv[data-mode="live"] .cine[data-tr="words"] .tr-fx').first()).toBeAttached({
+      timeout: 10_000,
+    });
     await saved(page);
     if (SHOTS) {
       // its colors: a dark band
