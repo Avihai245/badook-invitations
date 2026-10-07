@@ -78,14 +78,8 @@
   }
 }
 
-/* a story's ring: the event's colour turning into a warm glow and back (a social app's ring, in the
-   event's own colours) */
+/* a story's ring: the gradient people know from stories (warm yellow through orange and red to
+   pink and purple) */
 .gallery-ring {
-  background: conic-gradient(
-    from 210deg,
-    var(--gallery-accent),
-    color-mix(in oklab, var(--gallery-accent) 45%, #f6b351),
-    color-mix(in oklab, var(--gallery-accent) 65%, #ea4c7a),
-    var(--gallery-accent)
-  );
+  background: linear-gradient(45deg, #f9ce34 0%, #f58529 22%, #ee2a7b 55%, #c13584 78%, #6228d7 100%);
 }

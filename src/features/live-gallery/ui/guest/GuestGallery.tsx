@@ -495,9 +495,10 @@ function GalleryBody({
 
   const canUpload = phase === 'ready' && (state === 'open' || state === 'paused');
   const showQueue = roundItems.length > 0 || (snapshot?.preparing ?? 0) > 0;
+  // stable: the pill's photo is fetched once per file
+  const thumbnail = useCallback((id: string) => uploader.current?.thumbnail(id) ?? Promise.resolve(null), []);
   const initial = (Array.from(name.trim())[0] ?? '').toLocaleUpperCase();
-  // the event's picture: its newest photo, else the couple's initials ("נ&א")
-  const cover = items.find((i) => i.thumb)?.thumb ?? null;
+  // the event's picture is its name: the hosts' initials ("נ&א")
   const monogram = title
     .split(/\s*&\s*/)
     .map((w) => Array.from(w.trim())[0] ?? '')
@@ -594,11 +595,7 @@ function GalleryBody({
             className="gallery-ring grid size-[86px] shrink-0 place-items-center rounded-full p-[3px] sm:size-[104px]"
           >
             <span className="relative grid size-full place-items-center overflow-hidden rounded-full border-[3px] border-canvas bg-[color-mix(in_oklab,var(--gallery-accent)_14%,white)] font-display text-[26px] font-bold text-[var(--gallery-accent)]">
-              {cover ? (
-                <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
-              ) : (
-                monogram || <Sparkles className="size-8" />
-              )}
+              {monogram || <Sparkles className="size-8" />}
             </span>
           </span>
           <div className="min-w-0 flex-1">
@@ -678,19 +675,6 @@ function GalleryBody({
                   reasons: [...new Set(skipped.map((s) => t.item.errors[s.code] ?? s.code))].join(', '),
                 })}
               </p>
-            ) : null}
-
-            {showQueue && snapshot ? (
-              <div className="mt-4">
-                <QueuePanel
-                  snapshot={snapshot}
-                  items={roundItems}
-                  thumbnail={(id) => uploader.current?.thumbnail(id) ?? Promise.resolve(null)}
-                  onRetry={() => uploader.current?.retryAll()}
-                  onRemove={(id) => void uploader.current?.remove(id)}
-                  onClear={() => void clearRound()}
-                />
-              </div>
             ) : null}
 
             {data.faces ? <FaceSearch token={token} code={codeOf} until={data.faces.until} /> : null}
@@ -944,6 +928,19 @@ function GalleryBody({
             </button>
           </nav>
         </div>
+      ) : null}
+
+      {/* the upload going on: a small pill above the share bar, out of the way */}
+      {showQueue && snapshot ? (
+        <QueuePanel
+          snapshot={snapshot}
+          items={roundItems}
+          thumbnail={thumbnail}
+          onRetry={() => uploader.current?.retryAll()}
+          onRemove={(id) => void uploader.current?.remove(id)}
+          onClear={() => void clearRound()}
+          raised={canUpload}
+        />
       ) : null}
 
       <NameSheet

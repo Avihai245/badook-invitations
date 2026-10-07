@@ -237,6 +237,8 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
   await expect.poll(() => dropped, { timeout: 30_000 }).toBe(true);
   await expect(guest.getByText('אין חיבור לאינטרנט. הכל שמור בטלפון')).toBeVisible();
   await expect(progressTitle(guest)).toHaveText('0 מתוך 3 הועלו');
+  if (process.env.STORIES_SHOTS)
+    await guest.screenshot({ path: 'tests/.artifacts/qa/gallery/he-mobile-8-uploading.png' });
   expect((await itemsOf(id)).filter((i) => i.status !== 'uploading')).toHaveLength(0);
 
   // a while offline, then back: the queue goes on by itself
@@ -244,6 +246,8 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
   await context.setOffline(false);
   await expect(progressTitle(guest)).toHaveText('3 מתוך 3 הועלו', { timeout: 60_000 });
   await expect(guest.getByText('הכל עלה. תודה ששיתפתם!')).toBeVisible();
+  // the pill above the share bar says so, then leaves by itself
+  await expect(guest.getByTestId('upload-progress')).toBeHidden({ timeout: 10_000 });
 
   // all three are in the gallery, with their originals — byte for byte what the phone had
   const rows = await itemsOf(id);
