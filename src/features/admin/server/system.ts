@@ -1,6 +1,7 @@
 import 'server-only';
 import { billingMode, type BillingMode } from '@/features/billing/server/billing';
 import { payplusConfigured } from '@/features/billing/server/payplus';
+import { tranzilaConfigured } from '@/features/billing/server/tranzila';
 import { seedVersion } from '@/features/invitations/templates/seed-data';
 import { dailyDue } from '@/features/jobs/schedule';
 import { chatProvider } from '@/features/support/chat';
@@ -19,6 +20,7 @@ export interface Deployment {
     whatsapp: boolean;
     whatsappWebhook: boolean;
     templates: { invitation: boolean; table: boolean; gallery: boolean };
+    tranzila: boolean;
     payplus: boolean;
     billing: BillingMode;
     email: boolean;
@@ -58,6 +60,7 @@ export function deployment(now = new Date()): Deployment {
         table: !!env.INVITES_WHATSAPP_TABLE_TEMPLATE,
         gallery: !!env.INVITES_WHATSAPP_GALLERY_TEMPLATE,
       },
+      tranzila: tranzilaConfigured(),
       payplus: payplusConfigured(),
       billing: billingMode(),
       email: !!(env.INVITES_EMAIL_API_KEY && env.INVITES_EMAIL_FROM),

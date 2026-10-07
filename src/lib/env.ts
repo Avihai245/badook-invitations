@@ -138,6 +138,24 @@ const ServerEnvSchema = z.object({
   INVITES_PAYPLUS_PAGE_UID: z.string().default(''),
   INVITES_PAYPLUS_SANDBOX: flag(false),
   INVITES_PAYPLUS_API_BASE: z.string().default(''),
+  // ── payments: Tranzila (docs/billing-setup.md): the card is typed in Tranzila's iframe on the
+  // iframe terminal, which hands back a token; the token terminal charges it (the first payment and
+  // every month) through the API. With the API keys set, new purchases go through Tranzila.
+  INVITES_TRANZILA_TERMINAL: z.string().trim().default('badookinvit'),
+  INVITES_TRANZILA_TOKEN_TERMINAL: z.string().trim().default('badookinvittok'),
+  INVITES_TRANZILA_APP_KEY: z.string().trim().default(''),
+  INVITES_TRANZILA_SECRET: z.string().trim().default(''),
+  // what the iframe does with the card: NK checks it (J2, nothing held) and makes a token; VK holds the
+  // sum (J5) and makes a token; K only makes a token
+  INVITES_TRANZILA_TRANMODE: z.enum(['NK', 'VK', 'K']).default('NK'),
+  INVITES_TRANZILA_API_BASE: z
+    .url()
+    .default('https://api.tranzila.com')
+    .transform((u) => u.replace(/\/+$/, '')),
+  INVITES_TRANZILA_IFRAME_BASE: z
+    .url()
+    .default('https://direct.tranzila.com')
+    .transform((u) => u.replace(/\/+$/, '')),
   // local / end-to-end tests only: a fake checkout page instead of PayPlus
   INVITES_BILLING_TEST_MODE: flag(false),
   // monthly plan prices in shekels, VAT included
