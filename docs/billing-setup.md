@@ -30,7 +30,7 @@
 | `INVITES_TRANZILA_TOKEN_TERMINAL` | מסוף הטוקנים (ברירת מחדל `badookinvittok`) |
 | `INVITES_TRANZILA_TRANMODE` | מה הטופס עושה בכרטיס: `NK` (ברירת המחדל: בדיקה בלי לתפוס סכום, וטוקן), `VK` (תפיסת הסכום, J5, וטוקן) או `K` (טוקן בלי בדיקה) |
 
-ברגע ש־`INVITES_TRANZILA_APP_KEY` ו־`INVITES_TRANZILA_SECRET` מוגדרים, **כל רכישה חדשה עוברת דרך טרנזילה** (גם אם PayPlus מוגדרת). מנויים קיימים ב־PayPlus ממשיכים להתחדש שם. לפני ה־Redeploy מריצים על מסד הנתונים את `supabase/migrations/20261007000100_tranzila.sql`.
+ברגע ש־`INVITES_TRANZILA_APP_KEY` ו־`INVITES_TRANZILA_SECRET` מוגדרים, **כל רכישה חדשה עוברת דרך טרנזילה** (גם אם PayPlus מוגדרת). מנויים קיימים ב־PayPlus ממשיכים להתחדש שם. לפני ה־Redeploy מריצים על מסד הנתונים את `supabase/migrations/20261007020000_tranzila.sql`.
 
 ### איך זה עובד
 
