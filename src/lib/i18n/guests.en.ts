@@ -14,6 +14,44 @@ export const guestsEn: typeof guestsHe = {
     declined: 'Not coming',
     pending: 'No reply yet',
   },
+  /** the list in people (what the seating and the event day count) */
+  summary: {
+    label: 'Who is coming',
+    coming: { one: 'One person coming', other: '{n} people coming' },
+    invited: 'of {n} invited',
+    waiting: { one: 'one more waiting for a reply', other: '{n} more waiting for a reply' },
+    declined: { one: 'one not coming', other: '{n} not coming' },
+    hint: 'These count people, not families: “invited” is how many you invited, “coming” how many confirmed. The seating and the event day work by these numbers.',
+  },
+  /** the host's own answer for a guest, and their requests to bring more */
+  answer: {
+    column: 'Coming',
+    edit: "Update {name}'s reply",
+    title: 'Reply · {name}',
+    body: 'Update it yourself, say after a phone call. It counts everywhere, the seating included.',
+    coming: 'Coming',
+    declined: 'Not coming',
+    none: 'No reply yet',
+    count: 'How many are coming',
+    invited: { one: 'One person invited', other: '{n} invited' },
+    over: 'More than invited: the party size will become {n}.',
+    guestAnswered: 'The guest answered themselves. You can change the answer, not clear it.',
+    manual: 'Manual',
+    manualHint: 'Set by hand on the list',
+    of: '{n} of {total}',
+    attending: 'Coming · {n}',
+    save: 'Save',
+    saved: 'Reply updated',
+    guestReply: 'The guest answered themselves: their answer can be changed, not cleared.',
+    extra: { one: 'Asked to bring one more person', other: 'Asked to bring {n} more' },
+    extraBadge: '+{n} asked',
+    extraBody:
+      'Approving makes their party {total}, all counted and seated. Until you decide, only the invited count.',
+    approve: 'Approve',
+    decline: 'Decline',
+    approved: 'Approved: the party is now {n}',
+    declinedToast: 'The request was declined',
+  },
   unmatched: {
     fromLink: { one: '1 of them from the general link', other: '{n} of them from the general link' },
     banner: {
@@ -21,7 +59,7 @@ export const guestsEn: typeof guestsHe = {
       other: '{n} replies came through the general link and aren’t matched to guests on the list yet.',
     },
     bannerBody:
-      'They already count under “Coming”. Match them to guests so the list shows their status and “Not answered” is exact.',
+      'They already count as coming. Match them to guests so the list shows their status and “No reply” is exact.',
     action: 'Match to guests',
     title: 'Replies from the general link',
     body: 'Someone who replied through the general link (not their personal one) isn’t linked to a guest. Pick who it is on the list — by name or phone.',
@@ -99,7 +137,7 @@ export const guestsEn: typeof guestsHe = {
   },
   actions: {
     import: 'Upload a list from Excel',
-    add: 'Add a guest',
+    add: 'Add guests',
     addManual: 'Add by hand',
     whatsapp: 'Send on WhatsApp',
     whatsappAll: 'Send on WhatsApp to all guests',
@@ -128,7 +166,9 @@ export const guestsEn: typeof guestsHe = {
     sample: 'Download a sample file with the columns the system reads — fill it in and upload it.',
     search: 'Find a guest by name, phone number (written any way) or group.',
     filters:
-      "Filter by where each guest stands: not sent, sent, failed (WhatsApp didn't reach them), opened, coming, not coming, no reply.",
+      'The numbers above the list are its filters too: click “Coming”, “No reply” and so on to see only them. “Failed” and “Asked for more” show up when there is something to handle.',
+    answer:
+      "Click a guest's reply to set it yourself: coming (and how many), not coming, or no reply yet. A guest who asked to bring more people is marked — approve or decline.",
     selectLabel: 'Selecting guests',
     select:
       'Tick guests in the checkboxes, then use the bar above the list: send on WhatsApp, mark as sent or delete — all of them at once.',
@@ -180,8 +220,8 @@ export const guestsEn: typeof guestsHe = {
     phone: 'Phone',
     group: 'Group',
     party: 'Invited',
-    status: 'Status',
-    reply: 'Reply',
+    status: 'Invitation',
+    reply: 'Coming',
     language: 'Language',
     actions: 'Actions',
   },
@@ -203,6 +243,7 @@ export const guestsEn: typeof guestsHe = {
     attending: 'Coming',
     declined: 'Not coming',
     noReply: 'No reply',
+    extra: 'Asked for more',
   },
   search: 'Search by name, phone or group',
   noMatches: 'No guests match the filter.',
@@ -210,10 +251,7 @@ export const guestsEn: typeof guestsHe = {
     "The invitation isn't published yet — personal links and WhatsApp sending start working once it is.",
   publish: 'Go to the editor to publish',
   greeting: {
-    title: "A personal greeting with the guest's name",
-    on: 'Guests opening their personal link see: "{text}"',
-    off: "You can add a personal greeting with the guest's name — in the editor, in the opening section.",
-    edit: 'Edit the greeting',
+    edit: 'Edit the personal greeting',
   },
   import: {
     title: 'Upload a guest list',
@@ -288,6 +326,7 @@ export const guestsEn: typeof guestsHe = {
     badPhone: 'Invalid phone number',
     badEmail: 'Invalid email address',
     required: 'Required',
+    belowConfirmed: '{n} already confirmed. To lower it, update their reply on the list first.',
   },
   confirmDelete: {
     title: { one: 'Delete this guest?', other: 'Delete {n} guests?' },

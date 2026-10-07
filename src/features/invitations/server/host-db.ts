@@ -47,6 +47,10 @@ export interface InvitationSummary {
   /** the guest list, and how many of them were sent the invitation (WhatsApp or by hand) */
   guests: number;
   sent: number;
+  /** guests on the list with a reply of their own (≤ guests) — absent in an older database */
+  answered?: number;
+  /** "coming" replies asking to bring more people than invited: waiting for the host */
+  extraRequests?: number;
   /** its design, filled in on the server for the screens (not from the database) */
   design?: DesignSummary | null;
 }

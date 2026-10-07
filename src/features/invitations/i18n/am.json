@@ -118,5 +118,12 @@
   "liveGallery.qrAfter": "በስልክዎ ለማየት ይቃኙ",
   "liveGallery.qrLabel": "ወደ ዝግጅቱ የፎቶ ማዕከል የሚወስድ QR ኮድ",
   "liveGallery.preview": "ቁልፉ የቀጥታ የፎቶ ማዕከሉ ሲበራ ወደ እሱ ይወስዳል",
-  "scene.rsvp": "መገኘትዎን ያረጋግጡ"
+  "scene.rsvp": "መገኘትዎን ያረጋግጡ",
+  "rsvp.invitedFor": {
+    "one": "ግብዣው ለአንድ ሰው ነው",
+    "other": "ግብዣው ለ{n} ሰዎች ነው"
+  },
+  "rsvp.bringMore": "ተጨማሪ ሰዎችን ማምጣት ይፈልጋሉ?",
+  "rsvp.bringMoreHint": "ጥያቄውን ለአስተናጋጆቹ እናስተላልፋለን፣ እነሱም ያጸድቃሉ።",
+  "rsvp.more": "ተጨማሪ"
 }

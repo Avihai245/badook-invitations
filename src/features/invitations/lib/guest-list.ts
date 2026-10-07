@@ -12,25 +12,70 @@ export interface ListGuest extends GuestLike {
   sendError?: string | null;
   /** asked the system's number to stop (a STOP reply, or they turned off our messages) */
   optedOut?: boolean;
+  partySize?: number | null;
+  response:
+    | (NonNullable<GuestLike['response']> & {
+        /** people beyond their invitation they asked to bring (waiting for the host) */
+        extraRequested?: number | null;
+        source?: 'guest' | 'host';
+      })
+    | null;
 }
 
-export type ListFilter = GuestFilter | 'failed';
-/** The list's filters: the status filters, with "failed" (WhatsApp didn't get through) after "sent". */
+export type ListFilter = GuestFilter | 'failed' | 'extra';
+/**
+ * The list's filters, as the summary above it shows them: the status filters, then the two that need
+ * the host — WhatsApp didn't get through ("failed"), asked to bring more people ("extra") — shown when
+ * there are any.
+ */
 export const LIST_FILTERS = [
   'all',
   'notSent',
   'sent',
-  'failed',
   'opened',
   'attending',
   'declined',
   'noReply',
+  'failed',
+  'extra',
 ] as const satisfies readonly ListFilter[];
+/** the filters shown only when some guest is in them */
+export const ATTENTION_FILTERS: readonly ListFilter[] = ['failed', 'extra'];
 
 export function matchesListFilter(g: ListGuest, filter: ListFilter): boolean {
   // a failed send the guest got past (opened the link, answered) needs nothing from the host
   if (filter === 'failed') return g.sendStatus === 'failed' && !wasSent(g);
+  if (filter === 'extra') return !!g.response?.attending && (g.response.extraRequested ?? 0) > 0;
   return matchesGuestFilter(g, filter);
+}
+
+/** A guest's invitation in people (a guest without a number is one). */
+export const invitedPeople = (g: Pick<ListGuest, 'partySize'>) => g.partySize ?? 1;
+/** The people a guest confirmed (0 without a "coming" reply). */
+export const confirmedPeople = (g: Pick<ListGuest, 'response'>) =>
+  g.response?.attending ? g.response.adults + g.response.children : 0;
+
+/**
+ * The list in people — what the seating and the event day count: invited (each guest's party size),
+ * coming (confirmed), not coming (their invitation), and still waiting for an answer.
+ */
+export function peopleSummary(guests: readonly ListGuest[]): {
+  invited: number;
+  coming: number;
+  declined: number;
+  waiting: number;
+} {
+  let invited = 0;
+  let coming = 0;
+  let declined = 0;
+  let waiting = 0;
+  for (const g of guests) {
+    invited += invitedPeople(g);
+    if (!g.response) waiting += invitedPeople(g);
+    else if (g.response.attending) coming += confirmedPeople(g);
+    else declined += invitedPeople(g);
+  }
+  return { invited, coming, declined, waiting };
 }
 
 /** Whether the system's WhatsApp can send to this guest, or why not. */

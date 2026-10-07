@@ -381,8 +381,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     },
     steps: [
       {
-        he: 'פותחים "מוזמנים" ב"ההזמנה והמוזמנים" ולוחצים "העלאת רשימה מאקסל".',
-        en: 'Open “Guests” under “Invitation & guests” and click “Upload a list from Excel”.',
+        he: 'פותחים "מוזמנים" ב"ההזמנה והמוזמנים", לוחצים "הוספת מוזמנים" ובוחרים "העלאת רשימה מאקסל".',
+        en: 'Open “Guests” under “Invitation & guests”, click “Add guests” and choose “Upload a list from Excel”.',
       },
       {
         he: 'גוררים קובץ xlsx או CSV לחלון, או לוחצים לבחירה. אין קובץ? "קובץ לדוגמה" מוריד תבנית עם העמודות.',
@@ -397,8 +397,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Click “Import N guests”. A guest already on the list is updated, not duplicated.',
       },
       {
-        he: 'רוצים להוסיף מישהו אחד? "הוספה ידנית": שם וטלפון, ולא חובה — מייל, כמות, קבוצה ושפה.',
-        en: 'Adding just one person? “Add by hand”: a name and phone, and optionally an email, party size, group and language.',
+        he: 'רוצים להוסיף מישהו אחד? "הוספת מוזמנים" ← "הוספה ידנית": שם וטלפון, ולא חובה — מייל, כמות, קבוצה ושפה.',
+        en: 'Adding just one person? “Add guests” → “Add by hand”: a name and phone, and optionally an email, party size, group and language.',
       },
     ],
     tips: [
@@ -444,16 +444,16 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'In the list, next to a guest (or in their ⋯ menu), click “Copy the personal link” and send it any way you like.',
       },
       {
-        he: 'רוצים ברכה עם השם? בכרטיס "ברכה אישית עם שם המוזמן" לוחצים "עריכת הברכה" וכותבים אותה בסקשן הפתיחה.',
-        en: 'Want a greeting with their name? In the personal greeting card, click “Edit the greeting” and write it in the opening section.',
+        he: 'רוצים ברכה עם השם? בתפריט ⋯ שבראש העמוד לוחצים "עריכת הברכה האישית" וכותבים אותה בסקשן הפתיחה.',
+        en: 'Want a greeting with their name? In the ⋯ menu at the top of the page, click “Edit the personal greeting” and write it in the opening section.',
       },
       {
         he: 'בהזמנה בכמה שפות, בוחרים לכל מוזמן שפה בעמודת "שפה". הקישור שלו נפתח בה.',
         en: 'In a multi-language invitation, choose each guest’s language in the “Language” column. Their link opens in it.',
       },
       {
-        he: 'עוקבים בעמודת "סטטוס": נשלח, נמסר, נקרא, פתח/ה את ההזמנה, מגיע/ה או לא מגיע/ה.',
-        en: 'Follow the “Status” column: sent, delivered, read, opened the invitation, coming or not coming.',
+        he: 'עוקבים בעמודת "ההזמנה" (נשלח, נמסר, נקרא, פתח/ה את ההזמנה) ובעמודת "הגעה" (מגיעים וכמה, לא מגיעים, עוד לא ענו).',
+        en: 'Follow the “Invitation” column (sent, delivered, read, opened) and the “Attending” column (coming and how many, not coming, no reply yet).',
       },
     ],
     tips: [
@@ -464,6 +464,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       {
         he: 'כמה מוזמנים באותו מכשיר? כל אחד מקבל את התשובה שלו, לפי הקישור שממנו נכנס.',
         en: 'Several guests on one device? Each keeps their own reply, by the link they came in from.',
+      },
+      {
+        he: 'מקישור אישי אפשר לאשר עד מספר המוזמנים של אותו מוזמן. מי שרוצה להביא עוד מבקש בטופס, והבקשה מחכה לאישור שלכם ("+N ביקשו" ברשימה).',
+        en: 'A personal link can confirm up to that guest’s party size. Anyone wanting to bring more asks in the form, and the request waits for you (“+N asked” in the list).',
       },
       {
         he: 'מחיקת מוזמן מפסיקה את הקישור האישי שלו. תשובה שכבר שלח נשארת.',
@@ -562,12 +566,12 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: 'Under “Email notifications” choose “For every reply”, “Daily summary” or “Off”. “Export to Excel” downloads every reply.',
       },
       {
-        he: 'ב"מוזמנים", כשמופיע כרטיס על תשובות מהקישור הכללי, לוחצים "שיוך למוזמנים".',
-        en: 'In “Guests”, when a card about replies from the general link appears, click “Match to guests”.',
+        he: 'ב"מוזמנים", כשמופיע כרטיס על תשובות מהקישור הכללי, לוחצים "שיוך למוזמנים" ובוחרים לכל תשובה את המוזמן שלה.',
+        en: 'In “Guests”, when a card about replies from the general link appears, click “Match to guests” and pick each reply’s guest.',
       },
       {
-        he: 'לכל תשובה בוחרים מוזמן מ"התאמות אפשריות" (לפי טלפון או שם) או מהרשימה, ולוחצים "שיוך".',
-        en: 'For each reply, pick a guest from “Possible matches” (by phone or name) or from the list, and click “Match”.',
+        he: 'מישהו אישר בטלפון? ב"מוזמנים" לוחצים על התא בעמודת "הגעה" ובוחרים מגיעים (וכמה), לא מגיעים או עוד לא ענו.',
+        en: 'Someone confirmed by phone? In “Guests”, click their cell in the “Attending” column and choose coming (and how many), not coming, or no reply yet.',
       },
       {
         he: 'כדי לתזכר, מסננים "בלי תשובה" ברשימת המוזמנים ושולחים מהתפריט ⋯ "שליחה מהוואטסאפ שלי".',
@@ -584,14 +588,14 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         en: '“Not answered” means guests on the list with no reply of their own — so matching general-link replies makes that number exact.',
       },
       {
-        he: 'אורח שכבר ענה יכול לערוך את התשובה מאותו מכשיר. היא מתעדכנת ולא נכפלת.',
-        en: 'A guest who already replied can edit the reply from the same device. It updates, not duplicates.',
+        he: 'אורח שעונה שוב (מאותו מכשיר, מהקישור האישי או עם הטלפון שלו) — התשובה מתעדכנת ולא נכפלת. תשובה שעדכנתם ידנית מסומנת "ידני" ונספרת בכל מקום, גם בסידור השולחנות.',
+        en: 'A guest who answers again (same device, personal link or their phone) updates the reply, never doubles it. An answer you set by hand is marked “manual” and counts everywhere, seating included.',
       },
     ],
     next: ['personal-links', 'whatsapp-sending', 'seating'],
     keywords: {
-      he: 'אישורי הגעה, RSVP, תשובות, מגיעים, לא מגיעים, עוד לא ענו, שיוך, קישור כללי, התראות, מייל, ייצוא, דדליין, תזכורת',
-      en: 'RSVP, replies, coming, not coming, not answered, match, general link, notifications, email, export, deadline, reminder',
+      he: 'אישורי הגעה, RSVP, תשובות, מגיעים, לא מגיעים, עוד לא ענו, שיוך, קישור כללי, התראות, מייל, ייצוא, דדליין, תזכורת, עדכון ידני, סטטוס הגעה, אישר בטלפון, ביקשו להוסיף',
+      en: 'RSVP, replies, coming, not coming, not answered, match, general link, notifications, email, export, deadline, reminder, set by hand, attendance status, confirmed by phone, asked for more',
     },
     screens: ['responses', 'guests'],
   },

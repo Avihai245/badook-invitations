@@ -501,9 +501,16 @@ describe('the guest’s table guide', () => {
       unit: { status: 'pending', seats: 1 },
       table: null,
     });
-    const noUnit = await guest('עוד לא בסידור', 2);
-    expect(await guide(noUnit.token)).toMatchObject({ ok: true, unit: null, table: null, arrived: 0 });
-    await c.query(`delete from invitation_guests where id = $1`, [noUnit.id]);
+    // a guest just added is in the seating at once (*_guest_answers.sql: the units follow the list),
+    // without a table yet
+    const added = await guest('עוד לא בסידור', 2);
+    expect(await guide(added.token)).toMatchObject({
+      ok: true,
+      unit: { status: 'pending', seats: 2 },
+      table: null,
+      arrived: 0,
+    });
+    await c.query(`delete from invitation_guests where id = $1`, [added.id]);
     const declined = await guest('לא יכולים להגיע', 2);
     await reply(declined.id, 'לא יכולים להגיע', 0, false);
     await state();

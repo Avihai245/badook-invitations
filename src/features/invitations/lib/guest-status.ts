@@ -15,7 +15,8 @@ export interface GuestLike {
   sendStatus: SendStatus;
   sendChannel: 'whatsapp' | 'manual' | null;
   openedAt: string | null;
-  response: { attending: boolean; adults: number; children: number } | null;
+  /** source 'host': the host set the answer (a phone call…) — it says nothing about the invitation reaching them */
+  response: { attending: boolean; adults: number; children: number; source?: 'guest' | 'host' } | null;
 }
 
 export type GuestState =
@@ -27,9 +28,12 @@ export function guestState(g: GuestLike): GuestState {
   return g.sendStatus;
 }
 
-/** The invitation reached them (sent, delivered, read, opened or answered). */
+/** They answered through the invitation themselves (not an answer the host set for them). */
+const answeredThemselves = (g: GuestLike) => !!g.response && g.response.source !== 'host';
+
+/** The invitation reached them (sent, delivered, read, opened, or they answered through it). */
 export const wasSent = (g: GuestLike) =>
-  !!g.response || !!g.openedAt || ['sent', 'delivered', 'read'].includes(g.sendStatus);
+  answeredThemselves(g) || !!g.openedAt || ['sent', 'delivered', 'read'].includes(g.sendStatus);
 
 export const GUEST_FILTERS = [
   'all',
@@ -51,7 +55,7 @@ export function matchesGuestFilter(g: GuestLike, filter: GuestFilter): boolean {
     case 'sent':
       return wasSent(g);
     case 'opened':
-      return !!g.openedAt || !!g.response;
+      return !!g.openedAt || answeredThemselves(g);
     case 'attending':
       return g.response?.attending === true;
     case 'declined':
@@ -95,7 +99,7 @@ export function guestStats(list: readonly GuestLike[]): GuestStats {
   };
   for (const g of list) {
     if (wasSent(g)) stats.sent++;
-    if (g.openedAt || g.response) stats.opened++;
+    if (g.openedAt || answeredThemselves(g)) stats.opened++;
     if (!g.response) stats.pending++;
     else if (g.response.attending) {
       stats.attending++;

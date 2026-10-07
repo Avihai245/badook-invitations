@@ -4,11 +4,12 @@ import {
   Armchair,
   CheckCheck,
   CheckSquare,
+  ChevronDown,
   Copy,
   Download,
-  Eye,
   FileSpreadsheet,
   Filter,
+  Info,
   Languages,
   Link2,
   MailCheck,
@@ -21,8 +22,6 @@ import {
   Trash2,
   Upload,
   UserPlus,
-  Users,
-  UserX,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -38,12 +37,11 @@ import {
   Hint,
   IconButton,
   Input,
-  KpiCard,
   Menu,
   PageTitle,
-  Segmented,
   type BadgeVariant,
   type DataTableColumn,
+  cn,
   useToast,
 } from '@/components/app';
 import { UpgradeDialog, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
@@ -57,20 +55,22 @@ import { GUEST_MESSAGE } from '../../lib/event-phrases';
 import { whatsappCapable } from '../../lib/guest-import';
 import { nativeName } from '../../lib/locales';
 import {
+  ATTENTION_FILTERS,
   formatIls,
   guestLink,
   guestPhone,
   LIST_FILTERS,
   matchesListFilter,
+  peopleSummary,
   sendFailure,
   whatsappReach,
   type ListFilter,
 } from '../../lib/guest-list';
-import { guestState, guestStats, matchesGuestSearch, wasSent, type GuestState } from '../../lib/guest-status';
-import { rsvpSummary } from '../../lib/rsvp-summary';
+import { guestState, matchesGuestSearch, wasSent, type GuestState } from '../../lib/guest-status';
 import type { GuestRecord, GuestsPageData } from '../../server/guests';
+import { AnswerDialog, AttendanceCell } from './Attendance';
 import { GuestDialog } from './GuestDialog';
-import { GuestsActions, GuestsGuide } from './GuestsStart';
+import { GuestsGuide } from './GuestsStart';
 import { downloadSample, ImportDialog } from './ImportDialog';
 import { OwnSendQueue, UnmatchedReplies } from './ReplyMatch';
 import { WhatsAppDialog } from './WhatsAppDialog';
@@ -94,6 +94,7 @@ type DialogState =
   | { kind: 'import' }
   | { kind: 'add' }
   | { kind: 'edit'; guest: GuestRecord }
+  | { kind: 'answer'; guest: GuestRecord }
   | { kind: 'delete'; ids: string[] }
   | { kind: 'whatsapp' }
   | { kind: 'upgrade'; reason: UpgradeReason }
@@ -160,13 +161,28 @@ export function GuestsScreen({
     window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
   }, []);
 
-  const stats = useMemo(() => guestStats(guests), [guests]);
-  // the replies the way every screen counts them: a general-link reply is "coming" too (lib/rsvp-summary)
-  const rsvp = useMemo(() => rsvpSummary(guests, data.replies), [guests, data.replies]);
   const unmatched = useMemo(() => {
     const onList = new Set(guests.map((x) => x.id));
     return data.replies.filter((r) => !r.guestId || !onList.has(r.guestId));
   }, [guests, data.replies]);
+  // the list in people — what the seating and the event day count; a "coming" reply from the general
+  // link that isn't matched yet is coming too
+  const people = useMemo(() => {
+    const p = peopleSummary(guests);
+    const fromLink = unmatched.reduce((n, r) => n + (r.attending ? r.adults + r.children : 0), 0);
+    return { ...p, coming: p.coming + fromLink };
+  }, [guests, unmatched]);
+  // how many guests each filter shows (the summary's numbers are the filters)
+  const counts = useMemo(
+    () =>
+      Object.fromEntries(
+        LIST_FILTERS.map((f) => [f, guests.filter((x) => matchesListFilter(x, f)).length]),
+      ) as Record<ListFilter, number>,
+    [guests],
+  );
+  const shownFilters = LIST_FILTERS.filter(
+    (f) => !ATTENTION_FILTERS.includes(f) || counts[f] > 0 || filter === f,
+  );
   const rows = useMemo(
     () => guests.filter((x) => matchesListFilter(x, filter) && matchesGuestSearch(x, query)),
     [guests, filter, query],
@@ -283,8 +299,15 @@ export function GuestsScreen({
   const allShown = rows.length > 0 && rows.every((x) => selected.has(x.id));
   const toggleAll = () => setSelected(allShown ? new Set() : new Set(rows.map((x) => x.id)));
 
-  const stateLabel = (x: GuestRecord) => {
+  /** Where the invitation got to — the answer itself has its own column ("Attending"): a guest who
+   * answered through a link saw the invitation; one the host answered for may never have been sent it. */
+  const inviteState = (x: GuestRecord): GuestState => {
     const s = guestState(x);
+    if (s !== 'attending' && s !== 'declined') return s;
+    return x.openedAt || x.response?.source !== 'host' ? 'opened' : x.sendStatus;
+  };
+  const stateLabel = (x: GuestRecord) => {
+    const s = inviteState(x);
     if (s === 'sent' && x.sendChannel === 'manual') return g.status.manual;
     return g.status[s];
   };
@@ -303,7 +326,7 @@ export function GuestsScreen({
     const detail = detailOf(x);
     return (
       <span className="inline-flex flex-col items-start gap-0.5">
-        <Badge variant={STATE_BADGE[guestState(x)]}>{stateLabel(x)}</Badge>
+        <Badge variant={STATE_BADGE[inviteState(x)]}>{stateLabel(x)}</Badge>
         {detail ? (
           <span
             className={`max-w-[240px] truncate text-[11.5px] ${detail.tone === 'danger' ? 'text-danger' : 'text-muted'}`}
@@ -351,18 +374,10 @@ export function GuestsScreen({
       </span>
     );
   };
-  const replyOf = (x: GuestRecord) =>
-    x.response ? (
-      x.response.attending ? (
-        <span className="font-semibold text-success">
-          {fmt(g.reply.attending, { n: number(x.response.adults + x.response.children) })}
-        </span>
-      ) : (
-        <span className="text-muted">{g.reply.declined}</span>
-      )
-    ) : (
-      <span className="text-muted">{g.reply.none}</span>
-    );
+  /** coming / not coming / no reply — a button: the host sets it (AnswerDialog) */
+  const replyOf = (x: GuestRecord) => (
+    <AttendanceCell guest={x} onOpen={() => setDialog({ kind: 'answer', guest: x })} />
+  );
   const actionsOf = (x: GuestRecord) => (
     <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
       <Hint text={g.help.copyLink}>
@@ -455,9 +470,9 @@ export function GuestsScreen({
       numeric: true,
       cell: (x) => (x.partySize ? number(x.partySize) : '—'),
     },
-    ...(showLanguage ? [{ key: 'language', header: g.columns.language, cell: languageOf }] : []),
-    { key: 'status', header: g.columns.status, cell: statusOf },
     { key: 'reply', header: g.columns.reply, cell: replyOf },
+    { key: 'status', header: g.columns.status, cell: statusOf },
+    ...(showLanguage ? [{ key: 'language', header: g.columns.language, cell: languageOf }] : []),
     {
       key: 'actions',
       header: <span className="sr-only">{g.columns.actions}</span>,
@@ -474,6 +489,7 @@ export function GuestsScreen({
     { icon: <Send />, label: g.actions.whatsappAll, text: h.whatsapp },
     { icon: <Search />, label: g.search, text: h.search },
     { icon: <Filter />, label: g.filters.label, text: h.filters },
+    { icon: <CheckCheck />, label: g.answer.column, text: h.answer },
     { icon: <CheckSquare />, label: h.selectLabel, text: h.select },
     { icon: <Link2 />, label: g.actions.copyLink, text: h.copyLink },
     { icon: <MessageCircle />, label: g.actions.sendOwn, text: h.sendOwn },
@@ -481,14 +497,14 @@ export function GuestsScreen({
     { icon: <X />, label: g.actions.unmarkSent, text: h.unmarkSent },
     { icon: <PencilLine />, label: g.actions.edit, text: h.edit },
     { icon: <Languages />, label: g.language.label, text: h.language },
-    { icon: <Trash2 />, label: g.actions.delete, text: h.delete },
     { icon: <PartyPopper />, label: g.greeting.edit, text: h.greeting },
+    { icon: <Trash2 />, label: g.actions.delete, text: h.delete },
     { icon: <Download />, label: g.actions.export, text: h.export },
     { icon: <FileSpreadsheet />, label: g.actions.sample, text: h.sample },
     ...(tables
       ? [{ icon: <Armchair />, label: t.eventDay.notices.button, text: t.eventDay.notices.buttonHint }]
       : []),
-    { icon: <CheckCheck />, label: g.columns.status, text: h.status },
+    { icon: <Send />, label: g.columns.status, text: h.status },
   ];
 
   const openImport = () => setDialog({ kind: 'import' });
@@ -520,6 +536,11 @@ export function GuestsScreen({
                 onSelect: () => window.location.assign(`/api/invitations/${data.id}/guests/export`),
               },
               { label: g.actions.sample, icon: <FileSpreadsheet />, onSelect: sample },
+              {
+                label: g.greeting.edit,
+                icon: <PartyPopper />,
+                onSelect: () => router.push(`/app/invitations/${data.id}/edit`),
+              },
               ...(tables
                 ? [
                     {
@@ -544,65 +565,68 @@ export function GuestsScreen({
 
         {guests.length ? (
           <>
-            <GuestsActions
-              onImport={openImport}
-              onAdd={openAdd}
-              onSend={() => (own ? setOwnOpen(true) : setDialog({ kind: 'whatsapp' }))}
-              sendHint={sendHint}
-              sendBlocked={own ? (ownQueue.length ? null : g.own.none) : sendBlocked}
-              own={own}
-            />
-
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              <KpiCard label={g.kpi.total} icon={<Users />} value={number(stats.total)} />
-              <KpiCard label={g.kpi.sent} icon={<Send />} value={number(stats.sent)} />
-              <KpiCard label={g.kpi.opened} icon={<Eye />} value={number(stats.opened)} />
-              <KpiCard
-                label={g.kpi.attending}
-                icon={<CheckCheck />}
-                value={number(rsvp.coming)}
-                sub={
-                  [
-                    rsvp.comingPeople
-                      ? plural(t.common.people, rsvp.comingPeople, { n: number(rsvp.comingPeople) })
+            {/* who is coming, in people — and the two things to do: add guests, send */}
+            <Card padding="md" className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+              <div className="min-w-0" data-testid="guests-summary">
+                <p className="flex flex-wrap items-baseline gap-x-2 text-[20px] font-extrabold leading-tight">
+                  <span>{plural(g.summary.coming, people.coming, { n: number(people.coming) })}</span>
+                  <span className="text-[15px] font-semibold text-muted">
+                    {fmt(g.summary.invited, { n: number(people.invited) })}
+                  </span>
+                  <Hint text={g.summary.hint}>
+                    <button
+                      type="button"
+                      aria-label={g.summary.hint}
+                      className="self-center text-faint hover:text-ink"
+                    >
+                      <Info aria-hidden className="size-4" />
+                    </button>
+                  </Hint>
+                </p>
+                <p className="mt-1 text-[13.5px] text-muted">
+                  {[
+                    people.waiting
+                      ? plural(g.summary.waiting, people.waiting, { n: number(people.waiting) })
                       : null,
-                    rsvp.comingFromLink
-                      ? plural(g.unmatched.fromLink, rsvp.comingFromLink, { n: number(rsvp.comingFromLink) })
+                    people.declined
+                      ? plural(g.summary.declined, people.declined, { n: number(people.declined) })
                       : null,
                   ]
                     .filter(Boolean)
-                    .join(' · ') || undefined
-                }
-              />
-              <KpiCard label={g.kpi.declined} icon={<UserX />} value={number(rsvp.declined)} />
-              <KpiCard label={g.kpi.pending} icon={<MailCheck />} value={number(rsvp.notAnswered)} />
-            </div>
+                    .join(' · ')}
+                </p>
+              </div>
+              <div className="flex flex-col items-stretch gap-1.5 sm:items-end">
+                <div className="flex flex-wrap gap-2" data-testid="guests-actions">
+                  <Menu
+                    align="end"
+                    trigger={
+                      <Button variant="secondary" icon={<UserPlus />}>
+                        {g.actions.add}
+                        <ChevronDown aria-hidden className="size-4 opacity-60" />
+                      </Button>
+                    }
+                    items={[
+                      { label: g.actions.import, icon: <Upload />, onSelect: openImport },
+                      { label: g.actions.addManual, icon: <UserPlus />, onSelect: openAdd },
+                    ]}
+                  />
+                  <Button
+                    icon={own ? <MessageCircle /> : <Send />}
+                    onClick={() => (own ? setOwnOpen(true) : setDialog({ kind: 'whatsapp' }))}
+                    disabled={own ? !ownQueue.length : !!sendBlocked}
+                    className="bg-[#0f7d41] text-white hover:bg-[#0c6a37] dark:text-white"
+                  >
+                    {own ? g.own.cta : g.actions.whatsappAll}
+                  </Button>
+                </div>
+                <p className="max-w-[440px] text-[12.5px] text-muted sm:text-end">
+                  {(own ? (ownQueue.length ? null : g.own.none) : sendBlocked) ?? sendHint}
+                </p>
+              </div>
+            </Card>
 
             <UnmatchedReplies id={data.id} replies={unmatched} guests={guests} onChanged={refresh} />
-
-            <Card padding="md" className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex min-w-0 items-start gap-3">
-                <span
-                  aria-hidden
-                  className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand"
-                >
-                  <PartyPopper className="size-[18px]" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[14px] font-semibold">{g.greeting.title}</p>
-                  <p className="text-[13px] text-muted">
-                    {data.greeting
-                      ? fmt(g.greeting.on, {
-                          text: data.greeting.replaceAll('{guest}', guests[0]?.name ?? t.guests.form.name),
-                        })
-                      : g.greeting.off}
-                  </p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href={`/app/invitations/${data.id}/edit`}>{g.greeting.edit}</Link>
-              </Button>
-            </Card>
 
             <Card className="mt-5 overflow-hidden">
               <div className="flex flex-wrap items-center gap-3 border-b border-line p-3">
@@ -619,13 +643,45 @@ export function GuestsScreen({
                     className="ps-9"
                   />
                 </div>
-                <div className="-mx-3 w-[calc(100%+24px)] min-w-0 overflow-x-auto px-3 lg:mx-0 lg:w-auto lg:px-0">
-                  <Segmented
-                    label={g.filters.label}
-                    value={filter}
-                    onValueChange={setFilter}
-                    options={LIST_FILTERS.map((f) => ({ value: f, label: g.filters[f] }))}
-                  />
+                {/* the summary's numbers are the filters: how many guests each one shows */}
+                <div
+                  role="radiogroup"
+                  aria-label={g.filters.label}
+                  className="flex w-full flex-wrap gap-1.5"
+                  data-testid="guest-filters"
+                >
+                  {shownFilters.map((f) => {
+                    const on = filter === f;
+                    const attention = ATTENTION_FILTERS.includes(f);
+                    return (
+                      <button
+                        key={f}
+                        type="button"
+                        role="radio"
+                        aria-checked={on}
+                        data-filter={f}
+                        onClick={() => setFilter(f)}
+                        className={cn(
+                          'inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold transition-colors',
+                          on
+                            ? 'border-ink bg-ink text-white dark:text-[#1c1917]'
+                            : attention
+                              ? 'border-warning-line bg-warning-bg text-warning hover:border-warning'
+                              : 'border-line bg-surface text-ink/80 hover:border-line-strong',
+                        )}
+                      >
+                        {g.filters[f]}
+                        <span
+                          className={cn(
+                            'rounded-full px-1.5 text-[11.5px] tabular-nums',
+                            on ? 'bg-white/20' : 'bg-subtle text-muted',
+                          )}
+                        >
+                          {number(counts[f])}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               {selected.size ? (
@@ -712,8 +768,8 @@ export function GuestsScreen({
                           {x.group ? ` · ${x.group}` : ''}
                         </p>
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px]">
+                          {replyOf(x)}
                           {statusOf(x)}
-                          {x.response ? replyOf(x) : null}
                         </div>
                         {showLanguage ? <div className="mt-1.5">{languageOf(x)}</div> : null}
                       </div>
@@ -760,6 +816,18 @@ export function GuestsScreen({
               );
             setDialog(null);
             toast({ title: g.toast.saved, variant: 'success' });
+            refresh();
+          }}
+        />
+      ) : null}
+      {dialog?.kind === 'answer' ? (
+        <AnswerDialog
+          invitationId={data.id}
+          guest={dialog.guest}
+          onClose={() => setDialog(null)}
+          onSaved={(saved) => {
+            setGuests((list) => list.map((x) => (x.id === saved.id ? saved : x)));
+            setDialog(null);
             refresh();
           }}
         />

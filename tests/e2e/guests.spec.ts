@@ -90,7 +90,8 @@ interface ApiGuest {
   sendStatus: string;
   openedAt: string | null;
   optedOut: boolean;
-  response: { attending: boolean; adults: number; children: number } | null;
+  partySize: number | null;
+  response: { attending: boolean; adults: number; children: number; source: 'guest' | 'host' } | null;
 }
 
 const listGuests = (page: Page, id: string) =>
@@ -114,8 +115,22 @@ const addGuests = (page: Page, id: string, list: { name: string; phone?: string 
 
 /** A guest's row: a table row on wide screens, a card on phones. */
 const row = (page: Page, name: string) => page.locator('[data-guest-row]:visible').filter({ hasText: name });
-const kpi = (page: Page, label: string) =>
-  page.locator('#main dl').filter({ has: page.getByText(label, { exact: true }) });
+/** A filter chip over the list: it shows how many guests it has. */
+const chip = (page: Page, filter: string) => page.locator(`[data-filter="${filter}"]`);
+/** "Add guests": a menu — from Excel, or by hand. */
+async function addVia(page: Page, item: 'העלאת רשימה מאקסל' | 'הוספה ידנית') {
+  await page.getByTestId('guests-actions').getByRole('button', { name: 'הוספת מוזמנים' }).click();
+  await page.getByRole('menuitem', { name: item }).click();
+}
+/** A row's "more actions" menu — the row first brought near the top, clear of the floating accessibility button. */
+async function moreOf(page: Page, name: string) {
+  const r = row(page, name);
+  await r.evaluate((el) => {
+    el.scrollIntoView({ block: 'start' });
+    window.scrollBy(0, -140);
+  });
+  await r.getByRole('button', { name: 'פעולות נוספות' }).click();
+}
 const toast = (page: Page, text: string) => page.locator('li').filter({ hasText: text });
 
 /** Meta's webhook: a signed delivery of statuses and/or guests' messages. */
@@ -188,7 +203,8 @@ test.describe('guest list', () => {
       'ביטול הסימון',
       'עריכה',
       'מחיקה',
-      'עריכת הברכה',
+      'עריכת הברכה האישית',
+      'הגעה',
     ])
       await expect(help.getByText(label, { exact: true })).toBeAttached();
     await page.keyboard.press('Escape');
@@ -209,18 +225,19 @@ test.describe('guest list', () => {
     await expect(row(page, 'דנה לוי')).toContainText('050-123-4567');
     await expect(row(page, 'דנה לוי')).toContainText('לא נשלח');
     await expect(row(page, 'סבתא שרה')).toContainText('מספר קווי — אין וואטסאפ');
-    await expect(kpi(page, 'מוזמנים ברשימה')).toContainText('5');
-    // the two main actions: upload, and send to everyone who can get it (3 mobiles) with the cost
+    await expect(chip(page, 'all')).toContainText('5');
+    await expect(page.getByTestId('guests-summary')).toContainText('0 אנשים מגיעים');
+    // the two main actions: add guests, and send to everyone who can get it (3 mobiles) with the cost
     const actions = page.getByTestId('guests-actions');
-    await expect(actions.getByRole('button', { name: 'העלאת רשימה מאקסל' })).toBeVisible();
+    await expect(actions.getByRole('button', { name: 'הוספת מוזמנים' })).toBeVisible();
     await expect(actions.getByRole('button', { name: 'שליחה בוואטסאפ לכל המוזמנים' })).toBeEnabled();
     await expect(
-      actions.getByText(/^3 מוזמנים עוד לא קיבלו · .*0\.16.* להודעה · יתרה: 0 קרדיטים$/),
+      page.getByText(/^3 מוזמנים עוד לא קיבלו · .*0\.16.* להודעה · יתרה: 0 קרדיטים$/),
     ).toBeVisible();
 
     // the same file again, one name spelled differently: updated — by phone, and by name without
     // a phone — never doubled
-    await actions.getByRole('button', { name: 'העלאת רשימה מאקסל' }).click();
+    await addVia(page, 'העלאת רשימה מאקסל');
     dialog = page.getByRole('dialog', { name: 'העלאת רשימת מוזמנים' });
     await dialog.getByTestId('guest-file').setInputFiles(guestFile('יוסף כהן'));
     await expect(dialog.getByTestId('import-preview').getByText('נמצאו 5 מוזמנים')).toBeVisible();
@@ -238,7 +255,7 @@ test.describe('guest list', () => {
     expect(dana).toMatchObject({ phone: '+972501234567', token: expect.stringMatching(/^[\w-]{16,}$/) });
 
     // "add by hand" with a phone already on the list: refused, and Dana stays Dana
-    await actions.getByRole('button', { name: 'הוספה ידנית' }).click();
+    await addVia(page, 'הוספה ידנית');
     const add = page.getByRole('dialog', { name: 'הוספת מוזמן' });
     await add.getByLabel('שם מלא').fill('מישהו אחר');
     await add.getByLabel('טלפון', { exact: true }).fill('050-1234567');
@@ -302,22 +319,57 @@ test.describe('guest list', () => {
     // the host sees each reply on its guest's row, and in the numbers
     await page.reload();
     await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
-    await expect(row(page, 'דנה לוי')).toContainText('מגיע/ה');
+    // the invitation column says where the invitation got to; the answer has a column of its own
+    await expect(row(page, 'דנה לוי')).toContainText('פתח/ה את ההזמנה');
     await expect(row(page, 'דנה לוי')).toContainText('מגיעים · 2');
-    await expect(row(page, 'יוסף כהן')).toContainText('לא מגיע/ה');
+    await expect(row(page, 'יוסף כהן')).toContainText('לא מגיעים');
     await expect(row(page, 'רותי אברהם')).toContainText('מגיעים · 1');
-    await expect(kpi(page, 'אישרו הגעה')).toContainText('2');
-    await expect(kpi(page, 'לא מגיעים')).toContainText('1');
-    await page.getByRole('radio', { name: 'בלי תשובה' }).click();
+    await expect(chip(page, 'attending')).toContainText('2');
+    await expect(chip(page, 'declined')).toContainText('1');
+    // in people: Dana and Tom, and Ruti
+    await expect(page.getByTestId('guests-summary')).toContainText('3 אנשים מגיעים');
+    await chip(page, 'noReply').click();
     await expect(row(page, 'דנה לוי')).toHaveCount(0);
     await expect(row(page, 'סבתא שרה')).toBeVisible();
-    await page.getByRole('radio', { name: 'כולם' }).click();
+    await chip(page, 'all').click();
+
+    // the host sets an answer by hand (after a phone call): David is coming, with 3 — more than
+    // he was invited with, so his invite grows to 3
+    await row(page, 'דוד בלי טלפון').locator('[data-guest-answer]').click();
+    let answer = page.getByRole('dialog', { name: /^הגעה · דוד בלי טלפון/ });
+    await answer.getByRole('radio', { name: 'מגיעים', exact: true }).click();
+    await answer.getByRole('button', { name: 'עוד מקומות' }).click();
+    await answer.getByRole('button', { name: 'עוד מקומות' }).click();
+    await expect(answer.getByTestId('answer-count')).toHaveText('3');
+    await expect(answer.getByText('יותר מהמוזמנים: מספר המוזמנים יעודכן ל־3.')).toBeVisible();
+    await answer.getByTestId('answer-save').click();
+    await expect(toast(page, 'ההגעה עודכנה')).toBeVisible();
+    await expect(row(page, 'דוד בלי טלפון')).toContainText('מגיעים · 3');
+    await expect(row(page, 'דוד בלי טלפון')).toContainText('ידני');
+    let david = (await listGuests(page, id)).find((g) => g.name === 'דוד בלי טלפון')!;
+    expect(david).toMatchObject({ partySize: 3, response: { attending: true, source: 'host' } });
+    // and taken back: no reply yet
+    await row(page, 'דוד בלי טלפון').locator('[data-guest-answer]').click();
+    answer = page.getByRole('dialog', { name: /^הגעה · דוד בלי טלפון/ });
+    await answer.getByRole('radio', { name: 'עוד לא ענו' }).click();
+    await answer.getByTestId('answer-save').click();
+    await expect(row(page, 'דוד בלי טלפון').locator('[data-guest-answer]')).toHaveAttribute(
+      'data-answer',
+      'none',
+    );
+    david = (await listGuests(page, id)).find((g) => g.name === 'דוד בלי טלפון')!;
+    expect(david.response).toBeNull();
+    // Dana answered herself: her answer can be changed, not taken back
+    await row(page, 'דנה לוי').locator('[data-guest-answer]').click();
+    answer = page.getByRole('dialog', { name: /^הגעה · דנה לוי/ });
+    await expect(answer.getByRole('radio', { name: 'עוד לא ענו' })).toBeDisabled();
+    await answer.getByRole('button', { name: 'ביטול' }).click();
 
     // marked as sent by hand, deleted
-    await row(page, 'דוד בלי טלפון').getByRole('button', { name: 'פעולות נוספות' }).click();
+    await moreOf(page, 'דוד בלי טלפון');
     await page.getByRole('menuitem', { name: 'סימון כנשלח' }).click();
     await expect(row(page, 'דוד בלי טלפון')).toContainText('נשלח ידנית');
-    await row(page, 'סבתא שרה').getByRole('button', { name: 'פעולות נוספות' }).click();
+    await moreOf(page, 'סבתא שרה');
     await page.getByRole('menuitem', { name: 'מחיקה' }).click();
     await page
       .getByRole('dialog', { name: 'למחוק את המוזמן?' })
@@ -495,11 +547,11 @@ test.describe('guest list', () => {
     await expect(row(page, 'דנה לוי')).toContainText('ביקש/ה לא לקבל הודעות בוואטסאפ');
     expect((await listGuests(page, id)).find((g) => g.name === 'דנה לוי')!.optedOut).toBe(true);
     // the failed ones, together
-    await page.getByRole('radio', { name: 'נכשל' }).click();
+    await chip(page, 'failed').click();
     await expect(row(page, 'לא בוואטסאפ')).toBeVisible();
     await expect(row(page, 'יוסי כהן')).toBeVisible();
     await expect(row(page, 'דנה לוי')).toHaveCount(0);
-    await page.getByRole('radio', { name: 'כולם' }).click();
+    await chip(page, 'all').click();
 
     // the scheduled job (it sends whatever is due in anyone's queue)
     const cron = await request.post('/api/cron/whatsapp', {
@@ -567,9 +619,9 @@ test.describe('guest list', () => {
     // not published: the send button says why it can't be pressed
     const actions = page.getByTestId('guests-actions');
     await expect(actions.getByRole('button', { name: 'שליחה בוואטסאפ לכל המוזמנים' })).toBeDisabled();
-    await expect(actions.getByText('צריך לפרסם את ההזמנה לפני השליחה.')).toBeVisible();
+    await expect(page.getByText('צריך לפרסם את ההזמנה לפני השליחה.')).toBeVisible();
 
-    await actions.getByRole('button', { name: 'הוספה ידנית' }).click();
+    await addVia(page, 'הוספה ידנית');
     const add = page.getByRole('dialog', { name: 'הוספת מוזמן' });
     await add.getByLabel('שם מלא').fill('אורח 151');
     await add.getByRole('button', { name: 'שמירה' }).click();
