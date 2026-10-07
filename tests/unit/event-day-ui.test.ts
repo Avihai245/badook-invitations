@@ -48,6 +48,8 @@ describe('telling guests their table: where a family stands', () => {
     // the table was renumbered: same table, another number — an update too
     expect(noticeState(row({ told: told(9, 't12') }))).toBe('update');
     expect(noticeState(row({ table: null, told: told(12) }))).toBe('unseated');
+    // said they aren't coming (still at a table): nothing to tell them
+    expect(noticeState(row({ status: 'declined' }))).toBe('none');
     expect(noticeState(row({ table: null }))).toBe('none');
   });
 });

@@ -39,7 +39,7 @@ const deps = (): RsvpDeps => ({
   },
   now: Date.now,
   ipHashSalt: serverEnv().INVITES_IP_HASH_SALT,
-  guestId: (invitationId, token) => guestsDb.byToken(invitationId, token),
+  guest: (invitationId, token) => guestsDb.rsvpGuest(invitationId, token),
   // the site's sample invitations keep no replies — unless INVITES_DEMO_RSVP=store (e2e tests)
   isDemo:
     serverEnv().INVITES_DEMO_RSVP === 'store'

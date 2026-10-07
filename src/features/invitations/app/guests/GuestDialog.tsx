@@ -75,12 +75,19 @@ export function GuestDialog({
       language: language || null,
     };
     setSaving(true);
-    const res = await hostApi<{ guest?: GuestRecord | { id: string; name: string }; code?: string }>(
+    const res = await hostApi<{
+      guest?: GuestRecord | { id: string; name: string };
+      code?: string;
+      confirmed?: number;
+    }>(
       guest ? `/api/invitations/${id}/guests/${guest.id}` : `/api/invitations/${id}/guests`,
       guest ? { method: 'PATCH', body } : { method: 'POST', body: { guest: body } },
     );
     setSaving(false);
     if (res.status === 401) return window.location.assign(loginUrl());
+    // fewer than the people they already confirmed: their reply comes first (it counts in the seating)
+    if (res.status === 409 && res.body?.code === 'below_confirmed')
+      return setErrors({ party: fmt(f.belowConfirmed, { n: res.body.confirmed ?? 0 }) });
     if (res.status === 409) {
       const other = res.body?.guest?.name;
       return setErrors({ phone: other ? fmt(f.duplicateOf, { name: other }) : f.duplicate });

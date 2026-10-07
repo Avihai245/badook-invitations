@@ -414,7 +414,10 @@ function InvitationCard({
                 </span>
                 {invite && item.guests ? (
                   <span className="font-semibold text-success">
-                    {fmt(t.list.repliedOf, { n: number(item.responses), total: number(item.guests) })}
+                    {fmt(t.list.repliedOf, {
+                      n: number(item.answered ?? Math.min(item.responses, item.guests)),
+                      total: number(item.guests),
+                    })}
                   </span>
                 ) : used !== null ? (
                   <span className="font-semibold text-muted" data-testid="card-glance">
@@ -537,7 +540,8 @@ function cardFacts(item: InvitationSummary, daysLeft: number, planning: CardPlan
     unpublishedChanges: item.unpublishedChanges,
     guests: item.guests,
     sent: item.sent,
-    notAnswered: Math.max(0, item.guests - item.responses),
+    // guests without a reply of their own (a general-link reply not matched yet answers nobody)
+    notAnswered: Math.max(0, item.guests - (item.answered ?? item.responses)),
     unmatched: 0,
     responses: item.responses,
     planning,

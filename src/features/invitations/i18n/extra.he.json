@@ -48,5 +48,12 @@
   "liveGallery.qrAfter": "סרקו כדי לראות בטלפון",
   "liveGallery.qrLabel": "קוד QR לגלריה של האירוע",
   "liveGallery.preview": "הכפתור יוביל לגלריה החיה של האירוע, כשהיא מופעלת",
-  "scene.rsvp": "אישור הגעה"
+  "scene.rsvp": "אישור הגעה",
+  "rsvp.invitedFor": {
+    "one": "ההזמנה היא לאדם אחד",
+    "other": "ההזמנה היא ל־{n} אנשים"
+  },
+  "rsvp.bringMore": "רוצים להביא עוד אנשים?",
+  "rsvp.bringMoreHint": "נעביר את הבקשה לבעלי האירוע, והם יאשרו.",
+  "rsvp.more": "עוד"
 }

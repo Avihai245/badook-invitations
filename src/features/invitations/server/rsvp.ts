@@ -37,6 +37,8 @@ export interface ResponseRow {
   ip_hash: string | null;
   /** the guest whose personal link this reply came through (submit_rsvp links it) */
   guest_id?: string | null;
+  /** people beyond the guest's invitation they asked to bring (waits for the host's approval) */
+  extra_requested?: number | null;
 }
 
 export interface AttendeeRow {
@@ -65,8 +67,11 @@ export interface RsvpDeps {
   }): Promise<{ id: string; replaced: boolean }>;
   now(): number;
   ipHashSalt: string;
-  /** a personal link's guest in this invitation (null: not one of its tokens) */
-  guestId?(invitationId: string, token: string): Promise<string | null>;
+  /**
+   * a personal link's guest in this invitation, with the people they were invited with (null: not one
+   * of its tokens)
+   */
+  guest?(invitationId: string, token: string): Promise<{ id: string; partySize: number | null } | null>;
   /** one of the site's sample invitations: replies are checked, never stored (INVITES_DEMO_RSVP) */
   isDemo?(invitationId: string): Promise<boolean>;
 }
@@ -115,8 +120,16 @@ const PHONE_OK = (s: string) => /^\d{9,15}$/.test(s.replace(/\D/g, '')) && /^[\d
 const EMAIL_OK = (s: string) => /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(s);
 const ALLERGIES: DietaryKey[] = ['nut_allergy', 'other_allergy'];
 
-/** Rules of the invitation's RSVP section (§3, §6), with localized messages keyed like the form. */
-export function validateAgainstConfig(sub: RsvpSubmission, config: RsvpConfig): Record<string, string> {
+/**
+ * Rules of the invitation's RSVP section (§3, §6), with localized messages keyed like the form. A
+ * personal link's guest (`partySize`) may confirm as many as they were invited with — whatever the
+ * section's own maximum — and no more (the database counts no more: the rest is a request).
+ */
+export function validateAgainstConfig(
+  sub: RsvpSubmission,
+  config: RsvpConfig,
+  partySize: number | null = null,
+): Record<string, string> {
   const L = sub.locale;
   const e: Record<string, string> = {};
   const req = t(L, 'rsvp.error.required');
@@ -129,8 +142,12 @@ export function validateAgainstConfig(sub: RsvpSubmission, config: RsvpConfig): 
   };
 
   if (sub.attending) {
-    if (sub.adults.length < 1 || sub.adults.length > config.maxAdults) e.adults = req;
-    if (sub.children.length > (config.askChildren ? config.maxChildren : 0)) e.children = req;
+    const maxAdults = partySize ?? config.maxAdults;
+    const maxChildren = config.askChildren ? (partySize ?? config.maxChildren) : 0;
+    if (sub.adults.length < 1 || sub.adults.length > maxAdults) e.adults = req;
+    if (sub.children.length > maxChildren) e.children = req;
+    if (partySize !== null && sub.adults.length + sub.children.length > partySize) e.adults = req;
+    if (sub.extraRequested !== undefined && partySize === null) e.extraRequested = req;
     sub.adults.forEach((a, i) => {
       if (i === 0 || config.perAttendeeDetails) {
         if (config.nameFormat === 'full') {
@@ -245,6 +262,7 @@ export function toRows(
       message,
       answers,
       ip_hash: ipHash,
+      extra_requested: sub.extraRequested ?? null,
     },
     attendees: [...adults, ...children],
   };
@@ -285,7 +303,9 @@ export async function handleRsvp(raw: string, ip: string | null, deps: RsvpDeps)
     return fail(409, 'closed');
   }
 
-  const fieldErrors = validateAgainstConfig(sub, section.data);
+  // a personal link: its guest, and the people they were invited with
+  const guest = sub.guestToken && deps.guest ? await deps.guest(invitation.id, sub.guestToken) : null;
+  const fieldErrors = validateAgainstConfig(sub, section.data, guest?.partySize ?? null);
   if (Object.keys(fieldErrors).length) return fail(400, 'invalid', fieldErrors);
 
   const token = newToken();
@@ -293,7 +313,7 @@ export async function handleRsvp(raw: string, ip: string | null, deps: RsvpDeps)
     return { status: 200, body: { ok: true, responseId: randomUUID(), editToken: token, demo: true } };
 
   const { response, attendees } = toRows(sub, section.data, ipHash);
-  if (sub.guestToken && deps.guestId) response.guest_id = await deps.guestId(invitation.id, sub.guestToken);
+  if (guest) response.guest_id = guest.id;
   // A personal link finds its guest's reply by itself. The browser's edit token only serves replies
   // through the general link: on a shared browser it may be another guest's reply.
   const existingTokenHash = sub.editToken && !response.guest_id ? sha256(sub.editToken) : null;
