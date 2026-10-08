@@ -69,26 +69,43 @@ interface MessagesResponse {
   error?: { type?: string; message?: string };
 }
 
-export async function askAssistant(
-  input: AskInput,
-  config: AiConfig,
-  fetchImpl: typeof fetch = fetch,
-): Promise<AskResult> {
-  // the conversation must open with the host; the device's own first question goes into the note
-  // (and turns alternate: the device's own questions and a tapped answer may follow one another)
-  const messages: { role: 'user' | 'assistant'; content: string }[] = [];
+type ChatTurn = { role: 'user' | 'assistant'; content: string };
+
+/**
+ * The conversation as the model gets it: opening with the host (the device's own first question goes
+ * into the note), turns alternating (the device's own questions and a tapped answer may follow one
+ * another), the details so far in the last message. null: no message of the host's to answer.
+ */
+function chatOf(input: AskInput): ChatTurn[] | null {
+  const messages: ChatTurn[] = [];
   for (const m of input.messages) {
     const prev = messages[messages.length - 1];
     if (prev?.role === m.role) prev.content += `\n${m.content}`;
     else if (messages.length || m.role === 'user') messages.push({ role: m.role, content: m.content });
   }
-  if (!messages.length) return { status: 'error', error: 'no message' };
-  const last = messages[messages.length - 1]!;
-  if (last.role !== 'user') return { status: 'error', error: 'no message' };
+  const last = messages[messages.length - 1];
+  if (!last || last.role !== 'user') return null;
   messages[messages.length - 1] = {
     role: 'user',
     content: `${stateNote(input.today, input.draft, input.skipped)}\n\nThe host's message:\n${last.content}`,
   };
+  return messages;
+}
+
+const answerOf = (text: string): Answer | null => {
+  const answer = parseAnswer(text);
+  return answer
+    ? { ...answer, skip: answer.skip.filter((f) => (FIELDS as readonly string[]).includes(f)) }
+    : null;
+};
+
+export async function askAssistant(
+  input: AskInput,
+  config: AiConfig,
+  fetchImpl: typeof fetch = fetch,
+): Promise<AskResult> {
+  const messages = chatOf(input);
+  if (!messages) return { status: 'error', error: 'no message' };
   const deadline = Date.now() + ASSISTANT.timeoutMs;
   let lastError = 'no answer';
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -157,13 +174,112 @@ export async function askAssistant(
       .filter((b) => b.type === 'text' && typeof b.text === 'string')
       .map((b) => b.text)
       .join('');
-    const answer = parseAnswer(text);
-    if (answer)
-      return {
-        status: 'ok',
-        answer: { ...answer, skip: answer.skip.filter((f) => (FIELDS as readonly string[]).includes(f)) },
-      };
+    const answer = answerOf(text);
+    if (answer) return { status: 'ok', answer };
     lastError = body?.stop_reason === 'max_tokens' ? 'cut short' : 'not the expected JSON';
+  }
+  return { status: 'error', error: lastError };
+}
+
+// ─── OpenAI (Chat Completions) ────────────────────────────────────────────────────────────────────
+
+interface CompletionResponse {
+  choices?: { message?: { content?: string | null; refusal?: string | null }; finish_reason?: string }[];
+  error?: { message?: string; type?: string; param?: string | null };
+}
+
+/**
+ * What a model doesn't take, learned from its answers (remembered per server): the token limit's other
+ * name (the reasoning and GPT-5 families take `max_completion_tokens`, gpt-4* and gpt-3.5* `max_tokens`),
+ * the reasoning effort (reasoning models only) and the strict JSON format.
+ */
+const openAiState = { legacyTokens: null as boolean | null, noEffort: false, noSchema: false };
+export const resetAssistantOpenAiState = () => {
+  openAiState.legacyTokens = null;
+  openAiState.noEffort = false;
+  openAiState.noSchema = false;
+};
+
+/** The same turn through OpenAI's Chat Completions API — when the site has an OpenAI key and no Anthropic one. */
+export async function askAssistantOpenAi(
+  input: AskInput,
+  config: AiConfig,
+  fetchImpl: typeof fetch = fetch,
+): Promise<AskResult> {
+  const messages = chatOf(input);
+  if (!messages) return { status: 'error', error: 'no message' };
+  const deadline = Date.now() + ASSISTANT.timeoutMs;
+  let lastError = 'no answer';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const left = deadline - Date.now();
+    if (left < 3_000) break;
+    const legacy = openAiState.legacyTokens ?? /^(gpt-4|gpt-3\.5)/i.test(config.model);
+    const tokens = legacy ? 'max_tokens' : 'max_completion_tokens';
+    const effort = !legacy && !openAiState.noEffort;
+    const schema = !openAiState.noSchema;
+    let res: Response;
+    try {
+      res = await fetchImpl(`${config.apiBase}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${config.apiKey}` },
+        body: JSON.stringify({
+          model: config.model,
+          [tokens]: ASSISTANT.maxTokens,
+          // a short form-filling turn: little reasoning, a quick answer
+          ...(effort ? { reasoning_effort: 'low' } : {}),
+          response_format: schema
+            ? {
+                type: 'json_schema',
+                json_schema: { name: 'assistant_turn', strict: true, schema: answerSchema(input.manifest) },
+              }
+            : { type: 'json_object' },
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt(config.brand, input.manifest, input.locale, input.uiLocale),
+            },
+            ...messages,
+          ],
+        }),
+        signal: AbortSignal.timeout(left),
+      });
+    } catch (err) {
+      lastError = err instanceof Error ? err.name || 'request failed' : 'request failed';
+      continue;
+    }
+    const body = (await res.json().catch(() => null)) as CompletionResponse | null;
+    if (!res.ok) {
+      const message = `${body?.error?.param ?? ''} ${body?.error?.message ?? ''}`;
+      lastError = `${res.status} ${body?.error?.type ?? ''}`.trim();
+      if (res.status === 400) {
+        // what this model doesn't take, from its own answer: asked again without it
+        if (/max_completion_tokens|max_tokens/.test(message) && openAiState.legacyTokens === null) {
+          openAiState.legacyTokens = !legacy;
+          attempt--;
+          continue;
+        }
+        if (effort && /reasoning_effort/.test(message)) {
+          openAiState.noEffort = true;
+          attempt--;
+          continue;
+        }
+        if (schema && /response_format|json_schema/.test(message)) {
+          openAiState.noSchema = true;
+          attempt--;
+          continue;
+        }
+      }
+      if (res.status === 429 || res.status >= 500) {
+        await new Promise((r) => setTimeout(r, 1_000));
+        continue;
+      }
+      break;
+    }
+    const choice = body?.choices?.[0];
+    if (choice?.message?.refusal) return { status: 'error', error: 'refused' };
+    const answer = answerOf(choice?.message?.content ?? '');
+    if (answer) return { status: 'ok', answer };
+    lastError = choice?.finish_reason === 'length' ? 'cut short' : 'not the expected JSON';
   }
   return { status: 'error', error: lastError };
 }

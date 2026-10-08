@@ -10,7 +10,13 @@ import {
   type Draft,
 } from '@/features/invitations/assistant/model';
 import { answerSchema, systemPrompt } from '@/features/invitations/assistant/prompt';
-import { askAssistant, parseAnswer, resetAssistantAiState } from '@/features/invitations/assistant/server/ai';
+import {
+  askAssistant,
+  askAssistantOpenAi,
+  parseAnswer,
+  resetAssistantAiState,
+  resetAssistantOpenAiState,
+} from '@/features/invitations/assistant/server/ai';
 import { assistantTurn, type AssistantDeps } from '@/features/invitations/assistant/server/api';
 import type { InvitationDocument } from '@/features/invitations/contracts/types';
 import { createInvitation, type HostDeps } from '@/features/invitations/server/host-api';
@@ -296,6 +302,124 @@ describe('the model call', () => {
       ask: 'done',
     });
     expect(parseAnswer('no json')).toBeNull();
+  });
+});
+
+describe('through OpenAI', () => {
+  const input = {
+    manifest: sahar,
+    locale: 'he' as const,
+    uiLocale: 'he' as const,
+    today: '2026-10-04',
+    draft: {},
+    skipped: [],
+    messages: [
+      { role: 'assistant' as const, content: 'איזה אירוע?' },
+      { role: 'user' as const, content: 'חתונה של דנה' },
+    ],
+  };
+  const config = { apiKey: 'oa', model: 'gpt-5-mini', apiBase: 'https://oa.test', brand: 'Badook' };
+  const answer = { draft: { primary: 'דנה' }, skip: [], ask: 'date', reply: 'מתי?' };
+  const ok = () =>
+    new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(answer) } }] }), {
+      status: 200,
+    });
+
+  it('asks Chat Completions for the strict JSON answer, with little reasoning', async () => {
+    resetAssistantOpenAiState();
+    const fetchImpl = vi.fn(async () => ok());
+    const r = await askAssistantOpenAi(input, config, fetchImpl as unknown as typeof fetch);
+    expect(r).toMatchObject({ status: 'ok', answer: { reply: 'מתי?', draft: { primary: 'דנה' } } });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('https://oa.test/v1/chat/completions');
+    expect((init.headers as Record<string, string>).authorization).toBe('Bearer oa');
+    const body = JSON.parse(init.body as string);
+    expect(body.model).toBe('gpt-5-mini');
+    expect(body.max_completion_tokens).toBeGreaterThanOrEqual(4096);
+    expect(body).not.toHaveProperty('max_tokens');
+    expect(body.reasoning_effort).toBe('low');
+    expect(body.response_format).toMatchObject({ type: 'json_schema', json_schema: { strict: true } });
+    expect(body.messages[0].role).toBe('system');
+    // the conversation opens with the host, the details so far in the last message
+    expect(body.messages.slice(1)).toHaveLength(1);
+    expect(body.messages[1].content).toContain('חתונה של דנה');
+  });
+
+  it('an older model: max_tokens and no reasoning effort, learned from its own answer', async () => {
+    resetAssistantOpenAiState();
+    const bodies: Record<string, unknown>[] = [];
+    const fetchImpl = vi.fn(async (_url: string, init: RequestInit) => {
+      const body = JSON.parse(init.body as string) as Record<string, unknown>;
+      bodies.push(body);
+      return 'max_completion_tokens' in body
+        ? new Response(
+            JSON.stringify({
+              error: {
+                type: 'invalid_request_error',
+                param: 'max_completion_tokens',
+                message: "Unsupported parameter: 'max_completion_tokens'. Use 'max_tokens' instead.",
+              },
+            }),
+            { status: 400 },
+          )
+        : ok();
+    });
+    const r = await askAssistantOpenAi(
+      input,
+      { ...config, model: 'my-custom-model' },
+      fetchImpl as unknown as typeof fetch,
+    );
+    expect(r.status).toBe('ok');
+    expect(bodies).toHaveLength(2);
+    expect(bodies[1]).toHaveProperty('max_tokens');
+    expect(bodies[1]).not.toHaveProperty('reasoning_effort');
+  });
+
+  it('a cut-short answer or a refusal falls back to the device’s questions', async () => {
+    resetAssistantOpenAiState();
+    const cut = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({ choices: [{ message: { content: '{"draft":' }, finish_reason: 'length' }] }),
+          {
+            status: 200,
+          },
+        ),
+    );
+    expect(await askAssistantOpenAi(input, config, cut as unknown as typeof fetch)).toEqual({
+      status: 'error',
+      error: 'cut short',
+    });
+    const refused = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ choices: [{ message: { content: null, refusal: 'no' } }] }), {
+          status: 200,
+        }),
+    );
+    expect(await askAssistantOpenAi(input, config, refused as unknown as typeof fetch)).toEqual({
+      status: 'error',
+      error: 'refused',
+    });
+  });
+
+  it('the questionnaire takes Anthropic when it is set up, else OpenAI with its key alone', async () => {
+    const depsWith = async (env: Record<string, string>) => {
+      for (const [k, v] of Object.entries(env)) vi.stubEnv(k, v);
+      vi.resetModules(); // serverEnv() reads the environment once
+      const { assistantDeps: fresh } = await import('@/features/invitations/assistant/server/deps');
+      return fresh({ email: null });
+    };
+    const none = {
+      ANTHROPIC_API_KEY: '',
+      INVITES_AI_MODEL: '',
+      OPENAI_API_KEY: '',
+      INVITES_AI_MODEL_OPENAI: '',
+    };
+    expect((await depsWith(none)).ask).toBeNull();
+    // OpenAI's key alone (its model has a default)
+    expect((await depsWith({ ...none, OPENAI_API_KEY: 'oa-key' })).ask).toBeTypeOf('function');
+    vi.unstubAllEnvs();
+    vi.resetModules();
   });
 });
 

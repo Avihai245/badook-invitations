@@ -13,6 +13,9 @@ const flag = (fallback: boolean) =>
  * Server-side configuration (every name matches amplify.yml's
  * `^(NEXT_PUBLIC_|SUPABASE_|INVITES_|ANTHROPIC_API_KEY=|OPENAI_API_KEY=)`). Documented in .env.example.
  */
+/** The OpenAI model used when OPENAI_API_KEY is set and INVITES_AI_MODEL_OPENAI isn't. */
+export const DEFAULT_OPENAI_MODEL = 'gpt-5-mini';
+
 const ServerEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().default(''),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().default(''),
@@ -72,11 +75,16 @@ const ServerEnvSchema = z.object({
     .transform((u) => u.replace(/\/+$/, '')),
   // questions a day for the whole site (a cost ceiling); past it the assistant answers from the guide
   INVITES_AI_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(2000),
-  // the chat only can answer through OpenAI instead: with this key and INVITES_AI_MODEL_OPENAI both
-  // set, it takes over just the chat (chat.completions) — every other AI feature above (gallery_ai,
-  // translate_ai, art_direction) stays on ANTHROPIC_API_KEY + INVITES_AI_MODEL regardless
+  // OpenAI instead: with this key the support chat answers through it (chat.completions), and so does
+  // the gallery's "quick create with AI" questionnaire when there is no Anthropic key — every other AI
+  // feature above (gallery_ai, translate_ai, art_direction, planning_ai) stays on ANTHROPIC_API_KEY +
+  // INVITES_AI_MODEL regardless. The model: INVITES_AI_MODEL_OPENAI, or DEFAULT_OPENAI_MODEL when empty.
   OPENAI_API_KEY: z.string().default(''),
-  INVITES_AI_MODEL_OPENAI: z.string().trim().default(''),
+  INVITES_AI_MODEL_OPENAI: z
+    .string()
+    .trim()
+    .default('')
+    .transform((m) => m || DEFAULT_OPENAI_MODEL),
   INVITES_AI_API_BASE_OPENAI: z
     .url()
     .default('https://api.openai.com')
