@@ -34,6 +34,7 @@ import {
 import {
   cardKey,
   chargeToken,
+  formAvailable,
   handshake,
   iframeUrl,
   payFirst,
@@ -190,6 +191,14 @@ export async function startCheckout(
   // the partner's discount, while it is in force: the monthly charge keeps this price
   const amount = productPrice(product, account.discount);
   if (!(amount > 0)) return fail(503, 'not_configured');
+  // Tranzila's card form must be there for the iframe terminal, or the buyer would see its error page
+  if (mode === 'tranzila' && !(await formAvailable())) {
+    await alertSupport('Tranzila serves no card form for the iframe terminal', {
+      terminal: serverEnv().INVITES_TRANZILA_TERMINAL,
+      fix: 'Ask Tranzila to turn on the hosted payment page (Tranzila Direct / iframe) for this terminal',
+    });
+    return fail(503, 'provider_unavailable');
+  }
   const id = await checkoutDb.create(user.id, product, amount, mode);
   // back to the address the host is on (their session is there)
   const base = await requestBaseUrl();

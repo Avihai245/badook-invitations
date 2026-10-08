@@ -108,6 +108,8 @@ export const billingEn: typeof billingHe = {
   errors: {
     already: 'That’s already your plan.',
     not_configured: 'Online payment isn’t enabled yet.',
+    provider_unavailable:
+      'The payment company’s page isn’t available right now. Let us know and we’ll fix it, or try again later.',
     server: 'Something went wrong. Please try again in a moment.',
   },
   going: 'Going to payment…',
