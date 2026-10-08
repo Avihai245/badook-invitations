@@ -387,6 +387,26 @@ export function BillingScreen({
         </p>
       )}
 
+      {/* under the plans, by the upgrade buttons: what every purchase is subject to (the terms, with
+          cancelling a purchase and refunds), before buying */}
+      <p className="mt-1.5 text-[13px] text-muted" data-testid="billing-terms">
+        {b.terms.before}
+        <Link
+          href="/terms#plans"
+          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
+        >
+          {b.terms.terms}
+        </Link>
+        {b.terms.middle}
+        <Link
+          href="/terms#cancel"
+          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
+        >
+          {b.terms.cancel}
+        </Link>
+        {b.terms.after}
+      </p>
+
       <section id="credits" className="mt-12 scroll-mt-20">
         <h2 className="text-[20px] font-bold">{b.packs.title}</h2>
         <p className="mt-1 text-[14px] text-muted">{b.packs.subtitle}</p>
@@ -487,25 +507,6 @@ export function BillingScreen({
           </Card>
         </div>
       </section>
-
-      {/* what every purchase is subject to: the terms, with cancelling a purchase and refunds */}
-      <p className="mt-10 border-t border-line pt-5 text-[13px] text-muted" data-testid="billing-terms">
-        {b.terms.before}
-        <Link
-          href="/terms#plans"
-          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
-        >
-          {b.terms.terms}
-        </Link>
-        {b.terms.middle}
-        <Link
-          href="/terms#cancel"
-          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
-        >
-          {b.terms.cancel}
-        </Link>
-        {b.terms.after}
-      </p>
 
       {payFrame ? (
         <Dialog
