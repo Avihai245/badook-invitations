@@ -59,6 +59,8 @@ export const systemEn: typeof systemHe = {
     aiChatProviderLabel: 'The chat assistant runs on',
     aiChatProviders: { openai: 'OpenAI', anthropic: 'Anthropic' },
     billing: 'Payments mode',
+    // where Tranzila's API keys were found
+    keySource: { env: 'keys in Amplify', vault: 'keys in the Vault' },
     billingModes: { tranzila: 'Tranzila', payplus: 'PayPlus', test: 'Test payment page', off: 'Off' },
     langs: 'WhatsApp template languages',
     langsHelp: 'INVITES_WHATSAPP_TEMPLATE_LANGS: the languages Meta approved the templates in.',

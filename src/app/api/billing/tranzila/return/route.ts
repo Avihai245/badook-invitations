@@ -13,7 +13,7 @@ import { requestFields } from '@/features/billing/server/tranzila-fields';
 async function handle(request: Request) {
   const url = new URL(request.url);
   const requested = url.searchParams.get('result') === 'success' ? 'success' : 'failure';
-  const fields = tranzilaConfigured() ? await requestFields(request) : null;
+  const fields = (await tranzilaConfigured()) ? await requestFields(request) : null;
   let outcome: TranzilaOutcome | null = null;
   let checkout = /^[0-9a-f-]{36}$/i.test(url.searchParams.get('checkout') ?? '')
     ? url.searchParams.get('checkout')

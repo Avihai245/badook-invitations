@@ -28,6 +28,8 @@ const state = {
   account: null as Account | null,
   claims: new Set<string>(),
   due: [] as DueRenewal[],
+  /** Supabase → Vault → Secrets */
+  vault: {} as Record<string, string>,
   calls: [] as [string, Record<string, unknown>][],
 };
 const calls = (fn: string) => state.calls.filter(([name]) => name === fn).map(([, args]) => args);
@@ -48,6 +50,10 @@ const rpc = vi.fn(async (fn: string, args: Record<string, unknown>) => {
         state.claims.add(String(args.p_id));
         return fresh;
       }
+      case 'billing_secrets':
+        return Object.fromEntries(
+          (args.p_names as string[]).filter((n) => n in state.vault).map((n) => [n, state.vault[n]]),
+        );
       case 'billing_renewals_due':
         return state.due;
       case 'checkout_create': {
@@ -198,6 +204,7 @@ beforeEach(() => {
   state.account = account();
   state.claims = new Set();
   state.due = [];
+  state.vault = {};
   state.calls = [];
   tranzila.answers = [];
   fetchMock.mockClear();
@@ -211,7 +218,8 @@ const alerts = () => sendEmail.mock.calls.map(([email]) => email.subject);
 describe('Tranzila: the API and the iframe', () => {
   it('signs each request: HMAC-SHA256 of the app key, keyed by secret + time + nonce, in hex', async () => {
     const { authHeaders } = await client();
-    const headers = authHeaders(1_760_000_000_400, 'n0nce');
+    const keys = { appKey: APP_KEY, secret: SECRET };
+    const headers = authHeaders(keys, 1_760_000_000_400, 'n0nce');
     expect(headers).toEqual({
       'X-tranzila-api-app-key': APP_KEY,
       'X-tranzila-api-request-time': '1760000000',
@@ -221,8 +229,8 @@ describe('Tranzila: the API and the iframe', () => {
         .digest('hex'),
     });
     // a fresh nonce each time
-    expect(authHeaders()['X-tranzila-api-nonce']).toMatch(/^[0-9a-f]{80}$/);
-    expect(authHeaders()['X-tranzila-api-nonce']).not.toBe(authHeaders()['X-tranzila-api-nonce']);
+    expect(authHeaders(keys)['X-tranzila-api-nonce']).toMatch(/^[0-9a-f]{80}$/);
+    expect(authHeaders(keys)['X-tranzila-api-nonce']).not.toBe(authHeaders(keys)['X-tranzila-api-nonce']);
   });
 
   it('the iframe: the iframe terminal’s form, the sum, a token, our purchase and our addresses', async () => {
@@ -308,7 +316,7 @@ describe('Tranzila: the API and the iframe', () => {
 describe('Tranzila: buying', () => {
   it('with the keys set, a purchase opens Tranzila’s form as an iframe (no redirect)', async () => {
     const { billingMode, startCheckout } = await billing();
-    expect(billingMode()).toBe('tranzila');
+    expect(await billingMode()).toBe('tranzila');
     const res = await startCheckout(
       { id: USER, email: 'dana@example.com', user_metadata: {} },
       { product: 'business' },
@@ -360,7 +368,7 @@ describe('Tranzila: buying', () => {
     expect(done).toMatchObject({
       p_id: CHECKOUT,
       p_status: 'paid',
-      p_event_id: 'tranzila:9001',
+      p_event_id: `tranzila:paid:${CHECKOUT}`,
       p_credits: 50,
     });
     expect(done!.p_patch).toMatchObject({
@@ -369,7 +377,8 @@ describe('Tranzila: buying', () => {
       billingProvider: 'tranzila',
       billingSubscriptionId: `tranzila:${CHECKOUT}`,
     });
-    // the token never lands in the records
+    // Tranzila's transaction id is in the record; the token never is
+    expect(JSON.stringify(done!.p_payload)).toContain('9001');
     expect(JSON.stringify(done!.p_payload)).not.toContain('Z5f3c1a2b3c4d5e6f71234');
   });
 
@@ -452,7 +461,7 @@ describe('Tranzila: the monthly charge', () => {
       items: [{ unit_price: 39.2 }],
     });
     expect(calls('billing_apply')[0]).toMatchObject({
-      p_event_id: 'tranzila:9001',
+      p_event_id: `tranzila:renewal:${USER}:2026-10-01T09:00:00.000Z:0`,
       p_provider: 'tranzila',
       p_type: 'renewal.paid',
       p_user_id: USER,
@@ -556,5 +565,48 @@ describe('Tranzila: the iframe’s return page', () => {
     );
     expect(await target(res)).toBe(`/app/billing?status=success&checkout=${CHECKOUT}`);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('Tranzila: the API keys from the Vault', () => {
+  const VAULT = { TRANZILA_API_APP_KEY: 'vault-app-key', TRANZILA_API_SECRET: 'vault-secret' };
+  const withoutEnvKeys = () => {
+    vi.stubEnv('INVITES_TRANZILA_APP_KEY', '');
+    vi.stubEnv('INVITES_TRANZILA_SECRET', '');
+  };
+  const restore = () => {
+    vi.stubEnv('INVITES_TRANZILA_APP_KEY', APP_KEY);
+    vi.stubEnv('INVITES_TRANZILA_SECRET', SECRET);
+  };
+
+  it('Amplify’s variables win; without them, the Vault’s secrets are used (and kept a while)', async () => {
+    state.vault = VAULT;
+    expect(await (await client()).tranzilaKeys()).toEqual({ appKey: APP_KEY, secret: SECRET, source: 'env' });
+    expect(calls('billing_secrets')).toEqual([]);
+    try {
+      withoutEnvKeys();
+      // fresh modules: the environment is read again
+      vi.resetModules();
+      const { tranzilaKeys, resetTranzilaKeys } = await client();
+      expect(await tranzilaKeys()).toEqual({
+        appKey: 'vault-app-key',
+        secret: 'vault-secret',
+        source: 'vault',
+      });
+      await tranzilaKeys();
+      expect(calls('billing_secrets')).toHaveLength(1);
+      // the charge is signed with them
+      const { tranzilaNotice, billingMode } = await billing();
+      expect(await billingMode()).toBe('tranzila');
+      expect((await tranzilaNotice(form())).outcome).toBe('paid');
+      expect(charges()[0]!.headers['X-tranzila-api-app-key']).toBe('vault-app-key');
+      // nothing in the Vault either: off, and a charge isn't even tried
+      state.vault = {};
+      resetTranzilaKeys();
+      expect(await billingMode()).toBe('off');
+    } finally {
+      restore();
+      vi.resetModules();
+    }
   });
 });

@@ -7,5 +7,5 @@ import { SystemScreen } from '@/features/admin/ui/system/SystemScreen.client';
 export default async function AdminSystemPage() {
   const staff = await requireStaff('system.view', '/app/admin/system');
   const state = await coreDb.system(staff.userId);
-  return <SystemScreen state={state} deployment={deployment()} />;
+  return <SystemScreen state={state} deployment={await deployment()} />;
 }
