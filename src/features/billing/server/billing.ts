@@ -34,7 +34,9 @@ import {
 import {
   cardKey,
   chargeToken,
+  handshake,
   iframeUrl,
+  payFirst,
   readNotice,
   tranzilaConfigured,
   type ChargeResult,
@@ -203,18 +205,22 @@ export async function startCheckout(
     // the iframe goes on to our return page, which takes the whole billing screen back to the result
     const back = (result: 'success' | 'failure') =>
       `${base}/api/billing/tranzila/return?result=${result}&checkout=${id}`;
-    const iframe = iframeUrl({
-      ref: id,
-      amount,
-      itemName,
-      customer,
-      locale,
-      urls: {
-        success: back('success'),
-        failure: back('failure'),
-        notify: `${base}/api/billing/tranzila/notify`,
+    const iframe = iframeUrl(
+      {
+        ref: id,
+        amount,
+        itemName,
+        customer,
+        locale,
+        urls: {
+          success: back('success'),
+          failure: back('failure'),
+          notify: `${base}/api/billing/tranzila/notify`,
+        },
       },
-    });
+      // the amount locked on Tranzila's side, when the terminal's password is set
+      await handshake(amount, id),
+    );
     return ok({ ok: true, iframe, checkout: id, amount });
   }
   const page = await generatePaymentLink({
@@ -518,7 +524,12 @@ export async function tranzilaNotice(fields: Record<string, string>): Promise<{
       : null;
   if (checkout.status !== 'pending' && !(checkout.status === 'failed' && card))
     return result(checkout.status);
-  const recorded = { response: notice.response, index: notice.index, last4: notice.last4 };
+  const recorded = {
+    response: notice.response,
+    index: notice.index,
+    held: notice.sum,
+    last4: notice.last4,
+  };
   if (!card) {
     await settle(checkout, 'failed', {
       eventId: `tranzila:failed:${checkout.id}`,
@@ -531,15 +542,8 @@ export async function tranzilaNotice(fields: Record<string, string>): Promise<{
   // one charge per purchase and card, whichever notice came first
   if (!(await tranzilaDb.claim(`tranzila:checkout:${checkout.id}:${cardKey(card.token)}`)))
     return result('pending');
-  const charge = await chargeToken({
-    ...card,
-    amount: Number(checkout.amount),
-    itemName: productName(checkout.product, 'he'),
-    customer:
-      notice.contact || notice.email ? { name: notice.contact ?? '', email: notice.email ?? '' } : null,
-    holderId: notice.holderId,
-    remarks: checkout.id,
-  });
+  // the form's hold taken (or the token charged) for the purchase's own amount, never the form's
+  const charge = await payFirst(card, notice, Number(checkout.amount), productName(checkout.product, 'he'));
   const payload = chargePayload(charge, { form: recorded });
   if (charge.status === 'unknown') {
     // it may have been charged: a person checks in Tranzila's dashboard before anything else happens
@@ -621,8 +625,6 @@ export async function chargeRenewals(now = Date.now()): Promise<{ paid: number; 
       expYear: due.expireYear,
       amount,
       itemName: productName(due.plan, 'he'),
-      customer: due.fullName ? { name: due.fullName, email: due.email ?? '' } : null,
-      remarks: `renewal ${due.userId}`,
     });
     if (charge.status === 'unknown') {
       await alertSupport('A Tranzila monthly charge without a clear answer', {
