@@ -1,6 +1,7 @@
 import 'server-only';
 import { createHash, createHmac, randomBytes } from 'node:crypto';
 import { serverEnv } from '@/lib/env';
+import { serviceDb } from '@/lib/supabase/server';
 
 /**
  * Tranzila (tranzila.com) — the payment provider, with two terminals:
@@ -16,14 +17,60 @@ import { serverEnv } from '@/lib/env';
  * docs/billing-setup.md lists what to set up with Tranzila.
  */
 
-export function tranzilaConfigured(): boolean {
+/** The API keys, and where they were found. */
+export interface TranzilaKeys {
+  appKey: string;
+  secret: string;
+  /** Amplify's environment variables, or the database's Vault (Supabase → Vault → Secrets) */
+  source: 'env' | 'vault';
+}
+
+/** The Vault secrets' names, in the order they are looked for (the first one set wins). */
+export const VAULT_NAMES = {
+  appKey: ['INVITES_TRANZILA_APP_KEY', 'TRANZILA_API_APP_KEY'],
+  secret: ['INVITES_TRANZILA_SECRET', 'TRANZILA_API_SECRET'],
+} as const;
+
+let vaultCache: { keys: TranzilaKeys | null; at: number } | null = null;
+/** for tests: forget what the Vault said */
+export function resetTranzilaKeys(): void {
+  vaultCache = null;
+}
+
+async function vaultKeys(): Promise<TranzilaKeys | null> {
+  const { data, error } = await serviceDb().rpc('billing_secrets', {
+    p_names: [...VAULT_NAMES.appKey, ...VAULT_NAMES.secret],
+  });
+  if (error) throw new Error(`billing_secrets: ${error.message}`);
+  const found = (data ?? {}) as Record<string, string | null>;
+  const pick = (names: readonly string[]) =>
+    names.map((n) => found[n]?.trim()).find((v): v is string => !!v) ?? null;
+  const appKey = pick(VAULT_NAMES.appKey);
+  const secret = pick(VAULT_NAMES.secret);
+  return appKey && secret ? { appKey, secret, source: 'vault' } : null;
+}
+
+/**
+ * Tranzila's API keys: from the environment (Amplify) when both are set there, else from the Vault of
+ * the database (read once and kept 10 minutes; a miss is asked again after a minute). null: payments
+ * through Tranzila are off.
+ */
+export async function tranzilaKeys(now = Date.now()): Promise<TranzilaKeys | null> {
   const env = serverEnv();
-  return !!(
-    env.INVITES_TRANZILA_APP_KEY &&
-    env.INVITES_TRANZILA_SECRET &&
-    env.INVITES_TRANZILA_TERMINAL &&
-    env.INVITES_TRANZILA_TOKEN_TERMINAL
-  );
+  if (!env.INVITES_TRANZILA_TERMINAL || !env.INVITES_TRANZILA_TOKEN_TERMINAL) return null;
+  if (env.INVITES_TRANZILA_APP_KEY && env.INVITES_TRANZILA_SECRET)
+    return { appKey: env.INVITES_TRANZILA_APP_KEY, secret: env.INVITES_TRANZILA_SECRET, source: 'env' };
+  if (vaultCache && now - vaultCache.at < (vaultCache.keys ? 600_000 : 60_000)) return vaultCache.keys;
+  const keys = await vaultKeys().catch((err) => {
+    console.error('[tranzila] reading the keys from the Vault', err);
+    return null;
+  });
+  vaultCache = { keys, at: now };
+  return keys;
+}
+
+export async function tranzilaConfigured(): Promise<boolean> {
+  return !!(await tranzilaKeys());
 }
 
 /**
@@ -31,16 +78,16 @@ export function tranzilaConfigured(): boolean {
  * HMAC-SHA256(key: secret + time + nonce, message: app key) in hex.
  */
 export function authHeaders(
+  keys: Pick<TranzilaKeys, 'appKey' | 'secret'>,
   now = Date.now(),
   nonce = randomBytes(40).toString('hex'),
 ): Record<string, string> {
-  const env = serverEnv();
   const time = String(Math.round(now / 1000));
-  const token = createHmac('sha256', env.INVITES_TRANZILA_SECRET + time + nonce)
-    .update(env.INVITES_TRANZILA_APP_KEY)
+  const token = createHmac('sha256', keys.secret + time + nonce)
+    .update(keys.appKey)
     .digest('hex');
   return {
-    'X-tranzila-api-app-key': env.INVITES_TRANZILA_APP_KEY,
+    'X-tranzila-api-app-key': keys.appKey,
     'X-tranzila-api-request-time': time,
     'X-tranzila-api-nonce': nonce,
     'X-tranzila-api-access-token': token,
@@ -197,6 +244,8 @@ export function readChargeResponse(httpStatus: number, json: unknown): ChargeRes
 /** Charges a card's token on the token terminal (POST /v1/transaction/credit_card/create). */
 export async function chargeToken(c: ChargeRequest, fetchImpl: typeof fetch = fetch): Promise<ChargeResult> {
   const env = serverEnv();
+  const keys = await tranzilaKeys();
+  if (!keys) return { status: 'unknown', error: 'Tranzila API keys are not set' };
   const amount = Math.round(c.amount * 100) / 100;
   const body = {
     terminal_name: env.INVITES_TRANZILA_TOKEN_TERMINAL,
@@ -219,7 +268,7 @@ export async function chargeToken(c: ChargeRequest, fetchImpl: typeof fetch = fe
   try {
     res = await fetchImpl(`${env.INVITES_TRANZILA_API_BASE}/v1/transaction/credit_card/create`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', accept: 'application/json', ...authHeaders() },
+      headers: { 'content-type': 'application/json', accept: 'application/json', ...authHeaders(keys) },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(30_000),
     });

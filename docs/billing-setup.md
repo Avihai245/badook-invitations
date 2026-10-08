@@ -30,7 +30,12 @@
 | `INVITES_TRANZILA_TOKEN_TERMINAL` | מסוף הטוקנים (ברירת מחדל `badookinvittok`) |
 | `INVITES_TRANZILA_TRANMODE` | מה הטופס עושה בכרטיס: `NK` (ברירת המחדל: בדיקה בלי לתפוס סכום, וטוקן), `VK` (תפיסת הסכום, J5, וטוקן) או `K` (טוקן בלי בדיקה) |
 
-ברגע ש־`INVITES_TRANZILA_APP_KEY` ו־`INVITES_TRANZILA_SECRET` מוגדרים, **כל רכישה חדשה עוברת דרך טרנזילה** (גם אם PayPlus מוגדרת). מנויים קיימים ב־PayPlus ממשיכים להתחדש שם. לפני ה־Redeploy מריצים על מסד הנתונים את `supabase/migrations/20261007020000_tranzila.sql`.
+**איפה שמים את המפתחות** (אחד מהשניים מספיק):
+
+- **Amplify** (Hosting → Environment variables): `INVITES_TRANZILA_APP_KEY` ו־`INVITES_TRANZILA_SECRET`, ואחריהם Redeploy. אם שניהם מוגדרים שם, הם קובעים.
+- **Supabase Vault** (הפרויקט Badook Invitations → Vault → Secrets): `TRANZILA_API_APP_KEY` ו־`TRANZILA_API_SECRET` (או באותם שמות כמו ב־Amplify). כשהמפתחות לא מוגדרים ב־Amplify, השרת קורא אותם מה־Vault (`billing_secrets`, רק השמות האלה ורק עם מפתח השרת), בלי Redeploy: תוך דקה.
+
+במסוף הניהול → מערכת, השורה ״תשלומים (טרנזילה)״ אומרת אם המפתחות נמצאו ואיפה (Amplify או Vault). כשהם נמצאו, **כל רכישה חדשה עוברת דרך טרנזילה** (גם אם PayPlus מוגדרת), ומנויים קיימים ב־PayPlus ממשיכים להתחדש שם. כשלא נמצאו בשום מקום, מסך החיובים אומר ״התשלום המקוון עוד לא הופעל״. המיגרציות `supabase/migrations/20261007020000_tranzila.sql` ו־`20261008010000_billing_secrets.sql` צריכות לרוץ על מסד הנתונים לפני הקוד.
 
 ### איך זה עובד
 
@@ -47,6 +52,9 @@
 1. מגדירים את המפתחות ומבצעים רכישה של חבילת הודעות קטנה בכרטיס אמיתי (או במסוף בדיקות של טרנזילה, אם יש).
 2. בודקים שהקרדיטים נוספו, שהתשלום מופיע בהיסטוריה ובממשק טרנזילה (במסוף `badookinvittok`).
 3. קונים חבילה חודשית, ובודקים שנשמר כרטיס (`select user_id, last4, expire_month, expire_year from billing_cards`).
+
+**בדיקה מקצה לקצה מקומית** (בלי כרטיס אמיתי): `tests/support/mock-tranzila.mjs` מחליף את טרנזילה (טופס הכרטיס ב־iframe, הודעת השרת, וה־API עם בדיקת החתימה), ו־`tests/e2e/tranzila.spec.ts` עובר על כל הדרך בדפדפן: חבילת הודעות, חבילה חודשית (והכרטיס נשמר), כרטיס שנדחה, והחיוב החודשי בבדיקה היומית. מריצים את השרת המקומי עם `INVITES_TRANZILA_API_BASE` ו־`INVITES_TRANZILA_IFRAME_BASE` שמצביעים על המחליף (ובלי `INVITES_BILLING_TEST_MODE`), ואז:
+`PW_TRANZILA_MOCK=http://127.0.0.1:55050 PW_BASE_URL=http://127.0.0.1:3200 npx playwright test tranzila`
 
 ## 1. מה צריך אצל PayPlus
 

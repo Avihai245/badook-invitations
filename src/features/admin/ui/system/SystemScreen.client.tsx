@@ -114,7 +114,12 @@ export function SystemScreen({ state, deployment: dep }: { state: SystemState; d
     [S.services.names.templateInvitation, dep.services.templates.invitation],
     [S.services.names.templateTable, dep.services.templates.table],
     [S.services.names.templateGallery, dep.services.templates.gallery],
-    [S.services.names.tranzila, dep.services.tranzila],
+    [
+      dep.services.tranzila
+        ? `${S.services.names.tranzila} · ${S.services.keySource[dep.services.tranzila]}`
+        : S.services.names.tranzila,
+      !!dep.services.tranzila,
+    ],
     [S.services.names.payplus, dep.services.payplus],
     [S.services.names.email, dep.services.email],
     [S.services.names.supportEmail, dep.services.supportEmail],

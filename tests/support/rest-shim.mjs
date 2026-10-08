@@ -93,6 +93,11 @@ const FUNCTIONS = new Set([
   'app_meta_get',
   'seed_upsert',
   'billing_pending_checkouts',
+  // Tranzila (features/billing/server/tranzila.ts)
+  'billing_claim',
+  'billing_card_save',
+  'billing_renewals_due',
+  'billing_secrets',
   'account_note_limit',
   'app_job_claim',
   'app_job_done',
@@ -325,7 +330,7 @@ const FUNCTIONS = new Set([
   'planning_template_get',
   'planning_template_delete',
 ]);
-const IDENT = /^p_[a-z_]+$/;
+const IDENT = /^p_[a-z0-9_]+$/;
 const JWT_SECRET = process.env.SHIM_JWT_SECRET ?? 'local-shim-jwt-secret-for-tests-only';
 const STORAGE_DIR = process.env.SHIM_STORAGE_DIR ?? 'tests/.artifacts/storage';
 const TOKEN_TTL = 3600;

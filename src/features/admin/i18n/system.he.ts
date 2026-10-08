@@ -57,6 +57,7 @@ export const systemHe = {
     aiChatProviderLabel: 'עוזר הצ׳אט פועל דרך',
     aiChatProviders: { openai: 'OpenAI', anthropic: 'Anthropic' },
     billing: 'מצב התשלומים',
+    keySource: { env: 'המפתחות ב־Amplify', vault: 'המפתחות ב־Vault' },
     billingModes: { tranzila: 'טרנזילה', payplus: 'PayPlus', test: 'עמוד תשלום לבדיקה', off: 'כבוי' },
     langs: 'שפות תבנית הוואטסאפ',
     langsHelp: 'INVITES_WHATSAPP_TEMPLATE_LANGS: השפות שבהן Meta אישרה את התבניות.',

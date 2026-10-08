@@ -11,7 +11,7 @@ const NO_STORE = { 'cache-control': 'no-store' };
  * Handled in features/billing/server/billing.ts (tranzilaNotice).
  */
 export async function POST(request: Request) {
-  if (!tranzilaConfigured()) return new Response('Not found', { status: 404, headers: NO_STORE });
+  if (!(await tranzilaConfigured())) return new Response('Not found', { status: 404, headers: NO_STORE });
   const fields = await requestFields(request);
   if (!fields) return new Response('Too large', { status: 413, headers: NO_STORE });
   try {

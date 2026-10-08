@@ -125,12 +125,12 @@ export const checkoutDb = {
 };
 
 export type BillingMode = 'tranzila' | 'payplus' | 'test' | 'off';
-export function billingMode(): BillingMode {
+export async function billingMode(): Promise<BillingMode> {
   const env = serverEnv();
   // the test payment page never runs on a public address, even if the flag is left on by mistake
   const local = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(env.INVITES_PUBLIC_BASE_URL);
   if (env.INVITES_BILLING_TEST_MODE && local) return 'test';
-  if (tranzilaConfigured()) return 'tranzila';
+  if (await tranzilaConfigured()) return 'tranzila';
   return payplusConfigured() ? 'payplus' : 'off';
 }
 
@@ -177,7 +177,7 @@ export async function startCheckout(
   const parsed = CheckoutSchema.safeParse(raw);
   if (!parsed.success) return fail(400, 'invalid');
   const product = parsed.data.product as Product;
-  const mode = billingMode();
+  const mode = await billingMode();
   if (mode === 'off') return fail(503, 'not_configured');
   const account = await loadAccount(user);
   // the plan in force decides: a plan that lapsed can be bought again, and so can one whose monthly
@@ -571,7 +571,8 @@ export async function tranzilaNotice(fields: Record<string, string>): Promise<{
       }),
     );
   await settle(checkout, 'paid', {
-    eventId: `tranzila:${charge.transactionId ?? checkout.id}`,
+    // our own key (a purchase is paid once); Tranzila's transaction id is in the payload
+    eventId: `tranzila:paid:${checkout.id}`,
     // the purchase that started this monthly plan
     subscriptionId: isPlan(checkout.product) ? `tranzila:${checkout.id}` : null,
     customerId: null,
@@ -636,7 +637,8 @@ export async function chargeRenewals(now = Date.now()): Promise<{ paid: number; 
     }
     const ok = charge.status === 'approved';
     await accountDb.billingApply({
-      id: ok ? `tranzila:${charge.transactionId ?? key}` : key,
+      // the attempt's own key (claimed once); Tranzila's transaction id is in the payload
+      id: key,
       provider: 'tranzila',
       type: ok ? 'renewal.paid' : 'renewal.failed',
       userId: due.userId,
@@ -686,7 +688,7 @@ const TestSchema = z.strictObject({ id: z.uuid(), outcome: z.enum(['paid', 'fail
 
 /** POST /api/billing/test-complete — the test payment page's buttons. 404 outside test mode. */
 export async function testComplete(userId: string, raw: unknown): Promise<ApiResult> {
-  if (billingMode() !== 'test') return fail(404, 'not_found');
+  if ((await billingMode()) !== 'test') return fail(404, 'not_found');
   const parsed = TestSchema.safeParse(raw);
   if (!parsed.success) return fail(400, 'invalid');
   const checkout = await checkoutDb.get(parsed.data.id, userId);
@@ -702,7 +704,7 @@ export async function testComplete(userId: string, raw: unknown): Promise<ApiRes
 
 /** POST /api/billing/test-renew — a monthly renewal of the signed-in user's test subscription. */
 export async function testRenew(user: Pick<User, 'id' | 'email'>, raw: unknown): Promise<ApiResult> {
-  if (billingMode() !== 'test') return fail(404, 'not_found');
+  if ((await billingMode()) !== 'test') return fail(404, 'not_found');
   const parsed = z.strictObject({ paid: z.boolean() }).safeParse(raw);
   if (!parsed.success) return fail(400, 'invalid');
   const account = await loadAccount(user);
@@ -781,7 +783,7 @@ export async function loadBillingPage(
       price: packPriceIls(count, env.INVITES_WHATSAPP_PRICE_USD, env.INVITES_USD_TO_ILS),
     })),
     messagePrice: messagePriceIls(env.INVITES_WHATSAPP_PRICE_USD, env.INVITES_USD_TO_ILS),
-    mode: billingMode(),
+    mode: await billingMode(),
     history,
     returned,
   };
@@ -815,10 +817,10 @@ async function reconcilePending(): Promise<number> {
  * how many plans are overdue.
  */
 export async function reportOverdue(): Promise<number> {
-  if (billingMode() === 'payplus')
+  if ((await billingMode()) === 'payplus')
     await reconcilePending().catch((err) => console.error('[billing] pending checkouts', err));
   // Tranzila's monthly charges are ours to make (also for plans bought before PayPlus took over again)
-  if (tranzilaConfigured())
+  if (await tranzilaConfigured())
     await chargeRenewals().catch((err) => console.error('[billing] tranzila renewals', err));
   const overdue = await rpc<{ userId: string; email: string; plan: string; renewsAt: string }[]>(
     'billing_overdue',

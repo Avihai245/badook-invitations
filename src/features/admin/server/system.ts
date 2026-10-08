@@ -1,7 +1,7 @@
 import 'server-only';
 import { billingMode, type BillingMode } from '@/features/billing/server/billing';
 import { payplusConfigured } from '@/features/billing/server/payplus';
-import { tranzilaConfigured } from '@/features/billing/server/tranzila';
+import { tranzilaKeys } from '@/features/billing/server/tranzila';
 import { seedVersion } from '@/features/invitations/templates/seed-data';
 import { dailyDue } from '@/features/jobs/schedule';
 import { chatProvider } from '@/features/support/chat';
@@ -20,7 +20,8 @@ export interface Deployment {
     whatsapp: boolean;
     whatsappWebhook: boolean;
     templates: { invitation: boolean; table: boolean; gallery: boolean };
-    tranzila: boolean;
+    /** Tranzila's API keys: where they were found (null: nowhere) */
+    tranzila: 'env' | 'vault' | null;
     payplus: boolean;
     billing: BillingMode;
     email: boolean;
@@ -46,8 +47,9 @@ export interface Deployment {
 
 let codeSeed: string | null = null;
 
-export function deployment(now = new Date()): Deployment {
+export async function deployment(now = new Date()): Promise<Deployment> {
   const env = serverEnv();
+  const [tranzila, billing] = await Promise.all([tranzilaKeys(), billingMode()]);
   codeSeed ??= seedVersion();
   const nextDaily = new Date(dailyDue(now).getTime() + 86_400_000);
   return {
@@ -60,9 +62,9 @@ export function deployment(now = new Date()): Deployment {
         table: !!env.INVITES_WHATSAPP_TABLE_TEMPLATE,
         gallery: !!env.INVITES_WHATSAPP_GALLERY_TEMPLATE,
       },
-      tranzila: tranzilaConfigured(),
+      tranzila: tranzila?.source ?? null,
       payplus: payplusConfigured(),
-      billing: billingMode(),
+      billing,
       email: !!(env.INVITES_EMAIL_API_KEY && env.INVITES_EMAIL_FROM),
       supportEmail: !!env.INVITES_SUPPORT_EMAIL,
       ai: !!(env.ANTHROPIC_API_KEY && env.INVITES_AI_MODEL),
