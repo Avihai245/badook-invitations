@@ -134,7 +134,9 @@ export function BillingScreen({
           ? b.errors.already
           : res.body?.code === 'not_configured'
             ? b.errors.not_configured
-            : b.errors.server,
+            : res.body?.code === 'provider_unavailable'
+              ? b.errors.provider_unavailable
+              : b.errors.server,
       variant: 'danger',
     });
   };

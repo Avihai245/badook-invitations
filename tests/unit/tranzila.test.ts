@@ -90,6 +90,8 @@ const tranzila = {
   answers: [] as (() => Response | Promise<Response>)[],
   /** the handshake's answer (tranzila71dt.cgi) */
   handshake: 'thtk=hs-token-1' as string,
+  /** the card form's status (iframenew.php): 404 when the terminal has no hosted page */
+  form: 200,
 };
 const answer = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -107,6 +109,7 @@ const declined = () =>
   });
 const fetchMock = vi.fn(async (url: string, _init?: RequestInit) => {
   if (url.endsWith('/cgi-bin/tranzila71dt.cgi')) return new Response(tranzila.handshake);
+  if (url.includes('/iframenew.php?')) return new Response('<html>form</html>', { status: tranzila.form });
   if (!url.endsWith('/v1/transaction/credit_card/create')) return answer({ error_code: 404 }, 404);
   const next = tranzila.answers.shift();
   return next ? next() : approved();
@@ -214,6 +217,7 @@ beforeEach(() => {
   state.calls = [];
   tranzila.answers = [];
   tranzila.handshake = 'thtk=hs-token-1';
+  tranzila.form = 200;
   fetchMock.mockClear();
   sendEmail.mockClear();
 });
@@ -415,7 +419,34 @@ describe('Tranzila: buying', () => {
       `https://invitations.example.com/api/billing/tranzila/return?result=success&checkout=${body.checkout}`,
     );
     // nothing is charged until the form gives a card
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(charges()).toEqual([]);
+  });
+
+  it('a terminal without Tranzila’s card form: a clear refusal (no broken page), and support is told', async () => {
+    const { startCheckout } = await billing();
+    const { resetFormCheck } = await client();
+    resetFormCheck();
+    tranzila.form = 404;
+    const res = await startCheckout(
+      { id: USER, email: 'dana@example.com', user_metadata: {} },
+      { product: 'pro' },
+      'he',
+    );
+    expect(res).toEqual({ status: 503, body: { ok: false, code: 'provider_unavailable' } });
+    expect(calls('checkout_create')).toEqual([]);
+    expect(alerts()).toEqual([expect.stringContaining('no card form')]);
+    // remembered a few minutes; once Tranzila turns it on, purchases open again
+    fetchMock.mockClear();
+    tranzila.form = 200;
+    await startCheckout({ id: USER, email: 'dana@example.com', user_metadata: {} }, { product: 'pro' }, 'he');
+    expect(fetchMock.mock.calls.filter(([u]) => String(u).includes('iframenew.php'))).toEqual([]);
+    resetFormCheck();
+    const open = await startCheckout(
+      { id: USER, email: 'dana@example.com', user_metadata: {} },
+      { product: 'pro' },
+      'he',
+    );
+    expect(open.status).toBe(200);
   });
 
   it('the form’s hold is taken on the iframe terminal, for the purchase’s own amount: the plan is given', async () => {

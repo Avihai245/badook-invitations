@@ -15,6 +15,9 @@
 
 ### מה צריך אצל טרנזילה
 
+> **בדיקה מהירה שהטופס פעיל במסוף:** `https://directng.tranzila.com/badookinvit/iframenew.php?sum=1.00&currency=1&cred_type=1&tranmode=VK` צריך להציג טופס כרטיס. אם הוא מציג ״הדף שחיפשת לא נמצא״, שירות דף הסליקה (Tranzila Direct / iframe) לא מופעל במסוף, ורק טרנזילה יכולה להפעיל אותו. עד אז המערכת לא פותחת את החלון: הלקוח מקבל הודעה ש״עמוד התשלום של חברת הסליקה לא זמין כרגע״, והתמיכה מקבלת מייל.
+
+
 1. שני המסופים פעילים, ובמסוף ה־iframe **טוקנים מופעלים** (`TranzilaTK`). מסוף הטוקנים צריך לאשר חיוב בטוקן **בלי CVV** (ובלי ת״ז, אם אפשר: הת״ז מועברת רק בתשלום הראשון ולא נשמרת).
 2. **מפתחות API** (ממשק טרנזילה → הגדרות → API): Application key (ציבורי) ו־Secret (פרטי). כל קריאה חתומה: `X-tranzila-api-app-key`, `X-tranzila-api-request-time`, `X-tranzila-api-nonce` ו־`X-tranzila-api-access-token` = HMAC-SHA256 של ה־app key במפתח secret + time + nonce.
 3. **הכתובות** שהמסוף צריך לאשר (אם טרנזילה מגבילה): `https://invitations.badooks.com/api/billing/tranzila/notify` (הודעת שרת) ו־`https://invitations.badooks.com/api/billing/tranzila/return` (העמוד שה־iframe עובר אליו בהצלחה ובכישלון).

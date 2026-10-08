@@ -133,6 +133,34 @@ const fromBenid = (b: string | null) =>
 /** Shekels → Tranzila's `sum` ("49.00"). */
 export const tranzilaSum = (amount: number) => (Math.round(amount * 100) / 100).toFixed(2);
 
+let formCache: { ok: boolean; at: number } | null = null;
+/** for tests: forget what Tranzila said about the form */
+export function resetFormCheck(): void {
+  formCache = null;
+}
+
+/**
+ * Whether Tranzila serves the card form for the iframe terminal: a terminal without Tranzila's hosted
+ * page (Tranzila Direct) answers "הדף שחיפשת לא נמצא" (404), and a buyer would see that in the dialog.
+ * Remembered an hour when it is there, a few minutes when it isn't; a check that can't be made (a
+ * timeout) counts as there — the form itself then says what is wrong.
+ */
+export async function formAvailable(now = Date.now(), fetchImpl: typeof fetch = fetch): Promise<boolean> {
+  if (formCache && now - formCache.at < (formCache.ok ? 3_600_000 : 300_000)) return formCache.ok;
+  const env = serverEnv();
+  const url = `${env.INVITES_TRANZILA_IFRAME_BASE}/${encodeURIComponent(env.INVITES_TRANZILA_TERMINAL)}/iframenew.php?sum=1.00&currency=1&cred_type=1&tranmode=${env.INVITES_TRANZILA_TRANMODE}`;
+  let ok = true;
+  try {
+    const res = await fetchImpl(url, { method: 'GET', signal: AbortSignal.timeout(8_000) });
+    ok = res.status !== 404;
+  } catch (err) {
+    console.error('[tranzila] checking the card form', err instanceof Error ? err.message : err);
+    return true;
+  }
+  formCache = { ok, at: now };
+  return ok;
+}
+
 /**
  * The handshake: the amount locked on Tranzila's side before the form opens (thtk), so the payer can't
  * change the sum on the iframe's address. Needs the iframe terminal's TranzilaPW; best effort — null
