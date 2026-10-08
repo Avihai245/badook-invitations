@@ -170,6 +170,16 @@ const ServerEnvSchema = z.object({
     .url()
     .default('https://secure5.tranzila.com')
     .transform((u) => u.replace(/\/+$/, '')),
+  // Apple Pay and Google Pay buttons in the iframe (apple_pay=1, google_pay=1): turn on only after
+  // Tranzila enables them on the iframe terminal (and, for Apple Pay, registers our domain)
+  INVITES_TRANZILA_APPLE_PAY: flag(false),
+  INVITES_TRANZILA_GOOGLE_PAY: flag(false),
+  // Apple Pay's domain file (/.well-known/apple-developer-merchantid-domain-association) as Tranzila
+  // gives it; empty: taken from Tranzila's public copy
+  INVITES_TRANZILA_APPLE_PAY_FILE: z.string().trim().default(''),
+  INVITES_TRANZILA_APPLE_PAY_FILE_URL: z
+    .url()
+    .default('https://api.tranzila.com/assets/apple_pay/merchant_authentication_file.zip'),
   // local / end-to-end tests only: a fake checkout page instead of PayPlus
   INVITES_BILLING_TEST_MODE: flag(false),
   // monthly plan prices in shekels, VAT included

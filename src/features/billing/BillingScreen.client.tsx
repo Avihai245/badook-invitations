@@ -530,6 +530,8 @@ export function BillingScreen({
             title={b.pay.frame}
             data-testid="payment-frame"
             allow="payment"
+            // Apple Pay and Google Pay inside Tranzila's form (older browsers read this instead of allow)
+            {...{ allowpaymentrequest: 'true' }}
             className="mt-4 block h-[560px] max-h-[70vh] w-full rounded-card border border-line bg-white"
           />
           <p className="mt-3 flex items-center gap-2 text-[12px] text-muted">

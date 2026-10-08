@@ -277,6 +277,35 @@ describe('Tranzila: the API and the iframe', () => {
     expect(p.thtk).toBeUndefined();
   });
 
+  it('the wallets: Apple Pay and Google Pay in the form only once they are turned on', async () => {
+    const request = {
+      ref: CHECKOUT,
+      amount: 16,
+      itemName: 'x',
+      customer: { name: '', email: '' },
+      locale: 'he' as const,
+      urls: { success: 'https://x.test/ok', failure: 'https://x.test/no', notify: 'https://x.test/n' },
+    };
+    const off = new URL((await client()).iframeUrl(request)).searchParams;
+    expect(off.get('apple_pay')).toBeNull();
+    expect(off.get('google_pay')).toBeNull();
+    vi.stubEnv('INVITES_TRANZILA_APPLE_PAY', '1');
+    vi.stubEnv('INVITES_TRANZILA_GOOGLE_PAY', 'true');
+    vi.resetModules();
+    try {
+      const on = new URL((await client()).iframeUrl(request)).searchParams;
+      expect(on.get('apple_pay')).toBe('1');
+      expect(on.get('google_pay')).toBe('1');
+      // the same purchase: the sum held and a token for the monthly charges
+      expect(on.get('tranmode')).toBe('VK');
+      expect(on.get('sum')).toBe('16.00');
+    } finally {
+      vi.stubEnv('INVITES_TRANZILA_APPLE_PAY', '');
+      vi.stubEnv('INVITES_TRANZILA_GOOGLE_PAY', '');
+      vi.resetModules();
+    }
+  });
+
   it('the handshake locks the sum, with the terminal’s password (and is skipped without it)', async () => {
     const { handshake } = await client();
     expect(await handshake(49, CHECKOUT)).toBeNull();

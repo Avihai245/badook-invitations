@@ -220,6 +220,9 @@ export function iframeUrl(r: IframeRequest, thtk: string | null = null): string 
     ...(r.customer.email ? { email: r.customer.email } : {}),
     ...(r.customer.phone ? { phone: r.customer.phone } : {}),
     ...(thtk ? { thtk } : {}),
+    // the wallets, once Tranzila has turned them on for the terminal
+    ...(env.INVITES_TRANZILA_APPLE_PAY ? { apple_pay: '1' } : {}),
+    ...(env.INVITES_TRANZILA_GOOGLE_PAY ? { google_pay: '1' } : {}),
   });
   return `${env.INVITES_TRANZILA_IFRAME_BASE}/${encodeURIComponent(env.INVITES_TRANZILA_TERMINAL)}/iframenew.php?${params}`;
 }
