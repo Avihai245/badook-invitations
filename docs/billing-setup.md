@@ -34,12 +34,27 @@
 | `INVITES_TRANZILA_TRANMODE` | מה הטופס עושה בכרטיס: `VK` (ברירת המחדל: תפיסת הסכום וטוקן; השרת גובה את התפיסה), `NK` (בדיקה בלי לתפוס סכום, וטוקן; השרת מחייב את הטוקן) או `K` |
 | `INVITES_TRANZILA_PW` | סיסמת TranzilaPW של מסוף ה־iframe (לא חובה): **נועלת את הסכום** בטופס מראש (handshake, `thtk`) כך שאי אפשר לשנות אותו בכתובת. אפשר גם ב־Vault בשם `TRANZILA_TERMINAL_PW`. בלעדיה הטופס נפתח בלי נעילה, והשרת ממילא גובה רק את הסכום של הרכישה |
 
+| `INVITES_TRANZILA_APPLE_PAY` / `INVITES_TRANZILA_GOOGLE_PAY` | `1` מוסיף לטופס כפתור **Apple Pay** / **Google Pay** (`apple_pay=1`, `google_pay=1`). להפעיל **רק אחרי** שטרנזילה הפעילה אותם במסוף `badookinvit` (ולאפל פיי: רשמה את הדומיין שלנו). ברירת מחדל: כבוי |
+| `INVITES_TRANZILA_APPLE_PAY_FILE` | קובץ אימות הדומיין של Apple Pay, אם טרנזילה נותנת קובץ משלה (לא חובה; בלעדיו מוגש העותק הציבורי של טרנזילה) |
+
 **איפה שמים את המפתחות** (אחד מהשניים מספיק):
 
 - **Amplify** (Hosting → Environment variables): `INVITES_TRANZILA_APP_KEY` ו־`INVITES_TRANZILA_SECRET`, ואחריהם Redeploy. אם שניהם מוגדרים שם, הם קובעים.
 - **Supabase Vault** (הפרויקט Badook Invitations → Vault → Secrets): `TRANZILA_API_APP_KEY` ו־`TRANZILA_API_SECRET`, ואם רוצים נעילת סכום גם `TRANZILA_TERMINAL_PW` (או באותם שמות כמו ב־Amplify). כשהמפתחות לא מוגדרים ב־Amplify, השרת קורא אותם מה־Vault (`billing_secrets`, רק השמות האלה ורק עם מפתח השרת), בלי Redeploy: תוך דקה.
 
 במסוף הניהול → מערכת, השורה ״תשלומים (טרנזילה)״ אומרת אם המפתחות נמצאו ואיפה (Amplify או Vault). כשהם נמצאו, **כל רכישה חדשה עוברת דרך טרנזילה** (גם אם PayPlus מוגדרת), ומנויים קיימים ב־PayPlus ממשיכים להתחדש שם. כשלא נמצאו בשום מקום, מסך החיובים אומר ״התשלום המקוון עוד לא הופעל״. המיגרציות `supabase/migrations/20261007020000_tranzila.sql`, `20261008010000_billing_secrets.sql` ו־`20261008020000_billing_secrets_terminal_pw.sql` צריכות לרוץ על מסד הנתונים לפני הקוד.
+
+### Apple Pay ו־Google Pay
+
+הכפתורים מופיעים **בתוך טופס התשלום של טרנזילה** (אותו iframe, אותו מסלול: תפיסת הסכום, טוקן, גבייה בשרת), כך שאין צורך בשינוי בלוגיקת התשלום. מה שכבר מוכן בצד שלנו:
+
+- ה־iframe מאפשר תשלום בארנק (`allow="payment"` ו־`allowpaymentrequest`).
+- קובץ אימות הדומיין של אפל מוגש ב־`/.well-known/apple-developer-merchantid-domain-association` (מנותב ל־`/api/billing/tranzila/apple-pay-domain`): מ־`INVITES_TRANZILA_APPLE_PAY_FILE` אם הוגדר, אחרת מהעותק הציבורי של טרנזילה (`api.tranzila.com/assets/apple_pay/merchant_authentication_file.zip`).
+- `tranmode=VK` (ברירת המחדל) נתמך באפל פיי; `NK`/`K` לא (לפי התיעוד של טרנזילה: אפל פיי לא תומך בבדיקה בלבד או ביצירת טוקן בלבד).
+
+להפעלה: (1) לבקש מטרנזילה להפעיל Apple Pay ו־Google Pay במסוף `badookinvit` ולרשום את הדומיין שלנו לאפל פיי; (2) לוודא שהכתובת `https://<הדומיין>/.well-known/apple-developer-merchantid-domain-association` מחזירה את הקובץ; (3) להגדיר ב־Amplify `INVITES_TRANZILA_APPLE_PAY=1` ו־`INVITES_TRANZILA_GOOGLE_PAY=1` ו־Redeploy.
+
+**מנוי חודשי בארנק**: תלוי בכך שטרנזילה מחזירה `TranzilaTK` גם בתשלום בארנק, ושאפשר לחייב אותו במסוף `badookinvittok`. השרת שלנו גובה את התפיסה ומחייב כל חודש **דרך הטוקן**, ולכן בלי טוקן הרכישה נרשמת כנכשלה (שום דבר לא נגבה, והתפיסה משתחררת מעצמה). לאמת מול טרנזילה לפני ההפעלה.
 
 ### איך זה עובד
 

@@ -205,6 +205,11 @@ const nextConfig: NextConfig = {
           destination: '/i/:slug/:lang',
         },
         { source: '/i/:slug', destination: '/i/:slug/default' },
+        // Apple Pay's domain file (Apple Pay in Tranzila's form): a route, since the file is Tranzila's
+        {
+          source: '/.well-known/apple-developer-merchantid-domain-association',
+          destination: '/api/billing/tranzila/apple-pay-domain',
+        },
       ],
     };
   },
