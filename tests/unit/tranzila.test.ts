@@ -88,6 +88,8 @@ vi.mock('@/lib/supabase/server', () => ({ serviceDb: () => ({ rpc }) }));
 const tranzila = {
   /** what the next charges answer, in turn (then approved) */
   answers: [] as (() => Response | Promise<Response>)[],
+  /** the handshake's answer (tranzila71dt.cgi) */
+  handshake: 'thtk=hs-token-1' as string,
 };
 const answer = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -104,15 +106,19 @@ const declined = () =>
     transaction_result: { processor_response_code: '004', transaction_id: 9002 },
   });
 const fetchMock = vi.fn(async (url: string, _init?: RequestInit) => {
+  if (url.endsWith('/cgi-bin/tranzila71dt.cgi')) return new Response(tranzila.handshake);
   if (!url.endsWith('/v1/transaction/credit_card/create')) return answer({ error_code: 404 }, 404);
   const next = tranzila.answers.shift();
   return next ? next() : approved();
 });
+const BENID = CHECKOUT.replace(/-/g, '');
 const charges = () =>
-  fetchMock.mock.calls.map(([, init]) => ({
-    body: JSON.parse(String(init?.body)) as Record<string, unknown>,
-    headers: init?.headers as Record<string, string>,
-  }));
+  fetchMock.mock.calls
+    .filter(([url]) => url.endsWith('/v1/transaction/credit_card/create'))
+    .map(([, init]) => ({
+      body: JSON.parse(String(init?.body)) as Record<string, unknown>,
+      headers: init?.headers as Record<string, string>,
+    }));
 
 function checkout(over: Partial<Checkout> = {}): Checkout {
   return {
@@ -150,20 +156,20 @@ function account(over: Partial<Account> = {}): Account {
   };
 }
 
-/** What the iframe sends to the notify address (a form), for our purchase. */
+/** What the iframe sends to the notify address (a form), for our purchase: a hold (VK) of its amount. */
 function form(over: Record<string, string> = {}): Record<string, string> {
   return {
     Response: '000',
-    sum: '1.00', // what the form says is never what is charged
+    sum: '49.00',
     TranzilaTK: 'Z5f3c1a2b3c4d5e6f71234',
     expmonth: '08',
     expyear: '29',
     ccno: '1234',
-    myid: '123456782',
+    index: '77',
+    ConfirmationCode: '0123456',
     contact: 'Dana',
     email: 'dana@example.com',
-    index: '77',
-    badook_checkout: CHECKOUT,
+    benid: BENID,
     ...over,
   };
 }
@@ -207,6 +213,7 @@ beforeEach(() => {
   state.vault = {};
   state.calls = [];
   tranzila.answers = [];
+  tranzila.handshake = 'thtk=hs-token-1';
   fetchMock.mockClear();
   sendEmail.mockClear();
 });
@@ -245,13 +252,14 @@ describe('Tranzila: the API and the iframe', () => {
         urls: { success: 'https://x.test/ok', failure: 'https://x.test/no', notify: 'https://x.test/n' },
       }),
     );
-    expect(url.origin + url.pathname).toBe('https://direct.tranzila.com/badookinvit/iframenew.php');
+    // directng: Tranzila's current host for the form (direct.tranzila.com answers "page not found")
+    expect(url.origin + url.pathname).toBe('https://directng.tranzila.com/badookinvit/iframenew.php');
     const p = Object.fromEntries(url.searchParams);
     expect(p).toMatchObject({
       sum: '49.00',
       currency: '1',
       cred_type: '1',
-      tranmode: 'NK',
+      tranmode: 'VK',
       lang: 'il',
       pdesc: 'חבילת Badook Pro',
       contact: 'Dana',
@@ -260,8 +268,53 @@ describe('Tranzila: the API and the iframe', () => {
       success_url_address: 'https://x.test/ok',
       fail_url_address: 'https://x.test/no',
       notify_url_address: 'https://x.test/n',
-      badook_checkout: CHECKOUT,
+      benid: BENID,
     });
+    expect(p.thtk).toBeUndefined();
+  });
+
+  it('the handshake locks the sum, with the terminal’s password (and is skipped without it)', async () => {
+    const { handshake } = await client();
+    expect(await handshake(49, CHECKOUT)).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+    vi.stubEnv('INVITES_TRANZILA_PW', 'tz-terminal-pw');
+    vi.resetModules();
+    try {
+      const fresh = await client();
+      expect(await fresh.handshake(49, CHECKOUT)).toBe('hs-token-1');
+      const [url, init] = fetchMock.mock.calls[0]!;
+      expect(url).toBe('https://secure5.tranzila.com/cgi-bin/tranzila71dt.cgi');
+      expect(Object.fromEntries(new URLSearchParams(String(init?.body)))).toEqual({
+        supplier: 'badookinvit',
+        TranzilaPW: 'tz-terminal-pw',
+        sum: '49.00',
+        currency: '1',
+        op: '1',
+        order: BENID,
+      });
+      // Tranzila refusing it (an HTML page) or not answering: no thtk, the form still opens
+      tranzila.handshake = '<html><body>Transactions are not allowed from this location</body></html>';
+      expect(await fresh.handshake(49, CHECKOUT)).toBeNull();
+      const { iframeUrl } = fresh;
+      const withToken = new URL(
+        iframeUrl(
+          {
+            ref: CHECKOUT,
+            amount: 49,
+            itemName: 'x',
+            customer: { name: '', email: '' },
+            locale: 'en',
+            urls: { success: 'https://x.test/ok', failure: 'https://x.test/no', notify: 'https://x.test/n' },
+          },
+          'hs-token-1',
+        ),
+      ).searchParams;
+      expect(withToken.get('thtk')).toBe('hs-token-1');
+      expect(withToken.get('lang')).toBe('us');
+    } finally {
+      vi.stubEnv('INVITES_TRANZILA_PW', '');
+      vi.resetModules();
+    }
   });
 
   it('reads what the iframe sends back', async () => {
@@ -274,10 +327,9 @@ describe('Tranzila: the API and the iframe', () => {
       expMonth: 8,
       expYear: 2029,
       last4: '1234',
-      holderId: '123456782',
       index: '77',
-      contact: 'Dana',
-      email: 'dana@example.com',
+      confirmationCode: '0123456',
+      sum: 49,
     });
     // expdate instead of expmonth/expyear; a declined form; garbage
     expect(readNotice(form({ expmonth: '', expyear: '', expdate: '1130' }))).toMatchObject({
@@ -285,31 +337,58 @@ describe('Tranzila: the API and the iframe', () => {
       expYear: 2030,
     });
     expect(readNotice(form({ Response: '033' })).ok).toBe(false);
-    expect(readNotice({ badook_checkout: 'x; drop', TranzilaTK: 'a b', expmonth: '13' })).toMatchObject({
+    expect(readNotice({ benid: 'x; drop', TranzilaTK: 'a b', expmonth: '13', index: '7a' })).toMatchObject({
       ok: false,
       checkoutId: null,
       token: null,
       expMonth: null,
+      index: null,
     });
   });
 
   it('reads the API’s answers: approved, declined, refused, and unclear', async () => {
     const { readChargeResponse } = await client();
+    const j = (v: unknown) => JSON.stringify(v);
     expect(
-      readChargeResponse(200, {
-        error_code: 0,
-        transaction_result: { processor_response_code: '000', transaction_id: 5, auth_number: '77' },
-      }),
+      readChargeResponse(
+        200,
+        j({
+          error_code: 0,
+          transaction_result: { processor_response_code: '000', transaction_id: 5, auth_number: '77' },
+        }),
+      ),
     ).toEqual({ status: 'approved', transactionId: '5', authNumber: '77', code: '000' });
+    // the processor's code as a number: 0 is 000, approved
     expect(
-      readChargeResponse(200, { error_code: 0, transaction_result: { processor_response_code: '004' } }),
+      readChargeResponse(200, j({ error_code: 0, transaction_result: { processor_response_code: 0 } })),
+    ).toMatchObject({ status: 'approved', code: '000' });
+    expect(
+      readChargeResponse(200, j({ error_code: 0, transaction_result: { processor_response_code: 4 } })),
     ).toMatchObject({ status: 'declined', code: '004' });
-    expect(readChargeResponse(401, { error_code: 401, message: 'Unauthorized' })).toMatchObject({
+    // Tranzila refusing the request (its keys, a field, no such card): nothing taken
+    expect(readChargeResponse(401, j({ error_code: 401, message: 'Unauthorized' }))).toMatchObject({
       status: 'declined',
+      code: 'API_401',
       message: 'Unauthorized',
     });
-    expect(readChargeResponse(502, null).status).toBe('unknown');
-    expect(readChargeResponse(503, { error_code: 1 }).status).toBe('unknown');
+    expect(
+      readChargeResponse(
+        200,
+        j({ error_code: 20401, message: 'Credit card fetching failed Z5f3c1a2b3c4d5e6' }),
+      ),
+    ).toEqual({ status: 'declined', code: 'API_20401', message: 'Credit card fetching failed [redacted]' });
+    expect(
+      readChargeResponse(200, '<html><body>Transactions are not allowed from this location</body></html>'),
+    ).toEqual({
+      status: 'declined',
+      code: 'REFUSED',
+      message: 'Transactions are not allowed from this location',
+    });
+    // no clear answer: the card may have been charged
+    expect(readChargeResponse(502, '<html>Bad gateway</html>').status).toBe('unknown');
+    expect(readChargeResponse(200, 'not json').status).toBe('unknown');
+    expect(readChargeResponse(503, j({ error_code: 1 })).status).toBe('unknown');
+    expect(readChargeResponse(200, j({ error_code: 0, message: 'Success' })).status).toBe('unknown');
   });
 });
 
@@ -328,7 +407,7 @@ describe('Tranzila: buying', () => {
     expect(body.amount).toBe(149);
     expect(calls('checkout_create')[0]).toMatchObject({ p_product: 'business', p_provider: 'tranzila' });
     const p = new URL(body.iframe).searchParams;
-    expect(p.get('badook_checkout')).toBe(body.checkout);
+    expect(p.get('benid')).toBe(body.checkout.replace(/-/g, ''));
     expect(p.get('sum')).toBe('149.00');
     expect(p.get('lang')).toBe('us');
     expect(p.get('notify_url_address')).toBe('https://invitations.example.com/api/billing/tranzila/notify');
@@ -339,20 +418,23 @@ describe('Tranzila: buying', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('the card’s token is charged on the token terminal for the purchase’s own amount: the plan is given', async () => {
+  it('the form’s hold is taken on the iframe terminal, for the purchase’s own amount: the plan is given', async () => {
     const { tranzilaNotice } = await billing();
     expect(await tranzilaNotice(form())).toEqual({ outcome: 'paid', checkoutId: CHECKOUT });
     const [charge] = charges();
-    expect(charge!.body).toMatchObject({
-      terminal_name: 'badookinvittok',
-      txn_type: 'debit',
+    // exactly the request Tranzila takes (the fields the working Badook Events integration sends)
+    expect(charge!.body).toEqual({
+      terminal_name: 'badookinvit',
+      txn_type: 'force',
       txn_currency_code: 'ILS',
+      payment_plan: 1,
       card_number: 'Z5f3c1a2b3c4d5e6f71234',
       expire_month: 8,
       expire_year: 2029,
-      card_holder_id: '123456782',
-      items: [{ unit_price: 49, units_number: 1 }],
-      remarks: CHECKOUT,
+      items: [{ name: 'חבילת Badook Pro', type: 'I', unit_price: 49, units_number: 1, price_type: 'G' }],
+      response_language: 'english',
+      reference_txn_id: 77,
+      authorization_number: '0123456',
     });
     expect(charge!.headers['X-tranzila-api-app-key']).toBe(APP_KEY);
     // the plan renews with this card
@@ -391,11 +473,40 @@ describe('Tranzila: buying', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it('no hold of this amount on the form (another sum, or tranmode NK): the token is charged instead', async () => {
+    const { tranzilaNotice } = await billing();
+    expect((await tranzilaNotice(form({ sum: '1.00' }))).outcome).toBe('paid');
+    expect(charges()[0]!.body).toMatchObject({
+      terminal_name: 'badookinvittok',
+      txn_type: 'debit',
+      items: [{ unit_price: 49 }],
+    });
+    expect(charges()[0]!.body.reference_txn_id).toBeUndefined();
+  });
+
+  it('Tranzila refuses the capture as a request: the token is charged, and the hold let go', async () => {
+    tranzila.answers = [() => answer({ error_code: 20112, message: 'Original transaction not found' })];
+    const { tranzilaNotice } = await billing();
+    expect((await tranzilaNotice(form())).outcome).toBe('paid');
+    expect(charges().map((c) => [c.body.terminal_name, c.body.txn_type])).toEqual([
+      ['badookinvit', 'force'],
+      ['badookinvittok', 'debit'],
+      ['badookinvit', 'reversal'],
+    ]);
+    // a card decline on the capture is a decline: nothing else is tried
+    state.checkouts.set(CHECKOUT, checkout());
+    state.claims = new Set();
+    fetchMock.mockClear();
+    tranzila.answers = [declined];
+    expect((await tranzilaNotice(form())).outcome).toBe('failed');
+    expect(charges()).toHaveLength(1);
+  });
+
   it('a message pack: its credits, and no card kept', async () => {
     state.checkouts.set(CHECKOUT, checkout({ product: 'credits_300', amount: 48 }));
     const { tranzilaNotice } = await billing();
-    expect((await tranzilaNotice(form())).outcome).toBe('paid');
-    expect(charges()[0]!.body.items).toMatchObject([{ unit_price: 48 }]);
+    expect((await tranzilaNotice(form({ sum: '48.00' }))).outcome).toBe('paid');
+    expect(charges()[0]!.body).toMatchObject({ txn_type: 'force', items: [{ unit_price: 48 }] });
     expect(calls('billing_card_save')).toEqual([]);
     expect(calls('checkout_complete')[0]).toMatchObject({ p_credits: 300, p_patch: {} });
   });
@@ -436,7 +547,7 @@ describe('Tranzila: buying', () => {
 
   it('a notice for no purchase of ours, or for another provider’s, charges nothing', async () => {
     const { tranzilaNotice } = await billing();
-    expect(await tranzilaNotice(form({ badook_checkout: '44444444-4444-4444-8444-444444444444' }))).toEqual({
+    expect(await tranzilaNotice(form({ benid: '44444444444444448444444444444444' }))).toEqual({
       outcome: 'unknown_checkout',
       checkoutId: null,
     });
@@ -569,7 +680,11 @@ describe('Tranzila: the iframe’s return page', () => {
 });
 
 describe('Tranzila: the API keys from the Vault', () => {
-  const VAULT = { TRANZILA_API_APP_KEY: 'vault-app-key', TRANZILA_API_SECRET: 'vault-secret' };
+  const VAULT = {
+    TRANZILA_API_APP_KEY: 'vault-app-key',
+    TRANZILA_API_SECRET: 'vault-secret',
+    TRANZILA_TERMINAL_PW: 'vault-terminal-pw',
+  };
   const withoutEnvKeys = () => {
     vi.stubEnv('INVITES_TRANZILA_APP_KEY', '');
     vi.stubEnv('INVITES_TRANZILA_SECRET', '');
@@ -581,7 +696,12 @@ describe('Tranzila: the API keys from the Vault', () => {
 
   it('Amplify’s variables win; without them, the Vault’s secrets are used (and kept a while)', async () => {
     state.vault = VAULT;
-    expect(await (await client()).tranzilaKeys()).toEqual({ appKey: APP_KEY, secret: SECRET, source: 'env' });
+    expect(await (await client()).tranzilaKeys()).toEqual({
+      appKey: APP_KEY,
+      secret: SECRET,
+      terminalPw: null,
+      source: 'env',
+    });
     expect(calls('billing_secrets')).toEqual([]);
     try {
       withoutEnvKeys();
@@ -591,6 +711,7 @@ describe('Tranzila: the API keys from the Vault', () => {
       expect(await tranzilaKeys()).toEqual({
         appKey: 'vault-app-key',
         secret: 'vault-secret',
+        terminalPw: 'vault-terminal-pw',
         source: 'vault',
       });
       await tranzilaKeys();

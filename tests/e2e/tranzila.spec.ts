@@ -32,12 +32,12 @@ async function sql<T = Record<string, unknown>>(text: string, values: unknown[] 
 /** what the stand-in saw for this buyer (the two projects run side by side) */
 const mock = async (email: string) => {
   const all = (await (await fetch(`${MOCK}/charges`)).json()) as {
-    charges: { terminal: string; amount: number; approved: boolean; email: string | null }[];
-    notices: { fields: Record<string, string>; response: { status: number; text: string } }[];
+    charges: { terminal: string; type: string; amount: number; approved: boolean; email: string | null }[];
+    notices: { email: string | null; response: { status: number; text: string } }[];
   };
   return {
     charges: all.charges.filter((c) => c.email === email),
-    notices: all.notices.filter((n) => n.fields.email === email),
+    notices: all.notices.filter((n) => n.email === email),
   };
 };
 
@@ -89,8 +89,9 @@ test('Tranzila: a pack and a plan paid in the iframe, a refused card, and the mo
   await expect(page.getByTestId('billing-returned')).toContainText('התשלום התקבל');
   await expect(kpi(page, 'קרדיטים לוואטסאפ')).toContainText('100');
   let seen = await mock(email);
+  // the form held the price (VK); our server took that hold on the iframe terminal
   expect(seen.charges).toEqual([
-    expect.objectContaining({ terminal: 'badookinvittok', amount: 16, approved: true }),
+    expect.objectContaining({ terminal: 'badookinvit', type: 'force', amount: 16, approved: true }),
   ]);
   // the notify charged it (the return page found it paid)
   expect(seen.notices.at(-1)!.response).toEqual({ status: 200, text: 'paid' });
@@ -131,7 +132,7 @@ test('Tranzila: a pack and a plan paid in the iframe, a refused card, and the mo
   expect(cron.status()).toBe(200);
   seen = await mock(email);
   expect(seen.charges.at(-1)).toEqual(
-    expect.objectContaining({ terminal: 'badookinvittok', amount: 49, approved: true }),
+    expect.objectContaining({ terminal: 'badookinvittok', type: 'debit', amount: 49, approved: true }),
   );
   const [renewed] = await sql<{ plan_status: string; ahead: boolean }>(
     `select plan_status, plan_renews_at > now() + interval '25 days' as ahead from accounts
