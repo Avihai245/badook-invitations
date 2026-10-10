@@ -148,6 +148,14 @@ const ServerEnvSchema = z.object({
   // the album's thank-you template (features/album: "thank you for celebrating with us" and a button to
   // the album), once Meta approved it (docs/whatsapp-setup.md §10); empty: hosts send it themselves
   INVITES_WHATSAPP_ALBUM_TEMPLATE: z.string().trim().default(''),
+  // the scheduled messages' templates (features/whatsapp/catalog.ts, docs/whatsapp-setup.md §11–13), once
+  // Meta approved them; empty: that message can't be sent from the system's number (nor scheduled)
+  // the RSVP follow-up to guests who haven't answered
+  INVITES_WHATSAPP_REMINDER_TEMPLATE: z.string().trim().default(''),
+  // the reminder before the event (the date, time and place) to guests who are coming
+  INVITES_WHATSAPP_EVENT_TEMPLATE: z.string().trim().default(''),
+  // the thank-you after the event, without an album
+  INVITES_WHATSAPP_THANKS_TEMPLATE: z.string().trim().default(''),
   INVITES_WHATSAPP_API_VERSION: z.string().trim().min(2).default('v26.0'),
   INVITES_WHATSAPP_API_BASE: z
     .url()

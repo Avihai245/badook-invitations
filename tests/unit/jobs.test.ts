@@ -19,6 +19,11 @@ let configured = true;
 vi.mock('@/features/whatsapp/cloud-api', () => ({ cloudApiConfigured: () => configured }));
 const processQueue = vi.fn(async () => ({ sent: 0, failed: 0, retried: 0 }));
 vi.mock('@/features/whatsapp/sender', () => ({ processQueue }));
+// the scheduled WhatsApp messages: the stages whose time came, and their own queue (features/whatsapp)
+const runDueStages = vi.fn(async () => ({ ran: 0, failed: 0 }));
+vi.mock('@/features/whatsapp/hub', () => ({ runDueStages }));
+const processNotices = vi.fn(async () => ({ sent: 0, failed: 0, retried: 0 }));
+vi.mock('@/features/whatsapp/notices', () => ({ processNotices }));
 // the table numbers' messages and the arrivals' keeping time (features/event-day)
 const processNoticeQueue = vi.fn(async () => ({ sent: 0, failed: 0, retried: 0 }));
 vi.mock('@/features/event-day/server/notify', () => ({ processNoticeQueue }));
@@ -111,6 +116,33 @@ describe('the WhatsApp queue', () => {
     expect(await runWhatsAppQueue(60_000)).toEqual({ sent: 4, failed: 0, retried: 1 });
     expect(processNoticeQueue).toHaveBeenCalledTimes(2);
     expect(processNoticeQueue).toHaveBeenCalledWith(null, 50);
+  });
+});
+
+describe('the scheduled messages', () => {
+  it('run the stages whose time came before the queues, and send their messages in the same rounds', async () => {
+    const order: string[] = [];
+    runDueStages.mockImplementationOnce(async () => (order.push('stages'), { ran: 2, failed: 1 }));
+    processQueue.mockImplementationOnce(
+      async () => (order.push('queue'), { sent: 0, failed: 0, retried: 0 }),
+    );
+    processNotices
+      .mockResolvedValueOnce({ sent: 2, failed: 0, retried: 0 })
+      .mockResolvedValueOnce({ sent: 0, failed: 0, retried: 0 });
+    expect(await runWhatsAppQueue(60_000)).toEqual({
+      sent: 2,
+      failed: 0,
+      retried: 0,
+      stages: { ran: 2, failed: 1 },
+    });
+    expect(order).toEqual(['stages', 'queue']);
+    expect(processNotices).toHaveBeenCalledWith(null, 50);
+  });
+
+  it('a stage run that throws never stops the queues', async () => {
+    runDueStages.mockRejectedValueOnce(new Error('database down'));
+    processQueue.mockResolvedValueOnce({ sent: 1, failed: 0, retried: 0 });
+    expect(await runWhatsAppQueue(60_000)).toEqual({ sent: 1, failed: 0, retried: 0 });
   });
 });
 

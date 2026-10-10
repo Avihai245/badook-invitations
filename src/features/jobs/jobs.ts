@@ -23,6 +23,8 @@ import { supportHousekeeping } from '@/features/support/tickets/server/housekeep
 import { voiceDeps } from '@/features/voice/server/deps';
 import { processVoice } from '@/features/voice/server/voice';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
+import { runDueStages } from '@/features/whatsapp/hub';
+import { processNotices } from '@/features/whatsapp/notices';
 import { processQueue } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
@@ -122,19 +124,25 @@ export async function runDaily(now: Date) {
 }
 
 /**
- * What is still queued for WhatsApp (a host closed the page mid-send, a retry that is due): the
- * invitations, the table numbers (features/event-day), the gallery links (features/live-gallery) and
- * the album's thank-yous (features/album).
+ * The scheduled messages whose time has come (features/whatsapp/hub: each stage queues its messages
+ * once), then what is still queued for WhatsApp (a host closed the page mid-send, a retry that is
+ * due): the invitations, the table numbers (features/event-day), the gallery links
+ * (features/live-gallery), the album's thank-yous (features/album) and the other scheduled messages
+ * (features/whatsapp/notices).
  */
 export async function runWhatsAppQueue(budgetMs: number) {
   const total = { sent: 0, failed: 0, retried: 0 };
   const until = Date.now() + budgetMs;
+  const stages = await runDueStages().catch(
+    (err) => (console.error('[jobs] whatsapp stages failed', err), null),
+  );
   for (let round = 0; round < 4 && Date.now() < until; round++) {
     const r = await processQueue(null, 50);
     const t = await processNoticeQueue(null, 50);
     const g = await processGalleryNoticeQueue(null, 50);
     const a = await processAlbumNoticeQueue(null, 50);
-    const results = [r, t, g, a];
+    const n = await processNotices(null, 50);
+    const results = [r, t, g, a, n];
     for (const x of results) {
       total.sent += x.sent;
       total.failed += x.failed;
@@ -144,7 +152,8 @@ export async function runWhatsAppQueue(budgetMs: number) {
   }
   // messages left (or failed): the admin console's numbers and queues (it never throws)
   if (total.sent + total.failed > 0) await adminNudge('message');
-  return total;
+  // the stages that ran this turn, when any did (the cron's answer says so)
+  return stages?.ran ? { ...total, stages } : total;
 }
 
 /** Records that `name` has just run (the app's own turn, or a scheduler's call): not due again until its next turn. */

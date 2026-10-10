@@ -6,6 +6,7 @@ import { tick } from '@/features/jobs/jobs';
 import { galleryNoticesDb } from '@/features/live-gallery/server/notices-db';
 import { inboundOf, statusesOf, validSignature } from '@/features/whatsapp/cloud-api';
 import { isStopRequest } from '@/features/whatsapp/opt-out';
+import { noticesDb } from '@/features/whatsapp/notices';
 import { whatsappDb } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
 import { sameSecret } from '@/lib/secrets';
@@ -44,11 +45,13 @@ export async function POST(request: Request) {
   try {
     for (const s of statusesOf(payload))
       if (!(await whatsappDb.status(s.id, s.status, s.error)))
-        // not an invitation's message: a table number's (features/event-day), a gallery link's, or
-        // an album's thank-you (features/album)
+        // not an invitation's message: a table number's (features/event-day), a gallery link's, an
+        // album's thank-you (features/album), or a scheduled follow-up / reminder / thank-you
+        // (features/whatsapp/notices)
         if (!(await eventDayDb.noticeStatus(s.id, s.status, s.error)))
           if (!(await galleryNoticesDb.status(s.id, s.status, s.error)))
-            await albumNoticesDb.status(s.id, s.status, s.error);
+            if (!(await albumNoticesDb.status(s.id, s.status, s.error)))
+              await noticesDb.status(s.id, s.status, s.error);
     for (const m of inboundOf(payload)) if (isStopRequest(m.text)) await whatsappDb.optOut(m.from, 'reply');
   } catch (err) {
     // Meta retries a failed delivery for days: answer 500 so it comes back

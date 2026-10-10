@@ -7,7 +7,8 @@ import { Button, Checkbox, cn, Dialog, Segmented, useToast } from '@/components/
 import { useUi } from '@/lib/i18n/client';
 import { guestLocale, templateChain } from '@/features/whatsapp/languages';
 import { fillTemplate, TEMPLATE_TEXT } from '@/features/whatsapp/template-text';
-import { RTL_LOCALES, type Locale } from '../../contracts/types';
+import { WhatsAppChat } from '@/features/whatsapp/ui/WhatsAppChat';
+import type { Locale } from '../../contracts/types';
 import { hostApi, loginUrl } from '../api';
 import { formatIls, whatsappReach } from '../../lib/guest-list';
 import { nativeName } from '../../lib/locales';
@@ -139,6 +140,12 @@ export function WhatsAppDialog({
   const values = data.whatsapp.values[lang];
   const sample =
     groups.find(([l]) => l === lang)?.[1][0]?.name ?? recipients[0]?.name ?? guests[0]?.name ?? '';
+  // the bubble's time: now, as the guest will see it when it arrives
+  const [previewTime] = useState(() =>
+    new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(
+      new Date(),
+    ),
+  );
   const message = fillTemplate(template.body, [
     sample,
     values?.hosts ?? '',
@@ -406,20 +413,23 @@ export function WhatsAppDialog({
                 />
               ) : null}
             </div>
-            <div
-              className="rounded-[14px] bg-[#e7ddd3] p-3"
-              dir={RTL_LOCALES.includes(lang) ? 'rtl' : 'ltr'}
-              lang={lang}
-              data-testid="whatsapp-preview"
-            >
-              <div className="max-w-[340px] rounded-[10px] bg-white px-3 pt-2.5 pb-2 shadow-sm">
-                <p className="text-[13.5px] leading-[1.5] whitespace-pre-line text-[#111b21]">{message}</p>
-                <p className="mt-1 text-[11.5px] text-[#667781]">{template.footer}</p>
-                <div className="mt-2 border-t border-[#e9edef] pt-2 text-center text-[13.5px] font-medium text-[#027eb5]">
-                  {template.button}
-                </div>
-              </div>
-            </div>
+            {/* the message on the guest's phone, as WhatsApp shows it */}
+            <WhatsAppChat
+              message={{
+                body: message,
+                footer: template.footer,
+                button: template.button,
+                link: 'invitation',
+              }}
+              locale={lang}
+              business={t.waMessages.preview.business}
+              businessHint={t.waMessages.preview.businessHint}
+              day={t.waMessages.preview.today}
+              time={previewTime}
+              placeholder={t.waMessages.preview.placeholder}
+              label={fmt(t.waMessages.preview.label, { name: sample })}
+              frame={false}
+            />
           </div>
 
           <div className="rounded-card border border-line bg-canvas px-3.5 py-3 text-[13px]">

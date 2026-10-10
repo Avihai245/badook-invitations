@@ -59,6 +59,12 @@ export const SUPPORT_PAGES: SupportPage[] = [
     he: 'מוזמנים',
     label: 'Invite: guest list, WhatsApp sending, RSVP status',
   },
+  {
+    path: '/app/invitations/:id/guests/whatsapp',
+    he: 'הודעות וואטסאפ',
+    label:
+      'Invite: WhatsApp messages — send any approved message now (invitation, RSVP reminder, event reminder, thank-you, album) or smart scheduling (Basic/Advanced/Smart/Premium sequences), previews and what was sent',
+  },
   { path: '/app/invitations/:id/responses', he: 'אישורי הגעה', label: 'Invite: RSVP responses' },
   {
     path: '/app/invitations/:id/share',

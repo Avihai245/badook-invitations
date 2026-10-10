@@ -16,6 +16,7 @@ import { filmEn } from './film.en';
 import { albumEn } from './album.en';
 import { aiPhotosEn } from './ai-photos.en';
 import { planningEn } from './planning.en';
+import { waMessagesEn } from './wa-messages.en';
 import { enCore } from './app-core.en';
 import { enMore } from './app-more.en';
 
@@ -40,4 +41,5 @@ export const en: AppDict = {
   album: albumEn,
   aiPhotos: aiPhotosEn,
   planning: planningEn,
+  waMessages: waMessagesEn,
 };

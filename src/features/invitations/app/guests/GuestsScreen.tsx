@@ -2,6 +2,7 @@
 
 import {
   Armchair,
+  CalendarClock,
   CheckCheck,
   CheckSquare,
   ChevronDown,
@@ -618,6 +619,12 @@ export function GuestsScreen({
                     className="bg-[#0f7d41] text-white hover:bg-[#0c6a37] dark:text-white"
                   >
                     {own ? g.own.cta : g.actions.whatsappAll}
+                  </Button>
+                  {/* the WhatsApp section: every approved message now, and the smart scheduling */}
+                  <Button asChild variant="secondary" icon={<CalendarClock />}>
+                    <Link href={`/app/invitations/${data.id}/guests/whatsapp`} data-testid="guests-messages">
+                      {t.waMessages.open}
+                    </Link>
                   </Button>
                 </div>
                 <p className="max-w-[440px] text-[12.5px] text-muted sm:text-end">
