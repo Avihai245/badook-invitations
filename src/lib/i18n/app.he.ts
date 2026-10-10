@@ -14,6 +14,7 @@ import { facesHe } from './faces.he';
 import { filmHe } from './film.he';
 import { albumHe } from './album.he';
 import { aiPhotosHe } from './ai-photos.he';
+import { scheduleHe } from './schedule.he';
 import { planningHe } from './planning.he';
 import { waMessagesHe } from './wa-messages.he';
 import { heCore } from './app-core.he';
@@ -42,6 +43,7 @@ export const he = {
   film: filmHe,
   album: albumHe,
   aiPhotos: aiPhotosHe,
+  schedule: scheduleHe,
   planning: planningHe,
   waMessages: waMessagesHe,
 };
@@ -85,6 +87,7 @@ export type AppOnlyKey =
   | 'film'
   | 'album'
   | 'aiPhotos'
+  | 'schedule'
   | 'planning'
   | 'waMessages';
 /** What the public pages' client components get (provider-lazy `site`). */

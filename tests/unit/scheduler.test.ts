@@ -1,0 +1,217 @@
+import { describe, expect, it, vi } from 'vitest';
+import { FEATURES, NO_OVERRIDES } from '@/features/flags/features';
+import { isTimeZone, localExists, localMoment, localParts, zoneCity } from '@/features/scheduler/time';
+import type { ScheduledSend } from '@/features/scheduler/types';
+
+// The clock's scheduling (features/scheduler): a date and a time on the clock become a moment only
+// with their time zone (New York's 15:00 is 19:00 UTC in summer, 20:00 in winter — never Israel's
+// 15:00), a time the clocks skip is refused; the host's API checks the zone, the time, the feature and
+// the template; the clock's turn sends to the guests the send is for and keeps how it went.
+
+vi.mock('server-only', () => ({}));
+const api = await import('@/features/scheduler/server/api');
+const run = await import('@/features/scheduler/server/run');
+
+describe('a date and a time in a time zone', () => {
+  it('is the moment it means there, daylight saving included', () => {
+    expect(localMoment('2027-06-17', '15:00', 'America/New_York').toISOString()).toBe(
+      '2027-06-17T19:00:00.000Z',
+    );
+    expect(localMoment('2027-01-10', '15:00', 'America/New_York').toISOString()).toBe(
+      '2027-01-10T20:00:00.000Z',
+    );
+    expect(localMoment('2027-06-17', '15:00', 'Asia/Jerusalem').toISOString()).toBe(
+      '2027-06-17T12:00:00.000Z',
+    );
+    expect(localMoment('2027-01-10', '15:00', 'Asia/Jerusalem').toISOString()).toBe(
+      '2027-01-10T13:00:00.000Z',
+    );
+    expect(localMoment('2027-06-17', '15:00', 'America/Los_Angeles').toISOString()).toBe(
+      '2027-06-17T22:00:00.000Z',
+    );
+  });
+
+  it('read back on each clock', () => {
+    const at = new Date('2027-06-17T19:00:00Z');
+    expect(localParts(at, 'America/New_York')).toEqual({ date: '2027-06-17', time: '15:00' });
+    expect(localParts(at, 'Asia/Jerusalem')).toEqual({ date: '2027-06-17', time: '22:00' });
+    expect(localParts(at, 'Asia/Tokyo')).toEqual({ date: '2027-06-18', time: '04:00' });
+  });
+
+  it('a time the clocks skip doesn’t exist; an unknown zone isn’t one', () => {
+    // New York moves to summer time on 14 March 2027 at 02:00
+    expect(localExists('2027-03-14', '02:30', 'America/New_York')).toBe(false);
+    expect(localExists('2027-03-14', '03:30', 'America/New_York')).toBe(true);
+    // Israel on 26 March 2027 at 02:00
+    expect(localExists('2027-03-26', '02:15', 'Asia/Jerusalem')).toBe(false);
+    expect(localExists('2027-02-30', '10:00', 'Asia/Jerusalem')).toBe(false);
+    expect(localExists('2027-06-17', '24:00', 'Asia/Jerusalem')).toBe(false);
+    expect(isTimeZone('Mars/Olympus')).toBe(false);
+    expect(isTimeZone('Europe/Paris')).toBe(true);
+    expect(zoneCity('America/New_York')).toBe('New York');
+  });
+});
+
+const INV = '0b6f1a4e-6c1e-4d0e-9a3a-2f1d8c7b6a50';
+const OWNER = '6a1f0c3e-0d7b-4e44-9c55-1f2e3d4c5b6a';
+const nextYear = new Date().getUTCFullYear() + 1;
+
+function deps(ready = true) {
+  return {
+    db: {
+      list: vi.fn(async () => ({ timeZone: 'America/New_York', sends: [] })),
+      set: vi.fn(async (_id: string, _owner: string, s: Record<string, unknown>) => ({
+        ok: true as const,
+        send: { ...s, id: 's1', status: 'scheduled' } as unknown as ScheduledSend,
+      })),
+      cancel: vi.fn(async () => true),
+    },
+    featureInput: vi.fn(async () => ({
+      ownerId: OWNER,
+      plan: 'business' as const,
+      admin: false,
+      overrides: NO_OVERRIDES,
+      available: new Set(FEATURES),
+    })),
+    ready: vi.fn(() => ready),
+  };
+}
+
+describe('the host schedules a send', () => {
+  const body = {
+    kind: 'album_thanks',
+    date: `${nextYear}-06-17`,
+    time: '15:00',
+    timeZone: 'America/New_York',
+  };
+
+  it('keeps the date, the time and the zone as picked (the database works the moment out)', async () => {
+    const d = deps();
+    const res = await api.setSchedule(OWNER, INV, body, d);
+    expect(res.status).toBe(200);
+    expect(d.db.set).toHaveBeenCalledWith(INV, OWNER, { ...body, audience: 'unsent' });
+  });
+
+  it('refuses a zone that isn’t one, a time the clocks skip, a template not approved, another’s event', async () => {
+    expect((await api.setSchedule(OWNER, INV, { ...body, timeZone: 'Mars/Olympus' }, deps())).body.code).toBe(
+      'time_zone',
+    );
+    expect(
+      (await api.setSchedule(OWNER, INV, { ...body, date: `${nextYear}-03-14`, time: '02:30' }, deps())).body
+        .code,
+    ).toBe(nextYear === 2027 ? 'no_such_time' : expect.any(String));
+    expect((await api.setSchedule(OWNER, INV, body, deps(false))).status).toBe(503);
+    expect((await api.setSchedule('someone-else', INV, body, deps())).status).toBe(404);
+    expect((await api.setSchedule(OWNER, INV, { ...body, time: '3pm' }, deps())).status).toBe(400);
+  });
+
+  it('the database’s answer: past, too far, running', async () => {
+    for (const [code, status] of [
+      ['past', 422],
+      ['too_far', 422],
+      ['running', 409],
+    ] as const) {
+      const d = deps();
+      d.db.set.mockResolvedValueOnce({ ok: false, code } as never);
+      const res = await api.setSchedule(OWNER, INV, body, d);
+      expect([res.status, res.body.code]).toEqual([status, code]);
+    }
+  });
+
+  it('the view starts in the event’s time zone; taking a send back', async () => {
+    const res = await api.getSchedule(OWNER, INV, deps());
+    expect(res.body).toMatchObject({
+      timeZone: 'America/New_York',
+      sends: [],
+      ready: { album_thanks: true },
+    });
+    expect((await api.cancelSchedule(OWNER, INV, { kind: 'gallery_link' }, deps())).status).toBe(200);
+    const none = deps();
+    none.db.cancel.mockResolvedValueOnce(false);
+    expect((await api.cancelSchedule(OWNER, INV, { kind: 'gallery_link' }, none)).body.code).toBe('none');
+  });
+});
+
+describe('the clock’s turn', () => {
+  const send = (over: Partial<ScheduledSend> = {}): ScheduledSend => ({
+    id: 's1',
+    invitationId: INV,
+    ownerId: OWNER,
+    kind: 'album_thanks',
+    date: '2027-06-17',
+    time: '15:00',
+    timeZone: 'America/New_York',
+    runAt: '2027-06-17T19:00:00Z',
+    audience: 'unsent',
+    status: 'running',
+    attempts: 1,
+    result: null,
+    error: null,
+    createdAt: '2027-06-01T00:00:00Z',
+    finishedAt: null,
+    ...over,
+  });
+  const rows = [
+    { guestId: 'a', reach: 'ok', queued: false, last: null },
+    { guestId: 'b', reach: 'ok', queued: false, last: { status: 'delivered' } },
+    { guestId: 'c', reach: 'ok', queued: false, last: { status: 'failed' } },
+    { guestId: 'd', reach: 'ok', queued: true, last: null },
+    { guestId: 'e', reach: 'landline', queued: false, last: null },
+  ] as const;
+
+  it('to whom: who hasn’t got it (or failed) — or everyone it reaches; never twice at once', () => {
+    expect(run.recipients(rows, 'unsent')).toEqual(['a', 'c']);
+    expect(run.recipients(rows, 'all')).toEqual(['a', 'b', 'c']);
+  });
+
+  function runDeps(sendRes: { status: number; body: Record<string, unknown> }) {
+    const runner = {
+      state: vi.fn(async (): Promise<{ status: number; body: Record<string, unknown> }> => ({
+        status: 200,
+        body: { ok: true, rows },
+      })),
+      send: vi.fn(async () => sendRes),
+    };
+    return {
+      runner,
+      deps: {
+        db: { claim: vi.fn(async () => [send()]), finish: vi.fn(async () => true) },
+        runners: { album_thanks: runner, gallery_link: runner },
+      },
+    };
+  }
+
+  it('sends as the owner would, keeps how it went', async () => {
+    const { runner, deps } = runDeps({
+      status: 200,
+      body: { ok: true, queued: 2, sent: 2, failed: 0, pending: 0 },
+    });
+    expect(await run.processScheduledSends(deps)).toEqual({ ran: 1, done: 1, failed: 0 });
+    expect(runner.send).toHaveBeenCalledWith(OWNER, INV, { action: 'send', guestIds: ['a', 'c'] });
+    expect(deps.db.finish).toHaveBeenCalledWith(
+      's1',
+      'done',
+      { queued: 2, sent: 2, failed: 0, pending: 0 },
+      null,
+    );
+  });
+
+  it('not enough credits by then: failed, with what was needed', async () => {
+    const { deps } = runDeps({ status: 402, body: { ok: false, code: 'credits', needed: 2, balance: 0 } });
+    expect(await run.processScheduledSends(deps)).toEqual({ ran: 1, done: 0, failed: 1 });
+    expect(deps.db.finish).toHaveBeenCalledWith('s1', 'failed', { needed: 2, balance: 0 }, 'credits');
+  });
+
+  it('the album turned off by then: failed with why; a run that throws is left for the next turn', async () => {
+    const { runner, deps } = runDeps({ status: 200, body: {} });
+    runner.state.mockResolvedValueOnce({ status: 409, body: { ok: false, code: 'no_album' } });
+    await run.processScheduledSends(deps);
+    expect(deps.db.finish).toHaveBeenCalledWith('s1', 'failed', null, 'no_album');
+    deps.db.finish.mockClear();
+    runner.state.mockRejectedValueOnce(new Error('network'));
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(await run.processScheduledSends(deps)).toEqual({ ran: 1, done: 0, failed: 0 });
+    expect(deps.db.finish).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+});

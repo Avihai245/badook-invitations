@@ -649,6 +649,7 @@ describe('the support assistant knows every feature', () => {
       partner: null, // partners' console
       legal: 'פרטיות',
       'ai-photos': 'צילומי AI עם בעלי השמחה',
+      scheduler: 'תזמון שליחה לתאריך ושעה',
       album: 'האלבום שאחרי האירוע',
       'art-direction': 'עצבו לי',
       billing: 'חבילות ותשלומים',
