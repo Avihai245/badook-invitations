@@ -202,7 +202,9 @@ export function tick(now = Date.now()): Promise<void> {
       await processVoice(null, voiceDeps()).catch((err) => console.error('[jobs] voice failed', err));
       // the AI photos: those working in OpenAI's background are checked, one queued photo is started
       // (a guest's request starts its own at once; this picks up what a stopped server left)
-      if (serverEnv().OPENAI_API_KEY) await processAiPhotos(null, aiWorkerDeps(), { starts: 1 });
+      const env = serverEnv();
+      if (env.INVITES_AI_IMAGE_API_KEY || env.OPENAI_API_KEY)
+        await processAiPhotos(null, aiWorkerDeps(), { starts: 1 });
       await runJob('daily', dailyDue(new Date(now)), 15 * 60, () => runDaily(new Date(now)));
     } catch (err) {
       console.error('[jobs] tick failed', err);

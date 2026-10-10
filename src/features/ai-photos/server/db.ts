@@ -1,6 +1,6 @@
 import 'server-only';
 import { serviceDb } from '@/lib/supabase/server';
-import type { Role } from '../model';
+import type { Role, Style } from '../model';
 
 /**
  * Typed access to the AI photos' database functions (supabase/migrations/*_ai_photos.sql). Always the
@@ -33,6 +33,8 @@ export interface PhotoRow {
   status: PhotoStatus;
   error: string | null;
   prompt: string;
+  /** how it looks (ai_photos.style) */
+  style: Style;
   people: string[];
   locale: string | null;
   guestName: string | null;
@@ -128,7 +130,14 @@ export const aiPhotoDb = {
     uploaderHash: string,
     guestId: string | null,
     name: string | null,
-    photo: { id: string; prompt: string; people: string[]; locale: string; sourcePath: string | null },
+    photo: {
+      id: string;
+      prompt: string;
+      style: Style;
+      people: string[];
+      locale: string;
+      sourcePath: string | null;
+    },
     dailyLimit: number,
   ) =>
     rpc<CreateResult>('ai_photo_create', {

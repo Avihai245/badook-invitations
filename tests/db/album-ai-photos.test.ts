@@ -334,7 +334,7 @@ describe('the AI photos', () => {
     expect(state.people.map((p) => p.id).sort()).toEqual([aviv, roni].sort());
   });
 
-  const ask = (id: string, people: string[], uploader = UPLOADER, daily = 1000) =>
+  const ask = (id: string, people: string[], uploader = UPLOADER, daily = 1000, style?: string) =>
     commit<{ ok: boolean; code?: string; left?: number }>('ai_photo_create', [
       inv,
       uploader,
@@ -343,6 +343,7 @@ describe('the AI photos', () => {
       JSON.stringify({
         id,
         prompt: 'תוסיף את אביב',
+        ...(style ? { style } : {}),
         people,
         locale: 'he',
         sourcePath: `${inv}/photos/${id}/source.jpg`,
@@ -367,7 +368,14 @@ describe('the AI photos', () => {
     // the site's ceiling: one counted photo today (the blocked one isn't)
     expect(await ask(randomUUID(), [roni], UPLOADER, 1)).toEqual({ ok: false, code: 'daily_limit' });
     const third = randomUUID();
-    expect(await ask(third, [roni])).toEqual({ ok: true, left: 0 });
+    expect(await ask(third, [roni], UPLOADER, 1000, 'cartoon')).toEqual({ ok: true, left: 0 });
+    // the style goes with the photo (none sent: a real photo)
+    expect((await one<{ style: string }>(`select style from ai_photos where id = $1`, [third])).style).toBe(
+      'cartoon',
+    );
+    expect((await one<{ style: string }>(`select style from ai_photos where id = $1`, [first])).style).toBe(
+      'photo',
+    );
     // the event's limit (3): another phone makes the third counted photo, a fourth phone is turned away
     expect(await ask(randomUUID(), [roni], SOMEONE)).toEqual({ ok: true, left: 1 });
     expect(await ask(randomUUID(), [roni], hex('c'))).toEqual({ ok: false, code: 'event_limit' });
@@ -380,6 +388,7 @@ describe('the AI photos', () => {
     expect(claimed).toHaveLength(1);
     expect(claimed[0]!.persons.map((p) => p.id)).toEqual([aviv]);
     expect(claimed[0]!.document).toBeTruthy();
+    expect((claimed[0] as unknown as { style: string }).style).toBe('photo');
     const id = claimed[0]!.id;
     // nobody else gets it while it runs
     const rest = await commit<{ id: string }[]>('ai_photo_claim', [inv, 5, 240, 2]);

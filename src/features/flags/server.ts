@@ -34,7 +34,8 @@ export function deploymentFeatures(env: ServerEnv = serverEnv()): Set<Feature> {
       if (off.has(f)) return false;
       if (f === 'face_albums') return env.INVITES_FACE_ALBUMS;
       if (f === 'gallery_ai' || f === 'translate_ai') return ai;
-      if (f === 'ai_photos') return !!env.OPENAI_API_KEY && !!env.INVITES_AI_IMAGE_MODEL;
+      if (f === 'ai_photos')
+        return !!(env.INVITES_AI_IMAGE_API_KEY || env.OPENAI_API_KEY) && !!env.INVITES_AI_IMAGE_MODEL;
       // planning is rolled out with its own switch (INVITES_PLANNING), after its migrations are applied
       if (f.startsWith('planning')) return env.INVITES_PLANNING && (f !== 'planning_ai' || ai);
       return true;

@@ -8,7 +8,7 @@ import type { HintKind } from '@/features/live-gallery/server/realtime';
 import { BUCKETS, type Bucket } from '@/features/live-gallery/server/storage';
 import { TOKEN_RE, UPLOADER_RE, rateKey, uploaderHash } from '@/features/live-gallery/server/tokens';
 import { AI_PHOTOS } from '../config';
-import { detectPeople } from '../model';
+import { STYLES, detectPeople } from '../model';
 import type { GuestAiPhoto, GuestAiState } from '../types';
 import type { AiPhotoDb, PhotoRow } from './db';
 import { photoPath } from './worker';
@@ -140,6 +140,8 @@ export const CreateSchema = z.strictObject({
   people: z.array(z.uuid()).max(AI_PHOTOS.people.max),
   /** a photo the guest took at the event (none: a new scene) */
   photo: Photo.nullable().optional(),
+  /** how it looks: a real photo (default), a cartoon, a watercolor… */
+  style: z.enum(STYLES).default('photo'),
   lang: z.enum(LOCALES),
 });
 
@@ -180,7 +182,7 @@ export async function aiCreate(raw: unknown, ip: string | null, deps: AiGuestDep
     hash,
     guestId,
     q.name ?? null,
-    { id, prompt: q.prompt, people, locale: q.lang, sourcePath },
+    { id, prompt: q.prompt, style: q.style, people, locale: q.lang, sourcePath },
     deps.dailyLimit,
   );
   if (!made.ok) {

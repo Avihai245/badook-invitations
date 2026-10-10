@@ -23,7 +23,7 @@ import { useGuestText } from '@/features/live-gallery/ui/guest-text';
 import { AI_PHOTOS_GUEST } from '@/lib/i18n/ai-photos-guest';
 import { fill } from '@/lib/i18n/guest';
 import { AI_PHOTOS } from '../config';
-import { detectPeople, nameIn } from '../model';
+import { STYLES, detectPeople, nameIn, type Style } from '../model';
 import { shrinkPhoto, type ShrunkPhoto } from '../client/photo';
 import type { GuestAiPhoto, GuestAiState } from '../types';
 
@@ -102,6 +102,7 @@ export function AiPhotoStudio({
   const [scene, setScene] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [chosen, setChosen] = useState<string[] | null>(null);
+  const [style, setStyle] = useState<Style>('photo');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<'photo' | 'create' | 'share' | null>(null);
   const [active, setActive] = useState<GuestAiPhoto | null>(null);
@@ -126,6 +127,7 @@ export function AiPhotoStudio({
     setScene(false);
     setPrompt('');
     setChosen(null);
+    setStyle('photo');
     setError(null);
     setActive(null);
   };
@@ -174,6 +176,7 @@ export function AiPhotoStudio({
         prompt: prompt.trim(),
         people: selected,
         photo: photo?.base64 ?? null,
+        style,
         lang: locale,
       }),
       { timeoutMs: 60_000 },
@@ -662,6 +665,27 @@ export function AiPhotoStudio({
                     <p className="mt-2 text-[12.5px] text-muted">{t.who.help}</p>
                   </fieldset>
 
+                  <fieldset>
+                    <legend className="mb-2 text-[14px] font-bold">{t.style.label}</legend>
+                    <div className="flex flex-wrap gap-1.5" data-testid="ai-styles">
+                      {STYLES.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          aria-pressed={style === s}
+                          onClick={() => setStyle(s)}
+                          className={`min-h-10 rounded-full border px-3.5 text-[13px] font-semibold ${
+                            style === s
+                              ? 'border-[var(--gallery-accent)] bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)]'
+                              : 'border-line bg-surface text-ink hover:border-line-strong'
+                          }`}
+                        >
+                          {t.style[s]}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+
                   <div>
                     <label htmlFor={promptId} className="mb-2 block text-[14px] font-bold">
                       {t.what.label}
@@ -713,7 +737,8 @@ export function AiPhotoStudio({
           </div>
 
           {!doneView && !pending(active) ? (
-            <div className="shrink-0 border-t border-line bg-canvas/95 px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur">
+            // the left corner stays clear for the accessibility button (AccessibilityPanel place="corner")
+            <div className="shrink-0 border-t border-line bg-canvas/95 pt-3 pr-4 pb-[max(12px,env(safe-area-inset-bottom))] pl-[72px] backdrop-blur">
               <div className="mx-auto flex max-w-[560px] items-center gap-3">
                 <span className="flex-1 text-[12.5px] text-muted">
                   {state.eventFull

@@ -66,6 +66,7 @@ export default defineConfig({
             MOCK_WHATSAPP_PORT: String(whatsappPort),
             MOCK_WHATSAPP_TOKEN: 'e2e-whatsapp-token',
             MOCK_AI_KEY: 'e2e-anthropic-key',
+            MOCK_OPENAI_KEY: 'e2e-openai-key',
             // the WhatsApp template's languages Meta "approved" here (tests/e2e/i18n.spec.ts: Arabic isn't)
             MOCK_WHATSAPP_LANGS: 'he,en,ru',
           },
@@ -124,6 +125,12 @@ export default defineConfig({
             // the partner API (tests/e2e/partner.spec.ts)
             INVITES_PARTNER_API_KEY: 'e2e-partner-key-0123456789abcdef0123',
             INVITES_AI_API_BASE: `http://127.0.0.1:${whatsappPort}`,
+            // the AI photos: OpenAI's image model, the stand-in above (tests/e2e/album-ai-photos.spec.ts) —
+            // a key of its own, so the support chat stays on the Anthropic stand-in
+            INVITES_AI_IMAGE_API_KEY: 'e2e-openai-key',
+            INVITES_AI_API_BASE_OPENAI: `http://127.0.0.1:${whatsappPort}`,
+            // the album's thank-you template (tests/e2e/album-ai-photos.spec.ts)
+            INVITES_WHATSAPP_ALBUM_TEMPLATE: 'badook_album',
             // the invitation read aloud: the text-to-speech stand-in above (features/voice)
             INVITES_TTS_AZURE_KEY: 'e2e-tts-key',
             INVITES_TTS_AZURE_REGION: 'e2e',

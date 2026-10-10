@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  STYLES,
   buildPrompt,
   defaultPeople,
   detectPeople,
+  isStyle,
   nameIn,
   rolesFor,
   sizeFor,
@@ -129,8 +131,31 @@ describe('the request the image model gets', () => {
       withSource: false,
     });
     expect(p).toContain('Image 1: Jonathan, the bar mitzvah boy.');
-    expect(p).toContain('Create a new photo of Jonathan at a bar mitzvah celebration');
+    // anywhere the guest imagines; the event only when the request doesn't say where
+    expect(p).toContain('Create a new image of Jonathan doing what the request says');
+    expect(p).toContain("when it doesn't say where, set it at a bar mitzvah celebration");
+    expect(p).toContain('The look: A photorealistic photo');
     expect(p.match(/"""/g)).toHaveLength(2);
+  });
+
+  it('a style: the look in the model’s words; with the guest’s photo the whole image takes it', () => {
+    const base = {
+      request: 'על חוף בהוואי',
+      locale: 'he' as const,
+      eventType: 'wedding' as const,
+      people: [{ name: 'אביב', role: 'groom' as const }],
+    };
+    const cartoon = buildPrompt({ ...base, withSource: false, style: 'cartoon' });
+    expect(cartoon).toContain('The look: A colorful 3D animated-film character style');
+    expect(cartoon).not.toContain('photorealistic');
+    const painted = buildPrompt({ ...base, withSource: true, style: 'watercolor' });
+    expect(painted).toContain('render the whole image — everyone in it — in the look below');
+    expect(painted).toContain('watercolor');
+    expect(painted).not.toContain('so it reads as one real photo');
+    // a real photo with the guest's photo blends in as before
+    expect(buildPrompt({ ...base, withSource: true })).toContain('so it reads as one real photo');
+    for (const s of STYLES) expect(isStyle(s)).toBe(true);
+    expect(isStyle('anime')).toBe(false);
   });
 
   it('the photo’s shape follows the guest’s photo', () => {
@@ -150,6 +175,7 @@ describe('the guests’ words', () => {
       for (const list of Object.values(t.ideas)) expect(list.length).toBeGreaterThanOrEqual(3);
       expect(Object.keys(t.roles).sort()).toEqual(Object.keys(he.roles).sort());
       expect(Object.keys(t.errors).sort()).toEqual(Object.keys(he.errors).sort());
+      expect(Object.keys(t.style).sort()).toEqual(['label', ...STYLES].sort());
       expect(t.card.title).toContain('{names}');
       expect(t.what.placeholder).toContain('{name}');
     }

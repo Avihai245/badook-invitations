@@ -19,7 +19,7 @@ import { processAiPhotos, type WorkerDeps } from './worker';
 export function imageConfig(): OpenAiImageConfig {
   const env = serverEnv();
   return {
-    apiKey: env.OPENAI_API_KEY,
+    apiKey: env.INVITES_AI_IMAGE_API_KEY || env.OPENAI_API_KEY,
     apiBase: env.INVITES_AI_API_BASE_OPENAI,
     model: env.INVITES_AI_IMAGE_MODEL,
     quality: env.INVITES_AI_IMAGE_QUALITY,
