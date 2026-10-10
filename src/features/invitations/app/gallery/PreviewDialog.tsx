@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Pencil, Sparkles } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Button, Dialog, PhoneFrame, Segmented, cn } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
@@ -17,10 +17,14 @@ export interface DesignChoice {
   fontPairId: string | null;
 }
 
+/** How the invitation is made from here: a short AI questionnaire, or the 3-step wizard. */
+export type CreateMode = 'ai' | 'manual';
+
 /**
  * Gallery preview (§9B.3-B): the template's demo invitation live in a phone, with its palette presets
- * and font pairs (its own, then the font library's) switching the preview instantly; "Use this
- * design" continues to the wizard.
+ * and font pairs (its own, then the font library's) switching the preview instantly; then "Quick
+ * create with AI" (a few questions: AssistantWizard) or "Fill in manually" (the wizard). `ai`: the
+ * questionnaire is offered (the design has Hebrew or English).
  */
 export function PreviewDialog({
   templateId,
@@ -28,12 +32,14 @@ export function PreviewDialog({
   onLocaleChange,
   onClose,
   onUse,
+  ai = false,
 }: {
   templateId: string;
   locale: Locale;
   onLocaleChange: (l: Locale) => void;
   onClose: () => void;
-  onUse: (choice: DesignChoice) => void;
+  onUse: (choice: DesignChoice, mode: CreateMode) => void;
+  ai?: boolean;
 }) {
   const { t, fmt, locale: ui } = useUi();
   const { manifest } = requireTemplate(templateId);
@@ -75,7 +81,28 @@ export function PreviewDialog({
               {t.gallery.preview.liveDemo}
             </a>
           </Button>
-          <Button onClick={() => onUse({ paletteId, fontPairId })}>{t.gallery.preview.use}</Button>
+          {ai ? (
+            <>
+              <Button
+                variant="secondary"
+                icon={<Pencil />}
+                onClick={() => onUse({ paletteId, fontPairId }, 'manual')}
+              >
+                {t.gallery.preview.useManual}
+              </Button>
+              <Button
+                icon={<Sparkles />}
+                title={t.gallery.preview.useAiHint}
+                onClick={() => onUse({ paletteId, fontPairId }, 'ai')}
+              >
+                {t.gallery.preview.useAi}
+              </Button>
+            </>
+          ) : (
+            <Button onClick={() => onUse({ paletteId, fontPairId }, 'manual')}>
+              {t.gallery.preview.use}
+            </Button>
+          )}
         </>
       }
     >

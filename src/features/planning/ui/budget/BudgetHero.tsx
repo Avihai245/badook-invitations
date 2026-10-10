@@ -6,6 +6,7 @@ import {
   Check,
   Handshake,
   Pencil,
+  Plus,
   Receipt,
   Table2,
   Users,
@@ -255,7 +256,14 @@ function Stat({
  * Every category as a small gauge — what is closed against what is planned — the furthest over first; a
  * tap opens the category below.
  */
-export function CategoryGauges({ onOpen }: { onOpen: (categoryId: string) => void }) {
+export function CategoryGauges({
+  onOpen,
+  onAddItem,
+}: {
+  onOpen: (categoryId: string) => void;
+  /** a new expense in a category (the "start here" shortcuts before anything is closed) */
+  onAddItem?: (categoryId: string) => void;
+}) {
   const { t, fmt, number } = useUi();
   const T = t.planning.budget;
   const C = T.catGauges;
@@ -269,7 +277,47 @@ export function CategoryGauges({ onOpen }: { onOpen: (categoryId: string) => voi
     })
     .sort((a, b) => b.over - a.over || b.ratio - a.ratio || b.r.totals.planned - a.r.totals.planned);
   const [table, setTable] = useState(false);
+  const [all, setAll] = useState(false);
   if (!rows.length) return null;
+  // nothing closed yet: a dozen gauges at 0% say nothing — where to start instead
+  const anything = rows.some(({ r }) => r.totals.committed > 0 || r.totals.paid > 0);
+  if (!anything) {
+    const start = [
+      ...rows.filter(({ r }) => r.category.required),
+      ...rows.filter(({ r }) => !r.category.required),
+    ].slice(0, 3);
+    return (
+      <section
+        aria-labelledby="budget-cat-gauges"
+        className="flex flex-col gap-3 rounded-[18px] border border-line bg-surface p-4 sm:p-5"
+        data-testid="budget-cat-gauges"
+      >
+        <div>
+          <h2 id="budget-cat-gauges" className="text-[16px] font-bold">
+            {C.emptyTitle}
+          </h2>
+          <p className="mt-0.5 text-[13px] text-muted">{C.emptyBody}</p>
+        </div>
+        <ul className="flex flex-wrap gap-2">
+          {start.map(({ r, name }) => (
+            <li key={r.category.id}>
+              <Button
+                size="sm"
+                variant="secondary"
+                icon={<Plus />}
+                onClick={() => (onAddItem ? onAddItem(r.category.id) : onOpen(r.category.id))}
+              >
+                {fmt(C.addTo, { name })}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
+  // only the categories with something going on, until the host asks for all of them
+  const active = rows.filter(({ r, over }) => r.totals.committed > 0 || r.totals.paid > 0 || over > 0);
+  const shown = all ? rows : active;
   const Ch = T.chart;
   const metrics = ['planned', 'committed', 'paid'] as const;
   return (
@@ -329,7 +377,7 @@ export function CategoryGauges({ onOpen }: { onOpen: (categoryId: string) => voi
         </div>
       ) : (
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {rows.map(({ r, name, ratio, over }) => (
+          {shown.map(({ r, name, ratio, over }) => (
             <li key={r.category.id}>
               <button
                 type="button"
@@ -372,6 +420,16 @@ export function CategoryGauges({ onOpen }: { onOpen: (categoryId: string) => voi
           ))}
         </ul>
       )}
+      {!table && rows.length > active.length ? (
+        <button
+          type="button"
+          onClick={() => setAll((x) => !x)}
+          aria-expanded={all}
+          className="self-start rounded-btn text-[13px] font-semibold text-brand-deep hover:underline"
+        >
+          {all ? C.showActive : fmt(C.showAll, { n: number(rows.length) })}
+        </button>
+      ) : null}
     </section>
   );
 }
@@ -396,6 +454,24 @@ export function UpcomingPayments({
       daysBetween(view.today, r.payment.dueDate) <= 30,
   );
   const total = Math.round(rows.reduce((n, r) => n + r.payment.amount, 0) * 100) / 100;
+  // nothing to pay soon: one quiet line, not a card
+  if (rows.length === 0)
+    return (
+      <p
+        data-testid="budget-upcoming"
+        className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[16px] border border-line bg-surface px-4 py-3 text-[13.5px] text-muted"
+      >
+        <CalendarClock aria-hidden className="size-4 text-brand-deep" />
+        {U.none}
+        <button
+          type="button"
+          onClick={onAll}
+          className="rounded-btn text-[13px] font-semibold text-brand-deep hover:underline"
+        >
+          {U.all}
+        </button>
+      </p>
+    );
   return (
     <Card padding="lg" data-testid="budget-upcoming">
       <div className="flex flex-wrap items-baseline justify-between gap-2">

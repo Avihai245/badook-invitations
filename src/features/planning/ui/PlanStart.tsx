@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useUi } from '@/lib/i18n/client';
 import { PlanFrame } from './PlanFrame';
@@ -13,12 +12,14 @@ import { usePlan } from './PlanProvider';
  */
 export function PlanStart() {
   const { t } = useUi();
-  const router = useRouter();
   const plan = usePlan();
   const planned = !!plan.view.settings;
   useEffect(() => {
-    if (planned) router.replace(`/app/invitations/${plan.id}`);
-  }, [planned, plan.id, router]);
+    if (!planned) return;
+    // a full load, once: the event's frame (kept across its screens by the router) shows the planning
+    // only once there is a plan, so it is drawn anew
+    window.location.replace(`/app/invitations/${plan.id}`);
+  }, [planned, plan.id]);
   return (
     <PlanFrame tool="overview" title={t.planning.title} description={t.planning.subtitle}>
       {null}

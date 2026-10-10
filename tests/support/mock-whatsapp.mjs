@@ -29,7 +29,13 @@
 // answers a one-line summary and two next steps; a description with "crash" / "נפילה" fails (overloaded)
 // and one with "garbage" / "זבל" answers something that isn't JSON. Each request is remembered
 // (GET /__ai/planning).
+//
+// Seating rules in words (POST /v1/messages, the seating prompt — features/seating/words.ts): each
+// comma-separated wish is matched to the units whose name (or group) it mentions — "near the stage" /
+// "ליד הבמה" a zone wish, "not" / "לא" apart, else together; a wish that names nobody comes back as
+// unclear. Each request is remembered (GET /__ai/seating).
 import { createServer } from 'node:http';
+import sharp from 'sharp';
 
 const port = Number(process.env.MOCK_WHATSAPP_PORT || 54340);
 const token = process.env.MOCK_WHATSAPP_TOKEN || 'e2e-whatsapp-token';
@@ -44,6 +50,7 @@ const galleryAiRequests = [];
 const translateRequests = [];
 const artAiRequests = [];
 const planningAiRequests = [];
+const seatingAiRequests = [];
 let n = 0;
 
 const ANSWERS = [
@@ -104,6 +111,8 @@ async function answerAi(req, res) {
   if (typeof body.system === 'string' && body.system.includes('art director')) return answerArt(res, body);
   if (typeof body.system === 'string' && body.system.startsWith('You help a host plan'))
     return answerPlanning(res, body);
+  if (typeof body.system === 'string' && body.system.startsWith('You help a host seat'))
+    return answerSeating(res, body);
   const photo = Array.isArray(body.messages?.[0]?.content)
     ? body.messages[0].content.find((c) => c?.type === 'image')
     : null;
@@ -182,6 +191,39 @@ function answerGalleryCheck(res, body, photo) {
     content: [{ type: 'text', text: JSON.stringify(scores) }],
     stop_reason: 'end_turn',
     usage: { input_tokens: 420, output_tokens: 30 },
+  });
+}
+
+function answerSeating(res, body) {
+  let task = null;
+  try {
+    task = JSON.parse(String(body.messages?.[0]?.content ?? ''));
+  } catch {
+    // not the expected request
+  }
+  seatingAiRequests.push({ model: body.model, structured: !!body.output_config?.format, task });
+  const units = Array.isArray(task?.units) ? task.units : [];
+  const out = { rules: [], zones: [], accessible: [], unclear: [] };
+  for (const wish of String(task?.wishes ?? '').split(/[,،]/)) {
+    const w = wish.trim();
+    if (!w) continue;
+    const words = w.split(/\s+/).filter((x) => x.length > 2);
+    const named = units
+      .filter((u) => words.some((x) => u.name.includes(x) || (u.group && u.group.includes(x))))
+      .map((u) => u.ref);
+    if (!named.length) out.unclear.push(w);
+    else if (/במה|stage/i.test(w)) out.zones.push({ units: named, zone: 'stage', near: true });
+    else if (/(^|\s)(לא|not)(\s|$)/i.test(w)) out.rules.push({ kind: 'apart', units: named, hard: true });
+    else out.rules.push({ kind: 'together', units: named, hard: true });
+  }
+  return json(res, 200, {
+    id: `msg_e2e_seating_${seatingAiRequests.length}`,
+    type: 'message',
+    role: 'assistant',
+    model: body.model,
+    content: [{ type: 'text', text: JSON.stringify(out) }],
+    stop_reason: 'end_turn',
+    usage: { input_tokens: 500, output_tokens: 80 },
   });
 }
 
@@ -351,6 +393,65 @@ function answerArt(res, body) {
   return reply(JSON.stringify({ concepts }));
 }
 
+// OpenAI's image model for the AI photos (features/ai-photos/server/openai.ts), in background mode
+// as on Amplify: POST /v1/responses (the image tool, the photos as input images) starts a response;
+// GET /v1/responses/:id says it is working once, then completed with a JPEG — a portrait with a
+// gradient and the look's name, so a screenshot shows it. A request whose text has "BLOCKME" is
+// refused by the "content rules". Each request is remembered (GET /__ai/images).
+const openAiKey = process.env.MOCK_OPENAI_KEY || 'e2e-openai-key';
+const imageRequests = [];
+const responses = new Map(); // id → { polls, blocked, look }
+async function madeImage(look) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb199"/><stop offset="1" stop-color="#7f5af0"/></linearGradient></defs>
+    <rect width="1024" height="1536" fill="url(#g)"/>
+    <circle cx="380" cy="640" r="170" fill="#fff" opacity="0.85"/>
+    <circle cx="660" cy="660" r="170" fill="#fff" opacity="0.7"/>
+    <text x="512" y="1100" font-size="96" font-family="sans-serif" text-anchor="middle" fill="#fff">${look}</text>
+  </svg>`;
+  return (await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toBuffer()).toString('base64');
+}
+async function answerImages(req, res, url) {
+  if (req.headers.authorization !== `Bearer ${openAiKey}`)
+    return json(res, 401, { error: { message: 'Incorrect API key provided', code: 'invalid_api_key' } });
+  if (req.method === 'POST' && url.pathname === '/v1/responses') {
+    let raw = '';
+    for await (const chunk of req) raw += chunk;
+    const body = JSON.parse(raw || '{}');
+    const content = body.input?.[0]?.content ?? [];
+    const text = content.find((c) => c.type === 'input_text')?.text ?? '';
+    imageRequests.push({
+      model: body.model,
+      background: body.background,
+      tool: body.tools?.[0] ?? null,
+      text,
+      images: content.filter((c) => c.type === 'input_image').length,
+    });
+    const id = `resp_${imageRequests.length}`;
+    const look = /The look: ([^.:]+)/.exec(text)?.[1]?.slice(0, 28) ?? 'AI';
+    responses.set(id, { polls: 0, blocked: text.includes('BLOCKME'), look });
+    return json(res, 200, { id, status: 'queued' });
+  }
+  const m = url.pathname.match(/^\/v1\/responses\/([\w-]+)$/);
+  if (req.method === 'GET' && m && responses.has(m[1])) {
+    const r = responses.get(m[1]);
+    if (r.polls++ < 1) return json(res, 200, { id: m[1], status: 'in_progress' });
+    if (r.blocked)
+      return json(res, 200, {
+        id: m[1],
+        status: 'failed',
+        error: { code: 'content_policy_violation', message: 'Refused by the safety system' },
+      });
+    return json(res, 200, {
+      id: m[1],
+      status: 'completed',
+      output: [{ type: 'image_generation_call', status: 'completed', result: await madeImage(r.look) }],
+    });
+  }
+  return json(res, 404, { error: { message: 'Unknown path' } });
+}
+
 const json = (res, status, body) => {
   res.writeHead(status, { 'content-type': 'application/json' });
   res.end(JSON.stringify(body));
@@ -367,8 +468,11 @@ createServer(async (req, res) => {
   if (req.method === 'GET' && url.pathname === '/__ai/gallery') return json(res, 200, galleryAiRequests);
   if (req.method === 'GET' && url.pathname === '/__ai/translate') return json(res, 200, translateRequests);
   if (req.method === 'GET' && url.pathname === '/__ai/planning') return json(res, 200, planningAiRequests);
+  if (req.method === 'GET' && url.pathname === '/__ai/seating') return json(res, 200, seatingAiRequests);
   if (req.method === 'GET' && url.pathname === '/__ai/art') return json(res, 200, artAiRequests);
   if (req.method === 'POST' && url.pathname === '/v1/messages') return answerAi(req, res);
+  if (req.method === 'GET' && url.pathname === '/__ai/images') return json(res, 200, imageRequests);
+  if (url.pathname.startsWith('/v1/responses')) return answerImages(req, res, url);
   const match = url.pathname.match(/^\/v[\d.]+\/(\d+)\/messages$/);
   if (req.method !== 'POST' || !match)
     return json(res, 404, { error: { message: 'Unknown path', code: 100 } });

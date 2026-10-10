@@ -1,0 +1,65 @@
+import type { AlbumGuestDict } from './album-guest.he';
+
+/** The album's page for guests — French. */
+export const albumGuestFr: AlbumGuestDict = {
+  metaTitle: 'L’album · {name}',
+  metaDescription: 'Les plus beaux moments de l’événement, réunis au même endroit',
+  eyebrow: 'L’album',
+  language: 'Langue',
+  invalid: {
+    title: 'Ce lien ne fonctionne pas',
+    body: 'Les hôtes l’ont peut-être remplacé par un nouveau. Demandez-leur le lien à jour.',
+  },
+  off: { title: 'L’album est fermé', body: 'Les hôtes ont fermé l’album.' },
+  soon: {
+    title: 'L’album est presque prêt',
+    body: 'Tous les moments de l’événement sont en train d’être réunis dans un seul album. Il ouvrira le {date}.',
+  },
+  empty: {
+    title: 'Pas encore de photos dans l’album',
+    body: 'Dès qu’il y aura des photos dans la galerie de l’événement, elles apparaîtront ici.',
+  },
+  message:
+    'Merci d’avoir fêté avec nous {event} ! Tous les moments que vous avez capturés — les sourires, les danses, les embrassades — sont réunis ici dans un seul album. Merci d’avoir fait partie de cette joie.',
+  enter: 'Vers les moments',
+  stats: {
+    photos: { one: '{n} photo', other: '{n} photos' },
+    videos: { one: '{n} vidéo', other: '{n} vidéos' },
+  },
+  highlights: 'Les plus beaux moments',
+  chapters: {
+    opening: 'Le début',
+    heart: 'Le cœur de la fête',
+    more: 'Encore des moments',
+    ending: 'Jusqu’au dernier moment',
+    all: 'Tous les moments',
+  },
+  showAll: { one: 'Encore {n} moment', other: 'Encore {n} moments' },
+  by: 'Prise par {name}',
+  ai: 'Créée avec l’IA',
+  photo: 'la photo',
+  video: 'la vidéo',
+  open: 'Ouvrir {kind} {n}',
+  viewer: {
+    label: 'L’album',
+    close: 'Fermer',
+    next: 'Suivante',
+    previous: 'Précédente',
+    position: '{n} sur {total}',
+  },
+  downloadOne: 'Télécharger',
+  share: 'Partager l’album',
+  shareText: 'Les plus beaux moments {event} 💛',
+  copied: 'Le lien de l’album a été copié',
+  downloadAll: 'Télécharger tout l’album',
+  downloading: 'Téléchargement… {done} sur {total}',
+  downloaded: 'L’album a été enregistré sur l’appareil',
+  missingName: 'fichiers-non-telecharges.txt',
+  missingIntro: 'Ces fichiers n’ont pas pu être téléchargés :',
+  thanks: 'Merci d’avoir fêté avec nous',
+  love: 'Avec amour',
+  made: 'Cet album a été créé avec {brand}',
+  makeYours: 'Une invitation numérique, une galerie en direct et un album — pour votre événement',
+  failed: 'Une erreur s’est produite. Réessayez.',
+  top: 'Retour en haut',
+};

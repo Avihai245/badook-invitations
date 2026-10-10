@@ -41,7 +41,8 @@ function read(data: unknown): { event: string | null; state: number | null } {
  * button pauses it for good (WCAG 2.2.2: moving content can be stopped).
  *
  * The still (`still`, picked on the server: hero-still.ts) is the first screen's largest picture: it
- * comes through the image optimizer, preloaded. The YouTube player (~1 MB of script) loads only once
+ * comes through the image optimizer, preloaded — without a priority of its own: it sits under the gradient
+ * and the text, and the demo video's poster (DemoVideo) is the picture a phone waits for. The YouTube player (~1 MB of script) loads only once
  * the visitor does something on the page (or presses play) — never on its own with the first paint.
  */
 export function BackgroundVideo({
@@ -64,10 +65,9 @@ export function BackgroundVideo({
   const [wanted, setWanted] = useState<boolean | null>(null);
   const engaged = useFirstInteraction();
   // the still, a plain <img> over the optimizer's widths (renderer/images.ts — next/image would add its
-  // runtime); preloaded with its priority, which an image preloaded without it lacks (it waits behind CSS)
-  const set = still ? imageSet(still, '100vw', 70) : null;
-  if (set?.srcSet)
-    preload(set.src, { as: 'image', imageSrcSet: set.srcSet, imageSizes: set.sizes, fetchPriority: 'high' });
+  // runtime); preloaded at the default priority, so the poster's high one is served first
+  const set = still ? imageSet(still, '100vw', 60) : null;
+  if (set?.srcSet) preload(set.src, { as: 'image', imageSrcSet: set.srcSet, imageSizes: set.sizes });
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -142,7 +142,6 @@ export function BackgroundVideo({
             srcSet={set.srcSet}
             sizes={set.sizes}
             alt=""
-            fetchPriority="high"
             decoding="async"
           />
         ) : null}

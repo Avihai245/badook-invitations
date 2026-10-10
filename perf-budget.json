@@ -1,12 +1,16 @@
 {
-  "$comment": "The performance budget every page must meet on a phone (Lighthouse's mobile preset: Moto G Power, Slow 4G, 4x CPU). Read by lighthouserc.cjs (CI: the home page and every template's sample invitation) and scripts/lighthouse-budget.mjs (a newly published invitation). Bytes are transferred (compressed) sizes of what loads with the page.",
-  "performance": 0.9,
-  "lcpMs": 2500,
-  "tbtMs": 200,
-  "cls": 0.1,
+  "$comment": "The performance budget every page must meet on a phone (Lighthouse's mobile preset: Moto G Power, Slow 4G, 4x CPU). Read by lighthouserc.cjs (CI: the home page and every template's sample invitation) and scripts/lighthouse-budget.mjs (a newly published invitation). Bytes are transferred (compressed) sizes of what loads with the page; fontRequests applies to the home page only (an invitation loads the fonts its host chose); serverResponseMs is the document's time to first byte.",
+  "performance": 0.98,
+  "lcpMs": 1800,
+  "tbtMs": 100,
+  "cls": 0.05,
   "scriptBytes": 174080,
   "totalBytes": 1572864,
   "accessibility": 1,
   "bestPractices": 1,
-  "seo": 1
+  "seo": 1,
+  "speedIndexMs": 2500,
+  "serverResponseMs": 600,
+  "scriptRequests": 8,
+  "fontRequests": 2
 }

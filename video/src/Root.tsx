@@ -1,6 +1,8 @@
 import './fonts';
 import { Composition } from 'remotion';
 import { Demo } from './Demo';
+import { SeatingTutorial } from './seating/SeatingTutorial';
+import { SEATING_TOTAL } from './seating/timing';
 import { FPS, TOTAL } from './timing';
 import { buildSchedule } from './tour/schedule';
 import { Tour } from './tour/Tour';
@@ -23,6 +25,22 @@ export function RemotionRoot() {
         id="DemoPortrait"
         component={Demo}
         durationInFrames={TOTAL}
+        fps={FPS}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="SeatingLandscape"
+        component={SeatingTutorial}
+        durationInFrames={SEATING_TOTAL}
+        fps={FPS}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="SeatingPortrait"
+        component={SeatingTutorial}
+        durationInFrames={SEATING_TOTAL}
         fps={FPS}
         width={1080}
         height={1920}

@@ -59,6 +59,12 @@ export const SUPPORT_PAGES: SupportPage[] = [
     he: 'מוזמנים',
     label: 'Invite: guest list, WhatsApp sending, RSVP status',
   },
+  {
+    path: '/app/invitations/:id/guests/whatsapp',
+    he: 'הודעות וואטסאפ',
+    label:
+      'Invite: WhatsApp messages — send any approved message now (invitation, RSVP reminder, event reminder, thank-you, album) or smart scheduling (Basic/Advanced/Smart/Premium sequences), previews and what was sent',
+  },
   { path: '/app/invitations/:id/responses', he: 'אישורי הגעה', label: 'Invite: RSVP responses' },
   {
     path: '/app/invitations/:id/share',
@@ -80,6 +86,16 @@ export const SUPPORT_PAGES: SupportPage[] = [
     path: '/app/invitations/:id/live',
     he: 'יום האירוע',
     label: 'Celebrate: the event day, entrance check-in',
+  },
+  {
+    path: '/app/invitations/:id/gallery/album',
+    he: 'האלבום שאחרי האירוע',
+    label: 'Celebrate: the album after the event — its settings, cover, link and the thank-you to guests',
+  },
+  {
+    path: '/app/invitations/:id/gallery/ai',
+    he: 'צילומי AI עם בעלי השמחה',
+    label: 'Celebrate: AI photos with the people of honor — their photos, consent, limits, the photos made',
   },
   {
     path: '/app/invitations/:id/gallery/film',

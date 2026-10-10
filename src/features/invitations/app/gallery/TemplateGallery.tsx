@@ -12,8 +12,9 @@ import { templateFileUrl } from '../../renderer/assets';
 import { TEMPLATES } from '../../templates/registry';
 import { posterImage, posterSample, type PosterText } from '../poster';
 import { TemplatePoster, type PosterTemplate } from '../TemplatePoster';
+import { AssistantWizard, assistantLocale } from './AssistantWizard';
 import { CreateWizard, type WizardSeed } from './CreateWizard';
-import { PreviewDialog } from './PreviewDialog';
+import { PreviewDialog, type CreateMode } from './PreviewDialog';
 import { usePreviewVideos } from './preview-videos';
 import { EVENT_ICONS } from '../event-icons';
 import { HelpFor } from '../HelpFor';
@@ -97,6 +98,8 @@ export function TemplateGallery({
   const [previewLocale, setPreviewLocale] = useState<Locale>(locale);
   const [preview, setPreview] = useState<string | null>(() => initialPreview(initialTemplateId, admin));
   const [wizard, setWizard] = useState<WizardSeed | null>(null);
+  /** the AI questionnaire, or the 3-step wizard */
+  const [mode, setMode] = useState<CreateMode>('ai');
 
   const templates = useMemo(
     () =>
@@ -216,8 +219,10 @@ export function TemplateGallery({
           locale={previewLocale}
           onLocaleChange={setPreviewLocale}
           onClose={() => setPreview(null)}
-          onUse={(choice) => {
+          ai={assistantLocale(preview, locale as UiLocale) !== null}
+          onUse={(choice, how) => {
             setPreview(null);
+            setMode(how);
             setWizard({
               templateId: preview,
               ...choice,
@@ -232,7 +237,9 @@ export function TemplateGallery({
           }}
         />
       ) : null}
-      {wizard ? (
+      {wizard && mode === 'ai' ? (
+        <AssistantWizard seed={wizard} onClose={() => setWizard(null)} onManual={() => setMode('manual')} />
+      ) : wizard ? (
         <CreateWizard seed={wizard} onClose={() => setWizard(null)} moreLanguages={moreLanguages} />
       ) : null}
     </div>

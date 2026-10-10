@@ -3,7 +3,7 @@
  * apply: `{name}` placeholders go through fmt(), plural entries through plural().
  */
 export const editorHe = {
-  back: 'חזרה להזמנות',
+  back: 'חזרה לאירוע',
   titleSeparator: ' · ',
   save: {
     saving: 'שומר…',
@@ -51,6 +51,11 @@ export const editorHe = {
     fr: 'צרפתית',
     es: 'ספרדית',
     am: 'אמהרית',
+  },
+  autoText: {
+    filled: 'מולא אוטומטית מפרטי ההזמנה ומתעדכן לבד',
+    own: 'טקסט שכתבתם',
+    reset: 'חזרה למילוי האוטומטי',
   },
   copyFrom: {
     he: 'העתקה מהעברית',
@@ -257,7 +262,7 @@ export const editorHe = {
       parallax: 'רקע מלא שזז לאט יותר מהגלילה',
       video_bg: 'סרטון שקט ברקע, בלולאה',
     },
-    needsMedia: 'קודם מוסיפים תמונה או וידאו',
+    needsMedia: 'הפריסות האלה מציגות תמונה — קודם מוסיפים תמונה או וידאו למעלה (לחיצה על פריסה מובילה לשם)',
     needsVideo: 'צריך סרטון',
     motion: {
       play: 'הצגה',
@@ -278,7 +283,7 @@ export const editorHe = {
       },
       scroll: 'בזמן הגלילה',
       scrolls: { none: 'בלי', parallax: 'פרלקסה', ken_burns: 'זום איטי' },
-      scrollNeedsMedia: 'לתמונה של הסקשן',
+      scrollNeedsMedia: 'מזיז את התמונה של הסקשן — זמין אחרי שמוסיפים תמונה או וידאו למעלה',
       text: 'חשיפת הטקסט',
       texts: { none: 'בלי', letters: 'אותיות', words: 'מילים', lines: 'שורות' },
       intensity: 'עוצמה',
@@ -748,11 +753,20 @@ export const editorHe = {
       slug: 'כתובת ההזמנה',
       slugHelp: 'אפשר לשנות את הכתובת בחלון הפרסום.',
       ogTitle: 'כותרת בשיתוף',
-      ogTitleHelp: 'ריק = שמות המארחים',
+      ogTitleHelp: 'מולא אוטומטית משמות המארחים ומתעדכן לבד — אפשר לשנות',
       ogDescription: 'תיאור בשיתוף',
-      ogDescriptionHelp: 'ריק = התאריך והמקום',
+      ogDescriptionHelp: 'מולא אוטומטית מהתאריך והמקום ומתעדכן לבד — אפשר לשנות',
       ogImage: 'תמונה בשיתוף',
-      ogImageHelp: 'ריק = תמונה שנוצרת מההזמנה',
+      ogImageHelp: 'נוצרה אוטומטית מההזמנה: התמונה הראשית, השמות והתאריך — ומתעדכנת לבד.',
+      ogImageOwnHelp: 'התמונה שהעליתם — היא נחתכת לפורמט רחב, כמו בתצוגה.',
+      ogImageUpload: 'העלאת תמונה אחרת',
+      ogImageReplace: 'החלפה',
+      ogImageReset: 'חזרה לתמונה האוטומטית',
+      intro: 'הכול כבר מולא אוטומטית מפרטי ההזמנה. אין צורך לשנות כלום — אלא אם תרצו.',
+      preview: 'כך ייראה הקישור כשתשלחו אותו',
+      previewLoading: 'מכינים את התמונה…',
+      previewFailed: 'לא הצלחנו להציג את התמונה כרגע.',
+      retry: 'ניסיון נוסף',
       noindex: 'להסתיר ממנועי חיפוש',
       noindexHelp: 'מומלץ: רק מי שקיבל את הקישור יגיע להזמנה.',
       notLive: 'ההזמנה עוד לא פורסמה — הקישור יתחיל לעבוד אחרי הפרסום.',

@@ -69,7 +69,7 @@ export function AppSidebar({
       )}
     >
       <Link
-        href="/app/invitations"
+        href="/app/invitations?all=1"
         className="rounded-btn text-[18px] lg:mx-5 lg:mt-5 lg:mb-5 lg:self-start lg:text-[19px]"
       >
         <BrandLogo label={t.brand} />
@@ -90,7 +90,7 @@ export function AppSidebar({
       </div>
 
       <nav aria-label={n.label} className="mt-5 hidden flex-col gap-1 px-3 lg:flex">
-        <SideLink href="/app/invitations" icon={LayoutGrid} active={current === 'invitations'}>
+        <SideLink href="/app/invitations?all=1" icon={LayoutGrid} active={current === 'invitations'}>
           {n.invitations}
         </SideLink>
         <button
@@ -194,7 +194,7 @@ export function MobileTabBar({ unread = 0 }: { unread?: number }) {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_-16px_rgba(28,25,23,0.25)] backdrop-blur lg:hidden"
     >
       <div className="flex h-16 items-stretch ps-1 pe-[76px]">
-        <TabLink href="/app/invitations" icon={LayoutGrid} active={current === 'invitations'}>
+        <TabLink href="/app/invitations?all=1" icon={LayoutGrid} active={current === 'invitations'}>
           {s.invitations}
         </TabLink>
         <Link

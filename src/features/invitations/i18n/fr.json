@@ -122,5 +122,13 @@
   "liveGallery.qrAfter": "Scannez pour le voir sur votre téléphone",
   "liveGallery.qrLabel": "Code QR de la galerie de l’événement",
   "liveGallery.preview": "Le bouton mène à la galerie en direct de l’événement une fois activée",
-  "scene.rsvp": "Confirmer ma présence"
+  "scene.rsvp": "Confirmer ma présence",
+  "rsvp.invitedFor": {
+    "one": "L'invitation est pour une personne",
+    "many": "L'invitation est pour {n} de personnes",
+    "other": "L'invitation est pour {n} personnes"
+  },
+  "rsvp.bringMore": "Vous souhaitez venir avec plus de personnes ?",
+  "rsvp.bringMoreHint": "Nous transmettrons la demande aux hôtes pour accord.",
+  "rsvp.more": "En plus"
 }

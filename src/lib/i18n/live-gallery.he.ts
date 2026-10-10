@@ -1,6 +1,24 @@
 /** The live gallery in the host app (the invitation's "Gallery" tab) — Hebrew. */
 export const liveGalleryHe = {
   views: { use: 'שימוש באירוע', settings: 'הגדרות ומחיקה' },
+  /** the tab's parts: what each is, in a line */
+  sections: {
+    label: 'חלקי הגלריה',
+    share: { title: 'שיתוף עם האורחים', body: 'קישור, QR, שליחה בוואטסאפ ומסך באולם' },
+    photos: { title: 'התמונות והסרטונים', body: '{n} בגלריה', pending: '{n} מחכות לאישור שלכם' },
+    extras: { title: 'אלבום, סרטון ו־AI', body: 'האלבום שאחרי, סרט רגעים, צילומי AI וזיהוי פנים' },
+    settings: { title: 'הגדרות', body: 'מי מאשר, קוד גישה, מתי פתוח, הורדה ומחיקה' },
+  },
+  /** what to do now, by where the gallery stands */
+  next: {
+    label: 'השלב הבא',
+    share: 'עוד אין תמונות — שלחו לאורחים את הקישור או הדפיסו את קוד ה־QR לשולחנות.',
+    shareCta: 'לשיתוף עם האורחים',
+    pending: { one: 'תמונה אחת מחכה לאישור שלכם.', other: '{n} תמונות מחכות לאישור שלכם.' },
+    pendingCta: 'לאישור התמונות',
+    album: 'האלבום מוכן — שלחו לאורחים תודה עם הקישור.',
+    albumCta: 'לאלבום',
+  },
   tab: 'גלריה',
   metaTitle: 'גלריה · {name}',
   title: 'גלריה חיה',
@@ -192,6 +210,7 @@ export const liveGalleryHe = {
       host: 'החלטה שלכם',
     },
     by: 'הועלה על ידי {name}',
+    instagram: 'ביקשו תיוג באינסטגרם: {handle}',
     video: 'סרטון',
     photo: 'תמונה',
     noPreview: 'אין תצוגה מקדימה',
@@ -205,6 +224,19 @@ export const liveGalleryHe = {
     next: 'הבא',
     previous: 'הקודם',
     position: '{i} מתוך {n}',
+  },
+  /** the guests who asked to be tagged on Instagram, to download */
+  tags: {
+    button: 'בקשות תיוג ({n})',
+    hint: 'רשימה לאקסל של האורחים שביקשו שתתייגו אותם באינסטגרם: שם המשתמש, קישור לפרופיל, השם, כמה תמונות ושמות הקבצים כמו בהורדת ה־ZIP.',
+    csv: {
+      handle: 'שם משתמש באינסטגרם',
+      link: 'קישור לפרופיל',
+      name: 'השם שכתבו',
+      photos: 'תמונות',
+      first: 'שיתפו לראשונה',
+      files: 'הקבצים בהורדה',
+    },
   },
   download: {
     button: 'הורדת הכל (ZIP)',

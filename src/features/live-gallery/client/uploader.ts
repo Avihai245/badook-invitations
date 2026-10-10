@@ -55,6 +55,8 @@ export interface UploaderOptions {
   uploader: string;
   code(): string | null;
   name(): string | null;
+  /** "tag me": the guest's Instagram username (null: they didn't ask) */
+  instagram?(): string | null;
   /** the guest's personal invitation token, when they came through it */
   guest: string | null;
   onChange(snapshot: Snapshot): void;
@@ -215,7 +217,12 @@ export class Uploader {
 
   // ── adding and removing ──
 
-  async add(files: File[]): Promise<AddResult> {
+  /**
+   * Prepares and queues `files`, shared `to` the story or the feed: the files picked together for
+   * the feed are one post (a key of their own).
+   */
+  async add(files: File[], to: 'story' | 'feed' = 'feed'): Promise<AddResult> {
+    const post = to === 'feed' ? randomToken(15) : undefined;
     const result: AddResult = { added: 0, errors: [] };
     this.preparing += files.length;
     this.emit();
@@ -272,6 +279,8 @@ export class Uploader {
         nextAt: 0,
         error: null,
         sent: 0,
+        placement: to,
+        ...(post ? { post } : {}),
       };
       try {
         await this.o.store.putBlob(localId, 'original', prepared.original);
@@ -439,6 +448,7 @@ export class Uploader {
       {
         ...this.common(),
         ...(this.o.name() ? { name: this.o.name()! } : {}),
+        ...(this.o.instagram?.() ? { instagram: this.o.instagram()! } : {}),
         ...(this.o.guest ? { g: this.o.guest } : {}),
         items: items.map((i) => ({
           key: i.localId,
@@ -450,6 +460,8 @@ export class Uploader {
           height: i.meta.height,
           durationMs: i.meta.durationMs,
           takenAt: i.meta.takenAt,
+          ...(i.placement ? { placement: i.placement } : {}),
+          ...(i.post ? { post: i.post } : {}),
         })),
       },
     );

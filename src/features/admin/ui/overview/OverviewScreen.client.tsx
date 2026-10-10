@@ -6,6 +6,7 @@ import { Card, Segmented } from '@/components/app';
 import type { ActivityItem } from '../../activity';
 import type { Overview, Periods } from '../../server/core-db';
 import type { FinanceSummary } from '../../server/summaries/finance';
+import type { HostPathStep } from '../../server/summaries/host-path';
 import type { SupportSummary } from '../../server/summaries/support';
 import { AdminPageHeader } from '../AdminShell.client';
 import { useAdminUi } from '../AdminUi.client';
@@ -32,12 +33,15 @@ export function OverviewScreen({
   feed,
   finance,
   support,
+  path = null,
   denied,
 }: {
   data: Overview;
   feed: ActivityItem[];
   finance: FinanceSummary | null;
   support: SupportSummary | null;
+  /** the hosts' path over 30 days (features/analytics); null: not read */
+  path?: HostPathStep[] | null;
   denied: boolean;
 }) {
   const { t, fmt, number, money, dateTime } = useAdminUi();
@@ -263,7 +267,66 @@ export function OverviewScreen({
             ))}
           </div>
         </section>
+
+        {path ? <HostPath steps={path} /> : null}
       </div>
     </>
+  );
+}
+
+/**
+ * Where new hosts stop (features/analytics): each step of the hosts' path over the last 30 days — how
+ * many hosts took it, how often — with a bar against the most-taken step.
+ */
+function HostPath({ steps }: { steps: HostPathStep[] }) {
+  const { t, number } = useAdminUi();
+  const P = t.overview.path;
+  const top = Math.max(1, ...steps.map((s) => s.hosts));
+  return (
+    <section aria-labelledby="admin-path" className="min-w-0" data-testid="admin-host-path">
+      <h2 id="admin-path" className="text-[17px] font-bold">
+        {P.title}
+      </h2>
+      <p className="mt-0.5 mb-3 text-[13px] text-muted">{P.intro}</p>
+      <Card padding="md" className="min-w-0 overflow-x-auto">
+        <table className="w-full text-[13.5px]">
+          <thead>
+            <tr className="text-start text-[12px] text-muted">
+              <th scope="col" className="pb-2 text-start font-semibold">
+                {P.step}
+              </th>
+              <th scope="col" className="pb-2 text-end font-semibold">
+                {P.hosts}
+              </th>
+              <th scope="col" className="pb-2 text-end font-semibold">
+                {P.times}
+              </th>
+              <th scope="col" className="w-[40%] pb-2">
+                <span className="sr-only">{P.bar}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {steps.map((s) => (
+              <tr key={s.name} className="border-t border-line">
+                <th scope="row" className="py-2 text-start font-medium">
+                  {P.steps[s.name]}
+                </th>
+                <td className="py-2 text-end font-bold tabular-nums">{number(s.hosts)}</td>
+                <td className="py-2 text-end text-muted tabular-nums">{number(s.times)}</td>
+                <td className="py-2 ps-4">
+                  <span aria-hidden className="block h-2 overflow-hidden rounded-full bg-subtle">
+                    <span
+                      className="block h-full rounded-full bg-brand"
+                      style={{ width: `${(s.hosts / top) * 100}%` }}
+                    />
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </section>
   );
 }

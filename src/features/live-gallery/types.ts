@@ -27,6 +27,24 @@ export interface FeedItem {
   /** when it entered the feed */
   at: string;
   name: string | null;
+  /** who it is from, as an opaque key (the stories group by it); 'host' for the hosts' own items */
+  by?: string | null;
+  /** shared to the story (the circles) or the feed (posts with likes); older answers: the feed */
+  placement?: Placement;
+  /** the feed post it belongs to (photos shared together are one post); its own id when alone */
+  post?: string;
+  /** the Instagram username the guest asked to be tagged with (no @) */
+  instagram?: string | null;
+  /** an AI photo a guest made with the people of honor (features/ai-photos) */
+  ai?: boolean;
+}
+
+export type Placement = 'story' | 'feed';
+
+/** A feed post's likes, and whether this phone liked it. */
+export interface Likes {
+  n: number;
+  mine: boolean;
 }
 
 /** One of this device's own uploads and where it stands. */
@@ -70,6 +88,8 @@ export interface FeedResponse {
   realtime: RealtimeInfo | null;
   /** the signed URLs in this answer last until then */
   expiresAt: number;
+  /** the likes of the posts asked about and of the posts in this answer (absent: nobody liked it) */
+  likes?: Record<string, Likes>;
 }
 
 export interface PartTicket {

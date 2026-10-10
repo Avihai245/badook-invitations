@@ -94,6 +94,15 @@ export function ArriveDialog({
           <Plus />
         </IconButton>
       </div>
+      {party.seats > 0 && party.arrived + count > party.seats ? (
+        <p
+          className="mt-3 rounded-btn bg-warning-bg px-3 py-2 text-[13px] text-warning"
+          role="status"
+          data-testid="arrive-over"
+        >
+          {fmt(a.over, { seats: number(party.seats) })}
+        </p>
+      ) : null}
     </Dialog>
   );
 }

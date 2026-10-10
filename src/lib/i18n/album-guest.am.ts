@@ -1,0 +1,65 @@
+import type { AlbumGuestDict } from './album-guest.he';
+
+/** The album's page for guests — Amharic. */
+export const albumGuestAm: AlbumGuestDict = {
+  metaTitle: 'አልበሙ · {name}',
+  metaDescription: 'የዝግጅቱ ውብ ጊዜያት በአንድ ቦታ',
+  eyebrow: 'አልበሙ',
+  language: 'ቋንቋ',
+  invalid: {
+    title: 'ይህ ሊንክ አይሠራም',
+    body: 'አዘጋጆቹ በአዲስ ሊንክ ቀይረውት ሊሆን ይችላል። የአሁኑን ሊንክ ይጠይቋቸው።',
+  },
+  off: { title: 'አልበሙ ተዘግቷል', body: 'አዘጋጆቹ አልበሙን ዘግተውታል።' },
+  soon: {
+    title: 'አልበሙ ሊዘጋጅ ጥቂት ቀርቶታል',
+    body: 'የዝግጅቱ ጊዜያት ሁሉ በአንድ አልበም እየተደራጁ ነው። በ{date} ይከፈታል።',
+  },
+  empty: {
+    title: 'በአልበሙ ውስጥ ገና ፎቶዎች የሉም',
+    body: 'በዝግጅቱ የፎቶ ማዕከል ፎቶዎች ሲኖሩ እዚህ ይታያሉ።',
+  },
+  message:
+    'ከእኛ ጋር {event} ስላከበሩ እናመሰግናለን! ያነሷቸው ጊዜያት ሁሉ — ፈገግታዎቹ፣ ጭፈራዎቹና እቅፎቹ — እዚህ በአንድ አልበም ተሰብስበዋል። የደስታችን አካል ስለሆኑ እናመሰግናለን።',
+  enter: 'ወደ ጊዜያቱ',
+  stats: {
+    photos: { one: '{n} ፎቶ', other: '{n} ፎቶዎች' },
+    videos: { one: '{n} ቪዲዮ', other: '{n} ቪዲዮዎች' },
+  },
+  highlights: 'ምርጥ ጊዜያት',
+  chapters: {
+    opening: 'መጀመሪያው',
+    heart: 'የደስታው ልብ',
+    more: 'ተጨማሪ ጊዜያት',
+    ending: 'እስከ መጨረሻው ጊዜ',
+    all: 'ሁሉም ጊዜያት',
+  },
+  showAll: { one: 'ተጨማሪ {n} ጊዜ', other: 'ተጨማሪ {n} ጊዜያት' },
+  by: 'ያነሳው/ያነሳችው፦ {name}',
+  ai: 'በAI የተሠራ',
+  photo: 'ፎቶ',
+  video: 'ቪዲዮ',
+  open: '{kind} {n}ን ክፈት',
+  viewer: {
+    label: 'አልበሙ',
+    close: 'ዝጋ',
+    next: 'ቀጣይ',
+    previous: 'ቀዳሚ',
+    position: '{n} ከ{total}',
+  },
+  downloadOne: 'አውርድ',
+  share: 'አልበሙን አጋራ',
+  shareText: 'ውብ ጊዜያት {event} 💛',
+  copied: 'የአልበሙ ሊንክ ተቀድቷል',
+  downloadAll: 'ሙሉውን አልበም አውርድ',
+  downloading: 'በማውረድ ላይ… {done} ከ{total}',
+  downloaded: 'አልበሙ ወደ መሣሪያው ወርዷል',
+  missingName: 'ያልወረዱ-ፋይሎች.txt',
+  missingIntro: 'እነዚህ ፋይሎች ሊወርዱ አልቻሉም፦',
+  thanks: 'ከእኛ ጋር ስላከበሩ እናመሰግናለን',
+  love: 'በፍቅር',
+  made: 'ይህ አልበም በ{brand} ተሠርቷል',
+  makeYours: 'ዲጂታል ግብዣ፣ የቀጥታ ፎቶ ማዕከልና አልበም — ለእርስዎ ዝግጅት',
+  failed: 'የሆነ ችግር ተፈጥሯል። እንደገና ይሞክሩ።',
+  top: 'ወደ ላይ ተመለስ',
+};

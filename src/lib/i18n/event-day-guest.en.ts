@@ -99,6 +99,11 @@ export const eventDayGuestEn: EventDayGuestDict = {
     declined: 'Replied they aren’t coming',
     notReplied: 'Didn’t RSVP',
     arrivingNow: 'Arriving now',
+    over: {
+      one: 'Heads up: more than their one seat. Check with the hosts that the table has room.',
+      other: 'Heads up: more than their {n} seats. Check with the hosts that the table has room.',
+    },
+    allHere: 'Everyone they had seats for is already checked in.',
     less: 'Fewer',
     more: 'More',
     checkIn: { one: 'Check in 1 guest', other: 'Check in {n} guests' },
@@ -128,5 +133,9 @@ export const eventDayGuestEn: EventDayGuestDict = {
     privacy: 'Privacy policy',
     accessibility: 'Accessibility statement',
     made: 'Made with {brand}',
+    site: 'Digital invitations & event planning',
+    visit: 'Visit {brand}',
+    events: 'Badook Events',
+    eventsHint: 'Find a venue for your event',
   },
 };

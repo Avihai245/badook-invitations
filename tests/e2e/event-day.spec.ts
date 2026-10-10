@@ -352,10 +352,34 @@ test('the entrance checks families in by search and by the code on their phone; 
   const station = await door.newPage();
   await station.goto(stationUrl);
   await expect(station.getByTestId('station')).toBeVisible();
+  // Badook is plain to see at the bottom, with its site and Badook Events (new tabs)
+  const brand = station.getByTestId('station-brand-card');
+  await brand.scrollIntoViewIfNeeded();
+  await expect(brand.getByRole('img', { name: 'Badook' }).first()).toBeVisible();
+  await expect(station.getByTestId('station-brand')).toHaveAttribute('href', '/');
+  await expect(station.getByTestId('station-brand-site')).toHaveAttribute('href', '/');
+  await expect(station.getByTestId('station-brand-site')).toHaveAttribute('target', '_blank');
+  await expect(station.getByTestId('station-brand-events')).toHaveAttribute(
+    'href',
+    'https://event.badooks.com/',
+  );
+  await expect(station.getByTestId('station-brand-events')).toHaveAttribute('target', '_blank');
+  mkdirSync(SCREENS, { recursive: true });
+  await settle(station);
+  await station.screenshot({ path: `${SCREENS}/station-brand-he-390.png`, fullPage: true });
+  await station.evaluate(() => window.scrollTo(0, 0));
   await station.getByTestId('station-search').fill('לוי');
   await station.locator('[data-party="משפחת לוי"]').click();
   await expect(station.getByTestId('party-table')).toContainText('12');
   await expect(station.getByTestId('party-count')).toHaveText('2');
+  // one more than their seats: the door is told to check with the hosts
+  await expect(station.getByTestId('party-over')).toHaveCount(0);
+  await station.getByRole('button', { name: 'יותר', exact: true }).click();
+  await expect(station.getByTestId('party-over')).toHaveText(
+    'שימו לב: יותר מ־2 המקומות שלהם. בדקו עם המארחים שיש מקום בשולחן.',
+  );
+  await station.getByRole('button', { name: 'פחות', exact: true }).click();
+  await expect(station.getByTestId('party-over')).toHaveCount(0);
   mkdirSync(SCREENS, { recursive: true });
   await settle(station);
   await station.screenshot({ path: `${SCREENS}/station-party-he-390.png` });
@@ -569,6 +593,7 @@ test('without the package the event day is offered, switched off it is gone, and
   await page.getByRole('button', { name: 'להפעיל את יום האירוע' }).click();
   // after the reload React may still hold a hidden copy of the streamed page for a moment
   await expect(page.locator('[data-testid="live-hall"]:visible')).toBeVisible({ timeout: 15_000 });
+  await page.waitForFunction(() => !document.querySelector('div[hidden][id^="S:"]'));
   await expect(navItem(page, 'live')).toBeVisible();
 });
 

@@ -26,6 +26,9 @@ import type { CategoryMode, Pref } from './model';
  *               table's main category; with "mix", the people of one category beyond half the table
  *        +   10 × every seat missing for a table with anyone at it to be `minFill` full (balance: no
  *               table of 2 next to a table of 12)
+ *        +   15 × every unit that is the only one of its category at a table (with "group": nobody sits
+ *               as the lone guest among another group when a friend from their own could sit with them
+ *               — a category with one unit in the whole event doesn't count)
  *
  * Hard "together" rules join units into one block that moves as a whole (when the block fits a table;
  * a block bigger than any table is split and reported). A seat for everyone weighs more than a hard
@@ -64,6 +67,7 @@ export interface SolverWeights {
   preference: number;
   category: number;
   fill: number;
+  lonely: number;
 }
 
 export const WEIGHTS: SolverWeights = {
@@ -73,6 +77,7 @@ export const WEIGHTS: SolverWeights = {
   preference: 12,
   category: 6,
   fill: 10,
+  lonely: 15,
 };
 
 export interface SolverOptions {
@@ -111,6 +116,8 @@ export type SolverIssue =
   /** "group": a table where categories sit together; "mix": a table that is mostly one category */
   | { code: 'mixed'; table: string; categories: string[] }
   | { code: 'unmixed'; table: string; category: string }
+  /** "group": units that are the only ones of their category at their table */
+  | { code: 'lonely'; table: string; units: string[] }
   /** units whose wish about a zone isn't met */
   | { code: 'preference'; zone: 'stage' | 'dance' | 'exit'; near: boolean; units: string[] };
 
@@ -170,6 +177,9 @@ export function solve(input: SolverInput, onProgress?: (p: SolverProgress) => vo
   const categories = [...new Set(units.map((u) => u.category).filter((c): c is string => !!c))].sort();
   const C = categories.length;
   const catOf = Int32Array.from(units, (u) => (u.category ? categories.indexOf(u.category) : -1));
+  // units of each category in the whole event (a category of one can't have company)
+  const catTotal = new Int32Array(Math.max(1, C));
+  for (let u = 0; u < U; u++) if (catOf[u]! >= 0) catTotal[catOf[u]!] = catTotal[catOf[u]!]! + 1;
   const pref = new Int8Array(U * 3);
   units.forEach((u, i) => ZONE_KEYS.forEach((z, k) => (pref[i * 3 + k] = u.prefs[z])));
   const accessU = Uint8Array.from(units, (u) => (u.accessible ? 1 : 0));
@@ -265,14 +275,19 @@ export function solve(input: SolverInput, onProgress?: (p: SolverProgress) => vo
   const occ = new Int32Array(T);
   const catCount = new Int32Array(Math.max(1, T * C));
   const catPeople = new Int32Array(T);
+  // units (not people) of each category at each table, and units at each table
+  const catUnits = new Int32Array(Math.max(1, T * C));
+  const unitsAt = new Int32Array(T);
 
   const place = (b: number, t: number, sign: 1 | -1) => {
     occ[t] = occ[t]! + sign * blockSeats[b]!;
     for (const u of blockList[b]!) {
+      unitsAt[t] = unitsAt[t]! + sign;
       const c = catOf[u]!;
       if (c >= 0) {
         catCount[t * C + c] = catCount[t * C + c]! + sign * seats[u]!;
         catPeople[t] = catPeople[t]! + sign * seats[u]!;
+        catUnits[t * C + c] = catUnits[t * C + c]! + sign;
       }
     }
   };
@@ -285,6 +300,13 @@ export function solve(input: SolverInput, onProgress?: (p: SolverProgress) => vo
   const eligible = (b: number, t: number) => !lockedT[t] && (!blockAccess[b] || accessT[t] === 1);
 
   // ── costs ──
+  /** the units at table t that are the only ones of their category there (and could have company) */
+  const lonelyAt = (t: number): number => {
+    if (unitsAt[t]! < 2 || !catPeople[t]) return 0;
+    let n = 0;
+    for (let c = 0, base = t * C; c < C; c++) if (catUnits[base + c] === 1 && catTotal[c]! > 1) n++;
+    return n;
+  };
   const tableCost = (t: number): number => {
     if (t < 0) return 0;
     const o = occ[t]!;
@@ -298,6 +320,7 @@ export function solve(input: SolverInput, onProgress?: (p: SolverProgress) => vo
       if (mode === 'group') cost += W.category * (catPeople[t]! - max);
       else cost += W.category * Math.max(0, max - Math.ceil(o / 2));
     }
+    if (mode === 'group' && W.lonely > 0) cost += W.lonely * lonelyAt(t);
     return cost;
   };
   const unitCost = (u: number, t: number): number => {
@@ -406,6 +429,8 @@ export function solve(input: SolverInput, onProgress?: (p: SolverProgress) => vo
     occ.fill(0);
     catCount.fill(0);
     catPeople.fill(0);
+    catUnits.fill(0);
+    unitsAt.fill(0);
     for (let b = 0; b < B; b++) if (blockFixed[b]! >= 0) moveBlock(b, blockFixed[b]!);
 
     // greedy start: the hardest to place first (accessible, then the biggest), each where it costs least
@@ -489,6 +514,8 @@ export function solve(input: SolverInput, onProgress?: (p: SolverProgress) => vo
     occ.fill(0);
     catCount.fill(0);
     catPeople.fill(0);
+    catUnits.fill(0);
+    unitsAt.fill(0);
     best.forEach((t, b) => t >= 0 && moveBlock(b, t));
   }
   const assignment: Record<string, string | null> = {};
@@ -545,6 +572,15 @@ export function solve(input: SolverInput, onProgress?: (p: SolverProgress) => vo
     const present = categories.filter((_, c) => catCount[t * C + c]! > 0);
     if (mode === 'group' && present.length > 1)
       issues.push({ code: 'mixed', table: input.tables[t]!.id, categories: present });
+    if (mode === 'group' && W.lonely > 0 && !lockedT[t] && lonelyAt(t) > 0) {
+      const alone: string[] = [];
+      for (let u = 0; u < U; u++) {
+        const c = catOf[u]!;
+        if (c >= 0 && tableOfUnit(u) === t && catUnits[t * C + c] === 1 && catTotal[c]! > 1)
+          alone.push(units[u]!.id);
+      }
+      issues.push({ code: 'lonely', table: input.tables[t]!.id, units: alone });
+    }
     if (mode === 'mix' && C > 1) {
       let top = 0;
       for (let c = 1; c < C; c++) if (catCount[t * C + c]! > catCount[t * C + top]!) top = c;

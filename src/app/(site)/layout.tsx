@@ -1,17 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { preload } from 'react-dom';
-import { faceUrl } from '@/features/invitations/fonts';
-import { appFaceUrl } from '@/lib/app-fonts';
-import { uiDir } from '@/lib/i18n/app';
-import { UiProvider } from '@/lib/i18n/provider-lazy';
+import { SiteRoot } from '@/features/site/SiteRoot';
 import { getUiLocale } from '@/lib/i18n/server';
-import { A11Y_BOOT } from '@/features/site/a11y';
-import { AccessibilityMenu } from '@/features/site/AccessibilityMenu.client';
-import { StaleBuildGuard } from '@/features/site/StaleBuildGuard.client';
-import { ThemeSync } from '@/features/site/Theme.client';
-import { THEME_BOOT } from '@/features/site/theme';
-import '@/styles/public.css';
 
 export const metadata: Metadata = {
   title: { default: 'Badook — הזמנות דיגיטליות', template: '%s · Badook' },
@@ -20,38 +10,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
 
-/**
- * Root layout for the host app — Hebrew RTL by default, English when the `ui_lang` cookie says so.
- * The invitation has its own root layout (its languages are independent of the app's).
- */
+/** Root layout for the host app and the public pages that follow the `ui_lang` cookie. */
 export default async function SiteLayout({ children }: { children: ReactNode }) {
-  const locale = await getUiLocale();
-  // the first screen's faces, fetched with the stylesheet rather than after it: the text and the
-  // headlines in the UI language's script (app.css --font-sans / --font-display)
-  const faces =
-    locale === 'he'
-      ? [
-          appFaceUrl('Heebo Variable', 'hebrew'),
-          // the letters, digits and punctuation of the text (the whole Latin face only for accents and the rest)
-          appFaceUrl('Heebo Variable', 'latin-basic'),
-          faceUrl('Frank Ruhl Libre', 'hebrew', 700),
-        ]
-      : [appFaceUrl('Inter Variable', 'latin-basic')];
-  for (const href of faces) if (href) preload(href, { as: 'font', type: 'font/woff2', crossOrigin: '' });
-  return (
-    <html lang={locale} dir={uiDir(locale)} suppressHydrationWarning>
-      <head>
-        {/* the accessibility menu's settings and the system's look (light / dark), before the first paint */}
-        <script dangerouslySetInnerHTML={{ __html: A11Y_BOOT + THEME_BOOT }} />
-      </head>
-      <body>
-        <UiProvider locale={locale} scope="site">
-          {children}
-          <AccessibilityMenu />
-          <ThemeSync />
-          <StaleBuildGuard />
-        </UiProvider>
-      </body>
-    </html>
-  );
+  return <SiteRoot locale={await getUiLocale()}>{children}</SiteRoot>;
 }

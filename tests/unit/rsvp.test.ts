@@ -333,10 +333,10 @@ describe('RSVP endpoint rules', () => {
       ...deps(invitation(), {
         submit: vi.fn<RsvpDeps['submit']>(async () => ({ id: 'resp-2', replaced: true })),
       }),
-      guestId: vi.fn<NonNullable<RsvpDeps['guestId']>>(async () => 'guest-b'),
+      guest: vi.fn<NonNullable<RsvpDeps['guest']>>(async () => ({ id: 'guest-b', partySize: null })),
     };
     const r = await call(yes({ editToken: token, guestToken }), d);
-    expect(d.guestId).toHaveBeenCalledWith('inv-1', guestToken);
+    expect(d.guest).toHaveBeenCalledWith('inv-1', guestToken);
     const input = d.submit.mock.calls[0]![0];
     expect(input.response.guest_id).toBe('guest-b');
     expect(input.existingTokenHash).toBeNull();
@@ -367,6 +367,50 @@ describe('RSVP endpoint rules', () => {
       editToken: expect.any(String),
     });
     expect(real.submit).toHaveBeenCalledTimes(1);
+  });
+
+  describe('a personal link counts as many as the guest was invited with', () => {
+    const guestToken = 'AbCdEfGhIjKlMnOp';
+    const withGuest = (partySize: number | null) => ({
+      ...deps(),
+      guest: vi.fn<NonNullable<RsvpDeps['guest']>>(async () => ({ id: 'guest-b', partySize })),
+    });
+    const many = (n: number) =>
+      Array.from({ length: n }, (_, i) => adult({ firstName: `A${i}`, phone: i ? null : '050-123-4567' }));
+
+    it('up to their party size — even beyond the section’s own maximum (4 here)', async () => {
+      const d = withGuest(6);
+      const r = await call(yes({ guestToken, adults: many(6) }), d);
+      expect(r.body.ok).toBe(true);
+      expect(d.submit.mock.calls[0]![0].response).toMatchObject({ guest_id: 'guest-b', adults_count: 6 });
+    });
+
+    it('no more than their party size: refused (the form stops there)', async () => {
+      const r = await call(yes({ guestToken, adults: many(3) }), withGuest(2));
+      expect(r.body).toMatchObject({
+        ok: false,
+        code: 'invalid',
+        fieldErrors: { adults: expect.any(String) },
+      });
+    });
+
+    it('asking to bring more is a request, kept with the reply for the host', async () => {
+      const d = withGuest(2);
+      const r = await call(yes({ guestToken, adults: many(2), extraRequested: 2 }), d);
+      expect(r.body.ok).toBe(true);
+      expect(d.submit.mock.calls[0]![0].response).toMatchObject({ adults_count: 2, extra_requested: 2 });
+    });
+
+    it('the general link asks for nothing more: the section’s maximum applies', async () => {
+      expect((await call(yes({ extraRequested: 1 }))).body).toMatchObject({
+        ok: false,
+        fieldErrors: { extraRequested: expect.any(String) },
+      });
+      expect((await call(yes({ adults: many(5) }))).body).toMatchObject({
+        ok: false,
+        fieldErrors: { adults: expect.any(String) },
+      });
+    });
   });
 });
 

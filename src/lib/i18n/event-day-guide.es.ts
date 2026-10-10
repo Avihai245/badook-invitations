@@ -77,5 +77,9 @@ export const eventDayGuideEs: EventDayGuideDict = {
     privacy: 'Política de privacidad',
     accessibility: 'Declaración de accesibilidad',
     made: 'Hecho con {brand}',
+    site: 'Invitaciones digitales y organización de eventos',
+    visit: 'Visitar {brand}',
+    events: 'Badook Events',
+    eventsHint: 'Encontrar un lugar para tu evento',
   },
 };

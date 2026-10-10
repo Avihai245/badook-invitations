@@ -48,11 +48,21 @@ interface DigestItem {
   responses: { name: string; attending: boolean; adults: number; children: number }[];
 }
 
-/** The daily summary (POST /api/cron/rsvp-digest): one email per invitation with new replies. */
+/** The daily summary's hour, on the clock of the invitation's own time zone. */
+export const DIGEST_LOCAL_HOUR = 8;
+
+/**
+ * The daily summary: one email per invitation with new replies, at 08:00 in the invitation's own time
+ * zone (rsvp_digest_due_local) — a host in New York gets it at 08:00 there, not at Israel's. The clock
+ * looks every few minutes (features/jobs); each invitation's goes out once a day.
+ */
 export async function sendDigests(now: Date): Promise<{ sent: number; failed: number }> {
   const db = serviceDb();
-  const { data, error } = await db.rpc('rsvp_digest_due', { p_now: now.toISOString() });
-  if (error) throw new Error(`rsvp_digest_due: ${error.message}`);
+  const { data, error } = await db.rpc('rsvp_digest_due_local', {
+    p_now: now.toISOString(),
+    p_hour: DIGEST_LOCAL_HOUR,
+  });
+  if (error) throw new Error(`rsvp_digest_due_local: ${error.message}`);
   let sent = 0;
   let failed = 0;
   for (const item of (data ?? []) as DigestItem[]) {

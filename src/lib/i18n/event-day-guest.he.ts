@@ -98,6 +98,11 @@ export const eventDayGuestHe = {
     declined: 'השיבו שלא יגיעו',
     notReplied: 'לא אישרו הגעה',
     arrivingNow: 'מגיעים עכשיו',
+    over: {
+      one: 'שימו לב: יותר מהמקום האחד שלהם. בדקו עם המארחים שיש מקום בשולחן.',
+      other: 'שימו לב: יותר מ־{n} המקומות שלהם. בדקו עם המארחים שיש מקום בשולחן.',
+    },
+    allHere: 'כל מי שהיה להם מקום כבר נרשם.',
     less: 'פחות',
     more: 'יותר',
     checkIn: { one: 'רישום אורח אחד', other: 'רישום {n} אורחים' },
@@ -127,6 +132,10 @@ export const eventDayGuestHe = {
     privacy: 'מדיניות פרטיות',
     accessibility: 'הצהרת נגישות',
     made: 'נוצר ב־{brand}',
+    site: 'הזמנות דיגיטליות וארגון אירועים',
+    visit: 'לאתר {brand}',
+    events: 'Badook אירועים',
+    eventsHint: 'למצוא מקום לאירוע',
   },
 };
 

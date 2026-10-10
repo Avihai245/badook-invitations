@@ -1,13 +1,26 @@
 'use client';
 
-import { CircleAlert, CircleCheck, Lock, RotateCcw, Sparkles, Undo2, X } from 'lucide-react';
+import {
+  Accessibility,
+  CircleAlert,
+  CircleCheck,
+  LoaderCircle,
+  Lock,
+  MessageSquareText,
+  RotateCcw,
+  Sparkles,
+  Undo2,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Button, Dialog, Hint, IconButton, Segmented, Switch, cn } from '@/components/app';
+import { hostApi } from '@/features/invitations/app/api';
 import type { AppDict } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { CATEGORY_MODES, type SeatingSettings } from '../model';
 import type { SolverInput, SolverIssue, SolverProgress, SolverResult } from '../solver';
+import type { WordsAnswer } from '../words';
 
 /**
  * Runs the solver in a Web Worker (solver.worker.ts); where there are no workers, on the page itself.
@@ -60,6 +73,7 @@ export function AutoDialog({
   onRun,
   onCancel,
   onClose,
+  words,
 }: {
   settings: SeatingSettings;
   lockedTables: number;
@@ -70,6 +84,8 @@ export function AutoDialog({
   onRun(): void;
   onCancel(): void;
   onClose(): void;
+  /** "tell us in words" (WordsPanel), where the AI is there */
+  words?: ReactNode;
 }) {
   const { t, plural } = useUi();
   const a = t.seating.auto;
@@ -98,6 +114,7 @@ export function AutoDialog({
       }
     >
       <div className="flex flex-col gap-4" data-testid="auto-dialog">
+        {words}
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold">{a.categories}</span>
           <Segmented
@@ -203,6 +220,8 @@ export function describeIssue(
       return fmt(i.mixed, { table: numbers.get(issue.table) ?? '?', categories: join(issue.categories) });
     case 'unmixed':
       return fmt(i.unmixed, { table: numbers.get(issue.table) ?? '?', category: issue.category });
+    case 'lonely':
+      return fmt(i.lonely, { table: numbers.get(issue.table) ?? '?', names: list(issue.units) });
     case 'underfilled':
       return fmt(i.underfilled, {
         table: numbers.get(issue.table) ?? '?',
@@ -224,6 +243,7 @@ const RANK: Record<SolverIssue['code'], number> = {
   preference: 6,
   mixed: 7,
   unmixed: 7,
+  lonely: 7,
 };
 
 /**
@@ -235,12 +255,15 @@ export function AutoResult({
   run,
   names,
   numbers,
+  rules = 0,
   onRerun,
   onUndo,
   onClose,
   className,
 }: {
   result: SolverResult;
+  /** the rules between the units that were seated (for "3 of 4 rules kept") */
+  rules?: number;
   /** how many arrangements were made so far (a new one is a new result) */
   run: number;
   names: ReadonlyMap<string, string>;
@@ -266,6 +289,18 @@ export function AutoResult({
     .map((issue) => ({ issue, text: describeIssue(issue, names, numbers, a, fmt, join) }));
   const serious = (i: SolverIssue) =>
     i.code === 'unseated' || i.code === 'conflict' || (i.code === 'rule' && i.hard);
+  // in plain words first: families whole (always), the rules kept, who has no seat
+  const broken = result.issues.filter((i) => i.code === 'rule').length;
+  const kept = Math.max(0, rules - broken);
+  const summary = [
+    a.summary.families,
+    rules
+      ? kept === rules
+        ? plural(a.summary.allRulesKept, rules)
+        : plural(a.summary.rulesKept, kept, { total: rules })
+      : null,
+    result.unseated ? plural(a.summary.unseated, result.unseated) : null,
+  ].filter(Boolean);
   return (
     <section
       aria-label={a.resultTitle}
@@ -302,6 +337,9 @@ export function AutoResult({
         </IconButton>
       </div>
       <div className="max-h-[calc(60vh-120px)] overflow-y-auto p-3">
+        <p className="mb-2 text-[12.5px] font-semibold" data-testid="auto-summary">
+          {summary.join(' · ')}
+        </p>
         {issues.length === 0 ? (
           <p className="text-[13px] text-success">{result.score === 0 ? a.perfect : a.nearlyPerfect}</p>
         ) : (
@@ -380,5 +418,217 @@ export function AutoUpgrade({
         </>
       }
     />
+  );
+}
+
+type WordItem =
+  | { key: string; kind: 'rule'; rule: WordsAnswer['rules'][number] }
+  | { key: string; kind: 'zone'; zone: WordsAnswer['zones'][number] }
+  | { key: string; kind: 'accessible'; unit: string };
+
+/**
+ * "Tell us in words who sits with whom": the host's wishes read by the AI (POST …/seating/words) into
+ * rules, shown as a list to tick — nothing is added until "Add". What it couldn't match is said back.
+ */
+export function WordsPanel({
+  id,
+  names,
+  onApply,
+}: {
+  id: string;
+  names: ReadonlyMap<string, string>;
+  onApply(answer: Pick<WordsAnswer, 'rules' | 'zones' | 'accessible'>): void;
+}) {
+  const { t, fmt, plural, locale } = useUi();
+  const a = t.seating.auto;
+  const W = a.words;
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<WordsAnswer | null>(null);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [added, setAdded] = useState<string | null>(null);
+  const join = (list: string[]) =>
+    new Intl.ListFormat(locale === 'he' ? 'he' : 'en', { type: 'conjunction' }).format(list);
+  const name = (u: string) => names.get(u) ?? '?';
+
+  const items: WordItem[] = answer
+    ? [
+        ...answer.rules.map((rule, i) => ({ key: `r${i}`, kind: 'rule' as const, rule })),
+        ...answer.zones.map((zone, i) => ({ key: `z${i}`, kind: 'zone' as const, zone })),
+        ...answer.accessible.map((unit, i) => ({ key: `a${i}`, kind: 'accessible' as const, unit })),
+      ]
+    : [];
+
+  const read = async () => {
+    setBusy(true);
+    setError(null);
+    setAdded(null);
+    const res = await hostApi<{ answer?: WordsAnswer; code?: string }>(
+      `/api/invitations/${id}/seating/words`,
+      { method: 'POST', body: { text, locale } },
+    );
+    setBusy(false);
+    if (res.ok && res.body?.answer) {
+      const next = res.body.answer;
+      setAnswer(next);
+      setPicked(
+        new Set([
+          ...next.rules.map((_, i) => `r${i}`),
+          ...next.zones.map((_, i) => `z${i}`),
+          ...next.accessible.map((_, i) => `a${i}`),
+        ]),
+      );
+      return;
+    }
+    const code = res.body?.code;
+    setAnswer(null);
+    setError(
+      code === 'not_understood' || code === 'refused'
+        ? W.errors.not_understood
+        : code === 'rate_limited'
+          ? W.errors.rate_limited
+          : code === 'no_guests'
+            ? W.errors.no_guests
+            : W.errors.failed,
+    );
+  };
+
+  const apply = () => {
+    if (!answer) return;
+    const chosen = {
+      rules: answer.rules.filter((_, i) => picked.has(`r${i}`)),
+      zones: answer.zones.filter((_, i) => picked.has(`z${i}`)),
+      accessible: answer.accessible.filter((_, i) => picked.has(`a${i}`)),
+    };
+    onApply(chosen);
+    setAdded(plural(W.added, picked.size));
+    setAnswer(null);
+    setText('');
+  };
+
+  const label = (item: WordItem) => {
+    if (item.kind === 'rule')
+      return (
+        <>
+          <span
+            className={cn(
+              'rounded-full px-2 py-0.5 text-[11.5px] font-bold',
+              item.rule.kind === 'together' ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger',
+            )}
+          >
+            {item.rule.kind === 'together' ? W.together : W.apart}
+          </span>
+          <bdi className="min-w-0">{join(item.rule.units.map(name))}</bdi>
+          <span className="text-[11.5px] text-muted">({item.rule.hard ? W.hard : W.soft})</span>
+        </>
+      );
+    if (item.kind === 'zone')
+      return (
+        <>
+          <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[11.5px] font-bold text-brand-deep">
+            {fmt(item.zone.near ? W.near : W.far, { zone: a.issues.zones[item.zone.zone] })}
+          </span>
+          <bdi className="min-w-0">{join(item.zone.units.map(name))}</bdi>
+        </>
+      );
+    return (
+      <>
+        <span className="flex items-center gap-1 rounded-full bg-subtle px-2 py-0.5 text-[11.5px] font-bold">
+          <Accessibility aria-hidden className="size-3.5" />
+          {W.accessible}
+        </span>
+        <bdi className="min-w-0">{name(item.unit)}</bdi>
+      </>
+    );
+  };
+
+  return (
+    <section
+      className="flex flex-col gap-2 rounded-[14px] border border-brand-line bg-brand-soft/40 p-3"
+      data-testid="seating-words"
+    >
+      <label className="flex flex-col gap-1.5">
+        <span className="flex items-center gap-1.5 text-[13px] font-bold">
+          <MessageSquareText aria-hidden className="size-4 text-brand-deep" />
+          {W.title}
+        </span>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={W.placeholder}
+          rows={2}
+          maxLength={800}
+          className="w-full resize-y rounded-btn border border-line bg-surface px-3 py-2 text-[14px] outline-none focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-brand/30"
+        />
+        <span className="text-[12px] leading-snug text-muted">{W.hint}</span>
+      </label>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          size="sm"
+          variant="secondary"
+          icon={busy ? <LoaderCircle className="motion-safe:animate-spin" /> : <Sparkles />}
+          disabled={busy || text.trim().length < 3}
+          onClick={read}
+          data-testid="words-read"
+        >
+          {busy ? W.reading : W.read}
+        </Button>
+        {added ? (
+          <span role="status" className="text-[12.5px] font-semibold text-success">
+            {added}
+          </span>
+        ) : null}
+      </div>
+      {error ? (
+        <p role="alert" className="text-[12.5px] text-danger">
+          {error}
+        </p>
+      ) : null}
+      {answer ? (
+        <div className="flex flex-col gap-2" data-testid="words-answer">
+          {items.length ? (
+            <>
+              <p className="text-[12.5px] font-semibold">{plural(W.found, items.length)}</p>
+              <ul className="flex flex-col gap-1">
+                {items.map((item) => (
+                  <li key={item.key}>
+                    <label className="flex cursor-pointer items-center gap-2 rounded-btn bg-surface px-2.5 py-1.5 text-[13px]">
+                      <input
+                        type="checkbox"
+                        checked={picked.has(item.key)}
+                        onChange={(e) => {
+                          const next = new Set(picked);
+                          if (e.target.checked) next.add(item.key);
+                          else next.delete(item.key);
+                          setPicked(next);
+                        }}
+                        className="size-4 accent-ink"
+                      />
+                      <span className="flex min-w-0 flex-wrap items-center gap-1.5">{label(item)}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+          {answer.unclear.length ? (
+            <p className="text-[12.5px] text-warning">
+              {fmt(W.unclear, { list: join(answer.unclear.map((q) => `"${q}"`)) })}
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {items.length ? (
+              <Button size="sm" onClick={apply} disabled={picked.size === 0} data-testid="words-add">
+                {plural(W.add, picked.size)}
+              </Button>
+            ) : null}
+            <Button size="sm" variant="ghost" onClick={() => setAnswer(null)}>
+              {W.discard}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </section>
   );
 }

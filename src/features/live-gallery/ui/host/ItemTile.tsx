@@ -79,7 +79,12 @@ export function ItemTile({
         type="button"
         onClick={onOpen}
         className="block aspect-square w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        aria-label={[kind, who, item.status !== 'published' ? g.status[item.status] : null]
+        aria-label={[
+          kind,
+          who,
+          item.instagram ? `@${item.instagram}` : null,
+          item.status !== 'published' ? g.status[item.status] : null,
+        ]
           .filter(Boolean)
           .join(' · ')}
       >

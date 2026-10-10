@@ -209,11 +209,12 @@ interface MessagesResponse {
   error?: { type?: string; message?: string };
 }
 
-type Called = { status: 'ok'; json: unknown } | { status: 'refused' } | { status: 'error'; error: string };
+export type Called =
+  { status: 'ok'; json: unknown } | { status: 'refused' } | { status: 'error'; error: string };
 
 const TIMEOUT_MS = 60_000;
 
-async function ask(
+export async function ask(
   config: AiConfig,
   system: string,
   user: string,

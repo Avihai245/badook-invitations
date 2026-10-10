@@ -3,6 +3,29 @@ import type { LiveGalleryDict } from './live-gallery.he';
 /** The live gallery in the host app (the invitation's "Gallery" tab) — English. */
 export const liveGalleryEn: LiveGalleryDict = {
   views: { use: 'At the event', settings: 'Settings & deleting' },
+  sections: {
+    label: 'Parts of the gallery',
+    share: { title: 'Share with guests', body: 'Link, QR code, WhatsApp and the venue screen' },
+    photos: {
+      title: 'Photos & videos',
+      body: '{n} in the gallery',
+      pending: '{n} waiting for your approval',
+    },
+    extras: { title: 'Album, film & AI', body: 'The album after, a moments film, AI photos and face search' },
+    settings: { title: 'Settings', body: 'Who approves, access code, when it’s open, download and delete' },
+  },
+  next: {
+    label: 'Next step',
+    share: 'No photos yet — send your guests the link or print the QR code for the tables.',
+    shareCta: 'Share with guests',
+    pending: {
+      one: 'One photo is waiting for your approval.',
+      other: '{n} photos are waiting for your approval.',
+    },
+    pendingCta: 'Review photos',
+    album: 'Your album is ready — send your guests a thank-you with the link.',
+    albumCta: 'Open the album',
+  },
   tab: 'Gallery',
   metaTitle: 'Gallery · {name}',
   title: 'Live gallery',
@@ -197,6 +220,7 @@ export const liveGalleryEn: LiveGalleryDict = {
       host: 'Your decision',
     },
     by: 'Uploaded by {name}',
+    instagram: 'Asked to be tagged on Instagram: {handle}',
     video: 'Video',
     photo: 'Photo',
     noPreview: 'No preview',
@@ -210,6 +234,18 @@ export const liveGalleryEn: LiveGalleryDict = {
     next: 'Next',
     previous: 'Previous',
     position: '{i} of {n}',
+  },
+  tags: {
+    button: 'Tag requests ({n})',
+    hint: 'A list for Excel of the guests who asked you to tag them on Instagram: username, profile link, name, how many photos and their file names as in the ZIP download.',
+    csv: {
+      handle: 'Instagram username',
+      link: 'Profile link',
+      name: 'Name they gave',
+      photos: 'Photos',
+      first: 'First shared',
+      files: 'Files in the download',
+    },
   },
   download: {
     button: 'Download all (ZIP)',

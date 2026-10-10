@@ -115,16 +115,40 @@ async function loadFonts(pair: FontPair, locale: Locale) {
 
 // ─── background ───────────────────────────────────────────────────────────────────────────────────
 
-/** The hero photo as a data URL (satori decodes JPEG/PNG only); null → the template's gradient. */
-async function heroPhoto(url: string | null): Promise<string | null> {
-  if (!url || !/\.(jpe?g|png)(\?|$)/i.test(url)) return null;
+/**
+ * A photo as a JPEG/PNG data URL (satori decodes those only); null → the template's gradient. Uploads
+ * are stored as WebP (editor/fields/prepare-image.ts) and template media may be WebP/AVIF too: those
+ * are re-encoded with sharp (at most 1600px wide — the card is 1200).
+ */
+async function photoData(url: string | null): Promise<string | null> {
+  if (!url || !/^https?:\/\//.test(url)) return null;
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
     const type = res.headers.get('content-type') ?? '';
-    if (!res.ok || !/^image\/(jpeg|png)\b/.test(type)) return null;
+    if (!res.ok || !/^image\//.test(type)) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    return buf.byteLength <= 6_000_000 ? `data:${type};base64,${buf.toString('base64')}` : null;
+    if (buf.byteLength > 12_000_000) return null;
+    if (/^image\/(jpeg|png)\b/.test(type) && buf.byteLength <= 6_000_000)
+      return `data:${type};base64,${buf.toString('base64')}`;
+    const jpeg = await toJpeg(buf);
+    return jpeg ? `data:image/jpeg;base64,${jpeg.toString('base64')}` : null;
   } catch {
+    return null;
+  }
+}
+
+/** Any image sharp reads (WebP, AVIF, a large JPEG/PNG…) as an upright JPEG ≤ 1600px wide; null without sharp. */
+async function toJpeg(buf: Buffer): Promise<Buffer | null> {
+  try {
+    const sharp = (await import('sharp')).default;
+    return await sharp(buf, { failOn: 'none' })
+      .rotate()
+      .resize({ width: 1600, withoutEnlargement: true })
+      .flatten({ background: '#ffffff' })
+      .jpeg({ quality: 82 })
+      .toBuffer();
+  } catch (err) {
+    console.error('OG image: could not convert a photo', err);
     return null;
   }
 }
@@ -145,6 +169,9 @@ function skyGradient(sky: string): string {
  */
 export async function invitationOgImage(ctx: RenderContext, headers?: HeadersInit): Promise<ImageResponse> {
   const { doc, template, locale } = ctx;
+  // the host's own share image (editor: "share image"): shown as it is, without text over it
+  const own = doc.share.ogImage ? await photoData(ctx.asset(doc.share.ogImage)) : null;
+  if (own) return ownImage(own, headers);
   const dir = dirOf(locale);
   // satori neither shapes Arabic nor lays out right to left: joined forms first, then visual order
   const line = (text: string) => visualLine(locale === 'ar' ? shapeArabic(text) : text, dir);
@@ -154,7 +181,7 @@ export async function invitationOgImage(ctx: RenderContext, headers?: HeadersIni
   const hero = doc.sections.find((s) => s.type === 'hero');
   const data = hero?.type === 'hero' ? hero.data : null;
   const photo = data
-    ? await heroPhoto(ctx.asset(data.media.kind === 'image' ? data.media.src : data.media.poster))
+    ? await photoData(ctx.asset(data.media.kind === 'image' ? data.media.src : data.media.poster))
     : null;
   const overlay = data?.overlayOpacity ?? template.hero.defaultOverlay;
 
@@ -193,7 +220,8 @@ export async function invitationOgImage(ctx: RenderContext, headers?: HeadersIni
         position: 'relative',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage: photo ? undefined : skyGradient(ctx.art.sky),
+        // satori fails on an undefined style value: the gradient only without a photo
+        ...(photo ? {} : { backgroundImage: skyGradient(ctx.art.sky) }),
         backgroundColor: template.hero.overlayColor,
       }}
     >
@@ -260,5 +288,21 @@ export async function invitationOgImage(ctx: RenderContext, headers?: HeadersIni
       </div>
     </div>,
     { ...OG_SIZE, fonts, headers },
+  );
+}
+
+/** The host's uploaded share image, cropped to fill the card. */
+function ownImage(photo: string, headers?: HeadersInit): ImageResponse {
+  return new ImageResponse(
+    <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: '#000' }}>
+      {/* eslint-disable-next-line jsx-a11y/alt-text -- satori: the whole card is the picture */}
+      <img
+        src={photo}
+        width={OG_SIZE.width}
+        height={OG_SIZE.height}
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    </div>,
+    { ...OG_SIZE, headers },
   );
 }

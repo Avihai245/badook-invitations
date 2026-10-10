@@ -1,0 +1,65 @@
+import type { AlbumGuestDict } from './album-guest.he';
+
+/** The album's page for guests — Spanish. */
+export const albumGuestEs: AlbumGuestDict = {
+  metaTitle: 'El álbum · {name}',
+  metaDescription: 'Los momentos más bonitos de la celebración, en un solo lugar',
+  eyebrow: 'El álbum',
+  language: 'Idioma',
+  invalid: {
+    title: 'Este enlace no funciona',
+    body: 'Puede que los anfitriones lo hayan cambiado por uno nuevo. Pídeles el enlace actual.',
+  },
+  off: { title: 'El álbum está cerrado', body: 'Los anfitriones cerraron el álbum.' },
+  soon: {
+    title: 'El álbum está casi listo',
+    body: 'Todos los momentos de la celebración se están reuniendo en un solo álbum. Se abrirá el {date}.',
+  },
+  empty: {
+    title: 'Todavía no hay fotos en el álbum',
+    body: 'Cuando haya fotos en la galería del evento, aparecerán aquí.',
+  },
+  message:
+    '¡Gracias por celebrar con nosotros {event}! Todos los momentos que capturaste — las sonrisas, los bailes y los abrazos — están reunidos aquí en un solo álbum. Gracias por ser parte de esta alegría.',
+  enter: 'A los momentos',
+  stats: {
+    photos: { one: '{n} foto', other: '{n} fotos' },
+    videos: { one: '{n} vídeo', other: '{n} vídeos' },
+  },
+  highlights: 'Los mejores momentos',
+  chapters: {
+    opening: 'El comienzo',
+    heart: 'El corazón de la fiesta',
+    more: 'Más momentos',
+    ending: 'Hasta el último momento',
+    all: 'Todos los momentos',
+  },
+  showAll: { one: '{n} momento más', other: '{n} momentos más' },
+  by: 'Tomada por {name}',
+  ai: 'Creada con IA',
+  photo: 'la foto',
+  video: 'el vídeo',
+  open: 'Abrir {kind} {n}',
+  viewer: {
+    label: 'El álbum',
+    close: 'Cerrar',
+    next: 'Siguiente',
+    previous: 'Anterior',
+    position: '{n} de {total}',
+  },
+  downloadOne: 'Descargar',
+  share: 'Compartir el álbum',
+  shareText: 'Los momentos más bonitos {event} 💛',
+  copied: 'Se copió el enlace del álbum',
+  downloadAll: 'Descargar todo el álbum',
+  downloading: 'Descargando… {done} de {total}',
+  downloaded: 'El álbum se guardó en el dispositivo',
+  missingName: 'archivos-no-descargados.txt',
+  missingIntro: 'No se pudieron descargar estos archivos:',
+  thanks: 'Gracias por celebrar con nosotros',
+  love: 'Con cariño',
+  made: 'Este álbum se creó con {brand}',
+  makeYours: 'Una invitación digital, una galería en vivo y un álbum — para tu celebración',
+  failed: 'Algo salió mal. Inténtalo de nuevo.',
+  top: 'Volver arriba',
+};

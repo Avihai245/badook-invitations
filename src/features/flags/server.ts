@@ -4,6 +4,7 @@ import { cache } from 'react';
 import { revalidateInvitationPageById } from '@/features/invitations/server/revalidate';
 import { isAdminEmail, loadAccount } from '@/features/billing/server/account';
 import { effectivePlan, isPlanId, type AccountPlanState, type PlanId } from '@/features/billing/plans';
+import { readTools, type ToolKey } from '@/features/invitations/lib/tools';
 import { serverEnv, type ServerEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
 import type { FlagDeps } from './api';
@@ -22,7 +23,8 @@ import {
  * ones that need an AI model when none is set up, and the face albums until they are approved
  * (INVITES_FACE_ALBUMS — biometric data, docs/features.md), and the planning section until its switch
  * (INVITES_PLANNING) is on. The design concepts (`art_direction`)
- * don't need the AI: without it they are composed from the photos (features/art-direction).
+ * don't need the AI: without it they are composed from the photos (features/art-direction). The AI
+ * photos with the people of honor (`ai_photos`) need OpenAI's image model (OPENAI_API_KEY).
  */
 export function deploymentFeatures(env: ServerEnv = serverEnv()): Set<Feature> {
   const off = new Set(env.INVITES_FEATURES_OFF);
@@ -32,6 +34,8 @@ export function deploymentFeatures(env: ServerEnv = serverEnv()): Set<Feature> {
       if (off.has(f)) return false;
       if (f === 'face_albums') return env.INVITES_FACE_ALBUMS;
       if (f === 'gallery_ai' || f === 'translate_ai') return ai;
+      if (f === 'ai_photos')
+        return !!(env.INVITES_AI_IMAGE_API_KEY || env.OPENAI_API_KEY) && !!env.INVITES_AI_IMAGE_MODEL;
       // planning is rolled out with its own switch (INVITES_PLANNING), after its migrations are applied
       if (f.startsWith('planning')) return env.INVITES_PLANNING && (f !== 'planning_ai' || ai);
       return true;
@@ -48,10 +52,13 @@ type Row = {
   planRenewsAt: string | null;
 };
 
-/** An event's inputs: its owner's plan in force, the event's overrides, this deployment (null: no event). */
+/**
+ * An event's inputs: its owner's plan in force, the event's overrides, this deployment (null: no event) —
+ * and, beside them, the tools the host chose for the event (invitations/lib/tools; null: never chose).
+ */
 export async function featureInput(
   invitationId: string,
-): Promise<(FeatureInput & { ownerId: string }) | null> {
+): Promise<(FeatureInput & { ownerId: string; tools: ToolKey[] | null }) | null> {
   const { data, error } = await serviceDb().rpc('invitation_features', { p_id: invitationId });
   if (error) throw new Error(`invitation_features: ${error.message}`);
   if (!data) return null;
@@ -68,6 +75,9 @@ export async function featureInput(
     admin,
     overrides: readOverrides(r.overrides),
     available: deploymentFeatures(),
+    tools: readTools(
+      r.overrides && typeof r.overrides === 'object' ? (r.overrides as Record<string, unknown>).tools : null,
+    ),
   };
 }
 

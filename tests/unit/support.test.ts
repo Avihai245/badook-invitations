@@ -641,12 +641,16 @@ describe('the support assistant knows every feature', () => {
     // each area → a phrase the manual uses for it; internal areas (no host-facing use) are listed as null
     const AREAS: Record<string, string | null> = {
       admin: null, // the staff console
+      analytics: null, // the host's path through the app, measured first party (no host-facing use)
       flags: null, // covered feature by feature above
       jobs: null, // background work
       site: null, // marketing pages
       support: 'פנייה לצוות',
       partner: null, // partners' console
       legal: 'פרטיות',
+      'ai-photos': 'צילומי AI עם בעלי השמחה',
+      scheduler: 'תזמון שליחה לתאריך ושעה',
+      album: 'האלבום שאחרי האירוע',
       'art-direction': 'עצבו לי',
       billing: 'חבילות ותשלומים',
       'event-day': 'יום האירוע',

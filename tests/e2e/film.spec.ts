@@ -41,8 +41,8 @@ test('a host makes a highlights film of the gallery: previewed, made, downloaded
     { color: [30, 150, 160], width: 1600, height: 1200 },
   ]);
 
-  // from the gallery tab's card
-  await open(page, `/app/invitations/${host.id}/gallery`);
+  // from the gallery tab's card ("album, film & AI")
+  await open(page, `/app/invitations/${host.id}/gallery?view=extras`);
   await page.getByTestId('gallery-film-open').click();
   await page.waitForURL(/\/gallery\/film$/);
   await hydrated(page);
@@ -158,7 +158,8 @@ test('a host makes a highlights film of the gallery: previewed, made, downloaded
     return (await res.json()) as { items: { kind: string }[] };
   }, t);
   expect(feed.items.filter((i) => i.kind === 'video')).toHaveLength(1);
-  await open(page, `/app/invitations/${host.id}/gallery`);
+  // the film is among the photos and videos
+  await open(page, `/app/invitations/${host.id}/gallery?view=photos`);
   await expect(page.getByRole('button', { name: /הסרט שלכם/ })).toBeVisible();
 });
 

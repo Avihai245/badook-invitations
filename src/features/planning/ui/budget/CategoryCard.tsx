@@ -101,7 +101,11 @@ export function CategoryCard({
                 )}
               />
               <span className="truncate text-[15px] font-bold">{name}</span>
-              {category.required && !past ? <Badge variant="info">{C.required}</Badge> : null}
+              {category.required && !past ? (
+                <span className="inline-flex" title={C.requiredHint}>
+                  <Badge variant="info">{C.required}</Badge>
+                </span>
+              ) : null}
               <span className="ms-auto shrink-0 text-[12.5px] text-muted">
                 {plural(C.items, items.length, { n: number(items.length) })}
               </span>

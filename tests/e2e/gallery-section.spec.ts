@@ -126,7 +126,7 @@ test('the gallery section: added once from the catalog, then before, during and 
   await during.card.locator('a.lg-cta').click();
   await during.guest.waitForURL(/\/e\/[a-z0-9-]+\/upload\?t=/);
   expect(new URL(during.guest.url()).searchParams.get('g')).toBe(token);
-  await expect(during.guest.getByRole('button', { name: 'בחירת תמונות וסרטונים' })).toBeVisible();
+  await expect(during.guest.getByTestId('gallery-share')).toBeVisible();
   await during.context.close();
 
   // after: the album — and on a computer, its QR code

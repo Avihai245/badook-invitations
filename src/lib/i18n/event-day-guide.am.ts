@@ -74,5 +74,9 @@ export const eventDayGuideAm: EventDayGuideDict = {
     privacy: 'የግላዊነት መመሪያ',
     accessibility: 'የተደራሽነት መግለጫ',
     made: 'በ{brand} የተሰራ',
+    site: 'ዲጂታል ግብዣዎችና የዝግጅት ዕቅድ',
+    visit: 'ወደ {brand} ድረ-ገጽ',
+    events: 'Badook Events',
+    eventsHint: 'ለዝግጅትዎ ቦታ ያግኙ',
   },
 };

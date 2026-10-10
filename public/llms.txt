@@ -1,0 +1,17 @@
+# Badook (בדוק)
+
+> Badook is a Hebrew-first service for designing, sending and managing digital invitations — weddings, bar and bat mitzvahs, brit milah, henna, engagements, baby showers, birthdays and corporate events. Guests open a link on their phone, answer the RSVP, and the host follows replies, seating and a live photo gallery.
+
+## Pages
+
+- [Home](https://invitations.badooks.com/): what Badook does, sample invitations, designs, pricing and questions (Hebrew)
+- [Home in English](https://invitations.badooks.com/en): the same page in English
+- [Contact](https://invitations.badooks.com/contact): questions and support
+- [Privacy policy](https://invitations.badooks.com/privacy)
+- [Terms of use](https://invitations.badooks.com/terms)
+- [Accessibility statement](https://invitations.badooks.com/accessibility)
+
+## Notes
+
+- Each invitation lives at /i/<name> and is private to whoever has the link; invitations are not indexed.
+- The host app (/app) requires signing in.

@@ -70,6 +70,24 @@ describe('tables', () => {
     expect(defaultTableSize('knights', 20)).toEqual({ w: 6, h: 1 });
   });
 
+  it('a square table is square — whatever its seats — with its chairs on all four sides', () => {
+    expect(defaultTableSize('square', 8)).toEqual({ w: 1.5, h: 1.5 });
+    expect(defaultTableSize('square', 4)).toEqual({ w: 0.9, h: 0.9 });
+    expect(defaultTableSize('square', 12)).toEqual({ w: 2.1, h: 2.1 });
+    const chairs = chairPositions(table({ shape: 'square', capacity: 8, w: 1.5, h: 1.5 }));
+    expect(chairs).toHaveLength(8);
+    const side = (pred: (p: { x: number; y: number }) => boolean) => chairs.filter(pred).length;
+    // two on each side, just outside the edge
+    expect(side((p) => p.y < -0.75)).toBe(2);
+    expect(side((p) => p.y > 0.75)).toBe(2);
+    expect(side((p) => p.x < -0.75)).toBe(2);
+    expect(side((p) => p.x > 0.75)).toBe(2);
+    // an odd count: the extra seats go top, then right
+    const ten = chairPositions(table({ shape: 'square', capacity: 10, w: 1.8, h: 1.8 }));
+    expect(ten.filter((p) => p.y < -0.9)).toHaveLength(3);
+    expect(ten.filter((p) => p.x > 0.9)).toHaveLength(3);
+  });
+
   it('puts a chair per seat: around a round table, along the long sides of the others', () => {
     const round = chairPositions(table({ capacity: 8 }));
     expect(round).toHaveLength(8);

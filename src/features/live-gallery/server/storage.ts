@@ -8,7 +8,12 @@ import { serviceDb } from '@/lib/supabase/server';
  * batches (one request per bucket, however many photos a page shows).
  */
 
-export const BUCKETS = { originals: 'gallery-originals', media: 'gallery-media' } as const;
+export const BUCKETS = {
+  originals: 'gallery-originals',
+  media: 'gallery-media',
+  /** the AI photos with the people of honor (features/ai-photos); their files share the trash queue */
+  aiPhotos: 'ai-photos',
+} as const;
 export type Bucket = (typeof BUCKETS)[keyof typeof BUCKETS];
 
 export interface SignedUpload {
@@ -36,11 +41,23 @@ export interface GalleryStorage {
   resumable(): { endpoint: string; apiKey: string };
 }
 
-export const galleryStorage: GalleryStorage = {
+/** The server stores a file itself (the AI photos: what the model made, a copy into the gallery). */
+export interface StorageUpload {
+  upload(bucket: Bucket, path: string, bytes: Uint8Array, contentType: string): Promise<void>;
+}
+
+export const galleryStorage: GalleryStorage & StorageUpload = {
   async signUpload(bucket, path) {
     const { data, error } = await serviceDb().storage.from(bucket).createSignedUploadUrl(path);
     if (error || !data) throw new Error(`signed upload: ${error?.message ?? 'no data'}`);
     return { path: data.path, token: data.token, url: data.signedUrl };
+  },
+
+  async upload(bucket, path, bytes, contentType) {
+    const { error } = await serviceDb()
+      .storage.from(bucket)
+      .upload(path, bytes, { contentType, upsert: true, cacheControl: '3600' });
+    if (error) throw new Error(`storage upload: ${error.message}`);
   },
 
   async signRead(bucket, paths, ttlSeconds) {

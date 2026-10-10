@@ -18,12 +18,17 @@ import {
  * offers a new one.
  */
 
-export type LinkKind = 'upload' | 'projector';
+/** the guests' upload link, the venue screen's, and the album's (features/album) */
+export type LinkKind = 'upload' | 'projector' | 'album';
 
 /** 24 URL-safe characters (144 random bits). */
 export const TOKEN_RE = /^[A-Za-z0-9_-]{24}$/;
 /** The browser's random uploader id. */
 export const UPLOADER_RE = /^[A-Za-z0-9_-]{16,64}$/;
+/** a feed post's key: made by the phone for the photos it shares together, or an item's id */
+export const POST_RE = /^[A-Za-z0-9_-]{8,40}$/;
+/** an Instagram username (without the @) */
+export const INSTAGRAM_RE = /^[A-Za-z0-9._]{1,30}$/;
 
 export { randomId, sha256Hex } from '@/lib/links/tokens';
 

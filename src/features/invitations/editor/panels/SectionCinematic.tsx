@@ -1,7 +1,7 @@
 'use client';
 
 import { Play, RotateCcw, Wand2 } from 'lucide-react';
-import { useEffect, useId, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Badge, Button, ColorSwatch, Field, Input, Segmented, cn, rovingKeyDown } from '@/components/app';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
@@ -248,7 +248,7 @@ function LayoutDrawing({ layout }: { layout: SectionLayout }) {
 }
 
 function LayoutCard({ section, index }: { section: Section; index: number }) {
-  const { apply } = useEditor();
+  const { apply, select } = useEditor();
   const { t } = useUi();
   const c = t.editor.cine;
   const current = layoutOf(section);
@@ -279,7 +279,12 @@ function LayoutCard({ section, index }: { section: Section; index: number }) {
                 data-roving-item=""
                 data-layout={layout}
                 title={why ?? c.layoutHints[layout]}
-                onClick={() => !disabled && apply((d) => setSectionLayout(d, index, layout), null)}
+                onClick={() =>
+                  disabled
+                    ? // it needs a picture (or a video) first: to the upload
+                      select({ kind: 'section', id: section.id }, `sections.${index}.media`)
+                    : apply((d) => setSectionLayout(d, index, layout), null)
+                }
                 className={cn(
                   'flex flex-col items-center gap-1 rounded-card border bg-surface px-1.5 py-2 text-center text-[12px] leading-tight',
                   on ? 'border-ink font-semibold ring-1 ring-ink' : 'border-line hover:bg-subtle',
@@ -333,16 +338,42 @@ function PresetPreview({ preset }: { preset: string }) {
   );
 }
 
+/**
+ * The section's motion played again in the preview after a change, so the host sees what they chose
+ * (an entrance only shows as the section comes in — it doesn't play again by itself): at once for a
+ * choice, a moment after the last move of a slider. Never pulls a phone's editor off the form.
+ */
+function useReplayAfterChange(section: Section, index: number) {
+  const { play } = usePreviewControls();
+  const [asked, setAsked] = useState<{ n: number; wait: number }>({ n: 0, wait: 0 });
+  const current = useRef(section);
+  current.current = section;
+  useEffect(() => {
+    if (!asked.n || !play) return;
+    // after the render that has the change: the preview gets this document before it plays
+    const t = window.setTimeout(
+      () => play(`sections.${index}`, motionMs(current.current), { show: false }),
+      asked.wait,
+    );
+    return () => window.clearTimeout(t);
+  }, [asked, index, play]);
+  return (wait = 0) => setAsked((a) => ({ n: a.n + 1, wait }));
+}
+
 function MotionCard({ section, index }: { section: Section; index: number }) {
   const { apply } = useEditor();
   const { t } = useUi();
   const { play } = usePreviewControls();
+  const replay = useReplayAfterChange(section, index);
   const c = t.editor.cine.motion;
   const hero = section.type === 'hero';
   const a = section.animation ?? DEFAULT_SECTION_ANIMATION;
   const path = `sections.${index}.animation`;
-  const change = (patch: AnimationPatch, key: string | null = null) =>
+  const change = (patch: AnimationPatch, key: string | null = null) => {
     apply((d) => setSectionAnimation(d, index, patch), key);
+    // a slider (it has a key: its moves coalesce) waits for the host to let go
+    replay(key ? 600 : 0);
+  };
   const media = !hero && !!section.media;
   const layout = layoutOf(section);
   const fine = useId();
@@ -516,7 +547,10 @@ function MotionCard({ section, index }: { section: Section; index: number }) {
               size="sm"
               icon={<RotateCcw />}
               className="self-start"
-              onClick={() => apply((d) => setSectionAnimation(d, index, null), null)}
+              onClick={() => {
+                apply((d) => setSectionAnimation(d, index, null), null);
+                replay();
+              }}
             >
               {c.reset}
             </Button>

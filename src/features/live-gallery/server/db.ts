@@ -36,6 +36,8 @@ export interface GalleryCounts {
   videos: number;
   uploaders: number;
   bytes: number;
+  /** Instagram usernames that asked to be tagged (in the gallery or waiting) */
+  tagged?: number;
 }
 
 export interface ItemRow {
@@ -62,9 +64,18 @@ export interface ItemRow {
   aiQuality: number | null;
   phash: string | null;
   name: string | null;
+  /** an opaque key of the uploader ('host' for the hosts' items): see gallery_item_json */
+  by?: string | null;
+  placement?: 'story' | 'feed';
+  /** the feed post (its key, or the item's id) */
+  post?: string;
+  /** the Instagram username to tag (no @) */
+  instagram?: string | null;
   guestId: string | null;
   /** who added it: a guest, or the host (their highlights film) */
   source?: 'guest' | 'host';
+  /** an AI photo a guest made with the people of honor (features/ai-photos) */
+  ai?: boolean;
   createdAt: string;
   completedAt: string | null;
   publishedAt: string | null;
@@ -111,6 +122,12 @@ export interface ReserveItem {
   height: number | null;
   durationMs: number | null;
   takenAt: string | null;
+  /** where a guest shared it (the feed when not said) */
+  placement?: 'story' | 'feed';
+  /** feed items shared together: one post */
+  post?: string | null;
+  /** "tag me": the guest's Instagram username */
+  instagram?: string | null;
 }
 
 export interface OwnerGallery {
@@ -199,6 +216,10 @@ export const galleryDb = {
       p_item_ids: itemIds,
       p_action: action,
     }),
+
+  /** the photos guests asked to be tagged in, by username (null: not the owner's) */
+  ownerTags: (id: string, ownerId: string) =>
+    rpc<ItemRow[] | null>('gallery_owner_tags', { p_id: id, p_owner_id: ownerId }),
 
   ownerOriginals: (
     id: string,
@@ -302,6 +323,21 @@ export const galleryDb = {
       p_invitation_id: invitationId,
       p_item_id: itemId,
       p_uploader_hash: uploaderHash,
+    }),
+
+  like: (invitationId: string, post: string, likerHash: string, on: boolean) =>
+    rpc<{ ok: true; n: number; mine: boolean } | { ok: false; code: 'not_found' }>('gallery_like', {
+      p_invitation_id: invitationId,
+      p_post: post,
+      p_liker_hash: likerHash,
+      p_on: on,
+    }),
+
+  likesOf: (invitationId: string, posts: string[], likerHash: string | null) =>
+    rpc<Record<string, { n: number; mine: boolean }>>('gallery_likes_of', {
+      p_invitation_id: invitationId,
+      p_posts: posts,
+      p_liker_hash: likerHash ?? '',
     }),
 
   rateHit: (key: string, limit: number, windowSeconds: number) =>

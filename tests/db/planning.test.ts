@@ -120,11 +120,11 @@ async function guest(name: string, partySize: number | null) {
     )
   ).id;
 }
-async function reply(attending: boolean, adults: number, children = 0) {
+async function reply(attending: boolean, adults: number, children = 0, guestId: string | null = null) {
   await c.query(
-    `insert into rsvp_responses (invitation_id, attending, locale, primary_name, adults_count, children_count, edit_token_hash)
-     values ($1, $2, 'he', 'x', $3, $4, $5)`,
-    [inv, attending, adults, children, `h-${Math.random()}`],
+    `insert into rsvp_responses (invitation_id, attending, locale, primary_name, adults_count, children_count, edit_token_hash, guest_id)
+     values ($1, $2, 'he', 'x', $3, $4, $5, $6)`,
+    [inv, attending, adults, children, `h-${Math.random()}`, guestId],
   );
 }
 
@@ -210,18 +210,25 @@ describe('setting a plan up', () => {
 });
 
 describe('the guest numbers a cost follows', () => {
-  it('invited: the list’s party sizes, all counted as adults; confirmed: the replies; manual: the host’s own', async () => {
-    await guest('משפחת כהן', 4);
+  it('by the list: the people expected (answers, else the invitation; not who said no); confirmed: the replies; manual: the host’s own', async () => {
+    const cohen = await guest('משפחת כהן', 4);
     await guest('דני לוי', null);
-    await reply(true, 2, 1);
+    const shir = await guest('שיר', 2);
+    // the Cohens answered: 2 adults and a child of the 4 invited
+    await reply(true, 2, 1, cohen);
+    // a "coming" reply through the general link, not matched to a guest yet
     await reply(true, 1, 0);
-    await reply(false, 0, 0);
+    // Shir isn't coming: none of her 2
+    await reply(false, 0, 0, shir);
     expect((await state())!.headcount).toMatchObject({
       basis: 'invited',
-      adults: 5,
-      children: 0,
+      // Cohens 2 + Dani (no answer yet: 1) + the general link's 1
+      adults: 4,
+      children: 1,
       guests: 5,
-      invited: 5,
+      invited: 7,
+      expectedAdults: 4,
+      expectedChildren: 1,
     });
 
     await commit('planning_settings_save', [inv, OWNER, { guestBasis: 'confirmed' }]);

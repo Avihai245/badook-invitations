@@ -24,8 +24,8 @@ test('after a new deployment, the next link loads the page in full instead of fr
   );
   await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
   await page.waitForResponse('**/api/version');
-  await page.locator('a[href="/app/invitations"]:visible').first().click();
-  await page.waitForURL(/\/app\/invitations$/);
+  await page.locator('a[href="/app/invitations?all=1"]:visible').first().click();
+  await page.waitForURL(/\/app\/invitations\?all=1$/);
   await page.waitForLoadState('load');
   expect(await marked(page)).toBe(false);
 });

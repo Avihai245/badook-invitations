@@ -6,7 +6,9 @@ import { DEFAULT_ZONE } from '@/features/planning/server/view';
 import { daysBetween, todayIn } from '@/features/planning/model/schedule';
 import { dueWithin, nextTask } from '@/features/planning/model/week';
 import type { PlanTask } from '@/features/planning/model/plan';
-import type { HomeFacts } from '../app/home/next-action';
+import type { HomeFacts } from '../app/home/journey';
+import type { ToolKey } from '../lib/tools';
+import { toolsView } from './tools';
 import type { WorkspaceCaps } from '../app/workspace/stages';
 import { rsvpSummary, type RsvpSummary } from '../lib/rsvp-summary';
 import { guestsDb } from './guests';
@@ -22,6 +24,8 @@ export interface EventHomeData {
   facts: HomeFacts;
   rsvp: RsvpSummary;
   caps: WorkspaceCaps;
+  /** the tools the host chose (null: never chose — the event's home offers the choice) */
+  chosenTools: ToolKey[] | null;
   /** the plan, when the event has planning (planned: false — not set up yet) */
   planning: {
     planned: boolean;
@@ -81,7 +85,7 @@ export async function loadEventHome(
     why === null ? ('on' as const) : why === 'plan' ? ('plan' as const) : null;
   const features = deploymentFeatures();
   const planningOn = !!input && item.eventType !== 'save_the_date' && whyOff('planning', input) === null;
-  const caps: WorkspaceCaps = {
+  const offered = {
     planning: planningOn,
     seating: offer(input ? whyOff('seating', input) : 'unavailable'),
     eventDay: offer(input ? whyOff('checkin', input) : 'unavailable'),
@@ -91,6 +95,7 @@ export async function loadEventHome(
 
   let planning: EventHomeData['planning'] = null;
   let seating: HomeFacts['seating'] = null;
+  // the plan's numbers (and the seating's, which the plan's facts carry) — only when the event can plan
   if (planningOn) {
     const o = await planningOverview(ownerId, item.id, {
       eventType: item.eventType,
@@ -129,6 +134,11 @@ export async function loadEventHome(
       if (o.raw.facts) seating = { tables: o.raw.facts.tables, unseated: o.raw.facts.confirmedUnseated };
     }
   }
+  const chosenTools = input?.tools ?? null;
+  const caps: WorkspaceCaps = {
+    ...offered,
+    tools: toolsView(item, input, !!planning?.planned).tools,
+  };
   if (caps.seating !== 'on') seating = null;
 
   const facts: HomeFacts = {
@@ -139,6 +149,7 @@ export async function loadEventHome(
     sent: item.sent,
     notAnswered: rsvp.notAnswered,
     unmatched: rsvp.unmatched,
+    responses: item.responses,
     planning: planning
       ? {
           planned: planning.planned,
@@ -159,6 +170,7 @@ export async function loadEventHome(
     facts,
     rsvp,
     caps,
+    chosenTools,
     planning,
   };
 }

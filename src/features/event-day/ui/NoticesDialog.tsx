@@ -16,6 +16,9 @@ export type NoticeState = 'queued' | 'told' | 'update' | 'unseated' | 'unsent' |
 
 export function noticeState(r: NoticeRow): NoticeState {
   if (r.queued) return 'queued';
+  // said they aren't coming: nothing to tell them (and the system never sends it — the database
+  // leaves them out)
+  if (r.status === 'declined' && !r.told) return 'none';
   if (r.told) {
     if (!r.table) return 'unseated';
     return r.table.number === r.told.number ? 'told' : 'update';

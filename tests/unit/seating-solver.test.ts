@@ -229,6 +229,34 @@ describe('the automatic seating', () => {
     expect(r.issues.filter((i) => i.code === 'underfilled')).toEqual([]);
   });
 
+  it('"group": nobody sits as the only one of their group when a friend from it could sit with them', () => {
+    // two full tables of 8: the 3 family units, 2 work and 3 army can't each have a table of their own
+    const w = input({
+      tables: [table('t1', 8), table('t2', 8)],
+      units: [
+        unit('f1', 2, { category: 'family' }),
+        unit('f2', 2, { category: 'family' }),
+        unit('f3', 2, { category: 'family' }),
+        unit('w1', 2, { category: 'work' }),
+        unit('w2', 2, { category: 'work' }),
+        unit('a1', 2, { category: 'army' }),
+        unit('a2', 2, { category: 'army' }),
+        unit('a3', 2, { category: 'army' }),
+      ],
+      options: { categories: 'group', minFill: 0, seed: 4, effort: 0.4 },
+    });
+    const lonely = (r: SolverResult) => r.issues.flatMap((i) => (i.code === 'lonely' ? i.units : [])).sort();
+    const r = solve(w);
+    expect(r.unseated).toBe(0);
+    // one unit alone (a family or an army unit among the others), not both work units split up
+    expect(lonely(r)).toHaveLength(1);
+    expect(r.assignment.w1).toBe(r.assignment.w2);
+    // without the principle, fewer people out of their group wins — and two sit alone
+    const plain = solve({ ...w, options: { ...w.options, weights: { lonely: 0 } } });
+    expect(plain.assignment.w1).not.toBe(plain.assignment.w2);
+    expect(WEIGHTS.lonely).toBeGreaterThan(0);
+  });
+
   it('the seeded random generator is repeatable', () => {
     const a = rng(42);
     const b = rng(42);

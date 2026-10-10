@@ -9,8 +9,9 @@ import { authAnswerRedirect, isSuspended, loginPath, signedInLanding } from '@/l
  * carries Supabase Auth's answer (below), which is sent on and never rendered.
  *
  * Host app: refreshes the Supabase session cookies (@supabase/ssr) and sends signed-out visitors of
- * /app/… to /login (and signed-in visitors of the home page, /login or /signup to where they were
- * going — `next`, the plan they chose — or their invitations).
+ * /app/… to /login (and signed-in visitors of /login or /signup to where they were going — `next`, the
+ * plan they chose — or their invitations). The home page is static and never goes through here (it
+ * sends signed-in visitors on from <head>: features/site/home/home-boot.ts).
  *
  * Supabase falls back to the Site URL (the home page) when a sign-in redirect isn't on its allow list:
  * `/?code=…`, `/?token_hash=…`, `/?error=…&error_code=…` on any page outside /auth and /api go on to
@@ -78,7 +79,6 @@ export const config = {
   runtime: 'nodejs',
   // (the config is read at build time: literal values only)
   matcher: [
-    '/',
     '/dev/:path*',
     '/app/:path*',
     '/login',

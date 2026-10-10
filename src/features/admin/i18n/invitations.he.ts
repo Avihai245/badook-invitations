@@ -141,6 +141,8 @@ export const invitationsHe = {
       projector: 'הגלריה על מסך באולם',
       face_albums: 'חיפוש לפי פנים',
       auto_reel: 'סרטון מהגלריה',
+      album: 'אלבום אחרי האירוע',
+      ai_photos: 'צילומי AI עם בעלי השמחה',
       languages: 'שפות נוספות',
       translate_ai: 'תרגום אוטומטי',
       voice: 'הקראת ההזמנה',

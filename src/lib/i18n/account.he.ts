@@ -6,7 +6,8 @@ export const accountHe = {
   profile: 'פרטים אישיים',
   fullName: 'שם מלא',
   phone: 'טלפון',
-  phoneHint: 'לא חובה. ישמש רק ליצירת קשר איתכם בנושא החשבון.',
+  phoneHint:
+    'לא חובה. ישמש רק ליצירת קשר איתכם בנושא החשבון — וגם להתראה בוואטסאפ אם שליחה מתוזמנת לאורחים לא יצאה.',
   email: 'מייל',
   signIn: 'כניסה',
   providers: { email: 'מייל וסיסמה', google: 'Google', partner: 'Badook Events' },

@@ -76,7 +76,7 @@ test('the free plan’s limit, upgrading, credits, a failed payment, a renewal a
   // free: one active invitation
   expect((await create(page)).status).toBe(201);
   expect(await create(page)).toEqual({ status: 402, body: { ok: false, code: 'plan_limit', limit: 1 } });
-  await page.goto('/app/invitations');
+  await page.goto('/app/invitations?all=1');
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
   await page
     .locator('#main')

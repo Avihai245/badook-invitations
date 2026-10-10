@@ -120,6 +120,8 @@ export const GALLERY = {
     /** wrong access codes */
     codePerAddress: { count: 10, windowSeconds: 900 },
     feedPerDevice: { count: 120, windowSeconds: 60 },
+    /** a heart tapped on and off: plenty for a guest scrolling the feed, not for a script */
+    likePerDevice: { count: 90, windowSeconds: 60 },
   },
 
   urls: {
@@ -153,6 +155,8 @@ export const GALLERY = {
   feed: {
     pageSize: 30,
     hostPageSize: 60,
+    /** the posts whose likes one answer brings (the ones on the guest's screen) */
+    likesPerAnswer: 300,
   },
 
   projector: {

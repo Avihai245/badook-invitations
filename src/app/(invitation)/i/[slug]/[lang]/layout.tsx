@@ -1,5 +1,6 @@
 import type { Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { preconnect } from 'react-dom';
 import { dirOf } from '@/features/invitations/contracts/types';
 import { InvitationHtml } from '@/features/invitations/renderer/InvitationHtml';
 import { MissingInvitationHtml } from '@/features/invitations/renderer/MissingInvitation';
@@ -39,6 +40,10 @@ export default async function PublicInvitationLayout({
       </MissingInvitationHtml>
     );
   const { doc } = invitation;
+  // the guests' videos and music play straight from the storage (pictures come through the image
+  // optimizer, on this origin): the connection is opened while the page is still being read
+  const storage = serverEnv().NEXT_PUBLIC_SUPABASE_URL;
+  if (storage) preconnect(new URL(storage).origin);
   // the host's type scale, spacing and motion need the event's `cinematic` feature (asked once per request)
   const cinematic = await cinematicForPage(invitation.id, doc, invitation.entry.manifest);
   return (

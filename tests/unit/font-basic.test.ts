@@ -1,8 +1,9 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { displayFontPreloads, fontFaceCss, fontFaceFiles } from '@/features/invitations/fonts';
 import generated from '@/features/invitations/fonts/font-faces.generated.json';
 import { requireTemplate } from '@/features/invitations/templates/registry';
-import { appFaceUrl } from '@/lib/app-fonts';
+import { appFaceUrl, appStaticFaceUrl } from '@/lib/app-fonts';
 
 type Face = { weight: number; style: string; subset: string; unicodeRange: string | null; url: string };
 type Family = { faces: Face[]; subsets: string[] };
@@ -128,12 +129,29 @@ describe('a page’s preloads', () => {
 });
 
 describe('the host app’s variable fonts', () => {
-  it('Heebo: the Hebrew face and the ASCII part, cut to the weights the app uses', () => {
-    expect(appFaceUrl('Heebo Variable', 'hebrew')).toMatch(/heebo-hebrew-w400-800-normal\.woff2$/);
-    expect(appFaceUrl('Heebo Variable', 'latin-basic')).toMatch(
-      /heebo-latin-basic\d+-w400-800-normal\.woff2$/,
+  it('Heebo: Hebrew and the ASCII part in one file, cut to the weights the app uses', () => {
+    expect(appFaceUrl('Heebo Variable', 'hebrew-basic')).toMatch(
+      /heebo-hebrew-basic\d+-w400-800-normal\.woff2$/,
     );
+    // the separate Hebrew and ASCII files are gone: the text is one request
+    expect(appFaceUrl('Heebo Variable', 'hebrew')).toBeNull();
+    expect(appFaceUrl('Heebo Variable', 'latin-basic')).toBeNull();
     expect(appFaceUrl('Heebo Variable', 'latin')).toMatch(/heebo-latin-wght-normal\.woff2$/);
+  });
+
+  it('the display font has Hebrew and the ASCII part in one file per weight', () => {
+    expect(appStaticFaceUrl('Frank Ruhl Libre', 700)).toMatch(
+      /frank-ruhl-libre-hebrew-basic\d+-700-normal\.woff2$/,
+    );
+  });
+
+  it('declares the combined face last, so it wins over the whole Latin face for the ASCII part', () => {
+    const faces = readFileSync('src/styles/app-fonts.generated.css', 'utf8')
+      .split('\n')
+      .filter((l) => l.includes("font-family:'Heebo Variable'"));
+    expect(faces.at(-1)).toContain('hebrew-basic');
+    expect(faces.at(-1)).toContain('U+05');
+    expect(faces.at(-1)).toContain('U+0020-007E');
   });
 
   it('Inter has its ASCII part too (the English text)', () => {

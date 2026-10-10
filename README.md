@@ -14,11 +14,11 @@ and rendering, the editor, the experience (video-first cover, music, live langua
 link preview, share screen) and the dashboard & extras (responses dashboard, CSV export, email
 notifications, gallery, gifts, date reveal, the save-the-date flow, template preview videos). On top:
 the public site (home, policies, cookie consent, accessibility menu, contact), guest lists with
-personal links, WhatsApp sending from the official number, three plans with PayPlus, the AI support
+personal links, WhatsApp sending from the official number, three plans with Tranzila (or PayPlus), the AI support
 assistant, sign in with Google, and the partner API for Badook Events.
 
 Setting up the outside services (each guide says what goes where):
-[WhatsApp](docs/whatsapp-setup.md) · [payments (PayPlus)](docs/billing-setup.md) ·
+[WhatsApp](docs/whatsapp-setup.md) · [payments (Tranzila, PayPlus)](docs/billing-setup.md) ·
 [sign in with Google](docs/google-sign-in.md) · [Badook Events partner API](docs/partner-api.md).
 
 ## Stack
@@ -98,6 +98,13 @@ link), and on the seating screen "send guests their table" — a second WhatsApp
 (`INVITES_WHATSAPP_TABLE_TEMPLATE`, [docs/whatsapp-setup.md](docs/whatsapp-setup.md) §8), the host's own
 WhatsApp, or table cards to print (`/app/invitations/<id>/seating/cards`). Once numbers were sent, moving
 a family that was told asks first, and only it gets the new number.
+
+**The album and AI photos** ([docs/album-and-ai-photos.md](docs/album-and-ai-photos.md), docs/features.md): the
+morning after the event the gallery becomes a designed album at `/e/<slug>/album?a=<token>` — shared by link, or
+thanked for with each guest's own WhatsApp message (a fourth template, [docs/whatsapp-setup.md](docs/whatsapp-setup.md)
+§10) — and guests create AI photos with the people of honor on the gallery's page (OpenAI's image model,
+`OPENAI_API_KEY`; the hosts upload the people's photos in the gallery tab). Apply
+`supabase/migrations/20261010*` first.
 
 **Event planning** (feature `planning`, off until `INVITES_PLANNING=on` — [docs/features.md](docs/features.md)): the
 invitation's "Event planning" tab `/app/invitations/<id>/plan` with tasks (`/plan/tasks`: a timeline compressed into
@@ -179,6 +186,7 @@ Dev-only pages (always on under `next dev`; in builds only with `INVITES_DEV_ROU
 | `npm run check:public-css`                      | Against a running build: every class the public pages render is in their stylesheet                                                                                                                        |
 | `node scripts/analyze-bundles.mjs --url <page>` | What a page's JavaScript is made of, module by module (build with `ANALYZE_SOURCEMAPS=1`)                                                                                                                  |
 | `npm run media:optimize -- <folder>`            | Web-ready pictures (WebP ≤ 2560 px) and videos (H.264 ≤ 720p, posters) for the template media (docs/template-media.md)                                                                                     |
+| `node scripts/build-brand.mjs`                  | The logo's AVIF / WebP files (public/brand) from the PNGs, named by content hash — paste the printed names into components/app/BrandLogo.tsx                                                               |
 | `npm run fonts`                                 | Regenerate the self-hosted `@font-face` files and index                                                                                                                                                    |
 | `npm run templates:validate`                    | Validate the template pack and fixtures against the contracts                                                                                                                                              |
 | `node scripts/make-test-media.mjs`              | Regenerate the synthetic cover/music test media in `tests/fixtures/media` (served by `/dev/media/<file>`)                                                                                                  |

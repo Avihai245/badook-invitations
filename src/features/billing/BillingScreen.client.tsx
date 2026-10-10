@@ -27,15 +27,22 @@ const post = async (url: string, body: unknown) => {
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),
   }).catch(() => null);
-  const json = (await res?.json().catch(() => null)) as { url?: string; code?: string } | null;
+  const json = (await res?.json().catch(() => null)) as {
+    url?: string;
+    iframe?: string;
+    amount?: number;
+    code?: string;
+  } | null;
   return { ok: !!res?.ok, status: res?.status ?? 0, body: json };
 };
 
 /**
  * /app/billing: the plan in force and what it allows, the plans side by side (upgrade, switch, cancel),
  * message packs, and the history. Coming back from the payment page it says how the payment ended —
- * and while the provider's notice is still on its way, it checks again by itself. `start`: the plan
- * chosen on the home page (?plan=), on to its payment page right away.
+ * and while the provider's notice is still on its way, it checks again by itself. With Tranzila the
+ * card is typed in Tranzila's own form, in an iframe here; when it is done, the page inside the iframe
+ * brings this screen to the result. `start`: the plan chosen on the home page (?plan=), on to its
+ * payment page right away.
  */
 export function BillingScreen({
   data,
@@ -52,6 +59,8 @@ export function BillingScreen({
   const { toast } = useToast();
   const [busy, setBusy] = useState<Product | 'cancel' | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  // Tranzila's card form for the purchase just opened
+  const [payFrame, setPayFrame] = useState<{ url: string; product: Product; amount: number } | null>(null);
   const a = data.account;
   const off = data.mode === 'off';
   const money = (v: number, digits = 0) =>
@@ -116,6 +125,8 @@ export function BillingScreen({
     if (res.status === 401)
       return window.location.assign(`/login?next=${encodeURIComponent('/app/billing')}`);
     if (res.ok && res.body?.url) return window.location.assign(res.body.url);
+    if (res.ok && res.body?.iframe)
+      return setPayFrame({ url: res.body.iframe, product, amount: Number(res.body.amount ?? 0) });
     setBusy(null);
     toast({
       title:
@@ -123,7 +134,9 @@ export function BillingScreen({
           ? b.errors.already
           : res.body?.code === 'not_configured'
             ? b.errors.not_configured
-            : b.errors.server,
+            : res.body?.code === 'provider_unavailable'
+              ? b.errors.provider_unavailable
+              : b.errors.server,
       variant: 'danger',
     });
   };
@@ -249,23 +262,6 @@ export function BillingScreen({
         />
       </div>
       <p className="mt-1 text-muted">{b.subtitle}</p>
-      <p className="mt-1 text-[13px] text-muted" data-testid="billing-terms">
-        {b.terms.before}
-        <Link
-          href="/terms#plans"
-          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
-        >
-          {b.terms.terms}
-        </Link>
-        {b.terms.middle}
-        <Link
-          href="/terms#cancel"
-          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
-        >
-          {b.terms.cancel}
-        </Link>
-        {b.terms.after}
-      </p>
 
       {returned ? (
         <p
@@ -387,9 +383,29 @@ export function BillingScreen({
       ) : (
         <p className="mt-3 flex items-center gap-2 text-[13px] text-muted">
           <ShieldCheck aria-hidden className="size-4 text-success" />
-          {b.secure} {t.site.plans.vat}
+          {data.mode === 'tranzila' ? b.pay.secure : b.secure} {t.site.plans.vat}
         </p>
       )}
+
+      {/* under the plans, by the upgrade buttons: what every purchase is subject to (the terms, with
+          cancelling a purchase and refunds), before buying */}
+      <p className="mt-1.5 text-[13px] text-muted" data-testid="billing-terms">
+        {b.terms.before}
+        <Link
+          href="/terms#plans"
+          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
+        >
+          {b.terms.terms}
+        </Link>
+        {b.terms.middle}
+        <Link
+          href="/terms#cancel"
+          className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
+        >
+          {b.terms.cancel}
+        </Link>
+        {b.terms.after}
+      </p>
 
       <section id="credits" className="mt-12 scroll-mt-20">
         <h2 className="text-[20px] font-bold">{b.packs.title}</h2>
@@ -491,6 +507,39 @@ export function BillingScreen({
           </Card>
         </div>
       </section>
+
+      {payFrame ? (
+        <Dialog
+          open
+          onOpenChange={(open) => {
+            if (open) return;
+            // closed before paying: nothing was charged (the purchase simply stays unfinished)
+            setPayFrame(null);
+            setBusy(null);
+          }}
+          title={b.pay.title}
+          description={fmt(b.pay.body, {
+            product: b.products[payFrame.product],
+            price: money(payFrame.amount, 2),
+          })}
+          closeLabel={t.common.close}
+          className="max-w-[480px]"
+        >
+          <iframe
+            src={payFrame.url}
+            title={b.pay.frame}
+            data-testid="payment-frame"
+            allow="payment"
+            // Apple Pay and Google Pay inside Tranzila's form (older browsers read this instead of allow)
+            {...{ allowpaymentrequest: 'true' }}
+            className="mt-4 block h-[560px] max-h-[70vh] w-full rounded-card border border-line bg-white"
+          />
+          <p className="mt-3 flex items-center gap-2 text-[12px] text-muted">
+            <ShieldCheck aria-hidden className="size-4 shrink-0 text-success" />
+            {b.pay.secure}
+          </p>
+        </Dialog>
+      ) : null}
 
       {confirmCancel ? (
         <Dialog

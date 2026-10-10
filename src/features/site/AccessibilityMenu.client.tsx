@@ -42,7 +42,46 @@ function load(): Prefs {
  */
 export function AccessibilityMenu() {
   const { t } = useUi();
-  const a = t.site.a11y;
+  return <AccessibilityPanel a={t.site.a11y} />;
+}
+
+/** The menu's words: the site's, or a guest page's own (in the invitation's languages). */
+export interface A11yStrings {
+  open: string;
+  title: string;
+  close: string;
+  text: string;
+  smaller: string;
+  larger: string;
+  contrast: string;
+  links: string;
+  readable: string;
+  spacing: string;
+  motion: string;
+  cursor: string;
+  reset: string;
+  statement: string;
+}
+
+/**
+ * The accessibility menu itself, with its words given: the site's pages use AccessibilityMenu; a
+ * guest page in another language (the live gallery) passes its own, and opens the statement in a new
+ * tab (`newTab`) so the page and what it was uploading stay.
+ */
+export function AccessibilityPanel({
+  a,
+  newTab = false,
+  place = 'middle',
+}: {
+  a: A11yStrings;
+  newTab?: boolean;
+  /**
+   * 'middle': halfway down the left side (the site: its corners belong to the assistant and the
+   * cookie notice); 'corner': the bottom left corner (a guest page whose middle is its content).
+   */
+  place?: 'middle' | 'corner';
+}) {
+  const corner = place === 'corner';
   const [open, setOpen] = useState(false);
   const [prefs, setPrefs] = useState<Prefs>(EMPTY);
   const panel = useRef<HTMLDivElement>(null);
@@ -93,9 +132,10 @@ export function AccessibilityMenu() {
         title={a.open}
         data-testid="a11y-button"
         className={cn(
-          'fixed top-1/2 left-3 z-[55] grid size-12 -translate-y-1/2 place-items-center rounded-full text-white shadow-[0_10px_28px_-8px_rgba(30,58,138,0.65)] ring-2 ring-white/85 transition-[background-color,scale] hover:scale-105 print:hidden sm:left-4',
+          'fixed left-3 z-[55] grid size-12 place-items-center rounded-full text-white shadow-[0_10px_28px_-8px_rgba(30,58,138,0.65)] ring-2 ring-white/85 transition-[background-color,scale] hover:scale-105 print:hidden sm:left-4',
           'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb]',
           active ? 'bg-[#1d4ed8]' : 'bg-[#1e3a8a] hover:bg-[#1d4ed8]',
+          corner ? 'bottom-[max(16px,env(safe-area-inset-bottom))] size-11' : 'top-1/2 -translate-y-1/2',
         )}
       >
         <Accessibility aria-hidden className="size-6" />
@@ -106,7 +146,10 @@ export function AccessibilityMenu() {
           id="a11y-menu"
           role="dialog"
           aria-labelledby="a11y-title"
-          className="site-swap fixed top-1/2 left-3 z-[56] max-h-[calc(100dvh-24px)] w-[min(300px,calc(100vw-24px))] -translate-y-1/2 overflow-y-auto rounded-[16px] border border-line bg-surface p-4 text-ink shadow-[0_24px_60px_-12px_rgba(28,25,23,0.35)] sm:left-[4.75rem]"
+          className={cn(
+            'site-swap fixed left-3 z-[56] max-h-[calc(100dvh-24px)] w-[min(300px,calc(100vw-24px))] overflow-y-auto rounded-[16px] border border-line bg-surface p-4 text-ink shadow-[0_24px_60px_-12px_rgba(28,25,23,0.35)]',
+            corner ? 'bottom-[72px]' : 'top-1/2 -translate-y-1/2 sm:left-[4.75rem]',
+          )}
         >
           <div className="flex items-center justify-between gap-2">
             <h2 id="a11y-title" className="text-[16px] font-bold">
@@ -177,6 +220,7 @@ export function AccessibilityMenu() {
             <Link
               href="/accessibility"
               onClick={() => setOpen(false)}
+              {...(newTab ? { target: '_blank', rel: 'noopener' } : {})}
               className="rounded-btn px-2 py-1.5 text-[13px] font-semibold text-brand-deep underline underline-offset-2"
             >
               {a.statement}

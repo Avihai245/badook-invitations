@@ -62,6 +62,26 @@ export const overviewEn: typeof overviewHe = {
     bar: '{date}: {n}',
     table: '{title}, by day',
   },
+  path: {
+    title: 'The hosts’ path — 30 days',
+    intro:
+      'How many hosts reached each step, and how often. No cookies, no third party; nothing is measured when the browser asks not to be tracked.',
+    step: 'Step',
+    hosts: 'Hosts',
+    times: 'Times',
+    bar: 'Hosts, against the most-taken step',
+    steps: {
+      list_view: 'Saw their events',
+      event_enter: 'Entered an event',
+      home_view: 'Saw the event home',
+      step_click: 'Took a step of the path',
+      tools_set: 'Chose or changed tools',
+      publish_open: 'Opened publishing',
+      help_open: 'Opened help from a step',
+      tour_skip: 'Skipped the tour',
+      tour_done: 'Finished the tour',
+    },
+  },
   feed: {
     title: 'What’s happening now',
     intro: 'The latest events in the system, newest first.',

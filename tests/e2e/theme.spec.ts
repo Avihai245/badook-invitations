@@ -213,7 +213,7 @@ test.describe('the system’s look', () => {
       const { ticket: t } = (await ticket.json()) as { ticket: { id: string } };
       const base = `/app/invitations/${inv.id}`;
       await sweep(page, theme, [
-        ['list', '/app/invitations'],
+        ['list', '/app/invitations?all=1'],
         ['new', '/app/invitations/new'],
         ['overview', base],
         ['responses', `${base}/responses`],

@@ -210,6 +210,20 @@ function guestWorld(
     uploaderItems: vi.fn(async (): Promise<ItemRow[]> => []),
     guestDelete: vi.fn(async () => true),
     guestByToken: vi.fn(async (): Promise<string | null> => 'guest-row-id'),
+    like: vi.fn(
+      async (
+        ..._args: Parameters<GuestDeps['db']['like']>
+      ): Promise<{ ok: true; n: number; mine: boolean } | { ok: false; code: 'not_found' }> => ({
+        ok: true,
+        n: 3,
+        mine: true,
+      }),
+    ),
+    likesOf: vi.fn(
+      async (
+        ..._args: Parameters<GuestDeps['db']['likesOf']>
+      ): Promise<Record<string, { n: number; mine: boolean }>> => ({}),
+    ),
   };
   const { storage, put, signedUploads } = fakeStorage();
   const deps: GuestDeps = {
@@ -468,6 +482,31 @@ describe('reserving uploads', () => {
     expect(rows.map((r) => r.takenAt)).toEqual(['2026-09-26T14:45:00.000Z', null]);
     expect(rows[1]!.durationMs).toBe(40_000);
     expect(cap).toBe(GALLERY.limits.itemsPerEvent);
+  });
+
+  it('"tag me": an Instagram username (an @ and capitals are fine) goes with every item; anything else is refused', async () => {
+    const w = guestWorld();
+    const ok = await guest.guestReserve(
+      { t: w.token, uploader: UPLOADER, instagram: ' @Dana.K_23 ', items: [photoSpec('a'), photoSpec('b')] },
+      IP,
+      w.deps,
+    );
+    expect(ok.status).toBe(200);
+    const rows = w.db.reserve.mock.calls[0]![4] as { instagram: string | null }[];
+    expect(rows.map((r) => r.instagram)).toEqual(['dana.k_23', 'dana.k_23']);
+    for (const bad of ['dana k', 'דנה', '@', 'x'.repeat(31)])
+      expect(
+        (
+          await guest.guestReserve(
+            { t: w.token, uploader: UPLOADER, instagram: bad, items: [photoSpec('c')] },
+            IP,
+            w.deps,
+          )
+        ).status,
+      ).toBe(400);
+    // without it: nothing
+    await guest.guestReserve({ t: w.token, uploader: UPLOADER, items: [photoSpec('d')] }, IP, w.deps);
+    expect((w.db.reserve.mock.calls.at(-1)![4] as { instagram: string | null }[])[0]!.instagram).toBeNull();
   });
 
   it('rate-limited per link, per address and per device (hashed keys) — nothing signed when over', async () => {
@@ -763,6 +802,19 @@ describe('the feed and the screen', () => {
       ...over,
     });
 
+  it('says who an item is from by an opaque key, and nothing else about the uploader', async () => {
+    const w = guestWorld();
+    w.db.feed.mockResolvedValueOnce([
+      published({ by: 'f3a9c0d1e2b47865', name: 'דנה' }),
+      published({ by: 'host', name: null }),
+      published(),
+    ]);
+    const res = await guest.guestFeed({ t: w.token }, IP, w.deps);
+    const items = res.body.items as Record<string, unknown>[];
+    expect(items.map((i) => i.by)).toEqual(['f3a9c0d1e2b47865', 'host', null]);
+    expect(JSON.stringify(res.body)).not.toMatch(/uploader/i);
+  });
+
   it('a page of published items with signed URLs only (no paths, no scores), and the next cursor', async () => {
     const w = guestWorld();
     const rows = Array.from({ length: GALLERY.feed.pageSize }, () => published());
@@ -781,12 +833,16 @@ describe('the feed and the screen', () => {
     expect(Object.keys(items[1]!).sort()).toEqual(
       [
         'at',
+        'by',
         'display',
         'durationMs',
         'height',
         'id',
+        'instagram',
         'kind',
         'name',
+        'placement',
+        'post',
         'takenAt',
         'thumb',
         'video',
@@ -841,6 +897,77 @@ describe('the feed and the screen', () => {
     ]);
     w.rateAnswers.set(tokens.rateKey('feed', `${INV}:${UPLOADER}`), false);
     expect((await guest.guestFeed({ t: w.token, uploader: UPLOADER }, IP, w.deps)).status).toBe(429);
+  });
+
+  it('the story or the feed: each item says where it was shared and its post; the feed brings likes', async () => {
+    const w = guestWorld();
+    const story = published({ placement: 'story', post: 'ignored' });
+    const a = published({ placement: 'feed', post: 'post-0123456789ab' });
+    const b = published({ placement: 'feed', post: 'post-0123456789ab' });
+    const old = published();
+    w.db.feed.mockResolvedValueOnce([story, a, b, old]);
+    w.db.likesOf.mockResolvedValueOnce({ 'post-0123456789ab': { n: 4, mine: true } });
+    const res = await guest.guestFeed(
+      { t: w.token, uploader: UPLOADER, posts: ['seen-on-screen-01'] },
+      IP,
+      w.deps,
+    );
+    const items = res.body.items as { placement: string; post: string }[];
+    expect(items.map((i) => [i.placement, i.post])).toEqual([
+      ['story', 'ignored'],
+      ['feed', 'post-0123456789ab'],
+      ['feed', 'post-0123456789ab'],
+      ['feed', old.id],
+    ]);
+    // the posts on the screen, then the feed posts of this answer (once each; never a story)
+    expect(w.db.likesOf).toHaveBeenCalledWith(
+      INV,
+      ['seen-on-screen-01', 'post-0123456789ab', old.id],
+      tokens.uploaderHash(INV, UPLOADER),
+    );
+    expect(res.body.likes).toEqual({ 'post-0123456789ab': { n: 4, mine: true } });
+    // a malformed post key is refused before anything is read
+    expect((await guest.guestFeed({ t: w.token, posts: ['no spaces'] }, IP, w.deps)).status).toBe(400);
+  });
+
+  it('a like: once per phone (its hash), pages are told; rate-limited; an unknown post is not found', async () => {
+    const w = guestWorld();
+    const res = await guest.guestLike(
+      { t: w.token, uploader: UPLOADER, post: 'post-0123456789ab', on: true },
+      IP,
+      w.deps,
+    );
+    expect(res).toEqual({ status: 200, body: { ok: true, likes: { n: 3, mine: true } } });
+    expect(w.db.like).toHaveBeenCalledWith(
+      INV,
+      'post-0123456789ab',
+      tokens.uploaderHash(INV, UPLOADER),
+      true,
+    );
+    expect(w.deps.broadcast).toHaveBeenCalledWith('gallery-channel-unit', 'likes');
+    w.db.like.mockResolvedValueOnce({ ok: false, code: 'not_found' });
+    expect(
+      (
+        await guest.guestLike(
+          { t: w.token, uploader: UPLOADER, post: 'gone-0123456789', on: true },
+          IP,
+          w.deps,
+        )
+      ).status,
+    ).toBe(404);
+    expect(
+      (await guest.guestLike({ t: w.token, post: 'post-0123456789ab', on: true }, IP, w.deps)).status,
+    ).toBe(400);
+    w.rateAnswers.set(tokens.rateKey('like', `${INV}:${UPLOADER}`), false);
+    expect(
+      (
+        await guest.guestLike(
+          { t: w.token, uploader: UPLOADER, post: 'post-0123456789ab', on: false },
+          IP,
+          w.deps,
+        )
+      ).status,
+    ).toBe(429);
   });
 
   it('the screen: newest published items, then what changed', async () => {
@@ -1306,5 +1433,56 @@ describe('what a storage error means for the upload queue', () => {
     for (const s of [408, 429, 500, 502, 503]) expect(classify(s, '')).toBe('server');
     expect(classify(400, 'bad')).toBe('expired');
     expect(classify(404, '')).toBe('server');
+  });
+});
+
+describe('the list of tag requests', () => {
+  const cols = {
+    handle: 'Instagram username',
+    link: 'Profile link',
+    name: 'Name',
+    photos: 'Photos',
+    first: 'First shared',
+    files: 'Files',
+  };
+  it('one row per username: its profile, the names given, how many photos and their names in the ZIP', () => {
+    const a1 = row({
+      instagram: 'dana.k',
+      name: 'דנה',
+      takenAt: '2027-06-17T18:10:00.000Z',
+      originalDone: true,
+    });
+    const a2 = row({
+      instagram: 'dana.k',
+      name: 'דנה ויואב',
+      takenAt: '2027-06-17T18:05:00.000Z',
+      originalDone: true,
+    });
+    const b = row({ instagram: 'roni', name: null, takenAt: null, createdAt: '2027-06-17T19:00:00.000Z' });
+    const csv = host.tagsCsv([a1, a2, b, row({ instagram: null })], 'Asia/Jerusalem', cols);
+    expect(csv.startsWith('﻿')).toBe(true);
+    const lines = csv.slice(1).split('\r\n');
+    expect(lines[0]).toBe('Instagram username,Profile link,Name,Photos,First shared,Files');
+    expect(lines).toHaveLength(3);
+    // no @ in front (Excel would read it as a formula); the earliest photo is when they first shared
+    expect(lines[1]).toBe(
+      [
+        'dana.k',
+        'https://www.instagram.com/dana.k/',
+        'דנה / דנה ויואב',
+        '2',
+        '2027-06-17 21:05:00',
+        `${host.archiveName(a1, 'Asia/Jerusalem', false)} | ${host.archiveName(a2, 'Asia/Jerusalem', false)}`,
+      ].join(','),
+    );
+    // without the original yet: named as the ZIP names its preview
+    expect(lines[2]!).toContain(host.archiveName(b, 'Asia/Jerusalem', true));
+    expect(lines[2]!.startsWith('roni,https://www.instagram.com/roni/,,1,2027-06-17 22:00:00,')).toBe(true);
+  });
+
+  it('nobody asked: the header only', () => {
+    expect(host.tagsCsv([], 'Asia/Jerusalem', cols).slice(1)).toBe(
+      'Instagram username,Profile link,Name,Photos,First shared,Files',
+    );
   });
 });

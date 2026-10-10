@@ -59,6 +59,8 @@ export function PreviewFrame({
   // a section's motion played as guests see it: the live page for a moment (`top`: where it starts)
   const [play, setPlay] = useState<{ n: number; top: number; hero: boolean; ms: number } | null>(null);
   const plays = useRef(0);
+  // the page shown is the live one (a play or the opening running) — read by the message handler
+  const liveNow = useRef(false);
   const highlight = useRef<{ path: string | null; label?: string }>({ path: null });
   // the family's comment pins (features/review), drawn over the editor's rendering
   const [pins, setPins] = useState<{ pins: LabeledPin[]; label: string }>({ pins: [], label: '' });
@@ -144,16 +146,26 @@ export function PreviewFrame({
         setPlay(null);
         setReplay((n) => n + 1);
       } else if (msg.type === 'play') {
-        // where the section is now (the live page lays out the same): it scrolls in from below there
-        const el = document.querySelector<HTMLElement>(`[data-edit-path="${CSS.escape(msg.path)}"]`);
-        const top = el ? el.getBoundingClientRect().top + window.scrollY : 0;
-        setReplay(0);
-        setPlay({
-          n: ++plays.current,
-          top,
-          hero: msg.path === 'sections.0',
-          ms: Math.min(9000, Math.max(1500, msg.ms)),
-        });
+        const start = () => {
+          // where the section is on the editing page (the live page lays out the same): it scrolls in
+          // from below there
+          const el = document.querySelector<HTMLElement>(`[data-edit-path="${CSS.escape(msg.path)}"]`);
+          const top = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+          setReplay(0);
+          setPlay({
+            n: ++plays.current,
+            top,
+            hero: msg.path === 'sections.0',
+            ms: Math.min(9000, Math.max(1500, msg.ms)),
+          });
+        };
+        // a play (or the opening) still running shows the live page, which has no editing marks to
+        // find the section by: back to the editing page first, then measure there
+        if (liveNow.current) {
+          setReplay(0);
+          setPlay(null);
+          requestAnimationFrame(() => requestAnimationFrame(start));
+        } else start();
       }
     };
     window.addEventListener('message', onMessage);
@@ -226,6 +238,7 @@ export function PreviewFrame({
   const pinLabel = useCallback((p: Pin) => (p as LabeledPin).label ?? '', []);
 
   const live = replay > 0 || play !== null;
+  liveNow.current = live;
   const ctx = useMemo(
     () =>
       state

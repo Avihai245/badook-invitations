@@ -90,7 +90,11 @@ async function draftFor(
       ? { adults: raw.headcount.confirmedAdults, children: raw.headcount.confirmedChildren, tables }
       : basis === 'manual'
         ? { adults: input.manualAdults ?? raw.headcount.invited, children: input.manualChildren ?? 0, tables }
-        : { adults: raw.headcount.invited, children: 0, tables };
+        : {
+            adults: raw.headcount.expectedAdults ?? raw.headcount.invited,
+            children: raw.headcount.expectedChildren ?? 0,
+            tables,
+          };
   const ctx = {
     eventDate,
     today,

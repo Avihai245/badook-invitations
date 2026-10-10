@@ -1,4 +1,5 @@
 import type { EventType } from '../../contracts/types';
+import { readTools, type ToolKey } from '../../lib/tools';
 
 /**
  * What the host answered in the start wizard, kept for the next screen in this tab (the gallery's
@@ -10,7 +11,8 @@ export interface StartAnswers {
   date: string | null;
   guests: number | null;
   budget: number | null;
-  start: 'plan' | 'design' | 'all';
+  /** what the host needs for the event (lib/tools) */
+  tools: ToolKey[];
   names: { primary: string; secondary: string; parents: string };
 }
 
@@ -27,7 +29,9 @@ export function saveAnswers(a: StartAnswers): void {
 export function readAnswers(): StartAnswers | null {
   try {
     const raw = window.sessionStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as StartAnswers) : null;
+    if (!raw) return null;
+    const a = JSON.parse(raw) as StartAnswers;
+    return { ...a, tools: readTools(a.tools) ?? ['invite'] };
   } catch {
     return null;
   }

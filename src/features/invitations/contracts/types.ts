@@ -845,6 +845,8 @@ export type RsvpSubmission = {
 } & (
   | {
       attending: true;
+      /** people beyond the guest's invitation they ask to bring (a personal link): the host decides */
+      extraRequested?: number;
       adults: {
         firstName: string;
         lastName: string;

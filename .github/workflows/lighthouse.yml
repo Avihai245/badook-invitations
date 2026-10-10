@@ -1,6 +1,7 @@
 # The performance budget (perf-budget.json) on Lighthouse's mobile preset — Moto G Power, Slow 4G, 4x
-# CPU: Performance ≥ 90, LCP ≤ 2.5 s, TBT ≤ 200 ms, CLS ≤ 0.1, ≤ 170 KB of JavaScript and ≤ 1.5 MB in
-# all (compressed) with the first load, Accessibility and Best Practices 100 (and SEO on the home page).
+# CPU: Performance ≥ 98, LCP ≤ 1.8 s, Speed Index ≤ 2.5 s, TBT ≤ 100 ms, CLS ≤ 0.05, server response
+# ≤ 600 ms, ≤ 8 script requests (and ≤ 2 font files on the home page), ≤ 170 KB of JavaScript and ≤ 1.5 MB
+# in all (compressed) with the first load, Accessibility and Best Practices 100 (and SEO on the home page).
 #
 # - pages: on pull requests that change what the pages load, and by hand — the home page and a sample
 #   invitation of every template (lighthouserc.cjs); a page over the budget fails the run.

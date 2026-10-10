@@ -13,7 +13,11 @@ import { insightsEn } from './insights.en';
 import { galleryNotifyEn } from './gallery-notify.en';
 import { facesEn } from './faces.en';
 import { filmEn } from './film.en';
+import { albumEn } from './album.en';
+import { aiPhotosEn } from './ai-photos.en';
+import { scheduleEn } from './schedule.en';
 import { planningEn } from './planning.en';
+import { waMessagesEn } from './wa-messages.en';
 import { enCore } from './app-core.en';
 import { enMore } from './app-more.en';
 
@@ -35,5 +39,9 @@ export const en: AppDict = {
   galleryNotify: galleryNotifyEn,
   faces: facesEn,
   film: filmEn,
+  album: albumEn,
+  aiPhotos: aiPhotosEn,
+  schedule: scheduleEn,
   planning: planningEn,
+  waMessages: waMessagesEn,
 };

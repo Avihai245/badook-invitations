@@ -1,6 +1,16 @@
 import type { Metadata } from 'next';
 import { loadAccount } from '@/features/billing/server/account';
-import { InvitationsList, type CardBudget } from '@/features/invitations/app/list/InvitationsList';
+import { redirect } from 'next/navigation';
+import {
+  InvitationsList,
+  type CardBudget,
+  type CardPlanning,
+} from '@/features/invitations/app/list/InvitationsList';
+import type { ToolKey } from '@/features/invitations/lib/tools';
+import { toolsView } from '@/features/invitations/server/tools';
+import { daysBetween, todayIn } from '@/features/planning/model/schedule';
+import { dueWithin } from '@/features/planning/model/week';
+import { DEFAULT_ZONE } from '@/features/planning/server/view';
 import { whyOff } from '@/features/flags/features';
 import { featureInput } from '@/features/flags/server';
 import { planningOverview } from '@/features/planning/server/badge';
@@ -33,44 +43,80 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * Each active event's budget for its card's tiny gauge: the events with planning and a total budget (a
- * few at most per host; a failure only leaves a card without its gauge).
+ * What each active event's card shows beyond its counts (a few events at most per host; a failure only
+ * leaves a card plainer): the tools the host chose (invitations/lib/tools), the plan's numbers for the
+ * card's path, and the budget for its tiny gauge — only for events that plan.
  */
-async function cardBudgets(ownerId: string, items: InvitationSummary[]): Promise<Record<string, CardBudget>> {
-  const active = items.filter((i) => i.status !== 'archived' && i.eventType !== 'save_the_date').slice(0, 12);
+async function cardFacts(ownerId: string, items: InvitationSummary[]) {
+  const active = items.filter((i) => i.status !== 'archived').slice(0, 12);
   const rows = await Promise.all(
     active.map(async (item) => {
       const input = await featureInput(item.id).catch(() => null);
-      if (!input || whyOff('planning', input) !== null) return null;
-      const o = await planningOverview(ownerId, item.id, {
-        eventType: item.eventType,
-        status: item.status,
-        unpublishedChanges: item.unpublishedChanges,
-        guests: item.guests,
-        sent: item.sent,
-        responses: item.responses,
-      }).catch(() => null);
-      const totals = o?.raw.totals;
-      if (!totals || !totals.totalBudget) return null;
-      return [
-        item.id,
-        {
-          total: totals.totalBudget,
-          committed: totals.committed,
-          paid: totals.paid,
-          planned: totals.planned,
-        },
-      ] as const;
+      const planningOn = !!input && item.eventType !== 'save_the_date' && whyOff('planning', input) === null;
+      // a host who chose their tools without planning: no plan to read
+      const wantsPlan = !input?.tools || input.tools.includes('plan');
+      const o =
+        planningOn && wantsPlan
+          ? await planningOverview(ownerId, item.id, {
+              eventType: item.eventType,
+              status: item.status,
+              unpublishedChanges: item.unpublishedChanges,
+              guests: item.guests,
+              sent: item.sent,
+              responses: item.responses,
+            }).catch(() => null)
+          : null;
+      const planned = !!o?.raw.settings;
+      const totals = o?.raw.taskTotals;
+      const planning: CardPlanning | null = o
+        ? {
+            planned,
+            totalBudget: o.raw.totals?.totalBudget ?? null,
+            week: planned ? dueWithin(o.tasks, o.today, 7).length : 0,
+            open: totals ? Math.max(0, totals.total - totals.done - totals.skipped) : 0,
+          }
+        : null;
+      const { tools } = toolsView(item, input, planned);
+      const t = o?.raw.totals;
+      const budget: CardBudget | null =
+        tools.includes('plan') && t && t.totalBudget
+          ? { total: t.totalBudget, committed: t.committed, paid: t.paid, planned: t.planned }
+          : null;
+      return { id: item.id, tools, planning, budget };
     }),
   );
-  return Object.fromEntries(rows.filter((r) => r !== null));
+  return {
+    tools: Object.fromEntries(rows.map((r) => [r.id, r.tools])) as Record<string, ToolKey[]>,
+    planning: Object.fromEntries(rows.map((r) => [r.id, r.planning])) as Record<string, CardPlanning | null>,
+    budgets: Object.fromEntries(rows.flatMap((r) => (r.budget ? [[r.id, r.budget]] : []))) as Record<
+      string,
+      CardBudget
+    >,
+  };
 }
 
-/** /app/invitations — the host's invitations (§9B.3-A). */
-export default async function InvitationsPage() {
+/**
+ * /app/invitations — the host's invitations (§9B.3-A). A host with exactly one event goes straight into
+ * it (its home: the path, the next step) — the list is one tap away ("all events", `?all=1`).
+ */
+export default async function InvitationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const user = await requireUser('/app/invitations');
-  const [items, account] = await Promise.all([ownerInvitations(user.id), loadAccount(user)]);
-  const budgets = await cardBudgets(user.id, items);
+  const [items, account, query] = await Promise.all([
+    ownerInvitations(user.id),
+    loadAccount(user),
+    searchParams,
+  ]);
+  const active = items.filter((i) => i.status !== 'archived');
+  if (active.length === 1 && query.all === undefined)
+    redirect(`/app/invitations/${active[0]!.id}?via=single`);
+  const { tools, planning, budgets } = await cardFacts(user.id, items);
+  // the days to each event as the server sees them (the cards move to the visitor's own day once known)
+  const today = todayIn(DEFAULT_ZONE);
+  const days = Object.fromEntries(items.map((i) => [i.id, daysBetween(today, i.date)]));
   // the greeting: the first name from the account, else from sign-up / Google
   const meta = (user.user_metadata ?? {}) as { full_name?: unknown; name?: unknown };
   const full =
@@ -88,6 +134,9 @@ export default async function InvitationsPage() {
         items={items}
         name={name}
         budgets={budgets}
+        tools={tools}
+        planning={planning}
+        days={days}
         posters={Object.fromEntries(
           items.map((item) => [
             item.id,

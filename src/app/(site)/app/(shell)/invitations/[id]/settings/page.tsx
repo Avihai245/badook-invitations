@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { EventSettingsScreen } from '@/features/invitations/app/workspace/EventSettings';
 import { hostsLine } from '@/features/invitations/lib/text';
+import { toolsView } from '@/features/invitations/server/tools';
 import { planPageData } from '@/features/planning/server/page';
 import { PlanProvider } from '@/features/planning/ui/PlanProvider';
 import { whyOff } from '@/features/flags/features';
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-/** /app/invitations/[id]/settings — the event's settings: details, planning, package, duplicate, archive. */
+/** /app/invitations/[id]/settings — the event's settings: details, its tools, planning, package, duplicate, archive. */
 export default async function EventSettingsPage({ params }: { params: Params }) {
   const { id } = await params;
   const user = await requireUser(`/app/invitations/${id}/settings`);
@@ -32,7 +33,10 @@ export default async function EventSettingsPage({ params }: { params: Params }) 
   const input = await featureInput(id).catch(() => null);
   const planning = !!input && item.eventType !== 'save_the_date' && whyOff('planning', input) === null;
   const data = planning ? await planPageData(id, '') : null;
-  const screen = <EventSettingsScreen item={item} planning={!!data && !data.off && !!data.view.settings} />;
+  const planned = !!data && !data.off && !!data.view.settings;
+  const screen = (
+    <EventSettingsScreen item={item} planning={planned} tools={toolsView(item, input, planned)} />
+  );
   return data && !data.off ? (
     <PlanProvider id={id} initial={data.view}>
       {screen}

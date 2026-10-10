@@ -478,7 +478,7 @@ test.describe('share screen', () => {
     await expect(svg).toHaveAttribute('href', /^data:image\/svg\+xml/);
 
     // the list menu leads here too
-    await open(page, '/app/invitations');
+    await open(page, '/app/invitations?all=1');
     await page.getByRole('button', { name: 'אפשרויות נוספות' }).first().click();
     await expect(page.getByRole('menuitem', { name: 'שיתוף' })).toHaveAttribute(
       'href',

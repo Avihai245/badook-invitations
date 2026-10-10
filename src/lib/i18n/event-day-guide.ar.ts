@@ -85,5 +85,9 @@ export const eventDayGuideAr: EventDayGuideDict = {
     privacy: 'سياسة الخصوصية',
     accessibility: 'بيان إمكانية الوصول',
     made: 'صُنعت باستخدام {brand}',
+    site: 'دعوات رقمية وتنظيم المناسبات',
+    visit: 'زيارة موقع {brand}',
+    events: 'Badook Events',
+    eventsHint: 'ابحثوا عن مكان لمناسبتكم',
   },
 };

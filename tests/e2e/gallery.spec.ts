@@ -102,7 +102,7 @@ async function phone(browser: Browser): Promise<BrowserContext> {
 async function openGallery(page: Page, link: string) {
   await page.goto(link);
   // the queue is ready (IndexedDB opened, the uploader started)
-  await expect(page.getByRole('button', { name: 'בחירת תמונות וסרטונים' })).toBeEnabled();
+  await expect(page.getByTestId('gallery-share')).toBeEnabled();
 }
 
 type Photo = { name: string; mimeType: string; buffer: Buffer };
@@ -210,7 +210,7 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
   await openGallery(guest, link);
   await expect(guest.getByRole('heading', { level: 1 })).toContainText('נועה');
   await expect(guest.getByRole('heading', { level: 1 })).toContainText('איתי');
-  await expect(guest.getByText('עוד אין כאן תמונות. היו הראשונים לשתף!')).toBeVisible();
+  await expect(guest.getByText('עוד אין פוסטים בפיד. היו הראשונים לשתף!')).toBeVisible();
   const files = await photos(guest, [{ look: 0 }, { look: 1 }, { look: 2 }]);
 
   // the network goes away as the second file goes up (the first photo's thumbnail is through, its
@@ -225,11 +225,20 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
     }
     return route.continue();
   });
-  await guest.getByLabel('השם שלכם').fill('דנה ויואב');
-  await choose(guest, files);
+  // sharing a post: the first time, the name (and "want us to tag you?"), then the phone's picker
+  await guest.getByTestId('gallery-share').click();
+  const sheet = guest.getByTestId('name-sheet');
+  await sheet.getByTestId('name-input').fill('דנה ויואב');
+  await sheet.getByRole('switch', { name: 'רוצים שנתייג אתכם?' }).click();
+  await sheet.getByTestId('instagram-input').fill('@Dana.Yoav');
+  const chooser = guest.waitForEvent('filechooser');
+  await sheet.getByTestId('name-continue').click();
+  await (await chooser).setFiles(files);
   await expect.poll(() => dropped, { timeout: 30_000 }).toBe(true);
   await expect(guest.getByText('אין חיבור לאינטרנט. הכל שמור בטלפון')).toBeVisible();
   await expect(progressTitle(guest)).toHaveText('0 מתוך 3 הועלו');
+  if (process.env.STORIES_SHOTS)
+    await guest.screenshot({ path: 'tests/.artifacts/qa/gallery/he-mobile-8-uploading.png' });
   expect((await itemsOf(id)).filter((i) => i.status !== 'uploading')).toHaveLength(0);
 
   // a while offline, then back: the queue goes on by itself
@@ -237,6 +246,8 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
   await context.setOffline(false);
   await expect(progressTitle(guest)).toHaveText('3 מתוך 3 הועלו', { timeout: 60_000 });
   await expect(guest.getByText('הכל עלה. תודה ששיתפתם!')).toBeVisible();
+  // the pill above the share bar says so, then leaves by itself
+  await expect(guest.getByTestId('upload-progress')).toBeHidden({ timeout: 10_000 });
 
   // all three are in the gallery, with their originals — byte for byte what the phone had
   const rows = await itemsOf(id);
@@ -250,7 +261,18 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
   for (const o of originals) expect(o && sent.has(o.toString('base64'))).toBe(true);
   expect(new Set(originals.map((o) => o!.toString('base64'))).size).toBe(3);
 
-  // the feed has them; the story view goes through them
+  // the feed has them as one post (picked together): a swipe between the three, and a heart
+  const posts = guest.getByTestId('gallery-posts');
+  await expect(posts.locator('[data-post]')).toHaveCount(1);
+  await expect(posts.locator('[data-item]')).toHaveCount(3);
+  await expect(posts.locator('[data-post]')).toHaveAttribute('aria-label', 'הפוסט של דנה ויואב');
+  await expect(posts.locator('[data-instagram="dana.yoav"]')).toHaveText('@dana.yoav');
+  await expect(posts.getByText('היו הראשונים לעשות לייק')).toBeVisible();
+  await posts.getByRole('button', { name: 'לייק', exact: true }).click();
+  await expect(posts.getByText('לייק אחד')).toBeVisible();
+  await expect(posts.getByRole('button', { name: 'ביטול הלייק' })).toHaveAttribute('aria-pressed', 'true');
+  // every photo, in the grid; the full-screen view goes through them
+  await guest.locator('[data-view="grid"]').click();
   const feed = guest.getByTestId('gallery-feed');
   await expect(feed.locator('[data-item]')).toHaveCount(3);
   await feed.locator('[data-item]').first().click();
@@ -263,9 +285,10 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
   await guest.keyboard.press('Escape');
   await expect(viewer).toBeHidden();
 
-  // the host's tab counts them
+  // the host's tab counts them ("the photos and videos")
   await page.reload();
   await hydrated(page);
+  await page.getByRole('tab', { name: /^התמונות והסרטונים/ }).click();
   await expect(page.getByTestId('gallery-items').locator('li')).toHaveCount(3);
   await context.close();
 });
@@ -306,7 +329,9 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   await expect(progressTitle(guest)).toHaveText('1 מתוך 1 הועלו', { timeout: 30_000 });
   const mine = guest.getByTestId('gallery-mine');
   await expect(mine).toContainText('ממתין לאישור המארחים');
-  await expect(guest.getByTestId('gallery-feed')).toHaveCount(0);
+  await expect(guest.getByTestId('gallery-posts')).toHaveCount(0);
+  // the review queue: in "the photos and videos"
+  await page.getByRole('tab', { name: /^התמונות והסרטונים/ }).click();
   const review = page.getByTestId('gallery-review');
   await expect(review).toContainText('ייתכן שאינו מתאים', { timeout: 20_000 });
   const checks = (await (await fetch(`${MOCKS}/__ai/gallery`)).json()) as {
@@ -324,9 +349,9 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   await expect(review).toBeHidden();
   await expect(mine).toContainText('לא יופיע בגלריה', { timeout: 20_000 });
 
-  // approval mode: everything waits (the settings are on their own tab; the link, the cards and the
-  // review queue on the first)
-  await page.getByRole('tab', { name: 'הגדרות ומחיקה' }).click();
+  // approval mode: everything waits (the settings are in their own section, the review queue in "the
+  // photos and videos")
+  await page.getByRole('tab', { name: /^הגדרות/ }).click();
   await expect(settings.getByRole('switch', { name: 'בדיקה אוטומטית' })).toBeChecked();
   await settings.getByRole('radio', { name: 'אחרי אישור שלכם' }).click();
   await expect(settings.getByRole('radio', { name: 'אחרי אישור שלכם' })).toHaveAttribute(
@@ -336,8 +361,8 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   await expect(guest.getByText('המארחים יאשרו אותם לפני שיופיעו בגלריה.')).toBeVisible({ timeout: 20_000 });
   await choose(guest, [plain!]);
   await expect(progressTitle(guest)).toHaveText('2 מתוך 2 הועלו', { timeout: 30_000 });
-  // back to the first tab with what the server holds now (a tab opened again starts from the page's data)
-  await page.goto(`/app/invitations/${id}/gallery`);
+  // back to the photos with what the server holds now (a section opened again starts from the page's data)
+  await page.goto(`/app/invitations/${id}/gallery?view=photos`);
   await hydrated(page);
   await expect(review).toContainText('ממתין לאישור שלכם', { timeout: 20_000 });
   const [held] = (await itemsOf(id)).filter((r) => r.status === 'pending');
@@ -346,7 +371,7 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   // approved: the guest's phone shows it by itself
   await review.getByRole('button', { name: 'אישור', exact: true }).click();
   await expect(review).toBeHidden();
-  await expect(guest.getByTestId('gallery-feed').locator(`[data-item="${held!.id}"]`)).toBeVisible({
+  await expect(guest.getByTestId('gallery-posts').locator(`[data-item="${held!.id}"]`)).toBeVisible({
     timeout: 20_000,
   });
   await expect(guest.getByTestId('gallery-live')).toBeVisible();

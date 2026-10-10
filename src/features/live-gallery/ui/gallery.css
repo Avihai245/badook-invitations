@@ -39,3 +39,57 @@
     transform: scale(1.04);
   }
 }
+
+/* a story's progress bar fills over the time its photo is shown (paused while someone holds the screen) */
+@keyframes story-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* a like: the heart over the photo pops and fades (double tap), the small one bounces */
+@keyframes like-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  18% {
+    opacity: 0.95;
+    transform: scale(1.15);
+  }
+  30% {
+    transform: scale(0.95);
+  }
+  70% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+@keyframes like-pop {
+  40% {
+    transform: scale(1.25);
+  }
+}
+
+/* a story's ring: the gradient people know from stories (warm yellow through orange and red to
+   pink and purple) */
+.gallery-ring {
+  background: linear-gradient(45deg, #f9ce34 0%, #f58529 22%, #ee2a7b 55%, #c13584 78%, #6228d7 100%);
+}
+
+/* the AI studio while a photo is being made: a light sweeping across */
+@keyframes ai-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}

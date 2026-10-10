@@ -9,7 +9,7 @@ import { z } from 'zod';
  * how many meters one of its pixels is (`metersPerPixel`).
  */
 
-export const TABLE_SHAPES = ['round', 'rect', 'knights'] as const;
+export const TABLE_SHAPES = ['round', 'square', 'rect', 'knights'] as const;
 export type TableShape = (typeof TABLE_SHAPES)[number];
 
 /** What a host marks about a table: near the stage / dance floor / an exit, reachable in a wheelchair. */

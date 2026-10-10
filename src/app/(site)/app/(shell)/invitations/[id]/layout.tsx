@@ -7,6 +7,7 @@ import { ItemPoster } from '@/features/invitations/app/ItemPoster';
 import { POSTER_FONT_CSS } from '@/features/invitations/app/poster-fonts';
 import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { InvitationWorkspace } from '@/features/invitations/app/workspace/InvitationWorkspace';
+import { toolsView } from '@/features/invitations/server/tools';
 import { planningTab } from '@/features/planning/server/badge';
 import { ticketsDb } from '@/features/support/tickets/server/db';
 import { getUiLocale } from '@/lib/i18n/server';
@@ -58,6 +59,9 @@ export default async function InvitationLayout({
     input,
   );
   const features = deploymentFeatures();
+  const gallery = features.has('live_gallery');
+  // the stages of the tools the host chose for the event (invitations/lib/tools)
+  const { tools } = toolsView(item, input, !!planning?.planned);
   return (
     <>
       {/* the posters write the names in the design's font */}
@@ -68,10 +72,11 @@ export default async function InvitationLayout({
           planning: planning !== null,
           seating,
           eventDay,
-          gallery: features.has('live_gallery'),
+          gallery,
           insights: features.has('analytics'),
+          tools,
         }}
-        plan={planning?.planned ? { open: planning.open } : null}
+        plan={planning?.planned ? { open: planning.open, week: planning.week } : null}
         seating={planning?.seating ?? null}
         account={<UserMenu email={user.email ?? null} admin={admin} unread={unread} compact />}
         thumb={

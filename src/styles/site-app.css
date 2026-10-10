@@ -120,3 +120,29 @@
     animation-duration: 2.4s;
   }
 }
+
+/* the bar at the top while the next screen loads (components/app/NavEffects) */
+.nav-progress > span {
+  transform: scaleX(0);
+  transform-origin: right;
+  opacity: 0;
+  transition:
+    transform 200ms ease-out,
+    opacity 300ms ease 150ms;
+}
+[dir='ltr'] .nav-progress > span {
+  transform-origin: left;
+}
+.nav-progress[data-busy] > span {
+  opacity: 1;
+  transform: scaleX(0.85);
+  transition:
+    transform 8s cubic-bezier(0.1, 0.7, 0.2, 1),
+    opacity 100ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-progress[data-busy] > span {
+    transform: scaleX(1);
+    transition: opacity 100ms;
+  }
+}

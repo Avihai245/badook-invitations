@@ -30,7 +30,16 @@ export async function sql<T = Record<string, unknown>>(text: string, values: unk
   }
 }
 
-export const hydrated = (page: Page) => page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+/**
+ * The page is hydrated, and its streamed parts are in place: until React swaps one in, it waits in a
+ * hidden copy (div#S:…[hidden]) — the same test id twice for a moment.
+ */
+export async function hydrated(page: Page) {
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+  await page
+    .waitForFunction(() => !document.querySelector('div[hidden][id^="S:"]'), null, { timeout: 15_000 })
+    .catch(() => undefined);
+}
 
 export async function open(page: Page, url: string) {
   await page.goto(url);
@@ -41,7 +50,7 @@ export async function open(page: Page, url: string) {
 export function api<T = Record<string, unknown>>(
   page: Page,
   url: string,
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
   body?: unknown,
 ): Promise<{ status: number; body: T }> {
   return page.evaluate(
@@ -185,6 +194,16 @@ export interface SeedPhoto {
   width?: number;
   height?: number;
   status?: 'published' | 'pending';
+  /** another guest's phone (the default is one phone for all) */
+  who?: string;
+  /** the name the guest gave: omitted is "אורחת", null is no name */
+  name?: string | null;
+  /** shared to the story or the feed (omitted: the feed, a post of its own) */
+  placement?: 'story' | 'feed';
+  /** the feed post it joins (photos shared together) */
+  post?: string;
+  /** "tag me": the guest's Instagram username */
+  instagram?: string;
 }
 
 /**
@@ -192,9 +211,11 @@ export interface SeedPhoto {
  * through the gallery's own database functions (published, with the phone's checks' numbers).
  */
 export async function seedPhotos(invitationId: string, photos: SeedPhoto[]): Promise<string[]> {
-  const uploader = createHash('sha256').update(`e2e-phone-${invitationId}`).digest('hex');
   const ids: string[] = [];
   for (const [i, p] of photos.entries()) {
+    const uploader = createHash('sha256')
+      .update(`e2e-phone-${invitationId}${p.who ? `-${p.who}` : ''}`)
+      .digest('hex');
     const id = randomUUID();
     const folder = `${invitationId}/${id}`;
     const width = p.width ?? 1200;
@@ -219,10 +240,13 @@ export async function seedPhotos(invitationId: string, photos: SeedPhoto[]): Pro
       height,
       durationMs: null,
       takenAt: taken,
+      ...(p.placement ? { placement: p.placement } : {}),
+      ...(p.post ? { post: p.post } : {}),
+      ...(p.instagram ? { instagram: p.instagram } : {}),
     };
     const [reserved] = await sql<{ r: { ok: boolean } }>(
-      `select public.gallery_reserve($1, $2, null, 'אורחת', $3, 3000) as r`,
-      [invitationId, uploader, JSON.stringify([item])],
+      `select public.gallery_reserve($1, $2, null, $4, $3, 3000) as r`,
+      [invitationId, uploader, JSON.stringify([item]), p.name === undefined ? 'אורחת' : p.name],
     );
     expect(reserved!.r.ok).toBe(true);
     const phash = createHash('sha256').update(id).digest('hex').slice(0, 16);

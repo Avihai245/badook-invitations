@@ -364,3 +364,162 @@ Footer: `Enviado con Badook` · Button: `Ir a la galería` · דוגמאות: `D
 - **קרדיטים:** קרדיט אחד להודעה, כמו בהזמנות, ואותו החזר על מה שלא נמסר; לא נשלח ולא מחויב מי שאין לו טלפון, מספר קווי, מי שביקש הסרה, או אורח שהקישור כבר בדרך אליו. הסטטוסים (נמסר, נקרא, נכשל) מגיעים באותו webhook (סעיף 4), והתור נשלח ברקע כמו ההזמנות (סעיף 5).
 - **רק כשהגלריה פועלת:** בלי הגלריה החיה בחבילה, או כשהיא כבויה, אין מה לשלוח. "קישור חדש" לגלריה מבטל גם את הקישורים האישיים הקודמים — שולחים שוב.
 - **בדיקה:** מוסיפים את עצמכם לרשימת המוזמנים, מפעילים את הגלריה, ובלשונית "גלריה" → "שליחת הקישור לאורחים" → "שליחה בוואטסאפ". ההודעה מגיעה עם השם שלכם, והכפתור פותח את הגלריה. עם שפה אחרת לעצמכם ברשימת המוזמנים (שההזמנה כתובה בה), ההודעה מגיעה בשפה הזו כשהטמפלט אושר בה, והגלריה נפתחת בה.
+
+## 10. הטמפלט הרביעי: תודה עם האלבום (האלבום שאחרי האירוע)
+
+"שליחת תודה לאורחים" (לשונית "גלריה" ← כרטיס "האלבום שאחרי האירוע", או בעריכת האלבום) שולח לכל אורח ברשימת המוזמנים "תודה שחגגתם איתנו" עם קישור לאלבום: `/e/<כתובת ההזמנה>/album?a=<הקישור של האלבום>` (ולאורח ששפתו אינה שפת ברירת המחדל של ההזמנה גם `&lang=<שפה>`). זו הודעה נפרדת, בטמפלט משלה, וקרדיט להודעה כמו בגלריה (הודעה שלא נמסרה מחזירה את הקרדיט). **עד שהוא מאושר ומוגדר ב-`INVITES_WHATSAPP_ALBUM_TEMPLATE`** הכפתור לשליחה מהמספר הרשמי לא מוצג: המארחים שולחים מהוואטסאפ שלהם ("שליחה מהוואטסאפ שלי" ליד כל אורח, עם הודעת תודה מוכנה בשפה של האורח), מעתיקים את ההודעה, או משתפים את הקישור לקבוצה ("שיתוף בוואטסאפ" בכרטיס).
+
+ב-WhatsApp Manager → Message templates → Create template:
+
+| שדה | ערך |
+|---|---|
+| Category | **Utility** (מידע על אירוע שהאורח השתתף בו; אם Meta מסווגת מחדש כ-Marketing, זה עדיין עובד, במחיר של Marketing) |
+| Name | `badook_album` (או שם אחר — אותו ערך ב-`INVITES_WHATSAPP_ALBUM_TEMPLATE`) |
+| Language | Hebrew (`he`), ואחר כך כל שפה מ-`INVITES_WHATSAPP_TEMPLATE_LANGS` |
+| Header | ללא |
+| Body | ראו למטה |
+| Footer | `נשלח באמצעות Badook` |
+| Button | Call to action → Visit website → **Dynamic**, טקסט: `לאלבום`, URL: `https://invitations.badooks.com/e/{{1}}` |
+
+**Body** (בדיוק כך):
+
+```
+היי {{1}} 💛
+תודה שחגגתם איתנו {{2}}!
+אספנו את הרגעים היפים שצילמתם לאלבום אחד — מוזמנים להיכנס, להיזכר ולשתף.
+באהבה, {{3}}
+לאלבום בכפתור 👇
+```
+
+| משתנה | משמעות | דוגמה |
+|---|---|---|
+| `{{1}}` | שם האורח, כמו ברשימת המוזמנים | `דנה לוי` |
+| `{{2}}` | איפה חגגו — לפי סוג האירוע (`src/features/album/phrases.ts`) | `בחתונה שלנו` · `בבר המצווה של יונתן` · `ביום ההולדת של דנה` · `באירוע` |
+| `{{3}}` | בעלי השמחה | `אביב & רוני` |
+| כפתור `{{1}}` | סוף הכתובת: ההזמנה והאלבום (ושפת האורח) | `aviv-and-roni/album?a=AbCdEfGhIjKlMnOpQrStUvWx` |
+
+**בכל שפה.** בדיוק כמו הקישור לגלריה (סעיף 9): השפה של האורח אם הטמפלט אושר בה, אחרת שפת ההזמנה; הערכים בשפה שנבחרה, והכפתור פותח את האלבום בשפה של האורח. אותו שם (`badook_album`), Category **Utility**, Header ללא, אותו כפתור ושלושה משתנים. הטקסטים (אותם טקסטים שחלון השליחה מציג, `src/features/whatsapp/template-text.ts` — `ALBUM_TEMPLATE_TEXT`):
+
+**English (`en`)**
+
+```
+Hi {{1}} 💛
+Thank you for celebrating with us {{2}}!
+We gathered the beautiful moments you captured into one album — come relive them and share.
+With love, {{3}}
+Tap the button for the album 👇
+```
+
+Footer: `Sent with Badook` · Button: `To the album` · דוגמאות: `Dana Levi`, `at our wedding`, `Aviv & Roni`
+
+**Русский (`ru`)**
+
+```
+Здравствуйте, {{1}}! 💛
+Спасибо, что праздновали вместе с нами {{2}}!
+Мы собрали красивые моменты, которые вы сняли, в один альбом — заходите вспомнить и поделиться.
+С любовью, {{3}}
+Альбом — по кнопке ниже 👇
+```
+
+Footer: `Отправлено через Badook` · Button: `К альбому` · דוגמאות: `Дана Леви`, `на нашей свадьбе`, `Авив & Рони`
+
+**العربية (`ar`)**
+
+```
+مرحبًا {{1}} 💛
+شكرًا لأنكم احتفلتم معنا {{2}}!
+جمعنا اللحظات الجميلة التي التقطتموها في ألبوم واحد — ادخلوا لتستعيدوا الذكريات وتشاركوها.
+مع الحب، {{3}}
+للألبوم اضغطوا على الزر 👇
+```
+
+Footer: `أُرسلت عبر Badook` · Button: `إلى الألبوم` · דוגמאות: `دانا ليفي`, `في حفل زفافنا`, `أفيف & روني`
+
+**Français (`fr`)**
+
+```
+Bonjour {{1}} 💛
+Merci d’avoir fêté avec nous {{2}} !
+Nous avons réuni les beaux moments que vous avez capturés dans un seul album — venez les revivre et les partager.
+Avec amour, {{3}}
+L’album, c’est par le bouton ci-dessous 👇
+```
+
+Footer: `Envoyé via Badook` · Button: `Voir l’album` · דוגמאות: `Dana Levi`, `à notre mariage`, `Aviv & Roni`
+
+**Español (`es`)**
+
+```
+¡Hola, {{1}}! 💛
+¡Gracias por celebrar con nosotros {{2}}!
+Reunimos en un solo álbum los momentos bonitos que capturaste: entra a revivirlos y compartirlos.
+Con cariño, {{3}}
+Toca el botón para ver el álbum 👇
+```
+
+Footer: `Enviado con Badook` · Button: `Ver el álbum` · דוגמאות: `Dana Levi`, `en nuestra boda`, `Aviv & Roni`
+
+אחרי האישור: `INVITES_WHATSAPP_ALBUM_TEMPLATE=badook_album` ב-Amplify, ופריסה מחדש. הסטטוסים (נמסר / נקרא / נכשל) מגיעים באותו Webhook (סעיף 4), וההודעות שנשארו בתור נשלחות ברקע כמו כל השאר (סעיף 5).
+
+## 11–13. הטמפלטים של התזמון החכם (תזכורת לאישור הגעה, תזכורת לפני האירוע, תודה בלי אלבום)
+
+אזור "הודעות וואטסאפ" (רשימת המוזמנים ← "הודעות ותזמון", `/app/invitations/<id>/guests/whatsapp`) שולח כל הודעה מאושרת עכשיו ("שליחה ידנית") או ברצף מתוזמן ("תזמון חכם": בסיסי 2 שלבים, מתקדם 4, חכם 6 — מומלץ, פרימיום 8). כל שלב הוא טמפלט מאושר, והנמענים נקבעים ברגע השליחה לפי אישורי ההגעה; תזכורת נבדקת שוב רגע לפני שהיא יוצאת, ומי שענה בינתיים לא מקבל אותה (והקרדיט חוזר). הודעה שהטמפלט שלה לא מוגדר מוצגת "ממתינה לאישור של וואטסאפ", ואי אפשר לשלוח או להפעיל אותה.
+
+| הודעה | שם מומלץ | משתנה סביבה | Category | משתנים | כפתור |
+|---|---|---|---|---|---|
+| תזכורת לאישור הגעה | `badook_rsvp_reminder` | `INVITES_WHATSAPP_REMINDER_TEMPLATE` | Marketing | 1 מוזמן · 2 מארחים · 3 האירוע עם מילת היחס · 4 התאריך (כמו ההזמנה) | Dynamic `https://invitations.badooks.com/i/{{1}}` — `לאישור הגעה` |
+| תזכורת לפני האירוע | `badook_event_reminder` | `INVITES_WHATSAPP_EVENT_TEMPLATE` | Utility | 1 מוזמן · 2 מארחים · 3 האירוע עם מילת היחס · 4 מתי ואיפה (`יום רביעי, 18 בנובמבר · 19:30 · גן האירועים`) | Dynamic `https://invitations.badooks.com/i/{{1}}` — `לפרטים ולניווט` |
+| תודה בלי אלבום | `badook_thanks` | `INVITES_WHATSAPP_THANKS_TEMPLATE` | Utility | 1 מוזמן · 2 איפה חגגו (`בחתונה שלנו`) · 3 בעלי השמחה | ללא |
+
+הטקסטים בכל השפות: `REMINDER_TEMPLATE_TEXT`, `EVENT_TEMPLATE_TEXT`, `THANKS_TEMPLATE_TEXT` ב-`src/features/whatsapp/template-text.ts` (אותם טקסטים שהתצוגה המקדימה מציגה). מגישים כל אחד בכל שפה שב-`INVITES_WHATSAPP_TEMPLATE_LANGS`, Header ללא, Footer `נשלח באמצעות Badook`. התודה עם האלבום משתמשת בטמפלט מסעיף 10; אם האלבום לא זמין כשמגיע הזמן, נשלחת התודה בלי אלבום (אם אושרה), אחרת השלב לא נשלח.
+
+**איך התזמון רץ:** עם תור הוואטסאפ, שהשעון של המערכת מריץ כל 2 דקות (pg_cron קורא ל-`/api/cron/tick` כל דקה — `docs/scheduler.md`) המערכת מריצה כל שלב שהגיע זמנו, פעם אחת, בטרנזקציה אחת (`whatsapp_stage_run`): בוחרת נמענים, מורידה קרדיט לכל הודעה ומכניסה לתור — או לא מורידה כלום ומסמנת למה (חסרו קרדיטים, טמפלט לא מאושר, ההזמנה לא מפורסמת, הרצף לא בחבילה). שלב שאיחר ביותר מ-12 שעות (תזמון מושהה) מסומן "לא נשלח בזמן" ולא נשלח. הרצפים לפי חבילה: בסיסי ומתקדם בכל חבילה, חכם מ-Pro, פרימיום מ-Business (`PRESET_MIN_PLAN` ב-`src/features/whatsapp/schedule.ts`).
+
+## 14. הטמפלט של התראה למארח: שליחה מתוזמנת שלא יצאה
+
+כששליחה מתוזמנת לאורחים (הקישור לגלריה, התודה עם האלבום — `docs/scheduler.md`) לא יוצאת, המארח מקבל מייל
+**וגם הודעת וואטסאפ** מהמספר הרשמי, לטלפון ששמור בחשבון שלו (מסך "החשבון שלי"). פעם אחת לכל שליחה; בלי
+קרדיט (הודעת מערכת); לא נשלחת למי שאין לו טלפון בחשבון, לטלפון קווי או למי שביקש לא לקבל הודעות. **עד
+שהטמפלט מאושר ומוגדר ב-`INVITES_WHATSAPP_HOST_ALERT_TEMPLATE`** נשלח רק המייל.
+
+ב-WhatsApp Manager → Message templates → Create template:
+
+| שדה | ערך |
+|---|---|
+| Category | **Utility** (עדכון על פעולה שהמארח קבע בחשבון שלו) |
+| Name | `badook_host_alert` (או שם אחר — אותו ערך ב-`INVITES_WHATSAPP_HOST_ALERT_TEMPLATE`) |
+| Language | Hebrew (`he`) ו-English (`en`) |
+| Header | ללא |
+| Body | ראו למטה |
+| Footer | `הודעת מערכת מ־Badook` |
+| Button | Call to action → Visit website → **Dynamic**, טקסט: `לשליחה מחדש`, URL: `https://invitations.badooks.com/app/invitations/{{1}}` |
+
+**Body** (בדיוק כך):
+
+```
+⚠️ השליחה המתוזמנת לא יצאה
+{{1}} שתוזמן ל־{{2}} לא נשלח לאורחים: {{3}}.
+אף אורח לא קיבל הודעה ולא ירדו קרדיטים. אפשר לשלוח שוב בכפתור למטה.
+```
+
+| משתנה | משמעות | דוגמה |
+|---|---|---|
+| `{{1}}` | מה היה מתוזמן | `התודה עם האלבום` · `הקישור לגלריה` |
+| `{{2}}` | מתי — לפי השעון שהמארח בחר, עם שם אזור הזמן | `יום שישי, 18 ביוני 2027 בשעה 15:00 (לפי שעון New York)` |
+| `{{3}}` | למה לא יצא | `לא היו מספיק קרדיטים (היה צריך 40, היו 3)` · `האלבום היה כבוי` |
+| כפתור `{{1}}` | סוף הכתובת: ההזמנה, לשונית הגלריה והחלק שבו הדיאלוג (`share` לקישור, `extras` לאלבום) | `0b6f1a4e-6c1e-4d0e-9a3a-2f1d8c7b6a50/gallery?view=extras` |
+
+**English (`en`)**
+
+```
+⚠️ Your scheduled send didn’t go out
+{{1}} scheduled for {{2}} wasn’t sent to your guests: {{3}}.
+No guest got a message and no credits were used. Tap the button below to send it again.
+```
+
+Footer: `A system message from Badook` · Button: `Send it again` · דוגמאות: `The thank-you with the album`,
+`Friday, 18 June 2027 at 15:00 (New York time)`, `there weren’t enough credits (40 needed, 3 left)`
+
+השפה: של המארח (עברית, אחרת אנגלית — כמו המייל); אם Meta עוד לא אישרה בה, השפה האחרת. הטקסטים בקוד:
+`src/features/whatsapp/template-text.ts` — `HOST_ALERT_TEMPLATE_TEXT`.

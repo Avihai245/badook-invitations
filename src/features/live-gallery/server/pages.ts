@@ -1,4 +1,10 @@
 import 'server-only';
+import { aiHostDeps } from '@/features/ai-photos/server/deps';
+import { aiHostView } from '@/features/ai-photos/server/host-api';
+import type { HostAiView } from '@/features/ai-photos/types';
+import { albumHostView } from '@/features/album/server/api';
+import { albumDeps } from '@/features/album/server/deps';
+import type { HostAlbumView } from '@/features/album/types';
 import type { Locale, Palette } from '@/features/invitations/contracts/types';
 import { isLocale } from '@/features/invitations/lib/locales';
 import { hostsLine } from '@/features/invitations/lib/text';
@@ -64,6 +70,11 @@ export interface GuestPageData {
    * after the event); null while the event doesn't have it.
    */
   faces: { until: string | null } | null;
+  /**
+   * The AI photos with the people of honor (feature ai_photos): the page asks what it offers this phone
+   * (/api/gallery/ai/state) — false while the event doesn't have the feature.
+   */
+  aiPhotos: boolean;
 }
 
 /** /e/<slug>/upload?t= — null for a link that opens nothing. */
@@ -95,6 +106,7 @@ export async function guestPage(token: string): Promise<GuestPageData | null> {
       videoMinutes: Math.round(GALLERY.limits.videoMs / 60_000),
     },
     faces: r.state !== 'off' && r.features.has('face_albums') && window.open ? { until: window.until } : null,
+    aiPhotos: r.state !== 'off' && r.features.has('ai_photos'),
   };
 }
 
@@ -152,6 +164,10 @@ export interface HostPageData {
   expiresAt: number;
   /** "The photos I'm in" (feature face_albums), for the host's card — null where it isn't offered */
   faces: FaceHostView | null;
+  /** the album after the event (feature album), for its card — null where it isn't offered */
+  album: HostAlbumView | null;
+  /** the AI photos with the people of honor (feature ai_photos), for its card — null where not offered */
+  aiPhotos: HostAiView | null;
 }
 
 /** The "Gallery" tab of an invitation (null when it isn't the host's). */
@@ -159,8 +175,13 @@ export async function hostPage(userId: string, id: string, base: string): Promis
   const deps = hostGalleryDeps();
   const view = await hostView(userId, id, base, deps);
   if (!view) return null;
-  const faces = await hostFaces(userId, id);
-  if (!view.gallery) return { view, pending: [], items: [], next: null, expiresAt: 0, faces };
+  const [faces, album, aiPhotos] = await Promise.all([
+    hostFaces(userId, id),
+    hostAlbum(userId, id, base),
+    hostAi(userId, id),
+  ]);
+  if (!view.gallery)
+    return { view, pending: [], items: [], next: null, expiresAt: 0, faces, album, aiPhotos };
   const [pending, all] = await Promise.all([
     listItems(userId, id, { status: 'pending' }, deps),
     listItems(userId, id, { status: 'all' }, deps),
@@ -174,7 +195,27 @@ export async function hostPage(userId: string, id: string, base: string): Promis
     next: a.next ?? null,
     expiresAt: a.expiresAt ?? 0,
     faces,
+    album,
+    aiPhotos,
   };
+}
+
+/** The AI photos' card: not where this deployment doesn't offer them (no OpenAI key). */
+async function hostAi(userId: string, id: string): Promise<HostAiView | null> {
+  const view = await aiHostView(userId, id, aiHostDeps()).catch((err) => {
+    console.error('[gallery] the AI photos’ card', err);
+    return null;
+  });
+  return view && view.feature.why !== 'unavailable' ? view : null;
+}
+
+/** The album's card: not where this deployment doesn't offer it. */
+async function hostAlbum(userId: string, id: string, base: string): Promise<HostAlbumView | null> {
+  const view = await albumHostView(userId, id, base, albumDeps()).catch((err) => {
+    console.error('[gallery] the album’s card', err);
+    return null;
+  });
+  return view && view.feature.why !== 'unavailable' ? view : null;
 }
 
 /** The face search card's first view: not where this deployment doesn't offer it (INVITES_FACE_ALBUMS). */

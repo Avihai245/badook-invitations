@@ -766,6 +766,8 @@ export const RsvpSubmissionSchema = z.discriminatedUnion('attending', [
   z.strictObject({
     ...RsvpBaseShape,
     attending: z.literal(true),
+    // people beyond the guest's invitation they ask to bring (the personal link): the host decides
+    extraRequested: z.number().int().min(1).max(20).optional(),
     adults: z
       .array(
         z.strictObject({
@@ -780,7 +782,8 @@ export const RsvpSubmissionSchema = z.discriminatedUnion('attending', [
         }),
       )
       .min(1)
-      .max(10),
+      // a personal link allows the guest's party size (up to 99); the general link the section's max
+      .max(99),
     children: z
       .array(
         z.strictObject({
@@ -790,7 +793,7 @@ export const RsvpSubmissionSchema = z.discriminatedUnion('attending', [
           dietaryNotes: z.string().max(300).nullable(),
         }),
       )
-      .max(10),
+      .max(99),
   }),
   z.strictObject({
     ...RsvpBaseShape,

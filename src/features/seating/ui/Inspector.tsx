@@ -170,6 +170,40 @@ export function TableInspector({
           fullWidth
         />
       </div>
+      {/* a table's real size, for halls with their own tables (a square keeps its sides equal) */}
+      {table.shape !== 'round' ? (
+        <div className="mt-2 grid grid-cols-2 gap-2" data-testid="table-size">
+          {table.shape === 'square' ? (
+            <NumberField
+              label={i.side}
+              value={table.w}
+              min={0.6}
+              max={6}
+              step={0.1}
+              onCommit={(side) => onPatch({ w: side, h: side })}
+            />
+          ) : (
+            <>
+              <NumberField
+                label={i.width}
+                value={table.w}
+                min={0.6}
+                max={20}
+                step={0.1}
+                onCommit={(w) => onPatch({ w })}
+              />
+              <NumberField
+                label={i.depth}
+                value={table.h}
+                min={0.6}
+                max={4}
+                step={0.1}
+                onCommit={(h) => onPatch({ h })}
+              />
+            </>
+          )}
+        </div>
+      ) : null}
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <div className="flex flex-col gap-1">

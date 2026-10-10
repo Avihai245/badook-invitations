@@ -1,7 +1,24 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- guests' photos come from short-lived signed URLs of private storage (or the phone itself): nothing for the image optimizer to cache */
 
-import { Camera, CircleAlert, Globe, ImagePlus, Lock, LoaderCircle, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Camera,
+  CircleAlert,
+  Globe,
+  ImagePlus,
+  LayoutGrid,
+  Plus,
+  Rows3,
+  Lock,
+  LoaderCircle,
+  MapPin,
+  Play,
+  Sparkles,
+  Trash2,
+  User,
+} from 'lucide-react';
 import {
   useCallback,
   useEffect,
@@ -12,8 +29,12 @@ import {
   type FormEvent,
   type ReactNode,
 } from 'react';
+import { BrandLogo } from '@/components/app/BrandLogo';
+import { AccessibilityPanel } from '@/features/site/AccessibilityMenu.client';
 import { RTL_LOCALES } from '@/features/invitations/contracts/types';
 import { nativeName } from '@/features/invitations/lib/locales';
+import { BADOOK_EVENTS_URL } from '@/features/site/links';
+import { AiPhotoStudio } from '@/features/ai-photos/ui/AiPhotoStudio';
 import { UploadFaceIndexer } from '@/features/faces/client/upload-indexer';
 import { FaceSearch } from '@/features/faces/ui/FaceSearch';
 import { GALLERY } from '../../config';
@@ -21,12 +42,26 @@ import { galleryApi } from '../../client/api';
 import { openStore, type QueueStore } from '../../client/idb';
 import { useLiveRefresh } from '@/lib/live/client';
 import { Uploader, randomToken, type AddResult, type Snapshot } from '../../client/uploader';
-import type { FeedItem, FeedResponse, GalleryState, MineItem, RealtimeInfo } from '../../types';
+import type {
+  FeedItem,
+  FeedResponse,
+  GalleryState,
+  Likes,
+  MineItem,
+  Placement,
+  RealtimeInfo,
+} from '../../types';
 import type { GuestPageData } from '../../server/pages';
 import { MediaViewer } from '../MediaViewer';
-import { GuestTextProvider, fmt, formatBytes, useGuestText, type GuestLocale } from '../guest-text';
+import { GuestTextProvider, fmt, useGuestText, type GuestLocale } from '../guest-text';
 import { FeedGrid } from './FeedGrid';
+import { FeedPost } from './FeedPost';
+import { groupPosts, isStory, mergeLikes, toggled, type Post } from './posts';
 import { QueuePanel } from './QueuePanel';
+import { NameSheet } from './NameSheet';
+import { StoriesTray } from './StoriesTray';
+import { StoryViewer } from './StoryViewer';
+import { groupStories, isUnseen, readSeen, writeSeen, type Story } from './stories';
 
 /**
  * The guests' page of the live gallery (/e/<slug>/upload?t=…): no sign-up, no app. Pick photos and
@@ -102,7 +137,22 @@ function GalleryBody({
   const [mine, setMine] = useState<MineItem[]>([]);
   const [fresh, setFresh] = useState<ReadonlySet<string>>(new Set());
   const [open, setOpen] = useState<number | null>(null);
+  // the stories: which person's is open, and what this phone has already watched
+  const [storyOpen, setStoryOpen] = useState<string | null>(null);
+  const [seen, setSeen] = useState<Record<string, string>>({});
+  useEffect(() => setSeen(readSeen(token)), [token]);
   const [loadingMore, setLoadingMore] = useState(false);
+  // the feed's posts and their likes; the feed as posts, or every photo in a grid
+  const [likes, setLikes] = useState<Record<string, Likes>>(data.initial?.likes ?? {});
+  const [view, setView] = useState<'feed' | 'grid'>('feed');
+  const postKeys = useRef<string[]>([]);
+  // sharing: where the files being picked go (the story or the feed), and the name sheet — asked once,
+  // before the first share, then opened from the top bar
+  const placement = useRef<Placement>('feed');
+  const [nameSheet, setNameSheet] = useState<{ mode: 'first' | 'edit'; to: Placement } | null>(null);
+  const [instagram, setInstagram] = useState('');
+  const instagramRef = useRef('');
+  const asked = useRef(false);
   const since = useRef<string | null>(data.initial?.now ?? null);
   const expires = useRef<number>(data.initial?.expiresAt ?? 0);
   // what the feed shows, for telling what a refresh brought that is new
@@ -149,6 +199,10 @@ function GalleryBody({
         const saved = localStorage.getItem('badook-gallery:name') ?? '';
         nameRef.current = saved;
         setName(saved);
+        const handle = localStorage.getItem('badook-gallery:instagram') ?? '';
+        instagramRef.current = handle;
+        setInstagram(handle);
+        asked.current = !!saved || localStorage.getItem('badook-gallery:asked') === '1';
       } catch {
         // private mode
       }
@@ -190,15 +244,19 @@ function GalleryBody({
 
   const request = useCallback(
     async (extra: Record<string, unknown>) => {
+      // the posts on the screen: their likes come back with the answer
+      const asked = postKeys.current.slice(0, GALLERY.feed.likesPerAnswer);
       const res = await galleryApi<FeedResponse & { code?: string; state?: GalleryState }>(
         '/api/gallery/feed',
         {
           t: token,
           ...(code.current ? { code: code.current } : {}),
           ...(uploaderId ? { uploader: uploaderId } : {}),
+          ...(asked.length ? { posts: asked } : {}),
           ...extra,
         },
       );
+      if (res.ok && res.body?.likes) setLikes((cur) => mergeLikes(cur, asked, res.body!.likes));
       if (res.status === 404) setPhase('invalid');
       else if (res.status === 403 && res.body?.code === 'off') {
         setState('off');
@@ -262,6 +320,7 @@ function GalleryBody({
       uploader: uploaderId,
       code: () => code.current,
       name: () => nameRef.current.trim() || null,
+      instagram: () => instagramRef.current || null,
       guest,
       onChange: setSnapshot,
       onResult: (item) => {
@@ -308,13 +367,12 @@ function GalleryBody({
   }, [state, snapshot?.blocked]);
 
   const fileInput = useRef<HTMLInputElement>(null);
-  const cameraInput = useRef<HTMLInputElement>(null);
   const onFiles = async (list: FileList | null) => {
     const files = list ? Array.from(list) : [];
     if (!files.length || !uploader.current) return;
     setSkipped([]);
     const before = new Set(uploader.current.snapshot().items.map((i) => i.localId));
-    const result = await uploader.current.add(files);
+    const result = await uploader.current.add(files, placement.current);
     const added = uploader.current
       .snapshot()
       .items.filter((i) => !before.has(i.localId))
@@ -337,6 +395,77 @@ function GalleryBody({
 
   // ── this phone's own uploads that aren't in the feed ──
   const mineIds = useMemo(() => new Set(mine.map((m) => m.id)), [mine]);
+  const stories = useMemo(() => groupStories(items.filter(isStory)), [items]);
+  const posts = useMemo(() => groupPosts(items), [items]);
+  useEffect(() => {
+    postKeys.current = posts.map((p) => p.key);
+  }, [posts]);
+  // an unnamed guest's number, the same in the stories and the feed
+  const people = useMemo(() => groupStories(items), [items]);
+  const authorOf = (post: Post) => {
+    if (post.by === 'host') return t.stories.host;
+    if (post.name) return post.name;
+    const person = people.find(
+      (s) => !s.name && s.items.some((i) => i.post === post.key || i.id === post.key),
+    );
+    return fmt(t.stories.anonymous, { n: number(person?.anonymous ?? 1) });
+  };
+  const like = useCallback(
+    async (post: string, on: boolean) => {
+      if (!uploaderId) return;
+      setLikes((cur) => ({ ...cur, [post]: toggled(cur[post], on) }));
+      const res = await galleryApi<{ likes?: Likes }>('/api/gallery/like', {
+        t: token,
+        uploader: uploaderId,
+        post,
+        on,
+        ...(code.current ? { code: code.current } : {}),
+      });
+      const answer = res.ok ? res.body?.likes : undefined;
+      // the server's count (others liked meanwhile), or back to how it was
+      setLikes((cur) => ({ ...cur, [post]: answer ?? toggled(cur[post], !on) }));
+    },
+    [token, uploaderId],
+  );
+  // one tap: the phone's own picker (it offers the camera too); the first time, the name first
+  const pick = (to: Placement) => {
+    placement.current = to;
+    fileInput.current?.click();
+  };
+  const share = (to: Placement) => {
+    if (asked.current) pick(to);
+    else setNameSheet({ mode: 'first', to });
+  };
+  const onNameDone = (value: { name: string; instagram: string }) => {
+    const sheet = nameSheet;
+    onName(value.name);
+    instagramRef.current = value.instagram;
+    setInstagram(value.instagram);
+    asked.current = true;
+    try {
+      localStorage.setItem('badook-gallery:asked', '1');
+      if (value.instagram) localStorage.setItem('badook-gallery:instagram', value.instagram);
+      else localStorage.removeItem('badook-gallery:instagram');
+    } catch {
+      // private mode: asked again next visit
+    }
+    setNameSheet(null);
+    // still the tap that opened the sheet's button: the picker may open
+    if (sheet?.mode === 'first') pick(sheet.to);
+  };
+  const storyName = (s: Story) =>
+    s.host ? t.stories.host : (s.name ?? fmt(t.stories.anonymous, { n: number(s.anonymous ?? 1) }));
+  const watched = useCallback(
+    (story: Story) =>
+      setSeen((cur) => {
+        if (!isUnseen(story, cur)) return cur;
+        const next = { ...cur, [story.key]: story.newestId };
+        writeSeen(token, next);
+        return next;
+      }),
+    [token],
+  );
+  const guests = people.filter((s) => !s.host).length;
   const waiting = mine.filter((m) => m.status !== 'published');
   const [confirming, setConfirming] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -353,6 +482,7 @@ function GalleryBody({
     setMine((m) => m.filter((x) => x.id !== id));
     setItems((cur) => cur.filter((x) => x.id !== id));
     setOpen(null);
+    setStoryOpen(null);
   };
 
   const onName = (value: string) => {
@@ -367,25 +497,73 @@ function GalleryBody({
 
   const canUpload = phase === 'ready' && (state === 'open' || state === 'paused');
   const showQueue = roundItems.length > 0 || (snapshot?.preparing ?? 0) > 0;
+  // stable: the pill's photo is fetched once per file
+  const thumbnail = useCallback((id: string) => uploader.current?.thumbnail(id) ?? Promise.resolve(null), []);
+  const initial = (Array.from(name.trim())[0] ?? '').toLocaleUpperCase();
+  // the event's picture is its name: the hosts' initials ("נ&א")
+  const monogram = title
+    .split(/\s*&\s*/)
+    .map((w) => Array.from(w.trim())[0] ?? '')
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('&');
+  const eventDate = data.event.date
+    ? date(`${data.event.date}T12:00:00Z`, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC',
+      })
+    : null;
+  const more_ = next ? '+' : '';
+  const stat = (n: number, label: string, testId?: string) => (
+    <div className="text-center" data-testid={testId}>
+      <p className="text-[19px] leading-none font-bold tabular-nums">
+        {number(n)}
+        {more_}
+      </p>
+      <p className="mt-1 text-[12.5px] text-muted">{label}</p>
+    </div>
+  );
 
   return (
-    <div style={accent} className="min-h-svh bg-canvas" dir={dir}>
-      <div className="mx-auto w-full max-w-[720px] px-4 pt-5 pb-10 sm:px-6 sm:pt-8">
-        <header className="relative text-center">
+    <div style={accent} className="relative min-h-svh overflow-x-clip bg-canvas" dir={dir}>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[460px] bg-[radial-gradient(120%_70%_at_85%_0%,color-mix(in_oklab,var(--gallery-accent)_22%,transparent),transparent_70%),radial-gradient(90%_60%_at_0%_10%,color-mix(in_oklab,var(--gallery-accent)_12%,transparent),transparent_70%)]"
+      />
+      {/* the top bar: the event, live, the language and "you" (the name on what you share) */}
+      <div className="sticky top-0 z-30 border-b border-line/70 bg-canvas/85 backdrop-blur-xl backdrop-saturate-150">
+        <div className="mx-auto flex h-14 w-full max-w-[640px] items-center gap-2 px-4">
+          <p className="min-w-0 flex-1 truncate font-display text-[19px] font-bold" aria-hidden>
+            <bdi>{title}</bdi>
+          </p>
+          {live === 'live' ? (
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full bg-success-bg px-2.5 py-1 text-[11.5px] font-semibold text-success"
+              data-testid="gallery-live"
+            >
+              <span aria-hidden className="relative flex size-1.5">
+                <span className="absolute inline-flex size-full rounded-full bg-success opacity-60 motion-safe:animate-ping" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-success" />
+              </span>
+              {t.feed.live}
+            </span>
+          ) : null}
           {others.length === 1 ? (
             <button
               type="button"
               onClick={() => onLocale(others[0]!)}
               lang={others[0]}
-              className="absolute end-0 top-0 inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-[12.5px] font-semibold text-ink shadow-sm"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full px-2.5 text-[12.5px] font-semibold text-ink hover:bg-subtle"
             >
-              <Globe aria-hidden className="size-3.5" />
+              <Globe aria-hidden className="size-4" />
               {nativeName(others[0]!)}
             </button>
           ) : others.length > 1 ? (
             // more languages: a menu of them, each by its own name
-            <label className="absolute end-0 top-0 inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-surface ps-3 pe-2 text-[12.5px] font-semibold text-ink shadow-sm">
-              <Globe aria-hidden className="size-3.5" />
+            <label className="inline-flex h-9 items-center gap-1.5 rounded-full ps-2.5 pe-1.5 text-[12.5px] font-semibold text-ink hover:bg-subtle">
+              <Globe aria-hidden className="size-4" />
               <select
                 aria-label={t.language}
                 value={locale}
@@ -400,24 +578,93 @@ function GalleryBody({
               </select>
             </label>
           ) : null}
-          {/* on a phone, a longer language's eyebrow wraps beside the language button, not under it */}
-          <p
-            className={`text-[12.5px] font-semibold tracking-[0.08em] text-[var(--gallery-accent)] uppercase ${others.length ? 'max-sm:px-[6.25rem]' : ''}`}
-          >
-            {t.eyebrow}
-          </p>
-          <h1 className="mt-2 font-display text-[30px] leading-[1.15] font-bold text-balance sm:text-[36px]">
-            <bdi>{title}</bdi>
-          </h1>
-          {data.event.date ? (
-            <p className="mt-1.5 text-[14px] text-muted">
-              {date(`${data.event.date}T12:00:00Z`, {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                timeZone: 'UTC',
-              })}
-            </p>
+          {canUpload && asked.current ? (
+            <button
+              type="button"
+              onClick={() => setNameSheet({ mode: 'edit', to: 'feed' })}
+              aria-label={`${name.trim() ? fmt(t.name.as, { name: name.trim() }) : t.name.anonymous}. ${t.name.edit}`}
+              title={t.name.edit}
+              data-testid="name-edit"
+              className="grid size-9 shrink-0 place-items-center rounded-full border border-line bg-surface font-display text-[15px] font-bold text-ink hover:border-line-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              {initial || <User aria-hidden className="size-4 text-muted" />}
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="relative mx-auto w-full max-w-[640px] px-4 pt-5 pb-32 sm:px-6">
+        {/* the event, like a profile: its picture in a ring, its name, its numbers */}
+        <header className="rounded-[28px] border border-white/70 bg-surface/80 p-4 shadow-[0_18px_50px_-30px_rgba(28,25,23,0.45)] backdrop-blur-sm sm:p-6">
+          <div className="flex items-center gap-4 sm:gap-6">
+            {(() => {
+              // the event's ring: all of its stories, from the first one this phone hasn't watched
+              const fresh_ = stories.some((s) => isUnseen(s, seen));
+              const face = (
+                <span className="relative grid size-full place-items-center overflow-hidden rounded-full border-[3px] border-surface bg-[color-mix(in_oklab,var(--gallery-accent)_14%,white)] font-display text-[26px] font-bold text-[var(--gallery-accent)]">
+                  {monogram || <Sparkles className="size-8" />}
+                </span>
+              );
+              const ring = `grid size-[88px] shrink-0 place-items-center rounded-full p-[3px] sm:size-[104px] ${
+                !stories.length || fresh_ ? 'gallery-ring' : 'bg-line-strong'
+              }`;
+              if (phase === 'ready' && stories.length)
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setStoryOpen((stories.find((s) => isUnseen(s, seen)) ?? stories[0]!).key)}
+                    aria-label={t.stories.title}
+                    title={t.stories.title}
+                    data-testid="gallery-ring"
+                    className={`group relative ${ring} transition-transform active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus motion-reduce:transition-none ${
+                      fresh_ ? 'shadow-[0_8px_28px_-10px_var(--gallery-accent)]' : ''
+                    }`}
+                  >
+                    {face}
+                    <span
+                      aria-hidden
+                      className="absolute -bottom-1 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full border-2 border-surface bg-[var(--gallery-accent)] px-2 py-0.5 text-[10.5px] font-bold text-[var(--gallery-accent-ink)]"
+                    >
+                      <Play className="size-2.5 fill-current" />
+                      {number(stories.reduce((n, s) => n + s.items.length, 0))}
+                    </span>
+                  </button>
+                );
+              if (phase === 'ready' && canUpload)
+                return (
+                  <button
+                    type="button"
+                    onClick={() => share('story')}
+                    aria-label={t.stories.addLabel}
+                    data-testid="gallery-ring"
+                    className={`relative ${ring} transition-transform active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus motion-reduce:transition-none`}
+                  >
+                    {face}
+                  </button>
+                );
+              return (
+                <span aria-hidden className={ring} data-testid="gallery-ring">
+                  {face}
+                </span>
+              );
+            })()}
+            <div className="min-w-0 flex-1">
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_12%,white)] px-2.5 py-1 text-[11.5px] font-semibold text-[var(--gallery-accent)]">
+                <Sparkles aria-hidden className="size-3" />
+                {t.eyebrow}
+              </p>
+              <h1 className="mt-1.5 font-display text-[25px] leading-[1.1] font-bold text-balance sm:text-[32px]">
+                <bdi>{title}</bdi>
+              </h1>
+              {eventDate ? <p className="mt-1 text-[13px] text-muted">{eventDate}</p> : null}
+            </div>
+          </div>
+          {phase === 'ready' ? (
+            <div className="mt-4 grid grid-cols-3 rounded-[18px] bg-canvas/70 py-3 [&>*+*]:border-s [&>*+*]:border-line/70">
+              {stat(posts.length, t.stats.posts)}
+              {stat(items.length, t.stats.media)}
+              {stat(guests, t.stats.people, 'gallery-people')}
+            </div>
           ) : null}
         </header>
 
@@ -445,122 +692,69 @@ function GalleryBody({
               <Banner text={t.ended} />
             ) : null}
 
+            {stories.length || canUpload ? (
+              <StoriesTray
+                stories={stories}
+                seen={seen}
+                nameOf={storyName}
+                onOpen={setStoryOpen}
+                onAdd={canUpload ? () => share('story') : undefined}
+                me={initial}
+              />
+            ) : null}
+            {canUpload && mode === 'approval' ? (
+              <p className="mt-1 text-[12.5px] text-muted">{t.upload.approvalBody}</p>
+            ) : null}
             {canUpload ? (
-              <section
-                className="mt-6 rounded-[20px] border border-line bg-surface p-5 shadow-sm sm:p-6"
-                aria-labelledby="gallery-upload"
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                hidden
+                data-testid="gallery-files"
+                onChange={(e) => {
+                  void onFiles(e.target.files);
+                  e.target.value = '';
+                }}
+              />
+            ) : null}
+            {skipped.length ? (
+              <p
+                role="alert"
+                className="mt-3 rounded-[12px] bg-warning-bg px-3 py-2 text-[13px] text-warning"
               >
-                <h2 id="gallery-upload" className="text-[18px] font-bold">
-                  {t.upload.title}
-                </h2>
-                <p className="mt-1 text-[14px] text-muted">
-                  {mode === 'approval' ? t.upload.approvalBody : t.upload.body}
-                </p>
-                <div className="mt-4 grid gap-2.5 sm:grid-cols-[1fr_auto]">
-                  <button
-                    type="button"
-                    onClick={() => fileInput.current?.click()}
-                    disabled={!snapshot}
-                    className="inline-flex h-13 items-center justify-center gap-2 rounded-[12px] bg-[var(--gallery-accent)] px-5 text-[16px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_10px_24px_-14px_rgba(0,0,0,0.6)] transition-transform active:scale-[0.98] disabled:opacity-60 motion-reduce:transition-none"
-                  >
-                    <ImagePlus aria-hidden className="size-5" />
-                    {t.upload.pick}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => cameraInput.current?.click()}
-                    disabled={!snapshot}
-                    className="inline-flex h-13 items-center justify-center gap-2 rounded-[12px] border border-line bg-surface px-5 text-[15px] font-semibold text-ink shadow-sm disabled:opacity-60"
-                  >
-                    <Camera aria-hidden className="size-5" />
-                    {t.upload.camera}
-                  </button>
-                </div>
-                <input
-                  ref={fileInput}
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  hidden
-                  data-testid="gallery-files"
-                  onChange={(e) => {
-                    void onFiles(e.target.files);
-                    e.target.value = '';
-                  }}
-                />
-                <input
-                  ref={cameraInput}
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  hidden
-                  onChange={(e) => {
-                    void onFiles(e.target.files);
-                    e.target.value = '';
-                  }}
-                />
-                <p className="mt-3 text-[12.5px] leading-relaxed text-muted">
-                  {t.upload.resilient}{' '}
-                  {fmt(t.upload.limits, {
-                    image: formatBytes(data.limits.imageBytes, locale),
-                    video: formatBytes(data.limits.videoBytes, locale),
-                    minutes: number(data.limits.videoMinutes),
-                  })}
-                </p>
-                <div className="mt-4">
-                  <label
-                    htmlFor="gallery-name"
-                    className="flex items-baseline gap-1.5 text-[13px] font-semibold"
-                  >
-                    {t.upload.name}
-                    <span className="text-[12px] font-normal text-muted">({t.upload.optional})</span>
-                  </label>
-                  <input
-                    id="gallery-name"
-                    value={name}
-                    maxLength={GALLERY.limits.nameLength}
-                    onChange={(e) => onName(e.target.value)}
-                    placeholder={t.upload.namePlaceholder}
-                    dir="auto"
-                    autoComplete="name"
-                    aria-describedby="gallery-name-help"
-                    className="mt-1.5 h-11 w-full rounded-[10px] border border-line bg-surface px-3 text-[15px] focus:border-ink focus:shadow-ring focus:outline-hidden"
-                  />
-                  <p id="gallery-name-help" className="mt-1 text-[12px] text-muted">
-                    {t.upload.nameHelp}
-                  </p>
-                </div>
-                {skipped.length ? (
-                  <p
-                    role="alert"
-                    className="mt-3 rounded-[10px] bg-warning-bg px-3 py-2 text-[13px] text-warning"
-                  >
-                    {plural(t.skipped, skipped.length, {
-                      reasons: [...new Set(skipped.map((s) => t.item.errors[s.code] ?? s.code))].join(', '),
-                    })}
-                  </p>
-                ) : null}
-              </section>
+                {plural(t.skipped, skipped.length, {
+                  reasons: [...new Set(skipped.map((s) => t.item.errors[s.code] ?? s.code))].join(', '),
+                })}
+              </p>
             ) : null}
 
-            {showQueue && snapshot ? (
-              <div className="mt-4">
-                <QueuePanel
-                  snapshot={snapshot}
-                  items={roundItems}
-                  thumbnail={(id) => uploader.current?.thumbnail(id) ?? Promise.resolve(null)}
-                  onRetry={() => uploader.current?.retryAll()}
-                  onRemove={(id) => void uploader.current?.remove(id)}
-                  onClear={() => void clearRound()}
-                />
-              </div>
+            {/* a photo with the people of honor, made by AI (feature ai_photos) */}
+            {data.aiPhotos ? (
+              <AiPhotoStudio
+                token={token}
+                code={codeOf}
+                uploader={uploaderId}
+                guest={guest}
+                name={name}
+                eventType={data.event.eventType}
+                theme={accent}
+                onShared={() => {
+                  setView('feed');
+                  void reload().then(() =>
+                    document
+                      .getElementById('gallery-feed-top')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+                  );
+                }}
+              />
             ) : null}
-
             {data.faces ? <FaceSearch token={token} code={codeOf} until={data.faces.until} /> : null}
 
             {waiting.length ? (
               <section className="mt-6" aria-labelledby="gallery-mine">
-                <h2 id="gallery-mine" className="text-[16px] font-bold">
+                <h2 id="gallery-mine" className="text-[15px] font-bold">
                   {t.mine.title}
                 </h2>
                 <p className="text-[13px] text-muted">{t.mine.help}</p>
@@ -568,9 +762,9 @@ function GalleryBody({
                   {waiting.map((m) => (
                     <li
                       key={m.id}
-                      className="flex items-center gap-3 rounded-[12px] border border-line bg-surface p-2 pe-3"
+                      className="flex items-center gap-3 rounded-[14px] border border-line bg-surface p-2 pe-3"
                     >
-                      <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[8px] bg-subtle">
+                      <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[10px] bg-subtle">
                         {m.thumb ? (
                           <img src={m.thumb} alt="" className="size-full object-cover" loading="lazy" />
                         ) : null}
@@ -610,49 +804,149 @@ function GalleryBody({
               </p>
             ) : null}
 
-            <section className="mt-8" aria-labelledby="gallery-feed">
-              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-                <h2 id="gallery-feed" className="text-[18px] font-bold">
-                  {t.feed.title}
-                  {items.length && !next ? (
-                    <span className="ms-2 text-[13px] font-normal text-muted">
-                      {plural(t.feed.count, items.length)}
-                    </span>
-                  ) : null}
-                </h2>
-                {live === 'live' ? (
-                  <span
-                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-success"
-                    data-testid="gallery-live"
+            <section className="mt-6 scroll-mt-20" aria-labelledby="gallery-feed" id="gallery-feed-top">
+              <h2 id="gallery-feed" className="sr-only">
+                {t.feed.title}
+              </h2>
+              {/* the feed's posts, or every photo and video (the stories' too) in a grid: a profile's tabs */}
+              <div
+                role="tablist"
+                aria-label={t.view.label}
+                className="grid grid-cols-2 gap-1 rounded-full border border-line/70 bg-surface/80 p-1 shadow-[0_6px_20px_-16px_rgba(28,25,23,0.4)]"
+              >
+                {(
+                  [
+                    ['feed', t.view.feed, Rows3],
+                    ['grid', t.view.grid, LayoutGrid],
+                  ] as const
+                ).map(([value, label, Icon]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    role="tab"
+                    aria-selected={view === value}
+                    aria-controls="gallery-view"
+                    onClick={() => setView(value)}
+                    data-view={value}
+                    className={`relative inline-flex h-10 items-center justify-center gap-2 rounded-full text-[13.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus ${
+                      view === value
+                        ? 'bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] shadow-sm'
+                        : 'text-muted hover:text-ink'
+                    }`}
                   >
-                    <span aria-hidden className="relative flex size-2">
-                      <span className="absolute inline-flex size-full rounded-full bg-success opacity-60 motion-safe:animate-ping" />
-                      <span className="relative inline-flex size-2 rounded-full bg-success" />
-                    </span>
-                    {t.feed.live}
-                  </span>
-                ) : null}
+                    <Icon aria-hidden className="size-[18px]" />
+                    {label}
+                  </button>
+                ))}
               </div>
-              {items.length ? (
-                <FeedGrid
-                  items={items}
-                  fresh={fresh}
-                  onOpen={setOpen}
-                  hasMore={!!next}
-                  loadingMore={loadingMore}
-                  onMore={() => void more()}
-                />
-              ) : (
-                <p className="rounded-[16px] border border-dashed border-line-strong px-4 py-10 text-center text-[14px] text-muted">
-                  {t.feed.empty}
-                </p>
-              )}
+              <div id="gallery-view" role="tabpanel" className="pt-4">
+                {view === 'grid' ? (
+                  items.length ? (
+                    <div className="-mx-4 sm:mx-0">
+                      <FeedGrid
+                        items={items}
+                        fresh={fresh}
+                        onOpen={setOpen}
+                        hasMore={!!next}
+                        loadingMore={loadingMore}
+                        onMore={() => void more()}
+                      />
+                    </div>
+                  ) : (
+                    <Empty
+                      text={t.feed.empty}
+                      action={canUpload ? t.share.postLabel : null}
+                      onAction={() => share('feed')}
+                    />
+                  )
+                ) : posts.length ? (
+                  <>
+                    <ol className="flex flex-col gap-5 sm:gap-6" data-testid="gallery-posts">
+                      {posts.map((post) => (
+                        <li key={post.key}>
+                          <FeedPost
+                            post={post}
+                            author={authorOf(post)}
+                            likes={likes[post.key]}
+                            fresh={post.items.some((i) => fresh.has(i.id))}
+                            onLike={(on) => void like(post.key, on)}
+                            onOpen={(item) => {
+                              const at = items.findIndex((i) => i.id === item.id);
+                              if (at >= 0) setOpen(at);
+                            }}
+                          />
+                        </li>
+                      ))}
+                    </ol>
+                    {next ? <MoreButton loading={loadingMore} onMore={() => void more()} /> : null}
+                  </>
+                ) : (
+                  <>
+                    <Empty
+                      text={t.view.empty}
+                      action={canUpload ? t.share.postLabel : null}
+                      onAction={() => share('feed')}
+                    />
+                    {next ? <MoreButton loading={loadingMore} onMore={() => void more()} /> : null}
+                  </>
+                )}
+              </div>
             </section>
           </>
         )}
 
-        <footer className="mt-12 text-center text-[12px] leading-relaxed text-muted">
-          {canUpload ? <p className="mx-auto max-w-[52ch]">{t.footer.consent}</p> : null}
+        <footer className="mt-16 text-center text-[12px] leading-relaxed text-muted">
+          {/* whose system this is: Badook, with the way to its site and to Badook Events */}
+          <section
+            aria-label={data.brand}
+            data-testid="gallery-brand-card"
+            className="mx-auto max-w-[420px] border-t border-line pt-8"
+          >
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener"
+              data-testid="gallery-brand"
+              className="inline-flex flex-col items-center gap-1.5 rounded-[14px] px-3 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <BrandLogo label={data.brand} className="text-[20px]" />
+              <span className="text-[13.5px] font-semibold text-ink">
+                {fmt(t.footer.made, { brand: data.brand })}
+              </span>
+            </a>
+            <p className="text-[12.5px] text-muted">{t.footer.site}</p>
+            <div className="mt-4 flex flex-col items-stretch gap-2 sm:flex-row sm:justify-center">
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener"
+                data-testid="gallery-brand-site"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-5 text-[13.5px] font-semibold text-white transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none dark:text-[#1c1917]"
+              >
+                {fmt(t.footer.visit, { brand: data.brand })}
+                {dir === 'rtl' ? (
+                  <ArrowLeft aria-hidden className="size-4" />
+                ) : (
+                  <ArrowRight aria-hidden className="size-4" />
+                )}
+              </a>
+              <a
+                href={BADOOK_EVENTS_URL}
+                target="_blank"
+                rel="noopener"
+                data-testid="gallery-brand-events"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-line bg-surface px-5 text-[13.5px] font-semibold text-ink transition-colors hover:bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              >
+                <MapPin aria-hidden className="size-4 text-[#e0532b]" />
+                <span>
+                  {t.footer.events}
+                  <span className="sr-only"> · </span>
+                  <span className="ms-1.5 font-normal text-muted">{t.footer.eventsHint}</span>
+                </span>
+              </a>
+            </div>
+          </section>
+          {canUpload ? <p className="mx-auto mt-6 max-w-[52ch]">{t.footer.consent}</p> : null}
           <p className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
             <a href="/privacy" target="_blank" rel="noopener" className="underline">
               {t.footer.privacy}
@@ -661,9 +955,88 @@ function GalleryBody({
               {t.footer.accessibility}
             </a>
           </p>
-          <p className="mt-2 text-muted">{fmt(t.footer.made, { brand: data.brand })}</p>
         </footer>
       </div>
+
+      {/* sharing, always at hand: the story, or a post (one tap to the phone's picker) */}
+      {canUpload ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(14px,env(safe-area-inset-bottom))]">
+          <nav
+            aria-label={t.share.dock}
+            data-testid="gallery-dock"
+            className="pointer-events-auto flex items-center gap-1 rounded-full bg-[#141210]/92 p-1.5 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] ring-1 ring-white/10 backdrop-blur-xl"
+          >
+            <button
+              type="button"
+              onClick={() => share('story')}
+              disabled={!snapshot}
+              aria-label={t.share.storyLabel}
+              data-testid="share-story"
+              className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-[14.5px] font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white disabled:opacity-50"
+            >
+              <span
+                aria-hidden
+                className="gallery-ring grid size-6 place-items-center rounded-full p-[1.5px]"
+              >
+                <span className="grid size-full place-items-center rounded-full bg-[#141210]">
+                  <Plus className="size-3" strokeWidth={3} />
+                </span>
+              </span>
+              {t.share.story}
+            </button>
+            <button
+              type="button"
+              onClick={() => share('feed')}
+              disabled={!snapshot}
+              aria-label={t.share.postLabel}
+              data-testid="gallery-share"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-5 text-[14.5px] font-bold text-[var(--gallery-accent-ink)] transition-transform active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white disabled:opacity-50 motion-reduce:transition-none"
+            >
+              <ImagePlus aria-hidden className="size-[18px]" />
+              {t.share.post}
+            </button>
+          </nav>
+        </div>
+      ) : null}
+
+      {/* the upload going on: a small pill above the share bar, out of the way */}
+      {showQueue && snapshot ? (
+        <QueuePanel
+          snapshot={snapshot}
+          items={roundItems}
+          thumbnail={thumbnail}
+          onRetry={() => uploader.current?.retryAll()}
+          onRemove={(id) => void uploader.current?.remove(id)}
+          onClear={() => void clearRound()}
+          raised={canUpload}
+        />
+      ) : null}
+
+      <NameSheet
+        open={!!nameSheet}
+        mode={nameSheet?.mode ?? 'edit'}
+        name={name}
+        instagram={instagram}
+        onClose={() => setNameSheet(null)}
+        onDone={onNameDone}
+        style={accent}
+      />
+
+      {/* the accessibility menu, on the side of the page, in the page's language */}
+      <AccessibilityPanel a={t.a11y} newTab place="corner" />
+
+      {storyOpen ? (
+        <StoryViewer
+          stories={stories}
+          startKey={storyOpen}
+          nameOf={storyName}
+          onClose={() => setStoryOpen(null)}
+          onWatched={watched}
+          canDelete={(item) => mineIds.has(item.id)}
+          onDelete={(item) => setConfirming(item.id)}
+          suspended={!!confirming}
+        />
+      ) : null}
 
       {open !== null && items[open] ? (
         <MediaViewer
@@ -704,6 +1077,65 @@ function GalleryBody({
           onCancel={() => setConfirming(null)}
         />
       ) : null}
+    </div>
+  );
+}
+
+/** Nothing here yet: an invitation to be the first, with the way to share. */
+function Empty({ text, action, onAction }: { text: string; action: string | null; onAction(): void }) {
+  return (
+    <div className="flex flex-col items-center gap-3 px-4 py-12 text-center">
+      <span
+        aria-hidden
+        className="grid size-[72px] place-items-center rounded-full border-2 border-ink text-ink"
+      >
+        <Camera className="size-8" strokeWidth={1.6} />
+      </span>
+      <p className="max-w-[30ch] text-[15px] text-muted">{text}</p>
+      {action ? (
+        <button
+          type="button"
+          onClick={onAction}
+          className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[14px] font-semibold text-[var(--gallery-accent)] transition-colors hover:bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        >
+          <ImagePlus aria-hidden className="size-4" />
+          {action}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+/** Older posts: on their own near the bottom (and with the button, without IntersectionObserver). */
+function MoreButton({ loading, onMore }: { loading: boolean; onMore(): void }) {
+  const { t } = useGuestText();
+  const ref = useRef<HTMLDivElement>(null);
+  const onMoreRef = useRef(onMore);
+  useEffect(() => {
+    onMoreRef.current = onMore;
+  }, [onMore]);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      (entries) => entries.some((e) => e.isIntersecting) && onMoreRef.current(),
+      {
+        rootMargin: '800px 0px',
+      },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className="mt-5 flex justify-center">
+      <button
+        type="button"
+        onClick={onMore}
+        disabled={loading}
+        className="h-10 rounded-full border border-line bg-surface px-5 text-[14px] font-semibold text-ink shadow-sm disabled:opacity-60"
+      >
+        {loading ? t.feed.loading : t.feed.more}
+      </button>
     </div>
   );
 }

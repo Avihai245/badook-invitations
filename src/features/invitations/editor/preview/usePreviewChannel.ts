@@ -110,7 +110,15 @@ export function usePreviewChannel(
     ),
     replay: useCallback(() => send({ type: 'replay' }), [send]),
     reveal: useCallback((path: string) => send({ type: 'reveal', path }), [send]),
-    play: useCallback((path: string, ms: number) => send({ type: 'play', path, ms }), [send]),
+    // the document as it is now first (its debounced send may still be waiting): the section plays
+    // the motion just chosen
+    play: useCallback(
+      (path: string, ms: number) => {
+        sendDoc();
+        send({ type: 'play', path, ms });
+      },
+      [send, sendDoc],
+    ),
     /** scroll the preview to a comment's pin (after the section's own reveal) */
     revealPin: useCallback(
       (id: string) => window.setTimeout(() => send({ type: 'revealPin', id }), debounceMs + 150),

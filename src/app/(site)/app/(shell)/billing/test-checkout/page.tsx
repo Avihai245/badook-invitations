@@ -7,7 +7,7 @@ import { requireUser } from '@/lib/supabase/session';
 export default async function TestCheckoutPage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const { id } = await searchParams;
   const user = await requireUser(`/app/billing/test-checkout?id=${id ?? ''}`);
-  if (billingMode() !== 'test' || !id || !/^[0-9a-f-]{36}$/i.test(id)) notFound();
+  if ((await billingMode()) !== 'test' || !id || !/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const checkout = await checkoutDb.get(id, user.id);
   if (!checkout || checkout.status !== 'pending') notFound();
   return <TestCheckout id={checkout.id} product={checkout.product} amount={Number(checkout.amount)} />;

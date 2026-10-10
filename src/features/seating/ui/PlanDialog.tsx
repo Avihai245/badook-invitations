@@ -7,6 +7,8 @@ import { useUi } from '@/lib/i18n/client';
 import { planScale } from '../geometry';
 import { LIMITS, type Layout, type VenueInfo } from '../model';
 import { PLAN_ACCEPT } from './plan-file';
+import type { HallTemplate } from '../templates';
+import { TemplatePicker } from './TemplatePicker';
 
 export type PlanBusy = { kind: 'uploading'; percent: number } | { kind: 'rendering' } | null;
 
@@ -27,6 +29,8 @@ export function PlanDialog({
   onDrawLine,
   onWidth,
   onClose,
+  guests = 0,
+  onTemplate,
 }: {
   layout: Layout;
   planUrl: string | null;
@@ -40,6 +44,10 @@ export function PlanDialog({
   onDrawLine(): void;
   onWidth(meters: number): void;
   onClose(): void;
+  /** the seats a ready-made hall is set for */
+  guests?: number;
+  /** no picture of the hall: a ready-made one (templates.ts) */
+  onTemplate?(template: HallTemplate): void;
 }) {
   const { t, fmt, number } = useUi();
   const p = t.seating.plan;
@@ -164,6 +172,12 @@ export function PlanDialog({
             <p className="mt-0.5 text-[12.5px] text-muted">{p.noPlanScale}</p>
           )}
         </section>
+        {!bg && onTemplate ? (
+          <section className="flex flex-col gap-2 border-t border-line pt-4">
+            <h3 className="text-[14px] font-bold">{t.seating.templates.inDialog}</h3>
+            <TemplatePicker guests={guests} onPick={onTemplate} compact />
+          </section>
+        ) : null}
       </div>
     </Dialog>
   );

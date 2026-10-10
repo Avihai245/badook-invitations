@@ -1,0 +1,65 @@
+import type { AlbumGuestDict } from './album-guest.he';
+
+/** The album's page for guests — English. */
+export const albumGuestEn: AlbumGuestDict = {
+  metaTitle: 'The album · {name}',
+  metaDescription: 'The beautiful moments of the event, in one place',
+  eyebrow: 'The album',
+  language: 'Language',
+  invalid: {
+    title: 'This link doesn’t work',
+    body: 'The hosts may have replaced it with a new one. Ask them for the current link.',
+  },
+  off: { title: 'The album is closed', body: 'The hosts closed the album.' },
+  soon: {
+    title: 'The album is almost ready',
+    body: 'All the moments of the event are being arranged into one album. It opens on {date}.',
+  },
+  empty: {
+    title: 'No photos in the album yet',
+    body: 'Once there are photos in the event’s gallery, they will appear here.',
+  },
+  message:
+    'Thank you for celebrating with us {event}! All the moments you captured — the smiles, the dancing, the hugs — are gathered here in one album. Thank you for being part of it.',
+  enter: 'To the moments',
+  stats: {
+    photos: { one: 'one photo', other: '{n} photos' },
+    videos: { one: 'one video', other: '{n} videos' },
+  },
+  highlights: 'Best moments',
+  chapters: {
+    opening: 'The beginning',
+    heart: 'The heart of it',
+    more: 'More moments',
+    ending: 'Until the very last moment',
+    all: 'All the moments',
+  },
+  showAll: { one: 'One more moment', other: '{n} more moments' },
+  by: 'Taken by {name}',
+  ai: 'Made with AI',
+  photo: 'photo',
+  video: 'video',
+  open: 'Open {kind} {n}',
+  viewer: {
+    label: 'The album',
+    close: 'Close',
+    next: 'Next',
+    previous: 'Previous',
+    position: '{n} of {total}',
+  },
+  downloadOne: 'Download',
+  share: 'Share the album',
+  shareText: 'The beautiful moments {event} 💛',
+  copied: 'The album’s link was copied',
+  downloadAll: 'Download the whole album',
+  downloading: 'Downloading… {done} of {total}',
+  downloaded: 'The album was saved to this device',
+  missingName: 'files-not-downloaded.txt',
+  missingIntro: 'These files could not be downloaded:',
+  thanks: 'Thank you for celebrating with us',
+  love: 'With love',
+  made: 'This album was made with {brand}',
+  makeYours: 'A digital invitation, a live gallery and an album — for your event',
+  failed: 'Something went wrong. Please try again.',
+  top: 'Back to the top',
+};

@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Copy,
   CreditCard,
+  LayoutGrid,
   PenLine,
   Settings2,
   Sparkles,
@@ -19,18 +20,31 @@ import { useUi } from '@/lib/i18n/client';
 import { hostApi, loginUrl } from '../api';
 import { hostsLine } from '../../lib/text';
 import type { InvitationSummary } from '../../server/host-db';
+import type { ToolKey } from '../../lib/tools';
+import { useOpenTools } from './context';
 
 /**
  * The event's settings (the navigation's foot): its details (in the editor), the planning's settings, its
  * package, and duplicating or archiving it — what used to be scattered over the list's menu and the
  * planning's header.
  */
-export function EventSettingsScreen({ item, planning }: { item: InvitationSummary; planning: boolean }) {
+export function EventSettingsScreen({
+  item,
+  planning,
+  tools,
+}: {
+  item: InvitationSummary;
+  planning: boolean;
+  /** the event's tools (invitations/lib/tools): shown, could have, need an upgrade */
+  tools: { tools: ToolKey[]; offered: ToolKey[]; locked: ToolKey[] };
+}) {
   const { t, locale, date, fmt } = useUi();
   const S = t.eventSettings;
   const { toast } = useToast();
   const router = useRouter();
   const [planOpen, setPlanOpen] = useState(false);
+  const openTools = useOpenTools();
+  const T = t.eventHome.tools;
   const [busy, setBusy] = useState(false);
   const loc = item.locales.includes(locale) ? locale : item.defaultLocale;
   const name = hostsLine(item.hosts, loc) || t.eventTypes[item.eventType];
@@ -63,6 +77,16 @@ export function EventSettingsScreen({ item, planning }: { item: InvitationSummar
           action={
             <Button variant="secondary" icon={<PenLine />} asChild>
               <Link href={`/app/invitations/${item.id}/edit`}>{S.details.cta}</Link>
+            </Button>
+          }
+        />
+        <Row
+          icon={<LayoutGrid />}
+          title={T.title}
+          body={tools.tools.map((k) => T.items[k].title).join(' · ')}
+          action={
+            <Button variant="secondary" onClick={openTools} aria-haspopup="dialog">
+              {T.manage}
             </Button>
           }
         />

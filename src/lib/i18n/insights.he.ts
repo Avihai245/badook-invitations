@@ -33,7 +33,7 @@ export const insightsHe = {
       opened: 'פתחו את ההזמנה',
       readEnd: 'קראו עד הסוף',
       rsvpStarted: 'התחילו למלא אישור הגעה',
-      rsvpSent: 'אישרו הגעה',
+      rsvpSent: 'שלחו תשובה',
     },
     ofPrevious: '({p} מהשלב הקודם)',
     table: 'השלבים כטבלה',

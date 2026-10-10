@@ -1,6 +1,14 @@
 'use client';
 
-import { CircleAlert, FileSpreadsheet, LoaderCircle, Maximize, Printer, Sparkles } from 'lucide-react';
+import {
+  CircleAlert,
+  FileSpreadsheet,
+  LoaderCircle,
+  Maximize,
+  PlayCircle,
+  Printer,
+  Sparkles,
+} from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Hint, PageHeader, Segmented, cn, useToast } from '@/components/app';
 import type { SeatingDayInfo } from '@/features/event-day/server/pages';
@@ -11,6 +19,7 @@ import { useUi } from '@/lib/i18n/client';
 import { applySolution, solverInput } from '../auto';
 import { calibrate, normalizeRotation, planScale, rescalePlan, type Point } from '../geometry';
 import {
+  newId,
   type LandmarkKind,
   type Plan,
   type PlanBackground,
@@ -41,7 +50,9 @@ import {
   type TablePatch,
 } from '../plan';
 import type { SolverProgress, SolverResult } from '../solver';
-import { AutoDialog, AutoResult, AutoUpgrade, runSolver } from './auto';
+import { applyTemplate, type HallTemplate } from '../templates';
+import { applyWords } from '../words';
+import { AutoDialog, AutoResult, AutoUpgrade, runSolver, WordsPanel } from './auto';
 import { CanvasToolbar, SeatingHelp } from './CanvasToolbar';
 import { AddGuestsPicker, RulesDialog, SeatPicker, UnitDialog } from './dialogs';
 import { GuestsPanel, listedUnits } from './GuestsPanel';
@@ -49,6 +60,8 @@ import { LandmarkInspector, TableInspector } from './Inspector';
 import { PlanFileError, preparePlanFile, renderStoredPdf, uploadTo } from './plan-file';
 import { LineLengthDialog, PlanDialog, type PlanBusy } from './PlanDialog';
 import { SeatingCanvas, type CanvasControls } from './SeatingCanvas';
+import { LearnCard, SeatingTutorial } from './SeatingTutorial';
+import { TemplatePicker } from './TemplatePicker';
 import { useSeatingSave, type SaveStatus } from './useSeatingSave';
 
 export type AutoAccess = 'on' | 'plan' | 'off';
@@ -83,10 +96,13 @@ export function SeatingScreen({
   autoPackage,
   planBase,
   day = null,
+  wordsAi = false,
 }: {
   id: string;
   initial: SeatingState;
   auto: AutoAccess;
+  /** the AI that reads rules in words is there (with the automatic seating) */
+  wordsAi?: boolean;
   /** the package (and its plan) that has the automatic seating, for the upgrade prompt */
   autoPackage: { name: string; plan: string };
   planBase: string;
@@ -150,6 +166,15 @@ export function SeatingScreen({
 
   const taken = useMemo(() => occupancyOf(plan, byId), [plan, byId]);
   const stats = useMemo(() => seatingStats(plan, units), [plan, units]);
+  // the seats a ready-made hall is set for: the confirmed guests, else everyone not declined
+  const planFor = useMemo(() => {
+    if (stats.confirmed) return stats.confirmed;
+    const expected = units.filter((u) => u.status !== 'declined').reduce((n, u) => n + u.seats, 0);
+    return expected || 100;
+  }, [stats.confirmed, units]);
+  const [learnOpen, setLearnOpen] = useState(false);
+  // "start from the empty hall": the ready-made halls step aside until the next visit
+  const [blank, setBlank] = useState(false);
   const tablesById = useMemo(() => new Map(plan.tables.map((x) => [x.id, x])), [plan.tables]);
   const names = useMemo(() => new Map(units.map((u) => [u.id, u.name])), [units]);
   const numbers = useMemo(() => new Map(plan.tables.map((x) => [x.id, x.number])), [plan.tables]);
@@ -275,6 +300,12 @@ export function SeatingScreen({
     const r = addTable(plan, shape, controls.current?.center() ?? null);
     update(() => r.plan);
     select([r.id]);
+  };
+  // a ready-made hall (templates.ts) for the guests there are — one step to undo
+  const pickTemplate = (key: HallTemplate) => {
+    update((p) => applyTemplate(p, key, planFor), null);
+    setSelection([]);
+    toast({ title: fmt(s.templates.applied, { name: s.templates.items[key].title }), variant: 'success' });
   };
   const addLandmarkAt = (kind: LandmarkKind) => {
     const r = addLandmark(plan, kind, controls.current?.center() ?? null);
@@ -628,9 +659,19 @@ export function SeatingScreen({
                 {s.actions.excel}
               </Button>
             </Hint>
+            <Button
+              variant="secondary"
+              icon={<PlayCircle className="text-brand-deep" />}
+              onClick={() => setLearnOpen(true)}
+              data-testid="seating-learn"
+            >
+              {s.learn.button}
+            </Button>
           </>
         }
       />
+      <SeatingTutorial open={learnOpen} onOpenChange={setLearnOpen} />
+      <LearnCard onPlay={() => setLearnOpen(true)} />
 
       {/* where things stand */}
       <div
@@ -853,6 +894,21 @@ export function SeatingScreen({
                 onOpenTable={(tableId) => setDialog({ kind: 'add', tableId })}
                 onCalibrated={(a, b) => setDialog({ kind: 'line', a, b })}
               />
+              {/* nothing on the map yet and no picture of the hall: a ready-made hall, or the venue's plan */}
+              {plan.tables.length === 0 && !plan.layout.background && !calibrating && !blank ? (
+                <div className="absolute inset-0 z-10 flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-6">
+                  <TemplatePicker
+                    guests={planFor}
+                    onPick={pickTemplate}
+                    onUpload={() => {
+                      setPlanError(null);
+                      setDialog({ kind: 'plan' });
+                    }}
+                    onLearn={() => setLearnOpen(true)}
+                    onBlank={() => setBlank(true)}
+                  />
+                </div>
+              ) : null}
               {calibrating ? (
                 <div className="absolute inset-x-2 top-2 z-10 flex flex-wrap items-center gap-2 rounded-card border border-info-line bg-info-bg px-3 py-2 text-[13px] shadow-sm sm:inset-x-auto sm:start-3">
                   {s.canvas.calibrating}
@@ -867,6 +923,9 @@ export function SeatingScreen({
                   run={runs}
                   names={names}
                   numbers={numbers}
+                  rules={
+                    plan.rules.filter((r) => r.a in result.assignment && r.b in result.assignment).length
+                  }
                   onRerun={() => run()}
                   onUndo={() => {
                     step(undo);
@@ -998,6 +1057,11 @@ export function SeatingScreen({
             rescaleTo(bg?.width ? meters / bg.width : null);
             setDialog(null);
           }}
+          guests={planFor}
+          onTemplate={(key) => {
+            pickTemplate(key);
+            setDialog(null);
+          }}
           onClose={() => setDialog(null)}
         />
       ) : null}
@@ -1027,6 +1091,15 @@ export function SeatingScreen({
             setRunning(false);
           }}
           onClose={() => setDialog(null)}
+          words={
+            wordsAi ? (
+              <WordsPanel
+                id={id}
+                names={names}
+                onApply={(answer) => update((p) => applyWords(p, answer, newId))}
+              />
+            ) : undefined
+          }
         />
       ) : null}
       {dialog?.kind === 'upgrade' ? (

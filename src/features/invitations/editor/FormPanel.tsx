@@ -127,7 +127,7 @@ export function FormPanel({ className }: { className?: string }) {
       );
     }
   } else {
-    return <div ref={ref} className={className} />;
+    return <div ref={ref} className={className} data-testid="form-panel" />;
   }
 
   const reviewTexts = section?.type === 'hero' && borrowedCopy(defaults, doc.eventType);
@@ -142,7 +142,7 @@ export function FormPanel({ className }: { className?: string }) {
     );
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={className} data-testid="form-panel">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-1">

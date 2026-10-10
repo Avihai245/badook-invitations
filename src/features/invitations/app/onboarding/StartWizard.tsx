@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Check, ClipboardList, Loader2, Palette, Sparkles, X } from 'lucide-react';
+import { ArrowRight, Loader2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
@@ -10,6 +10,9 @@ import { useUi } from '@/lib/i18n/client';
 import type { EventType, Locale } from '../../contracts/types';
 import { browserTimezone, DEFAULT_TIMEZONE } from '../../lib/timezones';
 import { TEMPLATES } from '../../templates/registry';
+import type { ToolKey } from '../../lib/tools';
+import { track } from '@/features/analytics/track';
+import { ToolsPicker, saveEventTools } from '../tools/ToolsPicker';
 import { COUPLE_EVENTS } from '../../templates/seed-copy';
 import { EVENT_ICONS } from '../event-icons';
 import { nameFields, type NameKey } from '../gallery/CreateWizard';
@@ -30,7 +33,7 @@ export const START_TYPES: EventType[] = [
   'other',
 ];
 
-/** The design a "planning first" event starts with: the first listed design made for its type. */
+/** The design an event starts with when the host doesn't need an invitation: the first listed design made for its type. */
 export function defaultTemplate(type: EventType, locale: Locale): { id: string; locales: Locale[] } | null {
   for (const { manifest } of TEMPLATES.values()) {
     if (!manifest.listed || !manifest.categories.includes(type)) continue;
@@ -43,14 +46,15 @@ export function defaultTemplate(type: EventType, locale: Locale): { id: string; 
 type Step = 1 | 2 | 3;
 
 /**
- * "New event" (UX report §4.2): three full screens, under a minute — what kind of event; when, roughly
- * how many guests and the budget (optional), and who it's for; then where to start — planning, the
- * invitation's design, or both. Planning first creates the event with a design for its type and its plan
- * at once and lands on the event's home (its tour opens); the others go on to the gallery, filtered by
- * the type, carrying the answers. "Skip" goes straight to the gallery from any screen.
+ * "New event" (UX report §4.2): three full screens, under a minute — what kind of event; what the host
+ * needs for it (lib/tools: a digital invitation, planning, seating, the event day — any mix, nothing more
+ * than asked for); then when, roughly how many guests, the budget (only with planning) and who it's for.
+ * With the invitation the host goes on to the gallery, filtered by the type, carrying the answers;
+ * without it the event is created at once with a design for its type (kept for later) and lands on the
+ * event's home (its tour opens). "Skip" goes straight to the gallery from any screen.
  */
 export function StartWizard() {
-  const { t, locale, plural, number, fmt } = useUi();
+  const { t, locale, number, fmt } = useUi();
   const S = t.start;
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
@@ -59,7 +63,7 @@ export function StartWizard() {
   const [guests, setGuests] = useState('');
   const [budget, setBudget] = useState('');
   const [names, setNames] = useState<Record<NameKey, string>>({ primary: '', secondary: '', parents: '' });
-  const [start, setStart] = useState<StartAnswers['start']>('all');
+  const [tools, setTools] = useState<ToolKey[]>(['invite']);
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,25 +80,28 @@ export function StartWizard() {
   const budgetN = parseWhole(budget, 1_000_000_000);
   const today = new Date().toISOString().slice(0, 10);
   const missingNames = fields.filter((f) => f.required && !names[f.key].trim()).map((f) => f.key);
-  const step2Valid = !!date && guestsN !== undefined && budgetN !== undefined && !missingNames.length;
+  const planning = tools.includes('plan');
+  const detailsValid =
+    !!date && guestsN !== undefined && (!planning || budgetN !== undefined) && !missingNames.length;
 
   const answers = (): StartAnswers => ({
     eventType: type!,
     date: date || null,
     guests: guestsN ?? null,
-    budget: budgetN ?? null,
-    start,
+    budget: planning ? (budgetN ?? null) : null,
+    tools,
     names,
   });
 
   async function finish() {
     const a = answers();
-    if (a.start !== 'plan') {
+    track('tools_set', { props: { tools: a.tools.join(','), source: 'start' } });
+    if (a.tools.includes('invite')) {
       saveAnswers(a);
       router.push(`/app/invitations/new?gallery=1&type=${a.eventType}`);
       return;
     }
-    // planning first: the event with a design for its type, and its plan, in one go
+    // no invitation needed (only planning, seating…): the event with a design for its type, in one go
     const tpl = defaultTemplate(a.eventType, locale);
     if (!tpl) {
       saveAnswers(a);
@@ -127,16 +134,18 @@ export function StartWizard() {
       if (res.status === 401) return router.push(`/login?next=${encodeURIComponent('/app/invitations/new')}`);
       const body = (await res.json().catch(() => null)) as { ok?: boolean; id?: string } | null;
       if (!res.ok || !body?.id) throw new Error(String(res.status));
-      // the plan: a convenience — the event exists either way
-      await fetch(`/api/invitations/${body.id}/planning`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(planInit(a, templateKeyFor(a.eventType) ?? 'blank')),
-      }).catch(() => null);
+      // the tools and the plan: a convenience — the event exists either way
+      await saveEventTools(body.id, a.tools);
+      if (a.tools.includes('plan'))
+        await fetch(`/api/invitations/${body.id}/planning`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(planInit(a, templateKeyFor(a.eventType) ?? 'blank')),
+        }).catch(() => null);
       router.push(`/app/invitations/${body.id}?tour=1`);
     } catch {
       setBusy(false);
-      setError(S.where.error);
+      setError(S.needs.error);
     }
   }
 
@@ -144,11 +153,13 @@ export function StartWizard() {
     e.preventDefault();
     if (step === 1 && type) return setStep(2);
     if (step === 2) {
-      setTried(true);
-      if (step2Valid) setStep(3);
+      if (tools.length) setStep(3);
       return;
     }
-    if (step === 3) void finish();
+    if (step === 3) {
+      setTried(true);
+      if (detailsValid) void finish();
+    }
   };
 
   return (
@@ -237,7 +248,16 @@ export function StartWizard() {
                 <DemoVideo className="mt-2" />
               </details>
             </Screen>
-          ) : step === 2 && type ? (
+          ) : step === 2 ? (
+            <Screen headingRef={heading} title={S.needs.title} body={S.needs.body}>
+              <ToolsPicker value={tools} onChange={setTools} popular="invite" />
+              {tools.length ? null : (
+                <p role="alert" className="mt-4 text-[13.5px] font-semibold text-danger">
+                  {t.eventHome.tools.pickOne}
+                </p>
+              )}
+            </Screen>
+          ) : type ? (
             <Screen headingRef={heading} title={S.details.title} body={S.details.body}>
               <div className="grid gap-4 rounded-[24px] bg-surface p-5 shadow-sm ring-1 ring-line sm:grid-cols-2 sm:p-7">
                 {fields.map((f) => (
@@ -275,91 +295,29 @@ export function StartWizard() {
                     placeholder="150"
                   />
                 </Field>
-                <Field
-                  label={S.details.budget}
-                  help={S.details.budgetHint}
-                  error={budgetN === undefined ? S.details.invalidNumber : undefined}
-                >
-                  <Input
-                    inputMode="numeric"
-                    dir="ltr"
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                    placeholder="120,000"
-                  />
-                </Field>
+                {planning ? (
+                  <Field
+                    label={S.details.budget}
+                    help={S.details.budgetHint}
+                    error={budgetN === undefined ? S.details.invalidNumber : undefined}
+                  >
+                    <Input
+                      inputMode="numeric"
+                      dir="ltr"
+                      value={budget}
+                      onChange={(e) => setBudget(e.target.value)}
+                      placeholder="120,000"
+                    />
+                  </Field>
+                ) : null}
               </div>
-            </Screen>
-          ) : (
-            <Screen headingRef={heading} title={S.where.title} body={S.where.body}>
-              <div role="radiogroup" aria-label={S.where.title} className="grid gap-3 md:grid-cols-3">
-                {(
-                  [
-                    { key: 'plan', icon: <ClipboardList />, words: S.where.plan },
-                    { key: 'design', icon: <Palette />, words: S.where.design },
-                    { key: 'all', icon: <Sparkles />, words: S.where.all },
-                  ] as const
-                ).map(({ key, icon, words }) => {
-                  const on = start === key;
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      role="radio"
-                      aria-checked={on}
-                      data-start={key}
-                      onClick={() => setStart(key)}
-                      className={cn(
-                        'relative flex flex-col items-start gap-3 rounded-[22px] border-2 bg-surface p-5 text-start shadow-sm transition-[box-shadow,border-color] hover:shadow-md motion-reduce:transition-none',
-                        on ? 'border-brand' : 'border-transparent ring-1 ring-line',
-                      )}
-                    >
-                      {'badge' in words ? (
-                        <span className="absolute -top-2.5 end-4 rounded-full bg-brand-deep px-2.5 py-0.5 text-[11px] font-bold text-white dark:text-[#1c1917]">
-                          {words.badge}
-                        </span>
-                      ) : null}
-                      <span
-                        aria-hidden
-                        className={cn(
-                          'grid size-12 place-items-center rounded-[15px] [&_svg]:size-6',
-                          on ? 'bg-brand text-white' : 'bg-brand-soft text-brand-deep',
-                        )}
-                      >
-                        {icon}
-                      </span>
-                      <span className="text-[17px] font-bold">{words.title}</span>
-                      <span className="text-[13.5px] text-muted">{words.body}</span>
-                      {on ? (
-                        <Check
-                          aria-hidden
-                          className="absolute end-4 bottom-4 size-5 text-brand"
-                          strokeWidth={3}
-                        />
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </div>
-              {type && (guestsN || budgetN) ? (
-                <p className="mt-4 text-[13px] text-muted">
-                  {[
-                    t.eventTypes[type],
-                    guestsN
-                      ? plural(t.planning.budget.guests.guestsN, guestsN, { n: number(guestsN) })
-                      : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </p>
-              ) : null}
               {error ? (
                 <p role="alert" className="mt-4 rounded-btn bg-danger-bg px-3 py-2 text-[13.5px] text-danger">
                   {error}
                 </p>
               ) : null}
             </Screen>
-          )}
+          ) : null}
 
           <footer className="mt-auto flex items-center justify-between gap-3 pt-8">
             {step > 1 ? (
@@ -378,10 +336,10 @@ export function StartWizard() {
               <Button
                 type="submit"
                 size="lg"
-                disabled={busy}
+                disabled={busy || (step === 2 && !tools.length)}
                 icon={busy ? <Loader2 className="animate-spin motion-reduce:animate-none" /> : undefined}
               >
-                {busy ? S.where.creating : step === 3 ? S.where.cta : S.next}
+                {busy ? S.needs.creating : step === 3 ? S.needs.cta : S.next}
                 {busy ? null : <ArrowRight aria-hidden className="icon-dir size-4" />}
               </Button>
             ) : null}

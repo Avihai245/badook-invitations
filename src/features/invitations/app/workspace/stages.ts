@@ -5,8 +5,18 @@
  * which stage it belongs to, and each stage's status for its badge (✓ done / N open / starts in N days).
  */
 
+import type { ToolKey } from '../../lib/tools';
+
 export const STAGES = ['plan', 'invite', 'arrange', 'celebrate'] as const;
 export type StageKey = (typeof STAGES)[number];
+
+/** Each stage is one of the event's tools (lib/tools): a tool the host didn't ask for is not shown. */
+export const STAGE_TOOL: Record<StageKey, ToolKey> = {
+  plan: 'plan',
+  invite: 'invite',
+  arrange: 'seating',
+  celebrate: 'day',
+};
 
 export type NavKey =
   | 'home'
@@ -66,8 +76,10 @@ export function navKeyOf(path: string, id: string): NavKey | null {
   return null;
 }
 
-export function stageOf(key: NavKey | null): StageKey | null {
+/** The stage a screen is in — as the event shows its stages, when given (the guests sit with the seating without the invitation). */
+export function stageOf(key: NavKey | null, caps?: WorkspaceCaps): StageKey | null {
   if (!key) return null;
+  if (caps) for (const s of STAGES) if (stageItems(s, caps).includes(key)) return s;
   for (const s of STAGES) if (STAGE_ITEMS[s].includes(key)) return s;
   return null;
 }
@@ -81,10 +93,18 @@ export interface WorkspaceCaps {
   eventDay: 'on' | 'plan' | null;
   gallery: boolean;
   insights: boolean;
+  /** the tools the host asked for (lib/tools eventTools): the stages of the others are not shown */
+  tools: readonly ToolKey[];
 }
 
 export function stageItems(stage: StageKey, caps: WorkspaceCaps): NavKey[] {
-  return STAGE_ITEMS[stage].filter((k) => {
+  if (!caps.tools.includes(STAGE_TOOL[stage])) return [];
+  // seating without the invitation: the guest list is the seating's own first screen
+  const items =
+    stage === 'arrange' && !caps.tools.includes('invite')
+      ? (['guests', 'seating'] as NavKey[])
+      : STAGE_ITEMS[stage];
+  return items.filter((k) => {
     if (stage === 'plan') return caps.planning;
     if (k === 'seating') return caps.seating !== null;
     if (k === 'live') return caps.eventDay !== null;
@@ -100,8 +120,8 @@ export interface StageFacts {
   sent: number;
   /** whole days to the event (0 on the day, negative after) */
   daysLeft: number;
-  /** the plan: none yet (null), or its open tasks */
-  plan: { open: number } | null;
+  /** the plan: none yet (null), or its open tasks and this week's */
+  plan: { open: number; week: number } | null;
   /** the seating: tables made and the confirmed guests not seated yet (null: not known) */
   seating: { tables: number; unseated: number } | null;
 }
@@ -109,6 +129,8 @@ export interface StageFacts {
 export type StageStatus =
   | { kind: 'done' }
   | { kind: 'open'; n: number }
+  | { kind: 'week'; n: number }
+  | { kind: 'inProgress' }
   | { kind: 'notStarted' }
   | { kind: 'draft' }
   | { kind: 'toSend'; n: number }
@@ -119,8 +141,10 @@ export type StageStatus =
 export function stageStatus(stage: StageKey, f: StageFacts): StageStatus {
   switch (stage) {
     case 'plan':
+      // the week's tasks, not the whole plan's open ones (thirty open tasks only frighten)
       if (!f.plan) return { kind: 'notStarted' };
-      return f.plan.open ? { kind: 'open', n: f.plan.open } : { kind: 'done' };
+      if (f.plan.week) return { kind: 'week', n: f.plan.week };
+      return f.plan.open ? { kind: 'inProgress' } : { kind: 'done' };
     case 'invite':
       if (f.status !== 'published') return { kind: 'draft' };
       if (!f.guests) return { kind: 'notStarted' };
@@ -153,6 +177,8 @@ export function stageProgress(s: StageStatus | null): StageProgress {
     case 'done':
       return 'done';
     case 'open':
+    case 'week':
+    case 'inProgress':
     case 'toSend':
     case 'draft':
     case 'today':

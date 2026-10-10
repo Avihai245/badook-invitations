@@ -108,9 +108,17 @@ export const billingEn: typeof billingHe = {
   errors: {
     already: 'That’s already your plan.',
     not_configured: 'Online payment isn’t enabled yet.',
+    provider_unavailable:
+      'The payment company’s page isn’t available right now. Let us know and we’ll fix it, or try again later.',
     server: 'Something went wrong. Please try again in a moment.',
   },
   going: 'Going to payment…',
+  pay: {
+    title: 'Secure payment',
+    body: '{product}: {price}. Type your card details in Tranzila’s secure form; the charge is made right after.',
+    frame: 'Tranzila’s payment form',
+    secure: 'Payments are secured by Tranzila. Card details never reach us.',
+  },
   secure: 'You pay on PayPlus’s secure page. Card details never reach us.',
   help: {
     choose:

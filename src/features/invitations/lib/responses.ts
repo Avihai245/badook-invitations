@@ -35,6 +35,10 @@ export interface ResponseRecord {
   answers: Record<string, string | boolean>;
   createdAt: string;
   updatedAt: string;
+  /** 'host': the host set it on the guests page (a phone call…), not the guest's own reply */
+  source?: 'guest' | 'host';
+  /** people beyond the guest's invitation they asked to bring, waiting for the host */
+  extraRequested?: number | null;
   attendees: ResponseAttendee[];
 }
 

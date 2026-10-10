@@ -391,7 +391,15 @@ export function SeatingCanvas({
           </pattern>
         </defs>
         <g transform={`translate(${view.tx} ${view.ty}) scale(${view.scale})`}>
-          <rect x={0} y={0} width={room.w} height={room.h} style={{ fill: 'var(--color-surface)' }} />
+          {/* no picture of the hall: a drawn one — a warm floor inside its walls (templates.ts fills it) */}
+          <rect
+            x={0}
+            y={0}
+            width={room.w}
+            height={room.h}
+            className={planUrl ? undefined : 'fill-[#fbf7f1] dark:fill-[#26221f]'}
+            style={planUrl ? { fill: 'var(--color-surface)' } : undefined}
+          />
           {planUrl && planDims ? (
             <image
               href={planUrl}
@@ -412,16 +420,31 @@ export function SeatingCanvas({
             opacity={planUrl ? 0.5 : 1}
             style={{ pointerEvents: 'none' }}
           />
-          <rect
-            x={0}
-            y={0}
-            width={room.w}
-            height={room.h}
-            fill="none"
-            strokeWidth={1}
-            vectorEffect="non-scaling-stroke"
-            style={{ stroke: 'var(--color-faint)', pointerEvents: 'none' }}
-          />
+          {planUrl ? (
+            <rect
+              x={0}
+              y={0}
+              width={room.w}
+              height={room.h}
+              fill="none"
+              strokeWidth={1}
+              vectorEffect="non-scaling-stroke"
+              style={{ stroke: 'var(--color-faint)', pointerEvents: 'none' }}
+            />
+          ) : (
+            // the walls: 25 cm thick, drawn outside the room's floor
+            <rect
+              x={-0.125}
+              y={-0.125}
+              width={room.w + 0.25}
+              height={room.h + 0.25}
+              rx={0.3}
+              fill="none"
+              strokeWidth={0.25}
+              className="stroke-[#a8977f] dark:stroke-[#6b5f52]"
+              style={{ pointerEvents: 'none' }}
+            />
+          )}
           {plan.layout.landmarks.map((m) => {
             const label = m.label || s.landmarks[m.kind];
             return (
@@ -498,7 +521,7 @@ export function SeatingCanvas({
           ) : null}
         </g>
       </svg>
-      {plan.tables.length === 0 && !calibrating ? (
+      {plan.tables.length === 0 && plan.layout.background && !calibrating ? (
         <p className="pointer-events-none absolute inset-x-4 top-1/2 mx-auto max-w-[340px] -translate-y-1/2 rounded-card bg-surface/90 px-4 py-3 text-center text-[13px] text-muted shadow-sm">
           {s.canvas.empty}
         </p>

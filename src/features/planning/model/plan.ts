@@ -188,6 +188,9 @@ export interface Headcount {
   invited: number;
   confirmedAdults: number;
   confirmedChildren: number;
+  /** the people expected by the list: each guest's answer, else their invitation (not who said no) */
+  expectedAdults?: number;
+  expectedChildren?: number;
 }
 
 export interface CategoryTotals {

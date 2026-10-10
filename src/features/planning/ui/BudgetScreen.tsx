@@ -5,6 +5,7 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { Button, Card, EmptyState, Segmented } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { categoryRows } from '../model/budget-view';
+import { Intro } from './Intro';
 import { isPast, PlanFrame, ToolHelp } from './PlanFrame';
 import { usePlan } from './PlanProvider';
 import { AddCategoryDialog } from './budget/AddCategoryDialog';
@@ -165,11 +166,44 @@ function BudgetBody({
 
   return (
     <div className="flex flex-col gap-5">
+      {!past ? (
+        <Intro
+          storageKey={`planning:budget-intro:${plan.id}`}
+          title={T.intro.title}
+          closeLabel={t.common.close}
+          testId="budget-intro"
+          steps={[
+            { text: T.intro.plan },
+            {
+              text: T.intro.close,
+              action: (
+                <Button size="sm" variant="secondary" icon={<Plus />} onClick={() => onOpenItem(null)}>
+                  {T.addItem}
+                </Button>
+              ),
+            },
+            {
+              text: T.intro.pay,
+              action: (
+                <Button size="sm" variant="ghost" onClick={toPayments}>
+                  {T.views.payments}
+                </Button>
+              ),
+            },
+          ]}
+        />
+      ) : null}
       {past ? <PastSummary /> : withTotal ? <BudgetHero /> : <BudgetSummary />}
       {!past ? <GuestsPanel /> : null}
       {!past && rows.length ? (
         <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
-          <CategoryGauges onOpen={reveal} />
+          <CategoryGauges
+            onOpen={reveal}
+            onAddItem={(categoryId) => {
+              setOpen((cur) => new Set(cur).add(categoryId));
+              onOpenItem(null, categoryId);
+            }}
+          />
           <UpcomingPayments onAll={toPayments} onOpenItem={(id) => onOpenItem(id)} />
         </div>
       ) : null}

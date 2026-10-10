@@ -48,5 +48,12 @@
   "liveGallery.qrAfter": "Scan to see it on your phone",
   "liveGallery.qrLabel": "QR code to the event’s gallery",
   "liveGallery.preview": "The button leads to the event’s live gallery once it is on",
-  "scene.rsvp": "RSVP"
+  "scene.rsvp": "RSVP",
+  "rsvp.invitedFor": {
+    "one": "The invitation is for one person",
+    "other": "The invitation is for {n} people"
+  },
+  "rsvp.bringMore": "Want to bring more people?",
+  "rsvp.bringMoreHint": "We'll pass the request to the hosts for their approval.",
+  "rsvp.more": "More"
 }
