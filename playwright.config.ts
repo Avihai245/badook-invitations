@@ -104,8 +104,13 @@ export default defineConfig({
             INVITES_WHATSAPP_VERIFY_TOKEN: 'e2e-whatsapp-verify',
             // the table numbers' template (the event day: tests/e2e/event-day.spec.ts)
             INVITES_WHATSAPP_TABLE_TEMPLATE: 'badook_table',
+            // the scheduled messages' templates (tests/e2e/whatsapp-messages.spec.ts)
+            INVITES_WHATSAPP_REMINDER_TEMPLATE: 'badook_rsvp_reminder',
+            INVITES_WHATSAPP_EVENT_TEMPLATE: 'badook_event_reminder',
+            INVITES_WHATSAPP_THANKS_TEMPLATE: 'badook_thanks',
             INVITES_ADMIN_EMAILS:
               'wa-admin-mobile@example.com,wa-admin-desktop@example.com,' +
+              'wa-sched-mobile@example.com,wa-sched-desktop@example.com,' +
               'i18n-admin-mobile@example.com,i18n-admin-desktop@example.com,i18n-translate-desktop@example.com,' +
               // the admin console's owners (tests/e2e/admin.spec.ts)
               'admin-owner-mobile@example.com,admin-owner-desktop@example.com',
