@@ -91,8 +91,8 @@ export interface TemplateSend {
   template: string;
   lang: string;
   body: string[];
-  /** appended to the template's URL button */
-  button: string;
+  /** appended to the template's URL button; null: the template has no button (the thank-you) */
+  button: string | null;
   /** our message id, echoed back in the status webhooks */
   ref: string;
 }
@@ -111,7 +111,11 @@ export async function postTemplate(m: TemplateSend, fetchImpl: typeof fetch = fe
       language: { code: m.lang },
       components: [
         { type: 'body', parameters: m.body.map(param) },
-        { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: m.button }] },
+        ...(m.button === null
+          ? []
+          : [
+              { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: m.button }] },
+            ]),
       ],
     },
   };

@@ -136,3 +136,140 @@ export const ALBUM_TEMPLATE_TEXT: Record<Locale, { body: string; button: string;
 export function fillTemplate(body: string, values: readonly string[]): string {
   return body.replace(/\{\{([1-9])\}\}/g, (_, n: string) => values[Number(n) - 1] ?? '');
 }
+
+/** A template as the screens preview it: its body, its footer, and its button's label (null: none). */
+export interface TemplateText {
+  body: string;
+  button: string | null;
+  footer: string;
+}
+
+/**
+ * The RSVP follow-up (badook_rsvp_reminder, docs/whatsapp-setup.md §11) to guests who got the
+ * invitation and haven't answered: the invitation's own values — {{1}} guest · {{2}} hosts · {{3}} the
+ * event with its preposition · {{4}} the date — and the same button to their personal link.
+ */
+export const REMINDER_TEMPLATE_TEXT: Record<Locale, TemplateText> = {
+  he: {
+    body: 'שלום {{1}} 👋\nרק מזכירים: {{2}} מזמינים אותך {{3}} ב{{4}}, ועוד לא קיבלנו ממך תשובה.\nנשמח לדעת אם תגיעו — זה לוקח רגע בכפתור 👇',
+    button: 'לאישור הגעה',
+    footer: 'נשלח באמצעות Badook',
+  },
+  en: {
+    body: 'Hi {{1}} 👋\nJust a reminder: {{2}} invite you {{3}} on {{4}}, and we haven’t heard from you yet.\nLet us know if you’re coming — it takes a moment with the button 👇',
+    button: 'RSVP',
+    footer: 'Sent with Badook',
+  },
+  ru: {
+    body: 'Здравствуйте, {{1}}! 👋\nНапоминаем: вас приглашают {{3}}: {{2}}.\n📅 {{4}}\nМы ещё не получили ваш ответ — подтвердите участие по кнопке ниже 👇',
+    button: 'Ответить',
+    footer: 'Отправлено через Badook',
+  },
+  ar: {
+    body: 'مرحبًا {{1}} 👋\nتذكير لطيف: يسرّ {{2}} دعوتكم {{3}} يوم {{4}}، ولم يصلنا ردّكم بعد.\nيسعدنا أن نعرف إن كنتم ستحضرون — اضغطوا على الزر 👇',
+    button: 'تأكيد الحضور',
+    footer: 'أُرسلت عبر Badook',
+  },
+  fr: {
+    body: 'Bonjour {{1}} 👋\nPetit rappel : vous êtes invités {{3}} : {{2}}.\n📅 {{4}}\nNous n’avons pas encore votre réponse — un clic sur le bouton ci-dessous suffit 👇',
+    button: 'Répondre',
+    footer: 'Envoyé via Badook',
+  },
+  es: {
+    body: '¡Hola, {{1}}! 👋\nTe recordamos que tienes una invitación {{3}} de {{2}}.\n📅 {{4}}\nAún no hemos recibido tu respuesta: confírmala con el botón de abajo 👇',
+    button: 'Confirmar',
+    footer: 'Enviado con Badook',
+  },
+  am: {
+    body: 'ሰላም {{1}} 👋\nማስታወሻ፦ ግብዣ {{3}}፦ {{2}}።\n📅 {{4}}\nእስካሁን ምላሽዎ አልደረሰንም — ከታች ያለውን ቁልፍ በመጫን ያረጋግጡ 👇',
+    button: 'ምላሽ ይስጡ',
+    footer: 'በBadook የተላከ',
+  },
+};
+
+/**
+ * The reminder before the event (badook_event_reminder, docs/whatsapp-setup.md §12) to the guests who
+ * are coming: {{1}} guest · {{2}} hosts · {{3}} the event with its preposition · {{4}} when and where
+ * ("יום שלישי, 17 בנובמבר · 19:30 · גן האירועים"); the button opens their invitation (the map, the
+ * directions). Says no "today", so it fits the day itself and the days before it.
+ */
+export const EVENT_TEMPLATE_TEXT: Record<Locale, TemplateText> = {
+  he: {
+    body: 'שלום {{1}} 🎉\n{{2}} מחכים לראות אותך {{3}}!\n📅 {{4}}\nהפרטים והדרך לאירוע בכפתור 👇',
+    button: 'לפרטים ולניווט',
+    footer: 'נשלח באמצעות Badook',
+  },
+  en: {
+    body: 'Hi {{1}} 🎉\nYou’re invited {{3}} — {{2}} can’t wait to see you!\n📅 {{4}}\nTap the button for the details and directions 👇',
+    button: 'Details & directions',
+    footer: 'Sent with Badook',
+  },
+  ru: {
+    body: 'Здравствуйте, {{1}}! 🎉\nЖдём вас {{3}}: {{2}}.\n📅 {{4}}\nПодробности и маршрут — по кнопке ниже 👇',
+    button: 'Подробности',
+    footer: 'Отправлено через Badook',
+  },
+  ar: {
+    body: 'مرحبًا {{1}} 🎉\nيتطلّع {{2}} لرؤيتكم {{3}}!\n📅 {{4}}\nللتفاصيل والطريق اضغطوا على الزر 👇',
+    button: 'التفاصيل والطريق',
+    footer: 'أُرسلت عبر Badook',
+  },
+  fr: {
+    body: 'Bonjour {{1}} 🎉\nOn vous attend {{3}} : {{2}}.\n📅 {{4}}\nLes détails et l’itinéraire, c’est par le bouton ci-dessous 👇',
+    button: 'Détails et accès',
+    footer: 'Envoyé via Badook',
+  },
+  es: {
+    body: '¡Hola, {{1}}! 🎉\nTe esperamos {{3}} de {{2}}.\n📅 {{4}}\nToca el botón para ver los detalles y cómo llegar 👇',
+    button: 'Detalles y cómo llegar',
+    footer: 'Enviado con Badook',
+  },
+  am: {
+    body: 'ሰላም {{1}} 🎉\nእንጠብቅዎታለን {{3}}፦ {{2}}።\n📅 {{4}}\nዝርዝሮችና አቅጣጫ ከታች ባለው ቁልፍ 👇',
+    button: 'ዝርዝሮችና አቅጣጫ',
+    footer: 'በBadook የተላከ',
+  },
+};
+
+/**
+ * The thank-you after the event without an album (badook_thanks, docs/whatsapp-setup.md §13): the
+ * album thank-you's values — {{1}} guest · {{2}} where they celebrated (album/phrases.ts) · {{3}}
+ * hosts — and no button.
+ */
+export const THANKS_TEMPLATE_TEXT: Record<Locale, TemplateText> = {
+  he: {
+    body: 'היי {{1}} 💛\nתודה שחגגתם איתנו {{2}}!\nהיה מרגש לחגוג יחד, ושמחנו מאוד שהייתם חלק מהיום הזה.\nבאהבה, {{3}}',
+    button: null,
+    footer: 'נשלח באמצעות Badook',
+  },
+  en: {
+    body: 'Hi {{1}} 💛\nThank you for celebrating with us {{2}}!\nIt was so special to celebrate together, and we’re so glad you were part of the day.\nWith love, {{3}}',
+    button: null,
+    footer: 'Sent with Badook',
+  },
+  ru: {
+    body: 'Здравствуйте, {{1}}! 💛\nСпасибо, что праздновали вместе с нами {{2}}!\nМы очень рады, что вы были с нами в этот день.\nС любовью, {{3}}',
+    button: null,
+    footer: 'Отправлено через Badook',
+  },
+  ar: {
+    body: 'مرحبًا {{1}} 💛\nشكرًا لأنكم احتفلتم معنا {{2}}!\nسعدنا جدًا بوجودكم معنا في هذا اليوم.\nمع الحب، {{3}}',
+    button: null,
+    footer: 'أُرسلت عبر Badook',
+  },
+  fr: {
+    body: 'Bonjour {{1}} 💛\nMerci d’avoir fêté avec nous {{2}} !\nNous sommes si heureux que vous ayez partagé cette journée avec nous.\nAvec amour, {{3}}',
+    button: null,
+    footer: 'Envoyé via Badook',
+  },
+  es: {
+    body: '¡Hola, {{1}}! 💛\n¡Gracias por celebrar con nosotros {{2}}!\nNos alegró muchísimo compartir este día contigo.\nCon cariño, {{3}}',
+    button: null,
+    footer: 'Enviado con Badook',
+  },
+  am: {
+    body: 'ሰላም {{1}} 💛\nከእኛ ጋር {{2}} ስላከበሩ እናመሰግናለን!\nይህን ቀን ከእኛ ጋር ስላሳለፉ በጣም ደስ ብሎናል።\nበፍቅር፣ {{3}}',
+    button: null,
+    footer: 'በBadook የተላከ',
+  },
+};
