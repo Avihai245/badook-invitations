@@ -322,7 +322,8 @@ describe('the messages', () => {
     );
     const reminder = renderMessage('event_reminder', 'he', 'דניאל', values);
     expect(reminder.body).toContain('📅 יום רביעי, 18 בנובמבר · 19:30 · גן האירועים');
-    expect(reminder.button).toBe('לפרטים ולניווט');
+    expect(reminder.button).toBe('ניווט לאירוע');
+    expect(reminder.link).toBe('way');
     const thanks = renderMessage('thanks', 'he', 'דניאל', values);
     expect(thanks.body).toContain('תודה שחגגתם איתנו בחתונה שלנו!');
     expect(thanks.button).toBeNull();

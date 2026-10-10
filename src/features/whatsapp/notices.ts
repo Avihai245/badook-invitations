@@ -94,6 +94,21 @@ function invitationSuffix(m: ClaimedNotice, doc: InvitationDocument): string {
   return query ? `${m.slug}?${query}` : m.slug;
 }
 
+/** The way to the event after the site's "/e/": "<slug>/way?g=<token>&lang=<language>". */
+export function waySuffix(
+  m: Pick<ClaimedNotice, 'slug' | 'guestToken' | 'guestLanguage'>,
+  doc: InvitationDocument,
+): string {
+  const page = guestLocale(m.guestLanguage, doc);
+  const query = [
+    m.guestToken ? `g=${m.guestToken}` : null,
+    page !== doc.defaultLocale ? `lang=${page}` : null,
+  ]
+    .filter(Boolean)
+    .join('&');
+  return query ? `${m.slug}/way?${query}` : `${m.slug}/way`;
+}
+
 /** A notice in one of its template's languages. */
 export function noticeMessage(
   m: ClaimedNotice,
@@ -106,8 +121,14 @@ export function noticeMessage(
     template: templateName(m.template),
     lang: lang.code,
     body: messageParams(m.template, m.guestName ?? '', values),
-    // the thank-you has no button; the others open the guest's invitation (the RSVP, the map)
-    button: m.template === 'thanks' ? null : invitationSuffix(m, doc),
+    // the thank-you has no button; the reminder before the event opens the way there (after the site's
+    // "/e/": navigation), the RSVP reminder the guest's invitation (after "/i/")
+    button:
+      m.template === 'thanks'
+        ? null
+        : m.template === 'event_reminder'
+          ? waySuffix(m, doc)
+          : invitationSuffix(m, doc),
     ref: m.id,
   };
 }
