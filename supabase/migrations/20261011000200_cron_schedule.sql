@@ -45,7 +45,7 @@ begin
     return;
   end if;
   create extension if not exists pg_cron;
-  create extension if not exists pg_net;
+  create extension if not exists pg_net with schema extensions;
   -- every minute: the app's clock
   perform cron.schedule('badook-clock', '* * * * *', 'select public.app_cron_call(''/api/cron/tick'')');
   -- pg_cron's own record of runs, kept a week
