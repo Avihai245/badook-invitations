@@ -359,6 +359,18 @@ const FUNCTIONS = new Set([
   'album_notice_requeue',
   'album_notice_status',
   'album_notice_pending',
+  // the WhatsApp section's scheduled messages (*_whatsapp_schedule.sql)
+  'whatsapp_audience',
+  'whatsapp_notice_queue',
+  'whatsapp_notice_result',
+  'whatsapp_notice_claim',
+  'whatsapp_notice_requeue',
+  'whatsapp_notice_status',
+  'whatsapp_notice_pending',
+  'whatsapp_hub_state',
+  'whatsapp_schedule_save',
+  'whatsapp_stages_due',
+  'whatsapp_stage_run',
   // the AI photos with the people of honor (supabase/migrations/*_ai_photos.sql)
   'ai_photo_owner_get',
   'ai_photo_owner_settings',

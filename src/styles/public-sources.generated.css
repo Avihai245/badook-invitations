@@ -246,6 +246,8 @@
 @source "../lib/i18n/ui-he.tsx";
 @source "../lib/i18n/ui-site-en.tsx";
 @source "../lib/i18n/ui-site-he.tsx";
+@source "../lib/i18n/wa-messages.en.ts";
+@source "../lib/i18n/wa-messages.he.ts";
 @source "../lib/links/tokens.ts";
 @source "../lib/live/broadcast.ts";
 @source "../lib/live/types.ts";
