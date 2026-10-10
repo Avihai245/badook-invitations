@@ -4,14 +4,15 @@ import { serviceDb } from '@/lib/supabase/server';
 
 /**
  * What an email is, for the admin console's log of emails (email_log: the kind and whether it went —
- * no address, no content; kept 90 days): a guest's reply to the host, the host's daily summary, the
- * family's comments on a draft, an alert to the team about money, the contact form, a support ticket's
+ * no address, no content; kept 90 days): a guest's reply to the host, the host's daily summary, a
+ * scheduled send that didn't go out, the family's comments on a draft, an alert to the team about money, the contact form, a support ticket's
  * answer, anything else.
  */
 export type EmailKind =
   | 'rsvp_reply'
   | 'rsvp_digest'
   | 'plan_reminder'
+  | 'scheduled_send'
   | 'review'
   | 'billing_alert'
   | 'contact'

@@ -4,10 +4,12 @@ import { albumNoticesState, sendAlbumNotices } from '@/features/album/server/not
 import { featureInput } from '@/features/flags/server';
 import { galleryNotifyDeps } from '@/features/live-gallery/server/deps';
 import { galleryNoticesState, sendGalleryNotices } from '@/features/live-gallery/server/notices-api';
+import { sendEmail } from '@/features/invitations/server/email';
 import { serverEnv } from '@/lib/env';
 import type { SendKind } from '../types';
 import type { ScheduleDeps } from './api';
 import { scheduleDb } from './db';
+import type { FailureMailDeps } from './email';
 import type { RunDeps } from './run';
 
 /** The real dependencies of the scheduled sends (tests pass their own). */
@@ -36,5 +38,15 @@ export function scheduleRunDeps(): RunDeps {
         send: (ownerId, id, body) => sendAlbumNotices(ownerId, id, body, albumNotifyDeps()),
       },
     },
+  };
+}
+
+/** "Your scheduled send didn't go out": the host's email. */
+export function failureMailDeps(): FailureMailDeps {
+  return {
+    db: scheduleDb,
+    send: (email) => sendEmail({ ...email, kind: 'scheduled_send' }),
+    base: base(),
+    brand: serverEnv().INVITES_BRAND_NAME,
   };
 }

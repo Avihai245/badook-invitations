@@ -336,6 +336,8 @@ const FUNCTIONS = new Set([
   'scheduled_send_claim',
   'scheduled_send_finish',
   'rsvp_digest_due_local',
+  'scheduled_send_failures',
+  'scheduled_send_failure_mailed',
   'cron_secret',
   // the album after the event (supabase/migrations/*_album.sql)
   'album_owner_get',

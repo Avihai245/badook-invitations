@@ -1,6 +1,7 @@
 import 'server-only';
 import { serviceDb } from '@/lib/supabase/server';
 import type { Audience, ScheduledSend, SendKind } from '../types';
+import type { FailedSend } from './email';
 
 /**
  * Typed access to the clock's database functions (supabase/migrations/*_scheduled_sends.sql). Always the
@@ -40,6 +41,9 @@ export const scheduleDb = {
     rpc<boolean | null>('scheduled_send_cancel', { p_id: id, p_owner: ownerId, p_kind: kind }),
   claim: (limit: number, staleSeconds: number) =>
     rpc<ScheduledSend[]>('scheduled_send_claim', { p_limit: limit, p_stale_seconds: staleSeconds }),
+  /** failed sends whose host wasn't told yet (scheduled_send_failures) */
+  failures: (limit: number) => rpc<FailedSend[]>('scheduled_send_failures', { p_limit: limit }),
+  failureMailed: (id: string) => rpc<boolean>('scheduled_send_failure_mailed', { p_send: id }),
   finish: (
     id: string,
     status: 'done' | 'failed',

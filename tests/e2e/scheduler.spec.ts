@@ -108,6 +108,75 @@ test('the album’s thank-you scheduled for 15:00 New York time goes out then �
 
   // the dialog says so
   await page.reload();
-  await page.getByTestId('album-card').getByTestId('album-send').click();
+  await page.getByTestId('album-card').getByTestId('album-send').first().click();
   await expect(page.getByRole('dialog').getByText(/השליחה המתוזמנת יצאה/)).toBeVisible();
+});
+
+test('a scheduled send that can’t go out (no credits by then): kept as failed with why, and its host gets an email', async ({
+  page,
+  request,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'one run is enough');
+  test.setTimeout(90_000);
+  const host = await newHost(page, 'clockfail', 'pro');
+  await galleryOn(page, host.id);
+  await publish(host.id);
+  const number = `+9725${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}04`;
+  await sql(
+    `insert into invitation_guests (invitation_id, name, party_size, phone, token) values ($1, 'משפחת לוי', 2, $2, $3)`,
+    [host.id, number, `sf${randomUUID().replace(/-/g, '').slice(0, 20)}`],
+  );
+  await sql(
+    `update accounts set message_credits = 0 where user_id = (select id from auth.users where email = $1)`,
+    [host.email],
+  );
+  // the gallery link scheduled from the app's API (as its dialog does), for 09:00 Los Angeles time
+  const year = new Date().getUTCFullYear() + 1;
+  const res = await page.evaluate(
+    async ({ id, year }) => {
+      const r = await fetch(`/api/invitations/${id}/schedule`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          kind: 'gallery_link',
+          date: `${year}-03-01`,
+          time: '09:00',
+          timeZone: 'America/Los_Angeles',
+        }),
+      });
+      return { status: r.status, body: await r.json() };
+    },
+    { id: host.id, year },
+  );
+  expect(res.status).toBe(200);
+  expect(res.body.send.runAt).toBe(`${year}-03-01T17:00:00+00:00`);
+
+  await sql(`update scheduled_sends set run_at = now() - interval '1 second' where invitation_id = $1`, [
+    host.id,
+  ]);
+  const turn = await request.post('/api/cron/tick', { headers: { authorization: `Bearer ${CRON}` } });
+  const body = await turn.json();
+  expect(body.scheduled).toEqual({ ran: 1, done: 0, failed: 1 });
+  expect(body.failureMails).toBe(1);
+  const [failed] = await sql<{ status: string; error: string; needed: number; mailed: boolean }>(
+    `select status, error, (result->>'needed')::int as needed, failure_mailed_at is not null as mailed
+       from scheduled_sends where invitation_id = $1`,
+    [host.id],
+  );
+  expect(failed).toEqual({ status: 'failed', error: 'credits', needed: 1, mailed: true });
+  // the log of emails has it (the local stack sends no real email: "skipped")
+  const [logged] = await sql<{ n: number }>(
+    `select count(*)::int as n from email_log where kind = 'scheduled_send' and created_at > now() - interval '5 minutes'`,
+  );
+  expect(logged!.n).toBeGreaterThanOrEqual(1);
+  // never twice
+  const again = await request.post('/api/cron/tick', { headers: { authorization: `Bearer ${CRON}` } });
+  expect((await again.json()).failureMails).toBe(0);
+
+  // the dialog says why
+  await open(page, `/app/invitations/${host.id}/gallery`);
+  await page.getByTestId('gallery-send-links').click();
+  await expect(page.getByRole('dialog').getByTestId('schedule-gallery_link-last')).toContainText(
+    'לא היו מספיק קרדיטים',
+  );
 });

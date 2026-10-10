@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { FEATURES, NO_OVERRIDES } from '@/features/flags/features';
+import { TEMPLATES } from '@/features/invitations/templates/registry';
+import { seedDocument } from '@/features/invitations/templates/seed-document';
 import { isTimeZone, localExists, localMoment, localParts, zoneCity } from '@/features/scheduler/time';
 import type { ScheduledSend } from '@/features/scheduler/types';
 
@@ -11,6 +13,19 @@ import type { ScheduledSend } from '@/features/scheduler/types';
 vi.mock('server-only', () => ({}));
 const api = await import('@/features/scheduler/server/api');
 const run = await import('@/features/scheduler/server/run');
+const email = await import('@/features/scheduler/server/email');
+
+const { manifest, defaults } = TEMPLATES.get('sahar-bordeaux')!;
+const doc = seedDocument(manifest, defaults, {
+  eventType: 'wedding',
+  locales: ['he', 'en'],
+  defaultLocale: 'he',
+  hosts: { primary: { he: 'נועה', en: 'Noa' }, secondary: { he: 'איתי', en: 'Itay' } },
+  date: '2027-06-17',
+  startTime: '19:30',
+  endTime: '01:00',
+  timezone: 'Asia/Jerusalem',
+});
 
 describe('a date and a time in a time zone', () => {
   it('is the moment it means there, daylight saving included', () => {
@@ -213,5 +228,85 @@ describe('the clock’s turn', () => {
     expect(await run.processScheduledSends(deps)).toEqual({ ran: 1, done: 0, failed: 0 });
     expect(deps.db.finish).not.toHaveBeenCalled();
     spy.mockRestore();
+  });
+});
+
+describe('a scheduled send that didn’t go out: the host’s email', () => {
+  const failed = {
+    kind: 'album_thanks' as const,
+    runAt: '2027-06-18T19:00:00Z',
+    timeZone: 'America/New_York',
+    error: 'credits',
+    result: { needed: 40, balance: 3 },
+  };
+  const urls = {
+    sendUrl: 'https://x.test/app/invitations/i/gallery',
+    billingUrl: 'https://x.test/app/billing',
+  };
+
+  it('what, when on the clock picked (the zone named), why, and what to do', () => {
+    const e = email.failedEmail({ send: failed, doc, ...urls, brand: 'Badook' });
+    expect(e.subject).toBe('השליחה המתוזמנת לא יצאה — נועה & איתי');
+    expect(e.text).toContain('התודה עם האלבום');
+    // 15:00 New York time — not Israel's 22:00
+    expect(e.text).toContain('15:00');
+    expect(e.text).not.toContain('22:00');
+    expect(e.text).toContain('New York');
+    expect(e.text).toContain('היה צריך 40, היו 3');
+    expect(e.text).toContain('https://x.test/app/billing');
+    expect(e.html).toContain(urls.sendUrl);
+    // another reason: no billing link
+    const off = email.failedEmail({
+      send: { ...failed, error: 'no_album', result: null },
+      doc,
+      ...urls,
+      brand: 'B',
+    });
+    expect(off.text).toContain('האלבום היה כבוי');
+    expect(off.text).not.toContain('billing');
+    // an English host
+    const en = email.failedEmail({
+      send: failed,
+      doc: { ...doc, defaultLocale: 'en', locales: ['en'] },
+      ...urls,
+      brand: 'B',
+    });
+    expect(en.subject).toBe('Noa & Itay — your scheduled send didn’t go out');
+    expect(en.text).toContain('15:00');
+  });
+
+  it('once each: marked after it went; one that couldn’t go is tried again; nobody to write to is marked', async () => {
+    const row = (id: string, ownerEmail: string | null) => ({
+      ...failed,
+      id,
+      invitationId: 'i',
+      ownerId: OWNER,
+      date: '2027-06-18',
+      time: '15:00',
+      audience: 'unsent' as const,
+      status: 'failed' as const,
+      attempts: 1,
+      createdAt: '',
+      finishedAt: '',
+      ownerEmail,
+      slug: 'noa-and-itay',
+      document: doc,
+    });
+    const deps = {
+      db: {
+        failures: vi.fn(async () => [
+          row('a', 'host@example.com'),
+          row('b', 'down@example.com'),
+          row('c', null),
+        ]),
+        failureMailed: vi.fn(async (_id: string) => true),
+      },
+      send: vi.fn(async (m: { to: string }) => m.to !== 'down@example.com'),
+      base: 'https://x.test',
+      brand: 'Badook',
+    };
+    expect(await email.mailFailedSends(deps)).toEqual({ mailed: 1 });
+    expect(deps.send).toHaveBeenCalledTimes(2);
+    expect(deps.db.failureMailed.mock.calls.map(([id]) => id)).toEqual(['a', 'c']);
   });
 });

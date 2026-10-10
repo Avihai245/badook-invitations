@@ -155,6 +155,28 @@ describe('a scheduled send', () => {
   });
 });
 
+describe('the host told when a send didn’t go out', () => {
+  it('the failed ones — a run that died too — with the owner’s address, once each', async () => {
+    const failures = () =>
+      commit<{ id: string; error: string; ownerEmail: string; slug: string; document: unknown }[]>(
+        'scheduled_send_failures',
+        [20],
+      );
+    // the album's send that timed out (above)
+    const before = await failures();
+    expect(before.map((f) => [f.error, f.ownerEmail, f.slug])).toEqual([
+      ['timeout', 'clock-owner@example.com', 'clock-test'],
+    ]);
+    expect(before[0]!.document).toBeTruthy();
+    expect(await commit('scheduled_send_failure_mailed', [before[0]!.id])).toBe(true);
+    expect(await commit('scheduled_send_failure_mailed', [before[0]!.id])).toBe(false);
+    expect(await failures()).toEqual([]);
+    // a done send is never one of them
+    const done = await c.query(`select id from scheduled_sends where status = 'done' limit 1`);
+    expect(await commit('scheduled_send_failure_mailed', [done.rows[0].id])).toBe(false);
+  });
+});
+
 describe('the RSVP summary at the host’s morning', () => {
   it('due once 08:00 has come in the invitation’s own time zone, and not again that day', async () => {
     await c.query(`insert into invitation_notifications (invitation_id, mode) values ($1, 'digest')`, [inv]);
@@ -206,6 +228,7 @@ describe('the scheduler', () => {
     for (const role of ['anon', 'authenticated'] as const)
       for (const sql of [
         `select public.scheduled_send_list($1, $2)`,
+        `select public.scheduled_send_failures(1) where $1::uuid is not null and $2::uuid is not null`,
         `select public.scheduled_send_claim(1, $1::int + 0 * length($2::text))`,
         `select public.cron_secret() where $1::uuid is not null and $2::uuid is not null`,
         `select public.app_cron_call('/x') where $1::uuid is not null and $2::uuid is not null`,

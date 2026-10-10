@@ -33,7 +33,12 @@ vi.mock('@/features/planning/server/reminders', () => ({ sendPlanReminders }));
 // what hosts scheduled (features/scheduler) and the album's emails (features/album)
 const processScheduledSends = vi.fn(async () => ({ ran: 0, done: 0, failed: 0 }));
 vi.mock('@/features/scheduler/server/run', () => ({ processScheduledSends }));
-vi.mock('@/features/scheduler/server/deps', () => ({ scheduleRunDeps: () => ({}) }));
+vi.mock('@/features/scheduler/server/deps', () => ({
+  scheduleRunDeps: () => ({}),
+  failureMailDeps: () => ({}),
+}));
+const mailFailedSends = vi.fn(async () => ({ mailed: 0 }));
+vi.mock('@/features/scheduler/server/email', () => ({ mailFailedSends }));
 const sendAlbumReadyEmails = vi.fn(async () => ({ sent: 0, skipped: 0, failed: 0 }));
 vi.mock('@/features/album/server/ready', () => ({ sendAlbumReadyEmails }));
 vi.mock('@/features/album/server/deps', () => ({ readyDeps: () => ({}) }));
@@ -176,6 +181,7 @@ describe('the app’s own clock (tick)', () => {
     database([false, false, false]);
     expect(await runClock(later())).toEqual({
       scheduled: { ran: 0, done: 0, failed: 0 },
+      failureMails: 0,
       whatsapp: false,
       local: false,
       daily: false,

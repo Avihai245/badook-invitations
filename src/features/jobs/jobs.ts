@@ -22,7 +22,8 @@ import { studioHousekeeping } from '@/features/review/server/housekeeping';
 import { supportHousekeeping } from '@/features/support/tickets/server/housekeeping';
 import { voiceDeps } from '@/features/voice/server/deps';
 import { processVoice } from '@/features/voice/server/voice';
-import { scheduleRunDeps } from '@/features/scheduler/server/deps';
+import { failureMailDeps, scheduleRunDeps } from '@/features/scheduler/server/deps';
+import { mailFailedSends } from '@/features/scheduler/server/email';
 import { processScheduledSends } from '@/features/scheduler/server/run';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { processQueue } from '@/features/whatsapp/sender';
@@ -199,6 +200,8 @@ export async function runJob<T>(
 export async function runClock(now = Date.now()) {
   const at = new Date(now);
   const scheduled = await processScheduledSends(scheduleRunDeps());
+  // a scheduled send that didn't go out: its host gets an email (once; tried again next turn)
+  const failureMails = await mailFailedSends(failureMailDeps());
   let whatsapp: { ran: boolean } = { ran: false };
   if (cloudApiConfigured())
     whatsapp = await runJob('whatsapp', new Date(now - WHATSAPP_EVERY_MS), 120, () =>
@@ -218,7 +221,13 @@ export async function runClock(now = Date.now()) {
   const daily = await runJob('daily', dailyDue(at), 15 * 60, () => runDaily(at)).catch(
     (err) => (console.error('[jobs] daily failed', err), { ran: false as const }),
   );
-  return { scheduled, whatsapp: whatsapp.ran, local: local.ran, daily: daily.ran };
+  return {
+    scheduled,
+    failureMails: failureMails.mailed,
+    whatsapp: whatsapp.ran,
+    local: local.ran,
+    daily: daily.ran,
+  };
 }
 
 /** How often one server looks for due jobs on its own traffic. */
