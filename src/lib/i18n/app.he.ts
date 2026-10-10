@@ -14,6 +14,7 @@ import { facesHe } from './faces.he';
 import { filmHe } from './film.he';
 import { albumHe } from './album.he';
 import { aiPhotosHe } from './ai-photos.he';
+import { scheduleHe } from './schedule.he';
 import { planningHe } from './planning.he';
 import { heCore } from './app-core.he';
 import { heMore } from './app-more.he';
@@ -41,6 +42,7 @@ export const he = {
   film: filmHe,
   album: albumHe,
   aiPhotos: aiPhotosHe,
+  schedule: scheduleHe,
   planning: planningHe,
 };
 
@@ -83,6 +85,7 @@ export type AppOnlyKey =
   | 'film'
   | 'album'
   | 'aiPhotos'
+  | 'schedule'
   | 'planning';
 /** What the public pages' client components get (provider-lazy `site`). */
 export type SiteDict = Omit<AppDict, AppOnlyKey>;

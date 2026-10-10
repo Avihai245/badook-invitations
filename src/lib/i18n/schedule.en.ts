@@ -1,0 +1,53 @@
+import type { ScheduleDict } from './schedule.he';
+
+/** Scheduling a send for later (features/scheduler) — English. */
+export const scheduleEn: ScheduleDict = {
+  open: 'Schedule for later',
+  openHint: 'Pick a date, a time and a time zone — it goes out exactly then, even with this page closed.',
+  title: 'Send on the date and at the time you choose',
+  date: 'Date',
+  time: 'Time',
+  zone: 'Time zone',
+  zoneEvent: 'The event’s — {city}',
+  zoneMine: 'Mine — {city}',
+  zoneOther: 'Other time zones',
+  audience: 'To',
+  audienceUnsent: 'Guests who haven’t got it',
+  audienceAll: 'Everyone it can reach',
+  willSend: 'Goes out on {when}, {city} time.',
+  alsoEvent: 'The event’s time ({city}): {when}.',
+  alsoMine: 'Your time ({city}): {when}.',
+  save: 'Schedule it',
+  saved: 'Scheduled',
+  back: 'Back',
+  scheduled: 'Scheduled for {when}, {city} time',
+  scheduledFor: { unsent: 'to guests who haven’t got it by then', all: 'to everyone it can reach' },
+  change: 'Change',
+  cancel: 'Cancel the schedule',
+  canceled: 'Schedule canceled',
+  running: 'The scheduled send is going out now…',
+  done: {
+    one: 'The scheduled send went out on {when}: one message',
+    other: 'The scheduled send went out on {when}: {n} messages',
+  },
+  failed: 'The send scheduled for {when} didn’t go out: {reason}',
+  reasons: {
+    credits: 'not enough credits',
+    not_configured: 'sending from the official number wasn’t available',
+    feature_off: 'it isn’t in your plan',
+    no_gallery: 'the gallery was off',
+    no_album: 'the album was off',
+    timeout: 'the send didn’t finish',
+    other: 'something went wrong',
+  },
+  errors: {
+    past: 'That time has passed — pick a future one.',
+    too_far: 'You can schedule up to 400 days ahead.',
+    time_zone: 'Unknown time zone. Pick another.',
+    no_such_time:
+      'That time doesn’t exist on that day in this time zone (the clocks jump forward). Pick another.',
+    running: 'It’s going out right now.',
+    not_configured: 'Sending from the official number isn’t available yet.',
+    failed: 'Something went wrong. Try again.',
+  },
+};

@@ -329,6 +329,14 @@ const FUNCTIONS = new Set([
   'planning_templates_list',
   'planning_template_get',
   'planning_template_delete',
+  // the clock: scheduled sends, the RSVP summary at the host's morning (supabase/migrations/*_scheduled_sends.sql)
+  'scheduled_send_set',
+  'scheduled_send_cancel',
+  'scheduled_send_list',
+  'scheduled_send_claim',
+  'scheduled_send_finish',
+  'rsvp_digest_due_local',
+  'cron_secret',
   // the album after the event (supabase/migrations/*_album.sql)
   'album_owner_get',
   'album_owner_ensure',

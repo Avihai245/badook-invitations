@@ -14,6 +14,7 @@ import {
   type TemplateLanguage,
 } from '@/features/whatsapp/languages';
 import { ALBUM_MESSAGE, albumLinkIn } from '@/features/album/messages';
+import { ScheduleSend } from '@/features/scheduler/ui/ScheduleSend';
 import { ALBUM_TEMPLATE_TEXT, fillTemplate, GALLERY_TEMPLATE_TEXT } from '@/features/whatsapp/template-text';
 import { fmt as format } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
@@ -518,6 +519,10 @@ export function SendLinkDialog({
               </div>
               <p className="text-[12px] text-muted">{N.previewHint}</p>
             </div>
+          ) : null}
+          {/* or later: on a date and at a time the host picks, on the clock of the time zone they pick */}
+          {data.ready ? (
+            <ScheduleSend invitationId={id} kind={album ? 'album_thanks' : 'gallery_link'} />
           ) : null}
         </div>
       )}

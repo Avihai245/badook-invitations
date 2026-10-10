@@ -22,19 +22,22 @@ import { studioHousekeeping } from '@/features/review/server/housekeeping';
 import { supportHousekeeping } from '@/features/support/tickets/server/housekeeping';
 import { voiceDeps } from '@/features/voice/server/deps';
 import { processVoice } from '@/features/voice/server/voice';
+import { scheduleRunDeps } from '@/features/scheduler/server/deps';
+import { processScheduledSends } from '@/features/scheduler/server/run';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
 import { processQueue } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
 import { serviceDb } from '@/lib/supabase/server';
-import { dailyDue, WHATSAPP_EVERY_MS } from './schedule';
+import { dailyDue, LOCAL_EVERY_MS, WHATSAPP_EVERY_MS } from './schedule';
 
 /**
- * The app's recurring jobs. A scheduler may call them (/api/cron/*, .github/workflows), and the app
- * runs them by itself too — on its own traffic (tick) — so nothing waits on a schedule that isn't set
- * up or doesn't fire. The database decides who runs a job (app_job_claim): each runs once per turn.
+ * The app's recurring jobs. Supabase's pg_cron calls the app's clock every minute (POST /api/cron/tick,
+ * supabase/migrations/*_cron_schedule.sql), and the app runs it by itself too — on its own traffic
+ * (tick) — so nothing waits on a schedule that doesn't fire. The database decides who runs a job
+ * (app_job_claim): each runs once per turn.
  */
 
-export type JobName = 'daily' | 'whatsapp';
+export type JobName = 'daily' | 'whatsapp' | 'local';
 
 /**
  * The daily run: the hosts' RSVP summaries, the purge, the billing checks, the templates sync, the
@@ -93,17 +96,12 @@ export async function runDaily(now: Date) {
   const aiPhotos = await aiPhotosHousekeeping().catch(
     (err) => (console.error('ai photos housekeeping failed', err), null),
   );
-  // the morning after: the hosts whose album just became ready get its link (features/album)
-  const album = await sendAlbumReadyEmails(now, readyDeps()).catch(
-    (err) => (console.error('album ready emails failed', err), null),
-  );
   // the hosts' path through the app (features/analytics) is kept 400 days
   const { data: hostEvents, error: hostEventsError } = await serviceDb().rpc('host_events_purge');
   if (hostEventsError) console.error('host_events_purge failed', hostEventsError.message);
   return {
     ...digests,
     planning,
-    album,
     aiPhotos,
     hostEvents: (hostEvents as number | null) ?? null,
     purged: (purged as number | null) ?? null,
@@ -147,6 +145,19 @@ export async function runWhatsAppQueue(budgetMs: number) {
   return total;
 }
 
+/**
+ * What happens at a local time — each event's own: the album's "it's ready" email once its morning
+ * after has come there (08:00 in the event's time zone), and the RSVP summaries at 08:00 in each
+ * invitation's. Looked at every few minutes, so a New York event's goes out at New York's 08:00.
+ */
+export async function runLocalTime(now: Date) {
+  const album = await sendAlbumReadyEmails(now, readyDeps()).catch(
+    (err) => (console.error('album ready emails failed', err), null),
+  );
+  const digests = await sendDigests(now).catch((err) => (console.error('rsvp digests failed', err), null));
+  return { album, digests };
+}
+
 /** Records that `name` has just run (the app's own turn, or a scheduler's call): not due again until its next turn. */
 export async function jobDone(name: JobName): Promise<void> {
   const { error } = await serviceDb().rpc('app_job_done', { p_name: name });
@@ -178,16 +189,47 @@ export async function runJob<T>(
   return { ran: true, result };
 }
 
+/**
+ * One turn of the clock (pg_cron's call every minute, or the app's own on its traffic): first what
+ * hosts scheduled for now — at the date and time they picked, in the time zone they picked — then the
+ * WhatsApp queue every couple of minutes, the invitations read aloud, the AI photos, what happens at
+ * each event's local time every few minutes, and the daily run once a day (06:00 UTC: the
+ * housekeeping). Each part is guarded on its own; the turn never throws.
+ */
+export async function runClock(now = Date.now()) {
+  const at = new Date(now);
+  const scheduled = await processScheduledSends(scheduleRunDeps());
+  let whatsapp: { ran: boolean } = { ran: false };
+  if (cloudApiConfigured())
+    whatsapp = await runJob('whatsapp', new Date(now - WHATSAPP_EVERY_MS), 120, () =>
+      runWhatsAppQueue(15_000),
+    ).catch((err) => (console.error('[jobs] whatsapp failed', err), { ran: false }));
+  // the invitations read aloud: what publishes queued, and retries that are due (each language is
+  // taken by one server: voice_claim)
+  await processVoice(null, voiceDeps()).catch((err) => console.error('[jobs] voice failed', err));
+  // the AI photos: those working in OpenAI's background are checked, one queued photo is started
+  // (a guest's request starts its own at once; this picks up what a stopped server left)
+  const env = serverEnv();
+  if (env.INVITES_AI_IMAGE_API_KEY || env.OPENAI_API_KEY)
+    await processAiPhotos(null, aiWorkerDeps(), { starts: 1 });
+  const local = await runJob('local', new Date(now - LOCAL_EVERY_MS), 5 * 60, () => runLocalTime(at)).catch(
+    (err) => (console.error('[jobs] local time failed', err), { ran: false as const }),
+  );
+  const daily = await runJob('daily', dailyDue(at), 15 * 60, () => runDaily(at)).catch(
+    (err) => (console.error('[jobs] daily failed', err), { ran: false as const }),
+  );
+  return { scheduled, whatsapp: whatsapp.ran, local: local.ran, daily: daily.ran };
+}
+
 /** How often one server looks for due jobs on its own traffic. */
 const TICK_EVERY_MS = 60_000;
 let lastTick = 0;
 let ticking: Promise<void> | null = null;
 
 /**
- * The app's own clock: called on its traffic (a host's page, a guest's reply, WhatsApp's status
- * notices), at most once a minute per server; runs the WhatsApp queue every couple of minutes and
- * the daily run once a day (06:00 UTC, like the workflow). Never throws. Off with
- * INVITES_JOBS_FALLBACK=off (the end-to-end tests, which drive the queue themselves).
+ * The app's own clock, besides pg_cron's: called on its traffic (a host's page, a guest's reply,
+ * WhatsApp's status notices), at most once a minute per server (runClock). Never throws. Off with
+ * INVITES_JOBS_FALLBACK=off (the end-to-end tests, which drive the clock themselves).
  */
 export function tick(now = Date.now()): Promise<void> {
   if (ticking || now - lastTick < TICK_EVERY_MS) return ticking ?? Promise.resolve();
@@ -195,17 +237,7 @@ export function tick(now = Date.now()): Promise<void> {
   lastTick = now;
   ticking = (async () => {
     try {
-      if (cloudApiConfigured())
-        await runJob('whatsapp', new Date(now - WHATSAPP_EVERY_MS), 120, () => runWhatsAppQueue(15_000));
-      // the invitations read aloud: what publishes queued, and retries that are due (each language is
-      // taken by one server: voice_claim)
-      await processVoice(null, voiceDeps()).catch((err) => console.error('[jobs] voice failed', err));
-      // the AI photos: those working in OpenAI's background are checked, one queued photo is started
-      // (a guest's request starts its own at once; this picks up what a stopped server left)
-      const env = serverEnv();
-      if (env.INVITES_AI_IMAGE_API_KEY || env.OPENAI_API_KEY)
-        await processAiPhotos(null, aiWorkerDeps(), { starts: 1 });
-      await runJob('daily', dailyDue(new Date(now)), 15 * 60, () => runDaily(new Date(now)));
+      await runClock(now);
     } catch (err) {
       console.error('[jobs] tick failed', err);
     }

@@ -1,6 +1,9 @@
 /** The daily run's hour: 06:00 UTC — 09:00 in Israel in summer, 08:00 in winter. */
 export const DAILY_AT_UTC_HOUR = 6;
 
+/** What happens at each event's local time (the album's email, the RSVP summaries) is looked at this often. */
+export const LOCAL_EVERY_MS = 5 * 60_000;
+
 /** The WhatsApp queue is looked at every couple of minutes. */
 export const WHATSAPP_EVERY_MS = 2 * 60_000;
 

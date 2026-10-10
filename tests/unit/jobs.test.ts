@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // The app's recurring jobs (features/jobs): when the daily run is due, the database deciding who runs
-// a job, and the app's own clock on its traffic.
+// a job, and the clock (pg_cron's call every minute, or the app's own on its traffic): what hosts
+// scheduled first, then the WhatsApp queue, what happens at each event's local time, the daily run.
 
 vi.mock('server-only', () => ({}));
 
@@ -29,8 +30,16 @@ vi.mock('@/features/event-day/server/housekeeping', () => ({ eventDayHousekeepin
 const sendPlanReminders = vi.fn(async () => ({ sent: 0, skipped: 0, failed: 0 }));
 vi.mock('@/features/planning/server/reminders', () => ({ sendPlanReminders }));
 
+// what hosts scheduled (features/scheduler) and the album's emails (features/album)
+const processScheduledSends = vi.fn(async () => ({ ran: 0, done: 0, failed: 0 }));
+vi.mock('@/features/scheduler/server/run', () => ({ processScheduledSends }));
+vi.mock('@/features/scheduler/server/deps', () => ({ scheduleRunDeps: () => ({}) }));
+const sendAlbumReadyEmails = vi.fn(async () => ({ sent: 0, skipped: 0, failed: 0 }));
+vi.mock('@/features/album/server/ready', () => ({ sendAlbumReadyEmails }));
+vi.mock('@/features/album/server/deps', () => ({ readyDeps: () => ({}) }));
+
 const { dailyDue } = await import('@/features/jobs/schedule');
-const { runJob, runWhatsAppQueue, tick } = await import('@/features/jobs/jobs');
+const { runClock, runJob, runWhatsAppQueue, tick } = await import('@/features/jobs/jobs');
 
 /** rpc answers: app_job_claim → `claims` (in order), purge_expired → a count, the rest → null. */
 function database(claims: boolean[]) {
@@ -46,6 +55,8 @@ beforeEach(() => {
   rpc.mockReset();
   processQueue.mockClear();
   sendDigests.mockClear();
+  processScheduledSends.mockClear();
+  sendAlbumReadyEmails.mockClear();
   env.INVITES_JOBS_FALLBACK = true;
   configured = true;
 });
@@ -119,35 +130,70 @@ describe('the app’s own clock (tick)', () => {
   let now = Date.parse('2026-09-24T08:00:00Z');
   const later = () => (now += 10 * 60_000);
 
-  it('runs the WhatsApp queue and the daily run when they are due', async () => {
-    database([true, true]);
+  it('what hosts scheduled first, then the WhatsApp queue, the local times and the daily run when due', async () => {
+    database([true, true, true]);
     await tick(later());
+    expect(processScheduledSends).toHaveBeenCalledTimes(1);
     expect(called('app_job_claim').map(([, a]) => (a as { p_name: string }).p_name)).toEqual([
       'whatsapp',
+      'local',
       'daily',
     ]);
     expect(processQueue).toHaveBeenCalled();
+    // at each event's own local time: the album's email and the RSVP summaries
+    expect(sendAlbumReadyEmails).toHaveBeenCalled();
     expect(sendDigests).toHaveBeenCalled();
     // the daily run keeps the privacy policy's promise about arrivals too
     expect(eventDayHousekeeping).toHaveBeenCalled();
-    expect(called('app_job_done')).toHaveLength(2);
+    expect(called('app_job_done')).toHaveLength(3);
+  });
+
+  it('the local times are looked at every five minutes', async () => {
+    database([false, true, false]);
+    const t = later();
+    await tick(t);
+    expect(
+      called('app_job_claim').find(([, a]) => (a as { p_name: string }).p_name === 'local')?.[1],
+    ).toEqual({
+      p_name: 'local',
+      p_due: new Date(t - 5 * 60_000).toISOString(),
+      p_lease_seconds: 300,
+    });
   });
 
   it('looks at most once a minute per server', async () => {
-    database([false, false]);
+    database([false, false, false]);
     const t = later();
     await tick(t);
     await tick(t + 30_000);
-    expect(called('app_job_claim')).toHaveLength(2);
+    expect(called('app_job_claim')).toHaveLength(3);
     await tick(t + 61_000);
-    expect(called('app_job_claim')).toHaveLength(2 + 2);
+    expect(called('app_job_claim')).toHaveLength(3 + 3);
   });
 
-  it('without WhatsApp set up: only the daily run; switched off: nothing', async () => {
+  it('pg_cron’s call turns the clock even when the app’s own is off; scheduled sends every turn', async () => {
+    env.INVITES_JOBS_FALLBACK = false;
+    database([false, false, false]);
+    expect(await runClock(later())).toEqual({
+      scheduled: { ran: 0, done: 0, failed: 0 },
+      whatsapp: false,
+      local: false,
+      daily: false,
+    });
+    processScheduledSends.mockResolvedValueOnce({ ran: 1, done: 1, failed: 0 });
+    database([false, false, false]);
+    expect((await runClock(later())).scheduled).toEqual({ ran: 1, done: 1, failed: 0 });
+    expect(processScheduledSends).toHaveBeenCalledTimes(2);
+  });
+
+  it('without WhatsApp set up: no queue; switched off: nothing', async () => {
     configured = false;
-    database([false]);
+    database([false, false]);
     await tick(later());
-    expect(called('app_job_claim').map(([, a]) => (a as { p_name: string }).p_name)).toEqual(['daily']);
+    expect(called('app_job_claim').map(([, a]) => (a as { p_name: string }).p_name)).toEqual([
+      'local',
+      'daily',
+    ]);
     rpc.mockReset();
     env.INVITES_JOBS_FALLBACK = false;
     await tick(later());
