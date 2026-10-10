@@ -5,7 +5,7 @@ import { hostLanguageOf } from '@/features/invitations/lib/locales';
 import { emailLayout, escapeHtml, type EmailContent } from '@/features/invitations/lib/notify-email';
 import { hostsLine } from '@/features/invitations/lib/text';
 import { fmt } from '@/lib/i18n/app';
-import { zoneCity } from '../time';
+import { localMoment, zoneCity } from '../time';
 import type { ScheduledSend, SendKind } from '../types';
 import type { ScheduleDb } from './db';
 
@@ -76,6 +76,46 @@ type Reason = keyof (typeof TEXT)['he']['reasons'];
 const reasonOf = (error: string | null): Reason =>
   error && error in TEXT.he.reasons ? (error as Reason) : 'other';
 
+/**
+ * What a failed send was, as the host reads it — the same words in the email and in the WhatsApp
+ * message: what it was, when it was for on the clock of the time zone they picked (and that zone's
+ * city), and why, in the invitation's host language (Hebrew, else English).
+ */
+export function failureParts(
+  send: Pick<ScheduledSend, 'kind' | 'runAt' | 'timeZone' | 'error' | 'result'> &
+    Partial<Pick<ScheduledSend, 'date' | 'time'>>,
+  doc: InvitationDocument,
+): { locale: 'he' | 'en'; reason: Reason; what: string; when: string; city: string; why: string } {
+  const locale = hostLanguageOf(doc);
+  const t = TEXT[locale];
+  const reason = reasonOf(send.error);
+  const when = new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
+    timeZone: send.timeZone,
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(
+    // the date and the time as the host picked them (the moment they mean there); else the moment
+    send.date && send.time ? localMoment(send.date, send.time, send.timeZone) : new Date(send.runAt),
+  );
+  const result = send.result ?? {};
+  return {
+    locale,
+    reason,
+    what: t.what[send.kind],
+    when,
+    city: zoneCity(send.timeZone),
+    why: fmt(t.reasons[reason], {
+      needed: String(result.needed ?? '?'),
+      balance: String(result.balance ?? 0),
+    }),
+  };
+}
+
 /** The email for a failed send. */
 export function failedEmail(opts: {
   send: Pick<ScheduledSend, 'kind' | 'runAt' | 'timeZone' | 'error' | 'result'>;
@@ -85,30 +125,11 @@ export function failedEmail(opts: {
   billingUrl: string;
   brand: string;
 }): EmailContent {
-  const locale = hostLanguageOf(opts.doc);
+  const p = failureParts(opts.send, opts.doc);
+  const { locale, reason } = p;
   const t = TEXT[locale];
   const names = hostsLine(opts.doc.hosts, locale) || hostsLine(opts.doc.hosts, opts.doc.defaultLocale);
-  const reason = reasonOf(opts.send.error);
-  const when = new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
-    timeZone: opts.send.timeZone,
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(opts.send.runAt));
-  const result = opts.send.result ?? {};
-  const body = fmt(t.body, {
-    what: t.what[opts.send.kind],
-    when,
-    city: zoneCity(opts.send.timeZone),
-    reason: fmt(t.reasons[reason], {
-      needed: String(result.needed ?? '?'),
-      balance: String(result.balance ?? 0),
-    }),
-  });
+  const body = fmt(t.body, { what: p.what, when: p.when, city: p.city, reason: p.why });
   const fix =
     reason === 'credits' || reason === 'no_gallery' || reason === 'no_album' ? t.fix[reason] : t.fix.other;
   const billing =

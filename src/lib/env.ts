@@ -158,6 +158,9 @@ const ServerEnvSchema = z.object({
   INVITES_WHATSAPP_EVENT_TEMPLATE: z.string().trim().default(''),
   // the thank-you after the event, without an album
   INVITES_WHATSAPP_THANKS_TEMPLATE: z.string().trim().default(''),
+  // the alert to a host whose scheduled send didn't go out (features/scheduler, docs/whatsapp-setup.md
+  // §14), to the phone on their account, once Meta approved it; empty: the email only
+  INVITES_WHATSAPP_HOST_ALERT_TEMPLATE: z.string().trim().default(''),
   INVITES_WHATSAPP_API_VERSION: z.string().trim().min(2).default('v26.0'),
   INVITES_WHATSAPP_API_BASE: z
     .url()

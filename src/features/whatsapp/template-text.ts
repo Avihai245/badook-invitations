@@ -273,3 +273,23 @@ export const THANKS_TEMPLATE_TEXT: Record<Locale, TemplateText> = {
     footer: 'በBadook የተላከ',
   },
 };
+
+/**
+ * The alert to a host whose scheduled send didn't go out (badook_host_alert, docs/whatsapp-setup.md §14;
+ * features/scheduler): {{1}} what it was · {{2}} when it was for, on the clock the host picked, with
+ * that zone's city · {{3}} why. The button opens the invitation's gallery tab, where its dialog sends it
+ * again (URL https://<site>/app/invitations/{{1}}: the suffix is "<id>/gallery"). Hebrew and English —
+ * the host's language.
+ */
+export const HOST_ALERT_TEMPLATE_TEXT: Record<'he' | 'en', TemplateText> = {
+  he: {
+    body: '⚠️ השליחה המתוזמנת לא יצאה\n{{1}} שתוזמן ל־{{2}} לא נשלח לאורחים: {{3}}.\nאף אורח לא קיבל הודעה ולא ירדו קרדיטים. אפשר לשלוח שוב בכפתור למטה.',
+    button: 'לשליחה מחדש',
+    footer: 'הודעת מערכת מ־Badook',
+  },
+  en: {
+    body: '⚠️ Your scheduled send didn’t go out\n{{1}} scheduled for {{2}} wasn’t sent to your guests: {{3}}.\nNo guest got a message and no credits were used. Tap the button below to send it again.',
+    button: 'Send it again',
+    footer: 'A system message from Badook',
+  },
+};

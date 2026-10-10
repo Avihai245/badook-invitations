@@ -177,6 +177,31 @@ describe('the host told when a send didn’t go out', () => {
   });
 });
 
+describe('the host’s WhatsApp alert when a send didn’t go out', () => {
+  it('the failed ones with the account’s phone and whether WhatsApp may reach it; once each', async () => {
+    const alerts = () =>
+      commit<{ id: string; ownerPhone: string | null; reach: string; document: unknown }[]>(
+        'scheduled_send_failure_alerts',
+        [20],
+      );
+    // no phone on the account yet
+    await commit('account_get', [OWNER]);
+    const first = await alerts();
+    expect(first.map((a) => [a.ownerPhone, a.reach])).toEqual([[null, 'none']]);
+    expect(first[0]!.document).toBeTruthy();
+    await c.query(`update accounts set phone = '+972501234567' where user_id = $1`, [OWNER]);
+    expect((await alerts()).map((a) => [a.ownerPhone, a.reach])).toEqual([['+972501234567', 'ok']]);
+    await c.query(`insert into whatsapp_opt_outs (phone, source) values ('+972501234567', 'reply')`);
+    expect((await alerts())[0]!.reach).toBe('opted_out');
+    await c.query(`delete from whatsapp_opt_outs where phone = '+972501234567'`);
+    // recorded once; an outcome that isn't one is refused
+    expect(await commit('scheduled_send_failure_alerted', [first[0]!.id, 'maybe'])).toBe(false);
+    expect(await commit('scheduled_send_failure_alerted', [first[0]!.id, 'sent'])).toBe(true);
+    expect(await commit('scheduled_send_failure_alerted', [first[0]!.id, 'sent'])).toBe(false);
+    expect(await alerts()).toEqual([]);
+  });
+});
+
 describe('the RSVP summary at the host’s morning', () => {
   it('due once 08:00 has come in the invitation’s own time zone, and not again that day', async () => {
     await c.query(`insert into invitation_notifications (invitation_id, mode) values ($1, 'digest')`, [inv]);
@@ -229,6 +254,7 @@ describe('the scheduler', () => {
       for (const sql of [
         `select public.scheduled_send_list($1, $2)`,
         `select public.scheduled_send_failures(1) where $1::uuid is not null and $2::uuid is not null`,
+        `select public.scheduled_send_failure_alerts(1) where $1::uuid is not null and $2::uuid is not null`,
         `select public.scheduled_send_claim(1, $1::int + 0 * length($2::text))`,
         `select public.cron_secret() where $1::uuid is not null and $2::uuid is not null`,
         `select public.app_cron_call('/x') where $1::uuid is not null and $2::uuid is not null`,

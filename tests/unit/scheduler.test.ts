@@ -14,6 +14,7 @@ vi.mock('server-only', () => ({}));
 const api = await import('@/features/scheduler/server/api');
 const run = await import('@/features/scheduler/server/run');
 const email = await import('@/features/scheduler/server/email');
+const alerts = await import('@/features/scheduler/server/whatsapp');
 
 const { manifest, defaults } = TEMPLATES.get('sahar-bordeaux')!;
 const doc = seedDocument(manifest, defaults, {
@@ -308,5 +309,104 @@ describe('a scheduled send that didn’t go out: the host’s email', () => {
     expect(await email.mailFailedSends(deps)).toEqual({ mailed: 1 });
     expect(deps.send).toHaveBeenCalledTimes(2);
     expect(deps.db.failureMailed.mock.calls.map(([id]) => id)).toEqual(['a', 'c']);
+  });
+});
+
+describe('a scheduled send that didn’t go out: the host’s WhatsApp message', () => {
+  const he = { locale: 'he' as const, code: 'he' };
+  const en = { locale: 'en' as const, code: 'en_US' };
+  const alert = (id: string, over: Record<string, unknown> = {}) => ({
+    id,
+    invitationId: INV,
+    ownerId: OWNER,
+    kind: 'album_thanks' as const,
+    date: '2027-06-18',
+    time: '15:00',
+    timeZone: 'America/New_York',
+    runAt: '2027-06-18T19:00:00Z',
+    audience: 'unsent' as const,
+    status: 'failed' as const,
+    attempts: 1,
+    result: { needed: 40, balance: 3 },
+    error: 'credits',
+    createdAt: '',
+    finishedAt: '',
+    ownerPhone: '+972501234567',
+    reach: 'ok' as const,
+    document: doc,
+    ...over,
+  });
+
+  it('the template’s three values — what, when on the clock picked (the zone named), why — and the button', () => {
+    expect(alerts.alertMessage(alert('a'), 'badook_host_alert', he)).toEqual({
+      to: '+972501234567',
+      template: 'badook_host_alert',
+      lang: 'he',
+      body: [
+        'התודה עם האלבום',
+        expect.stringMatching(/15:00.*\(לפי שעון New York\)$/),
+        'לא היו מספיק קרדיטים (היה צריך 40, היו 3)',
+      ],
+      button: `${INV}/gallery`,
+      ref: 'alert:a',
+    });
+    const english = alerts.alertMessage(alert('a'), 'badook_host_alert', en)!;
+    expect(english.lang).toBe('en_US');
+    expect(english.body[0]).toBe('The thank-you with the album');
+    expect(english.body[1]).toMatch(/15:00 \(New York time\)$/);
+  });
+
+  function deps(
+    answers: Record<string, { ok: true; id: string } | { ok: false; error: string; retryable: boolean }>,
+  ) {
+    const sent: { to: string; lang: string }[] = [];
+    return {
+      sent,
+      d: {
+        db: {
+          failureAlerts: vi.fn(async () => [
+            alert('ok'),
+            alert('nophone', { ownerPhone: null, reach: 'none' }),
+            alert('optout', { reach: 'opted_out' }),
+            alert('busy', { ownerPhone: '+972500000009' }),
+            alert('bad', { ownerPhone: '+972500000000' }),
+          ]),
+          failureAlerted: vi.fn(async (_id: string, _o: string) => true),
+        },
+        template: 'badook_host_alert',
+        languages: () => [he, en],
+        send: vi.fn(async (m: { to: string; lang: string }) => {
+          sent.push(m);
+          return answers[`${m.to}:${m.lang}`] ?? { ok: true as const, id: 'wamid.1' };
+        }),
+      },
+    };
+  }
+
+  it('once each: sent; nobody to write to skipped; busy tried again next turn; refused recorded', async () => {
+    const { d } = deps({
+      '+972500000009:he': { ok: false, error: '130429 · rate', retryable: true },
+      '+972500000000:he': { ok: false, error: '131026 · not a WhatsApp user', retryable: false },
+    });
+    expect(await alerts.alertFailedSends(d)).toEqual({ sent: 1, skipped: 2, failed: 1 });
+    expect(d.db.failureAlerted.mock.calls).toEqual([
+      ['ok', 'sent'],
+      ['nophone', 'skipped'],
+      ['optout', 'skipped'],
+      ['bad', 'failed'],
+    ]);
+  });
+
+  it('the host’s language first; when Meta has no template in it, the next; no template set up: nothing', async () => {
+    const { d, sent } = deps({
+      '+972501234567:he': { ok: false, error: '132001 · no such template', retryable: false },
+    });
+    d.db.failureAlerts.mockResolvedValueOnce([alert('a')]);
+    expect(await alerts.alertFailedSends(d)).toEqual({ sent: 1, skipped: 0, failed: 0 });
+    expect(sent.map((m) => m.lang)).toEqual(['he', 'en_US']);
+    const off = deps({});
+    off.d.template = '';
+    expect(await alerts.alertFailedSends(off.d)).toEqual({ sent: 0, skipped: 0, failed: 0 });
+    expect(off.d.db.failureAlerts).not.toHaveBeenCalled();
   });
 });

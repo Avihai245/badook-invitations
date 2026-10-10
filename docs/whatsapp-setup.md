@@ -475,3 +475,51 @@ Footer: `Enviado con Badook` · Button: `Ver el álbum` · דוגמאות: `Dana
 הטקסטים בכל השפות: `REMINDER_TEMPLATE_TEXT`, `EVENT_TEMPLATE_TEXT`, `THANKS_TEMPLATE_TEXT` ב-`src/features/whatsapp/template-text.ts` (אותם טקסטים שהתצוגה המקדימה מציגה). מגישים כל אחד בכל שפה שב-`INVITES_WHATSAPP_TEMPLATE_LANGS`, Header ללא, Footer `נשלח באמצעות Badook`. התודה עם האלבום משתמשת בטמפלט מסעיף 10; אם האלבום לא זמין כשמגיע הזמן, נשלחת התודה בלי אלבום (אם אושרה), אחרת השלב לא נשלח.
 
 **איך התזמון רץ:** עם תור הוואטסאפ, שהשעון של המערכת מריץ כל 2 דקות (pg_cron קורא ל-`/api/cron/tick` כל דקה — `docs/scheduler.md`) המערכת מריצה כל שלב שהגיע זמנו, פעם אחת, בטרנזקציה אחת (`whatsapp_stage_run`): בוחרת נמענים, מורידה קרדיט לכל הודעה ומכניסה לתור — או לא מורידה כלום ומסמנת למה (חסרו קרדיטים, טמפלט לא מאושר, ההזמנה לא מפורסמת, הרצף לא בחבילה). שלב שאיחר ביותר מ-12 שעות (תזמון מושהה) מסומן "לא נשלח בזמן" ולא נשלח. הרצפים לפי חבילה: בסיסי ומתקדם בכל חבילה, חכם מ-Pro, פרימיום מ-Business (`PRESET_MIN_PLAN` ב-`src/features/whatsapp/schedule.ts`).
+
+## 14. הטמפלט של התראה למארח: שליחה מתוזמנת שלא יצאה
+
+כששליחה מתוזמנת לאורחים (הקישור לגלריה, התודה עם האלבום — `docs/scheduler.md`) לא יוצאת, המארח מקבל מייל
+**וגם הודעת וואטסאפ** מהמספר הרשמי, לטלפון ששמור בחשבון שלו (מסך "החשבון שלי"). פעם אחת לכל שליחה; בלי
+קרדיט (הודעת מערכת); לא נשלחת למי שאין לו טלפון בחשבון, לטלפון קווי או למי שביקש לא לקבל הודעות. **עד
+שהטמפלט מאושר ומוגדר ב-`INVITES_WHATSAPP_HOST_ALERT_TEMPLATE`** נשלח רק המייל.
+
+ב-WhatsApp Manager → Message templates → Create template:
+
+| שדה | ערך |
+|---|---|
+| Category | **Utility** (עדכון על פעולה שהמארח קבע בחשבון שלו) |
+| Name | `badook_host_alert` (או שם אחר — אותו ערך ב-`INVITES_WHATSAPP_HOST_ALERT_TEMPLATE`) |
+| Language | Hebrew (`he`) ו-English (`en`) |
+| Header | ללא |
+| Body | ראו למטה |
+| Footer | `הודעת מערכת מ־Badook` |
+| Button | Call to action → Visit website → **Dynamic**, טקסט: `לשליחה מחדש`, URL: `https://invitations.badooks.com/app/invitations/{{1}}` |
+
+**Body** (בדיוק כך):
+
+```
+⚠️ השליחה המתוזמנת לא יצאה
+{{1}} שתוזמן ל־{{2}} לא נשלח לאורחים: {{3}}.
+אף אורח לא קיבל הודעה ולא ירדו קרדיטים. אפשר לשלוח שוב בכפתור למטה.
+```
+
+| משתנה | משמעות | דוגמה |
+|---|---|---|
+| `{{1}}` | מה היה מתוזמן | `התודה עם האלבום` · `הקישור לגלריה` |
+| `{{2}}` | מתי — לפי השעון שהמארח בחר, עם שם אזור הזמן | `יום שישי, 18 ביוני 2027 בשעה 15:00 (לפי שעון New York)` |
+| `{{3}}` | למה לא יצא | `לא היו מספיק קרדיטים (היה צריך 40, היו 3)` · `האלבום היה כבוי` |
+| כפתור `{{1}}` | סוף הכתובת: ההזמנה ולשונית הגלריה | `0b6f1a4e-6c1e-4d0e-9a3a-2f1d8c7b6a50/gallery` |
+
+**English (`en`)**
+
+```
+⚠️ Your scheduled send didn’t go out
+{{1}} scheduled for {{2}} wasn’t sent to your guests: {{3}}.
+No guest got a message and no credits were used. Tap the button below to send it again.
+```
+
+Footer: `A system message from Badook` · Button: `Send it again` · דוגמאות: `The thank-you with the album`,
+`Friday, 18 June 2027 at 15:00 (New York time)`, `there weren’t enough credits (40 needed, 3 left)`
+
+השפה: של המארח (עברית, אחרת אנגלית — כמו המייל); אם Meta עוד לא אישרה בה, השפה האחרת. הטקסטים בקוד:
+`src/features/whatsapp/template-text.ts` — `HOST_ALERT_TEMPLATE_TEXT`.

@@ -2,6 +2,7 @@ import 'server-only';
 import { serviceDb } from '@/lib/supabase/server';
 import type { Audience, ScheduledSend, SendKind } from '../types';
 import type { FailedSend } from './email';
+import type { AlertSend } from './whatsapp';
 
 /**
  * Typed access to the clock's database functions (supabase/migrations/*_scheduled_sends.sql). Always the
@@ -44,6 +45,10 @@ export const scheduleDb = {
   /** failed sends whose host wasn't told yet (scheduled_send_failures) */
   failures: (limit: number) => rpc<FailedSend[]>('scheduled_send_failures', { p_limit: limit }),
   failureMailed: (id: string) => rpc<boolean>('scheduled_send_failure_mailed', { p_send: id }),
+  /** failed sends whose host wasn't sent the WhatsApp alert yet (scheduled_send_failure_alerts) */
+  failureAlerts: (limit: number) => rpc<AlertSend[]>('scheduled_send_failure_alerts', { p_limit: limit }),
+  failureAlerted: (id: string, outcome: 'sent' | 'failed' | 'skipped') =>
+    rpc<boolean>('scheduled_send_failure_alerted', { p_send: id, p_outcome: outcome }),
   finish: (
     id: string,
     status: 'done' | 'failed',

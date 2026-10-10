@@ -136,6 +136,8 @@ export default defineConfig({
             INVITES_AI_API_BASE_OPENAI: `http://127.0.0.1:${whatsappPort}`,
             // the album's thank-you template (tests/e2e/album-ai-photos.spec.ts)
             INVITES_WHATSAPP_ALBUM_TEMPLATE: 'badook_album',
+            // the host's alert when a scheduled send fails (tests/e2e/scheduler.spec.ts)
+            INVITES_WHATSAPP_HOST_ALERT_TEMPLATE: 'badook_host_alert',
             // the invitation read aloud: the text-to-speech stand-in above (features/voice)
             INVITES_TTS_AZURE_KEY: 'e2e-tts-key',
             INVITES_TTS_AZURE_REGION: 'e2e',

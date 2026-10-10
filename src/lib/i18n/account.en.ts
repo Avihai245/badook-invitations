@@ -8,7 +8,8 @@ export const accountEn: typeof accountHe = {
   profile: 'Personal details',
   fullName: 'Full name',
   phone: 'Phone',
-  phoneHint: 'Optional. Used only to contact you about your account.',
+  phoneHint:
+    'Optional. Used only to contact you about your account — and for a WhatsApp alert if a scheduled send to your guests doesn’t go out.',
   email: 'Email',
   signIn: 'Sign-in',
   providers: { email: 'Email and password', google: 'Google', partner: 'Badook Events' },

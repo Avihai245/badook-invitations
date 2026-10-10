@@ -126,9 +126,11 @@ test('a scheduled send that can’t go out (no credits by then): kept as failed 
     `insert into invitation_guests (invitation_id, name, party_size, phone, token) values ($1, 'משפחת לוי', 2, $2, $3)`,
     [host.id, number, `sf${randomUUID().replace(/-/g, '').slice(0, 20)}`],
   );
+  // no credits by then; a phone on the host's account (for the WhatsApp alert)
+  const hostPhone = `+9725${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}05`;
   await sql(
-    `update accounts set message_credits = 0 where user_id = (select id from auth.users where email = $1)`,
-    [host.email],
+    `update accounts set message_credits = 0, phone = $2 where user_id = (select id from auth.users where email = $1)`,
+    [host.email, hostPhone],
   );
   // the gallery link scheduled from the app's API (as its dialog does), for 09:00 Los Angeles time
   const year = new Date().getUTCFullYear() + 1;
@@ -158,6 +160,28 @@ test('a scheduled send that can’t go out (no credits by then): kept as failed 
   const body = await turn.json();
   expect(body.scheduled).toEqual({ ran: 1, done: 0, failed: 1 });
   expect(body.failureMails).toBe(1);
+  expect(body.failureAlerts).toBe(1);
+  // the WhatsApp alert on the host's phone: what, when (on Los Angeles' clock, the zone named), why,
+  // and a button back to the invitation's gallery tab
+  const alerts = (
+    (await (await fetch(`${MOCKS}/__sent`)).json()) as {
+      to: string;
+      template: string;
+      language: string;
+      params: string[];
+      button: string;
+    }[]
+  ).filter((m) => m.to.endsWith(hostPhone.slice(1)) && m.template === 'badook_host_alert');
+  expect(alerts).toHaveLength(1);
+  expect(alerts[0]).toMatchObject({
+    language: 'he',
+    params: [
+      'הקישור לגלריה',
+      expect.stringMatching(/09:00.*לפי שעון Los Angeles/),
+      expect.stringContaining('קרדיטים'),
+    ],
+    button: `${host.id}/gallery`,
+  });
   const [failed] = await sql<{ status: string; error: string; needed: number; mailed: boolean }>(
     `select status, error, (result->>'needed')::int as needed, failure_mailed_at is not null as mailed
        from scheduled_sends where invitation_id = $1`,
@@ -171,7 +195,8 @@ test('a scheduled send that can’t go out (no credits by then): kept as failed 
   expect(logged!.n).toBeGreaterThanOrEqual(1);
   // never twice
   const again = await request.post('/api/cron/tick', { headers: { authorization: `Bearer ${CRON}` } });
-  expect((await again.json()).failureMails).toBe(0);
+  const second = await again.json();
+  expect([second.failureMails, second.failureAlerts]).toEqual([0, 0]);
 
   // the dialog says why
   await open(page, `/app/invitations/${host.id}/gallery`);

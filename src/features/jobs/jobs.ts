@@ -22,7 +22,8 @@ import { studioHousekeeping } from '@/features/review/server/housekeeping';
 import { supportHousekeeping } from '@/features/support/tickets/server/housekeeping';
 import { voiceDeps } from '@/features/voice/server/deps';
 import { processVoice } from '@/features/voice/server/voice';
-import { failureMailDeps, scheduleRunDeps } from '@/features/scheduler/server/deps';
+import { failureAlertDeps, failureMailDeps, scheduleRunDeps } from '@/features/scheduler/server/deps';
+import { alertFailedSends } from '@/features/scheduler/server/whatsapp';
 import { mailFailedSends } from '@/features/scheduler/server/email';
 import { processScheduledSends } from '@/features/scheduler/server/run';
 import { cloudApiConfigured } from '@/features/whatsapp/cloud-api';
@@ -211,6 +212,8 @@ export async function runClock(now = Date.now()) {
   const scheduled = await processScheduledSends(scheduleRunDeps());
   // a scheduled send that didn't go out: its host gets an email (once; tried again next turn)
   const failureMails = await mailFailedSends(failureMailDeps());
+  // …and a WhatsApp message on the phone of their account (once the host alert template is approved)
+  const failureAlerts = await alertFailedSends(failureAlertDeps());
   let whatsapp: { ran: boolean } = { ran: false };
   if (cloudApiConfigured())
     whatsapp = await runJob('whatsapp', new Date(now - WHATSAPP_EVERY_MS), 120, () =>
@@ -233,6 +236,7 @@ export async function runClock(now = Date.now()) {
   return {
     scheduled,
     failureMails: failureMails.mailed,
+    failureAlerts: failureAlerts.sent,
     whatsapp: whatsapp.ran,
     local: local.ran,
     daily: daily.ran,
