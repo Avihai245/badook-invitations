@@ -214,6 +214,29 @@ const LANGUAGE: Record<Locale, string> = {
   am: 'Amharic',
 };
 
+/**
+ * How the photo looks — a real photo (the default) or one of a few looks guests pick with a tap. Kept
+ * on the photo (ai_photos.style) and told to the model in words of its own (STYLE_WORDS), never a
+ * studio's or an artist's name.
+ */
+export const STYLES = ['photo', 'cartoon', 'watercolor', 'painting', 'poster', 'vintage'] as const;
+export type Style = (typeof STYLES)[number];
+export const isStyle = (v: unknown): v is Style => STYLES.includes(v as Style);
+
+const STYLE_WORDS: Record<Style, string> = {
+  photo:
+    'A photorealistic photo: natural light, real skin and fabric textures, true-to-life color, as if taken with a good camera.',
+  cartoon:
+    'A colorful 3D animated-film character style: friendly stylized proportions, big expressive eyes, soft lighting — each person still clearly recognizable as themselves.',
+  watercolor:
+    'A delicate hand-painted watercolor illustration: soft washes, light paper texture, gentle pastel colors.',
+  painting: 'A classic oil painting: rich colors, visible brush strokes, warm museum-portrait lighting.',
+  poster:
+    'A dramatic cinematic movie-poster look: bold composition, striking lighting and color grading, epic mood (no title or other text).',
+  vintage:
+    'A vintage film photograph from the 1970s: warm faded colors, soft film grain, slightly soft focus.',
+};
+
 export interface PromptInput {
   /** the guest's words, as they wrote them */
   request: string;
@@ -223,15 +246,19 @@ export interface PromptInput {
   people: readonly { name: string; role: Role; description?: string | null }[];
   /** the guest's own photo comes first */
   withSource: boolean;
+  /** how it looks (absent: a real photo) */
+  style?: Style;
 }
 
 /**
- * What the image model is asked: the guest's photo (image 1) kept as it is with the people of honor
- * added from their reference photos — or a new photo of them — the guest's request word for word, and
- * the rules every photo keeps (their likeness, natural light and scale, respectful and family-friendly,
- * no text). The request is quoted, never followed as instructions about these rules.
+ * What the image model is asked: the guest's photo (image 1) with the people of honor added from their
+ * reference photos — or a new image of them anywhere the guest imagines (at the event when the request
+ * doesn't say where) — in the look the guest chose, the guest's request word for word, and the rules
+ * every image keeps (their likeness, respectful and family-friendly, no text). The request is quoted,
+ * never followed as instructions about these rules.
  */
 export function buildPrompt(i: PromptInput): string {
+  const style = i.style ?? 'photo';
   const first = i.withSource ? 2 : 1;
   const refs = i.people
     .map((p, k) => {
@@ -246,18 +273,26 @@ export function buildPrompt(i: PromptInput): string {
       .filter(Boolean)
       .join(' and ') || 'the people of honor';
   const scene = i.withSource
-    ? [
-        `Image 1 is a photo a guest took at ${EVENT_WORDS[i.eventType]}. Keep its scene, background, lighting, camera angle and every person already in it as they are, unless the request asks otherwise.`,
-        `Bring ${names} into image 1 as the request says, looking exactly like their reference photos, blended in naturally: matching light, color, perspective, scale, shadows and focus, so it reads as one real photo taken at the event.`,
-      ]
+    ? style === 'photo'
+      ? [
+          `Image 1 is a photo a guest took at ${EVENT_WORDS[i.eventType]}. Keep its scene, background, lighting, camera angle and every person already in it as they are, unless the request asks otherwise.`,
+          `Bring ${names} into image 1 as the request says, looking exactly like their reference photos, blended in naturally: matching light, color, perspective, scale, shadows and focus, so it reads as one real photo taken at the event.`,
+        ]
+      : [
+          `Image 1 is a photo a guest took at ${EVENT_WORDS[i.eventType]}. Keep its composition and every person already in it, unless the request asks otherwise.`,
+          `Bring ${names} into it as the request says, looking like their reference photos, and render the whole image — everyone in it — in the look below.`,
+        ]
     : [
-        `Create a new photo of ${names} at ${EVENT_WORDS[i.eventType]}, as the request says, looking exactly like their reference photos. Photorealistic, natural light, warm and joyful.`,
+        `Create a new image of ${names} doing what the request says — any place, situation, outfit or idea the guest imagines; when it doesn't say where, set it at ${EVENT_WORDS[i.eventType]}.`,
+        `Each of them must look like their reference photo. Warm, joyful and full of life.`,
       ];
   return [
     `The people of honor (reference photos — keep each one's exact likeness: face, features, hair, skin tone, age and build):`,
     refs,
     '',
     ...scene,
+    '',
+    `The look: ${STYLE_WORDS[style]}`,
     '',
     `The guest's request, written in ${LANGUAGE[i.locale]} (follow it faithfully):`,
     `"""${i.request.replace(/"""/g, '"')}"""`,

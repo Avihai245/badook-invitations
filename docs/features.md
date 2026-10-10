@@ -216,7 +216,8 @@ people agreed; then on, with limits per guest's phone (default 3) and per event 
 guests may add their photos to the gallery. **Guests** (the gallery's page): a photo from the event (camera
 or phone, or a new scene), who is in it (marked from what they type — names in any language with Hebrew's
 and Arabic's prefixes, "the groom", "the couple", "everyone"), what should happen (free words or an idea for
-the kind of event) → the photo, made in the background (`POST /api/gallery/ai/create` answers at once; the
+the kind of event — a new scene can be anywhere the guest imagines, at the event when it doesn't say where),
+in a style (a real photo, an animated film, watercolor, oil painting, movie poster, vintage; `ai_photos.style`) → the photo, made in the background (`POST /api/gallery/ai/create` answers at once; the
 page polls `/status`), downloaded, shared, or added to the gallery (copied there as the guest's upload,
 `gallery_items.ai_generated`, by the gallery's approval mode; marked AI in the feed and the album).
 

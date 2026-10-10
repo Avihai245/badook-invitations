@@ -2,7 +2,7 @@ import 'server-only';
 import { safeMigrateDocument } from '@/features/invitations/contracts/migrate';
 import { isLocale } from '@/features/invitations/lib/locales';
 import { AI_PHOTOS } from '../config';
-import { buildPrompt, nameIn, sizeFor, type ImageSize } from '../model';
+import { buildPrompt, isStyle, nameIn, sizeFor, type ImageSize } from '../model';
 import type { AiPhotoDb, ClaimedPhoto, PhotoRow } from './db';
 import type { ImageInput, ImageOutcome, ImageRequest } from './openai';
 
@@ -125,6 +125,7 @@ export async function requestFor(
       eventType: doc.eventType,
       people,
       withSource: !!job.sourcePath,
+      style: isStyle(job.style) ? job.style : 'photo',
     }),
     images,
     size,

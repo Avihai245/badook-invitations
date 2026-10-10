@@ -62,6 +62,7 @@ const row = (over: Record<string, unknown> = {}) => ({
   status: 'queued' as const,
   error: null,
   prompt: 'תוסיף את אביב לתמונה',
+  style: 'photo' as const,
   people: [AVIV],
   locale: 'he',
   guestName: 'דנה',
@@ -324,11 +325,29 @@ describe('the guests', () => {
     expect(photo).toEqual({
       id,
       prompt: 'תוסיף את אביב לתמונה',
+      style: 'photo',
       people: [AVIV],
       locale: 'he',
       sourcePath: `${INV}/photos/${id}/source.jpg`,
     });
     expect(deps.kick).toHaveBeenCalledWith(INV);
+  });
+
+  it('a style the guest picked goes with the request; an unknown one is refused', async () => {
+    const { deps } = guestDeps();
+    const res = await guest.aiCreate(
+      { t: TOKEN, uploader: UPLOADER, prompt: 'על חוף בהוואי', people: [AVIV], style: 'cartoon', lang: 'he' },
+      '1.2.3.4',
+      deps,
+    );
+    expect(res.status).toBe(200);
+    expect(vi.mocked(deps.db.create).mock.calls[0]![4]).toMatchObject({ style: 'cartoon', sourcePath: null });
+    const bad = await guest.aiCreate(
+      { t: TOKEN, uploader: UPLOADER, prompt: 'x y', people: [AVIV], style: 'anime-studio', lang: 'he' },
+      '1.2.3.4',
+      deps,
+    );
+    expect(bad.status).toBe(400);
   });
 
   it('nobody chosen: the people the words name, else everyone; a new scene stores nothing', async () => {

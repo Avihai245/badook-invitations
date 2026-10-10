@@ -93,6 +93,8 @@ const ServerEnvSchema = z.object({
   // ── AI photos with the people of honor (feature ai_photos): OpenAI's image model, OPENAI_API_KEY ──
   // the GPT Image model ("gpt-image-2", or a newer one such as a gpt-image-2.5 model, as OpenAI names it)
   INVITES_AI_IMAGE_MODEL: z.string().trim().default('gpt-image-2'),
+  // a key of its own for the images (a separate budget or project); empty: OPENAI_API_KEY
+  INVITES_AI_IMAGE_API_KEY: z.string().trim().default(''),
   // low | medium | high: the price and the time of each photo grow with it
   INVITES_AI_IMAGE_QUALITY: z.enum(['low', 'medium', 'high']).default('medium'),
   // how the server asks for a photo: 'images' (the Images API, one request that waits for the photo),
