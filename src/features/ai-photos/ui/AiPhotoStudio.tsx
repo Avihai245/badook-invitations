@@ -10,13 +10,24 @@ import {
   ImagePlus,
   Images,
   LoaderCircle,
+  RefreshCw,
   Share2,
   Sparkles,
   Trash2,
   Wand2,
   X,
 } from 'lucide-react';
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
+import { createPortal } from 'react-dom';
 import type { EventType, Locale } from '@/features/invitations/contracts/types';
 import { galleryApi } from '@/features/live-gallery/client/api';
 import { useGuestText } from '@/features/live-gallery/ui/guest-text';
@@ -25,7 +36,7 @@ import { fill } from '@/lib/i18n/guest';
 import { AI_PHOTOS } from '../config';
 import { STYLES, detectPeople, nameIn, type Style } from '../model';
 import { shrinkPhoto, type ShrunkPhoto } from '../client/photo';
-import type { GuestAiPhoto, GuestAiState } from '../types';
+import type { GuestAiPerson, GuestAiPhoto, GuestAiState } from '../types';
 
 type Ideas = keyof (typeof AI_PHOTOS_GUEST)['he']['ideas'];
 const IDEAS_OF: Record<EventType, Ideas> = {
@@ -42,17 +53,111 @@ const IDEAS_OF: Record<EventType, Ideas> = {
   other: 'other',
 };
 
+/** How each style looks on its tile: a swatch and a sign. */
+const STYLE_LOOK: Record<Style, { swatch: string; sign: string }> = {
+  photo: { swatch: 'linear-gradient(135deg,#f6d8b8,#c98b6b 55%,#6b4a3a)', sign: '📸' },
+  cartoon: { swatch: 'linear-gradient(135deg,#ffe36e,#ff8a65 50%,#7c6cff)', sign: '🎬' },
+  watercolor: { swatch: 'linear-gradient(135deg,#bfe3f2,#d9c6f0 50%,#f7c9d4)', sign: '🖌️' },
+  painting: { swatch: 'linear-gradient(135deg,#2f4858,#86624a 50%,#e0b25b)', sign: '🖼️' },
+  poster: { swatch: 'linear-gradient(135deg,#111827,#7f1d1d 55%,#f59e0b)', sign: '🎞️' },
+  vintage: { swatch: 'linear-gradient(135deg,#efe2c4,#c7a979 55%,#7a5c3a)', sign: '📻' },
+};
+
+const ACCENT_SOFT = 'bg-[color-mix(in_oklab,var(--gallery-accent)_12%,white)]';
+const ON =
+  'border-[var(--gallery-accent)] bg-[color-mix(in_oklab,var(--gallery-accent)_10%,white)] text-ink shadow-[0_0_0_1px_var(--gallery-accent)]';
+const OFF = 'border-line bg-surface text-ink hover:border-line-strong';
+
 const pending = (p: GuestAiPhoto | null | undefined) =>
   !!p && (p.status === 'queued' || p.status === 'running');
 
+/** The people of honor's faces, side by side (their photo, else their initial). */
+function Faces({
+  people,
+  locale,
+  size = 44,
+  className = '',
+}: {
+  people: GuestAiPerson[];
+  locale: Locale;
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <span aria-hidden className={`flex shrink-0 -space-x-3 rtl:space-x-reverse ${className}`}>
+      {people.slice(0, 4).map((p) => (
+        <span
+          key={p.id}
+          className="grid shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--gallery-accent)] font-bold text-[var(--gallery-accent-ink)] ring-[3px] ring-white"
+          style={{ width: size, height: size, fontSize: size * 0.38 }}
+        >
+          {p.photo ? (
+            <img src={p.photo} alt="" className="size-full object-cover" />
+          ) : (
+            nameIn(p.name, locale).trim().slice(0, 1)
+          )}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/** One numbered step of the request. */
+function Step({
+  n,
+  title,
+  done,
+  children,
+  as: As = 'fieldset',
+  labelFor,
+}: {
+  n: number;
+  title: string;
+  done: boolean;
+  children: ReactNode;
+  as?: 'fieldset' | 'div';
+  labelFor?: string;
+}) {
+  const head = (
+    <span className="flex items-center gap-2.5">
+      <span
+        aria-hidden
+        className={`grid size-7 shrink-0 place-items-center rounded-full text-[13px] font-bold transition-colors ${
+          done
+            ? 'bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)]'
+            : 'border-2 border-[color-mix(in_oklab,var(--gallery-accent)_45%,white)] text-[var(--gallery-accent)]'
+        }`}
+      >
+        {done ? <Check className="size-4" /> : n}
+      </span>
+      <span className="text-[15.5px] font-bold">{title}</span>
+    </span>
+  );
+  return (
+    <As className="rounded-[20px] border border-line/70 bg-surface p-4 shadow-[0_6px_24px_-16px_rgba(28,25,23,0.35)]">
+      {As === 'fieldset' ? (
+        <legend className="float-start mb-3 w-full">{head}</legend>
+      ) : (
+        <label htmlFor={labelFor} className="mb-3 block">
+          {head}
+        </label>
+      )}
+      <div className="clear-both">{children}</div>
+    </As>
+  );
+}
+
 /**
- * "A photo with Aviv & Roni" on the gallery's guest page (feature ai_photos): a card that opens a
- * studio — a photo from the event (the camera, the phone, or a new scene), who is in it (marked by
- * itself from what the guest writes: a name in any of the invitation's languages, "the groom", "the
- * couple", "everyone"), what should happen (free words, or an idea for this kind of event) — then the
- * photo is made in the background (a minute or two; the page asks how it is doing, and keeps asking
- * if the guest comes back later). The result is downloaded, shared, or added to the event's gallery.
- * The phone's photo is made small and re-encoded on the phone; the request is limited per phone.
+ * "A photo with Aviv & Roni" on the gallery's guest page (feature ai_photos): a card with the people of
+ * honor's faces that opens a studio — four numbered steps on a phone-sized page: a photo from the event
+ * (the camera, the phone, or a new scene), who is in it (marked by itself from what the guest writes: a
+ * name in any of the invitation's languages, "the groom", "the couple", "everyone"), what should happen
+ * (free words, or an idea for this kind of event), and the style. The create button stays on the screen
+ * (a bar under the steps, the keyboard or not) and says what is still missing. The photo is made in the
+ * background (a minute or two; the page asks how it is doing, and keeps asking if the guest comes back
+ * later). The result is downloaded, shared, or added to the event's gallery — which closes the studio
+ * and takes the guest back to the feed. The phone's photo is made small and re-encoded on the phone;
+ * the request is limited per phone.
  */
 export function AiPhotoStudio({
   token,
@@ -61,6 +166,7 @@ export function AiPhotoStudio({
   guest,
   name,
   eventType,
+  theme,
   onShared,
 }: {
   token: string;
@@ -73,8 +179,10 @@ export function AiPhotoStudio({
   /** the name the guest gave the gallery */
   name: string;
   eventType: string;
-  /** a photo joined the gallery: the feed refreshes */
-  onShared(): void;
+  /** the gallery's colors (--gallery-accent…): the studio opens on top of the page, outside it */
+  theme?: CSSProperties;
+  /** a photo joined the gallery (or waits for the hosts): back to the feed */
+  onShared(status: 'published' | 'pending'): void;
 }) {
   const { locale, dir, plural } = useGuestText();
   const t = AI_PHOTOS_GUEST[locale];
@@ -244,6 +352,7 @@ export function AiPhotoStudio({
     return () => window.clearInterval(timer);
   }, [activePending]);
 
+  // into the gallery: the studio closes and the guest is back on the feed, where the photo is
   const share = async () => {
     if (!active) return;
     setBusy('share');
@@ -256,11 +365,13 @@ export function AiPhotoStudio({
       setError(errorText(res.status, res.body?.code));
       return;
     }
-    const sharedPhoto = { ...active, shared: true };
-    setActive(sharedPhoto);
-    setState((s) => (s ? { ...s, mine: s.mine.map((m) => (m.id === active.id ? sharedPhoto : m)) } : s));
-    setNotice(res.body.status === 'published' ? t.done.added : t.done.addedPending);
-    onShared();
+    const status = res.body.status;
+    const id = active.id;
+    setState((s) => (s ? { ...s, mine: s.mine.map((m) => (m.id === id ? { ...m, shared: true } : m)) } : s));
+    setOpen(false);
+    reset();
+    setNotice(status === 'published' ? t.done.added : t.done.addedPending);
+    onShared(status);
   };
 
   const download = async (p: GuestAiPhoto) => {
@@ -308,7 +419,7 @@ export function AiPhotoStudio({
 
   useEffect(() => {
     if (!notice) return;
-    const timer = window.setTimeout(() => setNotice(null), 4500);
+    const timer = window.setTimeout(() => setNotice(null), 5000);
     return () => window.clearTimeout(timer);
   }, [notice]);
 
@@ -330,55 +441,469 @@ export function AiPhotoStudio({
 
   if (!state || !people.length) return null;
 
+  const loc = locale as Locale;
   const ideas = (t.ideas[IDEAS_OF[eventType as EventType] ?? 'other'] ?? t.ideas.other).map((idea) =>
     fill(idea, { names: names(selected), name: names(selected.slice(0, 1)) }),
   );
-  const canCreate =
-    state.left > 0 &&
-    !state.eventFull &&
-    prompt.trim().length >= 2 &&
-    selected.length > 0 &&
-    (photo || scene);
+  const hasSource = !!photo || scene;
+  const hasPrompt = prompt.trim().length >= 2;
+  const out = state.left <= 0 || state.eventFull;
+  const canCreate = !out && hasPrompt && selected.length > 0 && hasSource;
+  // what is still missing, in the order of the steps
+  const missing = !hasSource
+    ? t.need.source
+    : !selected.length
+      ? t.need.who
+      : !hasPrompt
+        ? t.need.prompt
+        : null;
+  const leftText = state.eventFull
+    ? t.card.full
+    : state.left > 0
+      ? plural(t.card.left, state.left)
+      : t.card.none;
   const Back = dir === 'rtl' ? ArrowRight : ArrowLeft;
   const doneView = active?.status === 'done' && active.result;
+  const title = fill(t.card.title, { names: allNames });
+
+  const sourceTiles = [
+    { key: 'take', Icon: Camera, hint: t.photo.takeHint, onClick: () => camera.current?.click() },
+    { key: 'pick', Icon: ImagePlus, hint: t.photo.pickHint, onClick: () => files.current?.click() },
+    { key: 'none', Icon: Wand2, hint: t.photo.noneHint, onClick: () => setScene(true) },
+  ] as const;
+
+  const studio = (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-studio-title"
+      style={theme}
+      className="fixed inset-x-0 top-0 z-50 flex h-[100dvh] flex-col bg-[linear-gradient(180deg,color-mix(in_oklab,var(--gallery-accent)_10%,white),var(--color-canvas)_42%)] text-ink"
+      dir={dir}
+      data-testid="ai-studio"
+    >
+      <header className="flex h-14 shrink-0 items-center gap-2 px-3">
+        <button
+          type="button"
+          onClick={close}
+          className="grid size-10 place-items-center rounded-full bg-white/70 shadow-sm backdrop-blur hover:bg-white"
+          aria-label={t.close}
+        >
+          <Back aria-hidden className="size-5" />
+        </button>
+        <h2 id="ai-studio-title" className="min-w-0 flex-1 truncate text-[16px] font-bold">
+          <bdi>{title}</bdi>
+        </h2>
+        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--gallery-accent)] px-2.5 py-1 text-[11.5px] font-bold text-[var(--gallery-accent-ink)]">
+          <Sparkles aria-hidden className="size-3" />
+          {t.ai}
+        </span>
+      </header>
+
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="mx-auto w-full max-w-[560px] px-4 pt-1 pb-6">
+          {doneView ? (
+            // ── the result ──
+            <div className="flex flex-col items-center gap-4 pt-2" data-testid="ai-result">
+              <h3 className="flex items-center gap-2 text-[21px] font-bold">
+                <Sparkles aria-hidden className="size-5 text-[var(--gallery-accent)]" />
+                {t.done.title}
+              </h3>
+              <div className="relative rounded-[22px] bg-white p-2 shadow-[0_24px_60px_-24px_rgba(28,25,23,0.55)]">
+                <img
+                  src={active!.result!}
+                  alt={active!.prompt}
+                  className="max-h-[56dvh] w-auto max-w-full rounded-[16px] object-contain"
+                />
+              </div>
+              {active!.prompt ? (
+                <p className="max-w-[44ch] text-center text-[13.5px] text-muted">
+                  “<bdi>{active!.prompt}</bdi>”
+                </p>
+              ) : null}
+              {error ? (
+                <p role="alert" className="text-[13px] text-danger">
+                  {error}
+                </p>
+              ) : null}
+              <div className="flex flex-wrap justify-center gap-1">
+                {state.left > 0 && !state.eventFull ? (
+                  <button
+                    type="button"
+                    onClick={reset}
+                    className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[13.5px] font-semibold text-[var(--gallery-accent)] hover:bg-subtle"
+                  >
+                    <RefreshCw aria-hidden className="size-4" />
+                    {t.done.again}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => void remove(active!)}
+                  className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[13.5px] font-semibold text-muted hover:bg-subtle hover:text-danger"
+                >
+                  <Trash2 aria-hidden className="size-4" />
+                  {t.mine.delete}
+                </button>
+              </div>
+            </div>
+          ) : pending(active) ? (
+            // ── being made ──
+            <div
+              className="flex flex-col items-center gap-4 pt-6 text-center"
+              role="status"
+              aria-live="polite"
+              data-testid="ai-working"
+            >
+              <div className="relative grid aspect-[4/5] w-[min(72vw,280px)] place-items-center overflow-hidden rounded-[28px] bg-[color-mix(in_oklab,var(--gallery-accent)_18%,white)] shadow-[0_24px_60px_-28px_rgba(28,25,23,0.6)]">
+                {photo ? (
+                  <img
+                    src={photo.url}
+                    alt=""
+                    className="absolute inset-0 size-full object-cover opacity-60 blur-[3px]"
+                  />
+                ) : null}
+                <span
+                  aria-hidden
+                  className="absolute inset-0 bg-[linear-gradient(110deg,transparent_30%,rgba(255,255,255,0.55)_50%,transparent_70%)] bg-[length:250%_100%] motion-safe:animate-[ai-shimmer_2.2s_linear_infinite]"
+                />
+                <span className="relative flex flex-col items-center gap-3">
+                  <Faces people={people} locale={loc} size={56} />
+                  <span className="grid size-12 place-items-center rounded-full bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] shadow-lg">
+                    <Sparkles aria-hidden className="size-6 motion-safe:animate-pulse" />
+                  </span>
+                </span>
+              </div>
+              <h3 className="text-[20px] font-bold">{t.working.title}</h3>
+              <p className="min-h-[1.5em] text-[14.5px] font-semibold text-[var(--gallery-accent)]">
+                {t.working.tips[tip % t.working.tips.length]}
+              </p>
+              <p className="max-w-[40ch] text-[13px] text-muted">{t.working.body}</p>
+              <button
+                type="button"
+                onClick={close}
+                className="mt-1 max-w-[42ch] rounded-[16px] border border-line bg-surface px-4 py-2.5 text-[13px] font-semibold text-muted hover:text-ink"
+              >
+                {t.working.close}
+              </button>
+            </div>
+          ) : (
+            // ── the request ──
+            <div className="flex flex-col gap-3.5">
+              <div className="flex items-center gap-3 rounded-[20px] bg-[var(--gallery-accent)] p-4 text-[var(--gallery-accent-ink)] shadow-[0_14px_36px_-20px_var(--gallery-accent)]">
+                <Faces people={people} locale={loc} size={46} />
+                <p className="min-w-0 flex-1 text-[14px] leading-snug font-medium">
+                  <bdi>{fill(t.hero, { names: allNames })}</bdi>
+                </p>
+              </div>
+
+              <Step n={1} title={t.steps.source} done={hasSource}>
+                {photo ? (
+                  <div className="relative overflow-hidden rounded-[16px] bg-subtle">
+                    <img src={photo.url} alt="" className="max-h-[30dvh] w-full object-contain" />
+                    <div className="absolute inset-x-2 bottom-2 flex justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => files.current?.click()}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-[12.5px] font-semibold text-white backdrop-blur"
+                      >
+                        <RefreshCw aria-hidden className="size-3.5" />
+                        {t.photo.change}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          URL.revokeObjectURL(photo.url);
+                          setPhoto(null);
+                        }}
+                        className="grid size-9 place-items-center rounded-full bg-black/60 text-white backdrop-blur"
+                        aria-label={t.photo.remove}
+                      >
+                        <X aria-hidden className="size-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2">
+                    {sourceTiles.map(({ key, Icon, hint, onClick }) => {
+                      const on = key === 'none' && scene;
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={onClick}
+                          aria-pressed={key === 'none' ? scene : undefined}
+                          disabled={busy === 'photo'}
+                          className={`flex min-h-[104px] flex-col items-center justify-center gap-1.5 rounded-[16px] border px-1.5 py-3 text-center transition ${on ? ON : OFF}`}
+                        >
+                          <span
+                            aria-hidden
+                            className={`grid size-11 place-items-center rounded-full ${
+                              on
+                                ? 'bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)]'
+                                : `${ACCENT_SOFT} text-[var(--gallery-accent)]`
+                            }`}
+                          >
+                            {busy === 'photo' && key !== 'none' ? (
+                              <LoaderCircle className="size-5 animate-spin" />
+                            ) : (
+                              <Icon className="size-5" />
+                            )}
+                          </span>
+                          <span className="text-[13px] leading-tight font-bold">{t.photo[key]}</span>
+                          <span className="text-[11px] leading-tight text-muted">{hint}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                <p className="mt-2 text-[12.5px] text-muted">
+                  {photo || !scene ? t.photo.help : t.photo.noneHelp}
+                </p>
+                <input
+                  ref={camera}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  hidden
+                  onChange={(e) => {
+                    void onFile(e.target.files?.[0]);
+                    e.target.value = '';
+                  }}
+                />
+                <input
+                  ref={files}
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => {
+                    void onFile(e.target.files?.[0]);
+                    e.target.value = '';
+                  }}
+                />
+              </Step>
+
+              <Step n={2} title={t.steps.who} done={selected.length > 0}>
+                <div className="flex flex-wrap gap-2">
+                  {people.map((p) => {
+                    const on = selected.includes(p.id);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() =>
+                          setChosen(on ? selected.filter((x) => x !== p.id) : [...selected, p.id])
+                        }
+                        className={`inline-flex min-h-12 items-center gap-2 rounded-full border py-1 ps-1 pe-3.5 text-start text-[13.5px] transition ${on ? ON : OFF}`}
+                      >
+                        <span className="relative">
+                          <Faces people={[p]} locale={loc} size={38} />
+                          {on ? (
+                            <span
+                              aria-hidden
+                              className="absolute -end-1 -bottom-1 grid size-[18px] place-items-center rounded-full bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] ring-2 ring-white"
+                            >
+                              <Check className="size-3" />
+                            </span>
+                          ) : null}
+                        </span>
+                        <span className="flex flex-col leading-tight">
+                          <span className="font-bold">
+                            <bdi>{nameIn(p.name, loc)}</bdi>
+                          </span>
+                          <span className="text-[11.5px] text-muted">{t.roles[p.role]}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-[12.5px] text-muted">{t.who.help}</p>
+              </Step>
+
+              <Step n={3} title={t.steps.what} done={hasPrompt} as="div" labelFor={promptId}>
+                <textarea
+                  id={promptId}
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value.slice(0, AI_PHOTOS.prompt.max))}
+                  rows={2}
+                  maxLength={AI_PHOTOS.prompt.max}
+                  placeholder={fill(t.what.placeholder, { name: nameIn(people[0]!.name, loc) })}
+                  className="w-full resize-none rounded-[14px] border border-line bg-canvas px-3 py-2.5 text-[16px] outline-none focus:border-[var(--gallery-accent)] focus:bg-surface"
+                  data-testid="ai-prompt"
+                />
+                <p className="mt-2.5 mb-1.5 flex items-center gap-1 text-[12px] font-semibold text-muted">
+                  <Sparkles aria-hidden className="size-3.5 text-[var(--gallery-accent)]" />
+                  {t.what.ideas}
+                </p>
+                <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+                  {ideas.map((idea) => (
+                    <button
+                      key={idea}
+                      type="button"
+                      onClick={() => setPrompt(idea)}
+                      className={`shrink-0 rounded-full border px-3 py-2 text-[12.5px] whitespace-nowrap transition ${
+                        prompt === idea ? ON : OFF
+                      }`}
+                    >
+                      <bdi>{idea}</bdi>
+                    </button>
+                  ))}
+                </div>
+              </Step>
+
+              <Step n={4} title={t.steps.style} done>
+                <div className="grid grid-cols-3 gap-2" data-testid="ai-styles">
+                  {STYLES.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      aria-pressed={style === s}
+                      onClick={() => setStyle(s)}
+                      className={`overflow-hidden rounded-[14px] border p-1 text-[12.5px] font-semibold transition ${
+                        style === s ? ON : OFF
+                      }`}
+                    >
+                      <span
+                        aria-hidden
+                        className="grid h-12 place-items-center rounded-[10px] text-[22px]"
+                        style={{ background: STYLE_LOOK[s].swatch }}
+                      >
+                        {STYLE_LOOK[s].sign}
+                      </span>
+                      <span className="block px-0.5 py-1.5 leading-tight">{t.style[s]}</span>
+                    </button>
+                  ))}
+                </div>
+              </Step>
+
+              {error ? (
+                <p role="alert" className="rounded-[12px] bg-warning-bg px-3 py-2 text-[13px] text-warning">
+                  {error}
+                </p>
+              ) : null}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* the bar under the steps: always on the screen. The left corner stays clear for the
+          accessibility button (AccessibilityMenu place="corner"). */}
+      {doneView ? (
+        <div className="shrink-0 border-t border-line bg-surface/95 pt-3 pr-4 pb-[max(12px,env(safe-area-inset-bottom))] pl-[72px] backdrop-blur">
+          <div className="mx-auto flex max-w-[560px] items-center gap-2">
+            {state.toGallery && !active!.shared ? (
+              <button
+                type="button"
+                onClick={() => void share()}
+                disabled={busy === 'share'}
+                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[var(--gallery-accent)] px-5 text-[15px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_10px_24px_-12px_var(--gallery-accent)] disabled:opacity-60"
+                data-testid="ai-to-gallery"
+              >
+                {busy === 'share' ? (
+                  <LoaderCircle aria-hidden className="size-4 animate-spin" />
+                ) : (
+                  <Images aria-hidden className="size-4" />
+                )}
+                {t.done.toGallery}
+              </button>
+            ) : active!.shared ? (
+              <span className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 text-[14px] font-semibold text-success">
+                <Check aria-hidden className="size-4" />
+                {t.mine.inGallery}
+              </span>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => void save(active!)}
+              className="grid size-12 shrink-0 place-items-center rounded-full border border-line bg-surface"
+              aria-label={t.done.download}
+              title={t.done.download}
+            >
+              <Download aria-hidden className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => void shareOut(active!)}
+              className="grid size-12 shrink-0 place-items-center rounded-full border border-line bg-surface"
+              aria-label={t.done.share}
+              title={t.done.share}
+            >
+              <Share2 aria-hidden className="size-5" />
+            </button>
+          </div>
+        </div>
+      ) : !pending(active) ? (
+        <div className="shrink-0 border-t border-line bg-surface/95 pt-2.5 pr-4 pb-[max(12px,env(safe-area-inset-bottom))] pl-[72px] backdrop-blur">
+          <div className="mx-auto max-w-[560px]">
+            <button
+              type="button"
+              onClick={() => void create()}
+              disabled={!canCreate || busy === 'create'}
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--gallery-accent)] px-6 text-[15.5px] font-bold text-[var(--gallery-accent-ink)] shadow-[0_10px_24px_-12px_var(--gallery-accent)] transition disabled:opacity-45 disabled:shadow-none"
+              data-testid="ai-create"
+            >
+              {busy === 'create' ? (
+                <LoaderCircle aria-hidden className="size-5 animate-spin" />
+              ) : (
+                <Sparkles aria-hidden className="size-5" />
+              )}
+              {t.create}
+            </button>
+            <p className="mt-1.5 text-center text-[12px] text-muted" aria-live="polite">
+              {out || !missing ? leftText : missing}
+            </p>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 
   return (
     <section className="mt-5" aria-labelledby="ai-photos-title" data-testid="ai-photos">
-      <div className="relative overflow-hidden rounded-[20px] border border-[color-mix(in_oklab,var(--gallery-accent)_35%,transparent)] bg-[linear-gradient(135deg,color-mix(in_oklab,var(--gallery-accent)_14%,white),white_60%)] p-4">
-        <div className="flex items-start gap-3">
-          <span
-            aria-hidden
-            className="grid size-11 shrink-0 place-items-center rounded-full bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)]"
-          >
-            <Sparkles className="size-5" />
-          </span>
+      <div className="relative overflow-hidden rounded-[24px] bg-[linear-gradient(135deg,var(--gallery-accent),color-mix(in_oklab,var(--gallery-accent)_55%,#1c1917))] p-4 text-[var(--gallery-accent-ink)] shadow-[0_18px_44px_-22px_var(--gallery-accent)]">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -end-10 -top-12 size-40 rounded-full bg-white/15 blur-2xl"
+        />
+        <span aria-hidden className="pointer-events-none absolute end-4 top-3 text-[18px] opacity-80">
+          ✨
+        </span>
+        <div className="relative flex items-center gap-3">
+          <Faces people={people} locale={loc} size={52} />
           <div className="min-w-0 flex-1">
-            <h2 id="ai-photos-title" className="text-[16px] leading-snug font-bold">
-              <bdi>{fill(t.card.title, { names: allNames })}</bdi>
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10.5px] font-bold tracking-wide uppercase">
+              <Sparkles aria-hidden className="size-3" />
+              {t.ai}
+            </span>
+            <h2 id="ai-photos-title" className="mt-1 text-[17px] leading-snug font-bold">
+              <bdi>{title}</bdi>
             </h2>
-            <p className="mt-0.5 text-[13px] text-muted">{fill(t.card.body, { names: allNames })}</p>
           </div>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              if (!pending(active)) reset();
-              setOpen(true);
-            }}
-            disabled={(state.left <= 0 || state.eventFull) && !active}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-5 text-[14px] font-semibold text-[var(--gallery-accent-ink)] shadow-sm disabled:opacity-50"
-            data-testid="ai-photos-open"
-          >
+        <p className="relative mt-2 text-[13px] leading-relaxed opacity-90">
+          {fill(t.card.body, { names: allNames })}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            if (!pending(active)) reset();
+            setOpen(true);
+          }}
+          disabled={out && !active}
+          className="relative mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white text-[15px] font-bold text-[var(--gallery-accent)] shadow-sm disabled:opacity-60"
+          data-testid="ai-photos-open"
+        >
+          {pending(active) ? (
+            <LoaderCircle aria-hidden className="size-4 animate-spin" />
+          ) : (
             <Wand2 aria-hidden className="size-4" />
-            {pending(active) ? t.working.title : t.card.cta}
-          </button>
-          <span className="text-[12.5px] text-muted">
-            {state.eventFull ? t.card.full : state.left > 0 ? plural(t.card.left, state.left) : t.card.none}
-          </span>
-        </div>
+          )}
+          {pending(active) ? t.working.title : t.card.cta}
+        </button>
+        <p className="relative mt-2 text-center text-[12px] opacity-85">{leftText}</p>
         {state.mine.length ? (
-          <ul className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label={t.mine.title}>
+          <ul className="relative mt-3 flex gap-2 overflow-x-auto pb-1" aria-label={t.mine.title}>
             {state.mine.map((p) => (
               <li key={p.id} className="relative shrink-0">
                 <button
@@ -387,7 +912,7 @@ export function AiPhotoStudio({
                     setActive(p);
                     setOpen(true);
                   }}
-                  className="grid size-16 place-items-center overflow-hidden rounded-[12px] bg-subtle"
+                  className="grid size-16 place-items-center overflow-hidden rounded-[14px] bg-white/25 ring-2 ring-white/60"
                   aria-label={
                     p.status === 'done'
                       ? p.prompt
@@ -399,14 +924,14 @@ export function AiPhotoStudio({
                   {p.thumb ? (
                     <img src={p.thumb} alt="" className="size-full object-cover" loading="lazy" />
                   ) : pending(p) ? (
-                    <LoaderCircle aria-hidden className="size-5 animate-spin text-muted" />
+                    <LoaderCircle aria-hidden className="size-5 animate-spin" />
                   ) : (
-                    <X aria-hidden className="size-5 text-muted" />
+                    <X aria-hidden className="size-5" />
                   )}
                 </button>
                 {p.shared ? (
                   <span
-                    className="absolute -top-1 -end-1 grid size-5 place-items-center rounded-full bg-success text-white"
+                    className="absolute -end-1 -top-1 grid size-5 place-items-center rounded-full bg-success text-white ring-2 ring-white"
                     title={t.mine.inGallery}
                   >
                     <Check aria-hidden className="size-3" />
@@ -419,353 +944,17 @@ export function AiPhotoStudio({
       </div>
 
       {notice && !open ? (
-        <p role="status" className="mt-2 text-center text-[13px] text-success">
+        <p
+          role="status"
+          className="mt-2 flex items-center justify-center gap-1.5 rounded-full bg-success-bg px-3 py-2 text-center text-[13px] font-semibold text-success"
+          data-testid="ai-notice"
+        >
+          <Check aria-hidden className="size-4" />
           {notice}
         </p>
       ) : null}
 
-      {open ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="ai-studio-title"
-          className="fixed inset-0 z-50 flex flex-col bg-canvas"
-          dir={dir}
-          data-testid="ai-studio"
-        >
-          <div className="flex h-14 shrink-0 items-center gap-2 border-b border-line px-3">
-            <button
-              type="button"
-              onClick={close}
-              className="grid size-10 place-items-center rounded-full hover:bg-subtle"
-              aria-label={t.close}
-            >
-              <Back aria-hidden className="size-5" />
-            </button>
-            <h2 id="ai-studio-title" className="min-w-0 flex-1 truncate text-[16px] font-bold">
-              <bdi>{fill(t.card.title, { names: allNames })}</bdi>
-            </h2>
-            <span className="rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_14%,white)] px-2 py-0.5 text-[11.5px] font-bold text-[var(--gallery-accent)]">
-              {t.ai}
-            </span>
-          </div>
-
-          <div className="flex-1 overflow-y-auto">
-            <div className="mx-auto w-full max-w-[560px] px-4 pt-4 pb-28">
-              {doneView ? (
-                // ── the result ──
-                <div className="flex flex-col items-center gap-4" data-testid="ai-result">
-                  <h3 className="text-[20px] font-bold">{t.done.title}</h3>
-                  <img
-                    src={active!.result!}
-                    alt={active!.prompt}
-                    className="max-h-[62svh] w-auto max-w-full rounded-[16px] object-contain shadow-lg"
-                  />
-                  <div className="flex flex-wrap justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => void save(active!)}
-                      className="inline-flex h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 text-[14px] font-semibold"
-                    >
-                      <Download aria-hidden className="size-4" />
-                      {t.done.download}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void shareOut(active!)}
-                      className="inline-flex h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 text-[14px] font-semibold"
-                    >
-                      <Share2 aria-hidden className="size-4" />
-                      {t.done.share}
-                    </button>
-                    {state.toGallery && !active!.shared ? (
-                      <button
-                        type="button"
-                        onClick={() => void share()}
-                        disabled={busy === 'share'}
-                        className="inline-flex h-11 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-4 text-[14px] font-semibold text-[var(--gallery-accent-ink)] disabled:opacity-60"
-                        data-testid="ai-to-gallery"
-                      >
-                        {busy === 'share' ? (
-                          <LoaderCircle aria-hidden className="size-4 animate-spin" />
-                        ) : (
-                          <Images aria-hidden className="size-4" />
-                        )}
-                        {t.done.toGallery}
-                      </button>
-                    ) : active!.shared ? (
-                      <span className="inline-flex h-11 items-center gap-1.5 px-2 text-[13.5px] font-semibold text-success">
-                        <Check aria-hidden className="size-4" />
-                        {t.mine.inGallery}
-                      </span>
-                    ) : null}
-                  </div>
-                  {notice ? (
-                    <p role="status" className="text-[13px] text-success">
-                      {notice}
-                    </p>
-                  ) : null}
-                  {error ? (
-                    <p role="alert" className="text-[13px] text-danger">
-                      {error}
-                    </p>
-                  ) : null}
-                  <div className="flex gap-2">
-                    {state.left > 0 && !state.eventFull ? (
-                      <button
-                        type="button"
-                        onClick={reset}
-                        className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[13.5px] font-semibold text-[var(--gallery-accent)] hover:bg-subtle"
-                      >
-                        <Sparkles aria-hidden className="size-4" />
-                        {t.done.again}
-                      </button>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => void remove(active!)}
-                      className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[13.5px] font-semibold text-muted hover:bg-subtle hover:text-danger"
-                    >
-                      <Trash2 aria-hidden className="size-4" />
-                      {t.mine.delete}
-                    </button>
-                  </div>
-                </div>
-              ) : pending(active) ? (
-                // ── being made ──
-                <div
-                  className="flex flex-col items-center gap-4 pt-6 text-center"
-                  role="status"
-                  aria-live="polite"
-                  data-testid="ai-working"
-                >
-                  <div className="relative grid size-56 place-items-center overflow-hidden rounded-[24px] bg-subtle">
-                    {photo ? (
-                      <img
-                        src={photo.url}
-                        alt=""
-                        className="absolute inset-0 size-full object-cover opacity-50 blur-[2px]"
-                      />
-                    ) : null}
-                    <span className="relative grid size-16 place-items-center rounded-full bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] shadow-lg">
-                      <Sparkles aria-hidden className="size-7 motion-safe:animate-pulse" />
-                    </span>
-                  </div>
-                  <h3 className="text-[19px] font-bold">{t.working.title}</h3>
-                  <p className="text-[14px] font-medium text-[var(--gallery-accent)]">
-                    {t.working.tips[tip % t.working.tips.length]}
-                  </p>
-                  <p className="max-w-[40ch] text-[13px] text-muted">{t.working.body}</p>
-                </div>
-              ) : (
-                // ── the request ──
-                <div className="flex flex-col gap-6">
-                  <fieldset>
-                    <legend className="mb-2 text-[14px] font-bold">{t.photo.label}</legend>
-                    {photo ? (
-                      <div className="relative overflow-hidden rounded-[16px] bg-subtle">
-                        <img src={photo.url} alt="" className="max-h-[42svh] w-full object-contain" />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            URL.revokeObjectURL(photo.url);
-                            setPhoto(null);
-                          }}
-                          className="absolute top-2 end-2 grid size-9 place-items-center rounded-full bg-black/55 text-white"
-                          aria-label={t.photo.remove}
-                        >
-                          <X aria-hidden className="size-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-3 gap-2">
-                        {(
-                          [
-                            ['take', Camera, () => camera.current?.click()],
-                            ['pick', ImagePlus, () => files.current?.click()],
-                            ['none', Wand2, () => setScene(true)],
-                          ] as const
-                        ).map(([key, Icon, onClick]) => (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={onClick}
-                            aria-pressed={key === 'none' ? scene : undefined}
-                            disabled={busy === 'photo'}
-                            className={`flex h-24 flex-col items-center justify-center gap-1.5 rounded-[16px] border text-[13px] font-semibold ${
-                              key === 'none' && scene
-                                ? 'border-[var(--gallery-accent)] bg-[color-mix(in_oklab,var(--gallery-accent)_10%,white)] text-[var(--gallery-accent)]'
-                                : 'border-line bg-surface text-ink hover:border-line-strong'
-                            }`}
-                          >
-                            {busy === 'photo' && key !== 'none' ? (
-                              <LoaderCircle aria-hidden className="size-6 animate-spin" />
-                            ) : (
-                              <Icon aria-hidden className="size-6" />
-                            )}
-                            {t.photo[key]}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <p className="mt-2 text-[12.5px] text-muted">
-                      {photo || !scene ? t.photo.help : t.photo.noneHelp}
-                    </p>
-                    <input
-                      ref={camera}
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      hidden
-                      onChange={(e) => {
-                        void onFile(e.target.files?.[0]);
-                        e.target.value = '';
-                      }}
-                    />
-                    <input
-                      ref={files}
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e) => {
-                        void onFile(e.target.files?.[0]);
-                        e.target.value = '';
-                      }}
-                    />
-                  </fieldset>
-
-                  <fieldset>
-                    <legend className="mb-2 text-[14px] font-bold">{t.who.label}</legend>
-                    <div className="flex flex-wrap gap-2">
-                      {people.map((p) => {
-                        const on = selected.includes(p.id);
-                        return (
-                          <button
-                            key={p.id}
-                            type="button"
-                            aria-pressed={on}
-                            onClick={() =>
-                              setChosen(on ? selected.filter((x) => x !== p.id) : [...selected, p.id])
-                            }
-                            className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-start text-[13.5px] ${
-                              on
-                                ? 'border-[var(--gallery-accent)] bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)]'
-                                : 'border-line bg-surface text-ink'
-                            }`}
-                          >
-                            {on ? <Check aria-hidden className="size-4" /> : null}
-                            <span className="font-semibold">
-                              <bdi>{nameIn(p.name, locale as Locale)}</bdi>
-                            </span>
-                            <span className={on ? 'opacity-80' : 'text-muted'}>· {t.roles[p.role]}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <p className="mt-2 text-[12.5px] text-muted">{t.who.help}</p>
-                  </fieldset>
-
-                  <fieldset>
-                    <legend className="mb-2 text-[14px] font-bold">{t.style.label}</legend>
-                    <div className="flex flex-wrap gap-1.5" data-testid="ai-styles">
-                      {STYLES.map((s) => (
-                        <button
-                          key={s}
-                          type="button"
-                          aria-pressed={style === s}
-                          onClick={() => setStyle(s)}
-                          className={`min-h-10 rounded-full border px-3.5 text-[13px] font-semibold ${
-                            style === s
-                              ? 'border-[var(--gallery-accent)] bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)]'
-                              : 'border-line bg-surface text-ink hover:border-line-strong'
-                          }`}
-                        >
-                          {t.style[s]}
-                        </button>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  <div>
-                    <label htmlFor={promptId} className="mb-2 block text-[14px] font-bold">
-                      {t.what.label}
-                    </label>
-                    <textarea
-                      id={promptId}
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value.slice(0, AI_PHOTOS.prompt.max))}
-                      rows={3}
-                      maxLength={AI_PHOTOS.prompt.max}
-                      placeholder={fill(t.what.placeholder, {
-                        name: nameIn(people[0]!.name, locale as Locale),
-                      })}
-                      className="w-full resize-none rounded-[14px] border border-line bg-surface px-3 py-2.5 text-[15px] outline-none focus:border-[var(--gallery-accent)]"
-                      data-testid="ai-prompt"
-                    />
-                    <p className="mt-2 mb-1.5 text-[12.5px] font-semibold text-muted">{t.what.ideas}</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {ideas.map((idea) => (
-                        <button
-                          key={idea}
-                          type="button"
-                          onClick={() => setPrompt(idea)}
-                          className="rounded-full border border-line bg-surface px-3 py-1.5 text-[12.5px] hover:border-line-strong"
-                        >
-                          <bdi>{idea}</bdi>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <p className="text-[11.5px] leading-relaxed text-muted">
-                    {t.consent}{' '}
-                    <a href="/privacy" target="_blank" rel="noopener" className="underline">
-                      {t.privacy}
-                    </a>
-                  </p>
-                  {error ? (
-                    <p
-                      role="alert"
-                      className="rounded-[12px] bg-warning-bg px-3 py-2 text-[13px] text-warning"
-                    >
-                      {error}
-                    </p>
-                  ) : null}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {!doneView && !pending(active) ? (
-            // the left corner stays clear for the accessibility button (AccessibilityPanel place="corner")
-            <div className="shrink-0 border-t border-line bg-canvas/95 pt-3 pr-4 pb-[max(12px,env(safe-area-inset-bottom))] pl-[72px] backdrop-blur">
-              <div className="mx-auto flex max-w-[560px] items-center gap-3">
-                <span className="flex-1 text-[12.5px] text-muted">
-                  {state.eventFull
-                    ? t.card.full
-                    : state.left > 0
-                      ? plural(t.card.left, state.left)
-                      : t.card.none}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => void create()}
-                  disabled={!canCreate || busy === 'create'}
-                  className="inline-flex h-12 items-center gap-2 rounded-full bg-[var(--gallery-accent)] px-6 text-[15px] font-semibold text-[var(--gallery-accent-ink)] shadow-sm disabled:opacity-50"
-                  data-testid="ai-create"
-                >
-                  {busy === 'create' ? (
-                    <LoaderCircle aria-hidden className="size-4 animate-spin" />
-                  ) : (
-                    <Sparkles aria-hidden className="size-4" />
-                  )}
-                  {t.create}
-                </button>
-              </div>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+      {open && typeof document !== 'undefined' ? createPortal(studio, document.body) : null}
     </section>
   );
 }

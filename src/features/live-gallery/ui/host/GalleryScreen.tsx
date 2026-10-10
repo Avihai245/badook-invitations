@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  ArrowUpRight,
   AtSign,
   CalendarClock,
   Check,
@@ -18,6 +19,7 @@ import {
   ScanFace,
   Settings2,
   Send,
+  Share2,
   ShieldCheck,
   Smartphone,
   Sparkles,
@@ -39,10 +41,10 @@ import {
   Hint,
   KpiCard,
   PageHeader,
-  Tabs,
-  TabsPanel,
   useToast,
 } from '@/components/app';
+import { rovingKeyDown } from '@/components/app/roving';
+import { cn } from '@/components/app/utils';
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
 import { AiPhotosCard } from '@/features/ai-photos/ui/AiPhotosCard';
 import { AlbumCard } from '@/features/album/ui/AlbumCard';
@@ -93,11 +95,21 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
   const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [tab, setTab] = useState<'use' | 'settings'>('use');
-  // ?view=settings (a link to the gallery's settings) — read after mounting, like the server rendered it
+  const [tab, setTab] = useState<Section>('share');
+  // ?view=photos|extras|settings (a link to a part of the tab) — read after mounting, like the server
+  // rendered it
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('view') === 'settings') setTab('settings');
+    const v = new URLSearchParams(window.location.search).get('view');
+    if (isSection(v)) setTab(v);
   }, []);
+  const go = (v: Section) => {
+    setTab(v);
+    try {
+      window.history.replaceState(window.history.state, '', v === 'share' ? '?' : `?view=${v}`);
+    } catch {
+      /* the view just isn't in the address */
+    }
+  };
   const id = view.id;
   const g = view.gallery;
   const f = view.features.live_gallery;
@@ -353,49 +365,92 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
         <KpiCard label={L.kpi.uploaders} value={number(counts.uploaders)} icon={<Smartphone />} />
       </div>
 
-      {/* two views (UX report): using the gallery on the day, and its settings — the deleting at the end of those */}
-      <Tabs<'use' | 'settings'>
+      {/* what to do now: the one thing that moves the gallery forward */}
+      <NextStep
+        pending={counts.pending}
+        total={counts.total}
+        albumOpen={initial.album?.album?.state === 'open'}
+        onGo={go}
+      />
+
+      {/* the tab's parts, each named for what it holds and said in a line (not two vague tabs) */}
+      <SectionNav
         value={tab}
-        onValueChange={(v) => {
-          setTab(v);
-          try {
-            window.history.replaceState(window.history.state, '', v === 'settings' ? '?view=settings' : '?');
-          } catch {
-            /* the view just isn't in the address */
-          }
-        }}
-        label={L.title}
-        stretch={false}
-        className="mt-6"
+        onChange={go}
         items={[
-          { value: 'use', label: L.views.use, icon: <Images /> },
-          { value: 'settings', label: L.views.settings, icon: <Settings2 /> },
+          { value: 'share', icon: Share2, title: L.sections.share.title, body: L.sections.share.body },
+          {
+            value: 'photos',
+            icon: Images,
+            title: L.sections.photos.title,
+            body: fmt(L.sections.photos.body, { n: number(counts.total) }),
+            alert: counts.pending ? fmt(L.sections.photos.pending, { n: number(counts.pending) }) : null,
+          },
+          { value: 'extras', icon: Sparkles, title: L.sections.extras.title, body: L.sections.extras.body },
+          {
+            value: 'settings',
+            icon: Settings2,
+            title: L.sections.settings.title,
+            body: L.sections.settings.body,
+          },
         ]}
+      />
+
+      <div
+        role="tabpanel"
+        id={`gallery-panel-${tab}`}
+        aria-labelledby={`gallery-tab-${tab}`}
+        className="mt-6"
       >
-        <TabsPanel value="use" className="mt-5">
-          {/* the morning after: the album made from the gallery (feature album) */}
-          {initial.album ? (
-            <div className="mb-5">
-              <AlbumCard initial={initial.album} />
-            </div>
-          ) : null}
+        {tab === 'share' ? (
           <div className="grid items-start gap-5 lg:grid-cols-2">
             <ShareCard view={view} onRotate={rotate} />
-            <div className="grid gap-5">
-              {projector.why !== 'unavailable' ? (
-                <ProjectorCard
-                  url={g.projectorUrl}
-                  planned={projector.on}
-                  plan={projector.plan}
-                  onRotate={() => rotate('projector')}
-                />
-              ) : null}
+            {projector.why !== 'unavailable' ? (
+              <ProjectorCard
+                url={g.projectorUrl}
+                planned={projector.on}
+                plan={projector.plan}
+                onRotate={() => rotate('projector')}
+              />
+            ) : null}
+          </div>
+        ) : tab === 'photos' ? null : tab === 'extras' ? (
+          <div className="grid gap-5">
+            {/* the morning after: the album made from the gallery (feature album) */}
+            {initial.album ? <AlbumCard initial={initial.album} /> : null}
+            <div className="grid items-start gap-5 lg:grid-cols-2">
               {initial.aiPhotos ? <AiPhotosCard initial={initial.aiPhotos} /> : null}
               {view.features.auto_reel.why !== 'unavailable' ? (
                 <FilmCard id={id} feature={view.features.auto_reel} />
               ) : null}
+              {initial.faces ? <FaceSearchCard id={id} initial={initial.faces} /> : null}
             </div>
           </div>
+        ) : (
+          <>
+            <SettingsCard view={view} onPatch={patch} onAi={(on) => feature('gallery_ai', on)} />
+            <Card padding="lg" className="mt-10 border-danger-line" data-testid="gallery-danger">
+              <CardTitle as="h2" className="mb-1 text-danger">
+                {L.danger.title}
+              </CardTitle>
+              <p className="text-[13px] text-muted">{L.danger.body}</p>
+              <Hint text={L.hints.deleteGallery}>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  className="mt-3"
+                  icon={<Trash2 />}
+                  onClick={() => setConfirmDelete(true)}
+                >
+                  {L.danger.button}
+                </Button>
+              </Hint>
+            </Card>
+          </>
+        )}
+        {/* the photos stay mounted: their review queue and list follow the gallery live while another
+            section is open */}
+        <div hidden={tab !== 'photos'}>
           <ItemsSection
             key={id}
             invitationId={id}
@@ -405,31 +460,8 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
             version={version}
             onModerate={moderate}
           />
-        </TabsPanel>
-        <TabsPanel value="settings" className="mt-5">
-          <div className="grid items-start gap-5 lg:grid-cols-2">
-            <SettingsCard view={view} onPatch={patch} onAi={(on) => feature('gallery_ai', on)} />
-            {initial.faces ? <FaceSearchCard id={id} initial={initial.faces} /> : null}
-          </div>
-          <Card padding="lg" className="mt-10 border-danger-line" data-testid="gallery-danger">
-            <CardTitle as="h2" className="mb-1 text-danger">
-              {L.danger.title}
-            </CardTitle>
-            <p className="text-[13px] text-muted">{L.danger.body}</p>
-            <Hint text={L.hints.deleteGallery}>
-              <Button
-                variant="danger"
-                size="sm"
-                className="mt-3"
-                icon={<Trash2 />}
-                onClick={() => setConfirmDelete(true)}
-              >
-                {L.danger.button}
-              </Button>
-            </Hint>
-          </Card>
-        </TabsPanel>
-      </Tabs>
+        </div>
+      </div>
       <Dialog
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
@@ -593,5 +625,121 @@ function GalleryArt({ large = false }: { large?: boolean }) {
       />
       <circle cx="78" cy="46" r="4" style={{ fill: 'var(--color-brand-line)' }} transform="rotate(7 68 57)" />
     </svg>
+  );
+}
+
+type Section = 'share' | 'photos' | 'extras' | 'settings';
+const SECTIONS: readonly Section[] = ['share', 'photos', 'extras', 'settings'];
+/** the old link to the settings (?view=settings) still lands there */
+const isSection = (v: string | null): v is Section => !!v && (SECTIONS as readonly string[]).includes(v);
+
+/**
+ * The tab's parts as four large buttons — an icon, the name, what is in it in a line, and what waits
+ * for the host there (photos to approve) — a tab list (arrows move between them).
+ */
+function SectionNav({
+  value,
+  onChange,
+  items,
+}: {
+  value: Section;
+  onChange(v: Section): void;
+  items: { value: Section; icon: LucideIcon; title: string; body: string; alert?: string | null }[];
+}) {
+  const { t } = useUi();
+  return (
+    <div
+      role="tablist"
+      aria-label={t.liveGallery.sections.label}
+      onKeyDown={rovingKeyDown}
+      className="mt-6 grid grid-cols-2 gap-2.5 lg:grid-cols-4"
+      data-testid="gallery-sections"
+    >
+      {items.map(({ value: v, icon: Icon, title, body, alert }) => {
+        const on = v === value;
+        return (
+          <button
+            key={v}
+            type="button"
+            role="tab"
+            id={`gallery-tab-${v}`}
+            aria-selected={on}
+            aria-controls={`gallery-panel-${v}`}
+            tabIndex={on ? 0 : -1}
+            onClick={() => onChange(v)}
+            data-section={v}
+            className={cn(
+              'group relative flex min-h-[92px] items-start gap-3 rounded-[16px] border p-3.5 text-start transition-[background-color,border-color,box-shadow] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:p-4',
+              on
+                ? 'border-brand bg-brand-soft shadow-[0_8px_24px_-14px_rgba(160,112,63,0.55)]'
+                : 'border-line bg-surface hover:border-line-strong hover:bg-subtle/60',
+            )}
+          >
+            <span
+              aria-hidden
+              className={cn(
+                'grid size-10 shrink-0 place-items-center rounded-[12px] transition-colors',
+                on
+                  ? 'bg-brand text-white'
+                  : 'bg-subtle text-ink group-hover:bg-brand-soft group-hover:text-brand-deep',
+              )}
+            >
+              <Icon className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[14.5px] leading-snug font-bold">{title}</span>
+              <span className="mt-0.5 block text-[12.5px] leading-snug text-muted">{body}</span>
+              {alert ? (
+                <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-warning-bg px-2 py-0.5 text-[11.5px] font-semibold text-warning">
+                  <ShieldCheck aria-hidden className="size-3" />
+                  {alert}
+                </span>
+              ) : null}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The one thing to do now: share the link (nothing yet), approve what waits, or the album that is ready. */
+function NextStep({
+  pending,
+  total,
+  albumOpen,
+  onGo,
+}: {
+  pending: number;
+  total: number;
+  albumOpen: boolean;
+  onGo(v: Section): void;
+}) {
+  const { t, plural, number } = useUi();
+  const N = t.liveGallery.next;
+  const step: { text: string; cta: string; to: Section } | null = pending
+    ? { text: plural(N.pending, pending, { n: number(pending) }), cta: N.pendingCta, to: 'photos' }
+    : !total
+      ? { text: N.share, cta: N.shareCta, to: 'share' }
+      : albumOpen
+        ? { text: N.album, cta: N.albumCta, to: 'extras' }
+        : null;
+  if (!step) return null;
+  return (
+    <div
+      className="mt-5 flex flex-wrap items-center gap-3 rounded-[16px] border border-brand-line bg-[linear-gradient(135deg,var(--color-brand-soft),var(--color-surface))] px-4 py-3"
+      data-testid="gallery-next"
+    >
+      <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-full bg-brand text-white">
+        <ArrowUpRight className="icon-dir size-[18px]" />
+      </span>
+      <p className="min-w-0 flex-1 text-[14px]">
+        <span className="font-bold">{N.label}: </span>
+        {step.text}
+      </p>
+      <Button size="sm" onClick={() => onGo(step.to)}>
+        {step.cta}
+      </Button>
+    </div>
   );
 }

@@ -115,11 +115,11 @@ export function FeedPost({
     <article
       aria-label={fmt(P.label, { name: author })}
       data-post={post.key}
-      className={`overflow-hidden bg-surface sm:rounded-[18px] sm:border sm:border-line ${
+      className={`overflow-hidden rounded-[24px] border border-line/60 bg-surface shadow-[0_14px_40px_-26px_rgba(28,25,23,0.5)] ${
         fresh ? 'motion-safe:animate-[gallery-in_600ms_cubic-bezier(0.22,1,0.36,1)_both]' : ''
       }`}
     >
-      <header className="flex items-center gap-2.5 px-3 py-2.5">
+      <header className="flex items-center gap-2.5 px-3.5 py-3">
         <Avatar name={post.name} seed={post.name ?? post.by ?? post.key} host={post.by === 'host'} />
         <div className="min-w-0 flex-1 leading-tight">
           <p className="truncate text-[14px] font-semibold" dir="auto">
@@ -142,7 +142,7 @@ export function FeedPost({
         {current.ai ? (
           // an AI photo a guest made with the people of honor (features/ai-photos): said so
           <span
-            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-subtle px-2 py-0.5 text-[11px] font-bold text-muted"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--gallery-accent)] px-2 py-0.5 text-[11px] font-bold text-[var(--gallery-accent-ink)]"
             data-ai=""
           >
             <Sparkles aria-hidden className="size-3" />
@@ -150,13 +150,19 @@ export function FeedPost({
           </span>
         ) : null}
         {time ? (
-          <time className="shrink-0 text-[12.5px] text-muted" dateTime={post.at}>
+          <time
+            className="shrink-0 rounded-full bg-canvas px-2 py-0.5 text-[11.5px] text-muted"
+            dateTime={post.at}
+          >
             {time}
           </time>
         ) : null}
       </header>
 
-      <div className="relative bg-subtle" style={{ aspectRatio: String(frameRatio(post.items[0])) }}>
+      <div
+        className="relative mx-2 overflow-hidden rounded-[18px] bg-subtle"
+        style={{ aspectRatio: String(frameRatio(post.items[0])) }}
+      >
         <ul
           ref={track}
           className="flex size-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -243,7 +249,7 @@ export function FeedPost({
         ) : null}
       </div>
 
-      <div className="flex items-center gap-1 px-1.5 pt-1">
+      <div className="flex items-center gap-1 px-2 pt-1.5">
         <button
           type="button"
           onClick={() => onLike(!liked)}
@@ -284,7 +290,7 @@ export function FeedPost({
           <Maximize2 aria-hidden className="size-5" />
         </button>
       </div>
-      <p className="px-3.5 pb-3.5 text-[14px]" aria-live="polite" data-likes={post.key}>
+      <p className="px-4 pb-4 text-[14px]" aria-live="polite" data-likes={post.key}>
         {n ? (
           <span className="font-semibold">{plural(P.likes, n, { n: number(n) })}</span>
         ) : (

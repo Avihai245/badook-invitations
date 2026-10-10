@@ -3,6 +3,29 @@ import type { LiveGalleryDict } from './live-gallery.he';
 /** The live gallery in the host app (the invitation's "Gallery" tab) — English. */
 export const liveGalleryEn: LiveGalleryDict = {
   views: { use: 'At the event', settings: 'Settings & deleting' },
+  sections: {
+    label: 'Parts of the gallery',
+    share: { title: 'Share with guests', body: 'Link, QR code, WhatsApp and the venue screen' },
+    photos: {
+      title: 'Photos & videos',
+      body: '{n} in the gallery',
+      pending: '{n} waiting for your approval',
+    },
+    extras: { title: 'Album, film & AI', body: 'The album after, a moments film, AI photos and face search' },
+    settings: { title: 'Settings', body: 'Who approves, access code, when it’s open, download and delete' },
+  },
+  next: {
+    label: 'Next step',
+    share: 'No photos yet — send your guests the link or print the QR code for the tables.',
+    shareCta: 'Share with guests',
+    pending: {
+      one: 'One photo is waiting for your approval.',
+      other: '{n} photos are waiting for your approval.',
+    },
+    pendingCta: 'Review photos',
+    album: 'Your album is ready — send your guests a thank-you with the link.',
+    albumCta: 'Open the album',
+  },
   tab: 'Gallery',
   metaTitle: 'Gallery · {name}',
   title: 'Live gallery',

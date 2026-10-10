@@ -70,7 +70,7 @@ export interface OwnerAi {
 
 export interface GuestAi {
   settings: AiSettings;
-  people: { id: string; role: Role; name: Record<string, string> }[];
+  people: { id: string; role: Role; name: Record<string, string>; photoPath?: string | null }[];
   used: { guest: number; event: number };
   mine: PhotoRow[];
 }

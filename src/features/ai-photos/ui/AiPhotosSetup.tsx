@@ -25,6 +25,7 @@ import { AI_PHOTOS } from '../config';
 import { nameIn, type Role } from '../model';
 import { shrinkPhoto, type ShrunkPhoto } from '../client/photo';
 import type { HostAiPerson, HostAiPhoto, HostAiView } from '../types';
+import { AiExplainer, AiProgress } from './AiExplainer';
 
 const PER_EVENT = [25, 50, 100, 150, 200, 300, 500];
 
@@ -129,9 +130,14 @@ export function AiPhotosSetup({ initial }: { initial: HostAiView }) {
           </div>
         }
       />
+      <div className="mt-4">
+        <AiProgress people={view.people.some((p) => p.photo)} consent={!!s.consentAt} enabled={s.enabled} />
+      </div>
       {!view.gallery ? (
         <p className="mt-4 rounded-input bg-warning-bg px-3 py-2.5 text-[13px] text-warning">{P.noGallery}</p>
       ) : null}
+      {/* what it is, before anything else */}
+      <AiExplainer className="mt-5" />
 
       <div className="mt-6 grid items-start gap-5 xl:grid-cols-[1.4fr_1fr]">
         <Card padding="lg" className="flex flex-col gap-4" data-testid="ai-people">

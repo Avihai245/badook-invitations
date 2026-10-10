@@ -7,6 +7,7 @@ import { Badge, Button, Card, CardTitle, Hint, useToast } from '@/components/app
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
 import { useUi } from '@/lib/i18n/client';
 import type { HostAiView } from '../types';
+import { AiExplainer } from './AiExplainer';
 
 /**
  * The AI photos' card in the gallery tab (feature ai_photos): whether guests can make photos with the
@@ -61,6 +62,8 @@ export function AiPhotosCard({ initial }: { initial: HostAiView }) {
           <p className="mt-1 text-[13px] text-muted">{P.card.body}</p>
         </div>
       </div>
+      {/* how it works, in three steps (until it is open to guests) */}
+      {!ready ? <AiExplainer compact /> : null}
       {!f.on && f.why === 'plan' ? (
         <div className="flex flex-wrap items-center gap-3 rounded-input border border-brand-line bg-brand-soft px-3 py-2.5 text-[13px]">
           <Crown aria-hidden className="size-4 text-brand-deep" />

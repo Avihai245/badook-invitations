@@ -6,7 +6,7 @@ import { emailLayout, escapeHtml, type EmailContent } from '@/features/invitatio
 import { hostsLine } from '@/features/invitations/lib/text';
 import { fmt } from '@/lib/i18n/app';
 import { localMoment, zoneCity } from '../time';
-import type { ScheduledSend, SendKind } from '../types';
+import { sendPath, type ScheduledSend, type SendKind } from '../types';
 import type { ScheduleDb } from './db';
 
 /**
@@ -192,7 +192,7 @@ export async function mailFailedSends(deps: FailureMailDeps, limit = 20): Promis
       const email = failedEmail({
         send: f,
         doc: parsed.data,
-        sendUrl: `${deps.base}/app/invitations/${f.invitationId}/gallery`,
+        sendUrl: `${deps.base}/app/invitations/${sendPath(f.invitationId, f.kind)}`,
         billingUrl: `${deps.base}/app/billing`,
         brand: deps.brand,
       });

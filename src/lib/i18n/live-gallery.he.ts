@@ -1,6 +1,24 @@
 /** The live gallery in the host app (the invitation's "Gallery" tab) — Hebrew. */
 export const liveGalleryHe = {
   views: { use: 'שימוש באירוע', settings: 'הגדרות ומחיקה' },
+  /** the tab's parts: what each is, in a line */
+  sections: {
+    label: 'חלקי הגלריה',
+    share: { title: 'שיתוף עם האורחים', body: 'קישור, QR, שליחה בוואטסאפ ומסך באולם' },
+    photos: { title: 'התמונות והסרטונים', body: '{n} בגלריה', pending: '{n} מחכות לאישור שלכם' },
+    extras: { title: 'אלבום, סרטון ו־AI', body: 'האלבום שאחרי, סרט רגעים, צילומי AI וזיהוי פנים' },
+    settings: { title: 'הגדרות', body: 'מי מאשר, קוד גישה, מתי פתוח, הורדה ומחיקה' },
+  },
+  /** what to do now, by where the gallery stands */
+  next: {
+    label: 'השלב הבא',
+    share: 'עוד אין תמונות — שלחו לאורחים את הקישור או הדפיסו את קוד ה־QR לשולחנות.',
+    shareCta: 'לשיתוף עם האורחים',
+    pending: { one: 'תמונה אחת מחכה לאישור שלכם.', other: '{n} תמונות מחכות לאישור שלכם.' },
+    pendingCta: 'לאישור התמונות',
+    album: 'האלבום מוכן — שלחו לאורחים תודה עם הקישור.',
+    albumCta: 'לאלבום',
+  },
   tab: 'גלריה',
   metaTitle: 'גלריה · {name}',
   title: 'גלריה חיה',

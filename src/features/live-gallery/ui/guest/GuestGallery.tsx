@@ -14,6 +14,7 @@ import {
   Lock,
   LoaderCircle,
   MapPin,
+  Play,
   Sparkles,
   Trash2,
   User,
@@ -516,8 +517,8 @@ function GalleryBody({
     : null;
   const more_ = next ? '+' : '';
   const stat = (n: number, label: string, testId?: string) => (
-    <div className="text-center sm:text-start" data-testid={testId}>
-      <p className="text-[17px] leading-none font-bold tabular-nums">
+    <div className="text-center" data-testid={testId}>
+      <p className="text-[19px] leading-none font-bold tabular-nums">
         {number(n)}
         {more_}
       </p>
@@ -527,6 +528,10 @@ function GalleryBody({
 
   return (
     <div style={accent} className="relative min-h-svh overflow-x-clip bg-canvas" dir={dir}>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[460px] bg-[radial-gradient(120%_70%_at_85%_0%,color-mix(in_oklab,var(--gallery-accent)_22%,transparent),transparent_70%),radial-gradient(90%_60%_at_0%_10%,color-mix(in_oklab,var(--gallery-accent)_12%,transparent),transparent_70%)]"
+      />
       {/* the top bar: the event, live, the language and "you" (the name on what you share) */}
       <div className="sticky top-0 z-30 border-b border-line/70 bg-canvas/85 backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex h-14 w-full max-w-[640px] items-center gap-2 px-4">
@@ -590,30 +595,77 @@ function GalleryBody({
 
       <div className="relative mx-auto w-full max-w-[640px] px-4 pt-5 pb-32 sm:px-6">
         {/* the event, like a profile: its picture in a ring, its name, its numbers */}
-        <header className="flex items-center gap-5 sm:gap-7">
-          <span
-            aria-hidden
-            className="gallery-ring grid size-[86px] shrink-0 place-items-center rounded-full p-[3px] sm:size-[104px]"
-          >
-            <span className="relative grid size-full place-items-center overflow-hidden rounded-full border-[3px] border-canvas bg-[color-mix(in_oklab,var(--gallery-accent)_14%,white)] font-display text-[26px] font-bold text-[var(--gallery-accent)]">
-              {monogram || <Sparkles className="size-8" />}
-            </span>
-          </span>
-          <div className="min-w-0 flex-1">
-            <h1 className="font-display text-[24px] leading-[1.1] font-bold text-balance sm:text-[30px]">
-              <bdi>{title}</bdi>
-            </h1>
-            <p className="mt-1 text-[13px] text-muted">
-              {[t.eyebrow, eventDate].filter(Boolean).join(' · ')}
-            </p>
-            {phase === 'ready' ? (
-              <div className="mt-3.5 flex gap-6">
-                {stat(posts.length, t.stats.posts)}
-                {stat(items.length, t.stats.media)}
-                {stat(guests, t.stats.people, 'gallery-people')}
-              </div>
-            ) : null}
+        <header className="rounded-[28px] border border-white/70 bg-surface/80 p-4 shadow-[0_18px_50px_-30px_rgba(28,25,23,0.45)] backdrop-blur-sm sm:p-6">
+          <div className="flex items-center gap-4 sm:gap-6">
+            {(() => {
+              // the event's ring: all of its stories, from the first one this phone hasn't watched
+              const fresh_ = stories.some((s) => isUnseen(s, seen));
+              const face = (
+                <span className="relative grid size-full place-items-center overflow-hidden rounded-full border-[3px] border-surface bg-[color-mix(in_oklab,var(--gallery-accent)_14%,white)] font-display text-[26px] font-bold text-[var(--gallery-accent)]">
+                  {monogram || <Sparkles className="size-8" />}
+                </span>
+              );
+              const ring = `grid size-[88px] shrink-0 place-items-center rounded-full p-[3px] sm:size-[104px] ${
+                !stories.length || fresh_ ? 'gallery-ring' : 'bg-line-strong'
+              }`;
+              if (phase === 'ready' && stories.length)
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setStoryOpen((stories.find((s) => isUnseen(s, seen)) ?? stories[0]!).key)}
+                    aria-label={t.stories.title}
+                    title={t.stories.title}
+                    data-testid="gallery-ring"
+                    className={`group relative ${ring} transition-transform active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus motion-reduce:transition-none ${
+                      fresh_ ? 'shadow-[0_8px_28px_-10px_var(--gallery-accent)]' : ''
+                    }`}
+                  >
+                    {face}
+                    <span
+                      aria-hidden
+                      className="absolute -bottom-1 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full border-2 border-surface bg-[var(--gallery-accent)] px-2 py-0.5 text-[10.5px] font-bold text-[var(--gallery-accent-ink)]"
+                    >
+                      <Play className="size-2.5 fill-current" />
+                      {number(stories.reduce((n, s) => n + s.items.length, 0))}
+                    </span>
+                  </button>
+                );
+              if (phase === 'ready' && canUpload)
+                return (
+                  <button
+                    type="button"
+                    onClick={() => share('story')}
+                    aria-label={t.stories.addLabel}
+                    data-testid="gallery-ring"
+                    className={`relative ${ring} transition-transform active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus motion-reduce:transition-none`}
+                  >
+                    {face}
+                  </button>
+                );
+              return (
+                <span aria-hidden className={ring} data-testid="gallery-ring">
+                  {face}
+                </span>
+              );
+            })()}
+            <div className="min-w-0 flex-1">
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_oklab,var(--gallery-accent)_12%,white)] px-2.5 py-1 text-[11.5px] font-semibold text-[var(--gallery-accent)]">
+                <Sparkles aria-hidden className="size-3" />
+                {t.eyebrow}
+              </p>
+              <h1 className="mt-1.5 font-display text-[25px] leading-[1.1] font-bold text-balance sm:text-[32px]">
+                <bdi>{title}</bdi>
+              </h1>
+              {eventDate ? <p className="mt-1 text-[13px] text-muted">{eventDate}</p> : null}
+            </div>
           </div>
+          {phase === 'ready' ? (
+            <div className="mt-4 grid grid-cols-3 rounded-[18px] bg-canvas/70 py-3 [&>*+*]:border-s [&>*+*]:border-line/70">
+              {stat(posts.length, t.stats.posts)}
+              {stat(items.length, t.stats.media)}
+              {stat(guests, t.stats.people, 'gallery-people')}
+            </div>
+          ) : null}
         </header>
 
         {phase === 'invalid' ? (
@@ -687,7 +739,15 @@ function GalleryBody({
                 guest={guest}
                 name={name}
                 eventType={data.event.eventType}
-                onShared={() => void reload()}
+                theme={accent}
+                onShared={() => {
+                  setView('feed');
+                  void reload().then(() =>
+                    document
+                      .getElementById('gallery-feed-top')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+                  );
+                }}
               />
             ) : null}
             {data.faces ? <FaceSearch token={token} code={codeOf} until={data.faces.until} /> : null}
@@ -744,7 +804,7 @@ function GalleryBody({
               </p>
             ) : null}
 
-            <section className="mt-5" aria-labelledby="gallery-feed">
+            <section className="mt-6 scroll-mt-20" aria-labelledby="gallery-feed" id="gallery-feed-top">
               <h2 id="gallery-feed" className="sr-only">
                 {t.feed.title}
               </h2>
@@ -752,7 +812,7 @@ function GalleryBody({
               <div
                 role="tablist"
                 aria-label={t.view.label}
-                className="-mx-4 grid grid-cols-2 border-b border-line sm:mx-0"
+                className="grid grid-cols-2 gap-1 rounded-full border border-line/70 bg-surface/80 p-1 shadow-[0_6px_20px_-16px_rgba(28,25,23,0.4)]"
               >
                 {(
                   [
@@ -768,18 +828,14 @@ function GalleryBody({
                     aria-controls="gallery-view"
                     onClick={() => setView(value)}
                     data-view={value}
-                    className={`relative inline-flex h-12 items-center justify-center gap-2 text-[13.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus ${
-                      view === value ? 'text-ink' : 'text-muted hover:text-ink'
+                    className={`relative inline-flex h-10 items-center justify-center gap-2 rounded-full text-[13.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus ${
+                      view === value
+                        ? 'bg-[var(--gallery-accent)] text-[var(--gallery-accent-ink)] shadow-sm'
+                        : 'text-muted hover:text-ink'
                     }`}
                   >
                     <Icon aria-hidden className="size-[18px]" />
                     {label}
-                    {view === value ? (
-                      <span
-                        aria-hidden
-                        className="absolute inset-x-6 -bottom-px h-[2px] rounded-full bg-ink"
-                      />
-                    ) : null}
                   </button>
                 ))}
               </div>
@@ -805,7 +861,7 @@ function GalleryBody({
                   )
                 ) : posts.length ? (
                   <>
-                    <ol className="-mx-4 flex flex-col gap-3 sm:mx-0 sm:gap-6" data-testid="gallery-posts">
+                    <ol className="flex flex-col gap-5 sm:gap-6" data-testid="gallery-posts">
                       {posts.map((post) => (
                         <li key={post.key}>
                           <FeedPost

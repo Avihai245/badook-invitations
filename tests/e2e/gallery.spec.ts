@@ -285,9 +285,10 @@ test('a guest’s phone: three photos, the network drops midway, all of them arr
   await guest.keyboard.press('Escape');
   await expect(viewer).toBeHidden();
 
-  // the host's tab counts them
+  // the host's tab counts them ("the photos and videos")
   await page.reload();
   await hydrated(page);
+  await page.getByRole('tab', { name: /^התמונות והסרטונים/ }).click();
   await expect(page.getByTestId('gallery-items').locator('li')).toHaveCount(3);
   await context.close();
 });
@@ -329,6 +330,8 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   const mine = guest.getByTestId('gallery-mine');
   await expect(mine).toContainText('ממתין לאישור המארחים');
   await expect(guest.getByTestId('gallery-posts')).toHaveCount(0);
+  // the review queue: in "the photos and videos"
+  await page.getByRole('tab', { name: /^התמונות והסרטונים/ }).click();
   const review = page.getByTestId('gallery-review');
   await expect(review).toContainText('ייתכן שאינו מתאים', { timeout: 20_000 });
   const checks = (await (await fetch(`${MOCKS}/__ai/gallery`)).json()) as {
@@ -346,9 +349,9 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   await expect(review).toBeHidden();
   await expect(mine).toContainText('לא יופיע בגלריה', { timeout: 20_000 });
 
-  // approval mode: everything waits (the settings are on their own tab; the link, the cards and the
-  // review queue on the first)
-  await page.getByRole('tab', { name: 'הגדרות ומחיקה' }).click();
+  // approval mode: everything waits (the settings are in their own section, the review queue in "the
+  // photos and videos")
+  await page.getByRole('tab', { name: /^הגדרות/ }).click();
   await expect(settings.getByRole('switch', { name: 'בדיקה אוטומטית' })).toBeChecked();
   await settings.getByRole('radio', { name: 'אחרי אישור שלכם' }).click();
   await expect(settings.getByRole('radio', { name: 'אחרי אישור שלכם' })).toHaveAttribute(
@@ -358,8 +361,8 @@ test('the host’s review: the automatic check holds a suspicious photo, approva
   await expect(guest.getByText('המארחים יאשרו אותם לפני שיופיעו בגלריה.')).toBeVisible({ timeout: 20_000 });
   await choose(guest, [plain!]);
   await expect(progressTitle(guest)).toHaveText('2 מתוך 2 הועלו', { timeout: 30_000 });
-  // back to the first tab with what the server holds now (a tab opened again starts from the page's data)
-  await page.goto(`/app/invitations/${id}/gallery`);
+  // back to the photos with what the server holds now (a section opened again starts from the page's data)
+  await page.goto(`/app/invitations/${id}/gallery?view=photos`);
   await hydrated(page);
   await expect(review).toContainText('ממתין לאישור שלכם', { timeout: 20_000 });
   const [held] = (await itemsOf(id)).filter((r) => r.status === 'pending');

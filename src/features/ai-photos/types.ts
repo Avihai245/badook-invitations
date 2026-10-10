@@ -11,6 +11,8 @@ export interface GuestAiPerson {
   id: string;
   role: Role;
   name: L10n;
+  /** their photo, a short-lived signed link (null: none to show) */
+  photo?: string | null;
 }
 
 /** One of the guest's own photos: where it stands, and the result's links when done. */

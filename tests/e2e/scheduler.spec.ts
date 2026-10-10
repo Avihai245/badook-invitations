@@ -35,8 +35,8 @@ test('the album’s thank-you scheduled for 15:00 New York time goes out then �
     [host.email],
   );
 
-  // the album opened, its thank-you dialog: "schedule for later"
-  await open(page, `/app/invitations/${host.id}/gallery`);
+  // the album opened (the gallery tab's "album, film & AI"), its thank-you dialog: "schedule for later"
+  await open(page, `/app/invitations/${host.id}/gallery?view=extras`);
   const card = page.getByTestId('album-card');
   await card.getByRole('button', { name: 'לפתוח עכשיו' }).click();
   await expect(card.getByTestId('album-state')).toHaveText('פתוח לאורחים');
@@ -108,6 +108,7 @@ test('the album’s thank-you scheduled for 15:00 New York time goes out then �
 
   // the dialog says so
   await page.reload();
+  await expect(page.getByTestId('album-card')).toBeVisible();
   await page.getByTestId('album-card').getByTestId('album-send').first().click();
   await expect(page.getByRole('dialog').getByText(/השליחה המתוזמנת יצאה/)).toBeVisible();
 });
@@ -180,7 +181,7 @@ test('a scheduled send that can’t go out (no credits by then): kept as failed 
       expect.stringMatching(/09:00.*לפי שעון Los Angeles/),
       expect.stringContaining('קרדיטים'),
     ],
-    button: `${host.id}/gallery`,
+    button: `${host.id}/gallery?view=share`,
   });
   const [failed] = await sql<{ status: string; error: string; needed: number; mailed: boolean }>(
     `select status, error, (result->>'needed')::int as needed, failure_mailed_at is not null as mailed

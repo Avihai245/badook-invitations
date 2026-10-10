@@ -347,7 +347,7 @@ describe('a scheduled send that didn’t go out: the host’s WhatsApp message',
         expect.stringMatching(/15:00.*\(לפי שעון New York\)$/),
         'לא היו מספיק קרדיטים (היה צריך 40, היו 3)',
       ],
-      button: `${INV}/gallery`,
+      button: `${INV}/gallery?view=extras`,
       ref: 'alert:a',
     });
     const english = alerts.alertMessage(alert('a'), 'badook_host_alert', en)!;

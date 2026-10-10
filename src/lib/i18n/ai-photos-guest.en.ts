@@ -12,7 +12,23 @@ export const aiPhotosGuestEn: AiPhotosGuestDict = {
   },
   and: ' & ',
   title: 'A photo with the people of honor',
+  steps: {
+    source: 'Where do we start?',
+    who: 'Who’s in it?',
+    what: 'What’s happening?',
+    style: 'Which style?',
+  },
+  hero: 'Four small steps — and AI creates a photo of you with {names}.',
+  need: {
+    source: 'Pick a photo or an imagined scene',
+    who: 'Choose who’s in it',
+    prompt: 'Write what’s happening',
+  },
   photo: {
+    takeHint: 'Take one now',
+    pickHint: 'From your phone',
+    noneHint: 'No photo, just imagination',
+    change: 'Change photo',
     label: 'The photo',
     take: 'Camera',
     pick: 'From phone',
@@ -51,11 +67,9 @@ export const aiPhotosGuestEn: AiPhotosGuestDict = {
     baby: 'The baby',
     honoree: 'Guest of honor',
   },
-  consent:
-    'The photo and your request are processed by OpenAI and kept for the hosts until 30 days after the event. Inappropriate requests are blocked.',
-  privacy: 'Privacy policy',
   create: 'Create the photo',
   working: {
+    close: 'You can close this — the photo keeps being made and will wait for you here.',
     title: 'Creating your photo…',
     body: 'It usually takes up to a minute or two. Keep the page open — or come back to it later.',
     tips: [

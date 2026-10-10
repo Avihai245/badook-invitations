@@ -22,12 +22,11 @@ test('without the package the film and face search are offered, not given; their
   const host = await newHost(page, 'off-pro', 'pro');
   const link = await galleryOn(page, host.id);
   await seedPhotos(host.id, [{ color: [200, 60, 60] }, { color: [60, 60, 200] }, { color: [60, 200, 60] }]);
-  await open(page, `/app/invitations/${host.id}/gallery`);
+  await open(page, `/app/invitations/${host.id}/gallery?view=extras`);
   const film = page.getByTestId('gallery-film');
   await expect(film).toContainText('סרט הרגעים כלול בחבילת Business');
   await expect(film.getByTestId('gallery-film-open')).toHaveCount(0);
-  // the face search card is in the settings tab
-  await page.getByRole('tab', { name: 'הגדרות ומחיקה' }).click();
+  // the face search card is beside it
   await expect(page.getByTestId('face-search-card')).toContainText('החיפוש לפי פנים כלול בחבילת Business');
   await expect(page.getByTestId('face-search-prepare')).toHaveCount(0);
   // the studio offers the package

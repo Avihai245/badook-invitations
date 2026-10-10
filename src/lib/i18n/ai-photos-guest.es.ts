@@ -12,7 +12,23 @@ export const aiPhotosGuestEs: AiPhotosGuestDict = {
   },
   and: ' y ',
   title: 'Una foto con los protagonistas',
+  steps: {
+    source: '¿Por dónde empezamos?',
+    who: '¿Quién sale en la foto?',
+    what: '¿Qué está pasando?',
+    style: '¿Qué estilo?',
+  },
+  hero: 'Cuatro pasos sencillos — y la IA crea una foto tuya con {names}.',
+  need: {
+    source: 'Elige una foto o una escena imaginada',
+    who: 'Elige quién sale en la foto',
+    prompt: 'Escribe qué está pasando',
+  },
   photo: {
+    takeHint: 'Hacer una ahora',
+    pickHint: 'Desde el teléfono',
+    noneHint: 'Sin foto, solo imaginación',
+    change: 'Cambiar la foto',
     label: 'La foto',
     take: 'Cámara',
     pick: 'Del teléfono',
@@ -52,11 +68,9 @@ export const aiPhotosGuestEs: AiPhotosGuestDict = {
     baby: 'El bebé',
     honoree: 'Invitado de honor',
   },
-  consent:
-    'La foto y tu pedido se procesan en OpenAI y se guardan para los anfitriones hasta 30 días después de la celebración. Los pedidos inapropiados se bloquean.',
-  privacy: 'Política de privacidad',
   create: 'Crear la foto',
   working: {
+    close: 'Puedes cerrar — la foto se sigue creando y te esperará aquí.',
     title: 'Creando tu foto…',
     body: 'Suele tardar uno o dos minutos. Puedes dejar la página abierta o volver más tarde.',
     tips: ['Ajustando la luz…', 'Sumando a los protagonistas…', 'Acomodando sonrisas…', 'Ya casi…'],

@@ -48,7 +48,7 @@ test('the album: the guests’ photos in the invitation’s design, opened early
   );
 
   // the gallery tab: the album's card — it opens the morning after; the host opens it now
-  await open(page, `/app/invitations/${host.id}/gallery`);
+  await open(page, `/app/invitations/${host.id}/gallery?view=extras`);
   const card = page.getByTestId('album-card');
   await expect(card).toBeVisible();
   await expect(card.getByTestId('album-counts')).toContainText('16');
@@ -90,7 +90,7 @@ test('the album: the guests’ photos in the invitation’s design, opened early
     `update accounts set message_credits = 3 where user_id = (select id from auth.users where email = $1)`,
     [host.email],
   );
-  await open(page, `/app/invitations/${host.id}/gallery`);
+  await open(page, `/app/invitations/${host.id}/gallery?view=extras`);
   await page.getByTestId('album-card').getByTestId('album-send').click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByTestId('album-notices-rows').locator('li')).toHaveCount(1);
@@ -192,9 +192,10 @@ test('AI photos: the host sets up the couple; a guest makes them an animated-fil
   expect(last.text).toContain('animated-film');
   expect(last.text).toContain('נועה ואיתי רוקדים על חוף בהוואי בשקיעה');
 
-  // into the gallery, marked AI
+  // into the gallery, marked AI: the studio closes, back on the feed
   await studio.getByTestId('ai-to-gallery').click();
-  await expect(studio.getByText('התמונה נוספה לגלריה')).toBeVisible();
+  await expect(studio).toBeHidden();
+  await expect(guest.getByTestId('ai-notice')).toHaveText('התמונה נוספה לגלריה');
   const [item] = await sql<{ ai_generated: boolean; status: string }>(
     `select ai_generated, status from gallery_items where invitation_id = $1 and deleted_at is null`,
     [host.id],

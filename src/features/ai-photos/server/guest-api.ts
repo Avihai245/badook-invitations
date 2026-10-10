@@ -10,7 +10,7 @@ import { TOKEN_RE, UPLOADER_RE, rateKey, uploaderHash } from '@/features/live-ga
 import { AI_PHOTOS } from '../config';
 import { STYLES, detectPeople } from '../model';
 import type { GuestAiPhoto, GuestAiState } from '../types';
-import type { AiPhotoDb, PhotoRow } from './db';
+import type { AiPhotoDb, GuestAi, PhotoRow } from './db';
 import { photoPath } from './worker';
 
 /**
@@ -79,6 +79,15 @@ const rate = (
   limit: { count: number; windowSeconds: number },
 ) => deps.gallery.db.rateHit(rateKey(scope, value), limit.count, limit.windowSeconds);
 
+/** The people of honor for the page: their photo as a short-lived signed link (never the path). */
+async function guestPeople(rows: GuestAi['people'], deps: AiGuestDeps): Promise<GuestAiState['people']> {
+  const paths = rows.map((p) => p.photoPath).filter((x): x is string => !!x);
+  const urls = paths.length
+    ? await deps.signRead(BUCKETS.aiPhotos, paths, AI_PHOTOS.urls.signedTtlSeconds).catch(() => null)
+    : null;
+  return rows.map(({ photoPath, ...p }) => ({ ...p, photo: (photoPath && urls?.get(photoPath)) || null }));
+}
+
 async function guestPhotos(rows: readonly PhotoRow[], deps: AiGuestDeps): Promise<GuestAiPhoto[]> {
   const paths = rows.flatMap((r) => [r.thumbPath, r.resultPath]).filter((p): p is string => !!p);
   const urls = paths.length
@@ -112,7 +121,7 @@ export async function aiState(raw: unknown, ip: string | null, deps: AiGuestDeps
   );
   if (!s.settings.enabled || !s.people.length) return ok({ ai: null });
   const ai: GuestAiState = {
-    people: s.people,
+    people: await guestPeople(s.people, deps),
     perGuest: s.settings.perGuest,
     left: Math.max(0, s.settings.perGuest - s.used.guest),
     eventFull: s.used.event >= s.settings.perEvent,

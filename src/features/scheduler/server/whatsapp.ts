@@ -2,7 +2,7 @@ import 'server-only';
 import { safeMigrateDocument } from '@/features/invitations/contracts/migrate';
 import { missingTemplate, type SendResult, type TemplateSend } from '@/features/whatsapp/cloud-api';
 import type { TemplateLanguage } from '@/features/whatsapp/languages';
-import type { ScheduledSend } from '../types';
+import { sendPath, type ScheduledSend } from '../types';
 import type { ScheduleDb } from './db';
 import { failureParts } from './email';
 
@@ -44,7 +44,7 @@ export function alertMessage(f: AlertSend, template: string, lang: TemplateLangu
     template,
     lang: lang.code,
     body: [p.what, when, p.why],
-    button: `${f.invitationId}/gallery`,
+    button: sendPath(f.invitationId, f.kind),
     ref: `alert:${f.id}`,
   };
 }

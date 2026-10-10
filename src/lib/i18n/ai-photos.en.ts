@@ -8,6 +8,37 @@ export const aiPhotosEn: AiPhotosDict = {
     'Guests take a photo at the event, say what they’d like — and AI brings the people of honor into it. Upload a photo of each of them here, once.',
   back: 'To the gallery',
   plans: { free: 'Free', pro: 'Pro', business: 'Business' },
+  explain: {
+    title: 'What is it?',
+    lead: 'Guests create photos of themselves together with you on the gallery page — even when you didn’t get to take one together.',
+    steps: [
+      {
+        title: 'You upload your photos',
+        body: 'A clear photo of the face of each person of honor — once, before the event.',
+      },
+      {
+        title: 'Guests write what they’d like',
+        body: 'They take a photo at the event or imagine a new scene, and pick a style.',
+      },
+      {
+        title: 'AI creates the photo',
+        body: 'Within a minute. Download it, share it, or add it to the event’s gallery.',
+      },
+    ],
+    examples: 'What guests ask for, for example',
+    samples: [
+      'Add the groom raising a glass with us',
+      'Us with the couple on a tropical beach, animated-film style',
+      'The bride dancing with grandma',
+    ],
+    privacy: 'Only people with the gallery link. You see every photo made and can delete any of them.',
+  },
+  progress: {
+    label: 'Setup',
+    people: 'Photos of the people of honor',
+    consent: 'Their consent',
+    enabled: 'Open to guests',
+  },
   card: {
     title: 'AI photos with the people of honor',
     body: 'Guests create photos with the people of honor: take a photo, write “add Aviv to the photo” — and AI does the rest.',

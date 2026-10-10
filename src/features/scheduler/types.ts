@@ -4,6 +4,10 @@ import type { HHmm, ISODate } from './time';
 export const SEND_KINDS = ['gallery_link', 'album_thanks'] as const;
 export type SendKind = (typeof SEND_KINDS)[number];
 
+/** Where its dialog is: the gallery tab's section (?view=) — the link's "share", the album's "extras". */
+export const sendPath = (invitationId: string, kind: SendKind) =>
+  `${invitationId}/gallery?view=${kind === 'album_thanks' ? 'extras' : 'share'}`;
+
 /** To whom: the guests who haven't got it yet (or whose message failed), or everyone it reaches. */
 export type Audience = 'unsent' | 'all';
 

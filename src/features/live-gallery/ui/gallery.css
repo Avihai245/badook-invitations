@@ -83,3 +83,13 @@
 .gallery-ring {
   background: linear-gradient(45deg, #f9ce34 0%, #f58529 22%, #ee2a7b 55%, #c13584 78%, #6228d7 100%);
 }
+
+/* the AI studio while a photo is being made: a light sweeping across */
+@keyframes ai-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
