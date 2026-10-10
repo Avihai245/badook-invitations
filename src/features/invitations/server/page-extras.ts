@@ -1,5 +1,6 @@
 import 'server-only';
 import { cache } from 'react';
+import { invitationAlbumUrl } from '@/features/album/server/link';
 import { featuresFor } from '@/features/flags/server';
 import { invitationGalleryUrl } from '@/features/live-gallery/server/link';
 import type { InvitationDocument } from '../contracts/types';
@@ -8,8 +9,11 @@ import type { InvitationDocument } from '../contracts/types';
 export interface PageExtras {
   /** the beacon of how guests use the invitation (feature `analytics`) */
   insights: boolean;
-  /** the gallery section's link to the live gallery (feature `live_gallery`, and the gallery on) */
-  liveGallery: { url: string } | null;
+  /**
+   * the gallery section's link to the live gallery (feature `live_gallery`, and the gallery on), and
+   * to the album after the event (feature `album`, the album on)
+   */
+  liveGallery: { url: string; album?: string | null } | null;
 }
 
 const NONE: PageExtras = { insights: false, liveGallery: null };
@@ -36,9 +40,17 @@ export const pageExtras = cache(
       return NONE;
     }
     const link = await gallery;
+    // after the event the section leads to the album, when the event has one
+    const album =
+      link && features.has('album')
+        ? await invitationAlbumUrl(invitationId, doc.share.slug).catch((err) => {
+            console.error('page extras: the album’s link is unavailable', err);
+            return null;
+          })
+        : null;
     return {
       insights: features.has('analytics'),
-      liveGallery: features.has('live_gallery') ? link : null,
+      liveGallery: features.has('live_gallery') && link ? { ...link, album } : null,
     };
   },
 );

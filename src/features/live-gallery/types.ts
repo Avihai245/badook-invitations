@@ -35,6 +35,8 @@ export interface FeedItem {
   post?: string;
   /** the Instagram username the guest asked to be tagged with (no @) */
   instagram?: string | null;
+  /** an AI photo a guest made with the people of honor (features/ai-photos) */
+  ai?: boolean;
 }
 
 export type Placement = 'story' | 'feed';

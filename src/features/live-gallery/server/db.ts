@@ -74,6 +74,8 @@ export interface ItemRow {
   guestId: string | null;
   /** who added it: a guest, or the host (their highlights film) */
   source?: 'guest' | 'host';
+  /** an AI photo a guest made with the people of honor (features/ai-photos) */
+  ai?: boolean;
   createdAt: string;
   completedAt: string | null;
   publishedAt: string | null;

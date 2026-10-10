@@ -3,7 +3,8 @@
 Every new capability sits behind a flag (`src/features/flags`). A feature is on for an event when:
 
 1. **this deployment offers it** — not listed in `INVITES_FEATURES_OFF`, and its setup exists: the AI
-   features (`gallery_ai`, `translate_ai`) need `ANTHROPIC_API_KEY` + `INVITES_AI_MODEL`;
+   features (`gallery_ai`, `translate_ai`) need `ANTHROPIC_API_KEY` + `INVITES_AI_MODEL`; `ai_photos` needs
+   `OPENAI_API_KEY` (OpenAI's image model, `INVITES_AI_IMAGE_MODEL`);
    `face_albums` needs `INVITES_FACE_ALBUMS=on` (biometric data — see below); the `planning` features
    need `INVITES_PLANNING=on` (see "Event planning" below). `art_direction` works
    without the AI (its composer) and `voice` without the speech service (the guest's device reads) —
@@ -24,8 +25,8 @@ before it.
 | Package | Adds |
 |---|---|
 | Basic | `cinematic`, `seating`, `languages`, `draft_review`, `analytics`, `planning` |
-| Premium | `seating_auto`, `seating_guide`, `live_gallery`, `gallery_ai`, `translate_ai`, `voice`, `planning_ai`, `planning_export` |
-| VIP | `checkin`, `projector`, `auto_reel`, `face_albums`, `art_direction`, `planning_templates` |
+| Premium | `seating_auto`, `seating_guide`, `live_gallery`, `gallery_ai`, `album`, `translate_ai`, `voice`, `planning_ai`, `planning_export` |
+| VIP | `checkin`, `projector`, `auto_reel`, `face_albums`, `ai_photos`, `art_direction`, `planning_templates` |
 
 Changing a package is one line in `PACKAGE_FEATURES` (`src/features/flags/features.ts`).
 
@@ -178,6 +179,60 @@ only if the host ticks it. Off: the studio offers the package or the switch, the
   the invitation's; the button, the wa.me text and the copied message open the gallery in their language.
   The dialog counts the messages per language and previews each. Credits and statuses work like the other
   templates.
+
+## The album after the event (`album`, Premium)
+
+The morning after the event (08:00 in its time zone — or when the hosts open it) the gallery's published
+photos and videos become a designed album at a link of its own, `/e/<slug>/album?a=<token>`
+(`features/album`; the link is derived like the gallery's, kind `album`): a cover (the hosts' pick, else the
+best photo by the film's weighing — sharpness, exposure, size, the automatic check), the hosts' thank-you
+(their words per language, else the default written for the kind of event: `album/phrases.ts` "בחתונה
+שלנו", "at Jonathan's bar mitzvah"…), up to 9 best moments (one per moment, spread over the event), and the
+chapters — the invitation's own timeline (an evening past midnight included) or the pauses between photos —
+in justified rows; a full-screen viewer, downloads (one photo, or the whole album as a ZIP made in the
+browser), sharing; in the invitation's palette and fonts and in all its languages. The invitation's gallery
+section leads to it after the event. Signed links last 3 hours; a page left open asks for fresh ones
+(`POST /api/gallery/album`).
+
+The hosts (gallery tab → "the album after the event"; `/app/invitations/:id/gallery/album`): on/off, when it
+opens (the morning after, or now), videos, chapters, title and thank-you per language, the cover, photos left
+out (they stay in the gallery), the link with its QR and a new link, and **the thank-you to guests** — the
+same dialog as the gallery's link (`SendLinkDialog kind="album"`): from the system's number with the fourth
+template (`INVITES_WHATSAPP_ALBUM_TEMPLATE`, docs/whatsapp-setup.md §10; a credit each, refunded when not
+delivered), from the hosts' own WhatsApp, or copied — in each guest's language. The daily run emails the
+hosts once when the album becomes ready (`sendAlbumReadyEmails`). Data: `gallery_albums` (one per gallery,
+goes with it), `album_notices`. Off: the link opens "closed", the APIs refuse (403 `feature_off`), the card
+offers the package.
+
+## AI photos with the people of honor (`ai_photos`, VIP for now)
+
+Guests create photos with the people the event celebrates, with OpenAI's image model
+(`features/ai-photos`, docs/album-and-ai-photos.md). **Setup** (gallery tab → "AI photos with the people of
+honor"; `/app/invitations/:id/gallery/ai`, also before the gallery is on): the people of honor — started
+from who the invitation celebrates for its kind of event (a couple's two, the bar/bat mitzvah child, the
+birthday person, a brit's parents…), at most 4 — each with a role, a name per language, a few helpful words
+and a photo (made small on the device, re-encoded on the server without metadata); the hosts confirm the
+people agreed; then on, with limits per guest's phone (default 3) and per event (default 100), and whether
+guests may add their photos to the gallery. **Guests** (the gallery's page): a photo from the event (camera
+or phone, or a new scene), who is in it (marked from what they type — names in any language with Hebrew's
+and Arabic's prefixes, "the groom", "the couple", "everyone"), what should happen (free words or an idea for
+the kind of event) → the photo, made in the background (`POST /api/gallery/ai/create` answers at once; the
+page polls `/status`), downloaded, shared, or added to the gallery (copied there as the guest's upload,
+`gallery_items.ai_generated`, by the gallery's approval mode; marked AI in the feed and the album).
+
+**The model**: `INVITES_AI_IMAGE_MODEL` (default `gpt-image-2`; a newer one, e.g. a gpt-image-2.5 model, by
+its id — a model OpenAI doesn't know falls back to gpt-image-2) at `INVITES_AI_IMAGE_QUALITY`. Two ways
+(`INVITES_AI_IMAGE_TRANSPORT`): `images` — `/v1/images/edits` with the guest's photo and each person's photo
+as `image[]` (one request, 20–90 s); `background` — the Responses API in background mode with the
+image_generation tool (started at once, checked with short requests: for hosts that cut long requests, like
+Amplify's ~30 s); `auto` (default) — background, else images. The worker (`processAiPhotos`) runs after the
+guest's request, on the guest's polls (checks), on the app's own clock, and at `POST /api/cron/ai-photos`;
+the database hands each photo to one worker, retries twice, and counts limits under a lock (a failed or
+blocked photo doesn't count; `INVITES_AI_IMAGE_DAILY_LIMIT` is the site's ceiling a day). The request keeps
+the guest's words quoted inside fixed rules (likeness, natural light, respectful, no text); OpenAI's content
+rules refuse what they refuse ("blocked"). Files in the private `ai-photos` bucket; erased 30 days after the
+event (the daily run), at once when deleted, with the invitation. Off: the card offers the package or the
+switch, the APIs refuse (403).
 
 ## Insights (`analytics`)
 

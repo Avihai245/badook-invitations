@@ -28,6 +28,10 @@ export const FEATURES = [
   'face_albums',
   /** a highlights video made from the gallery */
   'auto_reel',
+  /** the morning after: the gallery as a designed album, a link to share and a thank-you to the guests */
+  'album',
+  /** guests create AI photos with the people of honor (their photos, uploaded by the host) */
+  'ai_photos',
   /** languages beyond Hebrew and English */
   'languages',
   /** automatic translation, reviewed before it is published */
@@ -72,6 +76,7 @@ const PREMIUM: readonly Feature[] = [
   'seating_guide',
   'live_gallery',
   'gallery_ai',
+  'album',
   'translate_ai',
   'voice',
   'planning_ai',
@@ -83,6 +88,7 @@ const VIP: readonly Feature[] = [
   'projector',
   'auto_reel',
   'face_albums',
+  'ai_photos',
   'art_direction',
   'planning_templates',
 ];

@@ -44,6 +44,8 @@ import {
   useToast,
 } from '@/components/app';
 import { hostApi, loginUrl } from '@/features/invitations/app/api';
+import { AiPhotosCard } from '@/features/ai-photos/ui/AiPhotosCard';
+import { AlbumCard } from '@/features/album/ui/AlbumCard';
 import { FaceSearchCard } from '@/features/faces/ui/FaceSearchCard';
 import { FilmCard } from '@/features/film/ui/FilmCard';
 import { useUi } from '@/lib/i18n/client';
@@ -287,6 +289,12 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
             <GalleryArt large />
           </div>
         </Card>
+        {/* the people of honor's photos can be set up before the gallery is on */}
+        {initial.aiPhotos ? (
+          <div className="mt-5 max-w-[720px]">
+            <AiPhotosCard initial={initial.aiPhotos} />
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -365,6 +373,12 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
         ]}
       >
         <TabsPanel value="use" className="mt-5">
+          {/* the morning after: the album made from the gallery (feature album) */}
+          {initial.album ? (
+            <div className="mb-5">
+              <AlbumCard initial={initial.album} />
+            </div>
+          ) : null}
           <div className="grid items-start gap-5 lg:grid-cols-2">
             <ShareCard view={view} onRotate={rotate} />
             <div className="grid gap-5">
@@ -376,6 +390,7 @@ export function GalleryScreen({ initial }: { initial: HostPageData }) {
                   onRotate={() => rotate('projector')}
                 />
               ) : null}
+              {initial.aiPhotos ? <AiPhotosCard initial={initial.aiPhotos} /> : null}
               {view.features.auto_reel.why !== 'unavailable' ? (
                 <FilmCard id={id} feature={view.features.auto_reel} />
               ) : null}

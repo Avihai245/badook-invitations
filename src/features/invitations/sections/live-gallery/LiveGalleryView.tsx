@@ -30,6 +30,7 @@ export function LiveGalleryView({ section, ctx }: SectionViewProps<SectionOf<'li
       <div className="wrap">
         <LiveGalleryCard
           url={url}
+          album={ctx.liveGallery?.album ?? null}
           base={ctx.publicBaseUrl}
           start={known ? range.start : null}
           end={known ? range.end : null}

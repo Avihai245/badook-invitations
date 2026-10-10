@@ -99,6 +99,13 @@ link), and on the seating screen "send guests their table" — a second WhatsApp
 WhatsApp, or table cards to print (`/app/invitations/<id>/seating/cards`). Once numbers were sent, moving
 a family that was told asks first, and only it gets the new number.
 
+**The album and AI photos** ([docs/album-and-ai-photos.md](docs/album-and-ai-photos.md), docs/features.md): the
+morning after the event the gallery becomes a designed album at `/e/<slug>/album?a=<token>` — shared by link, or
+thanked for with each guest's own WhatsApp message (a fourth template, [docs/whatsapp-setup.md](docs/whatsapp-setup.md)
+§10) — and guests create AI photos with the people of honor on the gallery's page (OpenAI's image model,
+`OPENAI_API_KEY`; the hosts upload the people's photos in the gallery tab). Apply
+`supabase/migrations/20261010*` first.
+
 **Event planning** (feature `planning`, off until `INVITES_PLANNING=on` — [docs/features.md](docs/features.md)): the
 invitation's "Event planning" tab `/app/invitations/<id>/plan` with tasks (`/plan/tasks`: a timeline compressed into
 the time that is left, system tasks the invitation ticks by itself, calendar export), budget (`/plan/budget`: four

@@ -33,6 +33,7 @@ import { AccessibilityPanel } from '@/features/site/AccessibilityMenu.client';
 import { RTL_LOCALES } from '@/features/invitations/contracts/types';
 import { nativeName } from '@/features/invitations/lib/locales';
 import { BADOOK_EVENTS_URL } from '@/features/site/links';
+import { AiPhotoStudio } from '@/features/ai-photos/ui/AiPhotoStudio';
 import { UploadFaceIndexer } from '@/features/faces/client/upload-indexer';
 import { FaceSearch } from '@/features/faces/ui/FaceSearch';
 import { GALLERY } from '../../config';
@@ -677,6 +678,18 @@ function GalleryBody({
               </p>
             ) : null}
 
+            {/* a photo with the people of honor, made by AI (feature ai_photos) */}
+            {data.aiPhotos ? (
+              <AiPhotoStudio
+                token={token}
+                code={codeOf}
+                uploader={uploaderId}
+                guest={guest}
+                name={name}
+                eventType={data.event.eventType}
+                onShared={() => void reload()}
+              />
+            ) : null}
             {data.faces ? <FaceSearch token={token} code={codeOf} until={data.faces.until} /> : null}
 
             {waiting.length ? (

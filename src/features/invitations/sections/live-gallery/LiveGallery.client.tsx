@@ -32,6 +32,7 @@ const QR_MEDIA = '(min-width: 720px)';
  */
 export function LiveGalleryCard({
   url,
+  album = null,
   base,
   start,
   end,
@@ -42,6 +43,8 @@ export function LiveGalleryCard({
 }: {
   /** the upload page (null in the editor before the gallery is on) */
   url: string | null;
+  /** the album (features/album): where the section leads after the event, when the event has one */
+  album?: string | null;
   /** the site's public address (the QR code needs a full one) */
   base: string;
   start: number | null;
@@ -79,7 +82,13 @@ export function LiveGalleryCard({
     watch.observe(html, { attributes: true, attributeFilter: ['lang'] });
     return () => watch.disconnect();
   }, []);
-  const href = url ? galleryHref(url, guest?.token ?? token, lang) : null;
+  // after the event: the album when there is one (it needs no personal link), else the gallery's feed
+  const href =
+    phase === 'after' && album
+      ? galleryHref(album, null, lang)
+      : url
+        ? galleryHref(url, guest?.token ?? token, lang)
+        : null;
 
   // the QR code: made for the address as it is now (the guest's personal link may arrive later)
   const full = href ? (href.startsWith('http') ? href : `${base}${href}`) : null;

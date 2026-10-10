@@ -13,7 +13,8 @@ import {
   valuesLocale,
   type TemplateLanguage,
 } from '@/features/whatsapp/languages';
-import { fillTemplate, GALLERY_TEMPLATE_TEXT } from '@/features/whatsapp/template-text';
+import { ALBUM_MESSAGE, albumLinkIn } from '@/features/album/messages';
+import { ALBUM_TEMPLATE_TEXT, fillTemplate, GALLERY_TEMPLATE_TEXT } from '@/features/whatsapp/template-text';
 import { fmt as format } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { GALLERY_MESSAGE, guestGalleryLink } from '../../messages';
@@ -31,8 +32,11 @@ interface NoticesState {
   unlimited: boolean;
   /** the gallery's link for guests (each guest's adds `&g=<their token>`, and their language) */
   link: string;
-  /** the invitation's languages and the hosts in each (the messages are in the guest's language) */
-  own: GalleryNoticeInvitation;
+  /**
+   * the invitation's languages and the hosts in each (the messages are in the guest's language) — and,
+   * for the album's thank-you, where guests celebrated ("בחתונה שלנו")
+   */
+  own: GalleryNoticeInvitation & { phrase?: Partial<Record<Locale, string>> };
 }
 
 /** Where a guest stands with the gallery link. */
@@ -98,19 +102,26 @@ function byLanguage(recipients: readonly GalleryNoticeRow[], data: NoticesState)
  * already, and three ways to send it — the system's WhatsApp number (the third template, in each
  * guest's language when it is approved in it; a credit each — how many go out in each language, and
  * each message as it will look), the host's own WhatsApp (a ready message in the guest's language,
- * then marked as sent), or that message copied. Marking by hand for the rest.
+ * then marked as sent), or that message copied. Marking by hand for the rest. The same dialog sends
+ * the album's thank-you (`kind="album"`, features/album): "thank you for celebrating with us" and the
+ * album's link, with its own template.
  */
 export function SendLinkDialog({
   id,
   open,
   onOpenChange,
+  kind = 'gallery',
 }: {
   id: string;
   open: boolean;
   onOpenChange(open: boolean): void;
+  kind?: 'gallery' | 'album';
 }) {
   const { t, fmt, plural, number } = useUi();
-  const N = t.galleryNotify;
+  const album = kind === 'album';
+  const N = album ? t.album.notify : t.galleryNotify;
+  const endpoint = `/api/invitations/${id}/${album ? 'album' : 'gallery'}/notices`;
+  const tid = album ? 'album-notices' : 'gallery-notices';
   const { toast } = useToast();
   const [data, setData] = useState<NoticesState | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -118,15 +129,17 @@ export function SendLinkDialog({
   const [busy, setBusy] = useState<'send' | 'mark' | null>(null);
 
   const load = useCallback(async () => {
-    const res = await hostApi<NoticesState & { code?: string }>(`/api/invitations/${id}/gallery/notices`);
+    const res = await hostApi<NoticesState & { code?: string }>(endpoint);
     if (res.status === 401) return window.location.assign(loginUrl());
     if (!res.ok || !res.body) {
-      setError(res.body?.code === 'no_gallery' ? N.noGallery : N.errors.failed);
+      setError(
+        res.body?.code === 'no_gallery' || res.body?.code === 'no_album' ? N.noGallery : N.errors.failed,
+      );
       return;
     }
     setError(null);
     setData(res.body);
-  }, [id, N.noGallery, N.errors.failed]);
+  }, [endpoint, N.noGallery, N.errors.failed]);
 
   useEffect(() => {
     if (!open) return;
@@ -160,6 +173,13 @@ export function SendLinkDialog({
   const messageOf = (r: GalleryNoticeRow) => {
     const l = languageOf(r);
     if (!data || !l) return null;
+    if (album)
+      return format(ALBUM_MESSAGE[l], {
+        name: isolate(r.name),
+        event: data.own.phrase?.[l] ?? data.own.phrase?.[data.own.locale] ?? '',
+        hosts: isolate(data.own.hosts[l] ?? data.own.hosts[data.own.locale] ?? ''),
+        url: albumLinkIn(data.link, l, data.own.locale),
+      });
     return format(GALLERY_MESSAGE[l], {
       name: isolate(r.name),
       hosts: isolate(data.own.hosts[l] ?? data.own.hosts[data.own.locale] ?? ''),
@@ -174,10 +194,18 @@ export function SendLinkDialog({
     doc && data ? (templateChain(null, doc, data.langs)[0]?.locale ?? doc.defaultLocale) : 'he';
   const lang: Locale =
     previewLang && groups.some(([l]) => l === previewLang) ? previewLang : (groups[0]?.[0] ?? firstLang);
-  const template = GALLERY_TEMPLATE_TEXT[lang];
+  const template = (album ? ALBUM_TEMPLATE_TEXT : GALLERY_TEMPLATE_TEXT)[lang];
   const sample = groups.find(([l]) => l === lang)?.[1][0]?.name ?? toSend[0]?.name ?? '';
+  const values = data && doc ? valuesLocale(lang, doc) : lang;
   const preview =
-    data && doc ? fillTemplate(template.body, [sample, data.own.hosts[valuesLocale(lang, doc)] ?? '']) : '';
+    data && doc
+      ? fillTemplate(
+          template.body,
+          album
+            ? [sample, data.own.phrase?.[values] ?? '', data.own.hosts[values] ?? '']
+            : [sample, data.own.hosts[values] ?? ''],
+        )
+      : '';
 
   const skippedLine = (skipped: Skipped | undefined) => {
     if (!skipped) return null;
@@ -190,7 +218,7 @@ export function SendLinkDialog({
   const mark = async (guestIds: string[], quiet = false) => {
     if (!guestIds.length) return;
     if (!quiet) setBusy('mark');
-    const res = await hostApi<{ marked?: number }>(`/api/invitations/${id}/gallery/notices`, {
+    const res = await hostApi<{ marked?: number }>(endpoint, {
       method: 'POST',
       body: { action: 'mark', guestIds },
     });
@@ -213,7 +241,7 @@ export function SendLinkDialog({
       needed?: number;
       balance?: number;
       skipped?: Skipped;
-    }>(`/api/invitations/${id}/gallery/notices`, { method: 'POST', body: { action: 'send', guestIds } });
+    }>(endpoint, { method: 'POST', body: { action: 'send', guestIds } });
     setBusy(null);
     if (res.status === 401) return window.location.assign(loginUrl());
     const body = res.body;
@@ -222,8 +250,8 @@ export function SendLinkDialog({
       const title =
         code === 'credits'
           ? fmt(N.errors.credits, { needed: number(body?.needed ?? 0), balance: number(body?.balance ?? 0) })
-          : code === 'nobody' || code === 'no_gallery'
-            ? N.errors[code]
+          : code === 'nobody' || code === 'no_gallery' || code === 'no_album'
+            ? N.errors[code === 'no_album' ? 'no_gallery' : code]
             : code === 'not_configured'
               ? N.notReady
               : N.errors.failed;
@@ -306,7 +334,7 @@ export function SendLinkDialog({
                 loading={busy === 'mark'}
                 onClick={() => void mark(toMark.map((r) => r.guestId))}
                 className="me-auto"
-                data-testid="gallery-notices-mark-all"
+                data-testid={`${tid}-mark-all`}
               >
                 {N.markAll}
               </Button>
@@ -323,7 +351,7 @@ export function SendLinkDialog({
                   disabled={!toSend.length || short}
                   loading={busy === 'send'}
                   onClick={() => void send()}
-                  data-testid="gallery-notices-send"
+                  data-testid={`${tid}-send`}
                 >
                   {toSend.length
                     ? plural(N.sendAll, toSend.length, { n: number(toSend.length) })
@@ -353,7 +381,7 @@ export function SendLinkDialog({
       ) : !rows.length ? (
         <p className="text-[13.5px] text-muted">{N.empty}</p>
       ) : (
-        <div className="flex flex-col gap-3" data-testid="gallery-notices">
+        <div className="flex flex-col gap-3" data-testid={tid}>
           {!data.ready ? (
             <p className="rounded-input bg-warning-bg px-3 py-2 text-[13px] text-warning">{N.notReady}</p>
           ) : null}
@@ -370,10 +398,7 @@ export function SendLinkDialog({
               label: `${N.tabs[k]} · ${number(counts[k])}`,
             }))}
           />
-          <ul
-            className="-mx-1 flex max-h-[46dvh] flex-col overflow-y-auto px-1"
-            data-testid="gallery-notices-rows"
-          >
+          <ul className="-mx-1 flex max-h-[46dvh] flex-col overflow-y-auto px-1" data-testid={`${tid}-rows`}>
             {shown.map((r) => {
               const note = reachNote(r);
               // the language their messages are written in (an invitation in several languages)
@@ -443,7 +468,7 @@ export function SendLinkDialog({
           {data.ready && toSend.length ? (
             <div className="flex flex-col gap-2 border-t border-line pt-3">
               {groups.length > 1 || fallbacks.length ? (
-                <ul className="flex flex-col gap-0.5 text-[12.5px]" data-testid="gallery-notices-languages">
+                <ul className="flex flex-col gap-0.5 text-[12.5px]" data-testid={`${tid}-languages`}>
                   {groups.map(([l, list]) => (
                     <li key={l}>
                       · {languageLine(plural(N.byLanguage, list.length, { n: number(list.length) }), l)}
@@ -481,7 +506,7 @@ export function SendLinkDialog({
                 className="rounded-[14px] bg-[#e7ddd3] p-3"
                 dir={RTL_LOCALES.includes(lang) ? 'rtl' : 'ltr'}
                 lang={lang}
-                data-testid="gallery-notices-preview"
+                data-testid={`${tid}-preview`}
               >
                 <div className="max-w-[340px] rounded-[10px] bg-white px-3 pt-2.5 pb-2 shadow-sm">
                   <p className="text-[13.5px] leading-[1.5] whitespace-pre-line text-[#111b21]">{preview}</p>

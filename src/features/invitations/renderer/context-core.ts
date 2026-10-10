@@ -74,9 +74,10 @@ export interface RenderContext {
   review: boolean;
   /**
    * The event's live gallery (feature `live_gallery`, turned on): the guests' upload page the
-   * invitation's gallery section links to. null: the section shows nothing to guests.
+   * invitation's gallery section links to — and, after the event, the album (feature `album`, null
+   * while there is none). null: the section shows nothing to guests.
    */
-  liveGallery: { url: string } | null;
+  liveGallery: { url: string; album?: string | null } | null;
   /** The event measures how guests use the invitation (feature `analytics`): the live page's beacon. */
   insights: boolean;
   /**
@@ -102,8 +103,8 @@ export interface RenderOptions {
   cinematic?: boolean;
   /** the draft on the family's review link (see RenderContext.review) */
   review?: boolean;
-  /** the live gallery's upload page (the public page asks the gallery; default none) */
-  liveGallery?: { url: string } | null;
+  /** the live gallery's upload page and the album (the public page asks the gallery; default none) */
+  liveGallery?: { url: string; album?: string | null } | null;
   /** the event has the `analytics` feature (the public page asks features/flags; default off) */
   insights?: boolean;
 }

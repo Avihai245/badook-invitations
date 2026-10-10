@@ -147,6 +147,8 @@ export const invitationsEn: typeof invitationsHe = {
       projector: 'The gallery on the venue’s screen',
       face_albums: 'Face search',
       auto_reel: 'Highlights video',
+      album: 'The album after the event',
+      ai_photos: 'AI photos with the people of honor',
       languages: 'More languages',
       translate_ai: 'Automatic translation',
       voice: 'The invitation read aloud',

@@ -79,6 +79,7 @@ const ServerEnvSchema = z.object({
   // the gallery's "quick create with AI" questionnaire when there is no Anthropic key — every other AI
   // feature above (gallery_ai, translate_ai, art_direction, planning_ai) stays on ANTHROPIC_API_KEY +
   // INVITES_AI_MODEL regardless. The model: INVITES_AI_MODEL_OPENAI, or DEFAULT_OPENAI_MODEL when empty.
+  // The AI photos with the people of honor (ai_photos) need it: OpenAI's image model (below).
   OPENAI_API_KEY: z.string().default(''),
   INVITES_AI_MODEL_OPENAI: z
     .string()
@@ -89,6 +90,19 @@ const ServerEnvSchema = z.object({
     .url()
     .default('https://api.openai.com')
     .transform((u) => u.replace(/\/+$/, '')),
+  // ── AI photos with the people of honor (feature ai_photos): OpenAI's image model, OPENAI_API_KEY ──
+  // the GPT Image model ("gpt-image-2", or a newer one such as a gpt-image-2.5 model, as OpenAI names it)
+  INVITES_AI_IMAGE_MODEL: z.string().trim().default('gpt-image-2'),
+  // low | medium | high: the price and the time of each photo grow with it
+  INVITES_AI_IMAGE_QUALITY: z.enum(['low', 'medium', 'high']).default('medium'),
+  // how the server asks for a photo: 'images' (the Images API, one request that waits for the photo),
+  // 'background' (the Responses API in background mode: started at once, checked with short requests —
+  // for hosts that cut long requests, like Amplify's 30 seconds), 'auto' (background, else images)
+  INVITES_AI_IMAGE_TRANSPORT: z.enum(['auto', 'images', 'background']).default('auto'),
+  // the text model that runs the image tool in background mode (it only passes the request on)
+  INVITES_AI_IMAGE_MAINLINE_MODEL: z.string().trim().default('gpt-5'),
+  // photos a day for the whole site (a cost ceiling); past it guests are asked to try tomorrow
+  INVITES_AI_IMAGE_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(1000),
   // design concepts made by the AI a day per account ("design it for me"); past it they are composed
   // from the photos without it. The site's ceiling for them is INVITES_AI_DAILY_LIMIT.
   INVITES_ART_DIRECTION_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(12),
@@ -131,6 +145,9 @@ const ServerEnvSchema = z.object({
   // the gallery link's template (features/live-gallery: each guest's link to upload photos and see the
   // album), once Meta approved it (docs/whatsapp-setup.md §9); empty: hosts send it from their own WhatsApp
   INVITES_WHATSAPP_GALLERY_TEMPLATE: z.string().trim().default(''),
+  // the album's thank-you template (features/album: "thank you for celebrating with us" and a button to
+  // the album), once Meta approved it (docs/whatsapp-setup.md §10); empty: hosts send it themselves
+  INVITES_WHATSAPP_ALBUM_TEMPLATE: z.string().trim().default(''),
   INVITES_WHATSAPP_API_VERSION: z.string().trim().min(2).default('v26.0'),
   INVITES_WHATSAPP_API_BASE: z
     .url()

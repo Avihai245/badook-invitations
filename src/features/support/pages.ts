@@ -82,6 +82,16 @@ export const SUPPORT_PAGES: SupportPage[] = [
     label: 'Celebrate: the event day, entrance check-in',
   },
   {
+    path: '/app/invitations/:id/gallery/album',
+    he: 'האלבום שאחרי האירוע',
+    label: 'Celebrate: the album after the event — its settings, cover, link and the thank-you to guests',
+  },
+  {
+    path: '/app/invitations/:id/gallery/ai',
+    he: 'צילומי AI עם בעלי השמחה',
+    label: 'Celebrate: AI photos with the people of honor — their photos, consent, limits, the photos made',
+  },
+  {
     path: '/app/invitations/:id/gallery/film',
     he: 'סרט הרגעים',
     label: 'Celebrate: the moments film, made from the gallery',

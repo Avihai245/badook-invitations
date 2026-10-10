@@ -12,6 +12,8 @@ import { insightsHe } from './insights.he';
 import { galleryNotifyHe } from './gallery-notify.he';
 import { facesHe } from './faces.he';
 import { filmHe } from './film.he';
+import { albumHe } from './album.he';
+import { aiPhotosHe } from './ai-photos.he';
 import { planningHe } from './planning.he';
 import { heCore } from './app-core.he';
 import { heMore } from './app-more.he';
@@ -37,6 +39,8 @@ export const he = {
   galleryNotify: galleryNotifyHe,
   faces: facesHe,
   film: filmHe,
+  album: albumHe,
+  aiPhotos: aiPhotosHe,
   planning: planningHe,
 };
 
@@ -77,6 +81,8 @@ export type AppOnlyKey =
   | 'galleryNotify'
   | 'faces'
   | 'film'
+  | 'album'
+  | 'aiPhotos'
   | 'planning';
 /** What the public pages' client components get (provider-lazy `site`). */
 export type SiteDict = Omit<AppDict, AppOnlyKey>;

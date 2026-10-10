@@ -1,8 +1,9 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- guests' photos come from short-lived signed URLs of private storage: nothing for the image optimizer to cache */
 
-import { ChevronLeft, ChevronRight, Heart, Maximize2, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart, Maximize2, Sparkles, User } from 'lucide-react';
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { AI_PHOTOS_GUEST } from '@/lib/i18n/ai-photos-guest';
 import type { FeedItem, Likes } from '../../types';
 import { fmt, useGuestText } from '../guest-text';
 import { hueOf } from './StoriesTray';
@@ -138,6 +139,16 @@ export function FeedPost({
             </a>
           ) : null}
         </div>
+        {current.ai ? (
+          // an AI photo a guest made with the people of honor (features/ai-photos): said so
+          <span
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-subtle px-2 py-0.5 text-[11px] font-bold text-muted"
+            data-ai=""
+          >
+            <Sparkles aria-hidden className="size-3" />
+            {AI_PHOTOS_GUEST[locale].ai}
+          </span>
+        ) : null}
         {time ? (
           <time className="shrink-0 text-[12.5px] text-muted" dateTime={post.at}>
             {time}

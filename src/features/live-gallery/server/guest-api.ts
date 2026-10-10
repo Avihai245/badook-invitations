@@ -168,6 +168,7 @@ export function feedItem(
     placement: r.placement ?? 'feed',
     post: r.post ?? r.id,
     instagram: r.instagram ?? null,
+    ...(r.ai ? { ai: true } : {}),
   };
 }
 

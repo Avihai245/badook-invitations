@@ -23,7 +23,8 @@ import {
  * ones that need an AI model when none is set up, and the face albums until they are approved
  * (INVITES_FACE_ALBUMS — biometric data, docs/features.md), and the planning section until its switch
  * (INVITES_PLANNING) is on. The design concepts (`art_direction`)
- * don't need the AI: without it they are composed from the photos (features/art-direction).
+ * don't need the AI: without it they are composed from the photos (features/art-direction). The AI
+ * photos with the people of honor (`ai_photos`) need OpenAI's image model (OPENAI_API_KEY).
  */
 export function deploymentFeatures(env: ServerEnv = serverEnv()): Set<Feature> {
   const off = new Set(env.INVITES_FEATURES_OFF);
@@ -33,6 +34,7 @@ export function deploymentFeatures(env: ServerEnv = serverEnv()): Set<Feature> {
       if (off.has(f)) return false;
       if (f === 'face_albums') return env.INVITES_FACE_ALBUMS;
       if (f === 'gallery_ai' || f === 'translate_ai') return ai;
+      if (f === 'ai_photos') return !!env.OPENAI_API_KEY && !!env.INVITES_AI_IMAGE_MODEL;
       // planning is rolled out with its own switch (INVITES_PLANNING), after its migrations are applied
       if (f.startsWith('planning')) return env.INVITES_PLANNING && (f !== 'planning_ai' || ai);
       return true;

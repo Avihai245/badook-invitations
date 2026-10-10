@@ -1,5 +1,6 @@
 import { after } from 'next/server';
 import { nudgeAfter } from '@/features/admin/server/nudge';
+import { albumNoticesDb } from '@/features/album/server/notices-db';
 import { eventDayDb } from '@/features/event-day/server/db';
 import { tick } from '@/features/jobs/jobs';
 import { galleryNoticesDb } from '@/features/live-gallery/server/notices-db';
@@ -43,9 +44,11 @@ export async function POST(request: Request) {
   try {
     for (const s of statusesOf(payload))
       if (!(await whatsappDb.status(s.id, s.status, s.error)))
-        // not an invitation's message: a table number's (features/event-day), or a gallery link's
+        // not an invitation's message: a table number's (features/event-day), a gallery link's, or
+        // an album's thank-you (features/album)
         if (!(await eventDayDb.noticeStatus(s.id, s.status, s.error)))
-          await galleryNoticesDb.status(s.id, s.status, s.error);
+          if (!(await galleryNoticesDb.status(s.id, s.status, s.error)))
+            await albumNoticesDb.status(s.id, s.status, s.error);
     for (const m of inboundOf(payload)) if (isStopRequest(m.text)) await whatsappDb.optOut(m.from, 'reply');
   } catch (err) {
     // Meta retries a failed delivery for days: answer 500 so it comes back

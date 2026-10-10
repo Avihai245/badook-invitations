@@ -18,7 +18,8 @@ import {
  * offers a new one.
  */
 
-export type LinkKind = 'upload' | 'projector';
+/** the guests' upload link, the venue screen's, and the album's (features/album) */
+export type LinkKind = 'upload' | 'projector' | 'album';
 
 /** 24 URL-safe characters (144 random bits). */
 export const TOKEN_RE = /^[A-Za-z0-9_-]{24}$/;

@@ -89,6 +89,49 @@ export const GALLERY_TEMPLATE_TEXT: Record<Locale, { body: string; button: strin
   },
 };
 
+/**
+ * The album's thank-you template (badook_album, docs/whatsapp-setup.md §10) in each language, as the
+ * "send guests the album" dialog previews it: {{1}} guest · {{2}} where they celebrated
+ * (album/phrases.ts: "בחתונה שלנו") · {{3}} hosts; the button opens the album in the guest's language.
+ */
+export const ALBUM_TEMPLATE_TEXT: Record<Locale, { body: string; button: string; footer: string }> = {
+  he: {
+    body: 'היי {{1}} 💛\nתודה שחגגתם איתנו {{2}}!\nאספנו את הרגעים היפים שצילמתם לאלבום אחד — מוזמנים להיכנס, להיזכר ולשתף.\nבאהבה, {{3}}\nלאלבום בכפתור 👇',
+    button: 'לאלבום',
+    footer: 'נשלח באמצעות Badook',
+  },
+  en: {
+    body: 'Hi {{1}} 💛\nThank you for celebrating with us {{2}}!\nWe gathered the beautiful moments you captured into one album — come relive them and share.\nWith love, {{3}}\nTap the button for the album 👇',
+    button: 'To the album',
+    footer: 'Sent with Badook',
+  },
+  ru: {
+    body: 'Здравствуйте, {{1}}! 💛\nСпасибо, что праздновали вместе с нами {{2}}!\nМы собрали красивые моменты, которые вы сняли, в один альбом — заходите вспомнить и поделиться.\nС любовью, {{3}}\nАльбом — по кнопке ниже 👇',
+    button: 'К альбому',
+    footer: 'Отправлено через Badook',
+  },
+  ar: {
+    body: 'مرحبًا {{1}} 💛\nشكرًا لأنكم احتفلتم معنا {{2}}!\nجمعنا اللحظات الجميلة التي التقطتموها في ألبوم واحد — ادخلوا لتستعيدوا الذكريات وتشاركوها.\nمع الحب، {{3}}\nللألبوم اضغطوا على الزر 👇',
+    button: 'إلى الألبوم',
+    footer: 'أُرسلت عبر Badook',
+  },
+  fr: {
+    body: 'Bonjour {{1}} 💛\nMerci d’avoir fêté avec nous {{2}} !\nNous avons réuni les beaux moments que vous avez capturés dans un seul album — venez les revivre et les partager.\nAvec amour, {{3}}\nL’album, c’est par le bouton ci-dessous 👇',
+    button: 'Voir l’album',
+    footer: 'Envoyé via Badook',
+  },
+  es: {
+    body: '¡Hola, {{1}}! 💛\n¡Gracias por celebrar con nosotros {{2}}!\nReunimos en un solo álbum los momentos bonitos que capturaste: entra a revivirlos y compartirlos.\nCon cariño, {{3}}\nToca el botón para ver el álbum 👇',
+    button: 'Ver el álbum',
+    footer: 'Enviado con Badook',
+  },
+  am: {
+    body: 'ሰላም {{1}} 💛\nከእኛ ጋር {{2}} ስላከበሩ እናመሰግናለን!\nያነሷቸውን ውብ ጊዜያት በአንድ አልበም ሰብስበናል — ገብተው ያስታውሱ፤ ያጋሩም።\nበፍቅር፣ {{3}}\nወደ አልበሙ ለመሄድ ከታች ያለውን ቁልፍ ይጫኑ 👇',
+    button: 'ወደ አልበሙ',
+    footer: 'በBadook የተላከ',
+  },
+};
+
 /** A template's body with its values: {{1}} is values[0], {{2}} values[1]… */
 export function fillTemplate(body: string, values: readonly string[]): string {
   return body.replace(/\{\{([1-9])\}\}/g, (_, n: string) => values[Number(n) - 1] ?? '');

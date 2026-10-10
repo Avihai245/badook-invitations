@@ -1,4 +1,9 @@
 import 'server-only';
+import { aiPhotosHousekeeping, aiWorkerDeps } from '@/features/ai-photos/server/deps';
+import { processAiPhotos } from '@/features/ai-photos/server/worker';
+import { readyDeps } from '@/features/album/server/deps';
+import { processAlbumNoticeQueue } from '@/features/album/server/notify';
+import { sendAlbumReadyEmails } from '@/features/album/server/ready';
 import { reportOverdue } from '@/features/billing/server/billing';
 import { consoleLogsHousekeeping } from '@/features/admin/messages/server';
 import { adminDb } from '@/features/admin/server/db';
@@ -84,12 +89,22 @@ export async function runDaily(now: Date) {
   const planning = await sendPlanReminders(now).catch(
     (err) => (console.error('planning reminders failed', err), null),
   );
+  // the AI photos' promise: erased 30 days after the event (features/ai-photos)
+  const aiPhotos = await aiPhotosHousekeeping().catch(
+    (err) => (console.error('ai photos housekeeping failed', err), null),
+  );
+  // the morning after: the hosts whose album just became ready get its link (features/album)
+  const album = await sendAlbumReadyEmails(now, readyDeps()).catch(
+    (err) => (console.error('album ready emails failed', err), null),
+  );
   // the hosts' path through the app (features/analytics) is kept 400 days
   const { data: hostEvents, error: hostEventsError } = await serviceDb().rpc('host_events_purge');
   if (hostEventsError) console.error('host_events_purge failed', hostEventsError.message);
   return {
     ...digests,
     planning,
+    album,
+    aiPhotos,
     hostEvents: (hostEvents as number | null) ?? null,
     purged: (purged as number | null) ?? null,
     overdue,
@@ -108,7 +123,8 @@ export async function runDaily(now: Date) {
 
 /**
  * What is still queued for WhatsApp (a host closed the page mid-send, a retry that is due): the
- * invitations, the table numbers (features/event-day) and the gallery links (features/live-gallery).
+ * invitations, the table numbers (features/event-day), the gallery links (features/live-gallery) and
+ * the album's thank-yous (features/album).
  */
 export async function runWhatsAppQueue(budgetMs: number) {
   const total = { sent: 0, failed: 0, retried: 0 };
@@ -117,11 +133,14 @@ export async function runWhatsAppQueue(budgetMs: number) {
     const r = await processQueue(null, 50);
     const t = await processNoticeQueue(null, 50);
     const g = await processGalleryNoticeQueue(null, 50);
-    total.sent += r.sent + t.sent + g.sent;
-    total.failed += r.failed + t.failed + g.failed;
-    total.retried += r.retried + t.retried + g.retried;
-    if (r.sent + r.failed + r.retried + t.sent + t.failed + t.retried + g.sent + g.failed + g.retried === 0)
-      break;
+    const a = await processAlbumNoticeQueue(null, 50);
+    const results = [r, t, g, a];
+    for (const x of results) {
+      total.sent += x.sent;
+      total.failed += x.failed;
+      total.retried += x.retried;
+    }
+    if (results.every((x) => x.sent + x.failed + x.retried === 0)) break;
   }
   // messages left (or failed): the admin console's numbers and queues (it never throws)
   if (total.sent + total.failed > 0) await adminNudge('message');
@@ -181,6 +200,9 @@ export function tick(now = Date.now()): Promise<void> {
       // the invitations read aloud: what publishes queued, and retries that are due (each language is
       // taken by one server: voice_claim)
       await processVoice(null, voiceDeps()).catch((err) => console.error('[jobs] voice failed', err));
+      // the AI photos: those working in OpenAI's background are checked, one queued photo is started
+      // (a guest's request starts its own at once; this picks up what a stopped server left)
+      if (serverEnv().OPENAI_API_KEY) await processAiPhotos(null, aiWorkerDeps(), { starts: 1 });
       await runJob('daily', dailyDue(new Date(now)), 15 * 60, () => runDaily(new Date(now)));
     } catch (err) {
       console.error('[jobs] tick failed', err);
