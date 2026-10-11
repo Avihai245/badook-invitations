@@ -27,6 +27,8 @@ export const albumGuestRu: AlbumGuestDict = {
     videos: { one: '{n} видео', other: '{n} видео' },
   },
   highlights: 'Лучшие моменты',
+  film: 'Фильм о празднике',
+  filmHint: 'Создан из фото и видео гостей',
   chapters: {
     opening: 'Начало',
     heart: 'В самом разгаре',

@@ -30,6 +30,8 @@ export const albumGuestHe = {
     videos: { one: 'סרטון אחד', other: '{n} סרטונים' } as PluralEntry,
   },
   highlights: 'הרגעים הנבחרים',
+  film: 'הסרטון של האירוע',
+  filmHint: 'נוצר מהתמונות והסרטונים שהאורחים העלו',
   chapters: {
     opening: 'ההתחלה',
     heart: 'לב השמחה',

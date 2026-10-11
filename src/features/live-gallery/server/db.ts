@@ -367,6 +367,10 @@ export const galleryDb = {
       p_max_items: maxItems,
     }),
 
+  /** the host's highlights film, saved: the album shows it at the top (null: not the owner's event) */
+  markFilm: (id: string, ownerId: string, itemId: string) =>
+    rpc<boolean | null>('gallery_mark_film', { p_id: id, p_owner_id: ownerId, p_item_id: itemId }),
+
   ownerAddDone: (
     id: string,
     ownerId: string,

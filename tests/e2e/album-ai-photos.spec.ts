@@ -1,6 +1,17 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
-import { LOCAL, PHONE, galleryOn, jpeg, newHost, open, publish, seedPhotos, sql } from '../support/phase5b';
+import {
+  LOCAL,
+  PHONE,
+  galleryOn,
+  jpeg,
+  newHost,
+  open,
+  publish,
+  seedPhotos,
+  sql,
+  store,
+} from '../support/phase5b';
 
 // The album after the event and the AI photos with the people of honor, end to end on the local stack
 // (tests/support/rest-shim.mjs; OpenAI's image model and WhatsApp are the stand-ins of
@@ -66,6 +77,28 @@ test('the album: the guests’ photos in the invitation’s design, opened early
   expect(url).toMatch(new RegExp(`/e/${host.slug}/album\\?a=[A-Za-z0-9_-]+$`));
   await shot(page, 'he-desktop-2-album-studio');
 
+  // the host's highlights film (as the film studio saves it): the album shows it at the top
+  const filmId = randomUUID();
+  const filmFolder = `${host.id}/${filmId}`;
+  await store('gallery-originals', `${filmFolder}/original.mp4`, Buffer.from('not a real film'));
+  await store('gallery-media', `${filmFolder}/display.jpg`, await jpeg([20, 20, 20], 640, 360));
+  await store('gallery-media', `${filmFolder}/thumb.jpg`, await jpeg([20, 20, 20], 360, 200));
+  await sql(
+    `with n as (select $2::uuid as id)
+     insert into gallery_items (id, invitation_id, kind, status, source, uploader_hash, original_path, original_type,
+       original_size, original_done, display_path, display_size, thumb_path, thumb_size, width, height, published_at)
+     select n.id, i.id, 'video', 'published', 'host', repeat('a', 64),
+       i.id || '/' || n.id || '/original.mp4', 'video/mp4', 1000, true,
+       i.id || '/' || n.id || '/display.jpg', 500, i.id || '/' || n.id || '/thumb.jpg', 100, 1280, 720, now()
+     from invitations i, n where i.id = $1`,
+    [host.id, filmId],
+  );
+  await sql(
+    `select gallery_mark_film($1, (select owner_id from invitations where id = $1),
+       (select id from gallery_items where invitation_id = $1 and kind = 'video' limit 1))`,
+    [host.id],
+  );
+
   // a guest's phone opens the link: the cover with the names, the letter, the highlights, the chapters
   const phone = await browser.newContext(PHONE);
   const guest = await phone.newPage();
@@ -74,6 +107,9 @@ test('the album: the guests’ photos in the invitation’s design, opened early
   await expect(guest.getByTestId('album-cover')).toContainText('נועה');
   await expect(guest.getByTestId('album-cover')).toContainText('איתי');
   await expect(guest.getByTestId('album-message')).toBeVisible();
+  // the film at the top: a player, and not one of the album's videos
+  await expect(guest.getByTestId('album-film').locator('video')).toHaveCount(1);
+  await expect(guest.getByTestId('album-film')).toContainText('הסרטון של האירוע');
   await expect(guest.getByTestId('album-highlights').locator('img').first()).toBeVisible();
   await guest.waitForLoadState('networkidle');
   await shot(guest, 'he-mobile-3-album');

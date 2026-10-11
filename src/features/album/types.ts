@@ -22,6 +22,8 @@ export interface AlbumPhoto {
   name: string | null;
   /** an AI photo a guest made with the people of honor (features/ai-photos) */
   ai?: boolean;
+  /** the event's highlights film (features/film), shown at the top of the album */
+  film?: boolean;
 }
 
 export interface AlbumLayout {

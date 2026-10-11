@@ -188,6 +188,7 @@ function filmWorld(opts: { input?: Partial<FeatureInput>; gallery?: boolean; doc
   const db = {
     ownerGet: vi.fn(async (_id: string, userId: string) => (userId === OWNER ? owned : null)),
     ownerFilm: vi.fn(async () => [photo, clip]),
+    markFilm: vi.fn(async () => true),
     ownerAdd: vi.fn(
       async (): Promise<{ ok: true } | { ok: false; code: 'full' | 'not_found'; left?: number }> => ({
         ok: true,
@@ -378,6 +379,8 @@ describe('the film joins the gallery', () => {
     w.files.set(`gallery-media:${folder}/thumb.jpg`, 30_000);
     const done = await film.postFilm(OWNER, INV, { step: 'done', id, show: false }, w.deps);
     expect(done).toMatchObject({ status: 200, body: { item: { id, status: 'hidden' } } });
+    // the album shows it at the top
+    expect(w.db.markFilm).toHaveBeenCalledWith(INV, OWNER, id);
     expect(w.db.ownerAddDone).toHaveBeenCalledWith(INV, OWNER, id, false, {
       original: 24_000_000,
       display: 180_000,

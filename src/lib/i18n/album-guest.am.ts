@@ -27,6 +27,8 @@ export const albumGuestAm: AlbumGuestDict = {
     videos: { one: '{n} ቪዲዮ', other: '{n} ቪዲዮዎች' },
   },
   highlights: 'ምርጥ ጊዜያት',
+  film: 'የዝግጅቱ ፊልም',
+  filmHint: 'እንግዶች ካጋሯቸው ፎቶዎችና ቪዲዮዎች የተሰራ',
   chapters: {
     opening: 'መጀመሪያው',
     heart: 'የደስታው ልብ',
