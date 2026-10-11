@@ -84,8 +84,11 @@ export function AlbumView({
   const phrase = e.phrase[locale] ?? e.phrase[e.defaultLocale] ?? '';
   const message = data.message[locale] || fill(t.message, { event: phrase });
   const photos = items.filter((i) => i.kind === 'image').length;
-  const videos = items.length - photos;
+  // the film is shown on its own: not one of the album's videos
+  const videos = items.filter((i) => i.kind === 'video' && !i.film).length;
   const cover = data.layout.cover ? byId.get(data.layout.cover) : undefined;
+  // the event's highlights film, at the top (its signed link is refreshed with the photos')
+  const film = items.find((i) => i.film && i.video);
   const highlights = data.layout.highlights.map((id) => byId.get(id)).filter((i): i is AlbumPhoto => !!i);
   let date = '';
   try {
@@ -291,6 +294,25 @@ export function AlbumView({
             <section className="album-notice mt-0!" data-testid="album-empty">
               <h2 className="album-display text-[26px]">{t.empty.title}</h2>
               <p className="mt-2 text-[15px] text-[var(--album-muted)]">{t.empty.body}</p>
+            </section>
+          ) : null}
+
+          {film ? (
+            <section className="album-section" aria-labelledby="album-film" data-testid="album-film">
+              <div className="album-heading">
+                <h2 id="album-film" className="album-display">
+                  {t.film}
+                </h2>
+                <p className="mt-1 text-[14px] text-[var(--album-muted)]">{t.filmHint}</p>
+              </div>
+              <video
+                className="album-film-video"
+                src={film.video!}
+                poster={film.display ?? film.thumb ?? undefined}
+                controls
+                playsInline
+                preload="metadata"
+              />
             </section>
           ) : null}
 

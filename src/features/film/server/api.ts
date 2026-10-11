@@ -49,7 +49,7 @@ export interface FilmInvitation {
 }
 
 export interface FilmDeps {
-  db: Pick<GalleryDb, 'ownerGet' | 'ownerFilm' | 'ownerAdd' | 'ownerAddDone'>;
+  db: Pick<GalleryDb, 'ownerGet' | 'ownerFilm' | 'ownerAdd' | 'ownerAddDone' | 'markFilm'>;
   storage: GalleryStorage;
   featureInput(invitationId: string): Promise<(FeatureInput & { ownerId: string }) | null>;
   /** the host's invitation as the film shows it (null: not theirs) */
@@ -351,6 +351,8 @@ async function finish(
     ...(thumb.size !== null ? { thumb: thumb.size } : {}),
   });
   if (!done) return notFound;
+  // the album shows the film at the top (the event's newest one)
+  await deps.db.markFilm(id, userId, q.id);
   // the guests' feed, the venue screen and the host's tab refresh (hidden: only the host's tab)
   await deps.broadcast(owned.gallery.channel, 'items');
   return ok({ item: { id: done.id, status: done.status, file: fileName(done.originalPath) } });

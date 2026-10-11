@@ -178,7 +178,7 @@ export async function jpeg(color: [number, number, number], width = 1200, height
     .toBuffer();
 }
 
-async function store(bucket: string, path: string, bytes: Buffer, type = 'image/jpeg') {
+export async function store(bucket: string, path: string, bytes: Buffer, type = 'image/jpeg') {
   const res = await fetch(`${SHIM}/storage/v1/object/${bucket}/${path}`, {
     method: 'POST',
     headers: { apikey: 'local-secret', authorization: 'Bearer local-secret', 'content-type': type },

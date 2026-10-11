@@ -40,7 +40,7 @@ export interface AlbumLookup {
 }
 
 /** An item of the album: the gallery's row, and whether the hosts left it out. */
-export type AlbumItemRow = ItemRow & { hidden?: boolean };
+export type AlbumItemRow = ItemRow & { hidden?: boolean; film?: boolean };
 
 export interface ReadyCandidate {
   invitationId: string;
