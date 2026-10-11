@@ -39,11 +39,15 @@ export const MESSAGE_TEXT: Record<MessageKind, Record<Locale, TemplateText>> = {
   album: ALBUM_TEMPLATE_TEXT,
 };
 
-/** Where a message's button leads: the guest's personal invitation, the album, or nowhere (no button). */
-export const MESSAGE_LINK: Record<MessageKind, 'invitation' | 'album' | null> = {
+/**
+ * Where a message's button leads: the guest's personal invitation, the way to the event (navigation:
+ * /e/<slug>/way), the album, or nowhere (no button).
+ */
+export type MessageLink = 'invitation' | 'way' | 'album';
+export const MESSAGE_LINK: Record<MessageKind, MessageLink | null> = {
   invitation: 'invitation',
   reminder: 'invitation',
-  event_reminder: 'invitation',
+  event_reminder: 'way',
   thanks: null,
   album: 'album',
 };
@@ -80,7 +84,7 @@ export interface RenderedMessage {
   body: string;
   footer: string;
   button: string | null;
-  link: 'invitation' | 'album' | null;
+  link: MessageLink | null;
 }
 
 export function renderMessage(
