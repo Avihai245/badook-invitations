@@ -186,8 +186,6 @@ const ServerEnvSchema = z.object({
   // what the iframe does with the card: VK holds the sum (J5, which our server then takes) and makes a
   // token; NK checks it (J2, nothing held) and makes a token; K only makes a token
   INVITES_TRANZILA_TRANMODE: z.enum(['VK', 'NK', 'K']).default('VK'),
-  // the iframe terminal's TranzilaPW: the handshake that locks the form's sum (optional)
-  INVITES_TRANZILA_PW: z.string().trim().default(''),
   INVITES_TRANZILA_API_BASE: z
     .url()
     .default('https://api.tranzila.com')
@@ -195,10 +193,6 @@ const ServerEnvSchema = z.object({
   INVITES_TRANZILA_IFRAME_BASE: z
     .url()
     .default('https://directng.tranzila.com')
-    .transform((u) => u.replace(/\/+$/, '')),
-  INVITES_TRANZILA_CGI_BASE: z
-    .url()
-    .default('https://secure5.tranzila.com')
     .transform((u) => u.replace(/\/+$/, '')),
   // Apple Pay and Google Pay buttons in the iframe (apple_pay=1, google_pay=1): turn on only after
   // Tranzila enables them on the iframe terminal (and, for Apple Pay, registers our domain)

@@ -23,8 +23,6 @@ import { serviceDb } from '@/lib/supabase/server';
 export interface TranzilaKeys {
   appKey: string;
   secret: string;
-  /** the iframe terminal's TranzilaPW (the handshake only); null when it isn't set */
-  terminalPw: string | null;
   /** Amplify's environment variables, or the database's Vault (Supabase → Vault → Secrets) */
   source: 'env' | 'vault';
 }
@@ -33,7 +31,6 @@ export interface TranzilaKeys {
 export const VAULT_NAMES = {
   appKey: ['INVITES_TRANZILA_APP_KEY', 'TRANZILA_API_APP_KEY'],
   secret: ['INVITES_TRANZILA_SECRET', 'TRANZILA_API_SECRET'],
-  terminalPw: ['INVITES_TRANZILA_PW', 'TRANZILA_TERMINAL_PW'],
 } as const;
 
 let vaultCache: { keys: TranzilaKeys | null; at: number } | null = null;
@@ -44,7 +41,7 @@ export function resetTranzilaKeys(): void {
 
 async function vaultKeys(): Promise<TranzilaKeys | null> {
   const { data, error } = await serviceDb().rpc('billing_secrets', {
-    p_names: [...VAULT_NAMES.appKey, ...VAULT_NAMES.secret, ...VAULT_NAMES.terminalPw],
+    p_names: [...VAULT_NAMES.appKey, ...VAULT_NAMES.secret],
   });
   if (error) throw new Error(`billing_secrets: ${error.message}`);
   const found = (data ?? {}) as Record<string, string | null>;
@@ -52,9 +49,7 @@ async function vaultKeys(): Promise<TranzilaKeys | null> {
     names.map((n) => found[n]?.trim()).find((v): v is string => !!v) ?? null;
   const appKey = pick(VAULT_NAMES.appKey);
   const secret = pick(VAULT_NAMES.secret);
-  return appKey && secret
-    ? { appKey, secret, terminalPw: pick(VAULT_NAMES.terminalPw), source: 'vault' }
-    : null;
+  return appKey && secret ? { appKey, secret, source: 'vault' } : null;
 }
 
 /**
@@ -69,7 +64,6 @@ export async function tranzilaKeys(now = Date.now()): Promise<TranzilaKeys | nul
     return {
       appKey: env.INVITES_TRANZILA_APP_KEY,
       secret: env.INVITES_TRANZILA_SECRET,
-      terminalPw: env.INVITES_TRANZILA_PW || null,
       source: 'env',
     };
   if (vaultCache && now - vaultCache.at < (vaultCache.keys ? 600_000 : 60_000)) return vaultCache.keys;
@@ -162,9 +156,12 @@ export async function formAvailable(now = Date.now(), fetchImpl: typeof fetch = 
 }
 
 /**
- * The handshake: the amount locked on Tranzila's side before the form opens (thtk), so the payer can't
- * change the sum on the iframe's address. Needs the iframe terminal's TranzilaPW; best effort — null
- * when it isn't set or Tranzila doesn't answer (the server charges the purchase's own amount anyway).
+ * The handshake (Handshake V2, POST /v2/handshake/create, signed with the API keys like every other call):
+ * the amount locked on Tranzila's side before the form opens, answered with a token (thtk) the iframe's
+ * address must carry. With "Enable Hand Shake" on in the iframe terminal's settings (my.tranzila.com →
+ * Settings → Terminal → iFrame → Advanced) the form refuses an address without a valid thtk, and a sum
+ * that differs from the locked one ("Illegal Operation 912791"). Best effort — null when Tranzila doesn't
+ * answer (the server charges the purchase's own amount anyway).
  */
 export async function handshake(
   amount: number,
@@ -173,23 +170,27 @@ export async function handshake(
 ): Promise<string | null> {
   const env = serverEnv();
   const keys = await tranzilaKeys();
-  if (!keys?.terminalPw) return null;
+  if (!keys) return null;
   try {
-    const res = await fetchImpl(`${env.INVITES_TRANZILA_CGI_BASE}/cgi-bin/tranzila71dt.cgi`, {
+    const res = await fetchImpl(`${env.INVITES_TRANZILA_API_BASE}/v2/handshake/create`, {
       method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        supplier: env.INVITES_TRANZILA_TERMINAL,
-        TranzilaPW: keys.terminalPw,
-        sum: tranzilaSum(amount),
-        currency: '1',
-        op: '1',
-        order: toBenid(order),
-      }).toString(),
+      headers: { 'content-type': 'application/json', accept: 'application/json', ...authHeaders(keys) },
+      body: JSON.stringify({
+        terminal_name: env.INVITES_TRANZILA_TERMINAL,
+        // exactly the sum the iframe's address carries
+        sum: Number(tranzilaSum(amount)),
+        // comes back with the transaction
+        request_params: { order_id: toBenid(order) },
+      }),
       signal: AbortSignal.timeout(10_000),
     });
-    const thtk = new URLSearchParams((await res.text()).trim()).get('thtk');
-    return thtk && /^[\w-]{4,200}$/.test(thtk) ? thtk : null;
+    const j = (await res.json()) as { error_code?: unknown; thtk?: unknown } | null;
+    const thtk = typeof j?.thtk === 'string' ? j.thtk : null;
+    if (!res.ok || !thtk || (j?.error_code !== undefined && Number(j.error_code) !== 0)) {
+      console.error('[tranzila] handshake refused', res.status, j?.error_code ?? 'no error_code');
+      return null;
+    }
+    return /^[\w-]{4,200}$/.test(thtk) ? thtk : null;
   } catch (err) {
     console.error('[tranzila] handshake', err instanceof Error ? err.message : err);
     return null;

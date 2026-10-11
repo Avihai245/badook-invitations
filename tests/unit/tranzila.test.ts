@@ -88,8 +88,8 @@ vi.mock('@/lib/supabase/server', () => ({ serviceDb: () => ({ rpc }) }));
 const tranzila = {
   /** what the next charges answer, in turn (then approved) */
   answers: [] as (() => Response | Promise<Response>)[],
-  /** the handshake's answer (tranzila71dt.cgi) */
-  handshake: 'thtk=hs-token-1' as string,
+  /** the handshake's answer (/v2/handshake/create) */
+  handshake: (): Response => answer({ error_code: 0, message: 'Success', thtk: 'hs-token-1' }),
   /** the card form's status (iframenew.php): 404 when the terminal has no hosted page */
   form: 200,
 };
@@ -108,7 +108,7 @@ const declined = () =>
     transaction_result: { processor_response_code: '004', transaction_id: 9002 },
   });
 const fetchMock = vi.fn(async (url: string, _init?: RequestInit) => {
-  if (url.endsWith('/cgi-bin/tranzila71dt.cgi')) return new Response(tranzila.handshake);
+  if (url.endsWith('/v2/handshake/create')) return tranzila.handshake();
   if (url.includes('/iframenew.php?')) return new Response('<html>form</html>', { status: tranzila.form });
   if (!url.endsWith('/v1/transaction/credit_card/create')) return answer({ error_code: 404 }, 404);
   const next = tranzila.answers.shift();
@@ -216,7 +216,7 @@ beforeEach(() => {
   state.vault = {};
   state.calls = [];
   tranzila.answers = [];
-  tranzila.handshake = 'thtk=hs-token-1';
+  tranzila.handshake = () => answer({ error_code: 0, message: 'Success', thtk: 'hs-token-1' });
   tranzila.form = 200;
   fetchMock.mockClear();
   sendEmail.mockClear();
@@ -306,46 +306,74 @@ describe('Tranzila: the API and the iframe', () => {
     }
   });
 
-  it('the handshake locks the sum, with the terminal’s password (and is skipped without it)', async () => {
+  it('the handshake (V2) locks the sum with the API keys, and the form’s address carries its thtk', async () => {
+    const { handshake, iframeUrl } = await client();
+    expect(await handshake(49, CHECKOUT)).toBe('hs-token-1');
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe('https://tranzila.test/v2/handshake/create');
+    expect(init?.method).toBe('POST');
+    // signed like every other call
+    const headers = init?.headers as Record<string, string>;
+    expect(headers['X-tranzila-api-app-key']).toBe(APP_KEY);
+    expect(headers['X-tranzila-api-access-token']).toBe(
+      createHmac('sha256', SECRET + headers['X-tranzila-api-request-time'] + headers['X-tranzila-api-nonce'])
+        .update(APP_KEY)
+        .digest('hex'),
+    );
+    // the terminal, and exactly the sum the form's address will carry
+    expect(JSON.parse(String(init?.body))).toEqual({
+      terminal_name: 'badookinvit',
+      sum: 49,
+      request_params: { order_id: BENID },
+    });
+    const withToken = new URL(
+      iframeUrl(
+        {
+          ref: CHECKOUT,
+          amount: 49,
+          itemName: 'x',
+          customer: { name: '', email: '' },
+          locale: 'en',
+          urls: { success: 'https://x.test/ok', failure: 'https://x.test/no', notify: 'https://x.test/n' },
+        },
+        'hs-token-1',
+      ),
+    ).searchParams;
+    expect(withToken.get('thtk')).toBe('hs-token-1');
+    expect(withToken.get('sum')).toBe('49.00');
+    expect(withToken.get('lang')).toBe('us');
+  });
+
+  it('a handshake Tranzila refuses or doesn’t answer gives no thtk: the form still opens', async () => {
     const { handshake } = await client();
-    expect(await handshake(49, CHECKOUT)).toBeNull();
-    expect(fetchMock).not.toHaveBeenCalled();
-    vi.stubEnv('INVITES_TRANZILA_PW', 'tz-terminal-pw');
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      tranzila.handshake = () => answer({ error_code: 401, message: 'Unauthorized' }, 401);
+      expect(await handshake(49, CHECKOUT)).toBeNull();
+      tranzila.handshake = () => answer({ error_code: 20004, message: 'Schema mismatch' });
+      expect(await handshake(49, CHECKOUT)).toBeNull();
+      tranzila.handshake = () => new Response('<html><body>Bad gateway</body></html>', { status: 502 });
+      expect(await handshake(49, CHECKOUT)).toBeNull();
+      tranzila.handshake = () => {
+        throw new Error('timeout');
+      };
+      expect(await handshake(49, CHECKOUT)).toBeNull();
+    } finally {
+      errors.mockRestore();
+    }
+  });
+
+  it('no keys, no handshake', async () => {
+    vi.stubEnv('INVITES_TRANZILA_APP_KEY', '');
+    vi.stubEnv('INVITES_TRANZILA_SECRET', '');
     vi.resetModules();
     try {
       const fresh = await client();
-      expect(await fresh.handshake(49, CHECKOUT)).toBe('hs-token-1');
-      const [url, init] = fetchMock.mock.calls[0]!;
-      expect(url).toBe('https://secure5.tranzila.com/cgi-bin/tranzila71dt.cgi');
-      expect(Object.fromEntries(new URLSearchParams(String(init?.body)))).toEqual({
-        supplier: 'badookinvit',
-        TranzilaPW: 'tz-terminal-pw',
-        sum: '49.00',
-        currency: '1',
-        op: '1',
-        order: BENID,
-      });
-      // Tranzila refusing it (an HTML page) or not answering: no thtk, the form still opens
-      tranzila.handshake = '<html><body>Transactions are not allowed from this location</body></html>';
       expect(await fresh.handshake(49, CHECKOUT)).toBeNull();
-      const { iframeUrl } = fresh;
-      const withToken = new URL(
-        iframeUrl(
-          {
-            ref: CHECKOUT,
-            amount: 49,
-            itemName: 'x',
-            customer: { name: '', email: '' },
-            locale: 'en',
-            urls: { success: 'https://x.test/ok', failure: 'https://x.test/no', notify: 'https://x.test/n' },
-          },
-          'hs-token-1',
-        ),
-      ).searchParams;
-      expect(withToken.get('thtk')).toBe('hs-token-1');
-      expect(withToken.get('lang')).toBe('us');
+      expect(fetchMock).not.toHaveBeenCalled();
     } finally {
-      vi.stubEnv('INVITES_TRANZILA_PW', '');
+      vi.stubEnv('INVITES_TRANZILA_APP_KEY', APP_KEY);
+      vi.stubEnv('INVITES_TRANZILA_SECRET', SECRET);
       vi.resetModules();
     }
   });
@@ -743,7 +771,6 @@ describe('Tranzila: the API keys from the Vault', () => {
   const VAULT = {
     TRANZILA_API_APP_KEY: 'vault-app-key',
     TRANZILA_API_SECRET: 'vault-secret',
-    TRANZILA_TERMINAL_PW: 'vault-terminal-pw',
   };
   const withoutEnvKeys = () => {
     vi.stubEnv('INVITES_TRANZILA_APP_KEY', '');
@@ -759,7 +786,6 @@ describe('Tranzila: the API keys from the Vault', () => {
     expect(await (await client()).tranzilaKeys()).toEqual({
       appKey: APP_KEY,
       secret: SECRET,
-      terminalPw: null,
       source: 'env',
     });
     expect(calls('billing_secrets')).toEqual([]);
@@ -771,7 +797,6 @@ describe('Tranzila: the API keys from the Vault', () => {
       expect(await tranzilaKeys()).toEqual({
         appKey: 'vault-app-key',
         secret: 'vault-secret',
-        terminalPw: 'vault-terminal-pw',
         source: 'vault',
       });
       await tranzilaKeys();

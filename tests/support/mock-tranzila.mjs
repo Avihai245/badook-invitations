@@ -1,6 +1,6 @@
 // Local stand-in for Tranzila, for the end-to-end stack (never deployed) — tests/e2e/tranzila.spec.ts:
-//   · the handshake: POST /cgi-bin/tranzila71dt.cgi (supplier, TranzilaPW, sum) → thtk=…, which the form
-//     then requires for that sum;
+//   · the handshake: POST /v2/handshake/create (HMAC headers; terminal_name, sum) → { thtk }, which the
+//     form then requires for that sum;
 //   · the card form: GET /<terminal>/iframenew.php?sum=…&tranmode=VK&benid=…&notify_url_address=… — its
 //     button posts to /<terminal>/pay, which holds the sum on the card (VK), makes a token, sends the
 //     notice (form fields, as Tranzila does: Response, TranzilaTK, expmonth, expyear, index,
@@ -20,7 +20,6 @@ const port = Number(process.env.MOCK_TRANZILA_PORT || 55050);
 const APP_KEY = process.env.MOCK_TRANZILA_APP_KEY || 'e2e-tranzila-app-key';
 const SECRET = process.env.MOCK_TRANZILA_SECRET || 'e2e-tranzila-secret';
 const TERMINAL = process.env.MOCK_TRANZILA_TERMINAL || 'badookinvit';
-const TERMINAL_PW = process.env.MOCK_TRANZILA_PW || 'e2e-terminal-pw';
 const TOKEN_TERMINAL = process.env.MOCK_TRANZILA_TOKEN_TERMINAL || 'badookinvittok';
 const FIELDS = new Set([
   'terminal_name',
@@ -73,20 +72,32 @@ const result = (res, code, extra = {}) =>
     transaction_result: { processor_response_code: code, transaction_id: ++txn, ...extra },
   });
 
+/** the API's HMAC headers: right app key, a fresh time, and the token of secret + time + nonce */
+const signed = (req) => {
+  const h = req.headers;
+  const time = String(h['x-tranzila-api-request-time'] ?? '');
+  const nonce = String(h['x-tranzila-api-nonce'] ?? '');
+  const expected = createHmac('sha256', SECRET + time + nonce)
+    .update(APP_KEY)
+    .digest('hex');
+  const fresh = Math.abs(Date.now() / 1000 - Number(time)) < 300;
+  return h['x-tranzila-api-app-key'] === APP_KEY && h['x-tranzila-api-access-token'] === expected && fresh;
+};
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://127.0.0.1:${port}`);
   if (url.pathname === '/health') return json(res, 200, { ok: true });
   if (url.pathname === '/charges') return json(res, 200, { charges, notices });
 
-  // the handshake
-  if (url.pathname === '/cgi-bin/tranzila71dt.cgi' && req.method === 'POST') {
-    const p = Object.fromEntries(new URLSearchParams(await body(req)));
-    if (p.supplier !== TERMINAL || p.TranzilaPW !== TERMINAL_PW)
-      return html(res, 'Transactions are not allowed from this location');
+  // the handshake (Handshake V2)
+  if (url.pathname === '/v2/handshake/create' && req.method === 'POST') {
+    if (!signed(req)) return json(res, 401, { error_code: 401, message: 'Unauthorized' });
+    const b = JSON.parse(await body(req));
+    if (b.terminal_name !== TERMINAL || !(Number(b.sum) > 0))
+      return json(res, 200, { error_code: 20004, message: 'Schema mismatch' });
     const thtk = randomBytes(12).toString('hex');
-    handshakes.set(thtk, p.sum);
-    res.writeHead(200, { 'content-type': 'text/plain' });
-    return res.end(`thtk=${thtk}`);
+    handshakes.set(thtk, Number(b.sum));
+    return json(res, 200, { error_code: 0, message: 'Success', thtk });
   }
 
   // the card form
@@ -94,8 +105,8 @@ const server = createServer(async (req, res) => {
   if (form && req.method === 'GET') {
     if (form[1] !== TERMINAL) return html(res, 'הדף שחיפשת לא נמצא', 404);
     const thtk = url.searchParams.get('thtk');
-    if (thtk && handshakes.get(thtk) !== url.searchParams.get('sum'))
-      return html(res, 'The sum does not match the handshake', 400);
+    if (thtk && handshakes.get(thtk) !== Number(url.searchParams.get('sum')))
+      return html(res, 'Illegal Operation 912791', 400);
     const hidden = [...url.searchParams]
       .map(([k, v]) => `<input type="hidden" name="${esc(k)}" value="${esc(v)}">`)
       .join('');
@@ -151,15 +162,7 @@ const server = createServer(async (req, res) => {
 
   // the API
   if (url.pathname === '/v1/transaction/credit_card/create' && req.method === 'POST') {
-    const h = req.headers;
-    const time = String(h['x-tranzila-api-request-time'] ?? '');
-    const nonce = String(h['x-tranzila-api-nonce'] ?? '');
-    const expected = createHmac('sha256', SECRET + time + nonce)
-      .update(APP_KEY)
-      .digest('hex');
-    const fresh = Math.abs(Date.now() / 1000 - Number(time)) < 300;
-    if (h['x-tranzila-api-app-key'] !== APP_KEY || h['x-tranzila-api-access-token'] !== expected || !fresh)
-      return json(res, 401, { error_code: 401, message: 'Unauthorized' });
+    if (!signed(req)) return json(res, 401, { error_code: 401, message: 'Unauthorized' });
     const b = JSON.parse(await body(req));
     const unknown = Object.keys(b).filter((k) => !FIELDS.has(k));
     if (unknown.length)

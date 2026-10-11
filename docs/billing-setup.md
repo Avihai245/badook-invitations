@@ -22,6 +22,7 @@
 2. **מפתחות API** (ממשק טרנזילה → הגדרות → API): Application key (ציבורי) ו־Secret (פרטי). כל קריאה חתומה: `X-tranzila-api-app-key`, `X-tranzila-api-request-time`, `X-tranzila-api-nonce` ו־`X-tranzila-api-access-token` = HMAC-SHA256 של ה־app key במפתח secret + time + nonce.
 3. **הכתובות** שהמסוף צריך לאשר (אם טרנזילה מגבילה): `https://invitations.badooks.com/api/billing/tranzila/notify` (הודעת שרת) ו־`https://invitations.badooks.com/api/billing/tranzila/return` (העמוד שה־iframe עובר אליו בהצלחה ובכישלון).
 4. **חשבוניות**: מפעילים במסוף הפקת חשבונית/קבלה אוטומטית לעסקאות (כולל החיובים החודשיים בטוקן), אם רוצים שטרנזילה תפיק אותן.
+5. **Handshake (למסוף ה־iframe)**: ב־my.tranzila.com → Settings → Terminal → iFrame → לשונית Advanced → **Enable Hand Shake**. אחרי ההפעלה הטופס דורש `thtk` תקף בכתובת ודוחה סכום שונה מזה שננעל (״Illegal Operation 912791״). השרת מבקש את ה־`thtk` מ־`POST https://api.tranzila.com/v2/handshake/create` (באותן כותרות חתימה של מפתחות ה־API, בלי סיסמת מסוף) ומוסיף אותו לכתובת ה־iframe.
 
 ### משתני הסביבה
 
@@ -32,15 +33,13 @@
 | `INVITES_TRANZILA_TERMINAL` | מסוף ה־iframe (ברירת מחדל `badookinvit`) |
 | `INVITES_TRANZILA_TOKEN_TERMINAL` | מסוף הטוקנים (ברירת מחדל `badookinvittok`) |
 | `INVITES_TRANZILA_TRANMODE` | מה הטופס עושה בכרטיס: `VK` (ברירת המחדל: תפיסת הסכום וטוקן; השרת גובה את התפיסה), `NK` (בדיקה בלי לתפוס סכום, וטוקן; השרת מחייב את הטוקן) או `K` |
-| `INVITES_TRANZILA_PW` | סיסמת TranzilaPW של מסוף ה־iframe (לא חובה): **נועלת את הסכום** בטופס מראש (handshake, `thtk`) כך שאי אפשר לשנות אותו בכתובת. אפשר גם ב־Vault בשם `TRANZILA_TERMINAL_PW`. בלעדיה הטופס נפתח בלי נעילה, והשרת ממילא גובה רק את הסכום של הרכישה |
-
 | `INVITES_TRANZILA_APPLE_PAY` / `INVITES_TRANZILA_GOOGLE_PAY` | `1` מוסיף לטופס כפתור **Apple Pay** / **Google Pay** (`apple_pay=1`, `google_pay=1`). להפעיל **רק אחרי** שטרנזילה הפעילה אותם במסוף `badookinvit` (ולאפל פיי: רשמה את הדומיין שלנו). ברירת מחדל: כבוי |
 | `INVITES_TRANZILA_APPLE_PAY_FILE` | קובץ אימות הדומיין של Apple Pay, אם טרנזילה נותנת קובץ משלה (לא חובה; בלעדיו מוגש העותק הציבורי של טרנזילה) |
 
 **איפה שמים את המפתחות** (אחד מהשניים מספיק):
 
 - **Amplify** (Hosting → Environment variables): `INVITES_TRANZILA_APP_KEY` ו־`INVITES_TRANZILA_SECRET`, ואחריהם Redeploy. אם שניהם מוגדרים שם, הם קובעים.
-- **Supabase Vault** (הפרויקט Badook Invitations → Vault → Secrets): `TRANZILA_API_APP_KEY` ו־`TRANZILA_API_SECRET`, ואם רוצים נעילת סכום גם `TRANZILA_TERMINAL_PW` (או באותם שמות כמו ב־Amplify). כשהמפתחות לא מוגדרים ב־Amplify, השרת קורא אותם מה־Vault (`billing_secrets`, רק השמות האלה ורק עם מפתח השרת), בלי Redeploy: תוך דקה.
+- **Supabase Vault** (הפרויקט Badook Invitations → Vault → Secrets): `TRANZILA_API_APP_KEY` ו־`TRANZILA_API_SECRET` (או באותם שמות כמו ב־Amplify). כשהמפתחות לא מוגדרים ב־Amplify, השרת קורא אותם מה־Vault (`billing_secrets`, רק השמות האלה ורק עם מפתח השרת), בלי Redeploy: תוך דקה.
 
 במסוף הניהול → מערכת, השורה ״תשלומים (טרנזילה)״ אומרת אם המפתחות נמצאו ואיפה (Amplify או Vault). כשהם נמצאו, **כל רכישה חדשה עוברת דרך טרנזילה** (גם אם PayPlus מוגדרת), ומנויים קיימים ב־PayPlus ממשיכים להתחדש שם. כשלא נמצאו בשום מקום, מסך החיובים אומר ״התשלום המקוון עוד לא הופעל״. המיגרציות `supabase/migrations/20261007020000_tranzila.sql`, `20261008010000_billing_secrets.sql` ו־`20261008020000_billing_secrets_terminal_pw.sql` צריכות לרוץ על מסד הנתונים לפני הקוד.
 
@@ -58,7 +57,7 @@
 
 ### איך זה עובד
 
-1. המשתמש לוחץ על חבילה או על חבילת הודעות. המערכת רושמת את הרכישה, נועלת את הסכום אצל טרנזילה (אם `INVITES_TRANZILA_PW` מוגדרת) ופותחת **חלון עם טופס התשלום של טרנזילה** (iframe של `https://directng.tranzila.com/badookinvit/iframenew.php`) עם הסכום ומספר הרכישה שלנו (`benid`).
+1. המשתמש לוחץ על חבילה או על חבילת הודעות. המערכת רושמת את הרכישה, נועלת את הסכום אצל טרנזילה (handshake, `thtk`) ופותחת **חלון עם טופס התשלום של טרנזילה** (iframe של `https://directng.tranzila.com/badookinvit/iframenew.php`) עם הסכום ומספר הרכישה שלנו (`benid`).
 2. המשתמש מקליד את הכרטיס. טרנזילה בודקת אותו ושולחת את הטוקן להודעת השרת (`/api/billing/tranzila/notify`), וה־iframe עובר לעמוד החזרה (`/api/billing/tranzila/return`).
 3. **מי שמגיע ראשון גובה**, פעם אחת בלבד (טבלת `billing_claims`), **בסכום של הרכישה כפי שנרשם אצלנו** (לא מה שהטופס אומר): כשהטופס תפס בדיוק את הסכום הזה, השרת גובה את התפיסה (`force` במסוף `badookinvit`, לפי מספר העסקה ומספר האישור שלה); כשטרנזילה מסרבת לגבייה כבקשה (שום דבר לא נגבה), השרת מחייב את הטוקן במסוף `badookinvittok` ומשחרר את התפיסה; כשאין תפיסה, הוא מחייב את הטוקן. התשובה של טרנזילה היא שקובעת: אושר → החבילה או הקרדיטים ניתנים מיד; נדחה → הרכישה נכשלת (ואפשר לנסות שוב, גם בכרטיס אחר). הודעה מזויפת לא נותנת כלום: טוקן או תפיסה שאינם אמיתיים פשוט נדחים.
 4. עמוד החזרה מעביר את כל מסך החיובים לתוצאה (`/app/billing?status=…&checkout=…`). אם החיוב עוד לא הסתיים, המסך מחכה ומתעדכן לבד.
