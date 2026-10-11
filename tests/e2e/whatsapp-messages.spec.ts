@@ -137,6 +137,10 @@ test('send a reminder now, then turn on the Smart sequence and let a stage run',
 
     // ── smart scheduling: choose Smart, review, turn on ──
     await page.getByRole('tab', { name: /תזמון חכם/ }).click();
+    // each stage says who gets it, behind its "?"
+    const smartCard = page.locator('[data-preset="smart"]');
+    await smartCard.getByRole('button', { name: /מה זה\? תזכורת 1/ }).click();
+    await expect(smartCard).toContainText('נשלחת רק למי שקיבל את ההזמנה ועדיין לא אישר ולא סירב');
     await page.locator('[data-preset="smart"]').getByRole('button', { name: 'בחירה' }).click();
     await expect(page.getByTestId('schedule-stages').locator('[data-stage]')).toHaveCount(6);
     await page.getByRole('button', { name: 'לסקירה ולהפעלה' }).click();
@@ -164,6 +168,8 @@ test('send a reminder now, then turn on the Smart sequence and let a stage run',
     expect(coming.map((m) => m.template)).toEqual(['badook_event_reminder']);
     expect(coming[0]!.params[0]).toBe('יוסי מגיע');
     expect(coming[0]!.params[3]).toContain('19:30');
+    // its button: the way to the event, with the guest's personal link
+    expect(coming[0]!.button).toMatch(new RegExp(`/way\\?g=[A-Za-z0-9_-]{16,}`));
     expect(await sentTo(phones.waiting)).toHaveLength(1);
     expect(await sentTo(phones.notYet)).toHaveLength(0);
     const stage = await db.query(
@@ -174,6 +180,16 @@ test('send a reminder now, then turn on the Smart sequence and let a stage run',
     // a second run sends nothing again
     await request.post('/api/cron/whatsapp', { headers: { authorization: `Bearer ${CRON_SECRET}` } });
     expect(await sentTo(phones.coming)).toHaveLength(1);
+
+    // the way page the button opens: navigation in one tap, and the guest's own invitation
+    // a page of its own, rendered on the server (no app around it)
+    await page.goto(`/e/${coming[0]!.button}`);
+    const way = page.getByTestId('way-page');
+    await expect(way).toContainText('הדרך לאירוע');
+    await expect(way).toContainText('נועה & איתי');
+    await expect(way.getByRole('link', { name: 'הוספה ליומן' })).toBeVisible();
+    await expect(way.getByRole('link', { name: 'להזמנה' })).toHaveAttribute('href', /\?g=/);
+    await page.goto(`/app/invitations/${id}/guests/whatsapp`);
 
     // the page shows it: the stage sent, and the messages in the history
     await page.reload();

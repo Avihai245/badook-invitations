@@ -469,7 +469,7 @@ Footer: `Enviado con Badook` · Button: `Ver el álbum` · דוגמאות: `Dana
 | הודעה | שם מומלץ | משתנה סביבה | Category | משתנים | כפתור |
 |---|---|---|---|---|---|
 | תזכורת לאישור הגעה | `badook_rsvp_reminder` | `INVITES_WHATSAPP_REMINDER_TEMPLATE` | Marketing | 1 מוזמן · 2 מארחים · 3 האירוע עם מילת היחס · 4 התאריך (כמו ההזמנה) | Dynamic `https://invitations.badooks.com/i/{{1}}` — `לאישור הגעה` |
-| תזכורת לפני האירוע | `badook_event_reminder` | `INVITES_WHATSAPP_EVENT_TEMPLATE` | Utility | 1 מוזמן · 2 מארחים · 3 האירוע עם מילת היחס · 4 מתי ואיפה (`יום רביעי, 18 בנובמבר · 19:30 · גן האירועים`) | Dynamic `https://invitations.badooks.com/i/{{1}}` — `לפרטים ולניווט` |
+| תזכורת לפני האירוע | `badook_event_reminder` | `INVITES_WHATSAPP_EVENT_TEMPLATE` | Utility | 1 מוזמן · 2 מארחים · 3 האירוע עם מילת היחס · 4 מתי ואיפה (`יום רביעי, 18 בנובמבר · 19:30 · גן האירועים`) | Dynamic `https://invitations.badooks.com/e/{{1}}` — `ניווט לאירוע` (פותח את דף הדרך לאירוע: Waze, Google Maps, הוספה ליומן) |
 | תודה בלי אלבום | `badook_thanks` | `INVITES_WHATSAPP_THANKS_TEMPLATE` | Utility | 1 מוזמן · 2 איפה חגגו (`בחתונה שלנו`) · 3 בעלי השמחה | ללא |
 
 הטקסטים בכל השפות: `REMINDER_TEMPLATE_TEXT`, `EVENT_TEMPLATE_TEXT`, `THANKS_TEMPLATE_TEXT` ב-`src/features/whatsapp/template-text.ts` (אותם טקסטים שהתצוגה המקדימה מציגה). מגישים כל אחד בכל שפה שב-`INVITES_WHATSAPP_TEMPLATE_LANGS`, Header ללא, Footer `נשלח באמצעות Badook`. התודה עם האלבום משתמשת בטמפלט מסעיף 10; אם האלבום לא זמין כשמגיע הזמן, נשלחת התודה בלי אלבום (אם אושרה), אחרת השלב לא נשלח.

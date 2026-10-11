@@ -190,43 +190,43 @@ export const REMINDER_TEMPLATE_TEXT: Record<Locale, TemplateText> = {
 /**
  * The reminder before the event (badook_event_reminder, docs/whatsapp-setup.md §12) to the guests who
  * are coming: {{1}} guest · {{2}} hosts · {{3}} the event with its preposition · {{4}} when and where
- * ("יום שלישי, 17 בנובמבר · 19:30 · גן האירועים"); the button opens their invitation (the map, the
- * directions). Says no "today", so it fits the day itself and the days before it.
+ * ("יום שלישי, 17 בנובמבר · 19:30 · גן האירועים"); the button opens the way there (/e/<slug>/way:
+ * Waze, Google Maps, the calendar). Says no "today", so it fits the day itself and the days before it.
  */
 export const EVENT_TEMPLATE_TEXT: Record<Locale, TemplateText> = {
   he: {
-    body: 'שלום {{1}} 🎉\n{{2}} מחכים לראות אותך {{3}}!\n📅 {{4}}\nהפרטים והדרך לאירוע בכפתור 👇',
-    button: 'לפרטים ולניווט',
+    body: 'שלום {{1}} 🎉\n{{2}} מחכים לראות אותך {{3}}!\n📅 {{4}}\nהדרך לאירוע, עם ניווט ב-Waze או ב-Google Maps, בכפתור 👇',
+    button: 'ניווט לאירוע',
     footer: 'נשלח באמצעות Badook',
   },
   en: {
-    body: 'Hi {{1}} 🎉\nYou’re invited {{3}} — {{2}} can’t wait to see you!\n📅 {{4}}\nTap the button for the details and directions 👇',
-    button: 'Details & directions',
+    body: 'Hi {{1}} 🎉\nYou’re invited {{3}} — {{2}} can’t wait to see you!\n📅 {{4}}\nTap the button for the way there, with Waze or Google Maps 👇',
+    button: 'Directions',
     footer: 'Sent with Badook',
   },
   ru: {
-    body: 'Здравствуйте, {{1}}! 🎉\nЖдём вас {{3}}: {{2}}.\n📅 {{4}}\nПодробности и маршрут — по кнопке ниже 👇',
-    button: 'Подробности',
+    body: 'Здравствуйте, {{1}}! 🎉\nЖдём вас {{3}}: {{2}}.\n📅 {{4}}\nМаршрут (Waze или Google Maps) — по кнопке ниже 👇',
+    button: 'Маршрут',
     footer: 'Отправлено через Badook',
   },
   ar: {
-    body: 'مرحبًا {{1}} 🎉\nيتطلّع {{2}} لرؤيتكم {{3}}!\n📅 {{4}}\nللتفاصيل والطريق اضغطوا على الزر 👇',
-    button: 'التفاصيل والطريق',
+    body: 'مرحبًا {{1}} 🎉\nيتطلّع {{2}} لرؤيتكم {{3}}!\n📅 {{4}}\nللطريق إلى الحفل عبر Waze أو Google Maps اضغطوا على الزر 👇',
+    button: 'الطريق إلى الحفل',
     footer: 'أُرسلت عبر Badook',
   },
   fr: {
-    body: 'Bonjour {{1}} 🎉\nOn vous attend {{3}} : {{2}}.\n📅 {{4}}\nLes détails et l’itinéraire, c’est par le bouton ci-dessous 👇',
-    button: 'Détails et accès',
+    body: 'Bonjour {{1}} 🎉\nOn vous attend {{3}} : {{2}}.\n📅 {{4}}\nL’itinéraire (Waze ou Google Maps), c’est par le bouton ci-dessous 👇',
+    button: 'Itinéraire',
     footer: 'Envoyé via Badook',
   },
   es: {
-    body: '¡Hola, {{1}}! 🎉\nTe esperamos {{3}} de {{2}}.\n📅 {{4}}\nToca el botón para ver los detalles y cómo llegar 👇',
-    button: 'Detalles y cómo llegar',
+    body: '¡Hola, {{1}}! 🎉\nTe esperamos {{3}} de {{2}}.\n📅 {{4}}\nToca el botón para ver cómo llegar con Waze o Google Maps 👇',
+    button: 'Cómo llegar',
     footer: 'Enviado con Badook',
   },
   am: {
-    body: 'ሰላም {{1}} 🎉\nእንጠብቅዎታለን {{3}}፦ {{2}}።\n📅 {{4}}\nዝርዝሮችና አቅጣጫ ከታች ባለው ቁልፍ 👇',
-    button: 'ዝርዝሮችና አቅጣጫ',
+    body: 'ሰላም {{1}} 🎉\nእንጠብቅዎታለን {{3}}፦ {{2}}።\n📅 {{4}}\nአቅጣጫ (Waze ወይም Google Maps) ከታች ባለው ቁልፍ 👇',
+    button: 'አቅጣጫ',
     footer: 'በBadook የተላከ',
   },
 };

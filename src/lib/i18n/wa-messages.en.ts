@@ -30,7 +30,8 @@ export const waMessagesEn: WaMessagesDict = {
   kindHints: {
     invitation: 'The invitation with the guest’s name and a button to their personal link',
     reminder: 'To who got the invitation and hasn’t answered — with an RSVP button',
-    event_reminder: 'The date, time and place, with a button for details and directions',
+    event_reminder:
+      'To who’s coming: the date, time and place, with a button to navigate with Waze or Google Maps',
     thanks: '“Thank you for celebrating with us”, without a link',
     album: '“Thank you for celebrating with us” with a button to the event’s photo album',
   },
@@ -67,6 +68,7 @@ export const waMessagesEn: WaMessagesDict = {
     personal: 'Each guest gets their own name — and their language, when the message is approved in it.',
     link: {
       invitation: 'The button opens each guest’s personal invitation.',
+      way: 'The button opens the way to the event: Waze or Google Maps, and add to calendar.',
       album: 'The button opens the event’s photo album.',
       none: 'A message without a button.',
     },
@@ -154,13 +156,32 @@ export const waMessagesEn: WaMessagesDict = {
     plans: { free: 'Free', pro: 'Pro', business: 'Business' },
     stageNames: {
       invitation: 'The invitation',
-      followup1: 'First RSVP reminder',
-      followup2: 'Second reminder',
-      followup3: 'Last reminder',
-      event_reminder: 'Reminder before the event',
+      followup1: 'Reminder 1 — to who hasn’t RSVP’d',
+      followup2: 'Reminder 2 — to who still hasn’t',
+      followup3: 'Last reminder — to who still hasn’t',
+      event_reminder: 'Event reminder + directions — to who’s coming',
       thanks: 'Thank-you after the event',
-      custom1: 'Extra message',
-      custom2: 'Extra message 2',
+      custom1: 'An extra message of your choice',
+      custom2: 'An extra message of your choice 2',
+    },
+    help: 'What is this?',
+    stageHelp: {
+      invitation:
+        'The invitation itself, with each guest’s name and a button to their personal link. Goes only to who hasn’t got it yet — nobody gets it twice.',
+      followup1:
+        'Goes only to who got the invitation and hasn’t said yes or no. Who already answered doesn’t get it, and the list is checked again right before sending.',
+      followup2:
+        'Another reminder, again only to who still hasn’t answered. Whoever answered meanwhile — even thanks to the first reminder — drops off by itself.',
+      followup3:
+        'A last call a few days before the event, only to who still hasn’t answered, so you can confirm numbers with the venue.',
+      event_reminder:
+        'Goes only to who said they’re coming: a short reminder with the date, time and place, and a button to the way there — Waze or Google Maps in one tap.',
+      thanks:
+        'Goes after the event to who came (or every guest, your choice): a warm thank-you, and if you like, a link to the event’s photo album.',
+      custom1:
+        'An extra message you aim: which message, to whom and when — say, another reminder to who’s coming a few days before.',
+      custom2:
+        'Another message you aim: which message, to whom and when — say, a last call to who still hasn’t answered.',
     },
     stageStatus: {
       scheduled: 'Scheduled',

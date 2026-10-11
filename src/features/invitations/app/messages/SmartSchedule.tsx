@@ -6,6 +6,7 @@ import {
   CalendarClock,
   Check,
   CircleAlert,
+  CircleHelp,
   Eye,
   Lock,
   Pause,
@@ -17,7 +18,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import {
   Badge,
   Button,
@@ -357,10 +358,14 @@ export function SmartSchedule({
                       {ran && x.status === 'done' ? <Check aria-hidden className="size-4" /> : number(i + 1)}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="flex flex-wrap items-center gap-2 text-[14.5px] font-bold">
+                      <div className="flex flex-wrap items-center gap-2 text-[14.5px] font-bold">
                         {nameOf(x)}
                         <Badge variant={STATUS_BADGE[badge] ?? 'neutral'}>{s.stageStatus[badge]}</Badge>
-                      </p>
+                        <StageHelp
+                          name={nameOf(x)}
+                          text={(s.stageHelp as Record<string, string>)[x.key] ?? ''}
+                        />
+                      </div>
                       <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[13px] text-muted">
                         <span className="flex items-center gap-1">
                           <CalendarClock aria-hidden className="size-3.5" />
@@ -632,7 +637,14 @@ function PresetPicker({
                 {keys.map((k) => (
                   <li key={k} className="flex items-start gap-1.5">
                     <CalendarCheck aria-hidden className="mt-0.5 size-3.5 shrink-0 text-brand" />
-                    {(s.stageNames as Record<string, string>)[k]}
+                    <span className="min-w-0">
+                      {(s.stageNames as Record<string, string>)[k]}
+                      <StageHelp
+                        inline
+                        name={(s.stageNames as Record<string, string>)[k] ?? k}
+                        text={(s.stageHelp as Record<string, string>)[k] ?? ''}
+                      />
+                    </span>
                   </li>
                 ))}
               </ol>
@@ -1013,5 +1025,43 @@ function ReviewDialog({
         ) : null}
       </div>
     </Dialog>
+  );
+}
+
+/**
+ * The "?" beside a stage: tapped (a tooltip never opens on a phone), it unfolds who gets the stage and
+ * what it says, right under it.
+ */
+function StageHelp({ name, text, inline = false }: { name: string; text: string; inline?: boolean }) {
+  const { t } = useUi();
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  if (!text) return null;
+  return (
+    <>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={id}
+        aria-label={`${t.waMessages.smart.help} ${name}`}
+        onClick={() => setOpen((o) => !o)}
+        className={cn(
+          'size-6 shrink-0 place-items-center rounded-full transition-colors',
+          // in a line of text: right after its last word, never alone on a line of its own
+          inline ? 'ms-0.5 inline-grid align-middle' : 'grid',
+          open ? 'bg-brand-soft text-brand-deep' : 'text-muted hover:bg-subtle hover:text-ink',
+        )}
+        data-testid="stage-help"
+      >
+        <CircleHelp aria-hidden className="size-4" />
+      </button>
+      <span
+        id={id}
+        hidden={!open}
+        className="mt-1 block basis-full rounded-card bg-brand-soft/40 px-3 py-2 text-[12.5px] leading-snug font-normal text-ink/85"
+      >
+        {text}
+      </span>
+    </>
   );
 }
