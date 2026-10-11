@@ -41,6 +41,8 @@ export const albumGuestAr: AlbumGuestDict = {
     },
   },
   highlights: 'أجمل اللحظات',
+  film: 'فيلم الحفل',
+  filmHint: 'صُنع من الصور والفيديوهات التي شاركها الضيوف',
   chapters: {
     opening: 'البداية',
     heart: 'قلب الفرحة',

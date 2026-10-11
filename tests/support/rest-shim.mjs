@@ -202,6 +202,7 @@ const FUNCTIONS = new Set([
   'invitation_feature_on',
   'gallery_owner_add',
   'gallery_owner_add_done',
+  'gallery_mark_film',
   'gallery_owner_film',
   'gallery_face_index_upload',
   'gallery_face_search',

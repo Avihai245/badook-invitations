@@ -166,6 +166,7 @@ async function sign(rows: readonly AlbumItemRow[], deps: Pick<AlbumDeps, 'storag
     at: r.takenAt ?? r.publishedAt ?? r.createdAt,
     name: r.name,
     ...(r.ai ? { ai: true } : {}),
+    ...(r.film ? { film: true } : {}),
   }));
   return { photos: photos.filter((p) => p.display || p.video), expiresAt: deps.now() + ttl * 1000 };
 }
@@ -434,7 +435,8 @@ export async function albumPage(token: string, deps: AlbumDeps): Promise<AlbumPa
     message: words(r.settings.message, event.locales),
     items: photos,
     layout: albumLayout(
-      rows.filter((row) => shown.has(row.id)),
+      // the film has its own place at the top: never the cover, a best moment or in a chapter
+      rows.filter((row) => shown.has(row.id) && !row.film),
       r.doc,
       r.settings,
     ),

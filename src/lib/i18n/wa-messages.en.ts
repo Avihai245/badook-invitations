@@ -33,7 +33,8 @@ export const waMessagesEn: WaMessagesDict = {
     event_reminder:
       'To who’s coming: the date, time and place, with a button to navigate with Waze or Google Maps',
     thanks: '“Thank you for celebrating with us”, without a link',
-    album: '“Thank you for celebrating with us” with a button to the event’s photo album',
+    album:
+      '“Thank you for celebrating with us” with a button to the event’s album — including the film made from the photos',
   },
   categories: {
     invitations: 'Invitations',
@@ -177,7 +178,7 @@ export const waMessagesEn: WaMessagesDict = {
       event_reminder:
         'Goes only to who said they’re coming: a short reminder with the date, time and place, and a button to the way there — Waze or Google Maps in one tap.',
       thanks:
-        'Goes after the event to who came (or every guest, your choice): a warm thank-you, and if you like, a link to the event’s photo album.',
+        'Goes after the event to who came (or every guest, your choice): a warm thank-you, and if you like, a link to the event’s album, with the film the system made from all the guests’ photos at its top (once you’ve made it).',
       custom1:
         'An extra message you aim: which message, to whom and when — say, another reminder to who’s coming a few days before.',
       custom2:
@@ -259,7 +260,7 @@ export const waMessagesEn: WaMessagesDict = {
     audience: 'To whom',
     message: 'Which message',
     label: 'Name (only for you)',
-    withAlbum: 'Add the photo album’s link',
+    withAlbum: 'Add the album’s link (with the event’s film, once it’s made)',
     albumNo: 'The album comes with a plan that has it, once it’s on.',
     enabled: 'Stage on',
     recheck: 'Recipients are decided when it’s sent, by the RSVPs at that moment.',

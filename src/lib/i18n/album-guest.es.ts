@@ -27,6 +27,8 @@ export const albumGuestEs: AlbumGuestDict = {
     videos: { one: '{n} vídeo', other: '{n} vídeos' },
   },
   highlights: 'Los mejores momentos',
+  film: 'La película del evento',
+  filmHint: 'Hecho con las fotos y vídeos de los invitados',
   chapters: {
     opening: 'El comienzo',
     heart: 'El corazón de la fiesta',

@@ -541,3 +541,51 @@ describe('privileges', () => {
     });
   });
 });
+
+describe('the album’s film', () => {
+  it('is marked by the owner on their own video, once per event, and shown at the top whatever the videos switch says', async () => {
+    const film = async (source: string, kind: string) => {
+      const id = randomUUID();
+      const folder = `${inv}/${id}`;
+      await c.query(
+        `insert into gallery_items (id, invitation_id, kind, status, source, uploader_hash, original_path, original_type,
+           original_size, original_done, display_path, display_size, thumb_path, thumb_size, width, height, published_at)
+         values ($1, $2, $3, 'published', $4, $5, $6, 'video/mp4', 1000, true, $7, 500, $8, 100, 1280, 720, now())`,
+        [
+          id,
+          inv,
+          kind,
+          source,
+          UPLOADER,
+          `${folder}/original.mp4`,
+          `${folder}/display.jpg`,
+          `${folder}/thumb.jpg`,
+        ],
+      );
+      return id;
+    };
+    const mine = await film('host', 'video');
+    const guests = await film('guest', 'video');
+    const photo = await film('host', 'image');
+    expect(await commit('gallery_mark_film', [inv, OTHER, mine])).toBeNull();
+    // a guest's video and a photo aren't the film
+    expect(await commit('gallery_mark_film', [inv, OWNER, guests])).toBe(false);
+    expect(await commit('gallery_mark_film', [inv, OWNER, photo])).toBe(false);
+    expect(await commit('gallery_mark_film', [inv, OWNER, mine])).toBe(true);
+    // a newer film takes its place
+    const newer = await film('host', 'video');
+    expect(await commit('gallery_mark_film', [inv, OWNER, newer])).toBe(true);
+    const marked = await c.query(`select id from gallery_items where invitation_id = $1 and is_film`, [inv]);
+    expect(marked.rows.map((r) => r.id)).toEqual([newer]);
+    // the album says which item is the film — and shows it with "videos" switched off
+    await c.query(`update gallery_albums set show_videos = false where invitation_id = $1`, [inv]);
+    const items = await commit<{ id: string; film: boolean; kind: string }[]>('album_items', [
+      inv,
+      false,
+      100,
+    ]);
+    expect(items.find((i) => i.id === newer)).toMatchObject({ film: true, kind: 'video' });
+    expect(items.filter((i) => i.kind === 'video').map((i) => i.id)).toEqual([newer]);
+    await c.query(`update gallery_albums set show_videos = true where invitation_id = $1`, [inv]);
+  });
+});
