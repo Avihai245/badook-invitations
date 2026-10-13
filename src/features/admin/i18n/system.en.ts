@@ -45,6 +45,8 @@ export const systemEn: typeof systemHe = {
       templateTable: 'WhatsApp: the table number template',
       templateGallery: 'WhatsApp: the gallery link template',
       tranzila: 'Payments (Tranzila)',
+      applePay: 'Wallet: Apple Pay in the payment form',
+      googlePay: 'Wallet: Google Pay in the payment form',
       payplus: 'Payments (PayPlus)',
       email: 'Sending emails',
       supportEmail: 'Support email',

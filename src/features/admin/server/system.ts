@@ -1,7 +1,7 @@
 import 'server-only';
 import { billingMode, type BillingMode } from '@/features/billing/server/billing';
 import { payplusConfigured } from '@/features/billing/server/payplus';
-import { tranzilaKeys } from '@/features/billing/server/tranzila';
+import { tranzilaKeys, walletsEnabled } from '@/features/billing/server/tranzila';
 import { seedVersion } from '@/features/invitations/templates/seed-data';
 import { dailyDue } from '@/features/jobs/schedule';
 import { chatProvider } from '@/features/support/chat';
@@ -22,6 +22,9 @@ export interface Deployment {
     templates: { invitation: boolean; table: boolean; gallery: boolean };
     /** Tranzila's API keys: where they were found (null: nowhere) */
     tranzila: 'env' | 'vault' | null;
+    /** whether Tranzila's form is asked to show Apple Pay / Google Pay (false when Tranzila isn't set up) */
+    applePay: boolean;
+    googlePay: boolean;
     payplus: boolean;
     billing: BillingMode;
     email: boolean;
@@ -49,6 +52,7 @@ let codeSeed: string | null = null;
 
 export async function deployment(now = new Date()): Promise<Deployment> {
   const env = serverEnv();
+  const wallets = walletsEnabled();
   const [tranzila, billing] = await Promise.all([tranzilaKeys(), billingMode()]);
   codeSeed ??= seedVersion();
   const nextDaily = new Date(dailyDue(now).getTime() + 86_400_000);
@@ -63,6 +67,8 @@ export async function deployment(now = new Date()): Promise<Deployment> {
         gallery: !!env.INVITES_WHATSAPP_GALLERY_TEMPLATE,
       },
       tranzila: tranzila?.source ?? null,
+      applePay: !!tranzila && wallets.applePay,
+      googlePay: !!tranzila && wallets.googlePay,
       payplus: payplusConfigured(),
       billing,
       email: !!(env.INVITES_EMAIL_API_KEY && env.INVITES_EMAIL_FROM),

@@ -305,6 +305,32 @@ describe('Tranzila: the API and the iframe', () => {
       expect(p.get('sum')).toBe('16.00');
     });
 
+    it('walletsEnabled (what the system page shows) says what the form is asked for', async () => {
+      const wallets = async (env: Record<string, string> = {}) => {
+        for (const [k, v] of Object.entries(env)) vi.stubEnv(k, v);
+        vi.resetModules();
+        try {
+          return (await client()).walletsEnabled();
+        } finally {
+          for (const k of Object.keys(env)) vi.stubEnv(k, '');
+          vi.resetModules();
+        }
+      };
+      expect(await wallets()).toEqual({ applePay: true, googlePay: true });
+      expect(await wallets({ INVITES_TRANZILA_APPLE_PAY: '0' })).toEqual({
+        applePay: false,
+        googlePay: true,
+      });
+      expect(await wallets({ INVITES_TRANZILA_GOOGLE_PAY: '0' })).toEqual({
+        applePay: true,
+        googlePay: false,
+      });
+      expect(await wallets({ INVITES_TRANZILA_TRANMODE: 'NK' })).toEqual({
+        applePay: false,
+        googlePay: true,
+      });
+    });
+
     it('each can be taken off with 0', async () => {
       const noApple = await params({ INVITES_TRANZILA_APPLE_PAY: '0' });
       expect(noApple.get('apple_pay')).toBeNull();

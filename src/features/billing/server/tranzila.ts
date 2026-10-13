@@ -198,6 +198,19 @@ export async function handshake(
 }
 
 /**
+ * Which wallets the form is asked to show: Google Pay unless it is turned off, Apple Pay too — but only
+ * when the form holds the sum (VK): it can't check a card or make a token alone (NK / K). The system
+ * page shows the same answer.
+ */
+export function walletsEnabled(): { applePay: boolean; googlePay: boolean } {
+  const env = serverEnv();
+  return {
+    applePay: env.INVITES_TRANZILA_APPLE_PAY && env.INVITES_TRANZILA_TRANMODE === 'VK',
+    googlePay: env.INVITES_TRANZILA_GOOGLE_PAY,
+  };
+}
+
+/**
  * The address of Tranzila's card form for one purchase (the iframe's src), on directng.tranzila.com
  * (Tranzila's current host for the form). tranmode VK: the card is checked and the purchase's amount is
  * held on it (J5, nothing taken yet) — the payer sees what they pay — and a token comes back; our server
@@ -205,6 +218,7 @@ export async function handshake(
  */
 export function iframeUrl(r: IframeRequest, thtk: string | null = null): string {
   const env = serverEnv();
+  const wallets = walletsEnabled();
   const params = new URLSearchParams({
     sum: tranzilaSum(r.amount),
     currency: '1', // shekels
@@ -221,10 +235,9 @@ export function iframeUrl(r: IframeRequest, thtk: string | null = null): string 
     ...(r.customer.email ? { email: r.customer.email } : {}),
     ...(r.customer.phone ? { phone: r.customer.phone } : {}),
     ...(thtk ? { thtk } : {}),
-    // the wallets (Tranzila has turned them on for the terminal); Apple Pay only holds the sum (VK),
-    // it can't check a card or make a token alone (NK / K)
-    ...(env.INVITES_TRANZILA_APPLE_PAY && env.INVITES_TRANZILA_TRANMODE === 'VK' ? { apple_pay: '1' } : {}),
-    ...(env.INVITES_TRANZILA_GOOGLE_PAY ? { google_pay: '1' } : {}),
+    // the wallets (Tranzila has turned them on for the terminal)
+    ...(wallets.applePay ? { apple_pay: '1' } : {}),
+    ...(wallets.googlePay ? { google_pay: '1' } : {}),
   });
   return `${env.INVITES_TRANZILA_IFRAME_BASE}/${encodeURIComponent(env.INVITES_TRANZILA_TERMINAL)}/iframenew.php?${params}`;
 }

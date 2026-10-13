@@ -120,6 +120,8 @@ export function SystemScreen({ state, deployment: dep }: { state: SystemState; d
         : S.services.names.tranzila,
       !!dep.services.tranzila,
     ],
+    [S.services.names.applePay, dep.services.applePay],
+    [S.services.names.googlePay, dep.services.googlePay],
     [S.services.names.payplus, dep.services.payplus],
     [S.services.names.email, dep.services.email],
     [S.services.names.supportEmail, dep.services.supportEmail],

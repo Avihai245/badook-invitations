@@ -52,6 +52,9 @@ test.describe('the admin console’s system status', () => {
     await setUp('הקראה (Azure)', true);
     await setUp('מתזמן חיצוני (סוד ה־cron)', true);
     await setUp('תשלומים (PayPlus)', false);
+    // this stack has no Tranzila keys, so no wallets either
+    await setUp('ארנק: Apple Pay', false);
+    await setUp('ארנק: Google Pay', false);
     await setUp('המערכת מריצה עבודות בעצמה', false);
     await expect(service('מצב התשלומים')).toContainText('עמוד תשלום לבדיקה');
     await expect(service('עוזר הצ׳אט פועל דרך')).toContainText('Anthropic');

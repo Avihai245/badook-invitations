@@ -43,6 +43,8 @@ export const systemHe = {
       templateTable: 'וואטסאפ: תבנית מספר השולחן',
       templateGallery: 'וואטסאפ: תבנית קישור הגלריה',
       tranzila: 'תשלומים (טרנזילה)',
+      applePay: 'ארנק: Apple Pay בטופס התשלום',
+      googlePay: 'ארנק: Google Pay בטופס התשלום',
       payplus: 'תשלומים (PayPlus)',
       email: 'שליחת מיילים',
       supportEmail: 'מייל התמיכה',
