@@ -202,7 +202,14 @@ export async function submitReport(
   }
 
   // a held item leaves the feed, the screen and the host's tab at once; then the notices
-  if (stored.hidden && invitationId) deps.later(() => deps.refreshGallery(invitationId));
+  if (stored.hidden && invitationId)
+    deps.later(async () => {
+      try {
+        await deps.refreshGallery(invitationId);
+      } catch (err) {
+        console.error('[legal] gallery refresh failed', err);
+      }
+    });
   deps.later(() => notifyReport(stored, { invitationId, category: r.category, locale: r.locale }, deps));
   return ok({ number: stored.number, hidden: stored.hidden, urgent: stored.urgent });
 }

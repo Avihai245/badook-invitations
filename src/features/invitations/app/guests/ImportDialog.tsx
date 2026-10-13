@@ -8,6 +8,7 @@ import { useUi } from '@/lib/i18n/client';
 import { guestPhone } from '../../lib/guest-list';
 import { nativeName } from '../../lib/locales';
 import { hostApi, loginUrl } from '../api';
+import { GuestsNote } from './GuestsNote';
 import {
   csvCell,
   decodeCsv,
@@ -216,6 +217,8 @@ export function ImportDialog({
           <Download aria-hidden className="size-4" />
           {g.actions.sample}
         </button>
+
+        <GuestsNote kind="import" />
 
         {error ? (
           <p role="alert" className="rounded-card bg-danger-bg px-3 py-2 text-[13px] text-danger">

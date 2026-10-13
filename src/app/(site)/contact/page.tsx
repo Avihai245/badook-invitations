@@ -1,6 +1,7 @@
 import { Bot, Building2, Mail, MapPin, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
-import { legalContext } from '@/features/legal/context';
+import { legalContext, legalStatus } from '@/features/legal/context';
+import { ContactNotice } from '@/features/site/ContactNotice';
 import { ContactForm } from '@/features/site/ContactForm.client';
 import { SiteFooter } from '@/features/site/SiteFooter';
 import { SiteHeader } from '@/features/site/SiteHeader.client';
@@ -46,6 +47,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
           <ContactForm
             defaultTopic={TOPICS.find((x) => x === topic) ?? 'support'}
             sent={t.tickets.contactSent}
+            notice={legalStatus().active ? <ContactNotice t={t} operator={o} /> : undefined}
           />
           <aside className="flex flex-col gap-4">
             <div className="flex items-start gap-3 rounded-[18px] border border-brand-line bg-brand-soft/60 p-5 text-[14px]">

@@ -9,7 +9,8 @@ import type { BurstKind } from '../../renderer/fx/theme';
 import { formatEntry } from '../../i18n/format';
 import { CoreIcon } from '../../ui/core-icons';
 import { CalendarMenu, type CalendarLinks } from '../venues/CalendarMenu.client';
-import type { RsvpNotes } from './notes';
+import { PRIVACY_REQUEST_PATH } from '@/features/legal/versions';
+import { showsAnswersNote, type RsvpNotes } from './notes';
 import type { RsvpKey, RsvpStrings } from './strings';
 
 /** Everything the form needs, already localized on the server. */
@@ -22,6 +23,8 @@ export interface RsvpFormConfig {
   strings: RsvpStrings;
   /** where the reply goes (+ the privacy policy), and the sample invitations' note */
   notes: RsvpNotes;
+  /** version 2 of the legal documents is in force: the line on who sees the answers (notes.answers) */
+  legalNotice?: boolean;
   askChildren: boolean;
   maxAdults: number;
   maxChildren: number;
@@ -1048,6 +1051,23 @@ export function RsvpForm({ config }: { config: RsvpFormConfig }) {
                 {config.notes.privacyLink}
               </a>
             </p>
+            {showsAnswersNote(config) ? (
+              <p
+                className="privacy-note"
+                data-testid="rsvp-answers-note"
+                style={{ ...NOTE_STYLE, marginTop: 8 }}
+              >
+                {config.notes.answers}{' '}
+                <a
+                  href={PRIVACY_REQUEST_PATH}
+                  target="_blank"
+                  rel="noopener"
+                  style={{ color: 'inherit', textDecoration: 'underline' }}
+                >
+                  {config.notes.answersLink}
+                </a>
+              </p>
+            ) : null}
           </div>
           {/* honeypot: visually hidden, not display:none (§6.4) */}
           <input

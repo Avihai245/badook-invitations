@@ -73,12 +73,17 @@ function setup(over: { before?: Record<string, unknown>; after?: Record<string, 
     markRequestNotified: vi.fn(async (..._: unknown[]) => null),
   };
   const sent: { to: string; subject: string; html: string; text: string }[] = [];
+  const refreshGallery = vi.fn(async (_: string) => undefined);
   const send = vi.fn(
     async (m: { to: string; subject: string; html: string; text: string }) => (sent.push(m), true),
   );
   // (the fakes answer with plain strings where the real thing has unions)
-  const deps = { db, send, config } as unknown as AdminLegalDeps & { db: typeof db; send: typeof send };
-  return { deps, db, send, sent };
+  const deps = { db, send, refreshGallery, config } as unknown as AdminLegalDeps & {
+    db: typeof db;
+    send: typeof send;
+    refreshGallery: typeof refreshGallery;
+  };
+  return { deps, db, send, sent, refreshGallery };
 }
 
 beforeEach(() => {
@@ -149,7 +154,7 @@ describe('a decision on a report', () => {
       contactUrl: 'https://x/contact',
     });
     expect(he.html).toContain('dir="rtl"');
-    expect(he.text).toContain('להשאיר את הפריט');
+    expect(he.text).toContain('שלא להסיר את הפריט');
     expect(reportOutcomeOf('removed')).toBe('removed');
     expect(reportOutcomeOf('hidden')).toBe('hidden');
     expect(reportOutcomeOf('kept')).toBe('kept');
@@ -161,7 +166,7 @@ describe('a decision on a report', () => {
   it('the outcome follows what the report ended as (kept, not applicable)', async () => {
     const kept = setup({ after: { status: 'dismissed', resolution: 'kept' } });
     await adminReportAct(staff, ID, { action: 'keep', note: 'fine' }, kept.deps);
-    expect(kept.sent[0]!.text).toContain('decided to leave the item in the gallery');
+    expect(kept.sent[0]!.text).toContain('decided not to remove the item');
     const na = setup({ after: { status: 'dismissed', resolution: 'not_applicable' } });
     await adminReportAct(staff, ID, { action: 'dismiss', note: 'spam' }, na.deps);
     expect(na.sent[0]!.text).toContain('could not be processed');
@@ -189,6 +194,37 @@ describe('a decision on a report', () => {
     const again = setup({ before: { status: 'actioned', resolvedAt: '2026-10-30T10:00:00Z' } });
     await adminReportAct(staff, ID, { action: 'close', note: 'n' }, again.deps);
     expect(again.send).not.toHaveBeenCalled();
+  });
+});
+
+describe('what changes an item reaches the open pages', () => {
+  it('hide, restore, remove, keep and dismiss tell the gallery’s open pages; the others do not', async () => {
+    for (const action of ['hide', 'restore', 'remove', 'keep', 'dismiss']) {
+      const { deps, refreshGallery } = setup();
+      await adminReportAct(staff, ID, { action, note: 'n' }, deps);
+      expect(refreshGallery, action).toHaveBeenCalledWith('inv');
+    }
+    for (const action of ['review', 'note', 'close']) {
+      const { deps, refreshGallery } = setup();
+      await adminReportAct(staff, ID, { action, note: 'n' }, deps);
+      expect(refreshGallery, action).not.toHaveBeenCalled();
+    }
+  });
+
+  it('a hint that fails never fails the action; one for a refused action is never sent', async () => {
+    const { deps, refreshGallery } = setup();
+    refreshGallery.mockRejectedValueOnce(new Error('realtime down'));
+    expect((await adminReportAct(staff, ID, { action: 'hide' }, deps)).body).toMatchObject({ ok: true });
+    const refused = setup();
+    refused.deps.db.act.mockRejectedValueOnce(new AdminDbError('forbidden', 'forbidden'));
+    await expect(adminReportAct(staff, ID, { action: 'remove', note: 'n' }, refused.deps)).rejects.toThrow();
+    expect(refused.refreshGallery).not.toHaveBeenCalled();
+  });
+
+  it('a report with no invitation has no gallery to tell', async () => {
+    const { deps, refreshGallery } = setup({ before: { invitationId: null } });
+    await adminReportAct(staff, ID, { action: 'hide' }, deps);
+    expect(refreshGallery).not.toHaveBeenCalled();
   });
 });
 

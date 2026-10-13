@@ -66,6 +66,32 @@ async function item(invitation: string, status = 'published'): Promise<string> {
   return id;
 }
 
+let slugSeq = 0;
+/** A new invitation of DANA's with a gallery (its own item count for the hourly cap). */
+async function newInvitation(): Promise<string> {
+  const draft = { defaultLocale: 'he', hosts: { primary: { he: 'דנה' }, secondary: { he: 'איתי' } } };
+  const id = (
+    await c.query(
+      `insert into invitations (owner_id, template_id, slug, event_type, draft)
+       values ($1, 'sahar-bordeaux', $2, 'wedding', $3) returning id`,
+      [DANA, `dana-extra-${++slugSeq}`, draft],
+    )
+  ).rows[0].id as string;
+  await c.query(
+    `insert into galleries (invitation_id, upload_token_hash, upload_token_nonce, projector_token_hash,
+       projector_token_nonce, channel)
+     values ($1, $2, $3, $4, $5, $6)`,
+    [id, hex(64).padEnd(64, 'c'), hex(24), hex(64).padEnd(64, 'd'), hex(24), hex(24)],
+  );
+  return id;
+}
+type Moderated = { count: number; ids: string[]; held?: string[] };
+/** The host's decision (gallery_owner_moderate), as the server calls it. */
+const hostModerate = (invitation: string, ids: string[], action: string) =>
+  commit<Moderated>('gallery_owner_moderate', [invitation, DANA, ids, action]);
+const itemRow = async (id: string) =>
+  row('select status, status_reason, deleted_at from gallery_items where id = $1', [id]);
+
 const submitArgs = (over: Record<string, unknown> = {}) => ({
   invitation_id: danaInvitation,
   item_id: null,
@@ -339,9 +365,11 @@ describe('the console’s decisions on a report', () => {
       await row('select resolved_at, handled_by from media_reports where id = $1', [r.id]),
     ).toMatchObject({ handled_by: AGENT });
     expect(kept.events.map((e) => e.action)).toEqual(['submitted', 'review', 'hide', 'restore', 'keep']);
-    // the note is not copied into the trail, only that there was one
-    expect(kept.events.at(-1)).toMatchObject({ actor: 'staff', detail: { hasNote: true } });
-    expect(JSON.stringify(kept.events)).not.toContain('public stage');
+    // the staff's note is kept in the trail (the console shows it to staff; no email carries it)
+    expect(kept.events.at(-1)).toMatchObject({
+      actor: 'staff',
+      detail: { hasNote: true, note: 'The photo shows a public stage; no privacy issue.' },
+    });
 
     const audit = (
       await c.query(
@@ -467,6 +495,236 @@ describe('the console’s decisions on a report', () => {
     expect(await commit('media_report_admin_list', [AGENT, null, 1])).toHaveLength(1);
     const noEmail = await submit();
     expect((await getReport(AGENT, noEmail.id)).canReply).toBe(false);
+  });
+});
+
+describe('what is urgent, and the cap on automatic hiding', () => {
+  it('a child (the category, or the reporter is the child’s parent or guardian) and an intimate image are urgent and hide the item', async () => {
+    const inv = await newInvitation();
+    const byGuardian = await submit({ invitation_id: inv, item_id: await item(inv), role: 'guardian' });
+    expect(byGuardian).toMatchObject({ urgent: true, hidden: true });
+    const byCategory = await submit({
+      invitation_id: inv,
+      item_id: await item(inv),
+      category: 'child_safety',
+    });
+    expect(byCategory).toMatchObject({ urgent: true, hidden: true });
+    // any category with the guardian role
+    const copyright = await submit({
+      invitation_id: inv,
+      item_id: await item(inv),
+      role: 'guardian',
+      category: 'copyright',
+      reporter_name: 'Dana',
+      reporter_email: 'd@example.com',
+    });
+    expect(copyright).toMatchObject({ urgent: true, hidden: true });
+    // not a guardian, not a child, not intimate: not urgent
+    expect(await submit({ invitation_id: inv, item_id: await item(inv), role: 'depicted' })).toMatchObject({
+      urgent: false,
+      hidden: false,
+    });
+  });
+
+  it('hides at most 5 items per invitation an hour: beyond that the report is urgent, stored, and the item stays', async () => {
+    const inv = await newInvitation();
+    const other = await newInvitation();
+    const hiddenFlags: boolean[] = [];
+    let sixth: { id: string; item: string } | null = null;
+    for (let n = 0; n < 6; n++) {
+      const it1 = await item(inv);
+      const r = await submit({ invitation_id: inv, item_id: it1, category: 'child_safety' });
+      hiddenFlags.push(r.hidden);
+      expect(r.urgent).toBe(true);
+      if (n === 5) sixth = { id: r.id, item: it1 };
+    }
+    expect(hiddenFlags).toEqual([true, true, true, true, true, false]);
+    const m = await row(
+      'select urgent, hidden_by_report, prior_status, status from media_reports where id = $1',
+      [sixth!.id],
+    );
+    expect(m).toEqual({ urgent: true, hidden_by_report: false, prior_status: null, status: 'new' });
+    expect(await itemRow(sixth!.item)).toMatchObject({ status: 'published', status_reason: 'ok' });
+    const events = (
+      await c.query(
+        'select actor, action, detail from media_report_events where report_id = $1 order by id',
+        [sixth!.id],
+      )
+    ).rows;
+    expect(events.map((e) => e.action)).toEqual(['submitted', 'hide_capped']);
+    expect(events[1]).toMatchObject({ actor: 'system', detail: { cap: 5 } });
+    // another invitation is not affected
+    expect(
+      await submit({ invitation_id: other, item_id: await item(other), category: 'child_safety' }),
+    ).toMatchObject({
+      hidden: true,
+    });
+    // an hour later the cap is open again
+    await c.query(
+      `update media_report_events set created_at = now() - interval '61 minutes'
+       where action = 'hidden_urgent' and report_id in (select id from media_reports where invitation_id = $1)`,
+      [inv],
+    );
+    expect(
+      await submit({ invitation_id: inv, item_id: await item(inv), category: 'child_safety' }),
+    ).toMatchObject({
+      hidden: true,
+    });
+  });
+
+  it('the item is checked again under the lock: one deleted a moment ago is not reportable', async () => {
+    const inv = await newInvitation();
+    const it1 = await item(inv);
+    await c.query(`update gallery_items set deleted_at = now(), deleted_by = 'host' where id = $1`, [it1]);
+    await expect(submit({ invitation_id: inv, item_id: it1, category: 'child_safety' })).rejects.toThrow(
+      'item not found',
+    );
+    const hiddenAlready = await item(inv, 'hidden');
+    await expect(submit({ invitation_id: inv, item_id: hiddenAlready })).rejects.toThrow('item not found');
+  });
+});
+
+describe('an item a report holds', () => {
+  it('the host cannot publish, hide or reject it — only delete it; the others in the same call are decided', async () => {
+    const inv = await newInvitation();
+    const held = await item(inv);
+    const normal = await item(inv);
+    const r = await submit({ invitation_id: inv, item_id: held, category: 'child_safety' });
+    expect(r.hidden).toBe(true);
+    for (const action of ['publish', 'hide', 'reject']) {
+      const done = await hostModerate(inv, [held], action);
+      expect(done, action).toEqual({ count: 0, ids: [], held: [held] });
+      expect(await itemRow(held), action).toMatchObject({
+        status: 'hidden',
+        status_reason: 'report',
+        deleted_at: null,
+      });
+    }
+    const mixed = await hostModerate(inv, [held, normal], 'hide');
+    expect(mixed).toEqual({ count: 1, ids: [normal], held: [held] });
+    expect(await itemRow(normal)).toMatchObject({ status: 'hidden', status_reason: 'host' });
+    expect(await itemRow(held)).toMatchObject({ status_reason: 'report' });
+    // a host's own hidden item is theirs to show again
+    expect(await hostModerate(inv, [normal], 'publish')).toEqual({ count: 1, ids: [normal] });
+    expect(await itemRow(normal)).toMatchObject({ status: 'published' });
+    // delete is allowed, and puts the files in the trash
+    const before = (await row('select count(*)::int as n from gallery_trash')).n;
+    const deleted = await hostModerate(inv, [held], 'delete');
+    expect(deleted).toEqual({ count: 1, ids: [held] });
+    expect((await itemRow(held)).deleted_at).not.toBeNull();
+    expect((await row('select count(*)::int as n from gallery_trash')).n).toBe(before + 3);
+    // not their gallery: still null
+    expect(await commit('gallery_owner_moderate', [inv, YOSSI, [held], 'delete'])).toBeNull();
+  });
+
+  it('staff’s restore is the way back; then the host decides again', async () => {
+    const inv = await newInvitation();
+    const it1 = await item(inv);
+    const r = await submit({ invitation_id: inv, item_id: it1, intimate: true, category: 'harmful' });
+    expect((await hostModerate(inv, [it1], 'publish')).count).toBe(0);
+    const back = await act(AGENT, r.id, 'restore', 'Checked: not the person reported.');
+    expect(back.item).toMatchObject({ status: 'published', reason: 'host' });
+    expect(await hostModerate(inv, [it1], 'hide')).toEqual({ count: 1, ids: [it1] });
+    expect((await hostModerate(inv, [it1], 'publish')).count).toBe(1);
+  });
+
+  it('a staff hide holds the item the same way', async () => {
+    const inv = await newInvitation();
+    const it1 = await item(inv);
+    const r = await submit({ invitation_id: inv, item_id: it1 });
+    await act(AGENT, r.id, 'hide', 'hold until I read it');
+    expect(await hostModerate(inv, [it1], 'publish')).toEqual({ count: 0, ids: [], held: [it1] });
+  });
+});
+
+describe('the staff’s decisions keep the item and the report consistent', () => {
+  const heldReport = async (extra: Record<string, unknown> = {}) => {
+    const inv = await newInvitation();
+    const it1 = await item(inv);
+    const r = await submit({ invitation_id: inv, item_id: it1, category: 'child_safety', ...extra });
+    expect(r.hidden).toBe(true);
+    return { inv, it1, r };
+  };
+
+  it('keep and dismiss put back an item that the report hid, and clear the flag', async () => {
+    for (const [action, resolution] of [
+      ['keep', 'kept'],
+      ['dismiss', 'not_applicable'],
+    ] as const) {
+      const { it1, r } = await heldReport();
+      const done = await act(AGENT, r.id, action, `${action}: not what was reported`);
+      expect(done).toMatchObject({
+        resolution,
+        hiddenByReport: false,
+        item: { status: 'published', reason: 'host' },
+      });
+      expect(await itemRow(it1)).toMatchObject({ status: 'published', status_reason: 'host' });
+      expect(
+        await row(
+          `select result, detail from gallery_moderation where item_id = $1 and check_name = 'report' and decided_by = 'staff'`,
+          [it1],
+        ),
+      ).toMatchObject({ result: 'published', detail: { restored: true, by: action } });
+      expect(
+        (await row('select published_at from gallery_items where id = $1', [it1])).published_at,
+      ).not.toBeNull();
+    }
+  });
+
+  it('keep leaves alone an item the host already deleted, or that was restored', async () => {
+    const { it1, r } = await heldReport();
+    await hostModerate(
+      (await row('select invitation_id from gallery_items where id = $1', [it1])).invitation_id,
+      [it1],
+      'delete',
+    );
+    const done = await act(AGENT, r.id, 'keep', 'host deleted it');
+    expect(done.item?.deleted).toBe(true);
+    const second = await heldReport();
+    await act(AGENT, second.r.id, 'restore');
+    expect((await act(AGENT, second.r.id, 'keep', 'fine')).item).toMatchObject({ status: 'published' });
+  });
+
+  it('close says “hidden” only while the item is still held, else the host’s own decision stands', async () => {
+    const held = await heldReport();
+    expect(await act(AGENT, held.r.id, 'close', 'leave it held')).toMatchObject({
+      resolution: 'hidden',
+      item: { status: 'hidden', reason: 'report' },
+    });
+    const restored = await heldReport();
+    await act(AGENT, restored.r.id, 'restore');
+    expect(await act(AGENT, restored.r.id, 'close', 'back in the gallery')).toMatchObject({
+      resolution: 'host_handled',
+      status: 'closed',
+    });
+    const deleted = await heldReport();
+    await hostModerate(deleted.inv, [deleted.it1], 'delete');
+    expect((await act(AGENT, deleted.r.id, 'close', 'host removed it')).resolution).toBe('host_handled');
+  });
+
+  it('notes are kept in the trail — on every action, trimmed, up to 2000 characters, in any script', async () => {
+    const { r } = await heldReport();
+    const noted = await act(AGENT, r.id, 'note', '  The reporter called to add details.  ');
+    expect(noted.events.at(-1)).toMatchObject({
+      actor: 'staff',
+      action: 'note',
+      detail: { hasNote: true, note: 'The reporter called to add details.' },
+    });
+    const hebrew = 'ש'.repeat(2000);
+    const long = await act(AGENT, r.id, 'hide', hebrew + 'extra');
+    const note = (long.events.at(-1)!.detail as { note: string }).note;
+    expect(note).toHaveLength(2000);
+    const emoji = await act(AGENT, r.id, 'note', '😀'.repeat(2000));
+    expect((emoji.events.at(-1)!.detail as { note: string }).note).toHaveLength(4000); // UTF-16 length of 2000 emoji
+    // an action without a note says so
+    const plain = await act(AGENT, r.id, 'review');
+    expect(plain.events.at(-1)!.detail).toEqual({ hasNote: false });
+    // the audit log carries no note
+    const audit = await row(
+      `select details from admin_audit where target_id = $1 and action = 'report.note' limit 1`,
+      [`media_report:${r.number}`],
+    );
+    expect(JSON.stringify(audit)).not.toContain('reporter called');
   });
 });
 
@@ -802,6 +1060,7 @@ describe('none of it is reachable from the browser’s roles', () => {
     'privacy_request_admin_get(uuid, uuid)',
     'privacy_request_admin_set(uuid, uuid, text, text)',
     'legal_maintenance()',
+    'gallery_owner_moderate(uuid, uuid, uuid[], text)',
   ];
 
   it('anon and authenticated have no privilege on the six tables', async () => {

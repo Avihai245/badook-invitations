@@ -7,6 +7,7 @@ import { formatPhone } from '@/features/invitations/lib/phone';
 import { useUi } from '@/lib/i18n/client';
 import { CATEGORY_KEYS, VENDOR_STATUSES, isCategoryKey, type VendorStatus } from '../../model/categories';
 import type { PlanVendor } from '../../model/plan';
+import { usePlanningNote } from '../PlanningNote';
 import { mailLink, normalizeUrl, parseAmount, telLink, waLink } from './helpers';
 import { Stars } from './Stars';
 import type { VendorFields } from './useVendorActions';
@@ -69,6 +70,7 @@ function DrawerBody({
   const { t } = useUi();
   const V = t.planning.vendors;
   const D = V.drawer;
+  const note = usePlanningNote('vendor');
   const shownPhone = vendor.phone ? formatPhone(vendor.phone) : '';
   const [name, setName] = useState(vendor.name);
   const [category, setCategory] = useState<string>(vendor.category ?? '');
@@ -256,6 +258,7 @@ function DrawerBody({
             </Field>
           </>,
         )}
+        {note ? <p className="-mt-1 text-[12px] text-muted">{note}</p> : null}
         <Field label={D.url} error={errors.url}>
           <Input
             inputMode="url"

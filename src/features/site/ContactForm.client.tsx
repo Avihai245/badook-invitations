@@ -2,7 +2,7 @@
 
 import { CheckCircle2, Send } from 'lucide-react';
 import Link from 'next/link';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { Button } from '@/components/app/Button';
 import { Field } from '@/components/app/Field';
 import { Input, Select, Textarea } from '@/components/app/Input';
@@ -16,14 +16,18 @@ type Errors = Partial<Record<'name' | 'email' | 'phone' | 'message' | 'form', st
 /**
  * The contact form: name, email, optional phone, topic and message; errors in words, focus on the first.
  * `sent` — the strings of its "message received" card — comes from the page (the server has the whole
- * dictionary; the browser's public one leaves the ticket screens' out).
+ * dictionary; the browser's public one leaves the ticket screens' out). `notice` — the collection notice
+ * of the legal documents' version 2 — comes from the page for the same reason, and replaces the one-line
+ * privacy text; without it the form is as it was.
  */
 export function ContactForm({
   defaultTopic = 'support',
   sent: k,
+  notice,
 }: {
   defaultTopic?: Topic;
   sent: AppDict['tickets']['contactSent'];
+  notice?: ReactNode;
 }) {
   const { t, locale, fmt } = useUi();
   const c = t.site.contact;
@@ -139,11 +143,12 @@ export function ContactForm({
           {errors.form}
         </p>
       ) : null}
+      {notice}
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="lg" icon={<Send className="icon-dir" />} loading={state === 'sending'}>
           {state === 'sending' ? c.sending : c.send}
         </Button>
-        <p className="text-[13px] text-muted">{c.privacy}</p>
+        {notice ? null : <p className="text-[13px] text-muted">{c.privacy}</p>}
       </div>
     </form>
   );

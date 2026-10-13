@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { Button, Card, Field, Hint, Input, PageHeader, Select, Textarea, useToast } from '@/components/app';
+import { CollectionNote, NoteAnchor } from '@/features/legal/notices/CollectionNote';
+import { useLegalNotices } from '@/features/legal/notices/flag.client';
+import { PRIVACY_REQUEST_PATH } from '@/features/legal/versions';
 import { useUi } from '@/lib/i18n/client';
 import { TICKET_CATEGORIES, TICKETS, type TicketCategory } from '../config';
 
@@ -25,6 +28,8 @@ export function NewTicket({
   const { t, fmt, locale } = useUi();
   const s = t.tickets;
   const f = s.form;
+  const legal = useLegalNotices();
+  const notes = t.collectionNotes;
   const router = useRouter();
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
@@ -143,6 +148,35 @@ export function NewTicket({
               placeholder={f.messagePlaceholder}
             />
           </Field>
+          {legal ? (
+            <CollectionNote
+              title={notes.support.ticket.title}
+              more={notes.more}
+              newTab={notes.newTab}
+              testId="ticket-note"
+              rows={[
+                { label: notes.rows.voluntary, value: notes.support.ticket.voluntary },
+                { label: notes.rows.purpose, value: notes.support.ticket.purpose },
+                { label: notes.rows.recipients, value: notes.support.ticket.recipients },
+                {
+                  label: notes.rows.rights,
+                  value: (
+                    <>
+                      {notes.support.ticket.rights}{' '}
+                      <NoteAnchor
+                        href={PRIVACY_REQUEST_PATH}
+                        label={notes.support.ticket.rightsLink}
+                        newTab={notes.newTab}
+                      />
+                    </>
+                  ),
+                },
+              ]}
+              links={[{ href: '/privacy#support', label: notes.support.link }]}
+            >
+              {notes.support.ticket.short}
+            </CollectionNote>
+          ) : null}
           {errors.form ? (
             <p role="alert" className="rounded-card bg-danger-bg px-3 py-2 text-[14px] text-danger">
               {errors.form}

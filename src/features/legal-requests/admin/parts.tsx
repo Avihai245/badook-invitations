@@ -93,7 +93,14 @@ export function Timeline({ s, events }: { s: AdminStrings; events: LegalEvent[] 
                       {sent ? s.events.sent : s.events.notSent}
                     </span>
                   ) : null}
-                  {e.detail.hasNote === true ? (
+                  {typeof e.detail.note === 'string' ? (
+                    <span className="w-full">
+                      <span className="text-muted">{s.detail.staffNote}: </span>
+                      <span dir="auto" className="whitespace-pre-line [overflow-wrap:anywhere]">
+                        {e.detail.note}
+                      </span>
+                    </span>
+                  ) : e.detail.hasNote === true ? (
                     <span className="text-muted">({s.events.withNote})</span>
                   ) : null}
                 </li>

@@ -160,6 +160,9 @@ function ReportList({
             <span className="flex flex-wrap items-center gap-2">
               <span className="font-semibold tabular-nums">{fmt(s.list.reportRow, { n: r.number })}</span>
               {r.urgent ? <Badge variant="danger">{s.badges.urgent}</Badge> : null}
+              {r.item?.status === 'hidden' && r.item.reason === 'report' && !r.item.deleted ? (
+                <Badge variant="warning">{s.badges.held}</Badge>
+              ) : null}
               <Badge variant={OPEN_REPORT.includes(r.status) ? 'warning' : 'neutral'}>
                 {s.status.report[r.status]}
               </Badge>

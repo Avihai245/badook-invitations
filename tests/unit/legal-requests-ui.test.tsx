@@ -43,13 +43,30 @@ describe('the report form', () => {
   it('asks where the content is only without a gallery link (the link is checked by the server once the page is open)', () => {
     expect(form({})).toContain('name="reference"');
     expect(form({ i: 'x' })).toContain('name="reference"');
-    expect(form({ g: 'abcdefghijklmnopqrstuvwx' })).not.toContain('name="reference"');
+    expect(form({ g: 'abcdefghijklmnopqrstuvwx', i: 'x' })).not.toContain('name="reference"');
     expect(form({ a: 'abcdefghijklmnopqrstuvwx', i: 'x' })).not.toContain('name="reference"');
     expect(form({ g: 'abcdefghijklmnopqrstuvwx', i: 'x' })).toContain(en.report.linkedItem);
   });
 
-  it('has labelled fields, the honeypot, and the notice right before the button', () => {
+  it('a link to the gallery without an item asks which photo (who uploaded it, when, what it shows)', () => {
     const html = form({ g: 'abcdefghijklmnopqrstuvwx' });
+    expect(html).toContain('name="reference"');
+    expect(html).toContain(en.report.reference.labelGallery);
+    expect(html).toContain(en.report.reference.helpGallery);
+    expect(html).toContain(en.report.linkedGallery);
+    // no text says that no explanation is needed
+    for (const text of [en.report.linkedGallery, en.report.reference.helpGallery, en.report.contact.intro])
+      expect(text).not.toMatch(/no need|not needed|nothing to add/i);
+  });
+
+  it('calls the child category “A child”', () => {
+    expect(en.report.category.options.child_safety).toBe('A child');
+    expect(he.report.category.options.child_safety).toBe('ילד/ה');
+    expect(en.report.category.help.child_safety).toMatch(/photo or details of a child/);
+  });
+
+  it('has labelled fields, the honeypot, and the notice right before the button', () => {
+    const html = form({ g: 'abcdefghijklmnopqrstuvwx', i: 'x' });
     for (const name of ['category', 'role', 'description', 'name', 'email', 'phone'])
       expect(html).toMatch(
         new RegExp(`<label[^>]*for="[^"]+"[^>]*>[\\s\\S]*?</label>[\\s\\S]*?name="${name}"`),

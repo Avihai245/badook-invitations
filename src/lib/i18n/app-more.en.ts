@@ -1,4 +1,5 @@
 import type { AppDict, MoreKey } from './app.he';
+import { collectionNotesEn } from './collection-notes.en';
 import { legalRequestsEn } from './legal-requests.en';
 import { ticketsEn } from './tickets.en';
 
@@ -6,6 +7,7 @@ import { ticketsEn } from './tickets.en';
 export const enMore: Pick<AppDict, MoreKey> = {
   tickets: ticketsEn,
   legalRequests: legalRequestsEn,
+  collectionNotes: collectionNotesEn,
   workspace: {
     label: 'Invitation navigation',
     back: 'All invitations',

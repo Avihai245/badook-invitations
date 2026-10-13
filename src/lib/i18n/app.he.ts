@@ -53,6 +53,7 @@ export type AppDict = typeof he;
 export type MoreKey =
   | 'tickets'
   | 'legalRequests'
+  | 'collectionNotes'
   | 'workspace'
   | 'helpCenter'
   | 'start'

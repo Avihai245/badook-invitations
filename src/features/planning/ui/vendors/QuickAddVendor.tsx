@@ -5,6 +5,7 @@ import { useEffect, useId, useState, type FormEvent } from 'react';
 import { Button, Dialog, Field, Input, Select } from '@/components/app';
 import { useUi } from '@/lib/i18n/client';
 import { CATEGORY_KEYS, isCategoryKey, type CategoryKey } from '../../model/categories';
+import { usePlanningNote } from '../PlanningNote';
 import { contactPickerAvailable, pickContact } from './contacts';
 
 /**
@@ -26,6 +27,7 @@ export function QuickAddVendor({
 }) {
   const { t } = useUi();
   const Q = t.planning.vendors.quick;
+  const note = usePlanningNote('vendor');
   const formId = useId();
   const [name, setName] = useState('');
   const [cat, setCat] = useState<string>('');
@@ -102,7 +104,7 @@ export function QuickAddVendor({
             ))}
           </Select>
         </Field>
-        <Field label={Q.phone}>
+        <Field label={Q.phone} help={note}>
           <div className="flex items-start gap-2">
             <Input
               type="tel"

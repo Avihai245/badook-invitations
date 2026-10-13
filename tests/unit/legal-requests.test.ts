@@ -81,6 +81,7 @@ function makeDeps(over: Record<string, unknown> = {}) {
     ),
     later: (job: () => Promise<unknown>) => void later.push(job),
     hashIp: (ip: string | null) => `hash:${ip ?? 'unknown'}`,
+    refreshGallery: vi.fn(async (_: string) => undefined),
     config,
     ...over,
   };
@@ -165,7 +166,7 @@ describe('the report form’s validation', () => {
     const { deps, db } = makeDeps();
     await submitReport(reportOf({ category: 'privacy', intimate: true }), { ip: '1.1.1.1' }, deps);
     await submitReport(
-      reportOf({ category: 'harmful', intimate: true, i: undefined }),
+      reportOf({ category: 'harmful', intimate: true, i: undefined, reference: 'the photo by Dana' }),
       { ip: '2.2.2.2' },
       deps,
     );
@@ -199,12 +200,28 @@ describe('the item, resolved from the link', () => {
       item_id: ITEM,
       surface: 'album',
     });
-    await submitReport(reportOf({ i: undefined }), { ip: '2.2.2.2' }, deps);
+    await submitReport(
+      reportOf({ i: undefined, reference: 'the photo Dana uploaded at the dance' }),
+      { ip: '2.2.2.2' },
+      deps,
+    );
     expect(db.submitReport.mock.calls[1]![0]).toMatchObject({
       invitation_id: INV,
       item_id: null,
       surface: 'gallery',
+      reference: 'the photo Dana uploaded at the dance',
     });
+  });
+
+  it('a link to the gallery without an item (the footer’s) needs the reporter to say which photo', async () => {
+    const { deps, db } = makeDeps();
+    for (const extra of [{ i: undefined }, { i: undefined, g: undefined, a: ALBUM_TOKEN }]) {
+      const r = await submitReport(reportOf(extra), { ip: '1.1.1.1' }, deps);
+      expect(r).toMatchObject({ status: 400, body: { error: 'invalid', fields: ['reference'] } });
+    }
+    expect(db.submitReport).not.toHaveBeenCalled();
+    // an item in the link needs none
+    expect((await submitReport(reportOf(), { ip: '2.2.2.2' }, deps)).status).toBe(200);
   });
 
   it('a link that opens nothing is link_invalid — the form then asks where the content is', async () => {
@@ -297,6 +314,37 @@ describe('checking the link for the form', () => {
     const res = await route.POST(new Request('https://x.example/api/legal/report/link', { method: 'POST' }));
     expect(res.status).toBe(404);
     expect(await res.json()).toEqual({ error: 'not_found' });
+  });
+});
+
+describe('an item that goes dark reaches the open pages', () => {
+  it('a report that hid the item tells the gallery’s open pages first, then the notices', async () => {
+    const { deps, db, flush } = makeDeps();
+    const order: string[] = [];
+    deps.refreshGallery.mockImplementation(async (inv: string) => void order.push(`refresh:${inv}`));
+    deps.send.mockImplementation(async (m: { to: string }) => (order.push(`mail:${m.to}`), true));
+    db.submitReport.mockResolvedValueOnce({ id: REPORT_ID, number: 5009, urgent: true, hidden: true });
+    await submitReport(reportOf({ category: 'child_safety' }), { ip: '1.1.1.1' }, deps);
+    expect(deps.refreshGallery).not.toHaveBeenCalled(); // after the answer
+    await flush();
+    expect(order[0]).toBe(`refresh:${INV}`);
+    expect(order.length).toBe(3); // the hint, then the team's and the host's notices
+  });
+
+  it('not when nothing was hidden (not urgent, or capped), and a failing hint changes nothing', async () => {
+    const { deps, db, flush } = makeDeps();
+    await submitReport(reportOf(), { ip: '1.1.1.1' }, deps);
+    db.submitReport.mockResolvedValueOnce({ id: REPORT_ID, number: 5010, urgent: true, hidden: false });
+    await submitReport(reportOf({ category: 'child_safety' }), { ip: '2.2.2.2' }, deps);
+    await flush();
+    expect(deps.refreshGallery).not.toHaveBeenCalled();
+    db.submitReport.mockResolvedValueOnce({ id: REPORT_ID, number: 5011, urgent: true, hidden: true });
+    deps.refreshGallery.mockRejectedValueOnce(new Error('realtime down'));
+    const r = await submitReport(reportOf({ category: 'child_safety' }), { ip: '3.3.3.3' }, deps);
+    expect(r.body).toMatchObject({ ok: true, hidden: true });
+    // the notices still go out, and recorded
+    await expect(flush()).resolves.toBeUndefined();
+    expect(db.markReportNotified).toHaveBeenCalledWith(REPORT_ID, 'team', true);
   });
 });
 

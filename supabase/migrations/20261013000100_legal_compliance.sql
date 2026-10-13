@@ -631,8 +631,8 @@ end $$;
 
 -- gallery_owner_moderate (live gallery) with one rule more: an item that a report holds (hidden, reason
 -- 'report') cannot be published, hidden or rejected by the host — they may only delete it; staff's
--- 'restore' (media_report_admin_act) is the way back. Returns { count, ids, held }: what it changed, and
--- the held items it left alone.
+-- 'restore' (media_report_admin_act) is the way back. Returns { count, ids } — what it changed — and, only
+-- when there were any, { held }: the held items it left alone (so nothing changes for a host without any).
 create or replace function public.gallery_owner_moderate(p_id uuid, p_owner_id uuid, p_item_ids uuid[], p_action text)
 returns jsonb
 language plpgsql security definer set search_path = '' as $$
@@ -671,7 +671,8 @@ begin
     case p_action when 'publish' then 'published' when 'hide' then 'hidden' when 'reject' then 'rejected' else 'deleted' end,
     'host', p_owner_id
   from unnest(v_ids) id;
-  return jsonb_build_object('count', cardinality(v_ids), 'ids', to_jsonb(v_ids), 'held', to_jsonb(v_held));
+  return jsonb_build_object('count', cardinality(v_ids), 'ids', to_jsonb(v_ids))
+    || case when cardinality(v_held) > 0 then jsonb_build_object('held', to_jsonb(v_held)) else '{}'::jsonb end;
 end $$;
 
 -- ─── housekeeping ───────────────────────────────────────────────────────────────────────────────
