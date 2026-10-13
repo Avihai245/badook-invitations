@@ -67,6 +67,10 @@ export function ReportForm({
     };
   }, [hasLink, token]);
   const linked = (link.state === 'ok' || link.state === 'checking') && !broken;
+  // linked to the gallery but to no item (the footer's link): which photo is for the reporter to say
+  const footer = linked && !link.item;
+  const askReference = !linked || footer;
+  const referenceError = footer ? t.errors.referenceGallery : t.errors.reference;
 
   const labels: Record<string, string> = {
     description: t.description.label,
@@ -88,7 +92,7 @@ export function ReportForm({
     if (len < LEGAL_REQUESTS.description.min || len > LEGAL_REQUESTS.description.max)
       next.description =
         len < LEGAL_REQUESTS.description.min ? t.errors.descriptionShort : t.errors.description;
-    if (!linked && !v('reference')) next.reference = t.errors.reference;
+    if (askReference && !v('reference')) next.reference = referenceError;
     if (v('email') && !emailOk(v('email'))) next.email = t.errors.email;
     if (v('phone') && !phoneOk(v('phone'))) next.phone = t.errors.phone;
     if (category === 'copyright') {
@@ -111,7 +115,7 @@ export function ReportForm({
         name: v('name'),
         email: v('email'),
         phone: v('phone'),
-        reference: linked ? '' : v('reference'),
+        reference: askReference ? v('reference') : '',
         ...(linked ? token : {}),
         locale,
         website: v('website'),
@@ -154,7 +158,7 @@ export function ReportForm({
               : f === 'description'
                 ? t.errors.description
                 : f === 'reference'
-                  ? t.errors.reference
+                  ? referenceError
                   : f === 'name'
                     ? t.errors.copyrightName
                     : t.errors.server;
@@ -248,8 +252,13 @@ export function ReportForm({
         </div>
       ) : null}
 
-      {!linked ? (
-        <Field label={t.reference.label} help={t.reference.help} error={errors.reference} required>
+      {askReference ? (
+        <Field
+          label={footer ? t.reference.labelGallery : t.reference.label}
+          help={footer ? t.reference.helpGallery : t.reference.help}
+          error={errors.reference}
+          required
+        >
           <Input name="reference" maxLength={LEGAL_REQUESTS.reference} dir="auto" />
         </Field>
       ) : null}

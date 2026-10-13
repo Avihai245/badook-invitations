@@ -54,20 +54,22 @@ export const legalRequestsEn: typeof legalRequestsHe = {
     reference: {
       label: 'A link to, or a description of, the item',
       help: 'Paste a link to the page, or write where you saw the content and what it shows.',
+      labelGallery: 'Which photo or video?',
+      helpGallery: 'Who uploaded it, when, and what it shows. Without this we cannot find the item.',
     },
     category: {
       label: 'What is the report about?',
       options: {
         privacy: 'A privacy violation',
         copyright: 'Copyright infringement',
-        child_safety: 'Child safety',
+        child_safety: 'A child',
         harmful: 'Harmful or abusive content',
         other: 'Something else',
       },
       help: {
         privacy: 'Someone appears who did not want to, or their personal information is exposed.',
         copyright: 'Your work is used without permission. A name and an email address are required.',
-        child_safety: 'Content that harms or endangers a child. These reports are handled first.',
+        child_safety: 'A photo or details of a child. These reports are handled first.',
         harmful: 'Violence, harassment, hate or sexual content.',
         other: 'Any other issue.',
       },
@@ -105,6 +107,7 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       description: 'Write at least 10 and at most 2,000 characters.',
       descriptionShort: 'Write at least 10 characters.',
       reference: 'Write a link to, or a description of, where the content is.',
+      referenceGallery: 'Say which photo or video it is: who uploaded it, when, and what it shows.',
       email: 'The email address is not valid.',
       phone: 'The phone number is not valid.',
       copyrightName: 'A copyright claim needs your name.',
@@ -245,8 +248,10 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       subject: 'A report about an item in your event gallery',
       heading: 'An item in your event gallery was reported',
       body: 'A report was made about an item in your event gallery. The report’s category: {category}.',
-      hidden: 'Until we have looked at it, the item is hidden from the gallery.',
-      review: 'Our team will review the report. You do not need to do anything.',
+      hidden:
+        'While the report is under review the item is hidden from the gallery, and in the meantime you cannot show it again from the gallery. Only our team can put it back.',
+      review:
+        'Our team will review the report and update the item accordingly. You do not need to do anything.',
       anonymous: 'We do not share who made the report.',
       footer: 'This message was sent automatically to whoever created the invitation.',
     },
@@ -255,7 +260,7 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       heading: 'An update on report #{n}',
       removed: 'We reviewed the report, and the item was removed from the gallery.',
       hidden: 'We reviewed the report, and the item was hidden from the gallery for review.',
-      kept: 'We reviewed the report and decided to leave the item in the gallery.',
+      kept: 'We reviewed the report and decided not to remove the item.',
       notApplicable:
         'The report could not be processed. If you have more information, you can send a new report.',
       closed: 'We have finished handling the report.',
@@ -306,6 +311,7 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       intimate: 'Intimate',
       overdue: 'Overdue',
       hiddenByReport: 'Hidden because of the report',
+      held: 'Held hidden',
     },
     status: {
       report: {
@@ -335,7 +341,7 @@ export const legalRequestsEn: typeof legalRequestsHe = {
     category: {
       privacy: 'Privacy',
       copyright: 'Copyright',
-      child_safety: 'Child safety',
+      child_safety: 'A child',
       harmful: 'Harmful content',
       other: 'Other',
     },
@@ -381,6 +387,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       item: 'The item',
       itemStatus: 'Item status: {status}',
       itemDeleted: 'The item is deleted',
+      held: 'The item is held hidden because of this report. The host cannot show it again from the gallery (only delete it). The way back is here: restore the item, or keep / dismiss the report.',
+      staffNote: 'Staff note',
       itemNone:
         'The report is not linked to an item (an unrecognised link, or a note about the whole gallery).',
       invitation: 'The invitation in the system',
@@ -437,8 +445,9 @@ export const legalRequestsEn: typeof legalRequestsHe = {
         restore: 'The item goes back to what it was in the gallery.',
         remove:
           'The item is deleted from the gallery and its files go to the trash. This is for owners and admins.',
-        keep: 'The report is closed as not upheld and the item stays.',
-        dismiss: 'The report is closed as not applicable (spam, for example).',
+        keep: 'The report is closed as not upheld. An item that the report hid goes back to the gallery.',
+        dismiss:
+          'The report is closed as not applicable (spam, for example). An item that the report hid goes back to the gallery.',
         close: 'The report is closed.',
         reporterMail: 'The reporter gets a fixed message about the outcome, without your note.',
         reporterNoMail: 'The reporter gave no email address, so nothing will be sent.',
@@ -472,6 +481,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
     events: {
       submitted: 'Submitted',
       hidden_urgent: 'The item was hidden automatically (urgent)',
+      hide_capped:
+        'The report is urgent, but the item was NOT hidden automatically: the invitation reached the automatic hiding limit (5 an hour). Check by hand.',
       notice_team: 'Notice to the team',
       notice_host: 'Notice to the host',
       notice_reporter: 'Notice to the reporter',

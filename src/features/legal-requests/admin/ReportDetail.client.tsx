@@ -30,6 +30,8 @@ export function ReportDetail({ s, report: r, back }: { s: AdminStrings; report: 
   const resolved = RESOLVED.includes(r.status);
   const item = r.item;
   const itemLive = !!r.itemId && !!item && !item.deleted;
+  // hidden because of a report: the host cannot show it again, only staff (restore, keep, dismiss) can
+  const held = itemLive && item.status === 'hidden' && item.reason === 'report';
 
   const actions: ReportAction[] = [
     r.status === 'new' ? 'review' : null,
@@ -114,7 +116,13 @@ export function ReportDetail({ s, report: r, back }: { s: AdminStrings; report: 
             {r.intimate ? <Badge variant="danger">{s.badges.intimate}</Badge> : null}
             <Badge variant={resolved ? 'neutral' : 'warning'}>{s.status.report[r.status]}</Badge>
             {r.resolution ? <Badge variant="info">{s.resolution[r.resolution]}</Badge> : null}
-            {r.hiddenByReport ? <Badge variant="warning">{s.badges.hiddenByReport}</Badge> : null}
+            {held ? (
+              <Badge variant="warning" data-testid="report-held">
+                {s.badges.held}
+              </Badge>
+            ) : r.hiddenByReport ? (
+              <Badge variant="warning">{s.badges.hiddenByReport}</Badge>
+            ) : null}
           </div>
           <dl className="mt-3 grid gap-3 sm:grid-cols-2">
             <Fact label={s.detail.category}>{s.category[r.category]}</Fact>
@@ -156,6 +164,15 @@ export function ReportDetail({ s, report: r, back }: { s: AdminStrings; report: 
           ) : (
             <p className="mt-1 text-[14px] text-muted">{s.detail.itemNone}</p>
           )}
+          {held ? (
+            <p
+              role="status"
+              data-testid="report-held-note"
+              className="mt-2 rounded-[10px] border border-warning/40 bg-warning-bg px-3 py-2 text-[13px]"
+            >
+              {s.detail.held}
+            </p>
+          ) : null}
           {r.invitationId ? (
             <Link
               href={`/app/admin/invitations/${r.invitationId}`}
