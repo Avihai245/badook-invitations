@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { serverEnv } from '../env';
-import { ACT_AS_COOKIE, readActAs } from './act-as-token';
+import { ACT_AS_COOKIE, actAsSecret, readActAs } from './act-as-token';
 import { isSuspended } from './auth-paths';
 import { serviceDb } from './server';
 
@@ -62,7 +62,7 @@ export interface ActingAs {
 export const getActingAs = cache(async (): Promise<ActingAs | null> => {
   const raw = (await cookies()).get(ACT_AS_COOKIE)?.value;
   if (!raw) return null;
-  const claim = readActAs(serverEnv().SUPABASE_SECRET_KEY, raw);
+  const claim = readActAs(actAsSecret(serverEnv()), raw);
   if (!claim) return null;
   const staff = await getRealUser();
   if (!staff || staff.id !== claim.staffId || claim.targetId === staff.id) return null;

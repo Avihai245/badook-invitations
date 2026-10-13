@@ -17,6 +17,11 @@ export interface ActAsClaim {
   exp: number;
 }
 
+/** The key the cookie is signed with: INVITES_ACT_AS_SECRET, else the Supabase secret key. */
+export function actAsSecret(env: { INVITES_ACT_AS_SECRET: string; SUPABASE_SECRET_KEY: string }): string {
+  return env.INVITES_ACT_AS_SECRET || env.SUPABASE_SECRET_KEY;
+}
+
 function mac(secret: string, body: string): Buffer {
   const key = createHmac('sha256', secret).update('badook:act-as:v1').digest();
   return createHmac('sha256', key).update(body).digest();

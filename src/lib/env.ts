@@ -126,6 +126,10 @@ const ServerEnvSchema = z.object({
   // the key its links are derived from (random, ≥32 chars); empty: the Supabase secret key. Changing
   // it keeps the links already out working; the hosts' screens then offer new ones.
   INVITES_GALLERY_SECRET: z.string().default(''),
+  // the key the admin console's "act as a customer" cookie is signed with (random, ≥32 chars); empty:
+  // the Supabase secret key. Set on its own, so rotating the Supabase key doesn't end those sessions
+  // and the Supabase key isn't also a signing key. Changing it ends the open "act as" sessions (≤ 1 hour).
+  INVITES_ACT_AS_SECRET: z.string().default(''),
   // the model for the automatic check of guests' uploads (gallery_ai); empty: INVITES_AI_MODEL
   INVITES_GALLERY_AI_MODEL: z.string().trim().default(''),
 
