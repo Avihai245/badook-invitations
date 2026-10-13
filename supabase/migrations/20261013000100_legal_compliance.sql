@@ -137,7 +137,8 @@ create table public.media_report_events (
   actor text not null check (actor in ('reporter', 'system', 'staff', 'host')),
   actor_id uuid references auth.users (id) on delete set null,
   action text not null check (action ~ '^[a-z_]+$'),
-  detail jsonb not null default '{}'::jsonb check (jsonb_typeof(detail) = 'object' and pg_column_size(detail) <= 4096),
+  -- (room for a staff note of 2000 characters, which a report's trail keeps: staff only)
+  detail jsonb not null default '{}'::jsonb check (jsonb_typeof(detail) = 'object' and pg_column_size(detail) <= 10240),
   created_at timestamptz not null default now()
 );
 create index media_report_events_report on public.media_report_events (report_id, created_at);
@@ -257,42 +258,62 @@ language sql stable security definer set search_path = '' as $$
   )
 $$;
 
--- Stores a report and, when it is urgent (a child, an intimate image) and points at a published item,
--- hides that item at once — reversibly: staff decide afterwards. Returns { id, number, urgent, hidden }.
-create function public.media_report_submit(p jsonb) returns jsonb
+-- Stores a report and, when it is urgent and points at a published item, hides that item at once —
+-- reversibly: staff decide afterwards. Urgent: a child (category child_safety, or the reporter is the
+-- child's parent or guardian), an intimate image. The automatic hiding is capped at 5 items per
+-- invitation per rolling hour (a stranger with a link must not be able to blank a gallery): beyond it the
+-- report is still stored as urgent, the item is left as it is and the trail says 'hide_capped'. The item
+-- is locked and checked again (published, not deleted, of that invitation) before anything is written.
+-- Returns { id, number, urgent, hidden }.
+create function public.media_report_submit(p_data jsonb) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare
-  v_inv uuid := nullif(p ->> 'invitation_id', '')::uuid;
-  v_item uuid := nullif(p ->> 'item_id', '')::uuid;
-  v_category text := p ->> 'category';
-  v_intimate boolean := coalesce((p ->> 'intimate')::boolean, false);
-  v_urgent boolean := v_category = 'child_safety' or v_intimate;
+  v_inv uuid := nullif(p_data ->> 'invitation_id', '')::uuid;
+  v_item uuid := nullif(p_data ->> 'item_id', '')::uuid;
+  v_category text := p_data ->> 'category';
+  v_intimate boolean := coalesce((p_data ->> 'intimate')::boolean, false);
+  v_urgent boolean := v_category = 'child_safety' or v_intimate or (p_data ->> 'role') = 'guardian';
   v_prior text;
   v_hide boolean := false;
+  v_capped boolean := false;
+  v_it public.gallery_items;
   r public.media_reports;
 begin
   if v_item is not null then
-    if v_inv is null or not public.media_report_item_visible(v_inv, v_item) then
+    if v_inv is null then
       raise exception 'item not found' using errcode = 'P0001';
     end if;
-  end if;
-  if v_item is not null and v_urgent then
-    select status into v_prior from public.gallery_items where id = v_item for update;
-    if v_prior = 'published' then
-      v_hide := true;
-      update public.gallery_items set status = 'hidden', status_reason = 'report' where id = v_item;
-      insert into public.gallery_moderation (item_id, check_name, result, detail, decided_by)
-      values (v_item, 'report', 'hidden', jsonb_build_object('category', v_category), 'server');
+    if v_urgent then
+      -- one urgent report at a time per invitation, so the cap below counts them all
+      perform pg_advisory_xact_lock(hashtextextended('media_report_hide:' || v_inv::text, 0));
+    end if;
+    select * into v_it from public.gallery_items where id = v_item for update;
+    if not found or v_it.invitation_id <> v_inv or v_it.deleted_at is not null or v_it.status <> 'published' then
+      raise exception 'item not found' using errcode = 'P0001';
+    end if;
+    if v_urgent then
+      v_prior := v_it.status;
+      if (select count(*) from public.media_report_events e
+          join public.media_reports x on x.id = e.report_id
+          where e.action = 'hidden_urgent' and x.invitation_id = v_inv
+            and e.created_at > now() - interval '1 hour') >= 5 then
+        v_capped := true;
+      else
+        v_hide := true;
+        update public.gallery_items set status = 'hidden', status_reason = 'report' where id = v_item;
+        insert into public.gallery_moderation (item_id, check_name, result, detail, decided_by)
+        values (v_item, 'report', 'hidden', jsonb_build_object('category', v_category), 'server');
+      end if;
     end if;
   end if;
   insert into public.media_reports (
     invitation_id, item_id, surface, category, intimate, role, description, reference,
     reporter_name, reporter_email, reporter_phone, locale, urgent, hidden_by_report, prior_status, ip_hash
   ) values (
-    v_inv, v_item, p ->> 'surface', v_category, v_intimate, p ->> 'role', p ->> 'description',
-    nullif(p ->> 'reference', ''), nullif(p ->> 'reporter_name', ''), nullif(p ->> 'reporter_email', ''),
-    nullif(p ->> 'reporter_phone', ''), nullif(p ->> 'locale', ''), v_urgent, v_hide,
-    case when v_hide then v_prior end, nullif(p ->> 'ip_hash', '')
+    v_inv, v_item, p_data ->> 'surface', v_category, v_intimate, p_data ->> 'role', p_data ->> 'description',
+    nullif(p_data ->> 'reference', ''), nullif(p_data ->> 'reporter_name', ''), nullif(p_data ->> 'reporter_email', ''),
+    nullif(p_data ->> 'reporter_phone', ''), nullif(p_data ->> 'locale', ''), v_urgent, v_hide,
+    case when v_hide then v_prior end, nullif(p_data ->> 'ip_hash', '')
   ) returning * into r;
   insert into public.media_report_events (report_id, actor, action, detail)
   values (r.id, 'reporter', 'submitted',
@@ -300,6 +321,9 @@ begin
   if v_hide then
     insert into public.media_report_events (report_id, actor, action, detail)
     values (r.id, 'system', 'hidden_urgent', jsonb_build_object('priorStatus', v_prior));
+  elsif v_capped then
+    insert into public.media_report_events (report_id, actor, action, detail)
+    values (r.id, 'system', 'hide_capped', jsonb_build_object('cap', 5, 'perHour', true));
   end if;
   return jsonb_build_object('id', r.id, 'number', r.number, 'urgent', v_urgent, 'hidden', v_hide);
 end $$;
@@ -383,9 +407,11 @@ begin
 end $$;
 
 -- A staff decision on a report. p_action: review (start looking), hide, restore (back to what it was),
--- remove (the item is deleted for good — owners and admins only), keep (the report is not upheld),
--- dismiss (not applicable: spam, unreadable), close, note. Every action is recorded twice: in the report's
--- own trail and in the console's audit log. A removed item's files go to the trash like any deletion.
+-- remove (the item is deleted for good — owners and admins only), keep (the report is not upheld: an item
+-- that this report hid goes back), dismiss (not applicable: spam, unreadable; the same), close, note. Every
+-- action is recorded twice: in the report's own trail (with the staff's note, for staff only) and in the
+-- console's audit log. A removed item's files go to the trash like any deletion. While an item is held
+-- (hidden, reason 'report') the host cannot show it again (gallery_owner_moderate): staff are the way back.
 create function public.media_report_admin_act(p_actor uuid, p_id uuid, p_action text, p_note text)
 returns jsonb
 language plpgsql security definer set search_path = '' as $$
@@ -394,6 +420,7 @@ declare
   m public.media_reports;
   v_note text := nullif(btrim(left(coalesce(p_note, ''), 2000)), '');
   v_item public.gallery_items;
+  v_held boolean := false;
 begin
   select * into m from public.media_reports where id = p_id for update;
   if not found then
@@ -412,8 +439,10 @@ begin
     raise exception 'note required' using errcode = 'P0001';
   end if;
 
-  if p_action in ('hide', 'restore', 'remove') then
+  if m.item_id is not null and p_action in ('hide', 'restore', 'remove', 'keep', 'dismiss', 'close') then
     select * into v_item from public.gallery_items where id = m.item_id for update;
+    -- still held: hidden, and by a report (this one or a staff member's hide)
+    v_held := found and v_item.deleted_at is null and v_item.status = 'hidden' and v_item.status_reason = 'report';
   end if;
 
   if p_action = 'review' then
@@ -429,17 +458,6 @@ begin
       insert into public.gallery_moderation (item_id, check_name, result, detail, decided_by, actor_id)
       values (v_item.id, 'report', 'hidden', jsonb_build_object('report', m.number), 'staff', p_actor);
     end if;
-  elsif p_action = 'restore' then
-    if v_item.deleted_at is null and v_item.status = 'hidden' and m.prior_status is not null then
-      update public.gallery_items
-      set status = m.prior_status, status_reason = 'host',
-          published_at = case when m.prior_status = 'published' then now() else published_at end
-      where id = v_item.id;
-      insert into public.gallery_moderation (item_id, check_name, result, detail, decided_by, actor_id)
-      values (v_item.id, 'report', m.prior_status, jsonb_build_object('report', m.number, 'restored', true),
-              'staff', p_actor);
-      update public.media_reports set hidden_by_report = false, handled_by = p_actor where id = p_id;
-    end if;
   elsif p_action = 'remove' then
     if v_item.deleted_at is null then
       update public.gallery_items set deleted_at = now(), deleted_by = 'system' where id = v_item.id;
@@ -450,7 +468,21 @@ begin
     set status = 'actioned', resolution = 'removed', resolution_note = v_note, resolved_at = now(),
         handled_by = p_actor
     where id = p_id;
-  elsif p_action = 'keep' then
+  end if;
+
+  -- put an item that is still held back where it was: staff's restore, and a report that is not upheld
+  if p_action in ('restore', 'keep', 'dismiss') and v_held and m.prior_status is not null then
+    update public.gallery_items
+    set status = m.prior_status, status_reason = 'host',
+        published_at = case when m.prior_status = 'published' then now() else published_at end
+    where id = v_item.id;
+    insert into public.gallery_moderation (item_id, check_name, result, detail, decided_by, actor_id)
+    values (v_item.id, 'report', m.prior_status,
+            jsonb_build_object('report', m.number, 'restored', true, 'by', p_action), 'staff', p_actor);
+    update public.media_reports set hidden_by_report = false, handled_by = p_actor where id = p_id;
+  end if;
+
+  if p_action = 'keep' then
     update public.media_reports
     set status = 'dismissed', resolution = 'kept', resolution_note = v_note, resolved_at = now(),
         handled_by = p_actor
@@ -463,14 +495,17 @@ begin
   elsif p_action = 'close' then
     update public.media_reports
     set status = case when status in ('actioned', 'dismissed') then status else 'closed' end,
-        resolution = coalesce(resolution, case when hidden_by_report then 'hidden' else 'host_handled' end),
+        -- 'hidden' only while the item really is held; else the host's own decision stands
+        resolution = coalesce(resolution, case when v_held then 'hidden' else 'host_handled' end),
         resolution_note = coalesce(v_note, resolution_note), resolved_at = coalesce(resolved_at, now()),
         handled_by = p_actor
     where id = p_id;
   end if;
 
   insert into public.media_report_events (report_id, actor, actor_id, action, detail)
-  values (p_id, 'staff', p_actor, p_action, jsonb_build_object('hasNote', v_note is not null));
+  values (p_id, 'staff', p_actor, p_action,
+          jsonb_build_object('hasNote', v_note is not null)
+          || case when v_note is not null then jsonb_build_object('note', v_note) else '{}'::jsonb end);
   perform public.admin_log(p_actor, 'report.' || p_action, 'system', 'media_report:' || m.number,
                            jsonb_build_object('role', v_role));
   return public.media_report_admin_get(p_actor, p_id);
@@ -478,14 +513,14 @@ end $$;
 
 -- ─── privacy requests ───────────────────────────────────────────────────────────────────────────
 
-create function public.privacy_request_submit(p jsonb) returns jsonb
+create function public.privacy_request_submit(p_data jsonb) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare
   r public.privacy_requests;
 begin
   insert into public.privacy_requests (kind, relation, name, email, phone, details, reference, locale, ip_hash)
-  values (p ->> 'kind', p ->> 'relation', p ->> 'name', p ->> 'email', nullif(p ->> 'phone', ''),
-          p ->> 'details', nullif(p ->> 'reference', ''), nullif(p ->> 'locale', ''), nullif(p ->> 'ip_hash', ''))
+  values (p_data ->> 'kind', p_data ->> 'relation', p_data ->> 'name', p_data ->> 'email', nullif(p_data ->> 'phone', ''),
+          p_data ->> 'details', nullif(p_data ->> 'reference', ''), nullif(p_data ->> 'locale', ''), nullif(p_data ->> 'ip_hash', ''))
   returning * into r;
   insert into public.privacy_request_events (request_id, actor, action, detail)
   values (r.id, 'requester', 'submitted', jsonb_build_object('kind', r.kind));
@@ -592,6 +627,53 @@ begin
   return public.privacy_request_admin_get(p_actor, p_id);
 end $$;
 
+-- ─── the host and a held item ───────────────────────────────────────────────────────────────────
+
+-- gallery_owner_moderate (live gallery) with one rule more: an item that a report holds (hidden, reason
+-- 'report') cannot be published, hidden or rejected by the host — they may only delete it; staff's
+-- 'restore' (media_report_admin_act) is the way back. Returns { count, ids, held }: what it changed, and
+-- the held items it left alone.
+create or replace function public.gallery_owner_moderate(p_id uuid, p_owner_id uuid, p_item_ids uuid[], p_action text)
+returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_ids uuid[];
+  v_held uuid[];
+begin
+  if p_action not in ('publish', 'hide', 'reject', 'delete') then
+    raise exception 'gallery_owner_moderate: bad action';
+  end if;
+  if not exists (select 1 from public.invitations where id = p_id and owner_id = p_owner_id) then
+    return null;
+  end if;
+  select coalesce(array_agg(i.id), '{}') into v_held
+  from public.gallery_items i
+  where p_action <> 'delete' and i.invitation_id = p_id and i.id = any(p_item_ids)
+    and i.deleted_at is null and i.status = 'hidden' and i.status_reason = 'report';
+  with changed as (
+    update public.gallery_items i set
+      status = case p_action
+        when 'publish' then 'published' when 'hide' then 'hidden' when 'reject' then 'rejected' else i.status end,
+      status_reason = case when p_action = 'delete' then i.status_reason else 'host' end,
+      published_at = case when p_action = 'publish' and i.status <> 'published' then now() else i.published_at end,
+      deleted_at = case when p_action = 'delete' then now() else i.deleted_at end,
+      deleted_by = case when p_action = 'delete' then 'host' else i.deleted_by end
+    where i.invitation_id = p_id
+      and i.id = any(p_item_ids)
+      and i.deleted_at is null
+      and i.status <> 'uploading'
+      and not (i.id = any(v_held))
+    returning i.id
+  )
+  select coalesce(array_agg(id), '{}') into v_ids from changed;
+  insert into public.gallery_moderation (item_id, check_name, result, decided_by, actor_id)
+  select id, 'host',
+    case p_action when 'publish' then 'published' when 'hide' then 'hidden' when 'reject' then 'rejected' else 'deleted' end,
+    'host', p_owner_id
+  from unnest(v_ids) id;
+  return jsonb_build_object('count', cardinality(v_ids), 'ids', to_jsonb(v_ids), 'held', to_jsonb(v_held));
+end $$;
+
 -- ─── housekeeping ───────────────────────────────────────────────────────────────────────────────
 
 -- The daily run: closed reports and finished requests are erased two years after they were resolved
@@ -645,7 +727,8 @@ begin
     'public.privacy_request_admin_list(uuid, text, int)',
     'public.privacy_request_admin_get(uuid, uuid)',
     'public.privacy_request_admin_set(uuid, uuid, text, text)',
-    'public.legal_maintenance()'
+    'public.legal_maintenance()',
+    'public.gallery_owner_moderate(uuid, uuid, uuid[], text)'
   ] loop
     execute format('revoke all on function %s from public, anon, authenticated', f);
     execute format('grant execute on function %s to service_role', f);

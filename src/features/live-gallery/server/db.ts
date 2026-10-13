@@ -210,7 +210,8 @@ export const galleryDb = {
     itemIds: string[],
     action: 'publish' | 'hide' | 'reject' | 'delete',
   ) =>
-    rpc<{ count: number; ids: string[] } | null>('gallery_owner_moderate', {
+    // held: items a report holds (hidden, reason 'report'): the host may only delete those
+    rpc<{ count: number; ids: string[]; held?: string[] } | null>('gallery_owner_moderate', {
       p_id: id,
       p_owner_id: ownerId,
       p_item_ids: itemIds,

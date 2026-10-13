@@ -33,6 +33,8 @@ export interface AdminLegalDeps {
     'act' | 'reportTarget' | 'setStatus' | 'requestTarget' | 'markReportNotified' | 'markRequestNotified'
   >;
   send: SendMail;
+  /** the gallery's open pages are told something changed (an item hidden, shown again, removed) */
+  refreshGallery(invitationId: string): Promise<void>;
   config: LegalConfig;
 }
 
@@ -44,6 +46,9 @@ const fail = (status: number, code: string, extra: Record<string, unknown> = {})
 
 /** 'sent' · 'failed' (recorded as not sent: follow up by hand) · 'none' (nobody to write to) */
 export type Emailed = 'sent' | 'failed' | 'none';
+
+/** The decisions that can change an item (hide, restore, remove — and keep / dismiss, which put a held item back). */
+const ITEM_ACTIONS: readonly string[] = ['hide', 'restore', 'remove', 'keep', 'dismiss'];
 
 export const ReportActionSchema = z.strictObject({
   action: z.enum(REPORT_ACTIONS),
@@ -75,6 +80,14 @@ export async function adminReportAct(
   if (!before) return fail(404, 'not_found');
 
   const report = await deps.db.act(staff.userId, id, action, note || null);
+  // what changes an item reaches the open pages at once (best effort: the hint never fails the action)
+  if (before.invitationId && ITEM_ACTIONS.includes(action)) {
+    try {
+      await deps.refreshGallery(before.invitationId);
+    } catch (err) {
+      console.error('[legal] gallery refresh failed', err);
+    }
+  }
 
   let emailed: Emailed = 'none';
   // the first time the report is resolved, to whoever left an address

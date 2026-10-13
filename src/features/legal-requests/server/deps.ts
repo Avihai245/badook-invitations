@@ -1,10 +1,11 @@
 import 'server-only';
 import { after } from 'next/server';
-import { sendEmail } from '@/features/invitations/server/email';
+import { sendEmailStrict } from '@/features/invitations/server/email';
 import { legalContext } from '@/features/legal/context';
 import { legalStatus } from '@/features/legal/status';
 import { serverEnv } from '@/lib/env';
 import { rateKey } from '@/lib/links/tokens';
+import { broadcastRefresh } from '@/lib/live/broadcast';
 import { legalDb } from './db';
 import type { LegalConfig, SendMail } from './common';
 import type { AdminLegalDeps } from './admin-api';
@@ -26,7 +27,21 @@ export function legalConfig(): LegalConfig {
   };
 }
 
-const send: SendMail = (email) => sendEmail({ ...email, kind: 'other' });
+// strict: not configured (nothing was sent) must not be recorded as a notice that went out
+const send: SendMail = (email) => sendEmailStrict({ ...email, kind: 'other' });
+
+/**
+ * "Something changed" for the gallery's open pages (the guests' feed, the screen, the host's tab): a hidden
+ * or restored item shows or goes at once. Best effort — a hint that fails is only logged.
+ */
+async function refreshGallery(invitationId: string): Promise<void> {
+  try {
+    const channel = await legalDb.galleryChannel(invitationId);
+    if (channel) await broadcastRefresh(channel, 'items', fetch, 'gallery');
+  } catch (err) {
+    console.error('[legal] gallery refresh failed', err);
+  }
+}
 
 /** The address as the database keeps it: a salted hash (never the address itself). */
 const hashIp = (ip: string | null) => rateKey('legal', 'ip', ip ?? 'unknown');
@@ -35,7 +50,7 @@ const later = (job: () => Promise<unknown>) =>
   after(() => job().catch((err) => console.error('[legal] notices failed', err)));
 
 export function reportDeps(): ReportDeps {
-  return { db: legalDb, send, later, hashIp, config: legalConfig() };
+  return { db: legalDb, send, later, hashIp, refreshGallery, config: legalConfig() };
 }
 
 export function requestDeps(): RequestDeps {
@@ -43,5 +58,5 @@ export function requestDeps(): RequestDeps {
 }
 
 export function adminLegalDeps(): AdminLegalDeps {
-  return { db: legalDb, send, config: legalConfig() };
+  return { db: legalDb, send, refreshGallery, config: legalConfig() };
 }

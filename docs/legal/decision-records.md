@@ -82,6 +82,9 @@ text that the guest's consent covers only their own selfie, with links to the ex
   retention to the event window; (viii) a lawful-basis memo + notice duty (s.11) on the depicted people
   (impractical → supports the preferred design).
 - Also assess: database definition/registration/notification (DR-08), DPO (DR-08), security level.
+- The uploader notice is re-shown (with the face-search line) on a device that acknowledged before the host
+  turned face search on; the acknowledgement key carries that state. A device whose queue was saved earlier
+  resumes uploads without passing the notice (known limitation).
 
 ## DR-04 ⚠ Consumer Protection Law — refunds, cancellation fee, credits
 
@@ -93,8 +96,9 @@ text that the guest's consent covers only their own selfie, with links to the ex
 - **v2 refund policy** states what the code does (immediate cancellation, plan runs to period end, manual
   refunds), states the statutory right as applying "where the law applies" (not universally), says the fee is
   charged only where the law permits and never for our fault, keeps the unused-credit 14-day commitment as
-  a **voluntary commitment beyond the law**, and does not promise a refund timetable beyond "the period the
-  law sets".
+  a **voluntary commitment beyond the law**, and states the 14-day refund period as the statutory one ("within
+  14 days of your notice") — **there is no refund tool or automation, a person does it by hand**, so the owner
+  must be able to meet it.
 - **Counsel to confirm:** (1) whether s.14C(a) applies to a monthly SaaS plan and to credit packs, and which
   exceptions (service supplied during the 14 days, digital content) apply; (2) whether the s.13D continuing-
   transaction cancellation rules (incl. online cancellation, the effect date, any fee) are met by the billing
@@ -168,9 +172,13 @@ notice, whether the platform wants a statutory-style notice-and-takedown safe-ha
 
 ## DR-11 ⚠ Children and minors
 
-No age signal exists. Done: parent/guardian can report (child category = urgent, auto-hide, reversible);
+No age signal exists. Done: a report is **urgent and hides the published item (reversibly)** when its category is
+"A child", it is an intimate image, or the reporter says they are a parent/guardian (any category) — capped at 5
+auto-hides per gallery per hour so the hide cannot be turned into mass suppression; a report from the
+"report" link without an item needs a description of which photo (the form requires it);
 `child_photo` privacy-request kind; rules and policy recommend not publishing others' children and not enabling
-face search; AI photos: guests told not to send children's photos. Not done (needs decision): approval mode by
+face search; AI photos: guests told not to send children's photos. A `child_photo` privacy request is **not** urgent and hides nothing (30-day due date; the quick path is
+"Report content"). Not done (needs decision): approval mode by
 default for events typed bar/bat mitzvah/brit/birthday; hiding children's faces; blocking AI photos of
 honorees who are minors without recorded guardian consent (today: one host checkbox, no per-person/guardian record).
 
@@ -236,6 +244,56 @@ negligence added); one-sided indemnity softened to "to the extent the law allows
 ## DR-19 ⚠ Security findings left open
 
 See [`security-findings.md`](security-findings.md): client IP for rate limits comes from a spoofable
-`X-Forwarded-For` first hop; gallery access codes are a fast salted SHA-256 (rate-limited); album/projector
+`X-Forwarded-For` first hop (**this also weakens the report abuse cap: anyone holding a gallery link and an item
+id can trigger the reversible urgent hide of that item; the per-gallery cap of 5 per hour limits the damage, and
+staff restore/keep puts the item back** — treat as a real exposure until the client-IP source is fixed); gallery access codes are a fast salted SHA-256 (rate-limited); album/projector
 links do not check the access code; the upload token sits in the public invitation page and in a query string;
 no CAPTCHA on public forms (Turnstile keys exist in env but unused).
+
+## DR-20 ⚠ Remote support ("act as") and the privacy policy
+
+`ACT_AS_PERMISSION = 'support.reply'` (`src/features/admin/server/act-as.ts`): staff with the support role can open
+a host's own app and use it as them (guest lists, replies, galleries). Its start is audited with a reason; whether
+each action inside the session is audited was **not verified**. The v1 policy §6A said the team never sees guests'
+details — inaccurate. **v2 §8 now discloses remote support.** Owner: decide whether support staff should have it,
+whether in-session actions must be audited, and whether to restrict it (e.g. owner/admin only).
+
+## DR-21 ⚠ Email delivery and the IP-hash salt
+
+- `sendEmail` treats an unconfigured mailbox as "delivered" (local-dev convenience). The report/request flows now
+  use a strict variant: nothing is recorded as sent unless Resend accepted it; the console shows "NOT sent". The
+  reports are stored either way — staff must look at the console (`/app/admin/legal`, with a nav badge), as no
+  email can be assumed. Before go-live set `INVITES_EMAIL_API_KEY`, `INVITES_EMAIL_FROM`,
+  `INVITES_SUPPORT_EMAIL`/`INVITES_PRIVACY_EMAIL` and confirm the team really watches the console or the mailbox.
+- The IP "hashes" are salted SHA-256; with an empty `INVITES_IP_HASH_SALT` they would be reversible over the IPv4
+  space. Version 2 does not switch on without a salt of at least 16 characters.
+
+## DR-22 ℹ Things this programme changed that are not behind `INVITES_LEGAL_V2`
+
+(So "exactly as before while off" is not literally true.) (1) Upload-time location minimisation (HEIC/PNG/WebP/
+MP4/MOV originals are rewritten in the browser; any failure falls back to the original file). (2) Revoked browser
+grants on `billing_cards`, `billing_claims`, `rsvp_rate_events`. (3) The live v1 pages show "Version 1 · date" and
+are also reachable at `/legal/<doc>/1`. (4) The support assistant's knowledge mentions the new pages. (5) The daily
+job runs `legal_maintenance()` (it only erases rows that exist). (6) The environment adds optional variables.
+
+## DR-23 ℹ Immutability limits
+
+The v1 manifest pins the source files, but archived versions render live values from the deployment (prices,
+whether face search is offered, the operator's details): a price or entity change alters what an archived page
+shows. **Rule: a price, entity or feature change that a document states is a new version.** v2 is not hash-pinned;
+pin it (add a `tests/fixtures/legal-v2.sha256.json`) at go-live. Git history is the second record. Version
+dates come from the deployment: do not change `INVITES_LEGAL_V2_EFFECTIVE` after go-live.
+
+## DR-24 ℹ Payment records on account deletion
+
+`billing_events` rows are detached from the account (`on delete set null`) and never purged; they hold provider
+data (last four digits, provider response, amounts). The policy now says so. Owner/counsel: decide a retention
+limit (the 7-year tax period) after which they are erased.
+
+## DR-25 ℹ Acknowledgement and request e-mails
+
+The gallery acknowledgement is client-supplied (hashed per event) and fire-and-forget; it is evidence that a
+device saw the notice, not proof of who. Privacy-request acknowledgements and outcomes are emailed to the typed
+address without verification (5 per hour per IP; the IP source is spoofable — DR-19), so the email could be used to
+send unsolicited mail to a third party; the text of those emails never contains personal data beyond the
+reference number and the staff's optional note.

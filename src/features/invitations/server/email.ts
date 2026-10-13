@@ -35,7 +35,8 @@ type Outcome = 'sent' | 'failed' | 'skipped';
 async function deliver(email: OutgoingEmail): Promise<Outcome> {
   const env = serverEnv();
   if (!env.INVITES_EMAIL_API_KEY || !env.INVITES_EMAIL_FROM) {
-    console.info(`[email] not configured — would send to ${email.to}: ${email.subject}`);
+    // (only the kind: an address is personal data, and this goes to the logs)
+    console.info(`[email] not configured — not sent (${email.kind ?? 'other'})`);
     return 'skipped';
   }
   try {
@@ -85,4 +86,15 @@ export async function sendEmail(email: OutgoingEmail): Promise<boolean> {
   const outcome = await deliver(email);
   await logEmail(email.kind ?? 'other', outcome);
   return outcome !== 'failed';
+}
+
+/**
+ * The same, but true only when the provider took the email (outcome 'sent'): not configured ('skipped')
+ * is false here. For notices whose delivery is recorded and shown to the team (the reports and privacy
+ * requests: a notice that did not go out must not be recorded as sent). Never throws.
+ */
+export async function sendEmailStrict(email: OutgoingEmail): Promise<boolean> {
+  const outcome = await deliver(email);
+  await logEmail(email.kind ?? 'other', outcome);
+  return outcome === 'sent';
 }

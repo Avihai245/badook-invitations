@@ -713,6 +713,8 @@ export const AcknowledgeSchema = z.strictObject({
   uploader: z.string().regex(UPLOADER_RE),
   /** the gallery rules' version the device saw — only the one in force is recorded */
   version: z.literal(GALLERY_RULES_VERSION),
+  /** face search was on when the notice was shown (the page shows a further line then); not stored — the record is per version */
+  faces: z.boolean().optional(),
   /** a honeypot: the page never sends it */
   website: z.string().max(200).optional(),
 });

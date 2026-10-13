@@ -12,7 +12,12 @@ import { galleryGuestEn as EN } from '@/lib/i18n/gallery-guest.en';
 const TOKEN = 'tok_ABCDEFGHIJKLMNOPQRST'.slice(0, 24);
 const UPLOADER = 'testuploader0123456789';
 
-const api = vi.hoisted(() => ({ calls: [] as { path: string; body: Record<string, unknown> }[], ack: 200 }));
+const api = vi.hoisted(() => ({
+  calls: [] as { path: string; body: Record<string, unknown> }[],
+  ack: 200,
+  items: [] as Record<string, unknown>[],
+  mine: [] as Record<string, unknown>[],
+}));
 vi.mock('@/features/live-gallery/client/api', () => ({
   galleryApi: vi.fn(async (path: string, body: Record<string, unknown>) => {
     api.calls.push({ path, body });
@@ -25,11 +30,11 @@ vi.mock('@/features/live-gallery/client/api', () => ({
         state: 'open',
         mode: 'instant',
         opensAt: null,
-        items: [],
+        items: api.items,
         next: null,
         now: '2026-10-13T10:00:00.000Z',
         expiresAt: 0,
-        mine: [],
+        mine: api.mine,
         realtime: null,
       },
     };
@@ -112,6 +117,8 @@ let picker: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   api.calls = [];
   api.ack = 200;
+  api.items = [];
+  api.mine = [];
   picker = vi.fn();
   HTMLInputElement.prototype.click = picker as unknown as () => void;
   window.matchMedia = ((query: string) => ({
@@ -136,7 +143,8 @@ async function mount(data: GuestPageData = pageData()) {
   return button;
 }
 const acks = () => api.calls.filter((c) => c.path === '/api/gallery/acknowledge');
-const ackKey = `badook-gallery:ack:2:${TOKEN}`;
+const ackKey = `badook-gallery:ack:2:nofaces:${TOKEN}`;
+const ackKeyFaces = `badook-gallery:ack:2:faces:${TOKEN}`;
 
 describe('the first-upload notice', () => {
   it('is a labelled modal dialog on the first share, and the picker waits', async () => {
@@ -176,10 +184,10 @@ describe('the first-upload notice', () => {
     fireEvent.click(await screen.findByRole('button', { name: EN.legal.notice.understand }));
     expect(picker).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('dialog')).toBeNull();
-    expect(localStorage.getItem(ackKey)).toBe('1');
     await waitFor(() => expect(acks()).toHaveLength(1));
+    await waitFor(() => expect(localStorage.getItem(ackKey)).toBe('1'));
     // the same device id the other calls send, the gallery link, the rules version — and nothing else
-    expect(acks()[0]!.body).toEqual({ t: TOKEN, uploader: UPLOADER, version: '2' });
+    expect(acks()[0]!.body).toEqual({ t: TOKEN, uploader: UPLOADER, version: '2', faces: false });
     // the next share goes straight to the picker, with no second request
     fireEvent.click(screen.getByTestId('share-story'));
     expect(screen.queryByRole('dialog')).toBeNull();
@@ -197,8 +205,8 @@ describe('the first-upload notice', () => {
   });
 
   it('is shown again for another rules version or another gallery', async () => {
-    localStorage.setItem(`badook-gallery:ack:1:${TOKEN}`, '1');
-    localStorage.setItem('badook-gallery:ack:2:someotherlinktoken00000', '1');
+    localStorage.setItem(`badook-gallery:ack:1:nofaces:${TOKEN}`, '1');
+    localStorage.setItem('badook-gallery:ack:2:nofaces:someotherlinktoken00000', '1');
     const share = await mount();
     fireEvent.click(share);
     expect(await screen.findByRole('dialog')).toBeTruthy();
@@ -263,7 +271,80 @@ describe('the first-upload notice', () => {
       expect(picker).toHaveBeenCalledTimes(1);
       await waitFor(() => expect(acks().length).toBeGreaterThan(0));
       expect(screen.queryByRole('dialog')).toBeNull();
+      // the phone does not remember what the server never got
+      expect(localStorage.getItem(ackKey)).toBeNull();
     }
+  });
+
+  it('a lost acknowledgement is sent once more at the next share (the upload never waits), then remembered', async () => {
+    api.ack = 0;
+    const share = await mount();
+    fireEvent.click(share);
+    fireEvent.click(await screen.findByRole('button', { name: EN.legal.notice.understand }));
+    await waitFor(() => expect(acks()).toHaveLength(1));
+    expect(picker).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem(ackKey)).toBeNull();
+    // not asked again in this visit; the retry goes with the next share, which still opens the picker
+    api.ack = 200;
+    fireEvent.click(share);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(picker).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(acks()).toHaveLength(2));
+    await waitFor(() => expect(localStorage.getItem(ackKey)).toBe('1'));
+    // and no third request
+    fireEvent.click(share);
+    expect(picker).toHaveBeenCalledTimes(3);
+    await act(async () => undefined);
+    expect(acks()).toHaveLength(2);
+  });
+
+  it('retries only once: a second failure is left for the next visit, where the notice comes again', async () => {
+    api.ack = 429;
+    const share = await mount();
+    fireEvent.click(share);
+    fireEvent.click(await screen.findByRole('button', { name: EN.legal.notice.understand }));
+    await waitFor(() => expect(acks()).toHaveLength(1));
+    fireEvent.click(share);
+    await waitFor(() => expect(acks()).toHaveLength(2));
+    fireEvent.click(share);
+    fireEvent.click(share);
+    await act(async () => undefined);
+    expect(acks()).toHaveLength(2);
+    expect(localStorage.getItem(ackKey)).toBeNull();
+    expect(picker).toHaveBeenCalledTimes(4);
+    cleanup();
+    const again = await mount();
+    fireEvent.click(again);
+    expect(await screen.findByRole('dialog')).toBeTruthy();
+  });
+
+  it('a device that acknowledged before face search was turned on sees the notice again, with the face line', async () => {
+    localStorage.setItem(ackKey, '1');
+    const share = await mount(pageData({ faces: { until: '2026-11-19' } }));
+    fireEvent.click(share);
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(EN.legal.notice.faces)).toBeTruthy();
+    expect(picker).not.toHaveBeenCalled();
+    fireEvent.click(within(dialog).getByRole('button', { name: EN.legal.notice.understand }));
+    await waitFor(() => expect(acks()).toHaveLength(1));
+    // the server record stays per version; the request only says what the page showed
+    expect(acks()[0]!.body).toEqual({ t: TOKEN, uploader: UPLOADER, version: '2', faces: true });
+    await waitFor(() => expect(localStorage.getItem(ackKeyFaces)).toBe('1'));
+    // the earlier acknowledgement is not enough for this gallery now, but this one is
+    cleanup();
+    picker.mockClear();
+    const next = await mount(pageData({ faces: { until: '2026-11-19' } }));
+    fireEvent.click(next);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(picker).toHaveBeenCalledTimes(1);
+  });
+
+  it('is not asked again when face search was on at the acknowledgement and still is', async () => {
+    localStorage.setItem(ackKeyFaces, '1');
+    const share = await mount(pageData({ faces: { until: '2026-11-19' } }));
+    fireEvent.click(share);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(picker).toHaveBeenCalledTimes(1);
   });
 
   it('goes on to the name sheet first-time guests get, then the picker', async () => {
@@ -305,6 +386,41 @@ describe('the first-upload notice', () => {
     expect(report.getAttribute('href')).toBe(`/report?g=${TOKEN}&lang=en`);
     expect(request.getAttribute('href')).toBe('/privacy-request?lang=en');
     for (const a of [rules, report, request]) expect(a.getAttribute('rel')).toContain('noopener');
+  });
+});
+
+describe('the report links on the items', () => {
+  const feedItem = (id: string) => ({
+    id,
+    kind: 'image',
+    thumb: `https://t/${id}.jpg`,
+    display: `https://d/${id}.jpg`,
+    video: null,
+    width: 800,
+    height: 600,
+    durationMs: null,
+    takenAt: null,
+    at: '2026-10-13T09:00:00.000Z',
+    name: 'Dana',
+    by: 'aaaa',
+  });
+
+  it('always point at the item (i), and are not offered on the phone’s own uploads', async () => {
+    api.items = [feedItem('item-theirs'), feedItem('item-mine')];
+    api.mine = [
+      { id: 'item-mine', kind: 'image', status: 'published', reason: 'ok', thumb: null, createdAt: '' },
+    ];
+    await mount();
+    await waitFor(() => expect(document.querySelectorAll('[data-post]').length).toBe(2));
+    const links = screen.getAllByRole('link', { name: EN.legal.report.photo });
+    expect(links.map((a) => a.getAttribute('href'))).toEqual([`/report?g=${TOKEN}&i=item-theirs&lang=en`]);
+  });
+
+  it('are not there without version 2', async () => {
+    api.items = [feedItem('item-theirs')];
+    await mount(pageData({ legal: null }));
+    await waitFor(() => expect(document.querySelectorAll('[data-post]').length).toBe(1));
+    expect(screen.queryByRole('link', { name: EN.legal.report.photo })).toBeNull();
   });
 });
 

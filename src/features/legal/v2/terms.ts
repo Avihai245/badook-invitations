@@ -46,7 +46,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
             {
               list: [
                 'Upload or type in only details of people you are inviting, and only if you are allowed to (for example, they gave them to you for that purpose). For these details you decide whom to invite and what to ask, and we process them for you.',
-                'Send invitations only to people who know you and expect to hear from you about the event. Before sending on WhatsApp you confirm this; every message lets the recipient block or stop receiving messages.',
+                'Send invitations only to people who know you and expect to hear from you about the event. When you send invitations or reminders on WhatsApp you confirm this; every message lets the recipient block or stop receiving messages.',
                 'The Service is for genuine invitations and the messages that go with an event: reminders, table numbers, links to the gallery and album. Do not use it for advertising, promotion, spam or any message that is not about your event, do not use guests’ details for a different purpose, and follow WhatsApp’s policies. We do not use guest lists for our own marketing.',
                 'You are responsible for what you ask your guests and for how you use their replies. Tell your guests what you ask for and why where the law requires it.',
               ],
@@ -106,7 +106,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
           id: 'reports',
           heading: '9. Reports of infringement and requests to remove content',
           body: [
-            'Anyone can ask us to review a photo, video or other item in a gallery or on an invitation — the uploader, a person who appears in it, a parent or guardian, a copyright owner, or anyone else — without an account, using the report form (“Report content”, linked from every gallery page and from the gallery rules). The report is reviewed by a person. We may hide the item while we look into it (immediately, where it appears to involve a child or an intimate image), then decide whether to restore it, remove it or leave it, and we tell the reporter the outcome where they gave a way to reach them. We do not automatically delete everything that is reported, because reports can be mistaken or abusive, and false or abusive reports may be disregarded.',
+            'Anyone can ask us to review a photo, video or other item in a gallery or on an invitation — the uploader, a person who appears in it, a parent or guardian, a copyright owner, or anyone else — without an account, using the report form (“Report content”, linked from every gallery page and from the gallery rules). The report is reviewed by a person. We may hide the item while we look into it (immediately, where it involves a child, an intimate image, or is made by a parent or guardian), then decide whether to restore it, remove it or leave it, and we tell the reporter the outcome where they gave a way to reach them. We do not automatically delete everything that is reported, because reports can be mistaken or abusive, and false or abusive reports may be disregarded.',
             'Reports about a child, an intimate image shared without consent, or other serious harm are handled first. You can also contact the authorities, and nothing here replaces that.',
             'A person who uploaded an item can delete it from the device they used; the host can delete any item in their gallery.',
           ],
@@ -252,7 +252,7 @@ export function termsDoc(c: LegalContext): LegalDoc {
         id: 'reports',
         heading: '9. דיווח על הפרה ובקשות להסיר תוכן',
         body: [
-          'כל אחד יכול לבקש מאיתנו לבדוק תמונה, סרטון או פריט אחר בגלריה או בהזמנה — מי שהעלה אותו, מי שמופיע בו, הורה או אפוטרופוס, בעל זכויות יוצרים או כל אחד אחר — בלי חשבון, בטופס הדיווח (״דיווח על תוכן״, שמקושר מכל עמוד של הגלריה ומהתקנון שלה). אדם בודק את הדיווח. אנחנו רשאים להסתיר את הפריט בזמן הבדיקה (מיד, כשנראה שמדובר בילד או בתמונה אינטימית), ואז להחליט אם להחזיר אותו, להסיר אותו או להשאיר אותו, ואנחנו מודיעים למדווח על התוצאה כשהוא מסר דרך ליצור קשר. איננו מוחקים אוטומטית כל מה שמדווחים עליו, כי דיווחים עלולים להיות שגויים או פוגעניים, ואפשר להתעלם מדיווחי שווא או פוגעניים.',
+          'כל אחד יכול לבקש מאיתנו לבדוק תמונה, סרטון או פריט אחר בגלריה או בהזמנה — מי שהעלה אותו, מי שמופיע בו, הורה או אפוטרופוס, בעל זכויות יוצרים או כל אחד אחר — בלי חשבון, בטופס הדיווח (״דיווח על תוכן״, שמקושר מכל עמוד של הגלריה ומהתקנון שלה). אדם בודק את הדיווח. אנחנו רשאים להסתיר את הפריט בזמן הבדיקה (מיד, כשמדובר בילד, בתמונה אינטימית או בדיווח של הורה או אפוטרופוס), ואז להחליט אם להחזיר אותו, להסיר אותו או להשאיר אותו, ואנחנו מודיעים למדווח על התוצאה כשהוא מסר דרך ליצור קשר. איננו מוחקים אוטומטית כל מה שמדווחים עליו, כי דיווחים עלולים להיות שגויים או פוגעניים, ואפשר להתעלם מדיווחי שווא או פוגעניים.',
           'דיווחים על ילד, על תמונה אינטימית שפורסמה בלי הסכמה או על פגיעה חמורה אחרת מטופלים ראשונים. אפשר גם לפנות לרשויות, ודבר מכאן אינו מחליף זאת.',
           'מי שהעלה פריט יכול למחוק אותו מהמכשיר שבו השתמש; המארח יכול למחוק כל פריט בגלריה שלו.',
         ],

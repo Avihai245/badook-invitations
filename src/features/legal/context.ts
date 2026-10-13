@@ -3,6 +3,7 @@ import { planPrices } from '@/features/billing/server/account';
 import { deploymentFeatures } from '@/features/flags/server';
 import { serverEnv } from '@/lib/env';
 import type { UiLocale } from '@/lib/i18n/app';
+import { isIsoDate } from './readiness';
 import { legalStatus } from './status';
 import type { LegalContext } from './types';
 
@@ -12,6 +13,8 @@ export { legalStatus };
 export const LEGAL_V1_EFFECTIVE = '2026-10-10';
 
 function formatDate(iso: string, locale: UiLocale): string {
+  // a date the deployment mistyped must not take the legal pages down: show it as typed
+  if (!isIsoDate(iso)) return iso;
   return new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
     day: 'numeric',
     month: 'long',

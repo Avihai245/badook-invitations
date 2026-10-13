@@ -32,8 +32,13 @@ export function privacyRequestLink(locale: string, kind?: string): string {
   return s ? `${PRIVACY_REQUEST_PATH}?${s}` : PRIVACY_REQUEST_PATH;
 }
 
-/** This device's memory of the notice it acknowledged: one key per rules version and gallery link. */
-export const ackKey = (version: string, token: string) => `badook-gallery:ack:${version}:${token}`;
+/**
+ * This device's memory of the notice it acknowledged: one key per rules version, gallery link and
+ * face-search state (the notice has one more line where face search is on, so a device that acknowledged
+ * before the host turned it on sees the notice again).
+ */
+export const ackKey = (version: string, faces: boolean, token: string) =>
+  `badook-gallery:ack:${version}:${faces ? 'faces' : 'nofaces'}:${token}`;
 
 export function readAck(key: string): boolean {
   try {

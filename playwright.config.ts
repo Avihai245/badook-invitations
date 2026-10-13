@@ -147,7 +147,7 @@ export default defineConfig({
             ...(process.env.PW_LEGAL_V2
               ? {
                   INVITES_LEGAL_V2: 'true',
-                  INVITES_LEGAL_V2_EFFECTIVE: '2026-11-01',
+                  INVITES_LEGAL_V2_EFFECTIVE: '2026-01-01',
                   INVITES_LEGAL_NAME: 'Test Operator Ltd',
                   INVITES_LEGAL_ID: '510000000',
                   INVITES_LEGAL_ADDRESS: '1 Test Street, Tel Aviv',

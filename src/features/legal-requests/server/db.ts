@@ -68,10 +68,10 @@ export const legalDb = {
   },
   itemVisible: (invitationId: string, itemId: string) =>
     rpc<boolean>('media_report_item_visible', { p_invitation_id: invitationId, p_item_id: itemId }),
-  submitReport: (p: ReportSubmission) => rpc<ReportStored>('media_report_submit', { p }),
+  submitReport: (p: ReportSubmission) => rpc<ReportStored>('media_report_submit', { p_data: p }),
   markReportNotified: (id: string, who: 'team' | 'host' | 'reporter', ok: boolean) =>
     rpc<null>('media_report_mark_notified', { p_id: id, p_who: who, p_ok: ok }),
-  submitRequest: (p: RequestSubmission) => rpc<RequestStored>('privacy_request_submit', { p }),
+  submitRequest: (p: RequestSubmission) => rpc<RequestStored>('privacy_request_submit', { p_data: p }),
   markRequestNotified: (id: string, who: 'team' | 'requester', ok: boolean) =>
     rpc<null>('privacy_request_mark_notified', { p_id: id, p_who: who, p_ok: ok }),
 
@@ -99,6 +99,16 @@ export const legalDb = {
     if (error) throw new Error(`media_reports duplicate: ${error.message}`);
     const row = data?.[0] as { number: number; urgent: boolean; hidden_by_report: boolean } | undefined;
     return row ? { number: row.number, urgent: row.urgent, hidden: row.hidden_by_report } : null;
+  },
+  /** The gallery's realtime channel (null: no gallery). */
+  async galleryChannel(invitationId: string): Promise<string | null> {
+    const { data, error } = await serviceDb()
+      .from('galleries')
+      .select('channel')
+      .eq('invitation_id', invitationId)
+      .maybeSingle();
+    if (error) throw new Error(`galleries channel: ${error.message}`);
+    return (data as { channel: string } | null)?.channel ?? null;
   },
   /** The email of whoever created the invitation (null: none on file). */
   async ownerEmail(invitationId: string): Promise<string | null> {

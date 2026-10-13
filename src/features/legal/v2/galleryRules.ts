@@ -108,7 +108,7 @@ export function galleryRulesDoc(c: LegalContext): LegalDoc {
             'Photographs and details of children are a heightened privacy risk. The Privacy Protection Authority recommends not publishing identifiable photographs of other people’s children without the consent of their parents. Please follow that recommendation in the gallery: upload photos of your own children, or of children whose parents agreed; do not upload photos of other people’s children in which they can be identified, and never anything that could embarrass a child or show a child undressed. A guest cannot authorise the use of another person’s child’s image.',
             {
               list: [
-                'A parent or guardian can ask for a photo of their child to be hidden or removed. Use “Report content” and choose “A child”; a report about a child is handled first, and the item is hidden for review at once — you do not need to explain why or to prove anything at this stage.',
+                'A parent or guardian can ask for a photo of their child to be hidden or removed. Use “Report content”, choose “A child” and say you are the parent or guardian; a report about a child is handled first, and the item is hidden for review at once — a few words of description are enough at this stage.',
                 'Hosts of events at which many children attend (a bar or bat mitzvah, a brit, a birthday) should tell guests before the event that the gallery exists and should consider approval mode. We recommend that hosts do not turn on face search for such events (section 14). These are protective recommendations, not conditions imposed by law.',
                 'Photos that contain a child’s identifying details (a school, a home address) or that show their location should not be uploaded. We try to remove location data from files (section 12) but cannot promise to for every kind of file.',
               ],
@@ -161,7 +161,7 @@ export function galleryRulesDoc(c: LegalContext): LegalDoc {
             {
               list: [
                 'Use “Report content” on the item, or the link in the gallery’s footer, or the report form with a link to the gallery. Choose a category (privacy, copyright, a child, harmful content, other) and say who you are in relation to the item (the uploader, a person who appears in it, a parent or guardian, a copyright owner, someone else). You describe the problem in a few lines. A name, email and phone number are optional (an email is needed to receive an answer; copyright reports need your name and email). The report points to the item without showing other guests’ details.',
-                'Your report is stored and a person reviews it. Reports about a child or an intimate image are urgent: the item is hidden at once, reversibly, until a decision. We tell the gallery’s host that a report was made, without saying who made it.',
+                'Your report is stored and a person reviews it. Reports about a child, an intimate image, or made by a parent or guardian are urgent: the item is hidden at once in our system, reversibly, until a decision. Pages that are already open are told to refresh, but a copy that was already loaded or downloaded, and a file link already issued, can still show it for up to a few hours. We tell the gallery’s host that a report was made, without saying who made it.',
                 'We then decide: leave the item, hide it, or remove it. Nothing is deleted automatically only because it was reported: reports can be mistaken or abusive, and false or abusive reports may be disregarded. If you gave an email, we tell you the outcome.',
                 'You can also use the privacy request form (section 16) for requests about personal information, and you can contact the Privacy Protection Authority or the courts at any time.',
                 'The host can hide or delete any item at any time. Hosts must act on complaints they receive, and must not retaliate against a guest who reports.',
@@ -331,10 +331,10 @@ export function galleryRulesDoc(c: LegalContext): LegalDoc {
         id: 'children',
         heading: '7. ילדים',
         body: [
-          'תצלומים ופרטים של ילדים הם סיכון מוגבר לפרטיות. הרשות להגנת הפרטיות ממליצה שלא לפרסם תצלומים מזוהים של ילדים של אחרים בלי הסכמת הוריהם. נא לפעול כך בגלריה: העלו תמונות של הילדים שלכם, או של ילדים שהוריהם הסכימו; אל תעלו תמונות של ילדים של אחרים שבהן הם ניתנים לזיהוי, ואף פעם לא משהו שעלול לביים ילד או להראות ילד חשוף. אורח אינו יכול לאשר שימוש בתמונת ילד של אדם אחר.',
+          'תצלומים ופרטים של ילדים הם סיכון מוגבר לפרטיות. הרשות להגנת הפרטיות ממליצה שלא לפרסם תצלומים מזוהים של ילדים של אחרים בלי הסכמת הוריהם. נא לפעול כך בגלריה: העלו תמונות של הילדים שלכם, או של ילדים שהוריהם הסכימו; אל תעלו תמונות של ילדים של אחרים שבהן הם ניתנים לזיהוי, ואף פעם לא משהו שעלול לבייש ילד או להראות ילד חשוף. אורח אינו יכול לאשר שימוש בתמונת ילד של אדם אחר.',
           {
             list: [
-              'הורה או אפוטרופוס יכולים לבקש להסתיר או להסיר תמונה של ילדם. השתמשו ב״דיווח על תוכן״ ובחרו ״ילד״; דיווח על ילד מטופל ראשון, והפריט מוסתר לבדיקה מיד — אין צורך להסביר מדוע או להוכיח משהו בשלב זה.',
+              'הורה או אפוטרופוס יכולים לבקש להסתיר או להסיר תמונה של ילדם. השתמשו ב״דיווח על תוכן״ ובחרו ״ילד/ה״ וציינו שאתם ההורה או האפוטרופוס; דיווח על ילד מטופל ראשון, והפריט מוסתר לבדיקה מיד — מספיקות כמה מילים של תיאור בשלב זה.',
               'מארחים של אירועים שבהם הרבה ילדים (בר או בת מצווה, ברית, יום הולדת) צריכים להודיע לאורחים לפני האירוע שהגלריה קיימת ולשקול מצב אישור. אנו ממליצים שמארחים לא יפעילו חיפוש לפי פנים באירועים כאלה (סעיף 14). אלה המלצות הגנה ולא תנאים שהחוק קובע.',
               'אין להעלות תמונות שיש בהן פרטים מזהים של ילד (בית ספר, כתובת מגורים) או שמראות את מיקומו. אנחנו מנסים להסיר נתוני מיקום מקבצים (סעיף 12), אבל לא מבטיחים זאת לכל סוג קובץ.',
             ],
@@ -345,7 +345,7 @@ export function galleryRulesDoc(c: LegalContext): LegalDoc {
         id: 'harm',
         heading: '8. תמונות אינטימיות ופוגעניות קשות',
         body: [
-          'אם תמונה אינטימית או מינית, או תמונה של ילד שהיא מינית או פוגענית, מופיעה בגלריה, דווחו מיד ב״דיווח על תוכן״ ובחרו ״תוכן פוגעני״ וסמנו שזו תמונה אינטימית ששותפה בלי הסכמה, או ״ילד״. דיווחים כאלה דחופים: הפריט מוסתר מיד ואדם בודק אותו ראשון. איננו נסמכים רק על בדיקות אוטומטיות. אם ילד בסכנה, או שמתבצעת עבירה, פנו גם למשטרה; דיווח אלינו אינו מחליף דיווח לרשויות.',
+          'אם תמונה אינטימית או מינית, או תמונה של ילד שהיא מינית או פוגענית, מופיעה בגלריה, דווחו מיד ב״דיווח על תוכן״ ובחרו ״תוכן פוגעני״ וסמנו שזו תמונה אינטימית ששותפה בלי הסכמה, או ״ילד/ה״. דיווחים כאלה דחופים: הפריט מוסתר מיד ואדם בודק אותו ראשון. איננו נסמכים רק על בדיקות אוטומטיות. אם ילד בסכנה, או שמתבצעת עבירה, פנו גם למשטרה; דיווח אלינו אינו מחליף דיווח לרשויות.',
         ],
       },
       {
@@ -387,7 +387,7 @@ export function galleryRulesDoc(c: LegalContext): LegalDoc {
           {
             list: [
               'השתמשו ב״דיווח על תוכן״ בפריט, או בקישור בתחתית הגלריה, או בטופס הדיווח עם קישור לגלריה. בחרו קטגוריה (פרטיות, זכויות יוצרים, ילד, תוכן פוגעני, אחר) וציינו מה הקשר שלכם לפריט (המעלה, מי שמופיע בו, הורה או אפוטרופוס, בעל זכויות יוצרים, אחר). תארו את הבעיה בכמה שורות. שם, מייל וטלפון אופציונליים (מייל נחוץ כדי לקבל תשובה; בדיווח על זכויות יוצרים נדרשים שם ומייל). הדיווח מצביע על הפריט בלי להציג פרטים של אורחים אחרים.',
-              'הדיווח נשמר ואדם בודק אותו. דיווחים על ילד או על תמונה אינטימית דחופים: הפריט מוסתר מיד, באופן הפיך, עד להחלטה. אנחנו מודיעים למארח הגלריה שהוגש דיווח, בלי לומר מי הגיש.',
+              'הדיווח נשמר ואדם בודק אותו. דיווחים על ילד, על תמונה אינטימית או של הורה או אפוטרופוס דחופים: הפריט מוסתר אצלנו מיד, באופן הפיך, עד להחלטה. עמודים פתוחים מקבלים הודעה לרענן, אבל עותק שכבר נטען או הורד, וקישור לקובץ שכבר הונפק, עשויים עדיין להציג אותו עד כמה שעות. אנחנו מודיעים למארח הגלריה שהוגש דיווח, בלי לומר מי הגיש.',
               'אחר כך אנחנו מחליטים: להשאיר את הפריט, להסתיר אותו או להסיר אותו. שום דבר לא נמחק אוטומטית רק כי דווח עליו: דיווחים עלולים להיות שגויים או פוגעניים, ואפשר להתעלם מדיווחי שווא או פוגעניים. אם מסרתם מייל, נודיע לכם את התוצאה.',
               'אפשר גם להשתמש בטופס בקשות הפרטיות (סעיף 16) לבקשות על מידע אישי, ואפשר לפנות לרשות להגנת הפרטיות או לבתי המשפט בכל עת.',
               'המארח יכול להסתיר או למחוק כל פריט בכל עת. מארחים חייבים לטפל בתלונות שהם מקבלים, ואסור להם לנקום באורח שמדווח.',

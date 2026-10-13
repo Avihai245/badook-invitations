@@ -124,21 +124,35 @@ describe('readiness: a blank or half-set identity is never published', () => {
     INVITES_LEGAL_ID: '510000000',
     INVITES_LEGAL_ADDRESS: '1 Test Street',
     INVITES_SUPPORT_EMAIL: 'support@example.test',
+    INVITES_IP_HASH_SALT: 'a-salt-of-at-least-16-chars',
   };
+  const after = new Date('2026-11-02T10:00:00Z');
   it('is active only when switched on and complete', () => {
-    expect(legalReadiness(full)).toMatchObject({ active: true, missing: [] });
-    expect(legalReadiness({ ...full, INVITES_LEGAL_V2: false }).active).toBe(false);
+    expect(legalReadiness(full, after)).toMatchObject({ active: true, scheduled: false, missing: [] });
+    expect(legalReadiness({ ...full, INVITES_LEGAL_V2: false }, after).active).toBe(false);
     for (const k of [
       'INVITES_LEGAL_NAME',
       'INVITES_LEGAL_ID',
       'INVITES_LEGAL_ADDRESS',
       'INVITES_SUPPORT_EMAIL',
       'INVITES_LEGAL_V2_EFFECTIVE',
+      'INVITES_IP_HASH_SALT',
     ] as const) {
-      const r = legalReadiness({ ...full, [k]: '  ' });
+      const r = legalReadiness({ ...full, [k]: '  ' }, after);
       expect(r.active).toBe(false);
       expect(r.missing).toEqual([k]);
     }
+  });
+
+  it('waits for the effective date, and a date that is not a date is not a date', () => {
+    expect(legalReadiness(full, new Date('2026-10-31T23:59:59Z'))).toMatchObject({
+      active: false,
+      scheduled: true,
+    });
+    expect(legalReadiness(full, new Date('2026-11-01T00:00:00Z')).active).toBe(true);
+    const bad = legalReadiness({ ...full, INVITES_LEGAL_V2_EFFECTIVE: '2026-13-45' }, after);
+    expect(bad).toMatchObject({ active: false, effective: null });
+    expect(bad.missing).toContain('INVITES_LEGAL_V2_EFFECTIVE');
   });
 });
 

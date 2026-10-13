@@ -8,7 +8,7 @@ import type { LegalContext, LegalDoc, LegalDocKey } from './types';
 /**
  * Every version of every legal document. A version is immutable once it was in force: its text lives in
  * its own file (v1/, v2/), never edited afterwards — a change is a new version, and
- * tests/unit/legal-versions.test.ts fails if a frozen file changes. Version 1 is the text that was live
+ * tests/unit/legal-docs.test.tsx fails if a frozen file changes. Version 1 is the text that was live
  * before the compliance update; version 2 is switched on by INVITES_LEGAL_V2 (legal/context.ts) after
  * the owner approved it. `effective` is the ISO date it took effect; null for version 2 means "the
  * date the deployment sets" (INVITES_LEGAL_V2_EFFECTIVE) — never invented in code.

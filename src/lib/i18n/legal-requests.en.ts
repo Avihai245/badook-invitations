@@ -45,7 +45,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       'Did you see a photo or video in an event gallery that violates privacy, copyright or safety? Tell us and we will look into it.',
     linkedItem:
       'This report is about an item in the event gallery you came from. The item itself is not shown here.',
-    linkedGallery: 'This report is about the event gallery you came from.',
+    linkedGallery:
+      'This report is about the event gallery you came from. Tell us which photo or video it is about.',
     unlinked:
       'You did not come from a gallery link, or the link is no longer valid. Describe where the content is and we will look for it.',
     linkBroken:

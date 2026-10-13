@@ -46,6 +46,8 @@ export interface ReportDeps {
   later(job: () => Promise<unknown>): void;
   /** the visitor's address as the database keeps it: a salted hash, never the address */
   hashIp(ip: string | null): string;
+  /** the gallery's open pages are told something changed (an item hidden): best effort, never throws */
+  refreshGallery(invitationId: string): Promise<void>;
   config: LegalConfig;
 }
 
@@ -149,6 +151,9 @@ export async function submitReport(
 
   const link = await resolveReportLink(r, deps);
   const linked = link.kind === 'ok';
+  // a link to the gallery without an item (the footer's) says nothing of which photo: then the reporter
+  // has to say it (who uploaded it, when, what it shows)
+  if (linked && link.itemId === null && !r.reference) return fail(400, 'invalid', { fields: ['reference'] });
   if (!linked && !r.reference) {
     // a link that opens nothing: the form then asks for a description of where the content is
     return link.kind === 'invalid'
@@ -196,6 +201,8 @@ export async function submitReport(
     throw err;
   }
 
+  // a held item leaves the feed, the screen and the host's tab at once; then the notices
+  if (stored.hidden && invitationId) deps.later(() => deps.refreshGallery(invitationId));
   deps.later(() => notifyReport(stored, { invitationId, category: r.category, locale: r.locale }, deps));
   return ok({ number: stored.number, hidden: stored.hidden, urgent: stored.urgent });
 }

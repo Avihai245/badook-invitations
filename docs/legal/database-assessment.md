@@ -51,7 +51,7 @@ evidenced.
 | --- | --- | --- |
 | Database definition document | skeleton below | this file |
 | Access permissions, least privilege | role matrix; service-role-only RPCs; masked contact details | `20260927010115_admin_console.sql`, `tests/db/support-tickets.test.ts`, `tests/db/legal-compliance.test.ts` |
-| Authentication / privileged access | Supabase Auth; staff by verified email; act-as is owner-only and audited | `admin_role_of` |
+| Authentication / privileged access | Supabase Auth; staff by verified email; remote support ("act as") is open to every role with `support.reply` (support, admin, owner), its start audited with a reason — in-session actions not verified as audited (DR-20) | `admin_role_of`, `act-as.ts` |
 | Tenant isolation | RLS on, no policies, definer RPCs scoped by owner/token | `tests/db/*.test.ts`, `tests/db/gallery-isolation.test.ts` |
 | Audit logging | `admin_audit` (2 y), report/request event trails | migrations |
 | Security events & incident response | **no written procedure in the repo** | [owner] |

@@ -34,10 +34,15 @@ request form, acceptance records, the checkout disclosure, the new footer links)
 
 1. `INVITES_LEGAL_V2=true`, **and**
 2. the operator's details are complete: `INVITES_LEGAL_NAME`, `INVITES_LEGAL_ID`, `INVITES_LEGAL_ADDRESS`,
-   `INVITES_SUPPORT_EMAIL`, and the effective date `INVITES_LEGAL_V2_EFFECTIVE` (`YYYY-MM-DD`).
+   `INVITES_SUPPORT_EMAIL`; **and**
+3. `INVITES_LEGAL_V2_EFFECTIVE` is a real date (`YYYY-MM-DD`) that **has arrived** (set the switch ahead of time
+   and nothing changes until that day, so the 14 days' notice to hosts can run first); **and**
+4. `INVITES_IP_HASH_SALT` is set (≥ 16 characters) — the stored IP hashes must be one-way.
 
 If any is missing the switch has no effect (`src/features/legal/readiness.ts`) — a blank or invented
-identity is never published. Optional: `INVITES_PRIVACY_EMAIL` (defaults to the support address),
+identity is never published. Also set the email variables (`INVITES_EMAIL_API_KEY`, `INVITES_EMAIL_FROM`) so
+the team is told of reports and requests (DR-21); without them everything is stored and shown in
+`/app/admin/legal`, and nothing is claimed as sent. Optional: `INVITES_PRIVACY_EMAIL` (defaults to the support address),
 `INVITES_ACCESSIBILITY_*`, and `INVITES_ACCESSIBILITY_REVIEW_DATE` (set it **only** when a manual review
 with assistive technology really took place — otherwise the statement says none is reported).
 

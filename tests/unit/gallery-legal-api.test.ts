@@ -174,6 +174,14 @@ describe('POST /api/gallery/acknowledge', () => {
     }
   });
 
+  it('accepts the page’s `faces` flag and stores nothing more for it', async () => {
+    const w = world();
+    expect((await guest.guestAcknowledge(body(w.token, { faces: true }), IP, w.deps)).status).toBe(200);
+    expect((await guest.guestAcknowledge(body(w.token, { faces: 'yes' }), IP, w.deps)).status).toBe(400);
+    expect(w.acknowledge).toHaveBeenCalledTimes(1);
+    expect(w.acknowledge.mock.calls[0]).toHaveLength(3);
+  });
+
   it('a filled honeypot answers ok and stores nothing', async () => {
     const w = world();
     const res = await guest.guestAcknowledge(body(w.token, { website: 'http://spam.test' }), IP, w.deps);

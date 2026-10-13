@@ -439,38 +439,56 @@ function GalleryBody({
     fileInput.current?.click();
   };
   // version 2 of the legal documents: before this device's first upload, the notice (once per rules
-  // version and gallery link; the page works the same without storage, asking once per visit)
+  // version, gallery link and face-search state — a gallery whose host turned face search on since gets
+  // it again, with the face line; the page works the same without storage, asking once per visit)
   const legal = data.legal?.active ? data.legal : null;
   const [legalNotice, setLegalNotice] = useState<Placement | null>(null);
+  // acknowledged in this visit (so the guest is not asked again), and whether the server has the evidence
   const acknowledged = useRef(false);
+  const unsent = useRef(false);
   const seenNotice = () => {
     if (!legal || acknowledged.current) return true;
-    if (!readAck(ackKey(legal.rulesVersion, token))) return false;
+    if (!readAck(ackKey(legal.rulesVersion, faces, token))) return false;
     acknowledged.current = true;
     return true;
+  };
+  /** The evidence that the notice was shown. The phone remembers it only once the server has it. */
+  const sendAcknowledgement = async (retry = false) => {
+    if (!legal) return;
+    if (!uploaderId) {
+      unsent.current = !retry;
+      return;
+    }
+    const res = await galleryApi('/api/gallery/acknowledge', {
+      t: token,
+      uploader: uploaderId,
+      version: legal.rulesVersion,
+      faces,
+      ...(code.current ? { code: code.current } : {}),
+    });
+    if (res.ok) writeAck(ackKey(legal.rulesVersion, faces, token));
+    else unsent.current = !retry;
   };
   const proceed = (to: Placement) => {
     if (asked.current) pick(to);
     else setNameSheet({ mode: 'first', to });
   };
   const share = (to: Placement) => {
-    if (seenNotice()) proceed(to);
-    else setLegalNotice(to);
+    if (seenNotice()) {
+      // a lost acknowledgement is sent once more at the next share; the upload doesn't wait for it
+      if (unsent.current) {
+        unsent.current = false;
+        void sendAcknowledgement(true);
+      }
+      proceed(to);
+    } else setLegalNotice(to);
   };
   const onAcknowledged = () => {
     const to = legalNotice;
     setLegalNotice(null);
     if (!legal || !to) return;
     acknowledged.current = true;
-    writeAck(ackKey(legal.rulesVersion, token));
-    // the evidence that the notice was shown: the upload goes on whatever this answers
-    if (uploaderId)
-      void galleryApi('/api/gallery/acknowledge', {
-        t: token,
-        uploader: uploaderId,
-        version: legal.rulesVersion,
-        ...(code.current ? { code: code.current } : {}),
-      });
+    void sendAcknowledgement();
     // still the tap on "I understand": the name sheet may open, the picker may open
     proceed(to);
   };

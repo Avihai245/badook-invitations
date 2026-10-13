@@ -96,7 +96,7 @@ export function refundsDoc(c: LegalContext): LegalDoc {
           heading: '6. A charge that fails',
           body: [
             'If the monthly charge is declined, we try again a few times over the following days and the account stays on its plan meanwhile. If it does not go through within 14 days of the due date, the account moves to the free plan. You can pay again at any time from the billing page, with another card if you like.',
-            'We will not charge a card after you cancelled the plan. If that happened, tell us and we will refund it.',
+            'After you cancel, our system makes no further monthly charge. If a charge nevertheless reaches you — for example because the payment provider processed it before the cancellation reached it — tell us and we will refund it.',
           ],
         },
         {
@@ -205,7 +205,7 @@ export function refundsDoc(c: LegalContext): LegalDoc {
         heading: '6. חיוב שנכשל',
         body: [
           'אם החיוב החודשי נדחה, ננסה שוב כמה פעמים בימים שאחרי, והחשבון נשאר בחבילתו בינתיים. אם החיוב לא עבר תוך 14 יום ממועד החיוב, החשבון עובר לחבילה החינמית. אפשר לשלם שוב בכל עת בעמוד החיובים, גם בכרטיס אחר.',
-          'איננו מחייבים כרטיס אחרי שביטלתם את החבילה. אם זה קרה, ספרו לנו ונחזיר.',
+          'אחרי שביטלתם, המערכת שלנו לא מבצעת חיוב חודשי נוסף. אם בכל זאת הגיע אליכם חיוב — למשל כי חברת התשלומים עיבדה אותו לפני שהביטול הגיע אליה — ספרו לנו ונחזיר.',
         ],
       },
       {

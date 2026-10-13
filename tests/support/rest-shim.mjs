@@ -527,7 +527,9 @@ function userJson(row) {
     phone: '',
     app_metadata: row.raw_app_meta_data ?? { provider: 'email', providers: ['email'] },
     user_metadata: row.raw_user_meta_data ?? {},
-    identities: [],
+    // like Supabase Auth: a real account has its email identity (an empty list marks an address that
+    // was already registered — what sign-up checks before recording the terms' acceptance)
+    identities: [{ identity_id: row.id, user_id: row.id, provider: 'email' }],
     created_at: row.created_at,
     updated_at: row.updated_at,
     last_sign_in_at: row.last_sign_in_at ?? null,
