@@ -277,7 +277,7 @@ describe('Tranzila: the API and the iframe', () => {
     expect(p.thtk).toBeUndefined();
   });
 
-  it('the wallets: Apple Pay and Google Pay in the form only once they are turned on', async () => {
+  describe('the wallets: Apple Pay and Google Pay in the form', () => {
     const request = {
       ref: CHECKOUT,
       amount: 16,
@@ -286,24 +286,42 @@ describe('Tranzila: the API and the iframe', () => {
       locale: 'he' as const,
       urls: { success: 'https://x.test/ok', failure: 'https://x.test/no', notify: 'https://x.test/n' },
     };
-    const off = new URL((await client()).iframeUrl(request)).searchParams;
-    expect(off.get('apple_pay')).toBeNull();
-    expect(off.get('google_pay')).toBeNull();
-    vi.stubEnv('INVITES_TRANZILA_APPLE_PAY', '1');
-    vi.stubEnv('INVITES_TRANZILA_GOOGLE_PAY', 'true');
-    vi.resetModules();
-    try {
-      const on = new URL((await client()).iframeUrl(request)).searchParams;
-      expect(on.get('apple_pay')).toBe('1');
-      expect(on.get('google_pay')).toBe('1');
-      // the same purchase: the sum held and a token for the monthly charges
-      expect(on.get('tranmode')).toBe('VK');
-      expect(on.get('sum')).toBe('16.00');
-    } finally {
-      vi.stubEnv('INVITES_TRANZILA_APPLE_PAY', '');
-      vi.stubEnv('INVITES_TRANZILA_GOOGLE_PAY', '');
+    const params = async (env: Record<string, string> = {}) => {
+      for (const [k, v] of Object.entries(env)) vi.stubEnv(k, v);
       vi.resetModules();
-    }
+      try {
+        return new URL((await client()).iframeUrl(request)).searchParams;
+      } finally {
+        for (const k of Object.keys(env)) vi.stubEnv(k, '');
+        vi.resetModules();
+      }
+    };
+
+    it('are on by default: the same purchase, the sum held and a token for the monthly charges', async () => {
+      const p = await params();
+      expect(p.get('apple_pay')).toBe('1');
+      expect(p.get('google_pay')).toBe('1');
+      expect(p.get('tranmode')).toBe('VK');
+      expect(p.get('sum')).toBe('16.00');
+    });
+
+    it('each can be taken off with 0', async () => {
+      const noApple = await params({ INVITES_TRANZILA_APPLE_PAY: '0' });
+      expect(noApple.get('apple_pay')).toBeNull();
+      expect(noApple.get('google_pay')).toBe('1');
+      const noGoogle = await params({ INVITES_TRANZILA_GOOGLE_PAY: 'false' });
+      expect(noGoogle.get('apple_pay')).toBe('1');
+      expect(noGoogle.get('google_pay')).toBeNull();
+    });
+
+    it('Apple Pay is asked for only when the form holds the sum (VK), not when it only checks (NK) or makes a token (K)', async () => {
+      for (const mode of ['NK', 'K']) {
+        const p = await params({ INVITES_TRANZILA_TRANMODE: mode });
+        expect(p.get('tranmode')).toBe(mode);
+        expect(p.get('apple_pay')).toBeNull();
+        expect(p.get('google_pay')).toBe('1');
+      }
+    });
   });
 
   it('the handshake (V2) locks the sum with the API keys, and the form’s address carries its thtk', async () => {

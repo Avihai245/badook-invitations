@@ -33,7 +33,7 @@
 | `INVITES_TRANZILA_TERMINAL` | מסוף ה־iframe (ברירת מחדל `badookinvit`) |
 | `INVITES_TRANZILA_TOKEN_TERMINAL` | מסוף הטוקנים (ברירת מחדל `badookinvittok`) |
 | `INVITES_TRANZILA_TRANMODE` | מה הטופס עושה בכרטיס: `VK` (ברירת המחדל: תפיסת הסכום וטוקן; השרת גובה את התפיסה), `NK` (בדיקה בלי לתפוס סכום, וטוקן; השרת מחייב את הטוקן) או `K` |
-| `INVITES_TRANZILA_APPLE_PAY` / `INVITES_TRANZILA_GOOGLE_PAY` | `1` מוסיף לטופס כפתור **Apple Pay** / **Google Pay** (`apple_pay=1`, `google_pay=1`). להפעיל **רק אחרי** שטרנזילה הפעילה אותם במסוף `badookinvit` (ולאפל פיי: רשמה את הדומיין שלנו). ברירת מחדל: כבוי |
+| `INVITES_TRANZILA_APPLE_PAY` / `INVITES_TRANZILA_GOOGLE_PAY` | מוסיפים לטופס כפתור **Apple Pay** / **Google Pay** (`apple_pay=1`, `google_pay=1`). ברירת מחדל: **פעיל** (טרנזילה הפעילה אותם במסוף `badookinvit`). `0` מכבה כפתור, למשל אם טרנזילה מבטלת אותו. Apple Pay נשלח רק עם `INVITES_TRANZILA_TRANMODE=VK` |
 | `INVITES_TRANZILA_APPLE_PAY_FILE` | קובץ אימות הדומיין של Apple Pay, אם טרנזילה נותנת קובץ משלה (לא חובה; בלעדיו מוגש העותק הציבורי של טרנזילה) |
 
 **איפה שמים את המפתחות** (אחד מהשניים מספיק):
@@ -51,7 +51,7 @@
 - קובץ אימות הדומיין של אפל מוגש ב־`/.well-known/apple-developer-merchantid-domain-association` (מנותב ל־`/api/billing/tranzila/apple-pay-domain`): מ־`INVITES_TRANZILA_APPLE_PAY_FILE` אם הוגדר, אחרת מהעותק הציבורי של טרנזילה (`api.tranzila.com/assets/apple_pay/merchant_authentication_file.zip`).
 - `tranmode=VK` (ברירת המחדל) נתמך באפל פיי; `NK`/`K` לא (לפי התיעוד של טרנזילה: אפל פיי לא תומך בבדיקה בלבד או ביצירת טוקן בלבד).
 
-להפעלה: (1) לבקש מטרנזילה להפעיל Apple Pay ו־Google Pay במסוף `badookinvit` ולרשום את הדומיין שלנו לאפל פיי; (2) לוודא שהכתובת `https://<הדומיין>/.well-known/apple-developer-merchantid-domain-association` מחזירה את הקובץ; (3) להגדיר ב־Amplify `INVITES_TRANZILA_APPLE_PAY=1` ו־`INVITES_TRANZILA_GOOGLE_PAY=1` ו־Redeploy.
+הכפתורים פעילים כברירת מחדל. מה שצריך לוודא מול טרנזילה: (1) ש־Apple Pay ו־Google Pay מופעלים במסוף `badookinvit`, ושהדומיין שלנו רשום לאפל פיי; (2) שהכתובת `https://<הדומיין>/.well-known/apple-developer-merchantid-domain-association` מחזירה את הקובץ. כדי להסיר כפתור (למשל אם הדומיין עוד לא רשום), מגדירים ב־Amplify `INVITES_TRANZILA_APPLE_PAY=0` או `INVITES_TRANZILA_GOOGLE_PAY=0` ו־Redeploy.
 
 **מנוי חודשי בארנק**: תלוי בכך שטרנזילה מחזירה `TranzilaTK` גם בתשלום בארנק, ושאפשר לחייב אותו במסוף `badookinvittok`. השרת שלנו גובה את התפיסה ומחייב כל חודש **דרך הטוקן**, ולכן בלי טוקן הרכישה נרשמת כנכשלה (שום דבר לא נגבה, והתפיסה משתחררת מעצמה). לאמת מול טרנזילה לפני ההפעלה.
 
