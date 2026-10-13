@@ -130,6 +130,7 @@ test.describe('the report and privacy request forms', () => {
     expect(await axe(page)).toEqual([]);
     await page.getByRole('button', { name: /^(Send|Submit)/ }).click();
     await expect(page.getByTestId('form-errors')).toBeVisible();
+    // focus goes to the first field in the page that is wrong (the order of the fields on the page)
     const invalid = page.locator('[aria-invalid="true"]').first();
     await expect(invalid).toBeFocused();
     const described = await invalid.getAttribute('aria-describedby');

@@ -96,7 +96,7 @@ export function ReportForm({
       if (!v('email')) next.email = t.errors.copyrightEmail;
     }
     setErrors(next);
-    const first = ['description', 'reference', 'name', 'email', 'phone'].find((k) => next[k]);
+    const first = ['reference', 'description', 'name', 'email', 'phone'].find((k) => next[k]);
     if (first) return focusField(form, first);
 
     setState('sending');
