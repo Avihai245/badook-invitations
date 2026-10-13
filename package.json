@@ -18,7 +18,7 @@
   "scripts": {
     "predev": "node scripts/build-fonts.mjs && node scripts/copy-face-models.mjs && npm run poster-art && npm run public-css",
     "dev": "next dev",
-    "prebuild": "tsx scripts/validate-templates.ts && node scripts/build-fonts.mjs && node scripts/copy-face-models.mjs && npm run poster-art && npm run public-css",
+    "prebuild": "node scripts/check-public-env.mjs && tsx scripts/validate-templates.ts && node scripts/build-fonts.mjs && node scripts/copy-face-models.mjs && npm run poster-art && npm run public-css",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
