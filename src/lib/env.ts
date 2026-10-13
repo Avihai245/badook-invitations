@@ -194,10 +194,10 @@ const ServerEnvSchema = z.object({
     .url()
     .default('https://directng.tranzila.com')
     .transform((u) => u.replace(/\/+$/, '')),
-  // Apple Pay and Google Pay buttons in the iframe (apple_pay=1, google_pay=1): turn on only after
-  // Tranzila enables them on the iframe terminal (and, for Apple Pay, registers our domain)
-  INVITES_TRANZILA_APPLE_PAY: flag(false),
-  INVITES_TRANZILA_GOOGLE_PAY: flag(false),
+  // Apple Pay and Google Pay buttons in the iframe (apple_pay=1, google_pay=1): on, now that Tranzila
+  // has enabled them on the iframe terminal; set to 0 to take a button off
+  INVITES_TRANZILA_APPLE_PAY: flag(true),
+  INVITES_TRANZILA_GOOGLE_PAY: flag(true),
   // Apple Pay's domain file (/.well-known/apple-developer-merchantid-domain-association) as Tranzila
   // gives it; empty: taken from Tranzila's public copy
   INVITES_TRANZILA_APPLE_PAY_FILE: z.string().trim().default(''),
