@@ -2,7 +2,16 @@
 
 import { CircleCheck } from 'lucide-react';
 import Link from 'next/link';
-import { Fragment, useActionState, type ReactNode } from 'react';
+import {
+  Fragment,
+  useActionState,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import { useFormStatus } from 'react-dom';
 import { Button } from '@/components/app/Button';
 import { Field } from '@/components/app/Field';
@@ -164,6 +173,68 @@ function TermsLine() {
   );
 }
 
+/**
+ * Version 2 of the legal documents: an unticked box the visitor must tick to sign up, with the
+ * documents one click away (they open in a new tab, so what was typed stays). The error belongs to the
+ * box (described by it, announced, and the box takes the focus).
+ */
+function AcceptTerms({
+  error,
+  inputRef,
+  onChange,
+}: {
+  error: boolean;
+  inputRef: RefObject<HTMLInputElement | null>;
+  onChange: (checked: boolean) => void;
+}) {
+  const { t } = useUi();
+  const a = t.accountPage.auth;
+  const errorId = useId();
+  const link = (href: string, label: string) => (
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener"
+      className="font-medium text-ink underline underline-offset-2"
+    >
+      {label}
+      <span className="sr-only"> {a.newTab}</span>
+    </Link>
+  );
+  return (
+    <div data-testid="signup-accept">
+      <label className="flex items-start gap-2.5 text-[13.5px] text-pretty">
+        <input
+          ref={inputRef}
+          type="checkbox"
+          name="accept"
+          value="yes"
+          required
+          aria-required="true"
+          aria-invalid={error || undefined}
+          aria-describedby={error ? errorId : undefined}
+          onChange={(e) => onChange(e.target.checked)}
+          className="mt-0.5 size-5 shrink-0 accent-ink"
+        />
+        <span className="min-w-0">
+          <Linked
+            text={a.accept}
+            links={{
+              terms: link('/terms', a.acceptTerms),
+              privacy: link('/privacy', a.acceptPrivacy),
+            }}
+          />
+        </span>
+      </label>
+      {error ? (
+        <p id={errorId} role="alert" className="mt-1.5 text-[13px] text-danger">
+          {t.accountPage.auth.errors.terms_required}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export function LoginForm({
   next,
   initialError,
@@ -226,9 +297,27 @@ export function LoginForm({
   );
 }
 
-export function SignupForm({ next, google = false }: { next: string; google?: boolean }) {
+export function SignupForm({
+  next,
+  google = false,
+  legal = false,
+}: {
+  next: string;
+  google?: boolean;
+  /** version 2 of the legal documents is in force: the terms are accepted with a box, not assumed */
+  legal?: boolean;
+}) {
   const { t, fmt } = useUi();
   const [state, action, pending] = useActionState<AuthState, FormData>(signUp, null);
+  const acceptRef = useRef<HTMLInputElement>(null);
+  // the box left unticked: caught before sending (what was typed stays), or answered by the server
+  const [unticked, setUnticked] = useState(false);
+  // the server's answer the visitor has since dealt with by ticking the box
+  const [dealtWith, setDealtWith] = useState<AuthState>(null);
+  const termsError = legal && (unticked || (state?.error === 'terms_required' && dealtWith !== state));
+  useEffect(() => {
+    if (legal && state?.error === 'terms_required') acceptRef.current?.focus();
+  }, [legal, state]);
   const toLogin = next === '/app/invitations' ? '/login' : `/login?next=${encodeURIComponent(next)}`;
   if (state?.sent) {
     return (
@@ -245,7 +334,17 @@ export function SignupForm({ next, google = false }: { next: string; google?: bo
   return (
     <AuthCard title={t.auth.signupTitle} subtitle={t.auth.signupSubtitle}>
       {google ? <GoogleSignIn next={next} /> : null}
-      <form action={action} className="flex flex-col gap-4" noValidate>
+      <form
+        action={action}
+        className="flex flex-col gap-4"
+        noValidate
+        onSubmit={(e) => {
+          if (!legal || acceptRef.current?.checked) return;
+          e.preventDefault();
+          setUnticked(true);
+          acceptRef.current?.focus();
+        }}
+      >
         <input type="hidden" name="next" value={next} />
         <Field label={t.auth.name}>
           <Input name="name" autoComplete="name" maxLength={80} />
@@ -271,11 +370,21 @@ export function SignupForm({ next, google = false }: { next: string; google?: bo
             required
           />
         </Field>
-        <FormError error={state?.error} />
+        {legal ? (
+          <AcceptTerms
+            error={termsError}
+            inputRef={acceptRef}
+            onChange={(checked) => {
+              setUnticked(false);
+              setDealtWith(checked ? state : null);
+            }}
+          />
+        ) : null}
+        <FormError error={legal && state?.error === 'terms_required' ? undefined : state?.error} />
         <Button type="submit" size="lg" fullWidth loading={pending}>
           {t.auth.signup}
         </Button>
-        <TermsLine />
+        {legal ? null : <TermsLine />}
       </form>
       <p className="mt-6 text-center text-[13px] text-muted">
         {t.auth.haveAccount}{' '}

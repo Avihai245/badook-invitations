@@ -63,5 +63,15 @@ export const albumGuestFr: AlbumGuestDict = {
   made: 'Cet album a été créé avec {brand}',
   makeYours: 'Une invitation numérique, une galerie en direct et un album — pour votre événement',
   failed: 'Une erreur s’est produite. Réessayez.',
+  /** version 2 des documents juridiques : les liens de signalement (seulement tant qu’elle est en vigueur) */
+  legal: {
+    short: 'Signaler',
+    photo: 'Signaler cette photo',
+    video: 'Signaler cette vidéo',
+    rules: 'Règles de la galerie',
+    report: 'Signaler un contenu',
+    privacy: 'Politique de confidentialité',
+    privacyRequest: 'Demande relative à la vie privée',
+  },
   top: 'Retour en haut',
 };

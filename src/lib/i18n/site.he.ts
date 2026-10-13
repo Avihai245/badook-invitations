@@ -267,6 +267,23 @@ export const siteHe = {
   legal: {
     updated: 'עודכן לאחרונה: {date}',
     contents: 'תוכן העניינים',
+    versionLine: 'גרסה {version} · בתוקף מ־{date}',
+    archivedNotice:
+      'זו גרסה קודמת של המסמך (גרסה {version}, בתוקף עד {until}). היא נשמרת כפי שהייתה, לצורך תיעוד.',
+    archivedNoticeNoDate: 'זו גרסה קודמת של המסמך (גרסה {version}). היא נשמרת כפי שהייתה, לצורך תיעוד.',
+    currentLink: 'לגרסה התקפה',
+    history: 'גרסאות קודמות',
+    historyCurrent: 'גרסה {version} (התקפה)',
+    historyItem: 'גרסה {version} · בתוקף מ־{date}',
+    related: 'מסמכים קשורים',
+    docNames: {
+      terms: 'תנאי שימוש',
+      privacy: 'מדיניות פרטיות',
+      cookies: 'מדיניות עוגיות',
+      accessibility: 'הצהרת נגישות',
+      refunds: 'מדיניות ביטולים והחזרים',
+      'gallery-rules': 'תקנון גלריית האירוע ותוכן גולשים',
+    },
   },
   footer: {
     tagline: 'הזמנות דיגיטליות עם אישורי הגעה, בעברית ובאנגלית.',

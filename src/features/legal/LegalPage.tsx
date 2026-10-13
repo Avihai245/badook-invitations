@@ -1,9 +1,26 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { SiteFooter } from '@/features/site/SiteFooter';
 import { SiteHeader } from '@/features/site/SiteHeader.client';
 import { fmt, type AppDict } from '@/lib/i18n/app';
-import type { LegalBlock, LegalContext, LegalDoc } from './types';
+import { legalHref, legalVersionHref } from './links';
+import type { LegalBlock, LegalContext, LegalDoc, LegalDocKey } from './types';
+
+/** What a page shows about the document's versions (built by legal/render.tsx). */
+export interface LegalVersionInfo {
+  key: LegalDocKey;
+  /** the version being shown */
+  version: string;
+  /** it is the version in force */
+  current: boolean;
+  /** when the newer version took effect, formatted (archived versions only) */
+  until?: string;
+  /** every version a visitor may open */
+  history: readonly { version: string; effective: string; current: boolean }[];
+  /** the documents this one links to (version 2 only) */
+  related: readonly LegalDocKey[];
+}
 
 export function legalMetadata(doc: LegalDoc, brand: string): Metadata {
   return {
@@ -42,11 +59,13 @@ export function LegalPage({
   t,
   doc,
   context,
+  info,
   children,
 }: {
   t: AppDict;
   doc: LegalDoc;
   context: LegalContext;
+  info?: LegalVersionInfo;
   children?: ReactNode;
 }) {
   const l = t.site.legal;
@@ -59,7 +78,24 @@ export function LegalPage({
             <h1 className="font-display text-[34px] leading-tight font-bold tracking-[-0.01em] sm:text-[44px]">
               {doc.title}
             </h1>
-            <p className="mt-2 text-[14px] text-muted">{fmt(l.updated, { date: context.updated })}</p>
+            <p className="mt-2 text-[14px] text-muted">
+              {info
+                ? fmt(l.versionLine, { version: info.version, date: context.updated })
+                : fmt(l.updated, { date: context.updated })}
+            </p>
+            {info && !info.current && (
+              <p
+                role="note"
+                className="mt-4 max-w-[72ch] rounded-card border border-brand-line bg-brand-soft/60 px-4 py-3 text-[15px] leading-[1.7]"
+              >
+                {info.until
+                  ? fmt(l.archivedNotice, { version: info.version, until: info.until })
+                  : fmt(l.archivedNoticeNoDate, { version: info.version })}{' '}
+                <Link className="font-bold underline" href={legalHref(info.key)}>
+                  {l.currentLink}
+                </Link>
+              </p>
+            )}
           </div>
         </div>
         <div className="mx-auto grid max-w-[1100px] gap-10 px-5 py-10 sm:px-6 lg:grid-cols-[240px_1fr]">
@@ -90,6 +126,44 @@ export function LegalPage({
               </section>
             ))}
             {children}
+            {info && info.related.length > 0 && (
+              <nav aria-labelledby="legal-related" className="pt-10">
+                <h2 id="legal-related" className="text-[20px] font-bold">
+                  {l.related}
+                </h2>
+                <ul className="mt-3 flex list-disc flex-col gap-2 ps-5 text-[15.5px] marker:text-brand">
+                  {info.related.map((k) => (
+                    <li key={k}>
+                      <Link className="underline" href={legalHref(k)}>
+                        {l.docNames[k]}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+            {info && info.history.length > 1 && (
+              <nav aria-labelledby="legal-history" className="pt-10">
+                <h2 id="legal-history" className="text-[20px] font-bold">
+                  {l.history}
+                </h2>
+                <ul className="mt-3 flex list-disc flex-col gap-2 ps-5 text-[15.5px] marker:text-brand">
+                  {info.history.map((h) => (
+                    <li key={h.version}>
+                      <Link
+                        className="underline"
+                        href={h.current ? legalHref(info.key) : legalVersionHref(info.key, h.version)}
+                        aria-current={h.version === info.version ? 'page' : undefined}
+                      >
+                        {h.current
+                          ? fmt(l.historyCurrent, { version: h.version })
+                          : fmt(l.historyItem, { version: h.version, date: h.effective })}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
           </article>
         </div>
       </main>

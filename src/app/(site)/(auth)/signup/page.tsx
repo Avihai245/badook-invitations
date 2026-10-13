@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { legalStatus } from '@/features/legal/context';
 import { getUi } from '@/lib/i18n/server';
 import { signupNext } from '@/lib/supabase/auth-paths';
 import { googleSignInEnabled } from '@/lib/supabase/providers';
@@ -18,5 +19,5 @@ export default async function SignupPage({
   searchParams: Promise<{ next?: string; plan?: string }>;
 }) {
   const [sp, google] = await Promise.all([searchParams, googleSignInEnabled()]);
-  return <SignupForm next={signupNext(sp)} google={google} />;
+  return <SignupForm next={signupNext(sp)} google={google} legal={legalStatus().active} />;
 }

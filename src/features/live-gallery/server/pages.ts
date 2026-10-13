@@ -13,6 +13,8 @@ import { getTemplate } from '@/features/invitations/templates/registry';
 import { faceWindow } from '@/features/faces/model';
 import { faceHostView, type FaceHostView } from '@/features/faces/server/api';
 import { faceHostDeps } from '@/features/faces/server/deps';
+import { legalStatus } from '@/features/legal/context';
+import { GALLERY_RULES_VERSION } from '@/features/legal/versions';
 import { serverEnv } from '@/lib/env';
 import { GALLERY } from '../config';
 import type { EventInfo, FeedResponse, FeedItem, GalleryState, HostItem, RealtimeInfo } from '../types';
@@ -75,6 +77,11 @@ export interface GuestPageData {
    * (/api/gallery/ai/state) — false while the event doesn't have the feature.
    */
   aiPhotos: boolean;
+  /**
+   * Version 2 of the legal documents is in force: the page shows the notice before a device's first
+   * upload and the report / rules / privacy-request links. null = exactly the page as it was.
+   */
+  legal: { active: boolean; rulesVersion: string } | null;
 }
 
 /** /e/<slug>/upload?t= — null for a link that opens nothing. */
@@ -107,6 +114,7 @@ export async function guestPage(token: string): Promise<GuestPageData | null> {
     },
     faces: r.state !== 'off' && r.features.has('face_albums') && window.open ? { until: window.until } : null,
     aiPhotos: r.state !== 'off' && r.features.has('ai_photos'),
+    legal: legalStatus().active ? { active: true, rulesVersion: GALLERY_RULES_VERSION } : null,
   };
 }
 

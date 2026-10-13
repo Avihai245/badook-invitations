@@ -1,9 +1,11 @@
 import type { AppDict, MoreKey } from './app.he';
+import { legalRequestsEn } from './legal-requests.en';
 import { ticketsEn } from './tickets.en';
 
 /** The host app's screens that only the /app pages show, English (see app-more.he.ts). */
 export const enMore: Pick<AppDict, MoreKey> = {
   tickets: ticketsEn,
+  legalRequests: legalRequestsEn,
   workspace: {
     label: 'Invitation navigation',
     back: 'All invitations',

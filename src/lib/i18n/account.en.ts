@@ -41,6 +41,7 @@ export const accountEn: typeof accountHe = {
         'This link has expired or was already used. Sign in, or get a new link with “Forgot password?”.',
       other_browser:
         'This link has to be opened in the browser where you asked for it. You can ask for a new link here.',
+      terms_required: 'To sign up, please accept the Terms of use and the Privacy policy.',
     },
     notices: {
       email_confirmed: 'Your email address is confirmed. Sign in to continue.',
@@ -52,6 +53,10 @@ export const accountEn: typeof accountHe = {
     terms: 'By signing up you agree to the {terms} and the {privacy}.',
     termsLink: 'Terms',
     privacyLink: 'Privacy Policy',
+    accept: 'I have read and accept the {terms} and the {privacy}.',
+    acceptTerms: 'Terms of use',
+    acceptPrivacy: 'Privacy policy',
+    newTab: '(opens in a new tab)',
     continue: {
       title: 'Sign in to Badook',
       subtitle: 'Your link from Badook Events is ready. Click to go to your invitations.',

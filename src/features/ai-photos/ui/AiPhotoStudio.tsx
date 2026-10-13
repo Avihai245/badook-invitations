@@ -31,6 +31,7 @@ import { createPortal } from 'react-dom';
 import type { EventType, Locale } from '@/features/invitations/contracts/types';
 import { galleryApi } from '@/features/live-gallery/client/api';
 import { useGuestText } from '@/features/live-gallery/ui/guest-text';
+import { legalPage } from '@/features/live-gallery/ui/legal';
 import { AI_PHOTOS_GUEST } from '@/lib/i18n/ai-photos-guest';
 import { fill } from '@/lib/i18n/guest';
 import { AI_PHOTOS } from '../config';
@@ -166,6 +167,7 @@ export function AiPhotoStudio({
   guest,
   name,
   eventType,
+  legal = false,
   theme,
   onShared,
 }: {
@@ -179,6 +181,8 @@ export function AiPhotoStudio({
   /** the name the guest gave the gallery */
   name: string;
   eventType: string;
+  /** version 2 of the legal documents is in force: what is sent to the AI provider is said above the create button */
+  legal?: boolean;
   /** the gallery's colors (--gallery-accent…): the studio opens on top of the page, outside it */
   theme?: CSSProperties;
   /** a photo joined the gallery (or waits for the hosts): back to the feed */
@@ -836,6 +840,23 @@ export function AiPhotoStudio({
       ) : !pending(active) ? (
         <div className="shrink-0 border-t border-line bg-surface/95 pt-2.5 pr-4 pb-[max(12px,env(safe-area-inset-bottom))] pl-[72px] backdrop-blur">
           <div className="mx-auto max-w-[560px]">
+            {legal ? (
+              <p
+                className="mb-2 max-h-[28svh] overflow-y-auto text-[12px] leading-snug text-muted"
+                data-testid="ai-legal-notice"
+              >
+                {t.notice.send} {t.notice.children} {t.notice.result} {t.notice.retention}{' '}
+                <a
+                  href={legalPage('/privacy', locale)}
+                  target="_blank"
+                  rel="noopener"
+                  className="font-semibold underline"
+                >
+                  {t.notice.privacy}
+                  <span className="sr-only"> ({t.notice.newTab})</span>
+                </a>
+              </p>
+            ) : null}
             <button
               type="button"
               onClick={() => void create()}

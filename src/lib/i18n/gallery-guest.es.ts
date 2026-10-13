@@ -316,6 +316,49 @@ export const galleryGuestEs: GalleryGuestDict = {
     leftOut:
       'Hecho: no aparecerás en las búsquedas de otros invitados, tampoco en las fotos que se suban a partir de ahora.',
   },
+  /** versión 2 de los documentos legales: el aviso antes de la primera subida, los enlaces de denuncia (solo mientras esté en vigor) */
+  legal: {
+    notice: {
+      title: 'Antes de compartir',
+      intro: 'Algunas cosas que conviene saber antes de tu primera subida:',
+      seen: 'Cualquiera que tenga el enlace de esta galería (y su código, si lo hay) y los anfitriones pueden ver las fotos publicadas. Los anfitriones también ven las que esperan aprobación o fueron rechazadas.',
+      own: 'Comparte solo fotos que puedas compartir. No subas fotos de hijos de otras personas, ni fotos que humillen o expongan a alguien. Quienes aparecen en una foto pueden pedir que se retire.',
+      location:
+        'Intentamos quitar los datos de ubicación de las fotos y los vídeos antes de subirlos, pero no podemos prometerlo para todos los tipos de archivo. Evita compartir archivos cuya ubicación sea sensible.',
+      copies:
+        'Los anfitriones pueden descargar lo que se sube, y los invitados pueden descargar algunos archivos. Una copia guardada en otro sitio ya no se puede recuperar.',
+      faces:
+        'La búsqueda por rostro está activada en esta galería: los rostros de las fotos que subas se detectan en tu teléfono y se guardan códigos faciales para la función «Las fotos en las que salgo». Consulta las reglas de la galería.',
+      ackOnly:
+        'Al pulsar «Entendido» solo confirmas que has leído este aviso. No es el consentimiento de las personas que aparecen en tus fotos.',
+      rules: 'Reglas de la galería',
+      privacy: 'Política de privacidad',
+      newTab: 'se abre en una pestaña nueva',
+      understand: 'Entendido — continuar',
+      cancel: 'Cancelar',
+    },
+    report: {
+      short: 'Reportar',
+      photo: 'Reportar esta foto',
+      video: 'Reportar este vídeo',
+    },
+    footer: {
+      rules: 'Reglas de la galería',
+      report: 'Reportar contenido',
+      privacyRequest: 'Solicitud de privacidad',
+    },
+    faces: {
+      mine: 'Tu consentimiento aquí cubre solo tu propio selfi y tu propia búsqueda.',
+      others:
+        'Los rostros de otras personas en la galería se detectaron en los teléfonos de quienes subieron las fotos, no con el consentimiento de esas personas.',
+      exclude: 'Pedir no aparecer en las búsquedas',
+      rules: 'Reglas de la galería',
+      children: 'Si la foto de un menor no debería estar en la galería, puedes reportarla.',
+      report: 'Reportar contenido',
+    },
+    /** this phone's own upload that a report hid */
+    mineReported: 'Oculto mientras se revisa',
+  },
   projector: {
     title: 'Pantalla de la galería · {name}',
     empty: 'Aquí aparecerán las fotos de los invitados',

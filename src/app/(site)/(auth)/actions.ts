@@ -4,6 +4,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { adminDb } from '@/features/admin/server/db';
 import { nudgeAfter } from '@/features/admin/server/nudge';
+import { recordAcceptance } from '@/features/billing/server/legal-acceptance';
+import { legalStatus } from '@/features/legal/context';
 import type { AppDict } from '@/lib/i18n/app';
 import { requestBaseUrl } from '@/lib/request-url';
 import { ACT_AS_COOKIE } from '@/lib/supabase/act-as-token';
@@ -59,7 +61,10 @@ export async function signIn(_prev: AuthState, form: FormData): Promise<AuthStat
   redirect(safeNext(form.get('next')));
 }
 
-/** A new account; then `next` (e.g. the checkout of the plan chosen on the home page). */
+/**
+ * A new account; then `next` (e.g. the checkout of the plan chosen on the home page). Google sign-in
+ * and accounts opened by a partner have no acceptance step: nothing is recorded for them.
+ */
 export async function signUp(_prev: AuthState, form: FormData): Promise<AuthState> {
   const email = field(form, 'email').trim();
   const password = field(form, 'password');
@@ -67,6 +72,9 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
   const next = safeNext(form.get('next'));
   if (!EMAIL_RE.test(email)) return { error: 'invalid_email', email };
   if (password.length < MIN_PASSWORD) return { error: 'weak_password', email };
+  // version 2 of the legal documents: no account without the box ticked (the form checks it too)
+  const legal = legalStatus().active;
+  if (legal && form.get('accept') !== 'yes') return { error: 'terms_required', email };
   const db = await sessionDb();
   const { data, error } = await db.auth.signUp({
     email,
@@ -76,6 +84,10 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
   if (error) return { error: errorKey(error), email };
   // a new account: the admin console's numbers and feed
   nudgeAfter('user');
+  // the evidence of the acceptance; an address that already has an account comes back with no
+  // identities (Supabase hides that it exists), and there is nothing to record for it
+  if (legal && data.user && data.user.identities?.length !== 0)
+    await recordAcceptance(data.user.id, 'signup');
   // Email confirmation off → signed in right away; on → "check your inbox".
   if (data.session) redirect(next);
   return { sent: true, email };

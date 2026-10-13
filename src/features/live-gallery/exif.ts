@@ -272,3 +272,66 @@ export function orientationTransform(
       return [1, 0, 0, 1, 0, 0];
   }
 }
+
+/**
+ * Empties the location block (GPS IFD) of a TIFF structure that starts at `tiff` inside `bytes`,
+ * IN PLACE and without moving anything: every GPS value zeroed, then the GPS directory made an empty
+ * one (count 0, no next) — the same result as `withoutGps`, but for any container that carries a bare
+ * TIFF/Exif block (a HEIC/AVIF 'Exif' item, a PNG eXIf chunk, a WebP EXIF chunk). Offsets inside the
+ * block count from `tiff`; nothing at or after `limit` is read or written. Directories are followed
+ * along their chain (IFD0 → IFD1 …) a few hops, so a stray GPS pointer in a later one goes too.
+ * Returns true when a byte changed (false for no GPS block, one already empty, or a TIFF it can't read).
+ */
+export function clearTiffGps(bytes: Uint8Array, tiff: number, limit: number): boolean {
+  if (tiff < 0 || limit > bytes.length || tiff + 8 > limit) return false;
+  const little = bytes[tiff] === 0x49; // "II"
+  if (!little && bytes[tiff] !== 0x4d) return false; // "MM"
+  if (bytes[tiff + 1] !== bytes[tiff]) return false;
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const u16 = (at: number) => view.getUint16(at, little);
+  const u32 = (at: number) => view.getUint32(at, little);
+  if (u16(tiff + 2) !== 42) return false;
+
+  let changed = false;
+  const zero = (from: number, to: number) => {
+    for (let i = Math.max(from, tiff); i < Math.min(to, limit); i++) {
+      if (bytes[i] !== 0) {
+        bytes[i] = 0;
+        changed = true;
+      }
+    }
+  };
+  const clearGps = (ifd: number) => {
+    if (ifd + 2 > limit) return;
+    const n = u16(ifd);
+    for (let i = 0; i < n; i++) {
+      const e = ifd + 2 + i * 12;
+      if (e + 12 > limit) break;
+      const size = (TYPE_SIZE[u16(e + 2)] ?? 0) * u32(e + 4);
+      // values longer than 4 bytes live elsewhere in the block: clear them too
+      if (size > 4) zero(tiff + u32(e + 8), tiff + u32(e + 8) + size);
+    }
+    zero(ifd + 2, ifd + 2 + n * 12 + 4);
+    zero(ifd, ifd + 2);
+  };
+
+  const seen = new Set<number>();
+  let next = u32(tiff + 4);
+  for (let hop = 0; hop < 4 && next > 0 && !seen.has(next); hop++) {
+    seen.add(next);
+    const ifd = tiff + next;
+    if (ifd + 2 > limit) break;
+    const n = u16(ifd);
+    for (let i = 0; i < n; i++) {
+      const e = ifd + 2 + i * 12;
+      if (e + 12 > limit) break;
+      if (u16(e) === 0x8825) {
+        const gps = u32(e + 8);
+        if (gps > 0) clearGps(tiff + gps);
+      }
+    }
+    const after = ifd + 2 + n * 12;
+    next = after + 4 <= limit ? u32(after) : 0;
+  }
+  return changed;
+}

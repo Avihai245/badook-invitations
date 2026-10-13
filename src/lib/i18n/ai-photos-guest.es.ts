@@ -108,6 +108,16 @@ export const aiPhotosGuestEs: AiPhotosGuestDict = {
     delete: 'Eliminar',
     confirmDelete: '¿Eliminar esta foto?',
   },
+  /** versión 2 de los documentos legales: qué se envía y adónde, antes de crear la foto */
+  notice: {
+    send: 'Tu foto y tu petición, junto con las fotos de los protagonistas que subieron los anfitriones, se envían a un proveedor de IA externo (OpenAI) para crear la imagen.',
+    children: 'No envíes fotos de hijos de otras personas ni de nadie que no haya dado su acuerdo.',
+    result: 'El resultado lo genera la IA y se indica como tal cuando se comparte en la galería.',
+    retention:
+      'Se elimina 30 días después de la celebración. Cuánto tiempo conserva los datos el proveedor lo fija la política del propio proveedor.',
+    privacy: 'Política de privacidad',
+    newTab: 'se abre en una pestaña nueva',
+  },
   ai: 'IA',
   close: 'Cerrar',
   back: 'Volver',

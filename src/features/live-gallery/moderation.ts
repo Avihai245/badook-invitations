@@ -21,7 +21,9 @@ export type Reason =
   | 'duplicate'
   | 'unchecked'
   | 'no_preview'
-  | 'host';
+  | 'host'
+  /** hidden because of a report (legal compliance v2; a staff member or an urgent report) */
+  | 'report';
 
 /** The automatic check's answer: its scores, a refusal to look, a failure, or not run (the day's ceiling). */
 export type AiResult =

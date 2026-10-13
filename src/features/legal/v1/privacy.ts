@@ -1,4 +1,4 @@
-import type { LegalContext, LegalDoc } from './types';
+import type { LegalContext, LegalDoc } from '../types';
 
 /**
  * The privacy policy — under the Protection of Privacy Law, 5741-1981 (as amended, incl. Amendment 13),

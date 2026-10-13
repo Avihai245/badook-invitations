@@ -6,6 +6,7 @@ import { albumDeps } from '@/features/album/server/deps';
 import { AlbumUnavailable } from '@/features/album/ui/AlbumUnavailable';
 import { AlbumView } from '@/features/album/ui/AlbumView';
 import { isLocale } from '@/features/invitations/lib/locales';
+import { legalStatus } from '@/features/legal/context';
 import { TOKEN_RE } from '@/features/live-gallery/server/tokens';
 import { fill } from '@/lib/i18n/guest';
 import { ALBUM_GUEST } from '@/lib/i18n/album-guest';
@@ -73,7 +74,7 @@ export default async function AlbumPage({ params, searchParams }: { params: Para
     <>
       {/* the design's fonts (the invitation's own) */}
       <style dangerouslySetInnerHTML={{ __html: fontCss ?? '' }} />
-      <AlbumView data={view} token={token} lang={locale} />
+      <AlbumView data={view} token={token} lang={locale} legal={legalStatus().active} />
     </>
   );
 }

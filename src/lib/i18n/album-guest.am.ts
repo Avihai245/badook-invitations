@@ -63,5 +63,15 @@ export const albumGuestAm: AlbumGuestDict = {
   made: 'ይህ አልበም በ{brand} ተሠርቷል',
   makeYours: 'ዲጂታል ግብዣ፣ የቀጥታ ፎቶ ማዕከልና አልበም — ለእርስዎ ዝግጅት',
   failed: 'የሆነ ችግር ተፈጥሯል። እንደገና ይሞክሩ።',
+  /** የሕጋዊ ሰነዶች ስሪት 2፦ የሪፖርት ሊንኮች (በሥራ ላይ እስካለ ብቻ) */
+  legal: {
+    short: 'ሪፖርት',
+    photo: 'ይህን ፎቶ ሪፖርት ያድርጉ',
+    video: 'ይህን ቪዲዮ ሪፖርት ያድርጉ',
+    rules: 'የፎቶ ማዕከል ደንቦች',
+    report: 'ይዘትን ሪፖርት ያድርጉ',
+    privacy: 'የግላዊነት መመሪያ',
+    privacyRequest: 'የግላዊነት ጥያቄ',
+  },
   top: 'ወደ ላይ ተመለስ',
 };

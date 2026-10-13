@@ -1,13 +1,7 @@
 import { GALLERY, ORIGINAL_TYPES, type MediaKind } from '../config';
-import {
-  readJpegInfo,
-  swapsSides,
-  takenAtIso,
-  orientationTransform,
-  withoutGps,
-  type JpegInfo,
-} from '../exif';
+import { readJpegInfo, swapsSides, takenAtIso, orientationTransform, type JpegInfo } from '../exif';
 import { dHash, fitWithin, levelsLut, applyLut, meanLuminance, sharpness, toGray } from '../image-metrics';
+import { stripLocation } from '../media-location';
 import { mp4CreationTime } from '../mp4';
 
 /**
@@ -15,8 +9,10 @@ import { mp4CreationTime } from '../mp4';
  * its first bytes, not its name), the size and length limits, and for a photo a display version
  * (long edge ≤ 2560 px, JPEG 0.85, upright per its EXIF orientation, a gentle levels/contrast lift)
  * and a thumbnail (≤ 480 px) with the checks run on it (sharpness, darkness, perceptual hash); the
- * original is kept as it is, minus its location (JPEG). For a video: a still (display + thumbnail)
- * and when it was recorded — no transcoding. One file at a time, canvases released after use (old
+ * original is kept as it is, minus its location (media-location.ts: every format it knows; the
+ * display version and thumbnail are canvas re-encodes and carry no metadata at all). For a video: a
+ * still (display + thumbnail), when it was recorded, and the original minus its location — no
+ * transcoding. One file at a time, canvases released after use (old
  * phones have little memory).
  */
 
@@ -178,25 +174,20 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   });
 }
 
+/** The original minus its location; the file as it is when that can't be done (never an error). */
+async function withoutLocation(file: Blob, type: string): Promise<Blob> {
+  try {
+    return (await stripLocation(file, type)).blob;
+  } catch {
+    return file;
+  }
+}
+
 async function preparePhoto(file: File, type: string): Promise<Prepared> {
   let info: JpegInfo | null = null;
-  let original: Blob = file;
-  if (type === 'image/jpeg') {
-    info = readJpegInfo(await readBytes(file, 0, 512 * 1024));
-    // the original goes without the guest's location (the file's size and everything else stay)
-    const exif = info?.exif;
-    if (exif && exif.gpsIfd !== null) {
-      const segment = await readBytes(file, exif.app1Start, exif.app1End);
-      const clean = withoutGps(segment, exif);
-      if (clean)
-        original = new Blob(
-          [file.slice(0, exif.app1Start), clean as Uint8Array<ArrayBuffer>, file.slice(exif.app1End)],
-          {
-            type,
-          },
-        );
-    }
-  }
+  if (type === 'image/jpeg') info = readJpegInfo(await readBytes(file, 0, 512 * 1024));
+  // the original goes without the guest's location (the file's size and everything else stay)
+  const original = await withoutLocation(file, type);
   const takenAt = info ? takenAtIso(info, -new Date().getTimezoneOffset()) : null;
   const base: Prepared = {
     kind: 'image',
@@ -306,6 +297,8 @@ async function prepareVideo(file: File, type: string): Promise<Prepared | Prepar
   if (type === 'video/mp4' || type === 'video/quicktime' || type === 'video/3gpp') {
     base.takenAt = await mp4CreationTime((s, e) => readBytes(file, s, e), file.size).catch(() => null);
   }
+  // only the movie's header box is read and patched; the bulk of the file stays a slice of the pick
+  base.original = await withoutLocation(file, type);
   const url = URL.createObjectURL(file);
   const video = document.createElement('video');
   let poster: HTMLCanvasElement | null = null;

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { AreaHelp, Badge, Button, Card, Dialog, Hint, KpiCard, PageTitle, useToast } from '@/components/app';
 import { PlanCards } from '@/features/site/PlanCards';
 import { useUi } from '@/lib/i18n/client';
@@ -37,6 +37,111 @@ const post = async (url: string, body: unknown) => {
 };
 
 /**
+ * Version 2 of the legal documents: what the buyer is shown before a paid plan or a credit pack is paid
+ * for, and the box they tick to accept the terms. Visible text, not a tooltip. The prices are the ones
+ * the screen already shows (nothing is worked out here); the server refuses a purchase that comes
+ * without the acceptance and records it when it comes (legal-acceptance.ts).
+ */
+function PurchaseReview({
+  product,
+  price,
+  plan,
+  busy,
+  onConfirm,
+  onClose,
+}: {
+  product: Product;
+  /** shown price, shekels incl. VAT: monthly for a plan, once for a pack */
+  price: string;
+  plan: boolean;
+  busy: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+}) {
+  const { t, fmt } = useUi();
+  const b = t.billing;
+  const r = b.review;
+  const [ticked, setTicked] = useState(false);
+  const [missing, setMissing] = useState(false);
+  const box = useRef<HTMLInputElement>(null);
+  const errorId = useId();
+  const link = (href: string, label: string) => (
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener"
+      className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
+    >
+      {label}
+      <span className="sr-only"> {r.newTab}</span>
+    </Link>
+  );
+  const confirm = () => {
+    if (!ticked) {
+      setMissing(true);
+      box.current?.focus();
+      return;
+    }
+    onConfirm();
+  };
+  const line = fmt(plan ? r.price : r.pack, { product: b.products[product], price });
+  return (
+    <Dialog
+      open
+      onOpenChange={(open) => !open && onClose()}
+      title={r.title}
+      description={line}
+      closeLabel={t.common.close}
+      className="max-w-[520px]"
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            {r.back}
+          </Button>
+          <Button loading={busy} onClick={confirm}>
+            {r.continue}
+          </Button>
+        </>
+      }
+    >
+      <div className="mt-4 flex flex-col gap-3 text-[14px]" data-testid="purchase-review">
+        {plan ? (
+          <>
+            <p>{r.renews}</p>
+            <p>{fmt(r.cancel, { where: b.title, button: b.cancel.button })}</p>
+          </>
+        ) : null}
+        <p className="text-[13px] text-muted">
+          {r.read} {link('/terms', r.terms)} · {link('/refunds', r.refunds)} · {link('/privacy', r.privacy)}
+        </p>
+        <div>
+          <label className="flex items-start gap-2.5 text-[13.5px]">
+            <input
+              ref={box}
+              type="checkbox"
+              checked={ticked}
+              required
+              aria-required="true"
+              aria-invalid={missing && !ticked ? true : undefined}
+              aria-describedby={missing && !ticked ? errorId : undefined}
+              onChange={(e) => setTicked(e.target.checked)}
+              className="mt-0.5 size-5 shrink-0 accent-ink"
+              data-testid="purchase-accept"
+            />
+            <span className="min-w-0">{r.accept}</span>
+          </label>
+          {missing && !ticked ? (
+            <p id={errorId} role="alert" className="mt-1.5 text-[13px] text-danger">
+              {r.required}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </Dialog>
+  );
+}
+
+/**
  * /app/billing: the plan in force and what it allows, the plans side by side (upgrade, switch, cancel),
  * message packs, and the history. Coming back from the payment page it says how the payment ended —
  * and while the provider's notice is still on its way, it checks again by itself. With Tranzila the
@@ -48,10 +153,13 @@ export function BillingScreen({
   data,
   status,
   start = null,
+  legal = false,
 }: {
   data: BillingPageData;
   status: string | null;
   start?: 'pro' | 'business' | null;
+  /** version 2 of the legal documents is in force: the terms are shown and accepted before paying */
+  legal?: boolean;
 }) {
   const { t, locale, fmt, number, date } = useUi();
   const b = t.billing;
@@ -59,6 +167,8 @@ export function BillingScreen({
   const { toast } = useToast();
   const [busy, setBusy] = useState<Product | 'cancel' | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  // the purchase whose terms the buyer is reading (legal)
+  const [review, setReview] = useState<Product | null>(null);
   // Tranzila's card form for the purchase just opened
   const [payFrame, setPayFrame] = useState<{ url: string; product: Product; amount: number } | null>(null);
   const a = data.account;
@@ -70,6 +180,9 @@ export function BillingScreen({
       minimumFractionDigits: digits,
       maximumFractionDigits: digits,
     }).format(v);
+  // a price as it is charged (agorot when there are any, as on the plan cards); version 2 shows the
+  // packs the same way, where they used to be rounded to whole shekels
+  const shown = (v: number) => money(v, Number.isInteger(v) ? 0 : 2);
   const renews = a.planRenewsAt
     ? date(a.planRenewsAt, { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
@@ -119,9 +232,10 @@ export function BillingScreen({
   // a monthly charge that failed (the plan still in its grace days): its own card offers to pay again
   const pastDue = a.planStatus === 'past_due' && a.effective !== 'free' && !a.admin;
 
-  const buy = async (product: Product) => {
+  const buy = async (product: Product, accepted = false) => {
     setBusy(product);
-    const res = await post('/api/billing/checkout', { product });
+    const res = await post('/api/billing/checkout', accepted ? { product, accepted: true } : { product });
+    setReview(null);
     if (res.status === 401)
       return window.location.assign(`/login?next=${encodeURIComponent('/app/billing')}`);
     if (res.ok && res.body?.url) return window.location.assign(res.body.url);
@@ -136,10 +250,15 @@ export function BillingScreen({
             ? b.errors.not_configured
             : res.body?.code === 'provider_unavailable'
               ? b.errors.provider_unavailable
-              : b.errors.server,
+              : res.body?.code === 'terms_not_accepted'
+                ? b.errors.terms_not_accepted
+                : b.errors.server,
       variant: 'danger',
     });
   };
+
+  // a purchase starts here: with version 2 of the legal documents, after the terms are shown and accepted
+  const choose = (product: Product) => (legal ? setReview(product) : void buy(product));
 
   // once: the address drops ?plan= first, so coming back from the payment page doesn't start again
   const started = useRef(false);
@@ -150,7 +269,7 @@ export function BillingScreen({
     if (off) return;
     if (a.effective === start && (a.planStatus === 'active' || a.planStatus === 'trialing'))
       toast({ title: b.errors.already });
-    else void buy(start);
+    else choose(start);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
   }, []);
 
@@ -200,7 +319,7 @@ export function BillingScreen({
           variant={plan === 'pro' ? 'primary' : 'secondary'}
           disabled={off || busy !== null}
           loading={busy === plan}
-          onClick={() => void buy(plan)}
+          onClick={() => choose(plan)}
         >
           {busy === plan ? b.going : label}
         </Button>
@@ -399,7 +518,7 @@ export function BillingScreen({
         </Link>
         {b.terms.middle}
         <Link
-          href="/terms#cancel"
+          href={legal ? '/refunds' : '/terms#cancel'}
           className="font-medium text-ink underline underline-offset-2 hover:text-brand-deep"
         >
           {b.terms.cancel}
@@ -418,7 +537,9 @@ export function BillingScreen({
                   <Coins aria-hidden className="size-5 text-brand" />
                   {fmt(b.packs.count, { n: number(p.count) })}
                 </p>
-                <p className="font-display text-[30px] leading-none font-bold">{money(p.price)}</p>
+                <p className="font-display text-[30px] leading-none font-bold">
+                  {legal ? shown(p.price) : money(p.price)}
+                </p>
                 <p className="text-[13px] text-muted">
                   {fmt(b.packs.per, { price: money(data.messagePrice, 2) })}
                 </p>
@@ -428,7 +549,7 @@ export function BillingScreen({
                     variant="secondary"
                     disabled={off || busy !== null}
                     loading={busy === p.product}
-                    onClick={() => void buy(p.product)}
+                    onClick={() => choose(p.product)}
                   >
                     {busy === p.product ? b.going : b.packs.buy}
                   </Button>
@@ -539,6 +660,21 @@ export function BillingScreen({
             {b.pay.secure}
           </p>
         </Dialog>
+      ) : null}
+
+      {review ? (
+        <PurchaseReview
+          product={review}
+          plan={review === 'pro' || review === 'business'}
+          price={shown(
+            review === 'pro' || review === 'business'
+              ? (discount?.prices ?? data.prices)[review]
+              : (data.packs.find((p) => p.product === review)?.price ?? 0),
+          )}
+          busy={busy === review}
+          onConfirm={() => void buy(review, true)}
+          onClose={() => setReview(null)}
+        />
       ) : null}
 
       {confirmCancel ? (

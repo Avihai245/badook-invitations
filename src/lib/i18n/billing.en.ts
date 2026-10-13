@@ -111,6 +111,24 @@ export const billingEn: typeof billingHe = {
     provider_unavailable:
       'The payment company’s page isn’t available right now. Let us know and we’ll fix it, or try again later.',
     server: 'Something went wrong. Please try again in a moment.',
+    terms_not_accepted: 'To pay, please accept the terms. Tick the box and try again.',
+  },
+  review: {
+    title: 'Before you pay',
+    price: '{product}: {price} per month, VAT included.',
+    renews: 'The plan renews automatically every month on the same date until you cancel.',
+    cancel:
+      'To cancel: {where} → {button}. Cancelling takes effect immediately and stops future charges; the plan stays active until the end of the period you paid for.',
+    pack: '{product}: {price}, VAT included. A one-time purchase; credits do not expire.',
+    read: 'You can read:',
+    terms: 'Terms of use',
+    refunds: 'Refund and cancellation policy',
+    privacy: 'Privacy policy',
+    newTab: '(opens in a new tab)',
+    accept: 'I have read and accept the Terms, the Refund and cancellation policy and the Privacy policy.',
+    required: 'To continue to payment, please tick the box.',
+    continue: 'Continue to payment',
+    back: 'Back',
   },
   going: 'Going to payment…',
   pay: {

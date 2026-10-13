@@ -54,11 +54,14 @@ import type {
 import type { GuestPageData } from '../../server/pages';
 import { MediaViewer } from '../MediaViewer';
 import { GuestTextProvider, fmt, useGuestText, type GuestLocale } from '../guest-text';
+import { ackKey, legalPage, privacyRequestLink, readAck, reportLink, writeAck } from '../legal';
+import { ReportLink } from '../ReportLink';
 import { FeedGrid } from './FeedGrid';
 import { FeedPost } from './FeedPost';
 import { groupPosts, isStory, mergeLikes, toggled, type Post } from './posts';
 import { QueuePanel } from './QueuePanel';
 import { NameSheet } from './NameSheet';
+import { UploadNotice } from './UploadNotice';
 import { StoriesTray } from './StoriesTray';
 import { StoryViewer } from './StoryViewer';
 import { groupStories, isUnseen, readSeen, writeSeen, type Story } from './stories';
@@ -395,6 +398,9 @@ function GalleryBody({
 
   // ── this phone's own uploads that aren't in the feed ──
   const mineIds = useMemo(() => new Set(mine.map((m) => m.id)), [mine]);
+  // the report form for an item — not for this phone's own uploads (those it can delete)
+  const reportOf = (item: FeedItem) =>
+    mineIds.has(item.id) ? null : reportLink({ gallery: token, item: item.id }, locale);
   const stories = useMemo(() => groupStories(items.filter(isStory)), [items]);
   const posts = useMemo(() => groupPosts(items), [items]);
   useEffect(() => {
@@ -432,9 +438,41 @@ function GalleryBody({
     placement.current = to;
     fileInput.current?.click();
   };
-  const share = (to: Placement) => {
+  // version 2 of the legal documents: before this device's first upload, the notice (once per rules
+  // version and gallery link; the page works the same without storage, asking once per visit)
+  const legal = data.legal?.active ? data.legal : null;
+  const [legalNotice, setLegalNotice] = useState<Placement | null>(null);
+  const acknowledged = useRef(false);
+  const seenNotice = () => {
+    if (!legal || acknowledged.current) return true;
+    if (!readAck(ackKey(legal.rulesVersion, token))) return false;
+    acknowledged.current = true;
+    return true;
+  };
+  const proceed = (to: Placement) => {
     if (asked.current) pick(to);
     else setNameSheet({ mode: 'first', to });
+  };
+  const share = (to: Placement) => {
+    if (seenNotice()) proceed(to);
+    else setLegalNotice(to);
+  };
+  const onAcknowledged = () => {
+    const to = legalNotice;
+    setLegalNotice(null);
+    if (!legal || !to) return;
+    acknowledged.current = true;
+    writeAck(ackKey(legal.rulesVersion, token));
+    // the evidence that the notice was shown: the upload goes on whatever this answers
+    if (uploaderId)
+      void galleryApi('/api/gallery/acknowledge', {
+        t: token,
+        uploader: uploaderId,
+        version: legal.rulesVersion,
+        ...(code.current ? { code: code.current } : {}),
+      });
+    // still the tap on "I understand": the name sheet may open, the picker may open
+    proceed(to);
   };
   const onNameDone = (value: { name: string; instagram: string }) => {
     const sheet = nameSheet;
@@ -739,6 +777,7 @@ function GalleryBody({
                 guest={guest}
                 name={name}
                 eventType={data.event.eventType}
+                legal={!!legal}
                 theme={accent}
                 onShared={() => {
                   setView('feed');
@@ -750,7 +789,15 @@ function GalleryBody({
                 }}
               />
             ) : null}
-            {data.faces ? <FaceSearch token={token} code={codeOf} until={data.faces.until} /> : null}
+            {data.faces ? (
+              <FaceSearch
+                token={token}
+                code={codeOf}
+                until={data.faces.until}
+                legal={!!legal}
+                report={legal ? reportOf : undefined}
+              />
+            ) : null}
 
             {waiting.length ? (
               <section className="mt-6" aria-labelledby="gallery-mine">
@@ -777,7 +824,9 @@ function GalleryBody({
                           {m.status === 'pending'
                             ? t.mine.pending
                             : m.status === 'hidden'
-                              ? t.mine.hidden
+                              ? m.reason === 'report'
+                                ? t.legal.mineReported
+                                : t.mine.hidden
                               : m.reason === 'duplicate'
                                 ? t.mine.duplicate
                                 : t.mine.rejected}
@@ -870,6 +919,7 @@ function GalleryBody({
                             likes={likes[post.key]}
                             fresh={post.items.some((i) => fresh.has(i.id))}
                             onLike={(on) => void like(post.key, on)}
+                            report={legal ? reportOf : undefined}
                             onOpen={(item) => {
                               const at = items.findIndex((i) => i.id === item.id);
                               if (at >= 0) setOpen(at);
@@ -954,6 +1004,30 @@ function GalleryBody({
             <a href="/accessibility" target="_blank" rel="noopener" className="underline">
               {t.footer.accessibility}
             </a>
+            {legal ? (
+              <>
+                <a
+                  href={legalPage('/gallery-rules', locale)}
+                  target="_blank"
+                  rel="noopener"
+                  className="underline"
+                >
+                  {t.legal.footer.rules}
+                </a>
+                <a
+                  href={reportLink({ gallery: token }, locale)}
+                  target="_blank"
+                  rel="noopener"
+                  data-testid="gallery-report-content"
+                  className="underline"
+                >
+                  {t.legal.footer.report}
+                </a>
+                <a href={privacyRequestLink(locale)} target="_blank" rel="noopener" className="underline">
+                  {t.legal.footer.privacyRequest}
+                </a>
+              </>
+            ) : null}
           </p>
         </footer>
       </div>
@@ -1022,6 +1096,16 @@ function GalleryBody({
         style={accent}
       />
 
+      {legal ? (
+        <UploadNotice
+          open={legalNotice !== null}
+          faces={faces}
+          onAcknowledge={onAcknowledged}
+          onCancel={() => setLegalNotice(null)}
+          style={accent}
+        />
+      ) : null}
+
       {/* the accessibility menu, on the side of the page, in the page's language */}
       <AccessibilityPanel a={t.a11y} newTab place="corner" />
 
@@ -1034,6 +1118,7 @@ function GalleryBody({
           onWatched={watched}
           canDelete={(item) => mineIds.has(item.id)}
           onDelete={(item) => setConfirming(item.id)}
+          report={legal ? reportOf : undefined}
           suspended={!!confirming}
         />
       ) : null}
@@ -1052,6 +1137,14 @@ function GalleryBody({
               <span className="min-w-0 truncate">
                 {item.name ? fmt(t.feed.by, { name: item.name }) : null}
               </span>
+              {legal && !mineIds.has(item.id) ? (
+                <ReportLink
+                  href={reportLink({ gallery: token, item: item.id }, locale)}
+                  label={item.kind === 'video' ? t.legal.report.video : t.legal.report.photo}
+                  text={t.legal.report.short}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/12 px-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-white"
+                />
+              ) : null}
               {mineIds.has(item.id) ? (
                 <button
                   type="button"

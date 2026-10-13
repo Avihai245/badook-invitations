@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { AI_PHOTOS_GUEST } from '@/lib/i18n/ai-photos-guest';
 import type { FeedItem, Likes } from '../../types';
 import { fmt, useGuestText } from '../guest-text';
+import { ReportLink } from '../ReportLink';
 import { hueOf } from './StoriesTray';
 import { frameRatio, type Post } from './posts';
 import { ago } from './stories';
@@ -48,6 +49,7 @@ export function FeedPost({
   fresh,
   onLike,
   onOpen,
+  report,
 }: {
   post: Post;
   /** the name shown (a guest's own, "Guest 2", or the hosts) */
@@ -57,6 +59,8 @@ export function FeedPost({
   onLike(on: boolean): void;
   /** full screen, at this item */
   onOpen(item: FeedItem): void;
+  /** the report form for an item (version 2 of the legal documents); null for the guest's own, absent while it isn't in force */
+  report?: (item: FeedItem) => string | null;
 }) {
   const { t, plural, number, locale, dir } = useGuestText();
   const P = t.post;
@@ -110,6 +114,7 @@ export function FeedPost({
   const current = post.items[index] ?? post.items[0]!;
   // the username the guest asked to be tagged with (their newest)
   const handle = [...post.items].reverse().find((i) => i.instagram)?.instagram ?? null;
+  const reportUrl = report?.(current) ?? null;
 
   return (
     <article
@@ -281,6 +286,13 @@ export function FeedPost({
         ) : (
           <span className="flex-1" />
         )}
+        {reportUrl ? (
+          <ReportLink
+            href={reportUrl}
+            label={current.kind === 'video' ? t.legal.report.video : t.legal.report.photo}
+            className="grid size-11 place-items-center rounded-full text-muted transition-colors hover:bg-subtle hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          />
+        ) : null}
         <button
           type="button"
           onClick={() => onOpen(current)}

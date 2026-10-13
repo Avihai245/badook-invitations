@@ -221,6 +221,19 @@ const ServerEnvSchema = z.object({
   INVITES_ACCESSIBILITY_COORDINATOR: z.string().default(''),
   INVITES_ACCESSIBILITY_PHONE: z.string().default(''),
   INVITES_ACCESSIBILITY_EMAIL: z.union([z.email(), z.literal('')]).default(''),
+  // legal documents, version 2 (docs/legal/README.md): off until the owner approves the texts. It turns
+  // on only when the operator's details above and the effective date below are all set — a blank
+  // identity is never published. INVITES_LEGAL_V2_EFFECTIVE is the ISO date the version takes effect.
+  INVITES_LEGAL_V2: flag(false),
+  INVITES_LEGAL_V2_EFFECTIVE: z
+    .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal('')])
+    .default(''),
+  // the date of the last manual accessibility review (ISO); the statement mentions one only if set
+  INVITES_ACCESSIBILITY_REVIEW_DATE: z
+    .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal('')])
+    .default(''),
+  // where privacy and media requests are received, when it is not the support address (optional)
+  INVITES_PRIVACY_EMAIL: z.union([z.email(), z.literal('')]).default(''),
 });
 
 export type ServerEnv = z.infer<typeof ServerEnvSchema>;

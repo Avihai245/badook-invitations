@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Pause, Play, Trash2, Volume2, VolumeX, X } f
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import type { FeedItem } from '../../types';
 import { fmt, useGuestText } from '../guest-text';
+import { ReportLink } from '../ReportLink';
 import { StoryAvatar } from './StoriesTray';
 import { ago, type Story } from './stories';
 
@@ -46,6 +47,7 @@ export function StoryViewer({
   onWatched,
   canDelete,
   onDelete,
+  report,
   suspended = false,
 }: {
   stories: readonly Story[];
@@ -57,6 +59,8 @@ export function StoryViewer({
   /** this phone's own uploads can be deleted from here */
   canDelete?: (item: FeedItem) => boolean;
   onDelete?: (item: FeedItem) => void;
+  /** the report form for an item (version 2 of the legal documents); null for the guest's own, absent while it isn't in force */
+  report?: (item: FeedItem) => string | null;
   /** something is on top of the viewer (a confirmation): the story waits */
   suspended?: boolean;
 }) {
@@ -268,6 +272,7 @@ export function StoryViewer({
     'grid size-11 place-items-center rounded-full bg-black/35 text-white backdrop-blur transition-colors hover:bg-black/55 focus-visible:outline-2 focus-visible:outline-white';
   const time = ago(item.at, now, locale);
   const isVideo = item.kind === 'video' && !!item.video;
+  const reportUrl = report?.(item) ?? null;
 
   return (
     <div
@@ -425,16 +430,26 @@ export function StoryViewer({
             </div>
           </div>
 
-          {canDelete?.(item) && onDelete ? (
-            <div className="absolute inset-x-0 bottom-0 flex justify-end px-3 pb-[max(14px,env(safe-area-inset-bottom))]">
-              <button
-                type="button"
-                onClick={() => onDelete(item)}
-                className="inline-flex h-10 items-center gap-1.5 rounded-full bg-black/45 px-4 text-[13px] font-semibold text-white backdrop-blur hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-white"
-              >
-                <Trash2 aria-hidden className="size-4" />
-                {t.mine.delete}
-              </button>
+          {(canDelete?.(item) && onDelete) || reportUrl ? (
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 px-3 pb-[max(14px,env(safe-area-inset-bottom))]">
+              {reportUrl ? (
+                <ReportLink
+                  href={reportUrl}
+                  label={item.kind === 'video' ? t.legal.report.video : t.legal.report.photo}
+                  text={t.legal.report.short}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-full bg-black/45 px-4 text-[13px] font-semibold text-white backdrop-blur hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-white"
+                />
+              ) : null}
+              {canDelete?.(item) && onDelete ? (
+                <button
+                  type="button"
+                  onClick={() => onDelete(item)}
+                  className="ms-auto inline-flex h-10 items-center gap-1.5 rounded-full bg-black/45 px-4 text-[13px] font-semibold text-white backdrop-blur hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-white"
+                >
+                  <Trash2 aria-hidden className="size-4" />
+                  {t.mine.delete}
+                </button>
+              ) : null}
             </div>
           ) : null}
 

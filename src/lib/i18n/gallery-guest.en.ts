@@ -288,6 +288,49 @@ export const galleryGuestEn: GalleryGuestDict = {
       'Done: your face code was deleted from this phone, and your face was removed from the gallery’s search.',
     leftOut: 'Done: you won’t appear in other guests’ searches — photos uploaded from now on included.',
   },
+  /** version 2 of the legal documents: the notice before the first upload, the report links (only while it is in force) */
+  legal: {
+    notice: {
+      title: 'Before you share',
+      intro: 'A few things to know before your first upload:',
+      seen: 'Anyone with this gallery’s link (and its code, if there is one) and the hosts can see the photos that are published. The hosts also see photos that are waiting for approval or were rejected.',
+      own: 'Share only photos you may share. Don’t upload photos of other people’s children, or photos that humiliate or expose someone. People who appear in a photo can ask for it to be removed.',
+      location:
+        'We try to remove location data from photos and videos before they are uploaded, but we can’t promise this for every file type. Avoid sharing files whose location is sensitive.',
+      copies:
+        'The hosts can download what is uploaded, and guests can download some files. A copy that has been saved elsewhere can’t be called back.',
+      faces:
+        'Face search is on in this gallery: faces in the photos you upload are detected on your phone, and face codes are stored for the “photos I’m in” feature. See the Gallery rules.',
+      ackOnly:
+        'Tapping “I understand” only confirms that you read this notice. It is not the consent of the people in your photos.',
+      rules: 'Gallery rules',
+      privacy: 'Privacy policy',
+      newTab: 'opens in a new tab',
+      understand: 'I understand — continue',
+      cancel: 'Cancel',
+    },
+    report: {
+      short: 'Report',
+      photo: 'Report this photo',
+      video: 'Report this video',
+    },
+    footer: {
+      rules: 'Gallery rules',
+      report: 'Report content',
+      privacyRequest: 'Privacy request',
+    },
+    faces: {
+      mine: 'Your consent here covers only your own selfie and your own search.',
+      others:
+        'The faces of other people in the gallery were detected on the phones of those who uploaded the photos, not with the consent of the people in them.',
+      exclude: 'Ask not to appear in searches',
+      rules: 'Gallery rules',
+      children: 'If a photo of a child shouldn’t be in the gallery, you can report it.',
+      report: 'Report content',
+    },
+    /** this phone's own upload that a report hid */
+    mineReported: 'Hidden while it is reviewed',
+  },
   projector: {
     title: 'Gallery screen · {name}',
     empty: 'Guests’ photos will appear here',

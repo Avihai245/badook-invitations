@@ -1,17 +1,9 @@
 import type { Metadata } from 'next';
-import { legalContext } from '@/features/legal/context';
-import { LegalPage, legalMetadata } from '@/features/legal/LegalPage';
-import { accessibilityDoc } from '@/features/legal/accessibility';
-import { getUi } from '@/lib/i18n/server';
+import { LegalDocPage, legalDocMetadata } from '@/features/legal/render';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { locale, t } = await getUi();
-  return legalMetadata(accessibilityDoc(legalContext(locale)), t.brand);
-}
+export const generateMetadata = (): Promise<Metadata> => legalDocMetadata('accessibility');
 
-/** /accessibility — the accessibility statement. */
-export default async function AccessibilityPage() {
-  const { locale, t } = await getUi();
-  const context = legalContext(locale);
-  return <LegalPage t={t} doc={accessibilityDoc(context)} context={context} />;
+/** /accessibility — the version of the document in force (features/legal/registry.ts). */
+export default function Page() {
+  return <LegalDocPage docKey="accessibility" />;
 }

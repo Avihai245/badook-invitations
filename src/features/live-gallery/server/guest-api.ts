@@ -2,6 +2,7 @@ import 'server-only';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type { Feature } from '@/features/flags/features';
+import { GALLERY_RULES_VERSION } from '@/features/legal/versions';
 import { GALLERY, ORIGINAL_TYPES, PREVIEW_TYPES, isOriginalType } from '../config';
 import { decide, type AiResult } from '../moderation';
 import { galleryState } from '../state';
@@ -67,6 +68,10 @@ export interface GuestDeps {
   /** the automatic check (null when this deployment has no AI model) */
   checkImage: ((jpeg: Uint8Array) => Promise<AiResult>) | null;
   realtime(channel: string): RealtimeInfo | null;
+  /** version 2 of the legal documents is in force (absent: it is not) */
+  legalActive?(): boolean;
+  /** stores a device's acknowledgement of the gallery notice (gallery_acknowledge) */
+  acknowledge?(invitationId: string, uploaderHash: string, version: string): Promise<void>;
   /** files were deleted: remove them from storage now (bounded) */
   swept(): Promise<void>;
   now(): number;
@@ -698,6 +703,46 @@ export async function guestLike(raw: unknown, ip: string | null, deps: GuestDeps
   if (!res.ok) return notFound;
   await deps.broadcast(r.lookup.gallery.channel, 'likes').catch(() => undefined);
   return ok({ likes: { n: res.n, mine: res.mine } satisfies Likes });
+}
+
+// ─── the first-upload notice ────────────────────────────────────────────────────────────────────
+
+export const AcknowledgeSchema = z.strictObject({
+  t: z.string(),
+  code: z.string().max(64).optional(),
+  uploader: z.string().regex(UPLOADER_RE),
+  /** the gallery rules' version the device saw — only the one in force is recorded */
+  version: z.literal(GALLERY_RULES_VERSION),
+  /** a honeypot: the page never sends it */
+  website: z.string().max(200).optional(),
+});
+
+/**
+ * POST /api/gallery/acknowledge — this phone saw the gallery notice before its first upload (version 2
+ * of the legal documents). Evidence that the notice was shown and acknowledged, keyed by the same
+ * per-event hash of the device's id the items carry: no name, no address. Not the consent of anyone in
+ * a photo, and not a condition of the upload (the page goes on whatever this answers). 404 while
+ * version 2 is not in force.
+ */
+export async function guestAcknowledge(raw: unknown, ip: string | null, deps: GuestDeps): Promise<ApiResult> {
+  if (!deps.legalActive?.() || !deps.acknowledge) return notFound;
+  const parsed = AcknowledgeSchema.safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const q = parsed.data;
+  if (q.website) return ok({});
+  const r = await resolve(q.t, 'upload', deps);
+  if (!r) return notFound;
+  if (r.state === 'off') return fail(403, 'off', { state: 'off' });
+  const denied = await checkCode(r, q.code, ip, deps);
+  if (denied) return denied;
+  const inv = r.invitationId;
+  const limits = await Promise.all([
+    rateOk(deps, 'ack-ip', `${inv}:${ip ?? 'unknown'}`, GALLERY.rate.reservePerAddress),
+    rateOk(deps, 'ack-device', `${inv}:${q.uploader}`, GALLERY.rate.reservePerDevice),
+  ]);
+  if (limits.includes(false)) return fail(429, 'rate');
+  await deps.acknowledge(inv, uploaderHash(inv, q.uploader), q.version);
+  return ok({});
 }
 
 export const ProjectorSchema = z.strictObject({

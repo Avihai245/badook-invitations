@@ -1,4 +1,4 @@
-import type { LegalContext, LegalDoc } from './types';
+import type { LegalContext, LegalDoc } from '../types';
 
 /**
  * The terms of use: the service, accounts, what hosts may send and to whom, their content, the plans

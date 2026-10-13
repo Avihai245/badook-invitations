@@ -112,6 +112,16 @@ export const aiPhotosGuestEn: AiPhotosGuestDict = {
     delete: 'Delete',
     confirmDelete: 'Delete this photo?',
   },
+  /** version 2 of the legal documents: what is sent and where, before the photo is made */
+  notice: {
+    send: 'Your photo and your request, together with the photos of the people of honor that the hosts uploaded, are sent to an outside AI provider (OpenAI) to create the image.',
+    children: 'Don’t send photos of other people’s children or of anyone who hasn’t agreed.',
+    result: 'The result is AI-generated, and it is labelled as such when it is shared in the gallery.',
+    retention:
+      'It is deleted 30 days after the event. How long the provider keeps data is set by the provider’s own policy.',
+    privacy: 'Privacy policy',
+    newTab: 'opens in a new tab',
+  },
   ai: 'AI',
   close: 'Close',
   back: 'Back',
