@@ -43,6 +43,12 @@ import { dailyDue, LOCAL_EVERY_MS, WHATSAPP_EVERY_MS } from './schedule';
 
 export type JobName = 'daily' | 'whatsapp' | 'local';
 
+async function legalMaintenance() {
+  const { data, error } = await serviceDb().rpc('legal_maintenance');
+  if (error) throw new Error(error.message);
+  return data as { reports: number; requests: number; hashes: number } | null;
+}
+
 /**
  * The daily run: the hosts' RSVP summaries, the purge, the billing checks, the templates sync, the
  * live gallery's housekeeping, the event day's (arrivals past their keeping time), the machine
@@ -92,6 +98,10 @@ export async function runDaily(now: Date) {
   const support = await supportHousekeeping().catch(
     (err) => (console.error('support tickets housekeeping failed', err), null),
   );
+  // reports and privacy requests: resolved ones are erased two years after, the hashed addresses after 30 days
+  const legal = await legalMaintenance().catch(
+    (err) => (console.error('legal housekeeping failed', err), null),
+  );
   // the weekly planning email: the week's tasks and payments (a no-op while planning is not offered)
   const planning = await sendPlanReminders(now).catch(
     (err) => (console.error('planning reminders failed', err), null),
@@ -120,6 +130,7 @@ export async function runDaily(now: Date) {
     logs,
     admin,
     support,
+    legal,
   };
 }
 

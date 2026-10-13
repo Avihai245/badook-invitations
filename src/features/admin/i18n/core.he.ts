@@ -15,6 +15,7 @@ export const coreHe = {
     messages: 'הודעות',
     finance: 'תזרים',
     support: 'תמיכה',
+    legal: 'דיווחים ופרטיות',
     partners: 'Badook Events',
     staff: 'צוות והרשאות',
     audit: 'יומן פעולות',

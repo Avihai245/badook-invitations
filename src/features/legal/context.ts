@@ -3,16 +3,13 @@ import { planPrices } from '@/features/billing/server/account';
 import { deploymentFeatures } from '@/features/flags/server';
 import { serverEnv } from '@/lib/env';
 import type { UiLocale } from '@/lib/i18n/app';
-import { legalReadiness, type LegalReadiness } from './readiness';
+import { legalStatus } from './status';
 import type { LegalContext } from './types';
+
+export { legalStatus };
 
 /** The date version 1 took effect — the text that was live before version 2 (registry.ts). */
 export const LEGAL_V1_EFFECTIVE = '2026-10-10';
-
-/** Whether version 2 of the legal documents is in force on this deployment (see readiness.ts). */
-export function legalStatus(): LegalReadiness {
-  return legalReadiness(serverEnv());
-}
 
 function formatDate(iso: string, locale: UiLocale): string {
   return new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB', {

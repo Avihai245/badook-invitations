@@ -142,6 +142,18 @@ export default defineConfig({
             INVITES_TTS_AZURE_KEY: 'e2e-tts-key',
             INVITES_TTS_AZURE_REGION: 'e2e',
             INVITES_TTS_AZURE_ENDPOINT: `http://127.0.0.1:${ttsPort}`,
+            // PW_LEGAL_V2=1: version 2 of the legal documents in force, with a made-up operator
+            // (tests/e2e/legal-v2.spec.ts, docs/legal/README.md); every other run keeps it off
+            ...(process.env.PW_LEGAL_V2
+              ? {
+                  INVITES_LEGAL_V2: 'true',
+                  INVITES_LEGAL_V2_EFFECTIVE: '2026-11-01',
+                  INVITES_LEGAL_NAME: 'Test Operator Ltd',
+                  INVITES_LEGAL_ID: '510000000',
+                  INVITES_LEGAL_ADDRESS: '1 Test Street, Tel Aviv',
+                  INVITES_SUPPORT_EMAIL: 'support@example.test',
+                }
+              : {}),
           },
           timeout: 120_000,
         },

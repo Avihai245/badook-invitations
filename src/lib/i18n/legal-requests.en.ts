@@ -21,7 +21,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
     report: {
       voluntary:
         'You are not required by law to give any details; it is up to you. Contact details are optional: without them we still handle the report, but we cannot contact you or send you the outcome. For a copyright claim a name and an email address are required, and without them we cannot process the claim.',
-      purpose: 'To handle the report, to contact you about its outcome, and to keep a record of how it was handled.',
+      purpose:
+        'To handle the report, to contact you about its outcome, and to keep a record of how it was handled.',
       recipients:
         'Our staff. The host of the gallery is told that a report was made about an item in their gallery, but not who made it.',
       rights: 'You can ask to see the details you gave and to have them corrected.',
@@ -42,7 +43,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
     title: 'Report content / request removal',
     subtitle:
       'Did you see a photo or video in an event gallery that violates privacy, copyright or safety? Tell us and we will look into it.',
-    linkedItem: 'This report is about an item in the event gallery you came from. The item itself is not shown here.',
+    linkedItem:
+      'This report is about an item in the event gallery you came from. The item itself is not shown here.',
     linkedGallery: 'This report is about the event gallery you came from.',
     unlinked:
       'You did not come from a gallery link, or the link is no longer valid. Describe where the content is and we will look for it.',
@@ -89,8 +91,10 @@ export const legalRequestsEn: typeof legalRequestsHe = {
     },
     contact: {
       legend: 'Contact details',
-      intro: 'You can report without giving contact details. Without an email address we cannot send you the outcome.',
-      copyright: 'For a copyright claim a name and an email address are required. Without them we cannot process the claim.',
+      intro:
+        'You can report without giving contact details. Without an email address we cannot send you the outcome.',
+      copyright:
+        'For a copyright claim a name and an email address are required. Without them we cannot process the claim.',
       name: 'Name',
       email: 'Email',
       phone: 'Phone',
@@ -149,7 +153,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
         title: 'When we reply',
         body: 'We reply to a request within 30 days of receiving it.',
       },
-      child: 'A request about a photo of a child? Choose “A photo of my child” and describe where it appears.',
+      child:
+        'A request about a photo of a child? Choose “A photo of my child” and describe where it appears.',
     },
     kind: {
       label: 'What is your request?',
@@ -250,7 +255,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       removed: 'We reviewed the report, and the item was removed from the gallery.',
       hidden: 'We reviewed the report, and the item was hidden from the gallery for review.',
       kept: 'We reviewed the report and decided to leave the item in the gallery.',
-      notApplicable: 'The report could not be processed. If you have more information, you can send a new report.',
+      notApplicable:
+        'The report could not be processed. If you have more information, you can send a new report.',
       closed: 'We have finished handling the report.',
       footer: 'You got this message because you gave this email address in the report.',
     },
@@ -294,7 +300,12 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       overdueDays: '{n} days overdue',
       noItem: 'No linked item',
     },
-    badges: { urgent: 'Urgent', intimate: 'Intimate', overdue: 'Overdue', hiddenByReport: 'Hidden because of the report' },
+    badges: {
+      urgent: 'Urgent',
+      intimate: 'Intimate',
+      overdue: 'Overdue',
+      hiddenByReport: 'Hidden because of the report',
+    },
     status: {
       report: {
         new: 'New',
@@ -369,7 +380,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       item: 'The item',
       itemStatus: 'Item status: {status}',
       itemDeleted: 'The item is deleted',
-      itemNone: 'The report is not linked to an item (an unrecognised link, or a note about the whole gallery).',
+      itemNone:
+        'The report is not linked to an item (an unrecognised link, or a note about the whole gallery).',
       invitation: 'The invitation in the system',
       surface: 'Source',
       category: 'Category',
@@ -406,7 +418,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
     actions: {
       title: 'Actions',
       noteLabel: 'Note',
-      noteHelp: 'Required to decide (remove, keep, dismiss, close). The note is kept in the record and never sent to the reporter.',
+      noteHelp:
+        'Required to decide (remove, keep, dismiss, close). The note is kept in the record and never sent to the reporter.',
       noteRequired: 'Write a note.',
       noPermission: 'Your role can view only.',
       review: 'Start review',
@@ -421,7 +434,8 @@ export const legalRequestsEn: typeof legalRequestsHe = {
       confirm: {
         hide: 'The item will be hidden from the gallery until a decision. It can be restored.',
         restore: 'The item goes back to what it was in the gallery.',
-        remove: 'The item is deleted from the gallery and its files go to the trash. This is for owners and admins.',
+        remove:
+          'The item is deleted from the gallery and its files go to the trash. This is for owners and admins.',
         keep: 'The report is closed as not upheld and the item stays.',
         dismiss: 'The report is closed as not applicable (spam, for example).',
         close: 'The report is closed.',

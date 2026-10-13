@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { BrandLogo } from '@/components/app/BrandLogo';
-import { legalStatus } from '@/features/legal/context';
+import { legalStatus } from '@/features/legal/status';
 import { fmt, type AppDict } from '@/lib/i18n/app';
 import { CookieConsent, CookieSettingsButton } from './CookieConsent.client';
 
@@ -80,6 +80,16 @@ export function SiteFooter({ t, onHome = false }: { t: AppDict; onHome?: boolean
                 <li>
                   <Link className={link} href="/gallery-rules">
                     {t.site.legal.docNames['gallery-rules']}
+                  </Link>
+                </li>
+                <li>
+                  <Link className={link} href="/report">
+                    {t.site.legal.reportLink}
+                  </Link>
+                </li>
+                <li>
+                  <Link className={link} href="/privacy-request">
+                    {t.site.legal.privacyRequestLink}
                   </Link>
                 </li>
               </>

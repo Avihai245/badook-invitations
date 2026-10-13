@@ -18,13 +18,23 @@ export const REPORT_RESOLUTIONS = ['hidden', 'removed', 'kept', 'host_handled', 
 export type ReportResolution = (typeof REPORT_RESOLUTIONS)[number];
 
 /** A staff decision on a report (media_report_admin_act). */
-export const REPORT_ACTIONS = ['review', 'hide', 'restore', 'remove', 'keep', 'dismiss', 'close', 'note'] as const;
+export const REPORT_ACTIONS = [
+  'review',
+  'hide',
+  'restore',
+  'remove',
+  'keep',
+  'dismiss',
+  'close',
+  'note',
+] as const;
 export type ReportAction = (typeof REPORT_ACTIONS)[number];
 /** The decisions that end a report: the reporter is told the outcome. */
 export const FINAL_REPORT_ACTIONS = ['remove', 'keep', 'dismiss', 'close'] as const;
 /** The decisions that need a note (the database refuses them without one). */
 export const NOTE_REQUIRED_ACTIONS = FINAL_REPORT_ACTIONS;
-export const isFinalReportAction = (a: ReportAction) => (FINAL_REPORT_ACTIONS as readonly string[]).includes(a);
+export const isFinalReportAction = (a: ReportAction) =>
+  (FINAL_REPORT_ACTIONS as readonly string[]).includes(a);
 
 export const REQUEST_KINDS = [
   'access',
@@ -78,7 +88,8 @@ export const LEGAL_REQUESTS = {
 
 export const PHONE_RE = /^[+\d\s().-]{5,30}$/;
 export const isUuid = (v: unknown): v is string =>
-  typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+  typeof v === 'string' &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
 
 export const isReportCategory = (v: unknown): v is ReportCategory =>
   typeof v === 'string' && (REPORT_CATEGORIES as readonly string[]).includes(v);

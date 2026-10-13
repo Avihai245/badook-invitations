@@ -29,9 +29,7 @@ const iso2 = (iso: string, he: boolean) =>
 function pick(key: LegalDocKey, version: string | undefined) {
   const active = legalStatus().active;
   const inForce = versionInForce(key, active);
-  const chosen = version
-    ? visibleVersions(key, active).find((v) => v.version === version)
-    : inForce;
+  const chosen = version ? visibleVersions(key, active).find((v) => v.version === version) : inForce;
   return { active, inForce, chosen };
 }
 
@@ -52,7 +50,9 @@ export async function LegalDocPage({ docKey, version }: { docKey: LegalDocKey; v
   const context = legalContext(locale, chosen.version);
   const he = locale === 'he';
   const visible = visibleVersions(docKey, active);
-  const newer = LEGAL_VERSIONS[docKey].find((v) => Number(v.version) > Number(chosen.version) && visible.includes(v));
+  const newer = LEGAL_VERSIONS[docKey].find(
+    (v) => Number(v.version) > Number(chosen.version) && visible.includes(v),
+  );
   const info: LegalVersionInfo = {
     key: docKey,
     version: chosen.version,

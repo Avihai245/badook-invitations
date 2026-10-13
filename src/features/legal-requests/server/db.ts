@@ -103,7 +103,11 @@ export const legalDb = {
   /** The email of whoever created the invitation (null: none on file). */
   async ownerEmail(invitationId: string): Promise<string | null> {
     const db = serviceDb();
-    const { data, error } = await db.from('invitations').select('owner_id').eq('id', invitationId).maybeSingle();
+    const { data, error } = await db
+      .from('invitations')
+      .select('owner_id')
+      .eq('id', invitationId)
+      .maybeSingle();
     if (error) throw new Error(`invitations owner: ${error.message}`);
     const ownerId = (data as { owner_id: string } | null)?.owner_id;
     if (!ownerId) return null;
@@ -115,7 +119,8 @@ export const legalDb = {
   // ── the console ──
   reports: (actor: string, status: 'open' | 'all', limit: number) =>
     rpc<AdminReport[]>('media_report_admin_list', { p_actor: actor, p_status: status, p_limit: limit }),
-  report: (actor: string, id: string) => rpc<AdminReport | null>('media_report_admin_get', { p_actor: actor, p_id: id }),
+  report: (actor: string, id: string) =>
+    rpc<AdminReport | null>('media_report_admin_get', { p_actor: actor, p_id: id }),
   act: (actor: string, id: string, action: string, note: string | null) =>
     rpc<AdminReport>('media_report_admin_act', { p_actor: actor, p_id: id, p_action: action, p_note: note }),
   requests: (actor: string, status: 'open' | 'all', limit: number) =>
@@ -123,7 +128,12 @@ export const legalDb = {
   request: (actor: string, id: string) =>
     rpc<AdminRequest | null>('privacy_request_admin_get', { p_actor: actor, p_id: id }),
   setStatus: (actor: string, id: string, status: string, note: string | null) =>
-    rpc<AdminRequest>('privacy_request_admin_set', { p_actor: actor, p_id: id, p_status: status, p_note: note }),
+    rpc<AdminRequest>('privacy_request_admin_set', {
+      p_actor: actor,
+      p_id: id,
+      p_status: status,
+      p_note: note,
+    }),
 
   /** What the outcome email needs, unmasked (never leaves the server). */
   async reportTarget(id: string): Promise<ReportTarget | null> {

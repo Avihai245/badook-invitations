@@ -15,6 +15,13 @@
 -- functions take the acting staff member (p_actor) and check the role first (admin_require): support.view
 -- to read, support.reply to handle, and users.suspend (owners and admins) to remove an item for good.
 
+-- ─── hardening found by the isolation tests (tests/db/gallery-isolation.test.ts) ─────────────────
+-- Three older tables have row level security on and no policy, so the browser's roles read nothing — but
+-- they still hold table grants, unlike every other server-only table. A payment token table should not
+-- depend on "no policy yet" alone: take the grants away (the server uses the service role and
+-- security-definer functions, which are unaffected).
+revoke all on public.billing_cards, public.billing_claims, public.rsvp_rate_events from anon, authenticated;
+
 -- ─── what a hidden-because-of-a-report item looks like ──────────────────────────────────────────
 
 do $$
@@ -385,7 +392,7 @@ language plpgsql security definer set search_path = '' as $$
 declare
   v_role text := public.admin_require(p_actor, 'support.reply');
   m public.media_reports;
-  v_note text := nullif(left(coalesce(p_note, ''), 2000), '');
+  v_note text := nullif(btrim(left(coalesce(p_note, ''), 2000)), '');
   v_item public.gallery_items;
 begin
   select * into m from public.media_reports where id = p_id for update;
@@ -522,7 +529,7 @@ declare
   v_pii boolean := public.admin_can(v_role, 'users.pii');
 begin
   return coalesce((
-    select jsonb_agg(public.privacy_request_json(y.m, v_pii) order by y.m.due_at)
+    select jsonb_agg(public.privacy_request_json(y.m, v_pii) order by (y.m).due_at)
     from (
       select m from public.privacy_requests m
       where case coalesce(p_status, 'all')
@@ -559,7 +566,7 @@ returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare
   v_role text := public.admin_require(p_actor, 'support.reply');
-  v_note text := nullif(left(coalesce(p_note, ''), 4000), '');
+  v_note text := nullif(btrim(left(coalesce(p_note, ''), 4000)), '');
   m public.privacy_requests;
   v_final boolean := p_status in ('fulfilled', 'partly', 'declined', 'closed');
 begin

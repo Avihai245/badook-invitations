@@ -34,6 +34,8 @@ export function UploadNotice({
   const content = useRef<HTMLDivElement>(null);
   // after "I understand" the next step (the name sheet, the phone's picker) takes the focus
   const continuing = useRef(false);
+  // what had the focus when the dialog opened: Radix returns focus to a trigger, and this one has none
+  const opener = useRef<HTMLElement | null>(null);
 
   const points: { key: string; icon: ReactNode; text: string }[] = [
     { key: 'seen', icon: <Eye />, text: N.seen },
@@ -56,16 +58,18 @@ export function UploadNotice({
           <RadixDialog.Content
             ref={content}
             data-testid="upload-notice"
+            aria-modal="true"
             // the dialog itself takes the focus: the title is read first and nothing is acknowledged by a stray Enter
             onOpenAutoFocus={(e) => {
               e.preventDefault();
+              opener.current = document.activeElement as HTMLElement | null;
               content.current?.focus();
             }}
             onCloseAutoFocus={(e) => {
-              if (continuing.current) {
-                e.preventDefault();
-                continuing.current = false;
-              }
+              e.preventDefault();
+              // cancelled: back to the button that was tapped; acknowledged: the next step has the focus
+              if (!continuing.current) opener.current?.focus?.();
+              continuing.current = false;
             }}
             className="relative max-h-[92svh] w-full max-w-[460px] overflow-y-auto rounded-t-[26px] bg-surface px-5 pt-2.5 pb-[max(20px,env(safe-area-inset-bottom))] text-ink shadow-2xl outline-none motion-safe:data-[state=open]:animate-app-dialog-in sm:rounded-[26px] sm:px-6 sm:pt-6"
           >

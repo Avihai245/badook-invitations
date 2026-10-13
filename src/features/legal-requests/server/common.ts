@@ -4,7 +4,10 @@ import type { EmailContent } from '@/features/invitations/lib/notify-email';
 /** What the public routes of the report and privacy-request forms answer (a status and a JSON body). */
 export type ApiResult = { status: number; body: Record<string, unknown> };
 
-export const ok = (body: Record<string, unknown>): ApiResult => ({ status: 200, body: { ok: true, ...body } });
+export const ok = (body: Record<string, unknown>): ApiResult => ({
+  status: 200,
+  body: { ok: true, ...body },
+});
 export const fail = (status: number, error: string, extra: Record<string, unknown> = {}): ApiResult => ({
   status,
   body: { ok: false, error, ...extra },

@@ -275,6 +275,8 @@ export const siteHe = {
     history: 'גרסאות קודמות',
     historyCurrent: 'גרסה {version} (התקפה)',
     historyItem: 'גרסה {version} · בתוקף מ־{date}',
+    reportLink: 'דיווח על תוכן',
+    privacyRequestLink: 'בקשת פרטיות',
     related: 'מסמכים קשורים',
     docNames: {
       terms: 'תנאי שימוש',

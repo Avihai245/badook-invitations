@@ -278,6 +278,8 @@ export const siteEn: typeof siteHe = {
     history: 'Earlier versions',
     historyCurrent: 'Version {version} (in force)',
     historyItem: 'Version {version} · in force from {date}',
+    reportLink: 'Report content',
+    privacyRequestLink: 'Privacy request',
     related: 'Related documents',
     docNames: {
       terms: 'Terms of use',

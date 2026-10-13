@@ -127,6 +127,20 @@ export const SUPPORT_PAGES: SupportPage[] = [
   { path: '/privacy', he: 'מדיניות הפרטיות', label: 'Privacy policy' },
   { path: '/cookies', he: 'מדיניות עוגיות', label: 'Cookies' },
   { path: '/accessibility', he: 'הצהרת נגישות', label: 'Accessibility statement' },
+  // the next four exist once version 2 of the legal documents is in force (features/legal)
+  { path: '/refunds', he: 'מדיניות ביטולים והחזרים', label: 'Refund and cancellation policy' },
+  { path: '/gallery-rules', he: 'תקנון גלריית האירוע', label: 'Event gallery rules' },
+  {
+    path: '/report',
+    he: 'דיווח על תוכן',
+    label: 'Report content / ask to remove a photo (no account needed)',
+  },
+  {
+    path: '/privacy-request',
+    he: 'בקשת פרטיות',
+    label: 'Privacy request: see, correct, delete, child photo (no account needed)',
+  },
+  { path: '/legal/:id/:id', he: 'גרסה קודמת של מסמך משפטי', label: 'An earlier version of a legal document' },
   { path: '/login', he: 'התחברות', label: 'Log in' },
   { path: '/signup', he: 'הרשמה', label: 'Sign up' },
 ];

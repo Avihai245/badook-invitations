@@ -11,8 +11,7 @@ import type { ReportCategory, ReportResolution, RequestKind, RequestStatus } fro
  * when the staff ticked "include the note" (the reporter never gets it). Everything typed is escaped.
  */
 
-const lines = (rows: readonly (string | false | null | undefined)[]) =>
-  rows.filter((r): r is string => !!r);
+const lines = (rows: readonly (string | false | null | undefined)[]) => rows.filter((r): r is string => !!r);
 
 function day(iso: string, locale: UiLocale): string {
   return new Intl.DateTimeFormat(intlLocale(locale), {

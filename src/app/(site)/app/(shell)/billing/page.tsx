@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BillingScreen } from '@/features/billing/BillingScreen.client';
 import { loadBillingPage } from '@/features/billing/server/billing';
+import { legalStatus } from '@/features/legal/context';
 import { getUi } from '@/lib/i18n/server';
 import { paidPlanParam } from '@/lib/supabase/auth-paths';
 import { requireUser } from '@/lib/supabase/session';
@@ -21,5 +22,12 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   const start = paidPlanParam(plan);
   const user = await requireUser(start ? `/app/billing?plan=${start}` : '/app/billing');
   const data = await loadBillingPage(user, checkout ?? null, typeof status === 'string' ? status : null);
-  return <BillingScreen data={data} status={typeof status === 'string' ? status : null} start={start} />;
+  return (
+    <BillingScreen
+      data={data}
+      status={typeof status === 'string' ? status : null}
+      start={start}
+      legal={legalStatus().active}
+    />
+  );
 }

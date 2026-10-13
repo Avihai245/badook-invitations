@@ -110,7 +110,8 @@ export async function resolveReportLink(
   if (!gallery && !album) return item ? { kind: 'invalid' } : { kind: 'none' };
   let invitationId: string | null = null;
   let surface: 'gallery' | 'album' = 'gallery';
-  if (gallery && TOKEN_RE.test(gallery)) invitationId = await deps.db.invitationOfGalleryLink(sha256Hex(gallery));
+  if (gallery && TOKEN_RE.test(gallery))
+    invitationId = await deps.db.invitationOfGalleryLink(sha256Hex(gallery));
   if (!invitationId && album && TOKEN_RE.test(album)) {
     invitationId = await deps.db.invitationOfAlbumLink(sha256Hex(album));
     surface = 'album';
@@ -119,6 +120,20 @@ export async function resolveReportLink(
   if (item === null) return { kind: 'ok', invitationId, itemId: null, surface };
   if (!isUuid(item) || !(await deps.db.itemVisible(invitationId, item))) return { kind: 'invalid' };
   return { kind: 'ok', invitationId, itemId: item, surface };
+}
+
+/** POST /api/legal/report/link — what the form's link opens (the page holds no gallery code of its own). */
+export async function checkReportLink(raw: unknown, deps: Pick<ReportDeps, 'db'>): Promise<ApiResult> {
+  const parsed = z
+    .strictObject({
+      g: z.string().trim().max(100).optional(),
+      a: z.string().trim().max(100).optional(),
+      i: z.string().trim().max(100).optional(),
+    })
+    .safeParse(raw);
+  if (!parsed.success) return fail(400, 'invalid');
+  const link = await resolveReportLink(parsed.data, deps);
+  return ok({ state: link.kind, item: link.kind === 'ok' && link.itemId !== null });
 }
 
 export async function submitReport(
@@ -136,7 +151,9 @@ export async function submitReport(
   const linked = link.kind === 'ok';
   if (!linked && !r.reference) {
     // a link that opens nothing: the form then asks for a description of where the content is
-    return link.kind === 'invalid' ? fail(422, 'link_invalid') : fail(400, 'invalid', { fields: ['reference'] });
+    return link.kind === 'invalid'
+      ? fail(422, 'link_invalid')
+      : fail(400, 'invalid', { fields: ['reference'] });
   }
   const invitationId = linked ? link.invitationId : null;
   const itemId = linked ? link.itemId : null;

@@ -12,7 +12,6 @@ import { contactLine, money, operatorLine } from './shared';
  * s. 14C to each product (docs/legal/decision-records.md, DR-04).
  */
 export function refundsDoc(c: LegalContext): LegalDoc {
-  const o = c.operator;
   const who = operatorLine(c);
   if (c.locale === 'en') {
     return {
