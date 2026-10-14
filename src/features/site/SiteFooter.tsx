@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { BrandLogo } from '@/components/app/BrandLogo';
+import { legalStatus } from '@/features/legal/status';
 import { fmt, type AppDict } from '@/lib/i18n/app';
 import { CookieConsent, CookieSettingsButton } from './CookieConsent.client';
 
@@ -10,6 +11,8 @@ export function SiteFooter({ t, onHome = false }: { t: AppDict; onHome?: boolean
   const n = t.site.nav;
   const at = (id: string) => (onHome ? `#${id}` : `/#${id}`);
   const link = 'rounded-btn text-muted transition-colors hover:text-ink';
+  // version 2 of the legal documents adds the refund policy and the gallery rules
+  const v2 = legalStatus().active;
   return (
     <footer className="border-t border-line bg-surface">
       {/* the public site's pages ask for consent; the app itself sets essential cookies only */}
@@ -67,6 +70,30 @@ export function SiteFooter({ t, onHome = false }: { t: AppDict; onHome?: boolean
                 {f.accessibility}
               </Link>
             </li>
+            {v2 && (
+              <>
+                <li>
+                  <Link className={link} href="/refunds">
+                    {t.site.legal.docNames.refunds}
+                  </Link>
+                </li>
+                <li>
+                  <Link className={link} href="/gallery-rules">
+                    {t.site.legal.docNames['gallery-rules']}
+                  </Link>
+                </li>
+                <li>
+                  <Link className={link} href="/report">
+                    {t.site.legal.reportLink}
+                  </Link>
+                </li>
+                <li>
+                  <Link className={link} href="/privacy-request">
+                    {t.site.legal.privacyRequestLink}
+                  </Link>
+                </li>
+              </>
+            )}
             <li>
               <CookieSettingsButton className={link} label={f.cookieSettings} />
             </li>

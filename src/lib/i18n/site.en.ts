@@ -269,6 +269,26 @@ export const siteEn: typeof siteHe = {
   legal: {
     updated: 'Last updated: {date}',
     contents: 'Contents',
+    versionLine: 'Version {version} · in force from {date}',
+    archivedNotice:
+      'This is an earlier version of the document (version {version}, in force until {until}). It is kept exactly as it was, for the record.',
+    archivedNoticeNoDate:
+      'This is an earlier version of the document (version {version}). It is kept exactly as it was, for the record.',
+    currentLink: 'Go to the version in force',
+    history: 'Earlier versions',
+    historyCurrent: 'Version {version} (in force)',
+    historyItem: 'Version {version} · in force from {date}',
+    reportLink: 'Report content',
+    privacyRequestLink: 'Privacy request',
+    related: 'Related documents',
+    docNames: {
+      terms: 'Terms of use',
+      privacy: 'Privacy policy',
+      cookies: 'Cookie policy',
+      accessibility: 'Accessibility statement',
+      refunds: 'Refund and cancellation policy',
+      'gallery-rules': 'Event gallery and user-generated content rules',
+    },
   },
   footer: {
     tagline: 'Digital invitations with RSVPs, in Hebrew and English.',

@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Card, cn, Field, Input, Switch, Textarea, useToast } from '@/components/app';
+import { AiNote } from '@/features/legal/notices/AiNote.client';
 import { useUi } from '@/lib/i18n/client';
 import { INTEGRATION_MODES, type IntegrationMode, type PlanView } from '../model/plan';
 import type { PrivateTemplateItems } from '../model/draft';
@@ -302,6 +303,12 @@ export function Onboarding() {
                         onChange={(e) => setDescribe(e.target.value)}
                       />
                     </Field>
+                    <AiNote
+                      kind="text"
+                      provider="Anthropic"
+                      anchor="planning"
+                      className="-mt-1 text-[12px] text-muted"
+                    />
                     <Button
                       variant="secondary"
                       icon={<Sparkles />}

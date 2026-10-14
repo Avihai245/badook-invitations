@@ -25,6 +25,8 @@ import {
   type ReactNode,
 } from 'react';
 import { cn, Hint } from '@/components/app';
+import { NoteAnchor } from '@/features/legal/notices/CollectionNote';
+import { useLegalNotices } from '@/features/legal/notices/flag.client';
 import { useUi } from '@/lib/i18n/client';
 import { navKeyOf } from '@/features/invitations/app/workspace/stages';
 import { SUPPORT_OPEN, openHelp, type SupportOpenDetail } from './open';
@@ -285,6 +287,7 @@ function Answer({
 export function SupportChat() {
   const { t, locale, fmt } = useUi();
   const s = t.support;
+  const legal = useLegalNotices();
   const path = usePathname();
   const [open, setOpen] = useState(false);
   // the help panel's tab: the written guide (an article or its index), the assistant, the team
@@ -795,6 +798,19 @@ export function SupportChat() {
                   </Link>
                 )}
               </p>
+              {legal ? (
+                <p
+                  className="mt-1 px-1 text-[11.5px] leading-[1.45] text-muted"
+                  data-testid="support-ai-note"
+                >
+                  {t.collectionNotes.support.assistant}{' '}
+                  <NoteAnchor
+                    href="/privacy#support"
+                    label={t.collectionNotes.support.assistantLink}
+                    newTab={t.collectionNotes.newTab}
+                  />
+                </p>
+              ) : null}
             </form>
           </div>
         </>

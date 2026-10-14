@@ -319,6 +319,49 @@ export const galleryGuestFr: GalleryGuestDict = {
     leftOut:
       'C’est fait : vous n’apparaîtrez pas dans les recherches des autres invités — photos envoyées à partir de maintenant comprises.',
   },
+  /** version 2 des documents juridiques : l’avis avant le premier envoi, les liens de signalement (seulement tant qu’elle est en vigueur) */
+  legal: {
+    notice: {
+      title: 'Avant de partager',
+      intro: 'Quelques points à connaître avant votre premier envoi :',
+      seen: 'Toute personne qui a le lien de cette galerie (et son code, s’il y en a un) ainsi que les hôtes peuvent voir les photos publiées. Les hôtes voient aussi celles qui attendent une validation ou qui ont été refusées.',
+      own: 'Ne partagez que des photos que vous avez le droit de partager. N’envoyez pas de photos d’enfants d’autres personnes, ni de photos qui humilient ou exposent quelqu’un. Les personnes qui apparaissent sur une photo peuvent en demander le retrait.',
+      location:
+        'Nous essayons de supprimer les données de localisation des photos et des vidéos avant l’envoi, mais nous ne pouvons pas le garantir pour tous les types de fichiers. Évitez de partager des fichiers dont la localisation est sensible.',
+      copies:
+        'Les hôtes peuvent télécharger ce qui est envoyé, et les invités peuvent télécharger certains fichiers. Une copie enregistrée ailleurs ne peut pas être rappelée.',
+      faces:
+        'La recherche par visage est activée dans cette galerie : les visages des photos que vous envoyez sont détectés sur votre téléphone, et des codes de visage sont conservés pour la fonction « Les photos où j’apparais ». Voir les règles de la galerie.',
+      ackOnly:
+        'Appuyer sur « J’ai compris » confirme seulement que vous avez lu cet avis. Ce n’est pas le consentement des personnes qui apparaissent sur vos photos.',
+      rules: 'Règles de la galerie',
+      privacy: 'Politique de confidentialité',
+      newTab: 's’ouvre dans un nouvel onglet',
+      understand: 'J’ai compris — continuer',
+      cancel: 'Annuler',
+    },
+    report: {
+      short: 'Signaler',
+      photo: 'Signaler cette photo',
+      video: 'Signaler cette vidéo',
+    },
+    footer: {
+      rules: 'Règles de la galerie',
+      report: 'Signaler un contenu',
+      privacyRequest: 'Demande relative à la vie privée',
+    },
+    faces: {
+      mine: 'Votre consentement ici ne couvre que votre propre selfie et votre propre recherche.',
+      others:
+        'Les visages des autres personnes de la galerie ont été détectés sur les téléphones de ceux qui ont envoyé les photos, et non avec le consentement de ces personnes.',
+      exclude: 'Demander à ne pas apparaître dans les recherches',
+      rules: 'Règles de la galerie',
+      children: 'Si la photo d’un enfant ne devrait pas se trouver dans la galerie, vous pouvez la signaler.',
+      report: 'Signaler un contenu',
+    },
+    /** this phone's own upload that a report hid */
+    mineReported: 'Masqué pendant son examen',
+  },
   projector: {
     title: 'Écran de la galerie · {name}',
     empty: 'Les photos des invités apparaîtront ici',

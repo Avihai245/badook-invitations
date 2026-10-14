@@ -1,4 +1,4 @@
-import type { LegalContext, LegalDoc } from './types';
+import type { LegalContext, LegalDoc } from '../types';
 
 /**
  * The cookie policy: every cookie and browser-storage key the site sets (all essential or remembering a

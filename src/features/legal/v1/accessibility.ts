@@ -1,4 +1,4 @@
-import type { LegalContext, LegalDoc } from './types';
+import type { LegalContext, LegalDoc } from '../types';
 
 /**
  * The accessibility statement, as the Equal Rights for Persons with Disabilities (Service

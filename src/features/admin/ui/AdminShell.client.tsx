@@ -6,6 +6,7 @@ import {
   Handshake,
   LayoutDashboard,
   LifeBuoy,
+  Scale,
   Mail,
   Menu as MenuIcon,
   MessageSquareText,
@@ -31,6 +32,7 @@ const ICONS: Record<AdminArea, LucideIcon> = {
   messages: MessageSquareText,
   finance: Wallet,
   support: LifeBuoy,
+  legal: Scale,
   partners: Handshake,
   staff: ShieldCheck,
   audit: ScrollText,
@@ -81,37 +83,40 @@ function AdminNavList({ badges, onNavigate }: { badges: AdminNavBadges; onNaviga
   const current = adminAreaOf(usePathname());
   return (
     <nav aria-label={t.nav.label} className="flex flex-col gap-0.5 px-3">
-      {ADMIN_NAV.filter((item) => can(item.perm)).map((item) => {
-        const Icon = ICONS[item.key];
-        const active = current === item.key;
-        const count = badges[item.key] ?? 0;
-        return (
-          <Link
-            key={item.key}
-            href={item.href}
-            onClick={onNavigate}
-            aria-current={active ? 'page' : undefined}
-            data-testid={`admin-nav-${item.key}`}
-            className={cn(
-              'relative flex h-10 items-center gap-3 rounded-[10px] px-3 text-[14px] transition-colors',
-              active
-                ? 'bg-brand-soft font-semibold text-brand-deep'
-                : 'font-medium text-muted hover:bg-subtle hover:text-ink',
-            )}
-          >
-            {active ? (
-              <span aria-hidden className="absolute inset-y-2 -start-3 w-[3px] rounded-e-full bg-brand" />
-            ) : null}
-            <Icon aria-hidden className="size-[18px] shrink-0" strokeWidth={1.75} />
-            <span className="min-w-0 flex-1 truncate">{t.nav[item.key]}</span>
-            {count > 0 ? (
-              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-strong px-1.5 text-[11px] font-bold text-white tabular-nums">
-                {count > 99 ? '99+' : count}
-              </span>
-            ) : null}
-          </Link>
-        );
-      })}
+      {/* the legal area exists only while version 2 of the legal documents is in force (adminNavBadges counts it then) */}
+      {ADMIN_NAV.filter((item) => can(item.perm) && (item.key !== 'legal' || badges.legal !== undefined)).map(
+        (item) => {
+          const Icon = ICONS[item.key];
+          const active = current === item.key;
+          const count = badges[item.key] ?? 0;
+          return (
+            <Link
+              key={item.key}
+              href={item.href}
+              onClick={onNavigate}
+              aria-current={active ? 'page' : undefined}
+              data-testid={`admin-nav-${item.key}`}
+              className={cn(
+                'relative flex h-10 items-center gap-3 rounded-[10px] px-3 text-[14px] transition-colors',
+                active
+                  ? 'bg-brand-soft font-semibold text-brand-deep'
+                  : 'font-medium text-muted hover:bg-subtle hover:text-ink',
+              )}
+            >
+              {active ? (
+                <span aria-hidden className="absolute inset-y-2 -start-3 w-[3px] rounded-e-full bg-brand" />
+              ) : null}
+              <Icon aria-hidden className="size-[18px] shrink-0" strokeWidth={1.75} />
+              <span className="min-w-0 flex-1 truncate">{t.nav[item.key]}</span>
+              {count > 0 ? (
+                <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-strong px-1.5 text-[11px] font-bold text-white tabular-nums">
+                  {count > 99 ? '99+' : count}
+                </span>
+              ) : null}
+            </Link>
+          );
+        },
+      )}
     </nav>
   );
 }

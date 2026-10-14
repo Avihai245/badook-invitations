@@ -26,6 +26,7 @@ export function RsvpView({ section, ctx }: SectionViewProps<SectionOf<'rsvp'>>) 
     intl: INTL_LOCALE[ctx.locale],
     strings: dictEntries(ctx.locale, RSVP_KEYS),
     notes: RSVP_NOTES[ctx.locale],
+    legalNotice: ctx.legalNotice,
     askChildren: d.askChildren,
     maxAdults: d.maxAdults,
     maxChildren: d.askChildren ? d.maxChildren : 0,

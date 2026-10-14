@@ -113,6 +113,18 @@ export const aiPhotosGuestFr: AiPhotosGuestDict = {
     delete: 'Supprimer',
     confirmDelete: 'Supprimer cette photo ?',
   },
+  /** version 2 des documents juridiques : ce qui est envoyé et où, avant la création de la photo */
+  notice: {
+    send: 'Votre photo et votre demande, avec les photos des personnes à l’honneur envoyées par les hôtes, sont transmises à un fournisseur d’IA externe (OpenAI) pour créer l’image.',
+    children:
+      'N’envoyez pas de photos d’enfants d’autres personnes ni de personnes qui n’ont pas donné leur accord.',
+    result:
+      'Le résultat est généré par l’IA et il est signalé comme tel quand il est partagé dans la galerie.',
+    retention:
+      'Il est supprimé 30 jours après l’événement. La durée de conservation chez le fournisseur dépend de sa propre politique.',
+    privacy: 'Politique de confidentialité',
+    newTab: 's’ouvre dans un nouvel onglet',
+  },
   ai: 'IA',
   close: 'Fermer',
   back: 'Retour',

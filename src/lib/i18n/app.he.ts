@@ -52,6 +52,8 @@ export type AppDict = typeof he;
 /** The keys of app-more.<locale>.ts: screens of the host app (the event home, settings, overview…). */
 export type MoreKey =
   | 'tickets'
+  | 'legalRequests'
+  | 'collectionNotes'
   | 'workspace'
   | 'helpCenter'
   | 'start'

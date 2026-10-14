@@ -17,7 +17,9 @@ import { DAY_MONTH_YEAR, formatDate } from '@/features/invitations/lib/dates';
 import { nativeName } from '@/features/invitations/lib/locales';
 import { galleryApi } from '@/features/live-gallery/client/api';
 import { downloadAll } from '@/features/live-gallery/client/download';
+import { legalPage, privacyRequestLink, reportLink } from '@/features/live-gallery/ui/legal';
 import { MediaViewer } from '@/features/live-gallery/ui/MediaViewer';
+import { ReportLink } from '@/features/live-gallery/ui/ReportLink';
 import { ALBUM_GUEST } from '@/lib/i18n/album-guest';
 import { fill, localeText } from '@/lib/i18n/guest';
 import { ALBUM } from '../config';
@@ -36,10 +38,13 @@ export function AlbumView({
   data,
   token,
   lang,
+  legal = false,
 }: {
   data: AlbumPageData;
   token: string;
   lang: Locale | null;
+  /** version 2 of the legal documents is in force: a report link on each photo and the legal links below */
+  legal?: boolean;
 }) {
   const e = data.event;
   const [locale, setLocale] = useState<Locale>(lang && e.locales.includes(lang) ? lang : e.defaultLocale);
@@ -403,6 +408,22 @@ export function AlbumView({
             {t.makeYours}
           </a>
         </p>
+        {legal ? (
+          <p className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1" data-testid="album-legal">
+            <a href={legalPage('/gallery-rules', locale)} target="_blank" rel="noopener">
+              {t.legal.rules}
+            </a>
+            <a href={reportLink({ album: token }, locale)} target="_blank" rel="noopener">
+              {t.legal.report}
+            </a>
+            <a href={legalPage('/privacy', locale)} target="_blank" rel="noopener">
+              {t.legal.privacy}
+            </a>
+            <a href={privacyRequestLink(locale)} target="_blank" rel="noopener">
+              {t.legal.privacyRequest}
+            </a>
+          </p>
+        ) : null}
       </footer>
 
       {notice ? (
@@ -434,6 +455,14 @@ export function AlbumView({
                 ) : null}
                 {p.name ? <span>{fill(t.by, { name: p.name })}</span> : null}
               </span>
+              {legal ? (
+                <ReportLink
+                  href={reportLink({ album: token, item: p.id }, locale)}
+                  label={p.kind === 'video' ? t.legal.video : t.legal.photo}
+                  text={t.legal.short}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/15 px-3 font-semibold hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-white"
+                />
+              ) : null}
               <button
                 type="button"
                 onClick={() => void downloadOne(p)}

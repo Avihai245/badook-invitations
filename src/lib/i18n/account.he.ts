@@ -37,6 +37,7 @@ export const accountHe = {
     errors: {
       link_expired: 'הקישור פג תוקף או שכבר השתמשו בו. היכנסו לחשבון, או בקשו קישור חדש ב"שכחתם סיסמה?".',
       other_browser: 'את הקישור צריך לפתוח באותו דפדפן שבו ביקשתם אותו. אפשר לבקש כאן קישור חדש.',
+      terms_required: 'כדי להירשם צריך לאשר את תנאי השימוש ואת מדיניות הפרטיות.',
     },
     notices: {
       email_confirmed: 'כתובת המייל אושרה. היכנסו כדי להמשיך.',
@@ -48,6 +49,11 @@ export const accountHe = {
     terms: 'בהרשמה אתם מסכימים ל{terms} ול{privacy}.',
     termsLink: 'תנאי השימוש',
     privacyLink: 'מדיניות הפרטיות',
+    /** version 2 of the legal documents: an unticked box instead of the line above */
+    accept: 'קראתי ואני מאשר/ת את {terms} ואת {privacy}.',
+    acceptTerms: 'תנאי השימוש',
+    acceptPrivacy: 'מדיניות הפרטיות',
+    newTab: '(נפתח בלשונית חדשה)',
     continue: {
       title: 'כניסה ל־Badook',
       subtitle: 'הקישור שלכם מ־Badook Events מוכן. לחצו כדי להיכנס להזמנות שלכם.',

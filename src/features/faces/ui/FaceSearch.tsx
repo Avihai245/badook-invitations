@@ -9,6 +9,8 @@ import {
   RefreshCw,
   ScanFace,
   ShieldCheck,
+  UserCheck,
+  Users,
   UserX,
   X,
 } from 'lucide-react';
@@ -16,7 +18,9 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 import { galleryApi } from '@/features/live-gallery/client/api';
 import { downloadAll } from '@/features/live-gallery/client/download';
 import type { FeedItem } from '@/features/live-gallery/types';
+import { legalPage, privacyRequestLink, reportLink } from '@/features/live-gallery/ui/legal';
 import { MediaViewer } from '@/features/live-gallery/ui/MediaViewer';
+import { ReportLink } from '@/features/live-gallery/ui/ReportLink';
 import { FeedGrid } from '@/features/live-gallery/ui/guest/FeedGrid';
 import { fmt, useGuestText } from '@/features/live-gallery/ui/guest-text';
 import { FACES } from '../config';
@@ -57,15 +61,21 @@ export function FaceSearch({
   token,
   code,
   until,
+  legal = false,
+  report,
 }: {
   token: string;
   /** the gallery's access code, when the hosts set one */
   code(): string | null;
   /** the last day search is open (the face data's erasure) */
   until: string | null;
+  /** version 2 of the legal documents is in force: the consent screen says whose consent this is */
+  legal?: boolean;
+  /** the report form for a photo of the album (null for the guest's own); absent while version 2 is not in force */
+  report?: (item: FeedItem) => string | null;
 }) {
   const text = useGuestText();
-  const { t, plural, number, date, dir } = text;
+  const { t, plural, number, date, dir, locale } = text;
   const F = t.faces;
   const [step, setStep] = useState<Step>('intro');
   const [agreed, setAgreed] = useState(false);
@@ -319,6 +329,43 @@ export function FaceSearch({
           <Point icon={<ImagePlus />}>{F.consent.gallery}</Point>
           <Point icon={<Download />}>{fmt(F.consent.model, { mb: number(FACES.model.sizeMb) })}</Point>
           <Point icon={<UserX />}>{F.consent.forget}</Point>
+          {legal ? (
+            // whose consent this is: the searching guest's own, for their own selfie — not the other faces'
+            <div
+              className="grid gap-2 rounded-[12px] border border-line bg-canvas p-3 text-[13.5px]"
+              data-testid="face-consent-legal"
+            >
+              <Point icon={<UserCheck />}>{t.legal.faces.mine}</Point>
+              <Point icon={<Users />}>{t.legal.faces.others}</Point>
+              <p>{t.legal.faces.children}</p>
+              <p className="flex flex-wrap gap-x-4 gap-y-1 font-semibold">
+                <a
+                  href={privacyRequestLink(locale, 'biometric_exclusion')}
+                  target="_blank"
+                  rel="noopener"
+                  className="underline"
+                >
+                  {t.legal.faces.exclude}
+                </a>
+                <a
+                  href={legalPage('/gallery-rules', locale)}
+                  target="_blank"
+                  rel="noopener"
+                  className="underline"
+                >
+                  {t.legal.faces.rules}
+                </a>
+                <a
+                  href={reportLink({ gallery: token }, locale)}
+                  target="_blank"
+                  rel="noopener"
+                  className="underline"
+                >
+                  {t.legal.faces.report}
+                </a>
+              </p>
+            </div>
+          ) : null}
           <a
             href="/privacy#faces"
             target="_blank"
@@ -506,6 +553,21 @@ export function FaceSearch({
           onClose={() => setOpen(null)}
           dir={dir}
           labels={t.viewer}
+          footer={
+            report
+              ? (item) => {
+                  const href = report(item);
+                  return href ? (
+                    <ReportLink
+                      href={href}
+                      label={item.kind === 'video' ? t.legal.report.video : t.legal.report.photo}
+                      text={t.legal.report.short}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/12 px-3 text-[13px] font-semibold text-white focus-visible:outline-2 focus-visible:outline-white"
+                    />
+                  ) : null;
+                }
+              : undefined
+          }
         />
       ) : null}
 

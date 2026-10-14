@@ -218,6 +218,7 @@ export const liveGalleryEn: LiveGalleryDict = {
       unchecked: 'The automatic check couldn’t run',
       no_preview: 'A format browsers can’t show',
       host: 'Your decision',
+      report: 'Hidden after a report',
     },
     by: 'Uploaded by {name}',
     instagram: 'Asked to be tagged on Instagram: {handle}',

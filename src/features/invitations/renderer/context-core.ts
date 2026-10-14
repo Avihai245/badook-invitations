@@ -81,6 +81,11 @@ export interface RenderContext {
   /** The event measures how guests use the invitation (feature `analytics`): the live page's beacon. */
   insights: boolean;
   /**
+   * The legal documents' version 2 is in force (features/legal): the RSVP form adds its line on who sees
+   * the answers. Part of the options, so the cached page and the live language switch agree.
+   */
+  legalNotice: boolean;
+  /**
    * The invitation as one scroll scene (renderer/scene: the host's choice or the design's, with the
    * `cinematic` feature) — its pictures, particles and tones; null: a page.
    */
@@ -107,6 +112,8 @@ export interface RenderOptions {
   liveGallery?: { url: string; album?: string | null } | null;
   /** the event has the `analytics` feature (the public page asks features/flags; default off) */
   insights?: boolean;
+  /** version 2 of the legal documents is in force (the public page asks features/legal; default off) */
+  legalNotice?: boolean;
 }
 
 /**
@@ -169,6 +176,7 @@ export function createRenderContext(
     review: options.review ?? false,
     liveGallery: options.liveGallery ?? null,
     insights: options.insights ?? false,
+    legalNotice: options.legalNotice ?? false,
     scene: sceneOn(doc, template, options.cinematic ?? true)
       ? sceneModel({ doc, template, bases: options.bases })
       : null,

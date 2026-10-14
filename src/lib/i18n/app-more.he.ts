@@ -1,3 +1,5 @@
+import { collectionNotesHe } from './collection-notes.he';
+import { legalRequestsHe } from './legal-requests.he';
 import { ticketsHe } from './tickets.he';
 
 /**
@@ -7,6 +9,8 @@ import { ticketsHe } from './tickets.he';
  */
 export const heMore = {
   tickets: ticketsHe,
+  legalRequests: legalRequestsHe,
+  collectionNotes: collectionNotesHe,
   /** an invitation's own pages: the header and tabs above the overview, guests, RSVPs and sharing */
   workspace: {
     label: 'ניווט בהזמנה',

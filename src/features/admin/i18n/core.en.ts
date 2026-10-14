@@ -13,6 +13,7 @@ export const coreEn: typeof coreHe = {
     messages: 'Messages',
     finance: 'Cash flow',
     support: 'Support',
+    legal: 'Reports & privacy',
     partners: 'Badook Events',
     staff: 'Staff & permissions',
     audit: 'Audit log',

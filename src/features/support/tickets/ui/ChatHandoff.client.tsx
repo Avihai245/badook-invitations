@@ -4,6 +4,8 @@ import { CheckCircle2, Send } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Button, Field, Hint, Input, Select, Textarea } from '@/components/app';
+import { NoteAnchor } from '@/features/legal/notices/CollectionNote';
+import { useLegalNotices } from '@/features/legal/notices/flag.client';
 import { useUi } from '@/lib/i18n/client';
 import { subjectFrom, TICKET_CATEGORIES, TICKETS, type TicketCategory } from '../config';
 import type { ChatLine } from '../types';
@@ -34,6 +36,7 @@ export function ChatHandoff({
 }) {
   const { t, fmt, locale, plural } = useUi();
   const h = t.tickets.handoff;
+  const legal = useLegalNotices();
   const questions = conversation.filter((l) => l.role === 'user');
   const [subject, setSubject] = useState(() => subjectFrom(questions[0]?.content ?? '', 120));
   const [category, setCategory] = useState<TicketCategory>('support');
@@ -114,6 +117,16 @@ export function ChatHandoff({
           {h.title}
         </h3>
         <p className="text-[13px] text-pretty text-muted">{h.intro}</p>
+        {legal ? (
+          <p className="text-[12.5px] text-pretty text-muted" data-testid="handoff-note">
+            {t.collectionNotes.support.handoff}{' '}
+            <NoteAnchor
+              href="/privacy#support"
+              label={t.collectionNotes.support.assistantLink}
+              newTab={t.collectionNotes.newTab}
+            />
+          </p>
+        ) : null}
         <Field label={h.subject} required>
           <Input
             value={subject}

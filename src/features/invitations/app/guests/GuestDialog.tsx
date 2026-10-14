@@ -10,6 +10,7 @@ import { normalizeGuestPhone, whatsappCapable } from '../../lib/guest-import';
 import { guestPhone } from '../../lib/guest-list';
 import { nativeName } from '../../lib/locales';
 import type { GuestRecord } from '../../server/guests';
+import { GuestsNote } from './GuestsNote';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -179,6 +180,7 @@ export function GuestDialog({
             </Select>
           </Field>
         ) : null}
+        <GuestsNote kind="add" className="sm:col-span-2" />
         <button type="submit" hidden />
       </form>
     </Dialog>

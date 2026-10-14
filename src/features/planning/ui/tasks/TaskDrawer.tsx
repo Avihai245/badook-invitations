@@ -9,6 +9,7 @@ import { CATEGORY_KEYS, isCategoryKey, TASK_STATUSES, type TaskStatus } from '..
 import { googleTaskUrl } from '../../model/calendar';
 import type { TaskView } from '../../model/plan';
 import { usePlan } from '../PlanProvider';
+import { usePlanningNote } from '../PlanningNote';
 import type { TaskChange } from './useTaskActions';
 
 /**
@@ -35,6 +36,7 @@ export function TaskDrawer({
 }) {
   const { t } = useUi();
   const D = t.planning.tasks.drawer;
+  const personNote = usePlanningNote('person');
   const plan = usePlan();
   const { view } = plan;
   const [name, setName] = useState('');
@@ -150,7 +152,7 @@ export function TaskDrawer({
           </Select>
         </Field>
         {who === 'other' ? (
-          <Field label={D.assigneeName}>
+          <Field label={D.assigneeName} help={personNote}>
             <Input value={other} maxLength={60} onChange={(e) => setOther(e.target.value)} />
           </Field>
         ) : null}

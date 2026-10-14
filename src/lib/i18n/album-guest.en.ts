@@ -63,5 +63,15 @@ export const albumGuestEn: AlbumGuestDict = {
   made: 'This album was made with {brand}',
   makeYours: 'A digital invitation, a live gallery and an album — for your event',
   failed: 'Something went wrong. Please try again.',
+  /** version 2 of the legal documents: the report links (only while it is in force) */
+  legal: {
+    short: 'Report',
+    photo: 'Report this photo',
+    video: 'Report this video',
+    rules: 'Gallery rules',
+    report: 'Report content',
+    privacy: 'Privacy policy',
+    privacyRequest: 'Privacy request',
+  },
   top: 'Back to the top',
 };

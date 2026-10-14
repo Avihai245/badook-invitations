@@ -208,6 +208,7 @@ export const liveGalleryHe = {
       unchecked: 'הבדיקה האוטומטית לא הצליחה',
       no_preview: 'פורמט שהדפדפן לא מציג',
       host: 'החלטה שלכם',
+      report: 'הוסתר בעקבות דיווח',
     },
     by: 'הועלה על ידי {name}',
     instagram: 'ביקשו תיוג באינסטגרם: {handle}',

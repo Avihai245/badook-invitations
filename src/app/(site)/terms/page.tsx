@@ -1,17 +1,9 @@
 import type { Metadata } from 'next';
-import { legalContext } from '@/features/legal/context';
-import { LegalPage, legalMetadata } from '@/features/legal/LegalPage';
-import { termsDoc } from '@/features/legal/terms';
-import { getUi } from '@/lib/i18n/server';
+import { LegalDocPage, legalDocMetadata } from '@/features/legal/render';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { locale, t } = await getUi();
-  return legalMetadata(termsDoc(legalContext(locale)), t.brand);
-}
+export const generateMetadata = (): Promise<Metadata> => legalDocMetadata('terms');
 
-/** /terms — the terms of use. */
-export default async function TermsPage() {
-  const { locale, t } = await getUi();
-  const context = legalContext(locale);
-  return <LegalPage t={t} doc={termsDoc(context)} context={context} />;
+/** /terms — the version of the document in force (features/legal/registry.ts). */
+export default function Page() {
+  return <LegalDocPage docKey="terms" />;
 }

@@ -375,7 +375,8 @@ export async function moderateItems(
     done.count ? deps.broadcast(current.gallery.channel, 'items') : null,
     parsed.data.action === 'delete' && done.count ? deps.sweep() : null,
   ]);
-  return ok({ count: done.count, ids: done.ids });
+  // held: items a report holds are left as they are (the count is what changed)
+  return ok({ count: done.count, ids: done.ids, ...(done.held?.length ? { held: done.held } : {}) });
 }
 
 // ─── download everything ────────────────────────────────────────────────────────────────────────

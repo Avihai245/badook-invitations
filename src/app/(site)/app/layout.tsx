@@ -2,6 +2,8 @@ import { after } from 'next/server';
 import { Suspense, type ReactNode } from 'react';
 import '@/styles/app.css';
 import { tick } from '@/features/jobs/jobs';
+import { LegalNoticesProvider } from '@/features/legal/notices/flag.client';
+import { legalStatus } from '@/features/legal/status';
 import { assertInvitationsEnabled } from '@/lib/feature';
 import { ActingAsBar } from '@/features/admin/ui/ActingAsBar.client';
 import { UiProvider } from '@/lib/i18n/provider-lazy';
@@ -15,9 +17,11 @@ import { AppToasts } from '../AppProviders';
  * Every /app page: feature flag, a verified session (the middleware already redirects signed-out
  * visitors — this is the server-side guarantee), toasts and the support assistant (signed-in hosts
  * only: the public pages don't have it). Once the page is sent, the app looks for its recurring jobs
- * that are due (features/jobs). The app's screens get the whole UI dictionary here (the root layout
- * gives the public pages only the site's part). Every move between screens starts at the top and shows
- * a bar while the next screen loads (NavEffects).
+ * that are due (features/jobs). The collection notices of the legal documents' version 2 (features/legal/
+ * notices) show only while that version is in force: the layout asks once, LegalNoticesProvider tells the
+ * screens. The app's screens get the whole UI dictionary here (the root layout gives the public pages
+ * only the site's part). Every move between screens starts at the top and shows a bar while the next
+ * screen loads (NavEffects).
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
   assertInvitationsEnabled();
@@ -26,14 +30,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   after(() => tick());
   return (
     <UiProvider locale={locale}>
-      <AppToasts>
-        {acting ? <ActingAsBar who={acting.target.email ?? acting.target.id} /> : null}
-        {children}
-        <SupportChat />
-        <Suspense>
-          <NavEffects />
-        </Suspense>
-      </AppToasts>
+      <LegalNoticesProvider active={legalStatus().active}>
+        <AppToasts>
+          {acting ? <ActingAsBar who={acting.target.email ?? acting.target.id} /> : null}
+          {children}
+          <SupportChat />
+          <Suspense>
+            <NavEffects />
+          </Suspense>
+        </AppToasts>
+      </LegalNoticesProvider>
     </UiProvider>
   );
 }

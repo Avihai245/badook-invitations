@@ -1,0 +1,7 @@
+{
+  "_": "SHA-256 of the frozen version-1 legal texts (src/features/legal/v1). A change to a text that was in force is a new version, never an edit: add src/features/legal/v2+ and a registry entry instead of changing these hashes.",
+  "accessibility.ts": "0323d6e85adc97ff2c24088be0d2a803358541b6e0636c35d085dcf63c87142d",
+  "cookies.ts": "d7929332da009a14fe48d49e7e664ae979b95609a5eba3b450c29a8e82ac57d6",
+  "privacy.ts": "66149560fb39f5cbcb2dd913a748a7e246d09d7b5467c3b810a98f6edf5dcfd7",
+  "terms.ts": "7e3a31dd8003328ac7167a2da168506822f5d81ed791ac35e39569fae105a4de"
+}

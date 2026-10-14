@@ -13,6 +13,7 @@ import {
   Textarea,
   useToast,
 } from '@/components/app';
+import { AiNote } from '@/features/legal/notices/AiNote.client';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import type { Locale } from '../../contracts/types';
@@ -132,6 +133,9 @@ export function LanguagesPanel() {
             );
           })}
         </ul>
+        {tr?.available ? (
+          <AiNote kind="text" provider="Anthropic" className="text-[12px] text-muted" />
+        ) : null}
         {doc.locales.length > 1 ? (
           <>
             <Field label={l.default}>

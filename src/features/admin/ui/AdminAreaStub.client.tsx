@@ -5,8 +5,14 @@ import type { AdminArea } from '../nav';
 import { AdminPageHeader } from './AdminShell.client';
 import { useAdminUi } from './AdminUi.client';
 
-/** An area's page before its screens are in: its title and what it will hold. */
-export function AdminAreaStub({ area, denied = false }: { area: AdminArea; denied?: boolean }) {
+/** An area's page before its screens are in: its title and what it will hold (the legal area has its own dictionary). */
+export function AdminAreaStub({
+  area,
+  denied = false,
+}: {
+  area: Exclude<AdminArea, 'legal'>;
+  denied?: boolean;
+}) {
   const { t } = useAdminUi();
   const d = t[area];
   return (

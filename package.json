@@ -48,7 +48,8 @@
     "video:render": "npm --prefix video ci && npm --prefix video run render",
     "video:seating": "npm --prefix video ci && npm --prefix video run render:seating",
     "video:tour": "npm --prefix video ci && npm --prefix video run narrate && npm --prefix video run render:tour",
-    "video:tour:recorded": "npm --prefix video ci && npm --prefix video run narrate:files && npm --prefix video run render:tour"
+    "video:tour:recorded": "npm --prefix video ci && npm --prefix video run narrate:files && npm --prefix video run render:tour",
+    "legal:export": "tsx scripts/export-legal.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -8,6 +8,7 @@ export const ADMIN_NAV = [
   { key: 'messages', href: '/app/admin/messages', perm: 'messages.view' },
   { key: 'finance', href: '/app/admin/finance', perm: 'finance.view' },
   { key: 'support', href: '/app/admin/support', perm: 'support.view' },
+  { key: 'legal', href: '/app/admin/legal', perm: 'support.view' },
   { key: 'partners', href: '/app/admin/partners', perm: 'partners.view' },
   { key: 'staff', href: '/app/admin/staff', perm: 'staff.view' },
   { key: 'audit', href: '/app/admin/audit', perm: 'audit.view' },
