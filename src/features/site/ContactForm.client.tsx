@@ -132,7 +132,7 @@ export function ContactForm({
         <Textarea name="message" rows={6} maxLength={5000} />
       </Field>
       {/* not for people: bots fill it in, and the message is then dropped */}
-      <div aria-hidden className="absolute -start-[9999px] size-px overflow-hidden">
+      <div aria-hidden className="sr-only">
         <label>
           Website
           <input name="website" tabIndex={-1} autoComplete="off" />

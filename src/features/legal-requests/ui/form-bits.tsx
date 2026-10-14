@@ -49,7 +49,7 @@ export function ErrorSummary({
 /** A field people don't see: bots fill it in, and the submission is then dropped. */
 export function Honeypot() {
   return (
-    <div aria-hidden className="absolute -start-[9999px] size-px overflow-hidden">
+    <div aria-hidden className="sr-only">
       <label>
         Website
         <input name="website" tabIndex={-1} autoComplete="off" />

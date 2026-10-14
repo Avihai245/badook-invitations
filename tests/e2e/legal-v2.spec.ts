@@ -103,7 +103,9 @@ test.describe('the six documents', () => {
     expect((await page.goto('/legal/refunds/1'))?.status()).toBe(404);
   });
 
-  test('the footer links the new documents and every page reflows at 320 px', async ({ page }) => {
+  test('the footer links the new documents and every page and form reflows at 320 px, in both directions', async ({
+    page,
+  }) => {
     await setLang(page, 'en');
     await page.setViewportSize({ width: 320, height: 700 });
     await page.goto('/terms');
@@ -111,10 +113,15 @@ test.describe('the six documents', () => {
     await expect(
       page.getByRole('link', { name: /Event gallery and user-generated content rules/ }).last(),
     ).toBeVisible();
-    for (const doc of DOCS) {
-      await page.goto(`/${doc}`);
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-      expect(overflow, doc).toBeLessThanOrEqual(1);
+    for (const path of [...DOCS.map((d) => `/${d}`), '/report', '/privacy-request', '/contact']) {
+      // Hebrew is right to left: anything parked off to the side makes the page scroll sideways
+      for (const l of ['en', 'he'] as const) {
+        await setLang(page, l);
+        await page.goto(path);
+        await hydrated(page);
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        expect(overflow, `${path} (${l})`).toBeLessThanOrEqual(1);
+      }
     }
   });
 });
@@ -335,7 +342,10 @@ test.describe('the guest gallery', () => {
       'A synthetic photo of my child that should not be here.',
     );
     await reporter.getByRole('button', { name: /^(Send|Submit)/ }).click();
-    await expect(reporter.getByTestId('report-number'), await reporter.locator('main').innerText()).toBeVisible();
+    await expect(
+      reporter.getByTestId('report-number'),
+      await reporter.locator('main').innerText(),
+    ).toBeVisible();
     const [item] = await sql<{ status: string; status_reason: string }>(
       `select status, status_reason from gallery_items where id = $1`,
       [g.itemId],
