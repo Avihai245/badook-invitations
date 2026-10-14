@@ -4,6 +4,7 @@ import { Lock, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button, Card, Checkbox, Dialog, Skeleton, useToast } from '@/components/app';
+import { AiNote } from '@/features/legal/notices/AiNote.client';
 import { useUi } from '@/lib/i18n/client';
 import { isCategoryKey } from '../../model/categories';
 import type { PlanIdea } from '../../model/plan';
@@ -117,7 +118,14 @@ export function IdeaAiDialog({ idea, onClose }: { idea: PlanIdea; onClose(): voi
         if (!open) onClose();
       }}
       title={T.title}
-      description={enabled ? T.body : undefined}
+      description={
+        enabled ? (
+          <>
+            {T.body}
+            <AiNote kind="text" provider="Anthropic" anchor="planning" className="mt-1" />
+          </>
+        ) : undefined
+      }
       closeLabel={t.planning.common.close}
       footer={
         enabled && state.status === 'ready' && state.steps.length > 0 ? (

@@ -6,6 +6,7 @@ import { useId, useRef } from 'react';
 import { Button, Field, Hint, Input, cn } from '@/components/app';
 import type { AssetRef } from '@/features/invitations/contracts/types';
 import { IMAGE_TYPES } from '@/features/invitations/editor/fields/media';
+import { AiNote } from '@/features/legal/notices/AiNote.client';
 import { fmt } from '@/lib/i18n/app';
 import { useUi } from '@/lib/i18n/client';
 import { ART_DIRECTION } from '../config';
@@ -162,6 +163,7 @@ export function PhotoPicker({
             {a.upload}
           </Button>
         </Hint>
+        <AiNote kind="photos" provider="Anthropic" anchor="studio" />
       </div>
 
       <Field label={a.mood} help={a.moodHelp} id={moodId}>
