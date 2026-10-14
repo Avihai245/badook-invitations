@@ -675,6 +675,62 @@ begin
     || case when cardinality(v_held) > 0 then jsonb_build_object('held', to_jsonb(v_held)) else '{}'::jsonb end;
 end $$;
 
+-- ─── server lookups (the app reads no table directly: only these functions) ──────────────────────
+
+-- How many reports / requests one hashed address made in the last p_hours (the per-address limits).
+create function public.legal_count_since(p_table text, p_ip_hash text, p_hours int) returns int
+language plpgsql stable security definer set search_path = '' as $$
+declare
+  n int;
+begin
+  if p_table = 'media_reports' then
+    select count(*) into n from public.media_reports
+    where ip_hash = p_ip_hash and created_at >= now() - make_interval(hours => p_hours);
+  elsif p_table = 'privacy_requests' then
+    select count(*) into n from public.privacy_requests
+    where ip_hash = p_ip_hash and created_at >= now() - make_interval(hours => p_hours);
+  else
+    raise exception 'bad table' using errcode = 'P0001';
+  end if;
+  return n;
+end $$;
+
+-- The earlier report of the same item for the same reason from the same address (null: none).
+create function public.media_report_earlier(p_ip_hash text, p_item_id uuid, p_category text, p_hours int)
+returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object('number', m.number, 'urgent', m.urgent, 'hidden', m.hidden_by_report)
+  from public.media_reports m
+  where m.ip_hash = p_ip_hash and m.item_id = p_item_id and m.category = p_category
+    and m.created_at >= now() - make_interval(hours => p_hours)
+  order by m.created_at limit 1
+$$;
+
+-- The gallery's realtime channel (null: no gallery) and the id of whoever created the invitation.
+create function public.legal_gallery_channel(p_invitation_id uuid) returns text
+language sql stable security definer set search_path = '' as $$
+  select channel from public.galleries where invitation_id = p_invitation_id
+$$;
+create function public.legal_invitation_owner(p_invitation_id uuid) returns uuid
+language sql stable security definer set search_path = '' as $$
+  select owner_id from public.invitations where id = p_invitation_id
+$$;
+
+-- What an outcome email needs, unmasked (never leaves the server).
+create function public.media_report_target(p_id uuid) returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object('id', m.id, 'number', m.number, 'invitation_id', m.invitation_id,
+    'status', m.status, 'resolution', m.resolution, 'resolved_at', m.resolved_at,
+    'reporter_email', m.reporter_email, 'locale', m.locale)
+  from public.media_reports m where m.id = p_id
+$$;
+create function public.privacy_request_target(p_id uuid) returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object('id', m.id, 'number', m.number, 'status', m.status,
+    'resolved_at', m.resolved_at, 'email', m.email, 'locale', m.locale)
+  from public.privacy_requests m where m.id = p_id
+$$;
+
 -- ─── housekeeping ───────────────────────────────────────────────────────────────────────────────
 
 -- The daily run: closed reports and finished requests are erased two years after they were resolved
@@ -729,6 +785,12 @@ begin
     'public.privacy_request_admin_get(uuid, uuid)',
     'public.privacy_request_admin_set(uuid, uuid, text, text)',
     'public.legal_maintenance()',
+    'public.legal_count_since(text, text, int)',
+    'public.media_report_earlier(text, uuid, text, int)',
+    'public.legal_gallery_channel(uuid)',
+    'public.legal_invitation_owner(uuid)',
+    'public.media_report_target(uuid)',
+    'public.privacy_request_target(uuid)',
     'public.gallery_owner_moderate(uuid, uuid, uuid[], text)'
   ] loop
     execute format('revoke all on function %s from public, anon, authenticated', f);

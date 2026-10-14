@@ -55,7 +55,6 @@ export interface RequestSubmission {
 export type ReportStored = { id: string; number: number; urgent: boolean; hidden: boolean };
 export type RequestStored = { id: string; number: number; dueAt: string };
 
-const hoursAgo = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
 
 export const legalDb = {
   // ── the public side ──
@@ -77,51 +76,30 @@ export const legalDb = {
 
   /** Reports / requests this address (hashed) sent since `hours` ago. */
   async countSince(table: 'media_reports' | 'privacy_requests', ipHash: string, hours: number) {
-    const { count, error } = await serviceDb()
-      .from(table)
-      .select('id', { count: 'exact', head: true })
-      .eq('ip_hash', ipHash)
-      .gte('created_at', hoursAgo(hours));
-    if (error) throw new Error(`${table} count: ${error.message}`);
-    return count ?? 0;
+    return rpc<number>('legal_count_since', { p_table: table, p_ip_hash: ipHash, p_hours: hours });
   },
   /** The same address's report of the same item for the same reason within `hours` (null: none). */
   async earlierReport(ipHash: string, itemId: string, category: string, hours: number) {
-    const { data, error } = await serviceDb()
-      .from('media_reports')
-      .select('number, urgent, hidden_by_report')
-      .eq('ip_hash', ipHash)
-      .eq('item_id', itemId)
-      .eq('category', category)
-      .gte('created_at', hoursAgo(hours))
-      .order('created_at', { ascending: true })
-      .limit(1);
-    if (error) throw new Error(`media_reports duplicate: ${error.message}`);
-    const row = data?.[0] as { number: number; urgent: boolean; hidden_by_report: boolean } | undefined;
-    return row ? { number: row.number, urgent: row.urgent, hidden: row.hidden_by_report } : null;
+    const row = await rpc<{ number: number; urgent: boolean; hidden: boolean } | null>(
+      'media_report_earlier',
+      {
+        p_ip_hash: ipHash,
+        p_item_id: itemId,
+        p_category: category,
+        p_hours: hours,
+      },
+    );
+    return row ?? null;
   },
   /** The gallery's realtime channel (null: no gallery). */
   async galleryChannel(invitationId: string): Promise<string | null> {
-    const { data, error } = await serviceDb()
-      .from('galleries')
-      .select('channel')
-      .eq('invitation_id', invitationId)
-      .maybeSingle();
-    if (error) throw new Error(`galleries channel: ${error.message}`);
-    return (data as { channel: string } | null)?.channel ?? null;
+    return (await rpc<string | null>('legal_gallery_channel', { p_invitation_id: invitationId })) ?? null;
   },
   /** The email of whoever created the invitation (null: none on file). */
   async ownerEmail(invitationId: string): Promise<string | null> {
-    const db = serviceDb();
-    const { data, error } = await db
-      .from('invitations')
-      .select('owner_id')
-      .eq('id', invitationId)
-      .maybeSingle();
-    if (error) throw new Error(`invitations owner: ${error.message}`);
-    const ownerId = (data as { owner_id: string } | null)?.owner_id;
+    const ownerId = await rpc<string | null>('legal_invitation_owner', { p_invitation_id: invitationId });
     if (!ownerId) return null;
-    const { data: user, error: userError } = await db.auth.admin.getUserById(ownerId);
+    const { data: user, error: userError } = await serviceDb().auth.admin.getUserById(ownerId);
     if (userError) throw new Error(`getUserById: ${userError.message}`);
     return user.user?.email ?? null;
   },
@@ -147,14 +125,8 @@ export const legalDb = {
 
   /** What the outcome email needs, unmasked (never leaves the server). */
   async reportTarget(id: string): Promise<ReportTarget | null> {
-    const { data, error } = await serviceDb()
-      .from('media_reports')
-      .select('id, number, invitation_id, status, resolution, resolved_at, reporter_email, locale')
-      .eq('id', id)
-      .maybeSingle();
-    if (error) throw new Error(`media_reports target: ${error.message}`);
-    if (!data) return null;
-    const r = data as Record<string, string | number | null>;
+    const r = await rpc<Record<string, string | number | null> | null>('media_report_target', { p_id: id });
+    if (!r) return null;
     return {
       id: r.id as string,
       number: r.number as number,
@@ -167,14 +139,10 @@ export const legalDb = {
     };
   },
   async requestTarget(id: string): Promise<RequestTarget | null> {
-    const { data, error } = await serviceDb()
-      .from('privacy_requests')
-      .select('id, number, status, resolved_at, email, locale')
-      .eq('id', id)
-      .maybeSingle();
-    if (error) throw new Error(`privacy_requests target: ${error.message}`);
-    if (!data) return null;
-    const r = data as Record<string, string | number | null>;
+    const r = await rpc<Record<string, string | number | null> | null>('privacy_request_target', {
+      p_id: id,
+    });
+    if (!r) return null;
     return {
       id: r.id as string,
       number: r.number as number,

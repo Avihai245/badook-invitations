@@ -335,7 +335,7 @@ test.describe('the guest gallery', () => {
       'A synthetic photo of my child that should not be here.',
     );
     await reporter.getByRole('button', { name: /^(Send|Submit)/ }).click();
-    await expect(reporter.getByTestId('report-number')).toBeVisible();
+    await expect(reporter.getByTestId('report-number'), await reporter.locator('main').innerText()).toBeVisible();
     const [item] = await sql<{ status: string; status_reason: string }>(
       `select status, status_reason from gallery_items where id = $1`,
       [g.itemId],

@@ -146,6 +146,12 @@ const FUNCTIONS = new Set([
   'privacy_request_admin_get',
   'privacy_request_admin_set',
   'legal_maintenance',
+  'legal_count_since',
+  'media_report_earlier',
+  'legal_gallery_channel',
+  'legal_invitation_owner',
+  'media_report_target',
+  'privacy_request_target',
   // seven languages (supabase/migrations/*_guest_languages.sql, *_translations.sql)
   'set_guests_language',
   'translations_list',

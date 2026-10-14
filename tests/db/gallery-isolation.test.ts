@@ -178,6 +178,18 @@ describe('feed, changes and a device’s own items', () => {
   });
 });
 
+describe('the server lookups the report flow uses', () => {
+  it('count, channel and owner answer for the right invitation only', async () => {
+    expect(await run('legal_count_since', ['media_reports', 'nobody', 1])).toBe(0);
+    await expect(run('legal_count_since', ['users', 'x', 1])).rejects.toThrow(/bad table/);
+    expect(await run('legal_gallery_channel', [invA])).toBe('chan-a-0123456789abcdef');
+    expect(await run('legal_gallery_channel', [invB])).toBe('chan-b-0123456789abcdef');
+    expect(await run('legal_invitation_owner', [invA])).toBe(OWNER_A);
+    expect(await run('legal_invitation_owner', [randomUUID()])).toBeNull();
+    expect(await run('media_report_target', [randomUUID()])).toBeNull();
+  });
+});
+
 describe('the browser’s roles', () => {
   const tables = [
     'galleries',
@@ -232,11 +244,20 @@ describe('the browser’s roles', () => {
       `public.legal_accept('${OWNER_A}'::uuid, array['terms'], '2', 'signup', null)`,
       `public.gallery_acknowledge('${invA}'::uuid, '${hex('a')}', '2')`,
       `public.legal_maintenance()`,
+      `public.legal_count_since('media_reports', 'x', 1)`,
+      `public.media_report_earlier('x', '${invA}'::uuid, 'privacy', 1)`,
+      `public.legal_gallery_channel('${invA}'::uuid)`,
+      `public.legal_invitation_owner('${invA}'::uuid)`,
+      `public.media_report_target('${invA}'::uuid)`,
+      `public.privacy_request_target('${invA}'::uuid)`,
     ]) {
-      for (const role of ['anon', 'authenticated'] as const)
-        await expect(as(c, role, OWNER_A, () => c.query(`select ${fn}`))).rejects.toThrow(
-          /permission denied/,
+      for (const role of ['anon', 'authenticated'] as const) {
+        const out = await as(c, role, OWNER_A, () => c.query(`select ${fn}`)).then(
+          () => 'CALL ALLOWED',
+          (e: Error) => e.message,
         );
+        expect(out, `${role}: ${fn}`).toMatch(/permission denied/);
+      }
     }
   });
 });
