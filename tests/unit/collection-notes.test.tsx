@@ -32,6 +32,8 @@ vi.mock('next/link', () => ({
     </a>
   ),
 }));
+// the vendor's files need the plan's provider; they are not what is tested here
+vi.mock('@/features/planning/ui/vendors/VendorFiles', () => ({ VendorFiles: () => null }));
 const push = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push, refresh: vi.fn() }),
