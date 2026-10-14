@@ -65,5 +65,6 @@ export async function LegalDocPage({ docKey, version }: { docKey: LegalDocKey; v
     })),
     related: chosen.version === '1' ? [] : RELATED[docKey],
   };
-  return <LegalPage t={t} doc={chosen.build(context)} context={context} info={info} />;
+  // while version 2 is not in force the page looks exactly as it always did ("last updated", no history)
+  return <LegalPage t={t} doc={chosen.build(context)} context={context} info={active ? info : undefined} />;
 }
