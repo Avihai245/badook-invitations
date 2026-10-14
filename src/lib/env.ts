@@ -225,9 +225,7 @@ const ServerEnvSchema = z.object({
   // on only when the operator's details above and the effective date below are all set — a blank
   // identity is never published. INVITES_LEGAL_V2_EFFECTIVE is the ISO date the version takes effect.
   INVITES_LEGAL_V2: flag(false),
-  INVITES_LEGAL_V2_EFFECTIVE: z
-    .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal('')])
-    .default(''),
+  INVITES_LEGAL_V2_EFFECTIVE: z.union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal('')]).default(''),
   // the date of the last manual accessibility review (ISO); the statement mentions one only if set
   INVITES_ACCESSIBILITY_REVIEW_DATE: z
     .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal('')])

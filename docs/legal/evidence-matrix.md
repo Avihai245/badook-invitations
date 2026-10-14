@@ -49,6 +49,20 @@ Playwright Chromium (desktop 1440×900 and mobile 390×844). `INVITES_LEGAL_V2` 
 | 35 | Independent adversarial review, findings resolved | brief §9 | review report (this branch's history) | 21 findings: 2 blockers, 6 high, 8 medium, 5 low — all fixed in code or text, or moved to a DR | PASS (as a process) | residual risks are in DR-03, 05, 11, 15, 19–25 |
 | 36 | No pricing/credit/payment/analytics/consent-loading change | brief §10 | — | diff review (reviewer): none; pack price display rounding changes only with v2 on | PASS | — |
 
-## Run log
+## Run log (final state of the branch; 2026-10-14)
 
-(Filled in with the final commands and results — see the end of the PR description.)
+| Command | Environment | Result |
+| --- | --- | --- |
+| `npx tsc --noEmit` | Node 22.22 | 0 errors |
+| `npx eslint .` | | 0 errors, 1 warning (pre-existing, `src/app/(gallery)/e/[slug]/layout.tsx`: unused eslint-disable) |
+| `npx prettier --check <all changed files>` | | clean |
+| `npx vitest run` | node/jsdom | 135 files, 4092 tests passed (baseline before the work: 114 files, 3746 tests) |
+| `npx vitest run --config vitest.db.config.ts` | PostgreSQL 16.15 + Supabase shim | 35 files, 499 tests passed (baseline: 31 of 32 files; the one failure was a role-creation race when run beside the unit suite) |
+| `PW_LEGAL_V2=1 npx playwright test tests/e2e/legal-v2.spec.ts --project=desktop --project=mobile` | production build + local stack, Chromium | 36 passed (documents ×2 languages with axe, anchors, version 1 page, 320 px reflow of docs and forms in LTR and RTL, report form, privacy-request form, first-upload dialog + acknowledgement record, urgent child report hides the item) |
+| `npx playwright test` (v2 **off**): p1-public, auth, site, billing, tranzila, gallery, gallery-section, faces, album-ai-photos, guests, a11y, support-tickets | same, both projects | 748 passed, 11 skipped, 3 failed on the first run: `site.spec` policy pages (a **stale** expected date `27 בספטמבר` that already failed at the base commit — expectation updated to the page's real date; passes), and `a11y.spec` draft-review page (failed once under load, **passed on re-run in isolation**; an area this work does not touch). `site.spec` re-run after the fix: 12 passed |
+| Independent adversarial review (separate agent, read-only) | | 21 findings; fixed or recorded (see row 35) |
+
+**Not run:** manual keyboard / screen-reader / zoom-200 % passes (no assistive technology available), real Apple/Android
+media, a live Supabase project (storage RLS), payment-provider sandboxes, WhatsApp/Resend delivery. The e2e specs for
+invitations editor, seating, scheduler, planning, event-day and the admin console were not re-run on the final build
+(their unit and DB suites were).

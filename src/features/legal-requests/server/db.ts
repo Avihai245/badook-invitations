@@ -55,7 +55,6 @@ export interface RequestSubmission {
 export type ReportStored = { id: string; number: number; urgent: boolean; hidden: boolean };
 export type RequestStored = { id: string; number: number; dueAt: string };
 
-
 export const legalDb = {
   // ── the public side ──
   /** The invitation behind a gallery upload link / an album link (null: a link that opens nothing). */

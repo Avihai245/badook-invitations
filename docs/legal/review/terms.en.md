@@ -19,7 +19,7 @@ The Service lets hosts create digital invitations from ready-made designs, publi
 ## 3. Guests, their details and messages {#guests}
 
 - Upload or type in only details of people you are inviting, and only if you are allowed to (for example, they gave them to you for that purpose). For these details you decide whom to invite and what to ask, and we process them for you.
-- Send invitations only to people who know you and expect to hear from you about the event. Before sending on WhatsApp you confirm this; every message lets the recipient block or stop receiving messages.
+- Send invitations only to people who know you and expect to hear from you about the event. When you send invitations or reminders on WhatsApp you confirm this; every message lets the recipient block or stop receiving messages.
 - The Service is for genuine invitations and the messages that go with an event: reminders, table numbers, links to the gallery and album. Do not use it for advertising, promotion, spam or any message that is not about your event, do not use guests’ details for a different purpose, and follow WhatsApp’s policies. We do not use guest lists for our own marketing.
 - You are responsible for what you ask your guests and for how you use their replies. Tell your guests what you ask for and why where the law requires it.
 
@@ -62,7 +62,7 @@ You can cancel a paid plan yourself at any time from the billing page; it takes 
 
 ## 9. Reports of infringement and requests to remove content {#reports}
 
-Anyone can ask us to review a photo, video or other item in a gallery or on an invitation — the uploader, a person who appears in it, a parent or guardian, a copyright owner, or anyone else — without an account, using the report form (“Report content”, linked from every gallery page and from the gallery rules). The report is reviewed by a person. We may hide the item while we look into it (immediately, where it appears to involve a child or an intimate image), then decide whether to restore it, remove it or leave it, and we tell the reporter the outcome where they gave a way to reach them. We do not automatically delete everything that is reported, because reports can be mistaken or abusive, and false or abusive reports may be disregarded.
+Anyone can ask us to review a photo, video or other item in a gallery or on an invitation — the uploader, a person who appears in it, a parent or guardian, a copyright owner, or anyone else — without an account, using the report form (“Report content”, linked from every gallery page and from the gallery rules). The report is reviewed by a person. We may hide the item while we look into it (immediately, where it involves a child, an intimate image, or is made by a parent or guardian), then decide whether to restore it, remove it or leave it, and we tell the reporter the outcome where they gave a way to reach them. We do not automatically delete everything that is reported, because reports can be mistaken or abusive, and false or abusive reports may be disregarded.
 
 Reports about a child, an intimate image shared without consent, or other serious harm are handled first. You can also contact the authorities, and nothing here replaces that.
 

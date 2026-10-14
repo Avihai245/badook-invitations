@@ -49,7 +49,7 @@ Where the Consumer Protection Law, 5741-1981 applies to your purchase — you ar
 
 If the monthly charge is declined, we try again a few times over the following days and the account stays on its plan meanwhile. If it does not go through within 14 days of the due date, the account moves to the free plan. You can pay again at any time from the billing page, with another card if you like.
 
-We will not charge a card after you cancelled the plan. If that happened, tell us and we will refund it.
+After you cancel, our system makes no further monthly charge. If a charge nevertheless reaches you — for example because the payment provider processed it before the cancellation reached it — tell us and we will refund it.
 
 ## 7. How to ask us, and how we answer {#process}
 

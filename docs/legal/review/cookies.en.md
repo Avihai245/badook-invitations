@@ -18,6 +18,10 @@ A few choices and working data are kept in your browser’s storage, not sent to
 - “rsvp:<invitation>”: on an invitation page, a guest’s own reply, so they can edit it later from the same device.
 - “badook:guest:<invitation>” (for the visit only): who opened a personal invitation link, to greet them and fill in the form.
 - “badook:review:name”: on the family review page, the name a person typed for their comments, so they don’t type it again.
+- “badook:review:key:<link>” and “badook:review:mine:<link>”: on the family review page, the secret key that lets a person delete their own comment and the list of their comments.
+- “badook:lang:<invitation>” (for the visit only): the language a guest chose on an invitation page.
+- “badook-station:<invitation>”: at the entrance station, the name the staff gave their station.
+- A service worker (“/e/table-sw.js”) and the browser’s cache storage: on a guest’s table guide, the page and its scripts, kept on the phone for the evening so that it works without signal.
 - “badook-film:<invitation>”: in the host’s app, their choices for the highlights film (the shots they pinned, removed and reordered, the length and the shape). Other small flags in the host’s app (for example that a tour was done) are kept the same way.
 - “badook-faces:<gallery>” (for the visit only, and only where face search is on): the face code of a guest who searched the gallery for their photos, so their album stays while the tab is open; “Forget me” erases it at once (privacy policy, face search section).
 
@@ -29,7 +33,8 @@ When a guest uses an event’s gallery, their browser keeps, on that device only
 
 - “badook-gallery:uploader”: a random identifier of the device (in localStorage and IndexedDB). It lets the guest see and delete their own uploads. We keep only a one-way hash of it, different for each event; it is not your name or phone number.
 - “badook-gallery:name” and “badook-gallery:instagram”: the display name and the optional handle you typed, so you don’t type them again. “badook-gallery:asked”: that you were already asked for a name.
-- “badook-gallery:ack:<version>:<gallery>”: that you acknowledged the gallery notice, so it is not shown again for each upload (where the gallery notice is in force).
+- “badook-gallery:ack:<version>:<faces or nofaces>:<gallery>”: that you acknowledged the gallery notice (and whether face search was on in that gallery at the time), so it is not shown again for each upload (where the gallery notice is in force).
+- “badook-gallery:seen:<gallery>”: which stories this device has already watched, to show them as seen.
 - An IndexedDB database called “badook-gallery”: the uploads waiting to be sent (the prepared photo and video files included), the gallery’s access code if you typed one, and small settings, so that closing the page or losing the signal doesn’t lose anything. It is cleared as uploads finish; you can delete it in your browser’s settings (uploads that haven’t finished are then lost).
 
 Deleting the browser’s data on that device removes the identifier, and with it the ability to delete your past uploads from that device — for those, use the report form or the privacy request form.
