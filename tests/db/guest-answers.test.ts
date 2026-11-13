@@ -252,6 +252,21 @@ describe('a party size never drops below the people confirmed', () => {
     await c.query(`update invitation_guests set party_size = 1 where id = $1`, [g]);
     expect(await partyOf(g)).toBe(1);
   });
+
+  it('another event’s guest: nothing about them is told, not even their confirmed count', async () => {
+    const g = await guest('משפחת זר', 4);
+    await reply({ guestId: g, adults: 3 });
+    const doc = (await c.query(`select draft from invitations where id = $1`, [inv])).rows[0].draft;
+    const otherInv = (
+      await c.query(
+        `select public.create_invitation($1, 'sahar-bordeaux', 'wedding', 'guest-answers-other', $2) as r`,
+        [OTHER, doc],
+      )
+    ).rows[0].r.id as string;
+    // OTHER owns their own event, and names this event's guest in it
+    expect(await commit('update_guest', [otherInv, OTHER, g, 'x', null, null, 1, null])).toBeNull();
+    expect(await partyOf(g)).toBe(4);
+  });
 });
 
 describe('the seating follows every change at once', () => {

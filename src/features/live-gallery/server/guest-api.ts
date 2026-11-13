@@ -56,6 +56,7 @@ export interface GuestDeps {
     | 'uploaderItems'
     | 'guestDelete'
     | 'rateHit'
+    | 'ratePeek'
     | 'guestByToken'
     | 'like'
     | 'likesOf'
@@ -99,7 +100,11 @@ export async function resolve(
   return { lookup, invitationId, features, state };
 }
 
-/** The access code, when the host set one: missing or wrong → 401 (wrong ones are rate-limited per address). */
+/**
+ * The access code, when the host set one: missing or wrong → 401. Wrong ones are counted per address,
+ * and an address over the limit is refused outright (429) — the right code included: otherwise the
+ * limit would only slow a brute force down, and the guess that finally fits would still get in.
+ */
 export async function checkCode(
   r: Resolved,
   code: unknown,
@@ -108,18 +113,13 @@ export async function checkCode(
 ): Promise<ApiResult | null> {
   const { accessCodeHash: hash, accessCodeSalt: salt } = r.lookup.gallery;
   if (!hash || !salt) return null;
-  if (typeof code === 'string' && code.length <= 64 && codeMatches(code, salt, hash)) return null;
-  if (typeof code === 'string' && code) {
-    const limit = GALLERY.rate.codePerAddress;
-    const within = await deps.db.rateHit(
-      rateKey('code', `${r.invitationId}:${ip ?? 'unknown'}`),
-      limit.count,
-      limit.windowSeconds,
-    );
-    if (!within) return fail(429, 'rate');
-    return fail(401, 'access_code', { wrong: true });
-  }
-  return fail(401, 'access_code', { wrong: false });
+  if (typeof code !== 'string' || !code) return fail(401, 'access_code', { wrong: false });
+  const limit = GALLERY.rate.codePerAddress;
+  const key = rateKey('code', `${r.invitationId}:${ip ?? 'unknown'}`);
+  if ((await deps.db.ratePeek(key, limit.windowSeconds)) >= limit.count) return fail(429, 'rate');
+  if (code.length <= 64 && codeMatches(code, salt, hash)) return null;
+  if (!(await deps.db.rateHit(key, limit.count, limit.windowSeconds))) return fail(429, 'rate');
+  return fail(401, 'access_code', { wrong: true });
 }
 
 async function rateOk(

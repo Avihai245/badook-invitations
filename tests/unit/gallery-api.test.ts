@@ -172,11 +172,14 @@ function guestWorld(
   };
   const items = new Map<string, { row: ItemRow; uploader: string }>();
   const rateAnswers = new Map<string, boolean>();
+  /** hits already in the window, per key (the non-counting peek) */
+  const ratePeeks = new Map<string, number>();
   const db = {
     byToken: vi.fn(async (hash: string, kind: 'upload' | 'projector') =>
       (kind === 'upload' ? gallery.uploadTokenHash : gallery.projectorTokenHash) === hash ? lookup : null,
     ),
     rateHit: vi.fn(async (key: string) => rateAnswers.get(key) ?? true),
+    ratePeek: vi.fn(async (key: string) => ratePeeks.get(key) ?? 0),
     reserve: vi.fn(
       async (
         ..._args: Parameters<GuestDeps['db']['reserve']>
@@ -253,6 +256,7 @@ function guestWorld(
     items,
     add,
     rateAnswers,
+    ratePeeks,
     token: upload.token,
     projector: projector.token,
     gallery,
@@ -391,6 +395,26 @@ describe('the link and the gallery’s state', () => {
     expect((await guest.guestFeed({ t: w.token, code: 'NOA-2026' }, IP, w.deps)).status).toBe(200);
     w.rateAnswers.set(codeKey, false);
     expect((await guest.guestFeed({ t: w.token, code: 'guess' }, IP, w.deps)).status).toBe(429);
+  });
+
+  it('an address over the limit is refused even with the right code (no brute force)', async () => {
+    const salt = tokens.randomId();
+    const w = guestWorld({
+      gallery: { accessCodeHash: tokens.codeHash('1234', salt), accessCodeSalt: salt },
+    });
+    const codeKey = tokens.rateKey('code', `${INV}:${IP}`);
+    // the right code, under the limit: in, and a right code is never counted
+    expect((await guest.guestFeed({ t: w.token, code: '1234' }, IP, w.deps)).status).toBe(200);
+    expect(w.db.rateHit).not.toHaveBeenCalledWith(codeKey, expect.anything(), expect.anything());
+    // ten wrong guesses in the window: every attempt from that address is refused, the right one too
+    w.ratePeeks.set(codeKey, GALLERY.rate.codePerAddress.count);
+    expect(await guest.guestFeed({ t: w.token, code: '1234' }, IP, w.deps)).toMatchObject({
+      status: 429,
+      body: { code: 'rate' },
+    });
+    expect(w.db.ratePeek).toHaveBeenCalledWith(codeKey, GALLERY.rate.codePerAddress.windowSeconds);
+    // another address isn't affected
+    expect((await guest.guestFeed({ t: w.token, code: '1234' }, '198.51.100.7', w.deps)).status).toBe(200);
   });
 });
 

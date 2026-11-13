@@ -27,6 +27,10 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // a machine whose Chromium isn't the build this Playwright version downloads (a preinstalled one)
+    ...(process.env.PW_CHROMIUM_PATH
+      ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } }
+      : {}),
     // an Israeli phone: the invitations' language detection (live/detect.ts) keeps a Hebrew-first
     // invitation in Hebrew — a test that wants another language asks for it (test.use({ locale }))
     locale: 'he-IL',

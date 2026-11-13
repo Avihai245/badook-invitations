@@ -226,6 +226,7 @@ function guestDeps(
           },
         })),
         rateHit: vi.fn(async () => true),
+        ratePeek: vi.fn(async () => 0),
         guestByToken: vi.fn(async () => null),
       } as never,
       features: async () => features,

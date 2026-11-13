@@ -540,6 +540,18 @@ describe('items', () => {
     expect(await commit('gallery_rate_hit', ['k1', 2, 60])).toBe(false);
     expect(await commit('gallery_rate_hit', ['k2', 2, 60])).toBe(true);
   });
+
+  it('a peek counts the hits in the window without adding one', async () => {
+    expect(await commit('gallery_rate_peek', ['k-peek', 60])).toBe(0);
+    await commit('gallery_rate_hit', ['k-peek', 5, 60]);
+    await commit('gallery_rate_hit', ['k-peek', 5, 60]);
+    expect(await commit('gallery_rate_peek', ['k-peek', 60])).toBe(2);
+    expect(await commit('gallery_rate_peek', ['k-peek', 60])).toBe(2);
+    await c.query(
+      `update gallery_rate_events set created_at = now() - interval '2 minutes' where key_hash = 'k-peek'`,
+    );
+    expect(await commit('gallery_rate_peek', ['k-peek', 60])).toBe(0);
+  });
 });
 
 describe('privileges', () => {
@@ -561,6 +573,7 @@ describe('privileges', () => {
         `select public.gallery_owner_get('${inv}', '${OWNER}')`,
         `select public.gallery_feed('${inv}', null, null, 10)`,
         `select public.gallery_rate_hit('x', 1, 1)`,
+        `select public.gallery_rate_peek('x', 1)`,
         `select public.gallery_trash_claim(1)`,
         `select public.gallery_maintenance(48, 30)`,
       ]) {

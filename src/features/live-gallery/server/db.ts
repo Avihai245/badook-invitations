@@ -343,6 +343,22 @@ export const galleryDb = {
   rateHit: (key: string, limit: number, windowSeconds: number) =>
     rpc<boolean>('gallery_rate_hit', { p_key_hash: key, p_limit: limit, p_window_seconds: windowSeconds }),
 
+  /**
+   * How many hits a key had in the window, without adding one (*_security_fixes.sql). A database that
+   * doesn't have the function yet (the code deployed before its migration) counts none — as before.
+   */
+  ratePeek: async (key: string, windowSeconds: number): Promise<number> => {
+    try {
+      return Number(
+        await rpc<number>('gallery_rate_peek', { p_key_hash: key, p_window_seconds: windowSeconds }),
+      );
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      if (code === 'PGRST202' || code === '42883') return 0;
+      throw err;
+    }
+  },
+
   guestByToken: (invitationId: string, token: string) =>
     rpc<string | null>('guest_by_token', { p_invitation_id: invitationId, p_token: token }),
 
