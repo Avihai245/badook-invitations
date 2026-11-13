@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useId, useState } from 'react';
 import { Button, Dialog, Skeleton, cn, rovingKeyDown } from '@/components/app';
+import { upgradeReason, type UpgradeReason } from '@/features/billing/UpgradeDialog.client';
 import { useUi } from '@/lib/i18n/client';
 import type { EventType } from '../../contracts/types';
 import type { InvitationSummary } from '../../server/host-db';
@@ -17,7 +18,16 @@ export const followUpTypes = (item: InvitationSummary): EventType[] =>
  * The save-the-date flow (§11 P4): pick the event, and a new draft with the save-the-date's names,
  * date, design and cover opens in the editor. The save-the-date stays as it is.
  */
-export function FollowUpDialog({ item, onClose }: { item: InvitationSummary; onClose: () => void }) {
+export function FollowUpDialog({
+  item,
+  onClose,
+  onUpgrade,
+}: {
+  item: InvitationSummary;
+  onClose: () => void;
+  /** the plan has no room for it (402): the list shows its upgrade dialog instead */
+  onUpgrade?: (reason: UpgradeReason) => void;
+}) {
   const { t } = useUi();
   const f = t.list.followUp;
   const router = useRouter();
@@ -39,6 +49,8 @@ export function FollowUpDialog({ item, onClose }: { item: InvitationSummary; onC
     // the skeleton stays up until the editor replaces this page
     if (res.ok && res.body?.id) return router.push(`/app/invitations/${res.body.id}/edit`);
     setCreating(false);
+    const limit = upgradeReason(res.status, res.body);
+    if (limit && onUpgrade) return onUpgrade(limit);
     setError(f.error);
   }
 

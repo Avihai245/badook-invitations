@@ -324,14 +324,21 @@ export async function createFollowUp(
   const doc = followUpDocument(entry.manifest, entry.defaults, source.draft, eventType);
   // "noa-and-itay-save-the-date" → "noa-and-itay"; otherwise from the names (the RPC makes it unique)
   const slug = usableSlug(followUpSlug(source.slug)) ?? usableSlug(doc.share.slug) ?? randomSlug();
-  const created = await deps.db.create(
-    userId,
-    entry.manifest.id,
-    eventType,
-    slug,
-    { ...doc, share: { ...doc.share, slug } },
-    source.id,
-  );
+  let created: { id: string; slug: string };
+  try {
+    created = await deps.db.create(
+      userId,
+      entry.manifest.id,
+      eventType,
+      slug,
+      { ...doc, share: { ...doc.share, slug } },
+      source.id,
+    );
+  } catch (err) {
+    // the save-the-date's first full invitation is free; another one counts like any invitation
+    // (the database's invitations_active_limit)
+    return refusedOverLimit(err, deps);
+  }
   return ok({ ok: true, id: created.id, slug: created.slug }, 201);
 }
 
