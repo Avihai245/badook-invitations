@@ -27,6 +27,30 @@ export function sessionCookieOptions(publicBaseUrl: string | undefined) {
  */
 export const SIGNED_IN_COOKIE = 'signed_in';
 
+/** Supabase Auth's session cookie (and its chunks: `.0`, `.1`…). */
+const AUTH_COOKIE = /^sb-.+-auth-token(\.\d+)?$/;
+
+/**
+ * What a batch of cookies Supabase writes means for the marker: a session written → true, the session
+ * removed → false, no session cookie in it → null. Sign-in and sign-up run in server actions (the page
+ * they redirect to renders in the same response, without the middleware), so the marker follows the
+ * session wherever its cookies are written.
+ */
+export function signedInChange(
+  list: readonly { name: string; value: string; options?: { maxAge?: number } }[],
+): boolean | null {
+  const auth = list.filter((c) => AUTH_COOKIE.test(c.name));
+  if (!auth.length) return null;
+  return auth.some((c) => !!c.value && c.options?.maxAge !== 0);
+}
+
+/** The marker's own options (readable by the page: it says nothing but "signed in"). */
+export function signedInCookie(on: boolean, secure: boolean) {
+  return on
+    ? { value: '1', options: { path: '/', sameSite: 'lax' as const, secure, maxAge: 400 * 24 * 60 * 60 } }
+    : { value: '', options: { path: '/', maxAge: 0 } };
+}
+
 /** Relative in-app paths only — never an open redirect to another origin. */
 export function safeNext(next: unknown, fallback = HOME_PATH): string {
   const value = typeof next === 'string' ? next : '';

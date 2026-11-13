@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import nextConfig from '../../next.config';
 import { homeBoot } from '@/features/site/home/home-boot';
-import { SIGNED_IN_COOKIE, sessionCookieOptions } from '@/lib/supabase/auth-paths';
+import {
+  SIGNED_IN_COOKIE,
+  sessionCookieOptions,
+  signedInChange,
+  signedInCookie,
+} from '@/lib/supabase/auth-paths';
 
 /**
  * The security headers every response carries (next.config.ts headers()), the session cookies'
@@ -83,5 +88,25 @@ describe('session cookies', () => {
     expect(run('sb-abc-auth-token=x')).toEqual(['/app/invitations']);
     expect(run(`${SIGNED_IN_COOKIE}=0`)).toEqual([]);
     expect(run('')).toEqual([]);
+  });
+
+  it('the marker follows the session wherever Supabase writes it (a sign-in in a server action too)', () => {
+    const set = { maxAge: 400 * 86400 };
+    // a session written (in chunks, an old chunk removed beside it)
+    expect(
+      signedInChange([
+        { name: 'sb-abc-auth-token.0', value: 'base64-…', options: set },
+        { name: 'sb-abc-auth-token.1', value: '', options: { maxAge: 0 } },
+      ]),
+    ).toBe(true);
+    // signed out: every chunk removed
+    expect(signedInChange([{ name: 'sb-abc-auth-token', value: '', options: { maxAge: 0 } }])).toBe(false);
+    // a PKCE verifier only: says nothing about the session
+    expect(
+      signedInChange([{ name: 'sb-abc-auth-token-code-verifier', value: 'v', options: set }]),
+    ).toBeNull();
+    expect(signedInChange([])).toBeNull();
+    expect(signedInCookie(true, true)).toMatchObject({ value: '1', options: { secure: true, path: '/' } });
+    expect(signedInCookie(false, true)).toEqual({ value: '', options: { path: '/', maxAge: 0 } });
   });
 });

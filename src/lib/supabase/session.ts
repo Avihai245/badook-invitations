@@ -6,7 +6,13 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { serverEnv } from '../env';
 import { ACT_AS_COOKIE, readActAs } from './act-as-token';
-import { isSuspended, sessionCookieOptions } from './auth-paths';
+import {
+  SIGNED_IN_COOKIE,
+  isSuspended,
+  sessionCookieOptions,
+  signedInChange,
+  signedInCookie,
+} from './auth-paths';
 import { serviceDb } from './server';
 
 export { safeNext } from './auth-paths';
@@ -21,13 +27,20 @@ export async function sessionDb(): Promise<SupabaseClient> {
   if (!url || !key)
     throw new Error('Supabase is not configured: set NEXT_PUBLIC_SUPABASE_URL and the publishable key');
   const store = await cookies();
+  const cookieOptions = sessionCookieOptions(serverEnv().INVITES_PUBLIC_BASE_URL);
   return createServerClient(url, key, {
-    cookieOptions: sessionCookieOptions(serverEnv().INVITES_PUBLIC_BASE_URL),
+    cookieOptions,
     cookies: {
       getAll: () => store.getAll(),
       setAll: (list) => {
         try {
           for (const { name, value, options } of list) store.set(name, value, options);
+          // the home page's marker follows the session: signed in or out here (a server action)
+          const change = signedInChange(list);
+          if (change !== null) {
+            const marker = signedInCookie(change, cookieOptions.secure);
+            store.set(SIGNED_IN_COOKIE, marker.value, marker.options);
+          }
         } catch {
           // Server Components can't write cookies; the middleware refreshes the session instead.
         }

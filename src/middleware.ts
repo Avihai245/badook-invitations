@@ -6,6 +6,7 @@ import {
   isSuspended,
   loginPath,
   sessionCookieOptions,
+  signedInCookie,
   signedInLanding,
 } from '@/lib/supabase/auth-paths';
 
@@ -69,15 +70,10 @@ export async function middleware(request: NextRequest) {
 
   // the home page's "signed in?" marker follows the session (auth-paths.ts SIGNED_IN_COOKIE)
   const marked = (res: NextResponse) => {
-    if (user)
-      res.cookies.set(SIGNED_IN_COOKIE, '1', {
-        path: '/',
-        sameSite: 'lax',
-        secure: cookieOptions.secure,
-        maxAge: 400 * 24 * 60 * 60,
-      });
-    else if (request.cookies.has(SIGNED_IN_COOKIE))
-      res.cookies.set(SIGNED_IN_COOKIE, '', { path: '/', maxAge: 0 });
+    if (user || request.cookies.has(SIGNED_IN_COOKIE)) {
+      const marker = signedInCookie(!!user, cookieOptions.secure);
+      res.cookies.set(SIGNED_IN_COOKIE, marker.value, marker.options);
+    }
     return res;
   };
   const redirectTo = (path: string) => {
