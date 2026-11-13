@@ -40,9 +40,11 @@ export const pageExtras = cache(
       return NONE;
     }
     const link = await gallery;
-    // after the event the section leads to the album, when the event has one
+    // after the event the section leads to the album, when the event has one — not when the host
+    // keeps the gallery behind an access code: the album's link asks for none, and this page is public
+    // (the guests get the album from the host's thank-you message or link instead)
     const album =
-      link && features.has('album')
+      link && !link.hasCode && features.has('album')
         ? await invitationAlbumUrl(invitationId, doc.share.slug).catch((err) => {
             console.error('page extras: the album’s link is unavailable', err);
             return null;
@@ -50,7 +52,7 @@ export const pageExtras = cache(
         : null;
     return {
       insights: features.has('analytics'),
-      liveGallery: features.has('live_gallery') && link ? { ...link, album } : null,
+      liveGallery: features.has('live_gallery') && link ? { url: link.url, album } : null,
     };
   },
 );
