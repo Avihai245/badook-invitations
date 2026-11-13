@@ -9,6 +9,8 @@ import { shapeArabic } from '../lib/arabic-shape';
 import { visualLine } from '../lib/bidi';
 import { formatDate } from '../lib/dates';
 import { LOCALE_INFO, type Script } from '../lib/locales';
+import { fetchPlanFile } from '@/features/partner/fetch-plan';
+import type { AssetBases } from '../renderer/assets';
 import type { RenderContext } from '../renderer/context';
 import { resolveFontPair } from '../renderer/theme';
 
@@ -120,14 +122,12 @@ async function loadFonts(pair: FontPair, locale: Locale) {
  * are stored as WebP (editor/fields/prepare-image.ts) and template media may be WebP/AVIF too: those
  * are re-encoded with sharp (at most 1600px wide — the card is 1200).
  */
-async function photoData(url: string | null): Promise<string | null> {
+async function photoData(url: string | null, bases: AssetBases): Promise<string | null> {
   if (!url || !/^https?:\/\//.test(url)) return null;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
-    const type = res.headers.get('content-type') ?? '';
-    if (!res.ok || !/^image\//.test(type)) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
-    if (buf.byteLength > 12_000_000) return null;
+    const got = await fetchPhoto(url, bases);
+    if (!got) return null;
+    const { buf, type } = got;
     if (/^image\/(jpeg|png)\b/.test(type) && buf.byteLength <= 6_000_000)
       return `data:${type};base64,${buf.toString('base64')}`;
     const jpeg = await toJpeg(buf);
@@ -135,6 +135,36 @@ async function photoData(url: string | null): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+const PHOTO_MAX_BYTES = 12_000_000;
+const PHOTO_TIMEOUT_MS = 3000;
+
+/** The URL is under one of our own storage bases (uploads, template media). */
+export function isOwnMedia(url: string, bases: AssetBases): boolean {
+  return [bases.uploads, bases.templateMedia].some((base) => !!base && url.startsWith(`${base}/`));
+}
+
+/**
+ * A photo's bytes. Our own storage is fetched as it is (never following a redirect); any other address
+ * — a host may give a picture's https link — only through the SSRF guard (partner/fetch-plan.ts:
+ * https on 443, every address the name resolves to public, the connection pinned to it, redirects
+ * checked the same way, the body cut off at the cap): this runs on the server, for a public route.
+ */
+async function fetchPhoto(url: string, bases: AssetBases): Promise<{ buf: Buffer; type: string } | null> {
+  if (isOwnMedia(url, bases)) {
+    const res = await fetch(url, { signal: AbortSignal.timeout(PHOTO_TIMEOUT_MS), redirect: 'error' });
+    const type = res.headers.get('content-type') ?? '';
+    if (!res.ok || !/^image\//.test(type)) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    return buf.byteLength > PHOTO_MAX_BYTES ? null : { buf, type };
+  }
+  const { bytes, contentType } = await fetchPlanFile(url, {
+    maxBytes: PHOTO_MAX_BYTES,
+    timeoutMs: PHOTO_TIMEOUT_MS,
+  });
+  const type = contentType ?? '';
+  return /^image\//.test(type) ? { buf: bytes, type } : null;
 }
 
 /** Any image sharp reads (WebP, AVIF, a large JPEG/PNG…) as an upright JPEG ≤ 1600px wide; null without sharp. */
@@ -170,7 +200,7 @@ function skyGradient(sky: string): string {
 export async function invitationOgImage(ctx: RenderContext, headers?: HeadersInit): Promise<ImageResponse> {
   const { doc, template, locale } = ctx;
   // the host's own share image (editor: "share image"): shown as it is, without text over it
-  const own = doc.share.ogImage ? await photoData(ctx.asset(doc.share.ogImage)) : null;
+  const own = doc.share.ogImage ? await photoData(ctx.asset(doc.share.ogImage), ctx.bases) : null;
   if (own) return ownImage(own, headers);
   const dir = dirOf(locale);
   // satori neither shapes Arabic nor lays out right to left: joined forms first, then visual order
@@ -181,7 +211,7 @@ export async function invitationOgImage(ctx: RenderContext, headers?: HeadersIni
   const hero = doc.sections.find((s) => s.type === 'hero');
   const data = hero?.type === 'hero' ? hero.data : null;
   const photo = data
-    ? await photoData(ctx.asset(data.media.kind === 'image' ? data.media.src : data.media.poster))
+    ? await photoData(ctx.asset(data.media.kind === 'image' ? data.media.src : data.media.poster), ctx.bases)
     : null;
   const overlay = data?.overlayOpacity ?? template.hero.defaultOverlay;
 
