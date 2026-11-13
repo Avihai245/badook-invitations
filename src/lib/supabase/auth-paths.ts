@@ -7,6 +7,26 @@
 export const HOME_PATH = '/app/invitations';
 export const RESET_PATH = '/auth/update-password';
 
+/**
+ * Supabase's session cookies: out of reach of page scripts (an XSS anywhere on the origin — invitations,
+ * galleries, the console — can't read a host's or a staff member's tokens), and HTTPS-only on an HTTPS
+ * deployment (a local http stack keeps working).
+ */
+export function sessionCookieOptions(publicBaseUrl: string | undefined) {
+  return {
+    httpOnly: true,
+    secure: /^https:\/\//i.test(publicBaseUrl ?? ''),
+    sameSite: 'lax' as const,
+    path: '/',
+  };
+}
+
+/**
+ * A non-secret "someone is signed in on this browser" marker, kept by the middleware next to the session:
+ * the static home page reads it (features/site/home/home-boot.ts) now that the session cookie is httpOnly.
+ */
+export const SIGNED_IN_COOKIE = 'signed_in';
+
 /** Relative in-app paths only — never an open redirect to another origin. */
 export function safeNext(next: unknown, fallback = HOME_PATH): string {
   const value = typeof next === 'string' ? next : '';

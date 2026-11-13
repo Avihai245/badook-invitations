@@ -1,6 +1,13 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { authAnswerRedirect, isSuspended, loginPath, signedInLanding } from '@/lib/supabase/auth-paths';
+import {
+  SIGNED_IN_COOKIE,
+  authAnswerRedirect,
+  isSuspended,
+  loginPath,
+  sessionCookieOptions,
+  signedInLanding,
+} from '@/lib/supabase/auth-paths';
 
 /**
  * Runs on the Node.js runtime — no Edge anywhere (MASTER_PROMPT §1.1 rule 4). Only the host app and the
@@ -38,7 +45,9 @@ export async function middleware(request: NextRequest) {
   if (!url || !key) return NextResponse.next();
 
   let response = NextResponse.next({ request });
+  const cookieOptions = sessionCookieOptions(runtimeEnv('INVITES_PUBLIC_BASE_URL'));
   const supabase = createServerClient(url, key, {
+    cookieOptions,
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (list) => {
@@ -58,10 +67,23 @@ export async function middleware(request: NextRequest) {
   if (suspended) await supabase.auth.signOut().catch(() => undefined);
   const user = suspended ? null : found;
 
+  // the home page's "signed in?" marker follows the session (auth-paths.ts SIGNED_IN_COOKIE)
+  const marked = (res: NextResponse) => {
+    if (user)
+      res.cookies.set(SIGNED_IN_COOKIE, '1', {
+        path: '/',
+        sameSite: 'lax',
+        secure: cookieOptions.secure,
+        maxAge: 400 * 24 * 60 * 60,
+      });
+    else if (request.cookies.has(SIGNED_IN_COOKIE))
+      res.cookies.set(SIGNED_IN_COOKIE, '', { path: '/', maxAge: 0 });
+    return res;
+  };
   const redirectTo = (path: string) => {
     const target = NextResponse.redirect(new URL(path, request.url));
     for (const cookie of response.cookies.getAll()) target.cookies.set(cookie);
-    return target;
+    return marked(target);
   };
   if (!user && pathname.startsWith('/app')) {
     return redirectTo(
@@ -72,7 +94,7 @@ export async function middleware(request: NextRequest) {
   }
   if (user && (pathname === '/' || pathname === '/login' || pathname === '/signup'))
     return redirectTo(signedInLanding(pathname, searchParams));
-  return response;
+  return marked(response);
 }
 
 export const config = {

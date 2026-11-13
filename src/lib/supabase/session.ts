@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { serverEnv } from '../env';
 import { ACT_AS_COOKIE, readActAs } from './act-as-token';
-import { isSuspended } from './auth-paths';
+import { isSuspended, sessionCookieOptions } from './auth-paths';
 import { serviceDb } from './server';
 
 export { safeNext } from './auth-paths';
@@ -22,6 +22,7 @@ export async function sessionDb(): Promise<SupabaseClient> {
     throw new Error('Supabase is not configured: set NEXT_PUBLIC_SUPABASE_URL and the publishable key');
   const store = await cookies();
   return createServerClient(url, key, {
+    cookieOptions: sessionCookieOptions(serverEnv().INVITES_PUBLIC_BASE_URL),
     cookies: {
       getAll: () => store.getAll(),
       setAll: (list) => {

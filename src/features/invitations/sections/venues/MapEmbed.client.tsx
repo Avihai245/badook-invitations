@@ -64,7 +64,7 @@ export function MapEmbed({
           src={src}
           title={label}
           loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
+          referrerPolicy="strict-origin-when-cross-origin"
           onLoad={() => setLoaded(true)}
         />
       ) : null}
