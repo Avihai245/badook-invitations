@@ -214,7 +214,7 @@ describe('CSV', () => {
   it('writes one row per reply: guests, dietary counts, answers as labels, escaped message', () => {
     const [, dana, avi] = csv.split('\r\n');
     expect(dana).toBe(
-      'דנה לוי,מגיעים,2,1,050-123-4567,dana@example.com,דנה לוי; תום לוי; נועם (6),טבעוני; אלרגיה לאגוזים; מנת ילדים,אגוזי מלך,מתל אביב,כן,"מזל טוב, ""מתרגשים""!",עברית,' +
+      'דנה לוי,מגיעים,2,1,050-123-4567,dana@example.com,"דנה לוי; תום לוי; נועם (6)","טבעוני; אלרגיה לאגוזים; מנת ילדים",אגוזי מלך,מתל אביב,כן,"מזל טוב, ""מתרגשים""!",עברית,' +
         `"${new Intl.DateTimeFormat('he-IL', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Jerusalem' }).format(new Date(LIST[0]!.createdAt))}",`,
     );
     // declined: no answers; a formula-looking email is neutralized
@@ -226,6 +226,8 @@ describe('CSV', () => {
     expect(csvCell('-1')).toBe("'-1");
     expect(csvCell('a,b')).toBe('"a,b"');
     expect(csvCell('line\nbreak')).toBe('"line\nbreak"');
+    // where Excel splits on semicolons, an unquoted one would start a formula cell
+    expect(csvCell("x;=cmd|' /C calc'!A0")).toBe('"x;=cmd|\' /C calc\'!A0"');
     expect(csvCell(null)).toBe('');
     expect(csvCell(3)).toBe('3');
   });

@@ -443,7 +443,9 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
     if (isPremiumTemplate(entry.manifest) && !e.premiumTemplates) return fail(402, 'premium_template');
     // an animated invitation (the scroll scene) is part of the paid plans too, on any design
     if (sceneOn(draft, entry.manifest, true) && !e.premiumTemplates) return fail(402, 'premium_scene');
-    const creditOff = draft.sections.some((s) => s.type === 'footer' && s.enabled && !s.data.showCredit);
+    // the credit is the footer's: a footer turned off (the editor never does that — an API call can)
+    // takes the credit with it, which is the paid plans' too
+    const creditOff = draft.sections.some((s) => s.type === 'footer' && (!s.enabled || !s.data.showCredit));
     if (creditOff && !e.removeBranding) return fail(402, 'branding');
   }
   if (slug !== inv.slug) {
