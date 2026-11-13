@@ -67,6 +67,12 @@ export interface GuestDeps {
   broadcast(channel: string, kind: HintKind): Promise<unknown>;
   /** the automatic check (null when this deployment has no AI model) */
   checkImage: ((jpeg: Uint8Array) => Promise<AiResult>) | null;
+  /**
+   * The thumbnail made on the server from the display version and stored over the browser's (null: it
+   * couldn't be). The automatic check reads what it returns — so the check sees what the feed, the
+   * viewer and the screen show, not a harmless picture uploaded beside a different one.
+   */
+  rethumb?(displayPath: string, thumbPath: string): Promise<Uint8Array | null>;
   realtime(channel: string): RealtimeInfo | null;
   /** files were deleted: remove them from storage now (bounded) */
   swept(): Promise<void>;
@@ -601,14 +607,19 @@ export async function guestComplete(raw: unknown, ip: string | null, deps: Guest
   if ((thumb?.size ?? 0) > L.thumbBytes || (display?.size ?? 0) > L.displayBytes)
     return fail(413, 'too_large');
 
-  // the automatic check: on the thumbnail (the display version is its big brother)
+  // the automatic check: on the thumbnail — made here from the display version when there is one (the
+  // browser sends both: a harmless thumbnail beside a different display picture would pass the check
+  // and show the other on the screen)
   let ai: AiResult | null = null;
   if (r.features.has('gallery_ai') && deps.checkImage) {
     if (!row.thumbPath) ai = { status: 'skipped', why: 'no_preview' };
     else if (!(await rateOk(deps, 'ai', 'day', { count: GALLERY.ai.perDay, windowSeconds: 86_400 })))
       ai = { status: 'skipped', why: 'daily_limit' };
     else {
-      const bytes = await deps.storage.download(BUCKETS.media, row.thumbPath);
+      const bytes =
+        row.displayPath && deps.rethumb
+          ? await deps.rethumb(row.displayPath, row.thumbPath).catch(() => null)
+          : await deps.storage.download(BUCKETS.media, row.thumbPath);
       ai = bytes ? await deps.checkImage(bytes) : { status: 'error', error: 'thumbnail unreadable' };
     }
   }

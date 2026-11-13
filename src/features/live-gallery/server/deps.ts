@@ -19,8 +19,9 @@ import type { GalleryNotifyDeps } from './notices-api';
 import { galleryNoticesDb } from './notices-db';
 import { galleryTemplateReady, processGalleryNoticeQueue } from './notify';
 import { broadcastRefresh } from './realtime';
-import { galleryStorage } from './storage';
+import { BUCKETS, galleryStorage } from './storage';
 import { sweepNow } from './sweep';
+import { makeThumbnail } from './thumbnail';
 
 /** The real dependencies of the gallery's API (tests pass their own). */
 
@@ -34,6 +35,19 @@ function aiCheck() {
     checkImage(jpeg, { apiKey: env.ANTHROPIC_API_KEY, model, apiBase: env.INVITES_AI_API_BASE });
 }
 
+/**
+ * The item's thumbnail from its display version (gallery-media bucket): the long edge and quality the
+ * browser uses (config.ts), in the thumbnail's own format, stored over the browser's.
+ */
+async function rethumb(displayPath: string, thumbPath: string): Promise<Uint8Array | null> {
+  const display = await galleryStorage.download(BUCKETS.media, displayPath);
+  if (!display) return null;
+  const webp = thumbPath.endsWith('.webp');
+  const bytes = await makeThumbnail(display, webp ? 'webp' : 'jpeg');
+  await galleryStorage.upload(BUCKETS.media, thumbPath, bytes, webp ? 'image/webp' : 'image/jpeg');
+  return bytes;
+}
+
 export function guestDeps(): GuestDeps {
   return {
     db: galleryDb,
@@ -41,6 +55,7 @@ export function guestDeps(): GuestDeps {
     features: featuresFor,
     broadcast: broadcastRefresh,
     checkImage: aiCheck(),
+    rethumb,
     realtime,
     swept: sweepNow,
     now: () => Date.now(),

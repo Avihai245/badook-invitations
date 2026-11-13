@@ -690,6 +690,42 @@ describe('finishing an upload', () => {
     }
   });
 
+  it('the check reads the thumbnail the server made from the display version, not the browser’s', async () => {
+    const fromDisplay = new Uint8Array([1, 2, 3]);
+    const seen: Uint8Array[] = [];
+    const check = vi.fn(async (bytes: Uint8Array): Promise<AiResult> => {
+      seen.push(bytes);
+      return { status: 'ok', nsfw: 0.95, quality: 0.8, reason: 'nudity' };
+    });
+    const w = guestWorld({ check });
+    const rethumb = vi.fn(async () => fromDisplay);
+    w.deps.rethumb = rethumb;
+    const r = w.add();
+    done(w, r);
+    const res = await guest.guestComplete(
+      { t: w.token, uploader: UPLOADER, id: r.id, originalDone: false, metrics },
+      IP,
+      w.deps,
+    );
+    expect(rethumb).toHaveBeenCalledWith(r.displayPath, r.thumbPath);
+    expect(seen).toEqual([fromDisplay]);
+    expect(w.storage.download).not.toHaveBeenCalledWith('gallery-media', r.thumbPath);
+    expect(res.body).toMatchObject({ status: 'rejected', reason: 'unsafe' });
+    // a display version the server can't read is never published unchecked
+    const broken = guestWorld({ check });
+    broken.deps.rethumb = vi.fn(async () => {
+      throw new Error('not an image');
+    });
+    const b = broken.add();
+    done(broken, b);
+    const res2 = await guest.guestComplete(
+      { t: broken.token, uploader: UPLOADER, id: b.id, originalDone: false, metrics },
+      IP,
+      broken.deps,
+    );
+    expect(res2.body).toMatchObject({ status: 'pending', reason: 'unchecked' });
+  });
+
   it('without the feature, or without a model on this server, nothing is sent to the AI', async () => {
     const check = vi.fn(async (): Promise<AiResult> => ({ status: 'ok', nsfw: 0, quality: 1, reason: '' }));
     const w = guestWorld({ check, features: ['live_gallery'] });
@@ -1508,5 +1544,23 @@ describe('the list of tag requests', () => {
     expect(host.tagsCsv([], 'Asia/Jerusalem', cols).slice(1)).toBe(
       'Instagram username,Profile link,Name,Photos,First shared,Files',
     );
+  });
+});
+
+describe('the server-made thumbnail', () => {
+  it('is the display version scaled to the thumbnail’s edge, upright, in its format', async () => {
+    const sharp = (await import('sharp')).default;
+    const { makeThumbnail } = await import('@/features/live-gallery/server/thumbnail');
+    const display = await sharp({
+      create: { width: 1600, height: 1200, channels: 3, background: { r: 200, g: 30, b: 30 } },
+    })
+      .jpeg()
+      .toBuffer();
+    for (const format of ['jpeg', 'webp'] as const) {
+      const meta = await sharp(await makeThumbnail(new Uint8Array(display), format)).metadata();
+      expect(meta.format).toBe(format);
+      expect(Math.max(meta.width!, meta.height!)).toBe(GALLERY.image.thumbMaxEdge);
+      expect(meta.width! / meta.height!).toBeCloseTo(4 / 3, 1);
+    }
   });
 });
