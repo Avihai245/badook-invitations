@@ -71,7 +71,7 @@
     "libphonenumber-js": "^1.13.13",
     "lucide-react": "^1.47.0",
     "mp4-muxer": "5.2.2",
-    "next": "15.5.26",
+    "next": "15.5.29",
     "pdfjs-dist": "^6.3.289",
     "qrcode": "^1.5.4",
     "react": "19.2.8",
@@ -80,7 +80,7 @@
     "server-only": "^0.0.1",
     "sharp": "^0.35.5",
     "write-excel-file": "^4.1.1",
-    "zod": "^4.6.5"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
@@ -168,7 +168,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
     "eslint": "^9.39.5",
-    "eslint-config-next": "15.5.26",
+    "eslint-config-next": "15.5.29",
     "fflate": "^0.8.3",
     "jsdom": "^27.4.0",
     "pg": "^8.23.0",
@@ -179,10 +179,14 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "~5.9.3",
-    "vite": "^7.3.6",
-    "vitest": "4.1.11"
+    "vite": "^7.3.8",
+    "vitest": "4.1.12"
   },
   "overrides": {
-    "postcss": "^8.5.28"
+    "postcss": "^8.5.28",
+    "source-map-js": "^1.2.2",
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.8"
+    }
   }
 }
