@@ -181,12 +181,13 @@ export interface CsvLabels {
 
 /**
  * A spreadsheet cell: quoted when needed, and never a formula — cells starting with = + - @ (or a
- * tab/CR) get a leading apostrophe (CSV injection, OWASP).
+ * tab/CR) get a leading apostrophe (CSV injection, OWASP). A `;` is quoted too: where Excel's list
+ * separator is a semicolon, an unquoted one would start a new cell — `x;=cmd…` — past that guard.
  */
 export function csvCell(value: string | number | null | undefined): string {
   let s = value == null ? '' : String(value);
   if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
-  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  return /[",;\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 /**

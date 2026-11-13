@@ -11,9 +11,9 @@ import { linkToken } from './tokens';
 export async function invitationGalleryUrl(
   invitationId: string,
   slug: string,
-): Promise<{ url: string } | null> {
+): Promise<{ url: string; hasCode: boolean } | null> {
   const g = await galleryDb.invitationLink(invitationId);
   if (!g || !g.enabled) return null;
   const token = linkToken('upload', invitationId, g.uploadTokenNonce, g.uploadTokenHash);
-  return token ? { url: `/e/${slug}/upload?t=${token}` } : null;
+  return token ? { url: `/e/${slug}/upload?t=${token}`, hasCode: g.hasCode } : null;
 }

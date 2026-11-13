@@ -1,6 +1,7 @@
 import { nudgeAfter } from '@/features/admin/server/nudge';
 import { payplusCallback } from '@/features/billing/server/billing';
 import { payplusConfigured } from '@/features/billing/server/payplus';
+import { readCappedText } from '@/lib/read-body';
 
 /**
  * POST /api/billing/payplus/callback — PayPlus's server-to-server notice of a payment (refURL_callback)
@@ -8,8 +9,8 @@ import { payplusConfigured } from '@/features/billing/server/payplus';
  */
 export async function POST(request: Request) {
   if (!payplusConfigured()) return new Response('Not found', { status: 404 });
-  const raw = await request.text();
-  if (raw.length > 256 * 1024) return new Response('Too large', { status: 413 });
+  const raw = await readCappedText(request, 256 * 1024);
+  if (raw === null) return new Response('Too large', { status: 413 });
   try {
     const result = await payplusCallback(raw, request.headers.get('hash'));
     // a payment or a monthly renewal: the admin console's money and feed

@@ -63,6 +63,8 @@ const T = {
   d90: `(now() - interval '90 days')`,
 };
 
+/** A date `days` from today (YYYY-MM-DD): the events stay upcoming or past whenever the tests run. */
+const daysFromNow = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
 const doc = (primary: string, secondary: string | null, date: string) => ({
   defaultLocale: 'he',
   locales: ['he', 'en'],
@@ -142,12 +144,12 @@ beforeAll(async () => {
       INV_C,
       INV_D,
       DANA,
-      doc('דנה', 'עומר', '2027-01-10'),
-      doc('Dana', null, '2027-03-01'),
+      doc('דנה', 'עומר', daysFromNow(60)),
+      doc('Dana', null, daysFromNow(110)),
       EYAL,
-      { ...doc('איל', null, '2026-10-20'), locales: ['he', 'ru'] },
+      { ...doc('איל', null, daysFromNow(20)), locales: ['he', 'ru'] },
       OLD,
-      doc('Old', null, '2026-08-01'),
+      doc('Old', null, daysFromNow(-100)),
     ],
   );
   // first publishes (they went live then); INV_A was published twice
@@ -991,7 +993,7 @@ describe('invitations', () => {
     expect(await ids(VIEWER, { to: d7 })).toEqual([INV_C, INV_D]);
     expect(await ids(VIEWER, { sort: 'oldest' })).toEqual([INV_D, INV_C, INV_A, INV_B]);
     expect(await ids(VIEWER, { sort: 'rsvps' })).toEqual([INV_A, INV_C, INV_D, INV_B]);
-    // upcoming first (INV_C in October, then January, March), then past ones (INV_D)
+    // upcoming first (INV_C in 20 days, then INV_A in 60, INV_B in 110), then past ones (INV_D)
     expect(await ids(VIEWER, { sort: 'event' })).toEqual([INV_C, INV_A, INV_B, INV_D]);
   });
 

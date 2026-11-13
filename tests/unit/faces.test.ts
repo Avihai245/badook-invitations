@@ -229,6 +229,7 @@ function world(opts: { features?: Feature[]; date?: string; code?: string; rate?
     db: {
       byToken: vi.fn(async (hash: string) => (hash === link.hash ? lookup : null)),
       rateHit: vi.fn(async () => opts.rate ?? true),
+      ratePeek: vi.fn(async () => 0),
     },
     storage: {
       signRead: vi.fn(

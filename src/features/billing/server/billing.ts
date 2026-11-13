@@ -21,7 +21,7 @@ import {
   type Product,
 } from '../plans';
 import { accountDb, loadAccount, planPrices, type AccountView, type BillingPatch } from './account';
-import { alertSupport } from './alert';
+import { alertSupport, alertSupportThrottled } from './alert';
 import {
   cancelRecurring,
   confirmPayment,
@@ -420,7 +420,8 @@ export async function payplusCallback(
   // a monthly charge of an existing plan (or a repeated notice of one already applied: the event id
   // is the transaction's, so it is applied once)
   if (!signed) {
-    await alertSupport('Unsigned PayPlus callback', {
+    // anyone can post here: logged every time, emailed a few times an hour at most
+    await alertSupportThrottled('payplus-unsigned', 'Unsigned PayPlus callback', {
       transaction: tx.transactionUid,
       recurring: tx.recurringUid,
     });

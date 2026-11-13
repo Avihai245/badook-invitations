@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import type { ApiResult } from '@/features/invitations/server/host-api';
 import { invitationsEnabled } from '@/lib/feature';
 import { getActingAs, getSessionUser } from '@/lib/supabase/session';
+import { readCappedText } from '@/lib/read-body';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 const json = (status: number, body: unknown) => NextResponse.json(body, { status, headers: NO_STORE });
@@ -21,8 +22,8 @@ export async function userRoute(
   if (!invitationsEnabled()) return json(404, { ok: false, code: 'not_found' });
   if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
     return json(415, { ok: false, code: 'unsupported_media_type' });
-  const text = await request.text();
-  if (text.length > 16_384) return json(413, { ok: false, code: 'too_large' });
+  const text = await readCappedText(request, 16_384);
+  if (text === null) return json(413, { ok: false, code: 'too_large' });
   let body: unknown;
   try {
     body = text ? JSON.parse(text) : {};

@@ -74,20 +74,15 @@ describe('seed', () => {
 });
 
 describe('anonymous', () => {
-  it('reads active templates only', async () => {
+  it('cannot read the templates table — a published invitation carries its template', async () => {
     // (an unlisted design — manifest `listed: false` — is seeded inactive)
     const all = (await c.query('select count(*)::int as n from invitation_templates where is_active')).rows[0]
       .n as number;
     expect(all).toBe(TEMPLATES.size - [...TEMPLATES.values()].filter((t) => !t.manifest.listed).length);
-    await c.query(`update invitation_templates set is_active = false where id = 'atara'`);
-    const n = await as(
-      c,
-      'anon',
-      null,
-      async () => (await c.query('select id from invitation_templates')).rowCount,
-    );
-    await c.query(`update invitation_templates set is_active = true where id = 'atara'`);
-    expect(n).toBe(all - 1);
+    for (const role of ['anon', 'authenticated'] as const)
+      await expect(
+        as(c, role, role === 'anon' ? null : OWNER_A, () => c.query('select id from invitation_templates')),
+      ).rejects.toThrow(/permission denied/);
   });
 
   it('cannot read invitations, versions, responses or attendees', async () => {
@@ -148,78 +143,115 @@ describe('anonymous', () => {
   });
 });
 
-describe('owners', () => {
-  it('A sees only their own invitations (including drafts)', async () => {
-    const slugs = await as(c, 'authenticated', OWNER_A, async () =>
-      (await c.query('select slug from invitations order by slug')).rows.map((r) => r.slug),
-    );
-    expect(slugs).toEqual(['a-draft', 'a-published']);
+describe('signed-in users (the Data API)', () => {
+  // The app reads and writes through the service role with the verified user's id; a user's own JWT
+  // reaches no table directly (20261113000100_data_api_lockdown.sql) — no paid features granted,
+  // documents published or premium designs taken by writing a row.
+  const TABLES = [
+    'invitations',
+    'invitation_versions',
+    'rsvp_responses',
+    'rsvp_attendees',
+    'rsvp_rate_events',
+    'invitation_templates',
+    'billing_cards',
+    'billing_claims',
+  ];
+
+  it('cannot read any of the tables, not even their own rows', async () => {
+    for (const table of TABLES)
+      await expect(as(c, 'authenticated', OWNER_A, () => c.query(`select * from ${table}`))).rejects.toThrow(
+        /permission denied/,
+      );
   });
 
-  it("B cannot read, change or delete A's invitation", async () => {
-    await as(c, 'authenticated', OWNER_B, async () => {
-      expect((await c.query('select * from invitations')).rowCount).toBe(0);
-      expect(
-        (await c.query(`update invitations set slug = 'stolen' where id = $1`, [draftId])).rowCount,
-      ).toBe(0);
-      expect((await c.query(`delete from invitations where id = $1`, [draftId])).rowCount).toBe(0);
-    });
+  it('cannot change, publish or grant features to their own invitation', async () => {
+    const writes = [
+      [`update invitations set features = '{"grant":["ai_photos","voice"]}' where id = $1`, [draftId]],
+      [`update invitations set status = 'published', published = draft where id = $1`, [draftId]],
+      [`update invitations set template_id = 'celestial' where id = $1`, [draftId]],
+      [`delete from invitations where id = $1`, [draftId]],
+      [`delete from rsvp_responses where id = $1`, [responseId]],
+    ] as const;
+    for (const [sql, params] of writes)
+      await expect(as(c, 'authenticated', OWNER_A, () => c.query(sql, [...params]))).rejects.toThrow(
+        /permission denied/,
+      );
+    const row = (await c.query(`select status, features from invitations where id = $1`, [draftId])).rows[0];
+    expect(row.status).toBe('draft');
+    expect(JSON.stringify(row.features ?? {})).not.toContain('ai_photos');
   });
 
-  it("B cannot read A's responses or attendees; A can", async () => {
-    const b = await as(c, 'authenticated', OWNER_B, async () => [
-      (await c.query('select * from rsvp_responses')).rowCount,
-      (await c.query('select * from rsvp_attendees')).rowCount,
-    ]);
-    expect(b).toEqual([0, 0]);
-    const a = await as(c, 'authenticated', OWNER_A, async () => [
-      (await c.query('select * from rsvp_responses')).rowCount,
-      (await c.query('select * from rsvp_attendees')).rowCount,
-    ]);
-    expect(a).toEqual([1, 1]);
-  });
-
-  it('cannot create an invitation for someone else', async () => {
+  it('cannot create invitations directly, for themselves or anyone else', async () => {
     const doc = (await c.query(`select draft from invitations where id = $1`, [draftId])).rows[0].draft;
-    await expect(
-      as(c, 'authenticated', OWNER_B, () =>
-        c.query(
-          `insert into invitations (owner_id, template_id, slug, event_type, draft) values ($1, 'sahar-bordeaux', 'b-fake', 'wedding', $2)`,
-          [OWNER_A, doc],
+    for (const owner of [OWNER_A, OWNER_B])
+      await expect(
+        as(c, 'authenticated', OWNER_B, () =>
+          c.query(
+            `insert into invitations (owner_id, template_id, slug, status, event_type, draft, published)
+             values ($1, 'sahar-bordeaux', 'b-direct', 'published', 'wedding', $2, $2)`,
+            [owner, doc],
+          ),
         ),
-      ),
-    ).rejects.toThrow(/row-level security/);
-    const ok = await as(
-      c,
-      'authenticated',
-      OWNER_B,
-      async () =>
-        (
-          await c.query(
-            `insert into invitations (owner_id, template_id, slug, event_type, draft) values ($1, 'sahar-bordeaux', 'b-own', 'wedding', $2)`,
-            [OWNER_B, doc],
-          )
-        ).rowCount,
-    );
-    expect(ok).toBe(1);
+      ).rejects.toThrow(/permission denied/);
   });
 
-  it('cannot insert responses directly, can delete their own', async () => {
-    await expect(
-      as(c, 'authenticated', OWNER_A, () =>
-        c.query(
-          `insert into rsvp_responses (invitation_id, attending, locale, primary_name, edit_token_hash) values ($1, true, 'he', 'x', 'x')`,
-          [publishedId],
+  it('cannot insert responses or truncate the billing tables', async () => {
+    for (const role of ['anon', 'authenticated'] as const) {
+      await expect(
+        as(c, role, role === 'anon' ? null : OWNER_A, () =>
+          c.query(
+            `insert into rsvp_responses (invitation_id, attending, locale, primary_name, edit_token_hash) values ($1, true, 'he', 'x', 'x')`,
+            [publishedId],
+          ),
         ),
-      ),
-    ).rejects.toThrow(/permission denied/);
-    const deleted = await as(
-      c,
-      'authenticated',
-      OWNER_A,
-      async () => (await c.query('delete from rsvp_responses where id = $1', [responseId])).rowCount,
-    );
-    expect(deleted).toBe(1);
+      ).rejects.toThrow(/permission denied/);
+      for (const table of ['billing_cards', 'billing_claims'])
+        await expect(
+          as(c, role, role === 'anon' ? null : OWNER_A, () => c.query(`truncate ${table}`)),
+        ).rejects.toThrow(/permission denied/);
+    }
+  });
+});
+
+describe('the Data API surface', () => {
+  it('anon and authenticated hold no privilege on any table or sequence of public', async () => {
+    const granted = (
+      await c.query(`
+        select c.relname, a.grantee::regrole::text as grantee, a.privilege_type
+        from pg_class c join pg_namespace n on n.oid = c.relnamespace
+        cross join lateral aclexplode(c.relacl) a
+        where n.nspname = 'public' and c.relkind in ('r', 'p', 'v', 'm', 'f', 'S')
+          and a.grantee in ('anon'::regrole, 'authenticated'::regrole)`)
+    ).rows;
+    expect(granted).toEqual([]);
+  });
+
+  it('a table or sequence created later starts with nothing for them either', async () => {
+    await c.query('begin');
+    try {
+      await c.query('create table public.zz_later (id bigserial primary key)');
+      const rows = (
+        await c.query(`
+          select c.relname from pg_class c cross join lateral aclexplode(c.relacl) a
+          where c.relname in ('zz_later', 'zz_later_id_seq')
+            and a.grantee in ('anon'::regrole, 'authenticated'::regrole)`)
+      ).rows;
+      expect(rows).toEqual([]);
+    } finally {
+      await c.query('rollback');
+    }
+  });
+
+  it('the one function they may call is get_published_invitation', async () => {
+    const callable = (
+      await c.query(`
+        select p.oid::regprocedure::text as fn from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname = 'public'
+          and (has_function_privilege('anon', p.oid, 'execute')
+            or has_function_privilege('authenticated', p.oid, 'execute'))`)
+    ).rows.map((r) => r.fn);
+    expect(callable).toEqual(['get_published_invitation(text)']);
   });
 });
 

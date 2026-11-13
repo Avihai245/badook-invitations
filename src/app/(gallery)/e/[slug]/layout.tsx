@@ -25,7 +25,6 @@ export default async function GalleryLayout({ children, params }: { children: Re
   const locale = await slugLocale(slug);
   return (
     <html lang={locale} dir={RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr'} suppressHydrationWarning>
-      {/* eslint-disable-next-line @next/next/no-head-element */}
       <head>
         {/* the accessibility menu's settings from the last visit, before the first paint */}
         <script dangerouslySetInnerHTML={{ __html: A11Y_BOOT }} />

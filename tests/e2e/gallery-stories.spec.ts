@@ -250,8 +250,9 @@ test('Badook is plain to see at the bottom, with its site and Badook Events; a b
   await expect(events).toContainText('למצוא מקום לאירוע');
   // the site's link opens the home page
   const [home] = await Promise.all([context.waitForEvent('page'), site.click()]);
-  await home.waitForLoadState('domcontentloaded');
-  expect(new URL(home.url()).pathname).toBe('/');
+  // (a noopener tab's address can still be empty at its first load state on some browser builds: wait
+  // for the navigation itself)
+  await home.waitForURL((u) => u.pathname === '/', { waitUntil: 'commit' });
   await home.close();
 
   // sharing is always at hand: the dock (the story, or a post); the first time asks the name — or not

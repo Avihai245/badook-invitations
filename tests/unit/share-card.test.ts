@@ -134,6 +134,40 @@ describe('the share image', () => {
     }
   });
 
+  it('never reaches inside the network for a link the host gave (SSRF)', async () => {
+    // our own storage is fetched directly — never following a redirect — and anything else only
+    // through the guarded fetcher, which refuses private and link-local addresses
+    const fetch = await serve({ r: 200, g: 0, b: 0 });
+    for (const link of [
+      'https://169.254.169.254/latest/meta-data/iam/security-credentials/',
+      'https://127.0.0.1/admin.png',
+      'https://10.0.0.5/x.png',
+      'https://[::1]/x.png',
+      'https://localhost/x.png',
+      'https://db.test.attacker.invalid/storage/v1/object/public/invitation-media/x.png',
+    ]) {
+      const d = doc();
+      d.share.ogImage = link;
+      const res = await invitationOgImage(ctxOf(d, 'he'));
+      expect(res.headers.get('content-type')).toBe('image/png');
+      // the generated card, not the (red) picture
+      const [r, g, b] = (await pixels(res))(20, 20);
+      expect(r > 150 && g + b < 80).toBe(false);
+    }
+    expect(fetch).not.toHaveBeenCalled();
+  }, 30_000);
+
+  it('fetches our own storage without following redirects', async () => {
+    const fetch = await serve({ r: 0, g: 160, b: 0 });
+    const d = doc();
+    d.share.ogImage = 'upload:u/i/own.webp';
+    await invitationOgImage(ctxOf(d, 'he'));
+    expect(fetch).toHaveBeenCalledWith(
+      'https://db.test/storage/v1/object/public/invitation-media/u/i/own.webp',
+      expect.objectContaining({ redirect: 'error' }),
+    );
+  });
+
   it('falls back to the generated card when the host’s image can’t be read', async () => {
     vi.stubGlobal(
       'fetch',

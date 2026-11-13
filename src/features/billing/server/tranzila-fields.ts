@@ -1,4 +1,5 @@
 import 'server-only';
+import { readCappedText } from '@/lib/read-body';
 
 /**
  * The fields Tranzila sent: the address's query and the body (a form, or JSON), the body winning.
@@ -8,8 +9,8 @@ export async function requestFields(request: Request): Promise<Record<string, st
   const fields: Record<string, string> = {};
   for (const [k, v] of new URL(request.url).searchParams) fields[k] = v;
   if (request.method !== 'POST') return fields;
-  const raw = await request.text();
-  if (raw.length > 64 * 1024) return null;
+  const raw = await readCappedText(request, 64 * 1024);
+  if (raw === null) return null;
   const type = request.headers.get('content-type') ?? '';
   if (type.includes('application/json')) {
     try {

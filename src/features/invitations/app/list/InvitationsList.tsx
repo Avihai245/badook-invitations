@@ -222,7 +222,16 @@ export function InvitationsList({
       ) : (
         <EmptyList />
       )}
-      {followUp ? <FollowUpDialog item={followUp} onClose={() => setFollowUp(null)} /> : null}
+      {followUp ? (
+        <FollowUpDialog
+          item={followUp}
+          onClose={() => setFollowUp(null)}
+          onUpgrade={(reason) => {
+            setFollowUp(null);
+            setUpgrade(reason);
+          }}
+        />
+      ) : null}
       {upgrade ? <UpgradeDialog reason={upgrade} onClose={() => setUpgrade(null)} /> : null}
     </div>
   );

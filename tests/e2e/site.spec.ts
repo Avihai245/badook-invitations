@@ -1,8 +1,22 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import pg from 'pg';
 
 // The public site around the product: cookie consent, the accessibility menu, the policy pages and the
 // contact form.
+
+/** The policies' "last updated" date (features/legal/context.ts LEGAL_UPDATED), as the pages write it. */
+const LEGAL_UPDATED = (() => {
+  const iso = /LEGAL_UPDATED = '(\d{4}-\d{2}-\d{2})'/.exec(
+    readFileSync('src/features/legal/context.ts', 'utf8'),
+  )![1]!;
+  return new Intl.DateTimeFormat('he-IL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${iso}T00:00:00Z`));
+})();
 
 const LOCAL = !process.env.PW_BASE_URL;
 const e2eDb = () => {
@@ -93,7 +107,7 @@ test('the policy pages: privacy, terms, cookies and the accessibility statement'
     expect(res?.status(), path).toBe(200);
     await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: section })).toBeAttached();
-    await expect(page.getByText(/עודכן לאחרונה: 27 בספטמבר 2026/)).toBeVisible();
+    await expect(page.getByText(`עודכן לאחרונה: ${LEGAL_UPDATED}`)).toBeVisible();
     // every policy is linked from every page's footer
     const footer = page.getByRole('contentinfo');
     for (const name of ['מדיניות פרטיות', 'תנאי שימוש', 'מדיניות עוגיות', 'הצהרת נגישות'])

@@ -281,6 +281,46 @@ describe('galleries', () => {
   });
 });
 
+describe('the gallery’s limit', () => {
+  it('a reservation whose upload never came stops counting once its upload URL is over', async () => {
+    const doc = (await c.query(`select draft from invitations where slug = 'noa-and-itay'`)).rows[0].draft;
+    const own = (
+      await commit<{ id: string }>('create_invitation', [
+        OWNER,
+        'sahar-bordeaux',
+        'wedding',
+        'gallery-cap',
+        doc,
+      ])
+    ).id;
+    expect(await commit('gallery_owner_create', [own, OWNER, ...links('c', 'd', 'cap')])).not.toBeNull();
+    const take = (n: number) =>
+      commit('gallery_reserve', [
+        own,
+        UPLOADER,
+        null,
+        null,
+        JSON.stringify(Array.from({ length: n }, () => item(own))),
+        3,
+      ]);
+    // three reserved and never uploaded: full
+    expect(await take(3)).toEqual({ ok: true });
+    expect(await take(1)).toEqual({ ok: false, code: 'full', left: 0 });
+    // their upload URLs are over (two hours): they no longer hold the gallery full
+    await c.query(
+      `update gallery_items set created_at = now() - interval '3 hours' where invitation_id = $1 and status = 'uploading'`,
+      [own],
+    );
+    expect(await take(1)).toEqual({ ok: true });
+    // an item that did arrive always counts, however old
+    await c.query(
+      `update gallery_items set status = 'published', created_at = now() - interval '3 days' where invitation_id = $1`,
+      [own],
+    );
+    expect(await take(1)).toEqual({ ok: false, code: 'full', left: 0 });
+  });
+});
+
 describe('items', () => {
   let a: ReturnType<typeof item>;
   let b: ReturnType<typeof item>;
@@ -540,6 +580,18 @@ describe('items', () => {
     expect(await commit('gallery_rate_hit', ['k1', 2, 60])).toBe(false);
     expect(await commit('gallery_rate_hit', ['k2', 2, 60])).toBe(true);
   });
+
+  it('a peek counts the hits in the window without adding one', async () => {
+    expect(await commit('gallery_rate_peek', ['k-peek', 60])).toBe(0);
+    await commit('gallery_rate_hit', ['k-peek', 5, 60]);
+    await commit('gallery_rate_hit', ['k-peek', 5, 60]);
+    expect(await commit('gallery_rate_peek', ['k-peek', 60])).toBe(2);
+    expect(await commit('gallery_rate_peek', ['k-peek', 60])).toBe(2);
+    await c.query(
+      `update gallery_rate_events set created_at = now() - interval '2 minutes' where key_hash = 'k-peek'`,
+    );
+    expect(await commit('gallery_rate_peek', ['k-peek', 60])).toBe(0);
+  });
 });
 
 describe('privileges', () => {
@@ -561,6 +613,7 @@ describe('privileges', () => {
         `select public.gallery_owner_get('${inv}', '${OWNER}')`,
         `select public.gallery_feed('${inv}', null, null, 10)`,
         `select public.gallery_rate_hit('x', 1, 1)`,
+        `select public.gallery_rate_peek('x', 1)`,
         `select public.gallery_trash_claim(1)`,
         `select public.gallery_maintenance(48, 30)`,
       ]) {

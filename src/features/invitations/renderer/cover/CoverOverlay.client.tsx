@@ -21,6 +21,7 @@ import type { Opening } from './opening';
 import { CinematicCover, type CoverBackdrop } from './Openings.client';
 import { announceOpen, reducedMotion, useOpening, type Phase, type PhaseProps } from './phase';
 import { SealArt, TagArt, TicketArt } from './SealArt';
+import { cssUrl } from '../../lib/css-url';
 
 type Overlay = TemplateManifest['cover']['overlay'];
 
@@ -285,8 +286,8 @@ function VideoCover({
           className="ov-tint"
           style={{
             backgroundColor: sealColor,
-            WebkitMaskImage: `url("${media.overlay}")`,
-            maskImage: `url("${media.overlay}")`,
+            WebkitMaskImage: cssUrl(media.overlay),
+            maskImage: cssUrl(media.overlay),
           }}
         />
       ) : null}

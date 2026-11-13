@@ -28,6 +28,8 @@ const state = {
   checkouts: new Map<string, Checkout>(),
   account: null as Account | null,
   calls: [] as [string, Record<string, unknown>][],
+  /** support_rate_hit's counts */
+  rate: new Map<string, number>(),
 };
 const calls = (fn: string) => state.calls.filter(([name]) => name === fn).map(([, args]) => args);
 
@@ -42,6 +44,11 @@ const rpc = vi.fn(async (fn: string, args: Record<string, unknown>) => {
       case 'account_note_limit':
       case 'checkout_attach':
         return null;
+      case 'support_rate_hit': {
+        const key = String(args.p_key_hash);
+        state.rate.set(key, (state.rate.get(key) ?? 0) + 1);
+        return state.rate.get(key)! <= Number(args.p_limit);
+      }
       case 'billing_apply':
         return true;
       case 'checkout_create': {
@@ -174,6 +181,7 @@ beforeEach(() => {
   state.checkouts = new Map([[CHECKOUT, checkout()]]);
   state.account = account();
   state.calls = [];
+  state.rate = new Map();
   payplus.ipn = { transaction_uid: 'tx-1', page_request_uid: 'page-1', status_code: '000', amount: 49 };
   payplus.cancel = 'success';
   fetchMock.mockClear();
@@ -453,6 +461,17 @@ describe('the callback', () => {
       status: 200,
       body: 'ok',
     });
+    expect(calls('billing_apply')).toEqual([]);
+  });
+
+  it('a flood of unsigned callbacks emails support a few times an hour, not once each', async () => {
+    state.checkouts.get(CHECKOUT)!.status = 'paid';
+    for (let i = 0; i < 20; i++)
+      expect(await post(notice({ uid: `tx-forged-${i}` }, 2))).toEqual({
+        status: 401,
+        body: 'bad signature',
+      });
+    expect(alerts()).toHaveLength(3);
     expect(calls('billing_apply')).toEqual([]);
   });
 

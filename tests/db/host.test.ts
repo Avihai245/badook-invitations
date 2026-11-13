@@ -375,19 +375,18 @@ describe('save-the-date → its full invitation (source_id)', () => {
   });
 
   it('nobody can attach their invitation to someone else’s save-the-date (direct writes included)', async () => {
-    const hijack = (sql: string, params: unknown[]) =>
-      as(c, 'authenticated', OWNER_B, () => c.query(sql, params));
-    await expect(
-      hijack(
-        `insert into invitations (owner_id, template_id, slug, status, event_type, draft, published, source_id)
-         values ($1, 'sahar-bordeaux', 'fu-hijack', 'published', 'wedding', $2, $2, $3)`,
-        [OWNER_B, doc, stdId],
-      ),
-    ).rejects.toThrow(/source_id/);
+    const insert = `insert into invitations (owner_id, template_id, slug, status, event_type, draft, published, source_id)
+         values ($1, 'sahar-bordeaux', 'fu-hijack', 'published', 'wedding', $2, $2, $3)`;
     const own = (await c.query(`select id from invitations where owner_id = $1 limit 1`, [OWNER_B])).rows[0]
       .id;
-    await expect(hijack(`update invitations set source_id = $1 where id = $2`, [stdId, own])).rejects.toThrow(
-      /source_id/,
-    );
+    const update = `update invitations set source_id = $1 where id = $2`;
+    // a signed-in user's own JWT writes no table at all (20261113000100_data_api_lockdown.sql)…
+    const hijack = (sql: string, params: unknown[]) =>
+      as(c, 'authenticated', OWNER_B, () => c.query(sql, params));
+    await expect(hijack(insert, [OWNER_B, doc, stdId])).rejects.toThrow(/permission denied/);
+    await expect(hijack(update, [stdId, own])).rejects.toThrow(/permission denied/);
+    // …and the table itself refuses it, whoever writes
+    await expect(c.query(insert, [OWNER_B, doc, stdId])).rejects.toThrow(/source_id/);
+    await expect(c.query(update, [stdId, own])).rejects.toThrow(/source_id/);
   });
 });

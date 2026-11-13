@@ -324,14 +324,21 @@ export async function createFollowUp(
   const doc = followUpDocument(entry.manifest, entry.defaults, source.draft, eventType);
   // "noa-and-itay-save-the-date" → "noa-and-itay"; otherwise from the names (the RPC makes it unique)
   const slug = usableSlug(followUpSlug(source.slug)) ?? usableSlug(doc.share.slug) ?? randomSlug();
-  const created = await deps.db.create(
-    userId,
-    entry.manifest.id,
-    eventType,
-    slug,
-    { ...doc, share: { ...doc.share, slug } },
-    source.id,
-  );
+  let created: { id: string; slug: string };
+  try {
+    created = await deps.db.create(
+      userId,
+      entry.manifest.id,
+      eventType,
+      slug,
+      { ...doc, share: { ...doc.share, slug } },
+      source.id,
+    );
+  } catch (err) {
+    // the save-the-date's first full invitation is free; another one counts like any invitation
+    // (the database's invitations_active_limit)
+    return refusedOverLimit(err, deps);
+  }
   return ok({ ok: true, id: created.id, slug: created.slug }, 201);
 }
 
@@ -436,7 +443,9 @@ export async function publish(userId: string, id: string, raw: unknown, deps: Ho
     if (isPremiumTemplate(entry.manifest) && !e.premiumTemplates) return fail(402, 'premium_template');
     // an animated invitation (the scroll scene) is part of the paid plans too, on any design
     if (sceneOn(draft, entry.manifest, true) && !e.premiumTemplates) return fail(402, 'premium_scene');
-    const creditOff = draft.sections.some((s) => s.type === 'footer' && s.enabled && !s.data.showCredit);
+    // the credit is the footer's: a footer turned off (the editor never does that — an API call can)
+    // takes the credit with it, which is the paid plans' too
+    const creditOff = draft.sections.some((s) => s.type === 'footer' && (!s.enabled || !s.data.showCredit));
     if (creditOff && !e.removeBranding) return fail(402, 'branding');
   }
   if (slug !== inv.slug) {

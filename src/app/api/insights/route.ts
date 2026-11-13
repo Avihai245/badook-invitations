@@ -4,6 +4,7 @@ import { beacon } from '@/features/insights/server/api';
 import { beaconDeps } from '@/features/insights/server/deps';
 import { clientIp } from '@/lib/client-ip';
 import { invitationsEnabled } from '@/lib/feature';
+import { readCappedText } from '@/lib/read-body';
 
 const HEADERS = { 'cache-control': 'no-store', 'x-robots-tag': 'noindex' };
 
@@ -16,8 +17,8 @@ const HEADERS = { 'cache-control': 'no-store', 'x-robots-tag': 'noindex' };
  */
 export async function POST(request: Request) {
   if (!invitationsEnabled()) return NextResponse.json({ ok: false }, { status: 404, headers: HEADERS });
-  const text = await request.text();
-  if (text.length > INSIGHTS.beacon.maxBytes)
+  const text = await readCappedText(request, INSIGHTS.beacon.maxBytes);
+  if (text === null)
     return NextResponse.json({ ok: false, code: 'too_large' }, { status: 413, headers: HEADERS });
   let body: unknown;
   try {

@@ -4,6 +4,7 @@ import { entitlementsFor, isAdminEmail } from '@/features/billing/server/account
 import type { Feature } from '@/features/flags/features';
 import { accountFeatures, featuresFor } from '@/features/flags/server';
 import { invitationsEnabled } from '@/lib/feature';
+import { readCappedText } from '@/lib/read-body';
 import { broadcastRefresh } from '@/lib/live/broadcast';
 import { getSessionUser } from '@/lib/supabase/session';
 import { voiceDeps } from '@/features/voice/server/deps';
@@ -57,8 +58,8 @@ export async function hostRoute(
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
       return json(415, { ok: false, code: 'unsupported_media_type' });
-    const text = await request.text();
-    if (text.length > maxBytes) return json(413, { ok: false, code: 'too_large' });
+    const text = await readCappedText(request, maxBytes);
+    if (text === null) return json(413, { ok: false, code: 'too_large' });
     try {
       body = text ? JSON.parse(text) : {};
     } catch {

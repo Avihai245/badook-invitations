@@ -269,6 +269,16 @@ test.describe('responses dashboard', () => {
     expect((await cron('Bearer wrong-secret')).status()).toBe(401);
     const first = await cron(`Bearer ${CRON_SECRET}`);
     expect(first.status()).toBe(200);
+    // the summary goes out from 08:00 on the invitation's clock (rsvp_digest_due_local): before that
+    // hour this morning's isn't due yet
+    const digestDue =
+      Number(
+        new Intl.DateTimeFormat('en-GB', {
+          hour: 'numeric',
+          hourCycle: 'h23',
+          timeZone: 'Asia/Jerusalem',
+        }).format(new Date()),
+      ) >= 8;
     // the same daily call also purges data past its keeping time (the privacy policy)
     const purged = {
       rsvpRate: expect.any(Number),
@@ -312,8 +322,10 @@ test.describe('responses dashboard', () => {
     };
     // …and the weekly planning email: tasks and payments of the coming week (features/planning)
     const planning = { sent: expect.any(Number), failed: expect.any(Number), skipped: expect.any(Number) };
+    // …and the AI photos': the people's photos and the guests' pictures 30 days after the event
+    const aiPhotos = { people: expect.any(Number), photos: expect.any(Number) };
     expect(await first.json()).toEqual({
-      sent: 1,
+      sent: digestDue ? 1 : 0,
       failed: 0,
       purged,
       overdue,
@@ -328,6 +340,7 @@ test.describe('responses dashboard', () => {
       admin,
       support,
       planning,
+      aiPhotos,
       hostEvents: expect.any(Number),
     });
     // nothing new since → nothing sent
@@ -347,6 +360,7 @@ test.describe('responses dashboard', () => {
       admin,
       support,
       planning,
+      aiPhotos,
       hostEvents: expect.any(Number),
     });
   });

@@ -215,6 +215,37 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      // Security headers on every response (a later entry that sets the same key wins: /review below).
+      {
+        source: '/:path*',
+        headers: [
+          // HTTPS only from the first visit on, for two years (no preload: that is the domain's own call)
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // a link's address (personal tokens: ?g=, ?t=, ?a=) never leaves for another site, only the origin
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // powers the app never uses, off for every page and every frame in it (the camera is the
+          // station's scanner and the face search; payment stays the default, for Tranzila's frame)
+          {
+            key: 'Permissions-Policy',
+            value:
+              'camera=(self), microphone=(), geolocation=(), usb=(), serial=(), hid=(), bluetooth=(), midi=(), display-capture=(), browsing-topics=()',
+          },
+        ],
+      },
+      {
+        // No page is framed by another site (the editor's preview, the home page's sample and the
+        // template previews are this origin's own): clickjacking is off. Tranzila's return page is the
+        // one exception — it opens inside Tranzila's payment frame and only sends the top window on.
+        source: '/((?!api/billing/tranzila/return).*)',
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'",
+          },
+        ],
+      },
       // Files versioned by name or folder — safe to cache forever (Amplify's CDN reads the same rules
       // from customHttp.yml; these serve `next start` and any other host):
       //   /fonts/<family>/<version>/…   /video/<name>.<hash>.<ext>   /brand/<name>-<w>.<hash>.<ext>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { openGuestLink } from '@/features/invitations/server/guests';
 import { invitationsEnabled } from '@/lib/feature';
+import { readCappedJson } from '@/lib/read-body';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 
@@ -11,7 +12,7 @@ const NO_STORE = { 'cache-control': 'no-store' };
  */
 export async function POST(request: Request) {
   if (!invitationsEnabled()) return NextResponse.json({ ok: false }, { status: 404, headers: NO_STORE });
-  const body = (await request.json().catch(() => null)) as { slug?: unknown; token?: unknown } | null;
+  const body = (await readCappedJson(request, 8 * 1024)) as { slug?: unknown; token?: unknown } | null;
   const slug = typeof body?.slug === 'string' ? body.slug : '';
   const token = typeof body?.token === 'string' ? body.token : '';
   try {

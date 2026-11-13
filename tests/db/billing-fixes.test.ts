@@ -211,6 +211,36 @@ describe('the plan’s limit on active invitations', () => {
     expect(await active(OWNER2)).toBe(1);
   });
 
+  it('a save-the-date’s first full invitation is free — a second one counts like any other', async () => {
+    const OWNER3 = '66666666-6666-4666-8666-666666666664';
+    await c.query(`insert into auth.users (id, email) values ($1, 'std@example.com')`, [OWNER3]);
+    await commit('account_get', [OWNER3]);
+    const std = await commit<{ id: string }>('create_invitation', [
+      OWNER3,
+      'sahar-bordeaux',
+      'save_the_date',
+      'std-limit',
+      doc,
+    ]);
+    await commit('account_note_limit', [OWNER3, 1]);
+    const followUp = (slug: string) =>
+      commit<{ id: string }>('create_invitation', [OWNER3, 'sahar-bordeaux', 'wedding', slug, doc, std.id]);
+    // the save-the-date fills the plan; its full invitation still comes free
+    const full = await followUp('std-limit-full');
+    // …but only one: more of them would be free invitations without end
+    await expect(followUp('std-limit-more')).rejects.toThrow(/plan_limit/);
+    // the first one archived: its replacement is the free one now, and coming back would make two
+    await commit('set_invitation_archived', [full.id, OWNER3, true]);
+    const again = await followUp('std-limit-again');
+    await expect(commit('set_invitation_archived', [full.id, OWNER3, false])).rejects.toThrow(/plan_limit/);
+    // editing and publishing the free one is never stopped
+    await commit('publish_invitation', [again.id, OWNER3]);
+    // with room in the plan, a second one is fine (and counts)
+    await commit('account_note_limit', [OWNER3, 2]);
+    await commit('set_invitation_archived', [full.id, OWNER3, false]);
+    await expect(followUp('std-limit-third')).rejects.toThrow(/plan_limit/);
+  });
+
   it('none of the new functions is reachable with the public keys', async () => {
     for (const role of ['anon', 'authenticated'] as const) {
       for (const sql of [

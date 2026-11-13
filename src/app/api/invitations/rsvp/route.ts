@@ -9,6 +9,7 @@ import { clientIp } from '@/lib/client-ip';
 import { serverEnv } from '@/lib/env';
 import { invitationsEnabled } from '@/lib/feature';
 import { serviceDb } from '@/lib/supabase/server';
+import { readCappedText } from '@/lib/read-body';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 /** The longest a guest waits for the host's notification email to be handed to the provider. */
@@ -59,7 +60,10 @@ export async function POST(request: Request) {
   if (declared > MAX_BODY_BYTES)
     return Response.json({ ok: false, code: 'invalid' }, { status: 413, headers: NO_STORE });
   try {
-    const { status, body, saved } = await handleRsvp(await request.text(), clientIp(request), deps());
+    const text = await readCappedText(request, MAX_BODY_BYTES);
+    if (text === null)
+      return Response.json({ ok: false, code: 'invalid' }, { status: 413, headers: NO_STORE });
+    const { status, body, saved } = await handleRsvp(text, clientIp(request), deps());
     // the host's email goes out before we answer (a serverless function may freeze right after the
     // response), but a slow or failing mail provider never holds the guest up or fails the reply
     if (saved) {

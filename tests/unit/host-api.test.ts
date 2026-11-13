@@ -268,6 +268,25 @@ describe('save-the-date flow', () => {
       expect(d.db.create).not.toHaveBeenCalled();
     }
   });
+
+  it('another full invitation of the same save-the-date over the plan’s limit: the 402, not an error', async () => {
+    const d = {
+      ...deps({
+        get: vi.fn(async () => saveTheDate()),
+        create: vi.fn(async () => {
+          throw Object.assign(new Error('create_invitation: plan_limit'), { code: 'P0001' });
+        }),
+      }),
+      entitlements: vi.fn(async () => ({
+        activeInvitations: 1,
+        used: 1,
+      })) as unknown as HostDeps['entitlements'],
+    };
+    expect(await createFollowUp(USER, ID, { eventType: 'wedding' }, d)).toEqual({
+      status: 402,
+      body: { ok: false, code: 'plan_limit', limit: 1 },
+    });
+  });
 });
 
 describe('a save-the-date’s full invitation', () => {
@@ -622,5 +641,20 @@ describe('the plan’s limits', () => {
     expect((await publish(USER, ID, {}, pro)).status).toBe(200);
     const withCredit = { ...deps(), entitlements: limits({ removeBranding: false }) };
     expect((await publish(USER, ID, {}, withCredit)).status).toBe(200);
+  });
+
+  it('turning the whole footer off doesn’t take the credit off for free', async () => {
+    const noFooter = () =>
+      invitation({}, (doc) => {
+        for (const s of doc.sections) if (s.type === 'footer') s.enabled = false;
+      });
+    const free = {
+      ...deps({ get: vi.fn(async () => noFooter()) }),
+      entitlements: limits({ removeBranding: false }),
+    };
+    expect(await publish(USER, ID, {}, free)).toEqual({ status: 402, body: { ok: false, code: 'branding' } });
+    expect(free.db.publish).not.toHaveBeenCalled();
+    const pro = { ...free, entitlements: limits({ removeBranding: true }) };
+    expect((await publish(USER, ID, {}, pro)).status).toBe(200);
   });
 });

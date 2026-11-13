@@ -172,11 +172,14 @@ function guestWorld(
   };
   const items = new Map<string, { row: ItemRow; uploader: string }>();
   const rateAnswers = new Map<string, boolean>();
+  /** hits already in the window, per key (the non-counting peek) */
+  const ratePeeks = new Map<string, number>();
   const db = {
     byToken: vi.fn(async (hash: string, kind: 'upload' | 'projector') =>
       (kind === 'upload' ? gallery.uploadTokenHash : gallery.projectorTokenHash) === hash ? lookup : null,
     ),
     rateHit: vi.fn(async (key: string) => rateAnswers.get(key) ?? true),
+    ratePeek: vi.fn(async (key: string) => ratePeeks.get(key) ?? 0),
     reserve: vi.fn(
       async (
         ..._args: Parameters<GuestDeps['db']['reserve']>
@@ -253,6 +256,7 @@ function guestWorld(
     items,
     add,
     rateAnswers,
+    ratePeeks,
     token: upload.token,
     projector: projector.token,
     gallery,
@@ -391,6 +395,26 @@ describe('the link and the gallery’s state', () => {
     expect((await guest.guestFeed({ t: w.token, code: 'NOA-2026' }, IP, w.deps)).status).toBe(200);
     w.rateAnswers.set(codeKey, false);
     expect((await guest.guestFeed({ t: w.token, code: 'guess' }, IP, w.deps)).status).toBe(429);
+  });
+
+  it('an address over the limit is refused even with the right code (no brute force)', async () => {
+    const salt = tokens.randomId();
+    const w = guestWorld({
+      gallery: { accessCodeHash: tokens.codeHash('1234', salt), accessCodeSalt: salt },
+    });
+    const codeKey = tokens.rateKey('code', `${INV}:${IP}`);
+    // the right code, under the limit: in, and a right code is never counted
+    expect((await guest.guestFeed({ t: w.token, code: '1234' }, IP, w.deps)).status).toBe(200);
+    expect(w.db.rateHit).not.toHaveBeenCalledWith(codeKey, expect.anything(), expect.anything());
+    // ten wrong guesses in the window: every attempt from that address is refused, the right one too
+    w.ratePeeks.set(codeKey, GALLERY.rate.codePerAddress.count);
+    expect(await guest.guestFeed({ t: w.token, code: '1234' }, IP, w.deps)).toMatchObject({
+      status: 429,
+      body: { code: 'rate' },
+    });
+    expect(w.db.ratePeek).toHaveBeenCalledWith(codeKey, GALLERY.rate.codePerAddress.windowSeconds);
+    // another address isn't affected
+    expect((await guest.guestFeed({ t: w.token, code: '1234' }, '198.51.100.7', w.deps)).status).toBe(200);
   });
 });
 
@@ -664,6 +688,42 @@ describe('finishing an upload', () => {
         expect(saved.metrics).toMatchObject({ aiNsfw: answer.nsfw, aiQuality: answer.quality });
       if (i === 2) expect(w.deps.broadcast).toHaveBeenCalledTimes(1);
     }
+  });
+
+  it('the check reads the thumbnail the server made from the display version, not the browser’s', async () => {
+    const fromDisplay = new Uint8Array([1, 2, 3]);
+    const seen: Uint8Array[] = [];
+    const check = vi.fn(async (bytes: Uint8Array): Promise<AiResult> => {
+      seen.push(bytes);
+      return { status: 'ok', nsfw: 0.95, quality: 0.8, reason: 'nudity' };
+    });
+    const w = guestWorld({ check });
+    const rethumb = vi.fn(async () => fromDisplay);
+    w.deps.rethumb = rethumb;
+    const r = w.add();
+    done(w, r);
+    const res = await guest.guestComplete(
+      { t: w.token, uploader: UPLOADER, id: r.id, originalDone: false, metrics },
+      IP,
+      w.deps,
+    );
+    expect(rethumb).toHaveBeenCalledWith(r.displayPath, r.thumbPath);
+    expect(seen).toEqual([fromDisplay]);
+    expect(w.storage.download).not.toHaveBeenCalledWith('gallery-media', r.thumbPath);
+    expect(res.body).toMatchObject({ status: 'rejected', reason: 'unsafe' });
+    // a display version the server can't read is never published unchecked
+    const broken = guestWorld({ check });
+    broken.deps.rethumb = vi.fn(async () => {
+      throw new Error('not an image');
+    });
+    const b = broken.add();
+    done(broken, b);
+    const res2 = await guest.guestComplete(
+      { t: broken.token, uploader: UPLOADER, id: b.id, originalDone: false, metrics },
+      IP,
+      broken.deps,
+    );
+    expect(res2.body).toMatchObject({ status: 'pending', reason: 'unchecked' });
   });
 
   it('without the feature, or without a model on this server, nothing is sent to the AI', async () => {
@@ -1484,5 +1544,23 @@ describe('the list of tag requests', () => {
     expect(host.tagsCsv([], 'Asia/Jerusalem', cols).slice(1)).toBe(
       'Instagram username,Profile link,Name,Photos,First shared,Files',
     );
+  });
+});
+
+describe('the server-made thumbnail', () => {
+  it('is the display version scaled to the thumbnail’s edge, upright, in its format', async () => {
+    const sharp = (await import('sharp')).default;
+    const { makeThumbnail } = await import('@/features/live-gallery/server/thumbnail');
+    const display = await sharp({
+      create: { width: 1600, height: 1200, channels: 3, background: { r: 200, g: 30, b: 30 } },
+    })
+      .jpeg()
+      .toBuffer();
+    for (const format of ['jpeg', 'webp'] as const) {
+      const meta = await sharp(await makeThumbnail(new Uint8Array(display), format)).metadata();
+      expect(meta.format).toBe(format);
+      expect(Math.max(meta.width!, meta.height!)).toBe(GALLERY.image.thumbMaxEdge);
+      expect(meta.width! / meta.height!).toBeCloseTo(4 / 3, 1);
+    }
   });
 });
