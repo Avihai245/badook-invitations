@@ -9,6 +9,7 @@ import { serviceDb } from '@/lib/supabase/server';
 import { getSessionUser } from '@/lib/supabase/session';
 import type { ApiResult, SaveAnswer, SeatingDeps } from './api';
 import { seatingAi } from './server-ai';
+import { readCappedText } from '@/lib/read-body';
 
 /** The floor plans' bucket (supabase/migrations/*_seating.sql). */
 export const PLAN_BUCKET = 'venue-plans';
@@ -88,8 +89,8 @@ export async function seatingRoute(
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
       return json(415, { ok: false, code: 'unsupported_media_type' });
-    const text = await request.text();
-    if (text.length > MAX_SEATING_JSON) return json(413, { ok: false, code: 'too_large' });
+    const text = await readCappedText(request, MAX_SEATING_JSON);
+    if (text === null) return json(413, { ok: false, code: 'too_large' });
     try {
       body = text ? JSON.parse(text) : {};
     } catch {

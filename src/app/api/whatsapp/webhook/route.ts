@@ -10,6 +10,7 @@ import { noticesDb } from '@/features/whatsapp/notices';
 import { whatsappDb } from '@/features/whatsapp/sender';
 import { serverEnv } from '@/lib/env';
 import { sameSecret } from '@/lib/secrets';
+import { readCappedText } from '@/lib/read-body';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 
@@ -31,7 +32,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const raw = await request.text();
+  // Meta's notices are a few KB (a batch of statuses at most): anything far bigger isn't one
+  const raw = await readCappedText(request, 2 * 1024 * 1024);
+  if (raw === null) return new Response('Too large', { status: 413 });
   if (
     !validSignature(raw, request.headers.get('x-hub-signature-256'), serverEnv().INVITES_WHATSAPP_APP_SECRET)
   )

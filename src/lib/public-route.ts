@@ -2,6 +2,7 @@ import 'server-only';
 import { NextResponse } from 'next/server';
 import { clientIp } from '@/lib/client-ip';
 import { invitationsEnabled } from '@/lib/feature';
+import { readCappedText } from '@/lib/read-body';
 
 const HEADERS = { 'cache-control': 'no-store', 'x-robots-tag': 'noindex' };
 
@@ -20,8 +21,8 @@ export async function publicJsonRoute(
   if (!invitationsEnabled()) return json(404, { ok: false, code: 'not_found' });
   if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
     return json(415, { ok: false, code: 'unsupported_media_type' });
-  const text = await request.text();
-  if (text.length > maxBytes) return json(413, { ok: false, code: 'too_large' });
+  const text = await readCappedText(request, maxBytes);
+  if (text === null) return json(413, { ok: false, code: 'too_large' });
   let body: unknown;
   try {
     body = text ? JSON.parse(text) : {};

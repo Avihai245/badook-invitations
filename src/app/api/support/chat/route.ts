@@ -3,6 +3,7 @@ import { supportChat } from '@/features/support/chat';
 import { clientIp } from '@/lib/client-ip';
 import { requestBaseUrl } from '@/lib/request-url';
 import { getSessionUser } from '@/lib/supabase/session';
+import { readCappedJson } from '@/lib/read-body';
 
 const NO_STORE = { 'cache-control': 'no-store' };
 
@@ -11,7 +12,7 @@ const NO_STORE = { 'cache-control': 'no-store' };
  * answer as a text stream.
  */
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => null)) as unknown;
+  const body = (await readCappedJson(request, 256 * 1024)) as unknown;
   try {
     const user = await getSessionUser().catch(() => null);
     if (!user)

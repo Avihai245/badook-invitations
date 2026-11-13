@@ -2,6 +2,7 @@ import 'server-only';
 import type { User } from '@supabase/supabase-js';
 import { z } from 'zod';
 import type { ApiResult } from '@/features/invitations/server/host-api';
+import { isAdminEmail } from '@/features/billing/server/account';
 import { serverEnv } from '@/lib/env';
 import { signActAs } from '@/lib/supabase/act-as-token';
 import { isSuspended } from '@/lib/supabase/auth-paths';
@@ -21,6 +22,18 @@ export async function mayActAs(user: Pick<User, 'id'>): Promise<boolean> {
     .whoami(user.id, serverEnv().INVITES_ADMIN_EMAILS)
     .catch((err) => (console.error('[admin] act as: whoami', err), null));
   return !!who && can(who.role, ACT_AS_PERMISSION);
+}
+
+/**
+ * The customer may still be acted as: not staff — checked on every request of an act-as session, not
+ * only when it starts (someone made staff during the hour isn't reachable that way). Fails closed.
+ */
+export async function mayBeActedAs(user: Pick<User, 'id' | 'email'>): Promise<boolean> {
+  if (isAdminEmail(user.email)) return false;
+  return adminDb.isStaff(user.id).then(
+    (staff) => !staff,
+    (err) => (console.error('[admin] act as: is staff', err), false),
+  );
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

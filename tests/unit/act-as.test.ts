@@ -2,6 +2,8 @@ import type { User } from '@supabase/supabase-js';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
+const isStaffNow = vi.fn(async (_id: string) => false);
+vi.mock('@/features/admin/server/db', () => ({ adminDb: { isStaff: (id: string) => isStaffNow(id) } }));
 
 const STAFF = '11111111-1111-4111-8111-111111111111';
 const CUSTOMER = '22222222-2222-4222-8222-222222222222';
@@ -78,5 +80,21 @@ describe('acting as a customer: starting', () => {
     expect(await code('not-a-uuid', reason)).toBe('not_found');
     expect(await code(CUSTOMER, { reason: '' })).toBe('invalid');
     expect(await code(CUSTOMER, { reason: 'ok', extra: 1 })).toBe('invalid');
+  });
+});
+
+describe('an act-as session, on every request', () => {
+  const CUSTOMER_ID = '22222222-2222-4222-8222-222222222222';
+  const customer = { id: CUSTOMER_ID, email: 'dana@example.com' };
+
+  it('ends once its customer is made staff (not only checked when it starts); fails closed', async () => {
+    const { mayBeActedAs } = await import('@/features/admin/server/act-as');
+    isStaffNow.mockResolvedValueOnce(false);
+    expect(await mayBeActedAs(customer)).toBe(true);
+    isStaffNow.mockResolvedValueOnce(true);
+    expect(await mayBeActedAs(customer)).toBe(false);
+    isStaffNow.mockRejectedValueOnce(new Error('db down'));
+    expect(await mayBeActedAs(customer)).toBe(false);
+    expect(isStaffNow).toHaveBeenLastCalledWith(CUSTOMER_ID);
   });
 });

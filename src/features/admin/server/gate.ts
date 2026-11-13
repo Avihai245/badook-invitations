@@ -11,6 +11,7 @@ import { serviceDb } from '@/lib/supabase/server';
 import { getRealUser } from '@/lib/supabase/session';
 import { can, permissionsOf, type Permission, type StaffRole } from '../permissions';
 import { AdminDbError, adminDb } from './db';
+import { readCappedText } from '@/lib/read-body';
 
 /**
  * Who may open the admin console (/app/admin) and do what there. The signed-in user's role comes from
@@ -100,8 +101,8 @@ export async function adminRoute(
   if (change) {
     if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
       return json(415, { ok: false, code: 'unsupported_media_type' });
-    const text = await request.text();
-    if (text.length > maxBytes) return json(413, { ok: false, code: 'too_large' });
+    const text = await readCappedText(request, maxBytes);
+    if (text === null) return json(413, { ok: false, code: 'too_large' });
     try {
       body = text ? JSON.parse(text) : {};
     } catch {

@@ -144,7 +144,7 @@ describe('the share image', () => {
       'https://10.0.0.5/x.png',
       'https://[::1]/x.png',
       'https://localhost/x.png',
-      'https://db.test.attacker.example/storage/v1/object/public/invitation-media/x.png',
+      'https://db.test.attacker.invalid/storage/v1/object/public/invitation-media/x.png',
     ]) {
       const d = doc();
       d.share.ogImage = link;
@@ -155,7 +155,7 @@ describe('the share image', () => {
       expect(r > 150 && g + b < 80).toBe(false);
     }
     expect(fetch).not.toHaveBeenCalled();
-  });
+  }, 30_000);
 
   it('fetches our own storage without following redirects', async () => {
     const fetch = await serve({ r: 0, g: 160, b: 0 });

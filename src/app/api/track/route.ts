@@ -3,6 +3,7 @@ import { ownerInvitation } from '@/features/invitations/app/workspace/data';
 import { invitationsEnabled } from '@/lib/feature';
 import { getSessionUser } from '@/lib/supabase/session';
 import { serviceDb } from '@/lib/supabase/server';
+import { readCappedText } from '@/lib/read-body';
 
 const HEADERS = { 'cache-control': 'no-store', 'x-robots-tag': 'noindex' };
 const MAX_BYTES = 4 * 1024;
@@ -16,8 +17,8 @@ export async function POST(request: Request) {
   if (!invitationsEnabled()) return new Response(null, { status: 404, headers: HEADERS });
   if (!(request.headers.get('content-type') ?? '').startsWith('application/json'))
     return new Response(null, { status: 415, headers: HEADERS });
-  const text = await request.text();
-  if (text.length > MAX_BYTES) return new Response(null, { status: 413, headers: HEADERS });
+  const text = await readCappedText(request, MAX_BYTES);
+  if (text === null) return new Response(null, { status: 413, headers: HEADERS });
   let body: unknown;
   try {
     body = JSON.parse(text);

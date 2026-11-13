@@ -25,6 +25,7 @@ import { PROPS } from './scene/props';
 import { Scene } from './scenes';
 import { resolvePalette } from './theme';
 import { endOfDayUtc } from '../lib/dates';
+import { cssUrl } from '../lib/css-url';
 
 /**
  * A tap on the cover before React has taken over (its scripts still loading on a slow connection)
@@ -93,7 +94,7 @@ function sceneVars(ctx: RenderContext): CSSProperties | undefined {
     '--sc-shade': scene.shade,
     '--sc-text': scene.text,
     '--sc-track': `${scene.tracking}em`,
-    ...(first ? { '--sc-desk': `url("${imageAt(first.fallback ?? first.src, 640)}")` } : {}),
+    ...(first ? { '--sc-desk': cssUrl(imageAt(first.fallback ?? first.src, 640)) } : {}),
   } as CSSProperties;
 }
 

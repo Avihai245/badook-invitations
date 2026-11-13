@@ -58,7 +58,8 @@ export interface ActingAs {
 /**
  * A staff member acting as a customer for remote support (started from the console's user page):
  * only with a valid signed claim for this very staff member, while they still have the permission,
- * for a customer who exists and isn't suspended — anything else and they're just themself again.
+ * for a customer who exists, isn't suspended and isn't staff — anything else and they're just themself
+ * again.
  */
 export const getActingAs = cache(async (): Promise<ActingAs | null> => {
   const raw = (await cookies()).get(ACT_AS_COOKIE)?.value;
@@ -68,10 +69,11 @@ export const getActingAs = cache(async (): Promise<ActingAs | null> => {
   const staff = await getRealUser();
   if (!staff || staff.id !== claim.staffId || claim.targetId === staff.id) return null;
   // imported here: the console's code imports this module
-  const { mayActAs } = await import('@/features/admin/server/act-as');
+  const { mayActAs, mayBeActedAs } = await import('@/features/admin/server/act-as');
   if (!(await mayActAs(staff))) return null;
   const { data, error } = await serviceDb().auth.admin.getUserById(claim.targetId);
   if (error || !data.user || isSuspended(data.user)) return null;
+  if (!(await mayBeActedAs(data.user))) return null;
   return { staff, target: data.user };
 });
 

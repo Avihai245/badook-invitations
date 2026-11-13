@@ -43,9 +43,19 @@ export function outlookCalendarUrl(e: CalendarEvent): string {
   return `https://outlook.live.com/calendar/0/deeplink/compose?${p.toString()}`;
 }
 
-/** Escape TEXT values: backslash, comma, semicolon, newline (RFC 5545 §3.3.11). */
+/** Escape TEXT values: backslash, comma, semicolon, newline — CRLF, LF or a lone CR (RFC 5545 §3.3.11). */
 export const escapeIcsText = (s: string) =>
-  s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  s
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r\n|\r|\n/g, '\\n');
+
+/**
+ * A value that isn't TEXT (the UID, the URL): no control character at all — a line break in a host's
+ * venue id would otherwise start a property of its own (an alarm, an attachment) in the guests' calendars.
+ */
+const icsValue = (s: string) => s.replace(/[\u0000-\u001f\u007f]/g, '');
 
 /** Fold content lines longer than 75 octets (RFC 5545 §3.1), never splitting a UTF-8 sequence. */
 export function foldIcsLine(line: string): string {
@@ -77,14 +87,14 @@ export function buildIcs(e: CalendarEvent, now: Date = new Date()): string {
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:${e.uid}`,
+    `UID:${icsValue(e.uid)}`,
     `DTSTAMP:${utcStamp(now)}`,
     `DTSTART:${utcStamp(e.start)}`,
     `DTEND:${utcStamp(e.end)}`,
     `SUMMARY:${escapeIcsText(e.title)}`,
     `LOCATION:${escapeIcsText(e.location)}`,
     ...(e.description ? [`DESCRIPTION:${escapeIcsText(e.description)}`] : []),
-    ...(e.url ? [`URL:${e.url}`] : []),
+    ...(e.url ? [`URL:${icsValue(e.url)}`] : []),
     'END:VEVENT',
     'END:VCALENDAR',
   ];
